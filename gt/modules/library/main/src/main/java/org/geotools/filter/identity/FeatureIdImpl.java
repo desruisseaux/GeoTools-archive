@@ -30,17 +30,17 @@ public class FeatureIdImpl implements FeatureId {
 		return feature != null && fid.equals( feature.getID() );
 	}
 
-	public boolean matches(Object object) {
-		if ( object instanceof Feature ) {
-			return matches( (Feature) object );
-		}
-		
-		if ( object instanceof org.geotools.feature.Feature ) {
-			return fid.equals( ( (org.geotools.feature.Feature) object ).getID() );
-		}
-		
-		return false;
-	}
+//	public boolean matches(Object object) {
+//		if ( object instanceof Feature ) {
+//			return matches( (Feature) object );
+//		}
+//		
+//		if ( object instanceof org.geotools.feature.Feature ) {
+//			return fid.equals( ( (org.geotools.feature.Feature) object ).getID() );
+//		}
+//		
+//		return false;
+//	}
 
 	public String toString() {
 		return fid;
@@ -57,6 +57,5 @@ public class FeatureIdImpl implements FeatureId {
 	public int hashCode() {
 		return fid.hashCode();
 	}
-	
-	
+
 }

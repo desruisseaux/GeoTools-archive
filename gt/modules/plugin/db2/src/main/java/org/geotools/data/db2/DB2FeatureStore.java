@@ -84,7 +84,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
         if (getSchema() != null) {
             typeName = getSchema().getTypeName();
             GeometryAttributeType geomType = getSchema()
-                .getPrimaryGeometry();
+                .getDefaultGeometry();
 
             if (query.getFilter() != Filter.EXCLUDE) {
                 String sqlStmt = null;
@@ -177,7 +177,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
 
 		if (getSchema() != null) {
 			typeName = getSchema().getTypeName();
-			GeometryAttributeType geomType = getSchema().getPrimaryGeometry();
+			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
 
 			if (filter != Filter.EXCLUDE) {
 				DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore) 

@@ -1413,8 +1413,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
         }
 
-        assertNull(type.getPrimaryGeometry());
-        assertEquals(type.getPrimaryGeometry(), actual.getPrimaryGeometry());
+        assertNull(type.getDefaultGeometry());
+        assertEquals(type.getDefaultGeometry(), actual.getDefaultGeometry());
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();

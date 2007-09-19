@@ -96,7 +96,7 @@ public class PointCoveredByEndPointOfLineValidation
 
         for (int i = 0; i < lines.length; i++) {
             Feature tmp = (Feature) lines[i];
-            Geometry gt = tmp.getPrimaryGeometry();
+            Geometry gt = tmp.getDefaultGeometry();
 
             if (gt instanceof LineString) {
                 LineString ls = (LineString) gt;
@@ -105,7 +105,7 @@ public class PointCoveredByEndPointOfLineValidation
 
                 for (int j = 0; j < points.length; j++) {
                     Feature tmp2 = (Feature) points[j];
-                    Geometry gt2 = tmp2.getPrimaryGeometry();
+                    Geometry gt2 = tmp2.getDefaultGeometry();
 
                     if (gt2 instanceof Point) {
                         Point pt = (Point) gt2;

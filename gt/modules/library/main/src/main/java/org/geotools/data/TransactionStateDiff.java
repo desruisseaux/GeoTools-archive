@@ -32,6 +32,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
@@ -350,183 +352,128 @@ public class TransactionStateDiff implements State {
     
     public static final Feature NULL=new Feature( ){
 
-		public Object getAttribute(String arg0) {
-			return null;
-		}
+        public Object getAttribute(String path) {
+            return null;
+        }
 
-		public Object getAttribute(int arg0) {
-			return null;
-		}
+        public Object getAttribute(int index) {
+            return null;
+        }
 
-		public Object[] getAttributes(Object[] arg0) {
-			return null;
-		}
+        public Object[] getAttributes(Object[] attributes) {
+            return null;
+        }
 
-		public ReferencedEnvelope getBounds() {
-			return null;
-		}
+        public ReferencedEnvelope getBounds() {
+            return null;
+        }
 
-		public Geometry getPrimaryGeometry() {
-			return null;
-		}
+        public Geometry getDefaultGeometry() {
+            return null;
+        }
+
+        public FeatureType getFeatureType() {
+            return null;
+        }
+
+        public String getID() {
+            return null;
+        }
+
+        public int getNumberOfAttributes() {
+            return 0;
+        }
+
+        public void setAttribute(int position, Object val) {
+        }
+
+        public void setAttribute(String path, Object attribute)
+                throws IllegalAttributeException {
+        }
+
+        public void setDefaultGeometry(Geometry geometry)
+                throws IllegalAttributeException {
+        }
+
+        public Object getAttribute(Name name) {
+            return null;
+        }
+
+        public int getAttributeCount() {
+            return 0;
+        }
+
+        public List<Object> getAttributes() {
+            return null;
+        }
+
+        public SimpleFeatureType getType() {
+            return null;
+        }
+
+        public void setAttribute(Name name, Object value) {
+        }
+
+        public void setAttributes(List<Object> values) {
+        }
+
+        public void setAttributes(Object[] values) {
+        }
+
+        public void setDefaultGeometry(Object geometry) {
+        }
+
+        public GeometryAttribute getDefaultGeometryProperty() {
+            return null;
+        }
+
+        public void setDefaultGeometryProperty(
+                GeometryAttribute geometryAttribute) {
+        }
+
+        public Collection<Property> getProperties(Name name) {
+            return null;
+        }
+
+        public Collection<Property> getProperties(String name) {
+            return null;
+        }
+
+        public Property getProperty(Name name) {
+            return null;
+        }
+
+        public Property getProperty(String name) {
+            return null;
+        }
+
+        public Collection<? extends Property> getValue() {
+            return null;
+        }
+
+        public void setValue(Collection<Property> values) {
+        }
+
+        public AttributeDescriptor getDescriptor() {
+            return null;
+        }
+
+        public Name getName() {
+            return null;
+        }
+
+        public Map<Object, Object> getUserData() {
+            return null;
+        }
+
+        public boolean isNillable() {
+            return false;
+        }
+
+        public void setValue(Object newValue) {
+        }
+
 		
-		public FeatureType getFeatureType() {
-			return null;
-		}
-
-		public String getID() {
-			return null;
-		}
-
-		public int getNumberOfAttributes() {
-			return 0;
-		}
-
-		public void setAttribute(int arg0, Object arg1) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {			
-		}
-
-		public void setAttribute(String arg0, Object arg1) throws IllegalAttributeException {
-		}
-
-		public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-		}
-
-		public Object getDefaultGeometryValue() {
-			return null;
-		}
-
-		public AttributeType getType() {
-			return null;
-		}
-
-		public List getTypes() {
-			return null;
-		}
-
-		public Object getValue(String name) {
-			return null;
-		}
-
-		public Object getValue(int index) {
-			return null;
-		}
-
-		public List getValues() {
-			return null;
-		}
-
-		public Object operation(String name, Object parameters) {
-			return null;
-		}
-
-		public void setDefaultGeometryValue(Object geometry) {			
-		}
-
-		public void setValue(String name, Object value) {
-		}
-
-		public void setValue(int index, Object value) {
-		}
-
-		public void setValues(List values) {
-		}
-
-		public void setValues(Object[] values) {
-		}
-
-		public CoordinateReferenceSystem getCRS() {
-			return null;
-		}
-
-		public GeometryAttribute getDefaultGeometry() {
-			return null;
-		}
-
-		public Object getUserData(Object key) {
-			return null;
-		}
-
-		public void putUserData(Object key, Object value) {
-		}
-
-		public void setCRS(CoordinateReferenceSystem crs) {
-		}
-
-		public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public Collection associations() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public Collection attributes() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public Object get() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public List get(Name name) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public AttributeDescriptor getDescriptor() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public void set(Object newValue) throws IllegalArgumentException {
-			// TODO Auto-generated method stub
-			
-		}
-
-		public boolean nillable() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		public Object operation(Name name, List parameters) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public PropertyDescriptor descriptor() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public Name name() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-        public List getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public Object getValue() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public void setValue( List values ) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        public void setValue( Object values ) {
-            // TODO Auto-generated method stub
-            
-        }
-    	
     };
 
 

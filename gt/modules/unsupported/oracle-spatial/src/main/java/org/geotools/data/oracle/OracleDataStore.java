@@ -512,7 +512,7 @@ public class OracleDataStore extends JDBCDataStore {
             LOGGER.finer("returning bounds " + retEnv);
 
             if ((schemaNew != null) && (schemaNew.getDefaultGeometry() != null))
-                return new ReferencedEnvelope(retEnv, schemaNew.getPrimaryGeometry()
+                return new ReferencedEnvelope(retEnv, schemaNew.getDefaultGeometry()
                         .getCoordinateSystem());
             if (query.getCoordinateSystem() != null)
                 return new ReferencedEnvelope(retEnv, query.getCoordinateSystem());

@@ -34,7 +34,7 @@ public class PointLazySearchCollectionTest extends TestCaseSupport {
 		ds=new IndexedShapefileDataStore(file.toURL());
 		ds.buildQuadTree(0);
 		tree = openQuadTree();
-		crs=ds.getSchema().getPrimaryGeometry().getCoordinateSystem();
+		crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 	}
 	
 	private QuadTree openQuadTree() throws StoreException{

@@ -2,68 +2,76 @@ package org.geotools.feature.type;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.geotools.resources.Utilities;
-import org.opengis.feature.type.PropertyType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyType;
+import org.opengis.filter.Filter;
 import org.opengis.util.InternationalString;
 
 public class PropertyTypeImpl implements PropertyType {
 
 	protected final Name name;
+	protected final Class<?> binding;
 	protected final boolean isAbstract;
-	protected final Set restrictions;
+	protected final PropertyType superType;
+	protected final List<Filter> restrictions;
 	protected final InternationalString description;
-	protected final Map userData;
+	protected final Map<Object,Object> userData;
 	
 	public PropertyTypeImpl(
-		Name name, boolean isAbstract, Set restrictions, 
-		InternationalString description 
+		Name name, Class<?> binding, boolean isAbstract, List<Filter> restrictions, 
+		PropertyType superType, InternationalString description 
 	) {
 		if(name== null){
 			throw new NullPointerException("name");
 		}
+		if(binding == null) {
+		    throw new NullPointerException("binding");
+		}
 		this.name = name;
+		this.binding = binding;
 		this.isAbstract = isAbstract;
+		
 		if (restrictions == null) {
 			this.restrictions = restrictions;
 		} else {
-			this.restrictions = Collections.unmodifiableSet(restrictions);
+			this.restrictions = Collections.unmodifiableList(restrictions);
 		}
+		
+		this.superType = superType;
 		this.description = description;
-		this.userData = new HashMap();		
+		this.userData = new HashMap<Object,Object>();		
 	}
 	
 	public Name getName() {
 		return name;
 	}
 
+	public Class<?> getBinding() {
+	    return binding;
+	}
+	
 	public boolean isAbstract() {
 		return isAbstract;
 	}
 
-	public Set getRestrictions() {
+	public List<Filter> getRestrictions() {
 		return restrictions;
 	}
 
+    public PropertyType getSuper() {
+        return superType;
+    }
+	    
 	public InternationalString getDescription() {
 		return description;
 	}
 	
-	public String toString() {
-		StringBuffer sb = new StringBuffer(getClass().getName());
-		sb.append("[name=").append(name)
-			.append(", abstrsct=, ").append(isAbstract)
-			.append(", restrictions=").append(restrictions)
-			.append(", description=").append(description);
-
-		return sb.toString();
-	}
-
 	public int hashCode() {
-		return getName().hashCode()
+		return getName().hashCode() ^ getBinding().hashCode()
 				^ (getDescription() != null ? getDescription().hashCode() : 17);
 	}
 
@@ -74,10 +82,15 @@ public class PropertyTypeImpl implements PropertyType {
 		}
 		
 		PropertyType prop = (PropertyType) other;
+		
 		if (!Utilities.equals(name,prop.getName())) {
 			return false;
 		}
 
+		if (!Utilities.equals(binding, prop.getBinding())) {
+		    return false;
+		}
+		
 		if (isAbstract != prop.isAbstract()) {
 			return false;
 		}
@@ -86,24 +99,31 @@ public class PropertyTypeImpl implements PropertyType {
 			return false;
 		}
 		
+		if (!Utilities.equals(superType, prop.getSuper())) {
+		    return false;
+		}
+		
 		if (!Utilities.equals(description,prop.getDescription())) {
 			return false;
 		}
 
 		return true;
-
 	}
 
-	public Object getUserData(Object key) {
-		return userData.get( key );
+	public Map<Object,Object> getUserData() {
+	    return userData;
 	}
+	
+	public String toString() {
+        StringBuffer sb = new StringBuffer(getClass().getName()).append(":");
+        sb.append("name=").append(name)
+            .append("; binding=").append(binding)
+            .append("; isAbstrsact=, ").append(isAbstract)
+            .append("; restrictions=").append(restrictions)
+            .append("; description=").append(description)
+            .append("; super=[").append(superType).append("]");
+            
+        return sb.toString();
+    }
 
-	public void putUserData(Object key, Object value) {
-		if( value == null && userData.containsKey( key )){
-			userData.remove( key );
-		}
-		else if (value != null ){
-			userData.put( key, value );
-		}
-	}
 }

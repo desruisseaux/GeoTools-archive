@@ -398,7 +398,7 @@ public class DefaultMapLayer implements MapLayer {
 	}
 	public ReferencedEnvelope getBounds() {
 		
-		CoordinateReferenceSystem sourceCrs = featureSource.getSchema().getPrimaryGeometry()
+		CoordinateReferenceSystem sourceCrs = featureSource.getSchema().getDefaultGeometry()
 				.getCoordinateSystem();
 		ReferencedEnvelope env;
 		try {

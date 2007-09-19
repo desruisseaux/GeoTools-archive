@@ -23,10 +23,6 @@ import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.filter.expression.PropertyAccessor;
 
@@ -49,7 +45,7 @@ public class XPathPropertyAcessorTest extends TestCase {
         builder.add("theName");
         builder.add("theDescription");
         builder.add(new GeometryFactory().createPoint(new Coordinate(0, 0)));
-        target = (Feature) builder.feature("fid");
+        target = (Feature) builder.build("fid");
     }
 
     public void testSimpleXpath() {

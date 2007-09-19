@@ -1,66 +1,34 @@
 package org.geotools.feature.type;
 
-import java.util.List;
-
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyType;
 
-public class AttributeDescriptorImpl extends StructuralDescriptorImpl 
+public class AttributeDescriptorImpl extends PropertyDescriptorImpl 
 	implements AttributeDescriptor {
-	
-	protected final AttributeType type;
-	
-	protected boolean isNillable;
 	
 	protected final Object defaultValue;
 	
 	public AttributeDescriptorImpl(
 		AttributeType type, Name name, int min, int max, boolean isNillable, Object defaultValue
 	) {
-		super(name,min,max);
+	    super(type,name,min,max,isNillable);
 		
-		if (type == null) {
-			throw new NullPointerException();
-		}
-		if ((min < 0) || (max < 0) || (max < min))
-			throw new IllegalArgumentException(
-					"min("
-							+ min
-							+ ") and max("
-							+ max
-							+ ") must be positive integers and max must be greater than or equal to min");
-
-		this.type = type;
-		this.isNillable = isNillable;
 		this.defaultValue = defaultValue;
 	}
 	
-	public boolean isNillable() {
-		return isNillable;
-	}
-	
-	public AttributeType/*<?>*/ getType() {
-		return type;
+	public AttributeType getType() {
+		return (AttributeType) super.getType();
 	}
     
 	public Object getDefaultValue() {
 		return defaultValue;
 	}
 	
-    public PropertyType type() {
-        return getType();
-    }
-	
-	public void validate(List/*<Attribute>*/ content) throws NullPointerException,
-		IllegalArgumentException {
-		DescriptorValidator.validate(this, content);
-	}
-	
-	public int hashCode(){
-		return super.hashCode() ^ type.hashCode();
+    public int hashCode(){
+		return super.hashCode() ^ 
+		    (defaultValue != null ? defaultValue.hashCode() : 0 ); 
 	}
 	
 	public boolean equals(Object o){
@@ -68,20 +36,13 @@ public class AttributeDescriptorImpl extends StructuralDescriptorImpl
 			return false;
 		
 		AttributeDescriptorImpl d = (AttributeDescriptorImpl)o;
-		
-		if (!Utilities.equals( defaultValue, d.defaultValue ) ) {
-			return false;
-		}
-		
-		return super.equals(d) && type.equals(d.type) && isNillable == d.isNillable;
-			
+	
+		return super.equals(o) && Utilities.equals( defaultValue, d.defaultValue );
 	}	
 	
-	public String toString(){
-		StringBuffer sb = new StringBuffer("AttributeDescriptor ")
-		.append(name.getLocalPart())
-		.append(":")
-		.append(type.getName().getLocalPart());
-		return sb.toString();
+	public String toString() {
+	    return new StringBuffer(super.toString()).append(";defaultValue=")
+	        .append(defaultValue).toString();
 	}
+	
 }

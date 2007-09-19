@@ -422,7 +422,7 @@ public class MIFDataStoreTest extends TestCase {
             fr = getFeatureReader("grafo");
 
             Feature f = fr.next();
-            assertEquals(f.getPrimaryGeometry().getFactory().getSRID(),
+            assertEquals(f.getDefaultGeometry().getFactory().getSRID(),
                 MIFTestUtils.SRID);
 
             fr.close();

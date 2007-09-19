@@ -250,7 +250,7 @@ public class GeometryBuilder {
         // A curve will be created
         // - The curve will be set as parent curves for the Curve segments
         // - Start and end params for the CurveSegments will be set
-        List<LineSegment> segmentList = new ArrayList<LineSegment>();
+        List/*<LineSegment>*/ segmentList = new ArrayList/*<LineSegment>*/();
         for( int i=0; i<points.length();i++){
             int start = i;
             int end = (i+1)%points.size();

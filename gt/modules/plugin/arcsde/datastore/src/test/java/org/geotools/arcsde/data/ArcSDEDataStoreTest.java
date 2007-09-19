@@ -192,7 +192,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void _testAutoFillSRS() throws Throwable {
         
         ArcSDEDataStore ds = testData.getDataStore();
-        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getPrimaryGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCoordinateSystem();
         
         LOGGER.info(sdeCRS.toWKT().replaceAll(" ","").replaceAll("\n", "").replaceAll("\"", "\\\""));
         
@@ -266,12 +266,12 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals("After size()", initialPoolSize, pool.getPoolSize());
             
             
-            BBOX bbox = ff.bbox(schema.getPrimaryGeometry().getLocalName(),
+            BBOX bbox = ff.bbox(schema.getDefaultGeometry().getLocalName(),
                     layerBounds.getMinX() + 10,
                     layerBounds.getMinY() + 10,
                     layerBounds.getMaxX() - 10,
                     layerBounds.getMaxY() - 10,
-                    schema.getPrimaryGeometry().getCoordinateSystem().getName().getCode());
+                    schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
             
             for(int i = 0; i < 20; i++){
             	LOGGER.fine("Running iteration #" + i);
@@ -514,7 +514,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertNotNull(f.getFeatureType());
             assertNotNull(f.getBounds());
 
-            Geometry geom = f.getPrimaryGeometry();
+            Geometry geom = f.getDefaultGeometry();
             assertNotNull(geom);
 
             return true;
@@ -536,7 +536,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         Query q = new DefaultQuery(typeName, Filter.INCLUDE);
         FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
         FeatureType retType = reader.getFeatureType();
-        assertNotNull(retType.getPrimaryGeometry());
+        assertNotNull(retType.getDefaultGeometry());
         assertTrue(reader.hasNext());
 
         return reader;
@@ -1056,9 +1056,9 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private Filter getBBoxfilter(FeatureSource fs) throws Exception {
         FeatureType schema = fs.getSchema();
-        BBOX bbe = ff.bbox(schema.getPrimaryGeometry().getLocalName(),
+        BBOX bbe = ff.bbox(schema.getDefaultGeometry().getLocalName(),
                 -60, -55, -40, -20,
-                schema.getPrimaryGeometry().getCoordinateSystem().getName().getCode());
+                schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
         return bbe;
     }
 

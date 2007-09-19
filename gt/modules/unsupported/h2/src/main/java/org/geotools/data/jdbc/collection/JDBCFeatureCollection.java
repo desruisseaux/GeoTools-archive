@@ -376,7 +376,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		return null;
 	}
 
-	public Geometry getPrimaryGeometry() {
+	public Geometry getDefaultGeometry() {
 		return null;
 	}
 	
@@ -400,7 +400,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 		
 	}
 
-	public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
 		
 	}
 	

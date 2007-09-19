@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
@@ -33,72 +34,8 @@ import org.opengis.feature.type.Schema;
  *
  */
 public class SchemaImpl implements Schema {
-	HashMap contents;		
+	HashMap<Name,AttributeType> contents;		
 	String uri;
-	
-	Namespace namespace = new Namespace(){
-		public String getURI() {
-			return uri;
-		}
-		public Name lookup(String lookupName) {
-			if (lookupName == null) 
-				return null;
-			
-			Name name = new org.geotools.feature.Name(getURI(), lookupName ); 
-			
-			for (Iterator itr = iterator(); itr.hasNext();) {
-				Name n = (Name) itr.next();
-				if (name.equals( n )) return n;
-			}
-			
-			return null;
-		}
-		public int size() {
-			return contents.size();
-		}
-
-		public boolean isEmpty() {
-			return contents.isEmpty();
-		}
-
-		public boolean contains(Object o) {
-			return contents.keySet().contains( o );
-		}
-		public Iterator iterator() {
-			return contents.keySet().iterator();
-		}
-		public Object[] toArray() {
-			return contents.keySet().toArray();
-		}
-		public Object[] toArray(Object[] array ) {
-			return contents.keySet().toArray( array );
-		}
-		public boolean add(Object arg0) {
-			throw new UnsupportedOperationException("You may only added a Type directly to the schema");
-		}
-		public boolean remove(Object o) {
-			return contents.keySet().remove( o );
-		}
-		public boolean containsAll(Collection stuff) {
-			return contents.keySet().containsAll( stuff );
-		}
-		public boolean addAll(Collection arg0) {
-			throw new UnsupportedOperationException("You may only added a Type directly to the schema");
-		}
-		public boolean retainAll(Collection keep) {
-			return contents.keySet().retainAll( keep );
-		}
-
-		public boolean removeAll(Collection arg0) {
-			return contents.keySet().removeAll( arg0  );
-		}
-		public void clear() {
-			contents.clear();
-		}		
-		public String toString() {
-			return contents.keySet().toString();
-		}
-	};
 	
 	/** Schema constructed w/ respect to provided URI */
 	public SchemaImpl( String uri) {
@@ -107,17 +44,10 @@ public class SchemaImpl implements Schema {
 		this.contents = new HashMap();
 	}
 
-	public Set keySet() {
-		return namespace();
+	public Set<Name> keySet() {
+		return contents.keySet();
 	}
-	public Namespace namespace() {
-		return namespace;
-	}
-
-	public String toURI() {
-		return namespace().getURI();
-	}
-
+	
 	public int size() {
 		return contents.size();
 	}
@@ -134,12 +64,12 @@ public class SchemaImpl implements Schema {
 		return contents.containsValue( value );
 	}
 
-	public Object get(Object key) {
+	public AttributeType get(Object key) {
 		return contents.get( key );
 	}
 
-	public Object put(Object name, Object type) {
-		if( !(name instanceof Name) ){
+	public AttributeType put(Name name, AttributeType type) {
+	 	if( !(name instanceof Name) ){
 			throw new IllegalArgumentException("Please use a Name");
 		}
 		Name n = (Name) name;
@@ -149,28 +79,31 @@ public class SchemaImpl implements Schema {
 		if( !(type instanceof AttributeType) ){
 			throw new IllegalArgumentException("Please use an AttributeType");
 		}
-		return contents.put( name, type );
+		AttributeType t = (AttributeType) type;
+		
+		return contents.put( n, t );
 	}
 
-	public Object remove(Object key) {
-		return contents.remove( key );
+	public AttributeType remove(Object key) {
+	    return contents.remove( key );
 	}
 
-	public void putAll(Map arg0) {
-		contents.putAll( arg0 );
+	public void putAll(Map<? extends Name, ? extends AttributeType> t) {
+		contents.putAll( t );
 	}
 
 	public void clear() {
 		contents.clear();
 	}
 
-	public Collection values() {
-		return contents.values();
+	public Collection<AttributeType> values() {
+	    return contents.values();
 	}
-
-	public Set entrySet() {
-		return contents.entrySet();
+	
+	public Set<Entry<Name, AttributeType>> entrySet() {
+	 	return contents.entrySet();
 	}
+	
 	public int hashCode() {
 		return contents.hashCode();
 	}
@@ -180,7 +113,16 @@ public class SchemaImpl implements Schema {
 	public String toString() {
 		return contents.toString();
 	}
-	public Schema profile(Namespace profile) {
+	
+	public String getURI() {
+	    return uri;
+	}
+	
+	public void add(AttributeType type) {
+	    put(type.getName(),type);
+    }
+
+	public Schema profile(Set<Name> profile) {
 		return new ProfileImpl(this, profile);
 	}
 }

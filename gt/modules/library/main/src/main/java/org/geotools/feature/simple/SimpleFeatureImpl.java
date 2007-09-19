@@ -1,16 +1,16 @@
 package org.geotools.feature.simple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 
 import org.geotools.feature.FeatureImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 
 /**
  * An implementation of the SimpleFeature convience methods ontop of
@@ -28,125 +28,102 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
         super(properties, type, id);
     }
 
-    /**
-     * Retrive value by attribute name.
-     * 
-     * @param name
-     * @return Attribute Value associated with name
-     */
-    public Object getValue(String name) {
-        for (Iterator itr = super.properties.iterator(); itr.hasNext();) {
+    public SimpleFeatureType getType() {
+        return (SimpleFeatureType) super.getType();
+    }
+    
+    public SimpleFeatureType getFeatureType() {
+        return getType();
+    }
+    
+    public List<Attribute> getValue() {
+        return (List<Attribute>) super.getValue();
+    }
+    
+    public Object getAttribute(Name name) {
+        return getAttribute(name.getLocalPart());
+    }
+    
+    public void setAttribute(Name name, Object value) {
+        setAttribute( name.getLocalPart(), value );
+    }
+    
+    public Object getAttribute(String name) {
+        for (Iterator<Attribute> itr = getValue().iterator(); itr.hasNext();) {
             Attribute att = (Attribute) itr.next();
-            AttributeType type = att.getType();
-            String attName = type.getName().getLocalPart();
-            if (attName.equals(name)) {
+            if ( att.getName().getLocalPart().equals( name )) {
                 return att.getValue();
             }
         }
         return null;
     }
-
-    public Object getValue(AttributeType type) {
-        if (!super.types().contains(type)) {
-            throw new IllegalArgumentException(
-                    "this feature content model has no type " + type);
+    
+    public void setAttribute(String name, Object value) {
+        Attribute attribute = (Attribute) getProperty(name);
+        if ( attribute == null ) {
+            throw new IllegalArgumentException("No such attribute: " + name);
         }
-        for (Iterator itr = super.properties.iterator(); itr.hasNext();) {
-            Attribute att = (Attribute) itr.next();
-            if (att.getType().equals(type)) {
-                return att.getValue();
-            }
-        }
-        throw new Error();
-    }
-
-    /**
-     * Access attribute by "index" indicated by SimpleFeatureType.
-     * 
-     * @param index
-     * @return
-     */
-    public Object getValue(int index) {
-        Attribute att = (Attribute) super.properties.get(index);
-        return att == null ? null : att.getValue();
-        // return values().get(index);
-    }
-
-    /**
-     * Modify attribute with "name" indicated by SimpleFeatureType.
-     * 
-     * @param name
-     * @param value
-     */
-    public void setValue(String name, Object value) {
-        AttributeType type = ((SimpleFeatureType) getType()).getType(name);
-        List/* <AttributeType> */types = types();
-        int idx = types.indexOf(type);
-        if (idx == -1) {
-            throw new IllegalArgumentException(name
-                    + " is not a feature attribute");
-        }
-        setValue(idx, value);
-    }
-
-    /**
-     * Modify attribute at the "index" indicated by SimpleFeatureType.
-     * 
-     * @param index
-     * @param value
-     */
-    public void setValue(int index, Object value) {
-        List/* <Attribute> */contents = (List) getValue();
-        Attribute attribute = (Attribute) contents.get(index);
-        attribute.setValue(value);
-        this.setValue(contents);
-    }
-
-    public void setValues(List values) {
-    	for ( int i = 0; i < values.size(); i++ ) {
-    		setValue( i , values.get( i ) );
-    	}
+        
+        attribute.setValue( value );
     }
     
-    public void setValues(Object[] values) {
-    	setValues( Arrays.asList(values));
+    public Object getAttribute(int index) throws IndexOutOfBoundsException {
+        return getValue().get(index).getValue();
     }
     
-    public List getAttributes() {
-        return attributes();
+    public void setAttribute(int index, Object value)
+            throws IndexOutOfBoundsException {
+        Attribute attribute = getValue().get( index );
+        attribute.setValue( value );
     }
-
+    
+    public List<Object> getAttributes() {
+        List attributes = new ArrayList();
+        for ( Iterator<Attribute> a = getValue().iterator(); a.hasNext(); ) {
+            Attribute attribute = a.next();
+            attributes.add( attribute.getValue() );
+        }
+        
+        return attributes;
+    }
+    
+    public void setAttributes(List<Object> values) {
+        if ( values.size() != getValue().size() ) {
+            String msg = "Expected " + getValue().size() + " attributes but " 
+                + values.size() + " were specified";
+            throw new IllegalArgumentException( msg );
+        }
+        
+        for ( int i = 0; i < values.size(); i++ ) {
+            getValue().get(i).setValue( values.get(i) );
+        }
+    }
+    
+    public void setAttributes(Object[] values) {
+        setAttributes( Arrays.asList(values) );
+    }
+    
+    public int getAttributeCount() {
+        return getValue().size();
+    }
+    
     public int getNumberOfAttributes() {
-        return types().size();
-    }
-
-    public List getTypes() {
-        return super.types();
+        return getAttributeCount();
     }
     
-    public List getValues() {
-    	return super.values();
+    public Object getDefaultGeometry() {
+        return getDefaultGeometryProperty() != null ? 
+            getDefaultGeometryProperty().getValue() : null;
     }
     
-    public Object getDefaultGeometryValue() {
-        return getDefaultGeometry() != null ? getDefaultGeometry().getValue() : null;
-    }
-
-    public void setDefaultGeometryValue(Object geometry) {
-        if (getDefaultGeometry() != null) {
-            getDefaultGeometry().setValue(geometry);
+    public void setDefaultGeometry(Object geometry) {
+        if ( getDefaultGeometryProperty() != null ) {
+            getDefaultGeometryProperty().setValue(geometry);
         }
+        else {
+            throw new IllegalStateException("Feature has no defaultGeometry property");    
+        }
+        
     }
-
-    public Object operation(String arg0, Object arg1) {
-        throw new UnsupportedOperationException("operation not supported yet");
-    }
-
-    public void setValue( List values ) {
-        setValue( (Object) values );        
-    }
-//
-//    public void setValue( Object values ) {
-//        
-//    }
+    
 }

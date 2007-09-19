@@ -91,13 +91,13 @@ public class LineEndPointCoveredByLineValidation
         while(fLine.hasNext()){
         	Feature line = fLine.next();
         	FeatureIterator fRLine = fcRLine.features();
-        	Geometry lineGeom = line.getPrimaryGeometry();
+        	Geometry lineGeom = line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){
         			while(fRLine.hasNext()){
         				Feature rLine = fRLine.next();
-        				Geometry rLineGeom = rLine.getPrimaryGeometry(); 
+        				Geometry rLineGeom = rLine.getDefaultGeometry(); 
         				if(envelope.contains(rLineGeom.getEnvelopeInternal())){
         					if(LineString.class.isAssignableFrom(rLineGeom.getClass())){
         						Point p1 = ((LineString)rLineGeom).getEndPoint();

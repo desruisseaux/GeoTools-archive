@@ -6,11 +6,6 @@ import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleSchema;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -60,7 +55,7 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 			line.setUserData( crs );
 			builder.add( line );
 			
-			delegate.add( builder.feature( i + "" ) );
+			delegate.add( builder.build( i + "" ) );
 		}
 	}
 }

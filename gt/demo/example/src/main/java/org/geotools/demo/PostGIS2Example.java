@@ -9,10 +9,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
@@ -34,11 +32,9 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
-import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.gui.swing.ProgressWindow;
-import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.Filter;
 
 public class PostGIS2Example {

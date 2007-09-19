@@ -36,7 +36,7 @@ public class DefaultFeatureTypeBuilderTest extends TestCase {
 		assertNotNull( t );
 		assertEquals( Integer.class, t.getBinding() );
 		
-		t = type.getPrimaryGeometry();
+		t = type.getDefaultGeometry();
 		assertNotNull( t );
 		assertEquals( Point.class, t.getBinding() );
 	}

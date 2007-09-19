@@ -113,7 +113,7 @@ public class PropertyDataStore2Test extends TestCase {
         assertNotNull( resultType );
         assertNotSame( resultType, origionalType );
         
-        GeometryAttributeType resultGeometryType = resultType.getPrimaryGeometry();
+        GeometryAttributeType resultGeometryType = resultType.getDefaultGeometry();
         assertEquals( world, resultGeometryType.getCoordinateSystem() );
     }
 }

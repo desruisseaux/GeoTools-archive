@@ -1,22 +1,25 @@
 package org.geotools.feature;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.opengis.feature.Association;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
+import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AssociationDescriptor;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.ComplexType;
-import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.geometry.coordinate.GeometryFactory;
 
 /**
  * Factory for creating instances of the Attribute family of classes.
@@ -60,53 +63,43 @@ public class FeatureFactoryImpl implements FeatureFactory {
     }
 	
 	public Attribute createAttribute( Object value, AttributeDescriptor descriptor, String id ) {
-		throw new UnsupportedOperationException();
-		//return new AttributeImpl(value,descriptor,id);
+		return new AttributeImpl(value,descriptor,id);
 	}
 	
 	public GeometryAttribute createGeometryAttribute(
-		Object value, AttributeDescriptor desc, String id, CoordinateReferenceSystem crs
+		Object value, GeometryDescriptor descriptor, String id, CoordinateReferenceSystem crs
 	) {
 	
-		throw new UnsupportedOperationException();
-		//return new GeometricAttribute(value,desc,id,crs);
+		return new GeometryAttributeImpl(value,descriptor,id);
 	}
 	
 	public ComplexAttribute createComplexAttribute( 
-		Collection value, AttributeDescriptor desc, String id
+		Collection value, AttributeDescriptor descriptor, String id
 	) {
-		throw new UnsupportedOperationException();
-		//return new ComplexAttributeImpl(value, desc, id );
+		return new ComplexAttributeImpl(value, descriptor, id );
 	}
 
 	public ComplexAttribute createComplexAttribute( Collection value, ComplexType type, String id ) 
 	{
-		throw new UnsupportedOperationException();
-		//return new ComplexAttributeImpl(value, type, id );
+		return new ComplexAttributeImpl(value, type, id );
 	}
 	
-	public Feature createFeature(Collection value, AttributeDescriptor desc, String id) {
-		throw new UnsupportedOperationException();
-		//return new FeatureImpl(value, desc, id);
+	public Feature createFeature(Collection value, AttributeDescriptor descriptor, String id) {
+		return new FeatureImpl(value,descriptor,id);
 	}
 
 	public Feature createFeature(Collection value, FeatureType type, String id) {
-		throw new UnsupportedOperationException();
-		//return new FeatureImpl(value, type, id);
+		return new FeatureImpl(value,type,id);
 	}
 	
-	public FeatureCollection createFeatureCollection(
-		Collection value, AttributeDescriptor desc, String id
-	) {
-		throw new UnsupportedOperationException();
-		//return new FeatureCollectionImpl(value, desc, id);
+	public SimpleFeature createSimpleFeautre(List<Attribute> value,
+	        AttributeDescriptor decsriptor, String id) {
+	    return new SimpleFeatureImpl(value,decsriptor,id);
 	}
 	
-	public FeatureCollection createFeatureCollection(
-		Collection value, FeatureCollectionType type, String id
-	) {
-		throw new UnsupportedOperationException();
-		//return new FeatureCollectionImpl(value, type, id);
+	public SimpleFeature createSimpleFeature(List<Attribute> value,
+	        SimpleFeatureType type, String id) {
+	    return new SimpleFeatureImpl(value,type,id);
 	}
    
 }

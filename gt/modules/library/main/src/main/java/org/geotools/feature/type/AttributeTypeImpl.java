@@ -1,11 +1,10 @@
 package org.geotools.feature.type;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
-import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
 import org.opengis.util.InternationalString;
 
 /**
@@ -16,43 +15,21 @@ import org.opengis.util.InternationalString;
  */
 public class AttributeTypeImpl extends PropertyTypeImpl implements AttributeType {
 	
-	final protected boolean IDENTIFIED;
-
-	final protected Class BINDING;
-
-	final protected AttributeType SUPER;
+	final protected boolean identified;
 
 	public AttributeTypeImpl(
-		Name name, Class binding, boolean identified, boolean isAbstract,
-		Set/*<Filter>*/ restrictions, AttributeType superType, InternationalString description
+		Name name, Class<?> binding, boolean identified, boolean isAbstract,
+		List<Filter> restrictions, AttributeType superType, InternationalString description
 	) {
-		super(name, isAbstract, restrictions, description);
+		super(name, binding, isAbstract, restrictions, superType, description);
 		
-		if(binding == null){
-			throw new NullPointerException("binding");
-		}
-		
-		BINDING = binding;
-		IDENTIFIED = identified;
-		SUPER = superType;
+		this.identified = identified;
 	}
 
 	public boolean isIdentified() {
-		return IDENTIFIED;
+		return identified;
 	}
 
-	public Class getBinding() {
-		return BINDING;
-	}
-
-	public AttributeType getSuper() {
-		return SUPER;
-	}
-
-	public Collection getOperations() {
-		throw new UnsupportedOperationException("Operations not implemented");
-	}
-	
 	/**
 	 * Allows this AttributeType to convert an argument to its prefered storage
 	 * type. If no parsing is possible, returns the original value. If a parse
@@ -79,25 +56,18 @@ public class AttributeTypeImpl extends PropertyTypeImpl implements AttributeType
 		return null;
 	}
 	
-	public String toString() {
-		StringBuffer sb = new StringBuffer(getClass().getName());
-			sb.append("[name=").append(getName()).append(", binding=").append(BINDING)
-			.append(", abstrsct=, ").append(isAbstract()).append(", identified=")
-			.append(IDENTIFIED).append(", restrictions=").append(getRestrictions())
-			.append(", superType=").append(SUPER).append("]");
-
-		return sb.toString();
+	public AttributeType getSuper() {
+	    return (AttributeType) super.getSuper();
 	}
-
+	
 	/**
-	 * Override of hashCode.
-	 * 
-	 * @return hashCode for this object.
+	 * Override of hashcode.
 	 */
 	public int hashCode() {
-		return name.hashCode() ^ BINDING.hashCode();
+	    return super.hashCode() ^ Boolean.valueOf(identified).hashCode();
+	   
 	}
-
+	
 	/**
 	 * Override of equals.
 	 * 
@@ -115,20 +85,17 @@ public class AttributeTypeImpl extends PropertyTypeImpl implements AttributeType
 			return false;
 		
 		AttributeType att = (AttributeType) other;
-
-		if (!Utilities.equals(BINDING,att.getBinding())) {
-			return false;
-		}
 		
-		if (IDENTIFIED != att.isIdentified()) {
-			return false;
-		}
-
-		if (!Utilities.equals(SUPER, att.getSuper())) {
+		if (identified != att.isIdentified()) {
 			return false;
 		}
 	
 		return true;
 	}
+	
+    public String toString() {
+       return new StringBuffer(super.toString()).append("; isIdentified=")
+           .append(identified).toString();
+    }
 
 }

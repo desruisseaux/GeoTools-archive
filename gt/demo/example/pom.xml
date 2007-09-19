@@ -89,47 +89,23 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions>      
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-cql</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions>      
     </dependency>
     <!--  GeoTools Plugins -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-postgis</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions> 
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-shapefile</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions> 
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-wfs</artifactId>
@@ -139,46 +115,22 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-geometry</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions> 
     </dependency>    
     <!--  GeoTools Extentions -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-wms</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions> 
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-mappane</artifactId>
       <version>${project.version}</version>
-      <exclusions>      
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
-        </exclusion>
-      </exclusions> 
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

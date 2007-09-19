@@ -370,7 +370,7 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals(rd1.getAttribute("id"), rd3.getAttribute("id"));
         assertEquals((Geometry) rd1.getAttribute("geom"),
             (Geometry) rd3.getAttribute("geom"));
-        assertNotNull(rd3.getPrimaryGeometry());
+        assertNotNull(rd3.getDefaultGeometry());
 
         Feature rv1 = riverFeatures[0];
         assertEquals(rv1, rv1);
@@ -392,7 +392,7 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals(rv1.getID(), rv3.getID());
         assertEquals(rv1.getAttribute("name"), rv3.getAttribute("name"));
         assertEquals(rv1.getAttribute("flow"), rv3.getAttribute("flow"));
-        assertNull(rv3.getPrimaryGeometry());
+        assertNull(rv3.getDefaultGeometry());
     }
 
     /*

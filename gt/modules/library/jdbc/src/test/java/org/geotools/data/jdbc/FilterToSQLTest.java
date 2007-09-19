@@ -26,14 +26,8 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
 

@@ -17,16 +17,10 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeatureCollection;
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 
 
@@ -96,17 +90,8 @@ import org.geotools.util.ProgressListener;
  * @source $URL$
  * @version $Id$
  *
- * @deprecated use {@link SimpleFeatureCollection}.
  */
-public interface FeatureCollection extends ResourceCollection, Feature, SimpleFeatureCollection {
-    /**
-     * Re-apply type narrowing that was stripped from our geoapi interface
-     */
-    SimpleFeatureCollectionType getType();
-
-    /** Re-apply type narrowing that was stripped from our geoapi interface */
-    SimpleFeatureType getMemberType();
-
+public interface FeatureCollection extends ResourceCollection, Feature {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -285,9 +270,22 @@ public interface FeatureCollection extends ResourceCollection, Feature, SimpleFe
      * </p>
      * @param visitor
      * @throws IOException
+     *
+     * @deprecated use {@link #accepts(org.opengis.feature.FeatureVisitor, org.opengis.util.ProgressListener)}
      */
     void accepts(FeatureVisitor visitor, ProgressListener progress)
         throws IOException;
+
+    /**
+     * Vists the contents of a feature collection.
+     *
+     * @param visitor The visitor.
+     * @param progress progress listener.
+     *
+     * @since 2.5
+     */
+    void accepts(org.opengis.feature.FeatureVisitor visitor,
+        org.opengis.util.ProgressListener progress) throws IOException;
 
     /**
      * FeatureCollection "view" indicated by provided filter.

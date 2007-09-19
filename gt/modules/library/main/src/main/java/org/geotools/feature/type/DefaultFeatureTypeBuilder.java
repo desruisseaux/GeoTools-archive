@@ -1,22 +1,12 @@
 package org.geotools.feature.type;
 
-import java.util.List;
-import java.util.Set;
-
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.DefaultTypeFactory;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.DefaultFeatureTypeFactory2;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.Name;
-import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -32,7 +22,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DefaultFeatureTypeBuilder extends SimpleFeatureTypeBuilder {
     
 	public DefaultFeatureTypeBuilder() {
-		super( new DefaultTypeFactory());
+		super( new DefaultFeatureTypeFactory2());
 		attributeBuilder = new DefaultAttributeTypeBuilder();
 		
 		//sets the default namespace to gml
@@ -75,8 +65,8 @@ public class DefaultFeatureTypeBuilder extends SimpleFeatureTypeBuilder {
 	    }
 	}
 	
-	protected boolean isGeometry(AttributeDescriptor descriptor) {
-		return descriptor instanceof GeometryAttributeType;
+	public void setDefaultGeometry(AttributeType defaultGeomtetry) {
+	    setDefaultGeometry(defaultGeomtetry.getLocalName());
 	}
 	
 	/**

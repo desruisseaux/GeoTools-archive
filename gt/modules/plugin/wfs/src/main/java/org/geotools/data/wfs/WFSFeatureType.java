@@ -20,6 +20,7 @@ import java.rmi.server.UID;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -39,6 +40,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -140,8 +142,8 @@ class WFSFeatureType implements FeatureType {
         return delegate.getAttributeTypes();
     }
 
-    public GeometryAttributeType getPrimaryGeometry() {
-    	return delegate.getPrimaryGeometry();
+    public GeometryAttributeType getDefaultGeometry() {
+    	return delegate.getDefaultGeometry();
     }
 
     public URI getNamespace() {
@@ -187,15 +189,27 @@ class WFSFeatureType implements FeatureType {
 	public AttributeDescriptor getAttribute(int index) {
 		return delegate.getAttribute(index);
 	}
-
-	public GeometryType getDefaultGeometryType() {
-		return delegate.getDefaultGeometryType();
+	
+	public AttributeDescriptor getAttribute(Name name) {
+	    return delegate.getAttribute(name);
+	}
+	
+	public PropertyDescriptor getProperty(Name name) {
+	    return delegate.getProperty(name);
+	}
+	
+	public PropertyDescriptor getProperty(String name) {
+	    return delegate.getProperty(name);
 	}
 
 	public org.opengis.feature.type.AttributeType getType(String name) {
 		return delegate.getType( name );
 	}
 
+	public org.opengis.feature.type.AttributeType getType(Name name) {
+        return delegate.getType( name );
+    }
+	
 	public org.opengis.feature.type.AttributeType getType(int index) {
 		return delegate.getType( index );
 	}
@@ -206,18 +220,6 @@ class WFSFeatureType implements FeatureType {
 
 	public CoordinateReferenceSystem getCRS() {
 		return delegate.getCRS();
-	}
-
-	public AttributeDescriptor getDefaultGeometry() {
-		return delegate.getDefaultGeometry();
-	}
-
-	public Collection associations() {
-		return delegate.associations(); 
-	}
-
-	public Collection attributes() {
-		return delegate.attributes();
 	}
 
 	public Class getBinding() {
@@ -232,11 +234,7 @@ class WFSFeatureType implements FeatureType {
 		return delegate.isInline();
 	}
 
-	public Collection getOperations() {
-		return delegate.getOperations();
-	}
-
-	public Set getRestrictions() {
+	public List getRestrictions() {
 		return delegate.getRestrictions();
 	}
 
@@ -256,16 +254,16 @@ class WFSFeatureType implements FeatureType {
 		return delegate.getName();
 	}
 
-	public Object getUserData(Object key) {
-		return delegate.getUserData(key);
-	}
-
-	public void putUserData(Object key, Object data) {
-		delegate.putUserData(key, data);
+	public Map<Object, Object> getUserData() {
+	    return delegate.getUserData();
 	}
 	
 	public int indexOf(String name) {
 		return delegate.indexOf(name);
+	}
+	
+	public int indexOf(Name name) {
+	    return delegate.indexOf(name);
 	}
 	
     private static class LenientFeature extends SimpleFeatureImpl implements SimpleFeature, Feature{
@@ -317,7 +315,7 @@ class WFSFeatureType implements FeatureType {
 
             setAttributes(attributes);
             
-            defaultGeomIndex=schema.find(schema.getPrimaryGeometry());
+            defaultGeomIndex=schema.find(schema.getDefaultGeometry());
             constructing=false;
         }
 
@@ -594,7 +592,7 @@ class WFSFeatureType implements FeatureType {
          * @return Geometry for this feature.
          * 
          */
-        public Geometry getPrimaryGeometry() {
+        public Geometry getDefaultGeometry() {
             if (defaultGeomIndex == -1) {
                 return null;
             }
@@ -611,7 +609,7 @@ class WFSFeatureType implements FeatureType {
          *         geometry.
          * 
          */
-        public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+        public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
         	if (defaultGeomIndex < 0) {
                 throw new IllegalAttributeException(
                     "Feature does not have geometry");

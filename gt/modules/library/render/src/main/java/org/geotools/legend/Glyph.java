@@ -481,22 +481,22 @@ public class Glyph {
     }
  
     public static BufferedImage icon( FeatureType ft ) {
-        if( ft==null || ft.getPrimaryGeometry()==null )
+        if( ft==null || ft.getDefaultGeometry()==null )
             return null;
  
-        if( Point.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding())
-        || MultiPoint.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding()) ){
+        if( Point.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
+        || MultiPoint.class.isAssignableFrom(ft.getDefaultGeometry().getBinding()) ){
             return point(DEFAULT_BORDER, DEFAULT_FILL);
         }
  
-        if( LineString.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding())
-        || MultiLineString.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding())
-        || LinearRing.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding())){
+        if( LineString.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
+        || MultiLineString.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
+        || LinearRing.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())){
             return line(DEFAULT_BORDER, 1);
         }
  
-        if( Polygon.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding())
-        || MultiPolygon.class.isAssignableFrom(ft.getPrimaryGeometry().getBinding()) ){
+        if( Polygon.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
+        || MultiPolygon.class.isAssignableFrom(ft.getDefaultGeometry().getBinding()) ){
             return polygon(DEFAULT_BORDER, DEFAULT_FILL, 1);
         }
  

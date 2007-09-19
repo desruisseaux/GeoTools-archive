@@ -9,6 +9,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.apache.xml.serialize.*;
 import org.eclipse.xsd.*;
 
@@ -107,7 +108,7 @@ public class SchemaClassTemplate
         String fullClassName = imported.getClass().getName();
         String className = fullClassName.substring(fullClassName.lastIndexOf(".")+1);
         
-        ns2import.put(imported.namespace().getURI(), className);
+        ns2import.put(imported.getURI(), className);
 
     stringBuffer.append(TEXT_3);
     stringBuffer.append(fullClassName);
@@ -175,14 +176,20 @@ public class SchemaClassTemplate
         if (type instanceof ComplexType) {
             ComplexType cType = (ComplexType)type;
 
-            if (!cType.attributes().isEmpty()) {
+            if (!cType.getProperties().isEmpty()) {
 
     stringBuffer.append(TEXT_10);
     stringBuffer.append(local.toUpperCase());
     stringBuffer.append(TEXT_11);
     
-                for (Iterator adItr = cType.attributes().iterator(); adItr.hasNext();) {
-                    AttributeDescriptor ad = (AttributeDescriptor) adItr.next();
+                for (Iterator adItr = cType.getProperties().iterator(); adItr.hasNext();) {
+                    PropertyDescriptor pd = (PropertyDescriptor) adItr.next();
+                    if ( !(pd instanceof AttributeDescriptor) ) {
+                        continue;
+                    }
+                    
+                    AttributeDescriptor ad = (AttributeDescriptor) pd;
+                    
                     AttributeType adType = ad.getType();
                     
                     String adTypeName = adType.getName().getLocalPart().toUpperCase() + 
@@ -294,7 +301,7 @@ public class SchemaClassTemplate
     stringBuffer.append(TEXT_54);
     stringBuffer.append(prefix);
     stringBuffer.append(TEXT_55);
-    stringBuffer.append(schema.toURI());
+    stringBuffer.append(schema.getURI());
     stringBuffer.append(TEXT_56);
     
     for (Iterator itr = types.iterator(); itr.hasNext();) {
@@ -304,7 +311,7 @@ public class SchemaClassTemplate
         String local = name.getLocalPart();
 
     stringBuffer.append(TEXT_57);
-    stringBuffer.append(schema.toURI());
+    stringBuffer.append(schema.getURI());
     stringBuffer.append(TEXT_58);
     stringBuffer.append(local);
     stringBuffer.append(TEXT_59);

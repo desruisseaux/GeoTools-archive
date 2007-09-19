@@ -152,7 +152,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
 
         // Check "Roads"
         featureSource = dataStore.getFeatureSource("Roads");
-        crs = featureSource.getSchema().getPrimaryGeometry()
+        crs = featureSource.getSchema().getDefaultGeometry()
                            .getCoordinateSystem();
         assertEquals("CRS mismatch",
             "NAD_1983_StatePlane_New_York_East_FIPS_3101_Feet",
@@ -160,7 +160,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
 
         // Check "Places"
         featureSource = dataStore.getFeatureSource("Places");
-        crs = featureSource.getSchema().getPrimaryGeometry()
+        crs = featureSource.getSchema().getDefaultGeometry()
                            .getCoordinateSystem();
         assertEquals("CRS mismatch", "GCS_North_American_1983",
             crs.getName().toString());

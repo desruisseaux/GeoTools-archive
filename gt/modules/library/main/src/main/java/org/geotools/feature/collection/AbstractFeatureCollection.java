@@ -159,15 +159,7 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
 		return rc.toArray(a);
 	}
 
-	/**
-     * Accepts a visitor, which then visits each feature in the collection.
-     * @throws IOException 
-     */
-    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        accepts((org.opengis.feature.FeatureVisitor)visitor,(org.opengis.util.ProgressListener)progress);
-    }
-    
-    public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
+	public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
     	Iterator iterator = null;
         // if( progress == null ) progress = new NullProgressListener();
         try{

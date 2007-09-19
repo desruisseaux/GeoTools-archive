@@ -21,12 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import org.opengis.feature.simple.SimpleFeatureFactory;
-import org.opengis.feature.simple.SimpleTypeFactory;
-import org.opengis.feature.type.Name;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -39,6 +33,14 @@ import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.type.FeatureTypeFactory;
+import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.util.TypeName;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -67,12 +69,12 @@ public abstract class ContentDataStore implements DataStore {
     /**
      * Factory used to create feature types
      */
-    protected SimpleTypeFactory typeFactory;
+    protected FeatureTypeFactory typeFactory;
 
     /**
      * Factory used to create features
      */
-    protected SimpleFeatureFactory featureFactory;
+    protected FeatureFactory featureFactory;
 
     /**
      * Factory used to create filters
@@ -96,19 +98,19 @@ public abstract class ContentDataStore implements DataStore {
     //
     // Property accessors
     //
-    public void setTypeFactory(SimpleTypeFactory typeFactory) {
+    public void setTypeFactory(FeatureTypeFactory typeFactory) {
         this.typeFactory = typeFactory;
     }
 
-    public SimpleTypeFactory getTypeFactory() {
+    public FeatureTypeFactory getTypeFactory() {
         return typeFactory;
     }
 
-    public void setFeatureFactory(SimpleFeatureFactory featureFactory) {
+    public void setFeatureFactory(FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
     }
 
-    public SimpleFeatureFactory getFeatureFactory() {
+    public FeatureFactory getFeatureFactory() {
         return featureFactory;
     }
 
@@ -314,7 +316,7 @@ public abstract class ContentDataStore implements DataStore {
      * Helper method to wrap a non-qualified name.
      */
     final protected Name name(String typeName) {
-        return new org.geotools.feature.type.TypeName(typeName);
+        return new org.geotools.feature.Name(typeName);
     }
 
     /**

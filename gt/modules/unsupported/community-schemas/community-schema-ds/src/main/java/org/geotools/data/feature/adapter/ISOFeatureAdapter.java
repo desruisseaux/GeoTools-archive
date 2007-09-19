@@ -99,13 +99,13 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public CoordinateReferenceSystem getCRS() {
-        GeometryAttributeType defaultGeometry = adaptee.getFeatureType().getPrimaryGeometry();
+        GeometryAttributeType defaultGeometry = adaptee.getFeatureType().getDefaultGeometry();
         return defaultGeometry == null ? null : defaultGeometry.getCoordinateSystem();
     }
 
     public GeometryAttribute getDefaultGeometry() {
         AttributeDescriptor defaultGeometry = featureType.getDefaultGeometry();
-        Geometry geom = adaptee.getPrimaryGeometry();
+        Geometry geom = adaptee.getDefaultGeometry();
         Attribute attribute;
         attribute = attributeFactory.createAttribute(geom, defaultGeometry, null);
         return (GeometryAttribute) attribute;
@@ -124,14 +124,14 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public void setCRS(CoordinateReferenceSystem crs) {
-        Geometry defaultGeometry = adaptee.getPrimaryGeometry();
+        Geometry defaultGeometry = adaptee.getDefaultGeometry();
         defaultGeometry.setUserData(crs);
     }
 
     public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
         Object value = geometryAttribute.get();
         try {
-            adaptee.setPrimaryGeometry((Geometry) value);
+            adaptee.setDefaultGeometry((Geometry) value);
         } catch (IllegalAttributeException e) {
             throw (RuntimeException) new RuntimeException().initCause(e);
         }
@@ -220,7 +220,7 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public Object defaultGeometry() {
-        return adaptee.getPrimaryGeometry();
+        return adaptee.getDefaultGeometry();
     }
 
     public void defaultGeometry(Object geometry) {

@@ -1,9 +1,13 @@
 package org.geotools.feature;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.Descriptors;
 import org.geotools.feature.type.Types;
 import org.geotools.resources.Utilities;
 import org.geotools.util.Converters;
@@ -12,6 +16,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.feature.type.PropertyType;
+
 import sun.security.action.GetBooleanAction;
 
 /**
@@ -24,82 +30,54 @@ import sun.security.action.GetBooleanAction;
  * @author Gabriel Roldan
  * @version $Id$
  */
-public class AttributeImpl implements Attribute {
+public class AttributeImpl extends PropertyImpl implements Attribute {
 
-	protected Object content;
-
-	protected AttributeDescriptor DESCRIPTOR;
-
-	protected final AttributeType TYPE;
-
-	protected final String ID;
+	/**
+	 * id of the attribute.
+	 */
+	protected final String id;
 
 	public AttributeImpl(Object content, AttributeDescriptor descriptor,
 			String id) {
-		//if content is null and the descriptor says we are not allowed to be 
-		// null, use the default value
-		this(content == null && !descriptor.isNillable() ? descriptor.getDefaultValue() : content, 
-				descriptor.getType(), id);
-
-		DESCRIPTOR = descriptor;
+	    super( content, descriptor );
+	    
+	    //set the id
+		this.id = id;
+		
+		//if the content is null and the descriptor says isNillable is false, 
+		// then set the default value
+		if ( content == null && !descriptor.isNillable()) {
+		    setValue(descriptor.getDefaultValue());
+		}
+		
 	}
 
 	public AttributeImpl(Object content, AttributeType type, String id) {
-		// if (type.isAbstract()) {
-		// throw new UnsupportedOperationException(type.getName()
-		// + " is abstract");
-		// }
-		TYPE = type;
-		ID = id;
-		
-		setValue(content);
+	    this( content, new AttributeDescriptorImpl( type, type.getName(), 1, 1, true, null), id );
 	}
 
 	public String getID() {
-		return ID;
+		return id;
 	}
-
-	public Object getValue() {
-		return content;
-	}
-
+	
 	public AttributeDescriptor getDescriptor() {
-		return DESCRIPTOR;
+	    return (AttributeDescriptor) super.getDescriptor();
 	}
-
-	public PropertyDescriptor descriptor() {
-		return getDescriptor();
-	}
-
+	
 	public AttributeType getType() {
-		return TYPE;
+	    return (AttributeType) super.getType();
 	}
-
-	public Name name() {
-		return DESCRIPTOR != null ? DESCRIPTOR.getName() : null;
-	}
-
-	public boolean nillable() {
-		if (getDescriptor() != null) {
-			return getDescriptor().isNillable();
-		}
-
-		return true;
-	}
-
+	
 	/**
-	 * 
-	 * @throws IllegalArgumentException
-	 * @throws IllegalStateException
-	 *             if the value has been parsed and validated, yet this
-	 *             Attribute does not passes the restrictions imposed by its
-	 *             AttributeType
+	 * Override of setValue to convert the newValue to specified type if need
+	 * be.
 	 */
 	public void setValue(Object newValue) throws IllegalArgumentException,
 			IllegalStateException {
 
 		newValue = parse(newValue);
 
+		//TODO: remove this validation
 		try {
 			Types.validate(getType(), this, newValue);
 		} catch (IllegalAttributeException e) {
@@ -107,7 +85,7 @@ public class AttributeImpl implements Attribute {
 					.initCause(e);
 		}
 
-		content = newValue;
+		super.setValue( newValue );
 	}
 
 	/**
@@ -116,10 +94,7 @@ public class AttributeImpl implements Attribute {
 	 * @return hashCode for this object.
 	 */
 	public int hashCode() {
-		return 37 * (DESCRIPTOR == null ? 0 : DESCRIPTOR.hashCode())
-				+ (37 * (TYPE == null ? 0 : TYPE.hashCode()))
-				+ (37 * (ID == null ? 0 : ID.hashCode()))
-				+ (37 * (content == null ? 0 : content.hashCode()));
+	    return super.hashCode() + ( 37 * (id == null ? 0 : id.hashCode()) );
 	}
 
 	/**
@@ -130,47 +105,26 @@ public class AttributeImpl implements Attribute {
 	 * 
 	 * @return whether other is equal to this attribute Type.
 	 */
-	public boolean equals(Object other) {
-		if (!(other instanceof AttributeImpl)) {
+	public boolean equals(Object obj) {
+	    if ( this == obj ) {
+	        return true;
+	    }
+	    
+		if (!(obj instanceof AttributeImpl)) {
 			return false;
 		}
 
-		AttributeImpl att = (AttributeImpl) other;
-
-		if (!Utilities.equals(DESCRIPTOR, att.DESCRIPTOR))
-			return false;
-
-		if (!Utilities.equals(TYPE, att.TYPE))
-			return false;
-
-		if (!Utilities.equals(ID, att.ID))
-			return false;
-
-		if (!Utilities.equals(content, att.content))
-			return false;	
-	
-		return true;
-	}
-
-	public Object operation(Name arg0, List arg1) {
-		throw new UnsupportedOperationException("operation not supported yet");
+		if (!super.equals(obj)) {
+		    return false;
+		}
+		
+		AttributeImpl att = (AttributeImpl) obj;
+		
+		return Utilities.equals( id, att.id );
 	}
 
 	public String toString() {
-		StringBuffer sb = new StringBuffer("Attribute[");
-		sb
-				.append(DESCRIPTOR == null ? "" : DESCRIPTOR.getName()
-						.getLocalPart());
-		sb.append(":");
-		sb.append(TYPE.getName().getLocalPart());
-		sb.append(":@");
-		sb.append(ID == null ? "" : ID);
-		sb.append(":");
-		sb.append(content);
-		sb.append("]");
-		// LOGGER.fine("converting value for unbound Attribute (possibly null
-		// value) " + sb.toString() );
-		return (content == null ? "" : content.toString());
+		return super.toString() + ":" + id; 
 	}
 	
 	/**

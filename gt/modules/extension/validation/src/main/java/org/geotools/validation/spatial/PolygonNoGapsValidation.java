@@ -73,7 +73,7 @@ public class PolygonNoGapsValidation extends DefaultFeatureValidation {
 	                          ValidationResults results){
 		
         if(feature != null){
-        	Geometry layer = feature.getPrimaryGeometry();
+        	Geometry layer = feature.getDefaultGeometry();
         	if(layer instanceof Polygon){
         		Polygon p = (Polygon)layer;
         		if(p.getNumInteriorRing()!=0){

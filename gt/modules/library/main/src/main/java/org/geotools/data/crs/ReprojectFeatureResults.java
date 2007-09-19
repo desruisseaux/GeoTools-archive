@@ -96,7 +96,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
                         
         this.results = origionalCollection( results );        
         
-        CoordinateReferenceSystem originalCs = results.getSchema().getPrimaryGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCoordinateSystem();
         this.transform = CRS.findMathTransform(originalCs,destinationCS, true);
         
         setResourceCollection(createResourceCollection());
@@ -151,7 +151,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
-        CoordinateReferenceSystem originalCs = startingType.getPrimaryGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry().getCoordinateSystem();
         
         if (forcedCS.equals(originalCs)) {
             return startingType;
@@ -183,7 +183,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
 
             while ( r.hasNext()) {
                 feature = r.next();
-                internal = feature.getPrimaryGeometry().getEnvelopeInternal();
+                internal = feature.getDefaultGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
             return ReferencedEnvelope.reference(newBBox);

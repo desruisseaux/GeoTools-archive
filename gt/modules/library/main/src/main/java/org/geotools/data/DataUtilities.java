@@ -54,7 +54,6 @@ import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.referencing.CRS;
-import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -913,7 +912,7 @@ public class DataUtilities {
      * @param features FeatureCollection
      * @return FeatureCollection
      */
-    public static SimpleFeatureCollection collection( List<Feature> list ) {
+    public static FeatureCollection collection( List<Feature> list ) {
         FeatureCollection collection = FeatureCollections.newCollection();
         for ( Feature feature : list ){
             collection.add( list );

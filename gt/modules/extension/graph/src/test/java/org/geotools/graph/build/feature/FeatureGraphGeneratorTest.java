@@ -60,7 +60,7 @@ public class FeatureGraphGeneratorTest extends TestCase {
 			LineString line = (LineString) e1.getObject();
 			Feature feature = (Feature) e2.getObject();
 			
-			assertEquals( line, feature.getPrimaryGeometry() );
+			assertEquals( line, feature.getDefaultGeometry() );
 		}
 	}
 	

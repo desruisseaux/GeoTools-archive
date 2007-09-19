@@ -310,8 +310,8 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
         FIDMapper mapper = getFIDMapper(typeName);
         encoder.setFIDMapper(mapper);
 
-        if (info.getSchema().getPrimaryGeometry() != null) {
-            String geom = info.getSchema().getPrimaryGeometry().getLocalName();
+        if (info.getSchema().getDefaultGeometry() != null) {
+            String geom = info.getSchema().getDefaultGeometry().getLocalName();
             srid = this.catalog.getSRID(getTableSchema(), typeName, geom);
         }
 

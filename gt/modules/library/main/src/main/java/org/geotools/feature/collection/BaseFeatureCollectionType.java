@@ -2,8 +2,6 @@ package org.geotools.feature.collection;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultFeatureType;
@@ -13,13 +11,8 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.Name;
-import org.geotools.feature.type.AssociationDescriptorImpl;
-import org.geotools.feature.type.AssociationTypeImpl;
-import org.geotools.feature.type.TypeName;
 import org.geotools.resources.Utilities;
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AssociationType;
 
 /**
  * Limited implementation of SimpleFeatureCollectionType for internal use
@@ -31,10 +24,11 @@ import org.opengis.feature.type.AssociationType;
  * @author Justin Deoliveira (The Open Planning Project)
  */
 public class BaseFeatureCollectionType extends DefaultFeatureType 
-	implements org.geotools.feature.FeatureType, SimpleFeatureCollectionType {
+	implements org.geotools.feature.FeatureType {
     final FeatureType memberType;
+    
 	public BaseFeatureCollectionType(FeatureType memberType) {
-	    super( new TypeName( FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType") ,
+	    super( new Name( FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType") ,
 	           null, // no attribute types
 	           null, // no super types (although I wish we had "AbstractFeatureColletionType"
 	           null  // no default geometry
@@ -46,14 +40,14 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 	public SimpleFeatureType getMemberType() {
 	    return memberType;
 	}
-	public Set getMemberTypes() {
-	    return Collections.singleton( getMemberType() );
-	}
-	public Set getMembers() {
-	    AssociationType contains = new AssociationTypeImpl( new TypeName("contains"), memberType, false, false, Collections.EMPTY_SET, null, null ); 
-	    AssociationDescriptorImpl member = new AssociationDescriptorImpl( null, new Name("member"), 0, Integer.MAX_VALUE );
-	    return Collections.singleton( member );
-	}
+//	public Set getMemberTypes() {
+//	    return Collections.singleton( getMemberType() );
+//	}
+//	public Set getMembers() {
+//	    AssociationType contains = new AssociationTypeImpl( new TypeName("contains"), memberType, false, false, Collections.EMPTY_SET, null, null ); 
+//	    AssociationDescriptorImpl member = new AssociationDescriptorImpl( null, new Name("member"), 0, Integer.MAX_VALUE );
+//	    return Collections.singleton( member );
+//	}
 	public Feature create(Object[] attributes) throws IllegalAttributeException {
 	    throw new UnsupportedOperationException("Types of feature collection do not support feature creation");
 	}
@@ -100,8 +94,8 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 		}
 	}
 
-	public GeometryAttributeType getPrimaryGeometry() {
-		return (GeometryAttributeType) getDefaultGeometry();
+	public GeometryAttributeType getDefaultGeometry() {
+		return (GeometryAttributeType) super.getDefaultGeometry();
 	}
 
 	public String getTypeName() {

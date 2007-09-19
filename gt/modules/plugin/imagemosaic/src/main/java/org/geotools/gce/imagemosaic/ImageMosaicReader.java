@@ -273,7 +273,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					crs.toWKT()).toString());
 		} else {
 			final CoordinateReferenceSystem tempcrs = featureSource.getSchema()
-					.getPrimaryGeometry().getCoordinateSystem();
+					.getDefaultGeometry().getCoordinateSystem();
 			if (tempcrs == null) {
 				// use the default crs
 				crs = AbstractGridFormat.getDefaultCRS();
@@ -1104,7 +1104,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		Iterator it = features.iterator();
 		while (it.hasNext()) {
 			loadedULC.expandToInclude(((Feature) it.next())
-					.getPrimaryGeometry().getEnvelopeInternal());
+					.getDefaultGeometry().getEnvelopeInternal());
 		}
 		return loadedULC;
 

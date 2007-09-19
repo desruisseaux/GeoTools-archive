@@ -18,19 +18,15 @@ package org.geotools.feature;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
 
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
-import org.geotools.feature.type.TypeName;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.util.InternationalString;
 
 /**
@@ -85,7 +81,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     public DefaultFeatureType(String typeName, URI namespace,
             Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
             throws NullPointerException {
-        this(  namespace != null ? new TypeName( namespace.toString(), typeName ) : new TypeName( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ),
+        this(  namespace != null ? new Name( namespace.toString(), typeName ) : new Name( FeatureTypes.DEFAULT_NAMESPACE.toString(), typeName ),
                 types, superTypes, defaultGeom );
     }
     private static final <T> List<T> toList( Collection<T> collection ){
@@ -126,7 +122,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     public DefaultFeatureType( org.opengis.feature.type.Name name,
         Collection types, Collection superTypes, GeometryAttributeType defaultGeom)
         throws NullPointerException {
-    	super( name, (List)types, defaultGeom, null,false, null, toFeatureType(superTypes), null );
+    	super( name, (List)types, defaultGeom, false, null, toFeatureType(superTypes), null );
     	
         if (name == null) {
             throw new NullPointerException("Name required");
@@ -167,11 +163,11 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     
     
     public DefaultFeatureType(
-        org.opengis.feature.type.Name name, List schema, AttributeDescriptor defaultGeometry, 
-        CoordinateReferenceSystem crs, boolean isAbstract, Set restrictions, org.opengis.feature.simple.SimpleFeatureType superType, 
+        org.opengis.feature.type.Name name, List schema, GeometryDescriptor defaultGeometry, 
+        boolean isAbstract, List restrictions,org.opengis.feature.type.AttributeType superType, 
         InternationalString description) {
         
-		super(name, schema, defaultGeometry, crs,isAbstract, restrictions,superType, description);
+		super(name, schema, defaultGeometry,isAbstract, restrictions,superType, description);
 
 		hashCode = computeHash();
 	}
@@ -287,9 +283,9 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
      * @return The attribute type of the default geometry, which will contain
      *         the position.
      */
-    public GeometryAttributeType getPrimaryGeometry() {
+    public GeometryAttributeType getDefaultGeometry() {
 //    	return defaultGeom;
-    	return (GeometryAttributeType) getDefaultGeometry();
+    	return (GeometryAttributeType) super.getDefaultGeometry();
     }
 
     /**

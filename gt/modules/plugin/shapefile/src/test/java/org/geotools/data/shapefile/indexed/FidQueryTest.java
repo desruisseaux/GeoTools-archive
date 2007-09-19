@@ -184,7 +184,7 @@ public class FidQueryTest extends FIDTestCase {
 		GeometryFilter bboxFilter = factory.createGeometryFilter(FilterType.GEOMETRY_INTERSECTS);
         bboxFilter.addRightGeometry(bb);
 
-        String geom = ds.getSchema().getPrimaryGeometry().getLocalName();
+        String geom = ds.getSchema().getDefaultGeometry().getLocalName();
 
         bboxFilter.addLeftGeometry(factory.createAttributeExpression(geom));
         

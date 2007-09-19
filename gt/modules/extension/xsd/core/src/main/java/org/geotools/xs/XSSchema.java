@@ -23,9 +23,9 @@ import java.sql.Timestamp;
 import java.util.Collections;
 import javax.xml.namespace.QName;
 import org.opengis.feature.type.AttributeType;
+import org.geotools.feature.Name;
 import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.feature.type.TypeName;
 
 
 /**
@@ -49,9 +49,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ANYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "anyType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, null, null);
+            false, Collections.EMPTY_LIST, null, null);
 
     /**
      * <p>
@@ -67,9 +67,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANYSIMPLETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ANYSIMPLETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "anySimpleType"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -108,9 +108,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NOTATION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NOTATION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "NOTATION"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -146,9 +146,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DECIMAL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DECIMAL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "decimal"), BigDecimal.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -170,9 +170,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGER_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType INTEGER_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "integer"), BigInteger.class, false, false,
-            Collections.EMPTY_SET, DECIMAL_TYPE, null);
+            Collections.EMPTY_LIST, DECIMAL_TYPE, null);
 
     /**
      * <p>
@@ -193,9 +193,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NONNEGATIVEINTEGER_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NONNEGATIVEINTEGER_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "nonNegativeInteger"), BigInteger.class, false,
-            false, Collections.EMPTY_SET, INTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, INTEGER_TYPE, null);
 
     /**
      * <p>
@@ -220,9 +220,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType UNSIGNEDLONG_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType UNSIGNEDLONG_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "unsignedLong"), BigInteger.class, false,
-            false, Collections.EMPTY_SET, NONNEGATIVEINTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, NONNEGATIVEINTEGER_TYPE, null);
 
     /**
      * <p>
@@ -243,9 +243,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType UNSIGNEDINT_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType UNSIGNEDINT_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "unsignedInt"), Long.class, false, false,
-            Collections.EMPTY_SET, UNSIGNEDLONG_TYPE, null);
+            Collections.EMPTY_LIST, UNSIGNEDLONG_TYPE, null);
 
     /**
      * <p>
@@ -266,9 +266,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType UNSIGNEDSHORT_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType UNSIGNEDSHORT_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "unsignedShort"), Integer.class, false, false,
-            Collections.EMPTY_SET, UNSIGNEDINT_TYPE, null);
+            Collections.EMPTY_LIST, UNSIGNEDINT_TYPE, null);
 
     /**
      * <p>
@@ -289,9 +289,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType UNSIGNEDBYTE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType UNSIGNEDBYTE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "unsignedByte"), Short.class, false, false,
-            Collections.EMPTY_SET, UNSIGNEDSHORT_TYPE, null);
+            Collections.EMPTY_LIST, UNSIGNEDSHORT_TYPE, null);
 
     /**
      * <p>
@@ -324,9 +324,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType QNAME_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType QNAME_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "QName"), QName.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -359,9 +359,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType STRING_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType STRING_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "string"), String.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -382,9 +382,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NORMALIZEDSTRING_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NORMALIZEDSTRING_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "normalizedString"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, STRING_TYPE, null);
 
     /**
      * <p>
@@ -405,9 +405,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOKEN_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType TOKEN_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "token"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, NORMALIZEDSTRING_TYPE, null);
+            Collections.EMPTY_LIST, NORMALIZEDSTRING_TYPE, null);
 
     /**
      * <p>
@@ -434,9 +434,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAME_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NAME_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "Name"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, TOKEN_TYPE, null);
+            Collections.EMPTY_LIST, TOKEN_TYPE, null);
 
     /**
      * <p>
@@ -463,9 +463,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NCNAME_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NCNAME_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "NCName"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, NAME_TYPE, null);
+            false, Collections.EMPTY_LIST, NAME_TYPE, null);
 
     /**
      * <p>
@@ -484,9 +484,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ENTITY_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ENTITY_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "ENTITY"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, NCNAME_TYPE, null);
+            false, Collections.EMPTY_LIST, NCNAME_TYPE, null);
 
     /**
      * <p>
@@ -522,9 +522,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SIMPLEDERIVATIONSET_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SIMPLEDERIVATIONSET_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "simpleDerivationSet"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -546,9 +546,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType PUBLIC_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType PUBLIC_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "public"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, TOKEN_TYPE, null);
+            false, Collections.EMPTY_LIST, TOKEN_TYPE, null);
 
     /**
      * <p>
@@ -576,9 +576,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LANGUAGE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LANGUAGE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "language"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, TOKEN_TYPE, null);
+            false, Collections.EMPTY_LIST, TOKEN_TYPE, null);
 
     /**
      * <p>
@@ -612,9 +612,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DURATION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DURATION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "duration"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -654,9 +654,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BLOCKSET_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BLOCKSET_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "blockSet"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -690,9 +690,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FLOAT_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType FLOAT_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "float"), Float.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -726,9 +726,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DATETIME_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DATETIME_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "dateTime"), Timestamp.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -762,9 +762,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GYEARMONTH_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GYEARMONTH_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "gYearMonth"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -783,9 +783,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ID_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ID_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "ID"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, NCNAME_TYPE, null);
+            Collections.EMPTY_LIST, NCNAME_TYPE, null);
 
     /**
      * <p>
@@ -812,9 +812,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NMTOKEN_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NMTOKEN_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "NMTOKEN"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, TOKEN_TYPE, null);
+            false, Collections.EMPTY_LIST, TOKEN_TYPE, null);
 
     /**
      * <p>
@@ -840,9 +840,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DERIVATIONCONTROL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DERIVATIONCONTROL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "derivationControl"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, NMTOKEN_TYPE, null);
+            false, false, Collections.EMPTY_LIST, NMTOKEN_TYPE, null);
 
     /**
      * <p>
@@ -865,9 +865,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType REDUCEDDERIVATIONCONTROL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType REDUCEDDERIVATIONCONTROL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "reducedDerivationControl"),
-            java.lang.Object.class, false, false, Collections.EMPTY_SET, DERIVATIONCONTROL_TYPE,
+            java.lang.Object.class, false, false, Collections.EMPTY_LIST, DERIVATIONCONTROL_TYPE,
             null);
 
     /**
@@ -889,9 +889,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NONPOSITIVEINTEGER_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NONPOSITIVEINTEGER_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "nonPositiveInteger"), BigInteger.class, false,
-            false, Collections.EMPTY_SET, INTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, INTEGER_TYPE, null);
 
     /**
      * <p>
@@ -912,9 +912,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NEGATIVEINTEGER_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NEGATIVEINTEGER_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "negativeInteger"), BigInteger.class, false,
-            false, Collections.EMPTY_SET, NONPOSITIVEINTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, NONPOSITIVEINTEGER_TYPE, null);
 
     /**
      * <p>
@@ -948,9 +948,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GMONTH_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GMONTH_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "gMonth"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -973,9 +973,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FORMCHOICE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType FORMCHOICE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "formChoice"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, NMTOKEN_TYPE, null);
+            false, Collections.EMPTY_LIST, NMTOKEN_TYPE, null);
 
     /**
      * <p>
@@ -996,9 +996,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POSITIVEINTEGER_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType POSITIVEINTEGER_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "positiveInteger"), BigInteger.class, false,
-            false, Collections.EMPTY_SET, NONNEGATIVEINTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, NONNEGATIVEINTEGER_TYPE, null);
 
     /**
      * <p>
@@ -1031,9 +1031,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BASE64BINARY_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BASE64BINARY_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "base64Binary"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1067,9 +1067,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DOUBLE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "double"), Double.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1110,9 +1110,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMESPACELIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NAMESPACELIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "namespaceList"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1146,9 +1146,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GYEAR_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GYEAR_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "gYear"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1179,9 +1179,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DERIVATIONSET_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DERIVATIONSET_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "derivationSet"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1215,9 +1215,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GMONTHDAY_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GMONTHDAY_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "gMonthDay"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1243,9 +1243,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LONG_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LONG_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "long"), Long.class, false, false,
-            Collections.EMPTY_SET, INTEGER_TYPE, null);
+            Collections.EMPTY_LIST, INTEGER_TYPE, null);
 
     /**
      * <p>
@@ -1267,9 +1267,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INT_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType INT_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "int"), Integer.class, false, false,
-            Collections.EMPTY_SET, LONG_TYPE, null);
+            Collections.EMPTY_LIST, LONG_TYPE, null);
 
     /**
      * <p>
@@ -1291,9 +1291,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SHORT_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SHORT_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "short"), Short.class, false, false,
-            Collections.EMPTY_SET, INT_TYPE, null);
+            Collections.EMPTY_LIST, INT_TYPE, null);
 
     /**
      * <p>
@@ -1315,9 +1315,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BYTE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BYTE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "byte"), Byte.class, false, false,
-            Collections.EMPTY_SET, SHORT_TYPE, null);
+            Collections.EMPTY_LIST, SHORT_TYPE, null);
 
     /**
      * <p>
@@ -1346,9 +1346,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEAN_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BOOLEAN_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "boolean"), Boolean.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1381,9 +1381,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANYURI_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ANYURI_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "anyURI"), URI.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1417,9 +1417,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GDAY_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GDAY_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "gDay"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1453,9 +1453,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIME_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType TIME_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "time"), Time.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1488,9 +1488,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType HEXBINARY_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType HEXBINARY_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "hexBinary"), byte[].class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1524,9 +1524,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DATE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DATE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "date"), java.sql.Date.class, false, false,
-            Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1552,9 +1552,9 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ALLNNI_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ALLNNI_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "allNNI"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1573,72 +1573,69 @@ public class XSSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType IDREF_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType IDREF_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.w3.org/2001/XMLSchema", "IDREF"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, NCNAME_TYPE, null);
+            Collections.EMPTY_LIST, NCNAME_TYPE, null);
 
     public XSSchema() {
         super("http://www.w3.org/2001/XMLSchema");
 
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "anyType"), ANYTYPE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "anySimpleType"), ANYSIMPLETYPE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "NOTATION"), NOTATION_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "decimal"), DECIMAL_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "integer"), INTEGER_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "nonNegativeInteger"),
+        put(new Name("http://www.w3.org/2001/XMLSchema", "anyType"), ANYTYPE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "anySimpleType"), ANYSIMPLETYPE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "NOTATION"), NOTATION_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "decimal"), DECIMAL_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "integer"), INTEGER_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "nonNegativeInteger"),
             NONNEGATIVEINTEGER_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "unsignedLong"), UNSIGNEDLONG_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "unsignedInt"), UNSIGNEDINT_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "unsignedShort"), UNSIGNEDSHORT_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "unsignedByte"), UNSIGNEDBYTE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "QName"), QNAME_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "string"), STRING_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "normalizedString"),
-            NORMALIZEDSTRING_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "token"), TOKEN_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "Name"), NAME_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "NCName"), NCNAME_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "ENTITY"), ENTITY_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "simpleDerivationSet"),
+        put(new Name("http://www.w3.org/2001/XMLSchema", "unsignedLong"), UNSIGNEDLONG_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "unsignedInt"), UNSIGNEDINT_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "unsignedShort"), UNSIGNEDSHORT_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "unsignedByte"), UNSIGNEDBYTE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "QName"), QNAME_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "string"), STRING_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "normalizedString"), NORMALIZEDSTRING_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "token"), TOKEN_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "Name"), NAME_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "NCName"), NCNAME_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "ENTITY"), ENTITY_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "simpleDerivationSet"),
             SIMPLEDERIVATIONSET_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "public"), PUBLIC_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "language"), LANGUAGE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "duration"), DURATION_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "blockSet"), BLOCKSET_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "float"), FLOAT_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "dateTime"), DATETIME_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "gYearMonth"), GYEARMONTH_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "ID"), ID_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "NMTOKEN"), NMTOKEN_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "derivationControl"),
+        put(new Name("http://www.w3.org/2001/XMLSchema", "public"), PUBLIC_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "language"), LANGUAGE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "duration"), DURATION_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "blockSet"), BLOCKSET_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "float"), FLOAT_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "dateTime"), DATETIME_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "gYearMonth"), GYEARMONTH_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "ID"), ID_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "NMTOKEN"), NMTOKEN_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "derivationControl"),
             DERIVATIONCONTROL_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "reducedDerivationControl"),
+        put(new Name("http://www.w3.org/2001/XMLSchema", "reducedDerivationControl"),
             REDUCEDDERIVATIONCONTROL_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "nonPositiveInteger"),
+        put(new Name("http://www.w3.org/2001/XMLSchema", "nonPositiveInteger"),
             NONPOSITIVEINTEGER_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "negativeInteger"),
-            NEGATIVEINTEGER_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "gMonth"), GMONTH_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "formChoice"), FORMCHOICE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "positiveInteger"),
-            POSITIVEINTEGER_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "base64Binary"), BASE64BINARY_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "double"), DOUBLE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "namespaceList"), NAMESPACELIST_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "gYear"), GYEAR_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "derivationSet"), DERIVATIONSET_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "gMonthDay"), GMONTHDAY_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "long"), LONG_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "int"), INT_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "short"), SHORT_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "byte"), BYTE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "boolean"), BOOLEAN_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "anyURI"), ANYURI_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "gDay"), GDAY_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "time"), TIME_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "hexBinary"), HEXBINARY_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "date"), DATE_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "allNNI"), ALLNNI_TYPE);
-        put(new TypeName("http://www.w3.org/2001/XMLSchema", "IDREF"), IDREF_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "negativeInteger"), NEGATIVEINTEGER_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "gMonth"), GMONTH_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "formChoice"), FORMCHOICE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "positiveInteger"), POSITIVEINTEGER_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "base64Binary"), BASE64BINARY_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "double"), DOUBLE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "namespaceList"), NAMESPACELIST_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "gYear"), GYEAR_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "derivationSet"), DERIVATIONSET_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "gMonthDay"), GMONTHDAY_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "long"), LONG_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "int"), INT_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "short"), SHORT_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "byte"), BYTE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "boolean"), BOOLEAN_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "anyURI"), ANYURI_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "gDay"), GDAY_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "time"), TIME_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "hexBinary"), HEXBINARY_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "date"), DATE_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "allNNI"), ALLNNI_TYPE);
+        put(new Name("http://www.w3.org/2001/XMLSchema", "IDREF"), IDREF_TYPE);
     }
 }

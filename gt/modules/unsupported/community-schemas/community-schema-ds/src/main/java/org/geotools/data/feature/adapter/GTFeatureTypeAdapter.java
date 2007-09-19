@@ -126,7 +126,7 @@ public class GTFeatureTypeAdapter implements FeatureType {
         throw new UnsupportedOperationException("not implemented yet");
     }
 
-    public GeometryAttributeType getPrimaryGeometry() {
+    public GeometryAttributeType getDefaultGeometry() {
     	throw new UnsupportedOperationException("not implemented yet");
     }
     

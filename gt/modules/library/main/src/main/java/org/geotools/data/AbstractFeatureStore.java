@@ -146,7 +146,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
                 for (int i = 0; i < type.length; i++) {
                     try {
                         feature.setAttribute(type[i].getLocalName(), value[i]);
-                    } catch (IllegalAttributeException e) {
+                    } catch (Exception e) {
                         throw new DataSourceException(
                             "Could not update feature " + feature.getID()
                             + " with " + type[i].getLocalName() + "=" + value[i], e);
@@ -224,7 +224,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
 
                 try {
                     newFeature.setAttributes(feature.getAttributes(null));
-                } catch (IllegalAttributeException writeProblem) {
+                } catch (Exception writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
                         + feature.getID(), writeProblem);
@@ -257,7 +257,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
                 newFeature = (SimpleFeature)writer.next();
                 try {
                     newFeature.setAttributes(feature.getAttributes(null));
-                } catch (IllegalAttributeException writeProblem) {
+                } catch (Exception writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
                         + feature.getID(), writeProblem);

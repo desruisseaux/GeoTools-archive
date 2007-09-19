@@ -497,7 +497,7 @@ public class MemoryDataStore extends AbstractDataStore {
                             //
                             try {
                                 live.setAttributes(current.getAttributes(null));
-                            } catch (IllegalAttributeException e) {
+                            } catch (Exception e) {
                                 throw new DataSourceException("Unable to accept modifications to "
                                     + live.getID() + " on " + typeName);
                             }
@@ -560,14 +560,14 @@ public class MemoryDataStore extends AbstractDataStore {
             int count = 1;
             Filter filter = query.getFilter();
             Feature first = (Feature) iterator.next();
-            envelope = new Envelope(first.getPrimaryGeometry().getEnvelopeInternal());
+            envelope = new Envelope(first.getDefaultGeometry().getEnvelopeInternal());
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 Feature feature = (Feature) iterator.next();
 
                 if (filter.evaluate(feature)) {
                     count++;
-                    envelope.expandToInclude(feature.getPrimaryGeometry().getEnvelopeInternal());
+                    envelope.expandToInclude(feature.getDefaultGeometry().getEnvelopeInternal());
                 }
             }
         }

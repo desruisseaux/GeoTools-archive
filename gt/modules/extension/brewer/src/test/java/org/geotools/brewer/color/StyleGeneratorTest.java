@@ -113,7 +113,7 @@ public class StyleGeneratorTest extends DataTestCase {
 
         // get the fts
         FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(classifier, expr2, colors,
-                "myfts", roadFeatures[0].getFeatureType().getPrimaryGeometry(),
+                "myfts", roadFeatures[0].getFeatureType().getDefaultGeometry(),
                 StyleGenerator.ELSEMODE_IGNORE, 0.5, null);
         assertNotNull(fts);
 

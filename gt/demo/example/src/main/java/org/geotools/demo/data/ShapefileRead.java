@@ -11,10 +11,10 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.GeoTools;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
 import org.geotools.gui.swing.ProgressWindow;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -75,7 +75,7 @@ public class ShapefileRead {
 		class DistanceVisitor extends AbstractFeatureVisitor {
 			int length =0;
 			public void visit(Feature feature) {
-				Geometry geometry = (Geometry) feature.getDefaultGeometry().getValue();
+				Geometry geometry = (Geometry) feature.getDefaultGeometryProperty().getValue();
 				length += geometry.getLength();
 			}
 		};

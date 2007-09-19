@@ -26,8 +26,8 @@ public class GmlObjectIdImpl implements GmlObjectId {
 	}
 
 	public boolean matches( Object object ) {
-		if ( object instanceof Feature || object instanceof org.opengis.feature.Feature ) {
-			return new FeatureIdImpl( gmlId ).matches( object );
+		if ( object instanceof org.opengis.feature.Feature ) {
+			return new FeatureIdImpl( gmlId ).matches( (org.opengis.feature.Feature) object );
 		}
 		
 		//TODO: geometries

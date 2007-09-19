@@ -22,7 +22,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Namespace;
 import org.opengis.feature.type.Schema;
 
@@ -51,7 +54,7 @@ public class ProfileImpl implements Schema {
 	/**
 	 * Keyset used by this profile (immutable).
 	 */
-	private Set profile;
+	private Set<Name> profile;
 	
 	/**
 	 * Profile contents (created in a lazy fashion).
@@ -64,24 +67,21 @@ public class ProfileImpl implements Schema {
 	 * @param parent
 	 * @param profile
 	 */
-	public ProfileImpl( Schema parent, Set profile ){
+	public ProfileImpl( Schema parent, Set<Name> profile ){
 		this.parent = parent;
+		
 		this.profile = Collections.unmodifiableSet(profile);
 	}
 	
-	public Set keySet() {
+	public Set<Name> keySet() {
 		return profile;
 	}
 
-	public Namespace namespace() {
-		return parent.namespace();
+	public String getURI() {
+		return parent.getURI();
 	}
 
-	public String toURI() {
-		return parent.toURI();
-	}
-
-	public Schema profile(Namespace profile) {
+	public Schema profile(Set<Name> profile) {
 		return parent.profile( profile );
 	}
 
@@ -101,37 +101,44 @@ public class ProfileImpl implements Schema {
 		return values().contains( value );
 	}
 
-	public Object get(Object key) {
+	public AttributeType get(Object key) {
 		if( profile.contains( key )){
 			return parent.get( key );
 		}
 		return null;
 	}
 
-	public Object put(Object arg0, Object arg1) {
-		throw new UnsupportedOperationException("Profile not mutable");
+	public AttributeType put(Name key, AttributeType value) {
+	    throw new UnsupportedOperationException("Profile not mutable");
+	}
+	
+	public AttributeType remove(Object key) {
+	 	throw new UnsupportedOperationException("Profile not mutable");
 	}
 
-	public Object remove(Object key) {
-		throw new UnsupportedOperationException("Profile not mutable");
-	}
-
-	public void putAll(Map arg0) {
-		throw new UnsupportedOperationException("Profile not mutable");
+	public void putAll(Map<? extends Name, ? extends AttributeType> t) {
+    	throw new UnsupportedOperationException("Profile not mutable");
 	}
 
 	public void clear() {
-		throw new UnsupportedOperationException("Profile not mutable");
+	    throw new UnsupportedOperationException("Profile not mutable");
 	}
 
-	public Collection values() {
-		return contents().values();
+	public void add(AttributeType type) {
+	    throw new UnsupportedOperationException("Profile not mutable");
+	}
+	
+	//public Collection values() {
+	public Collection<AttributeType> values() {
+	 	return contents().values();
 	}
 
-	public Set entrySet() {
-		return contents().entrySet();
+	//public Set<Name> entrySet() {
+	public Set<Entry<Name, AttributeType>> entrySet() {
+	 	return contents().entrySet();
 	}
-	private synchronized Map contents(){
+	
+	private synchronized Map<Name,AttributeType> contents(){
 		if( contents == null){
 			contents = new LinkedHashMap();
 			for( Iterator i=profile.iterator();i.hasNext();){

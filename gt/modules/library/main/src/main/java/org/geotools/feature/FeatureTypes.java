@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
-import org.geotools.feature.type.TypeName;
 import org.geotools.filter.LengthFunction;
 import org.geotools.geometry.jts.JTS;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -86,8 +85,8 @@ public class FeatureTypes {
     }
 		
 	/** default feature collection name */
-	final public static TypeName DEFAULT_TYPENAME = 
-		new TypeName( "AbstractFeatureCollectionType", DEFAULT_NAMESPACE.toString() );
+	final public static Name DEFAULT_TYPENAME = 
+		new Name( "AbstractFeatureCollectionType", DEFAULT_NAMESPACE.toString() );
 	
 	/** represent an unbounded field length */
     final public static int ANY_LENGTH = -1;
@@ -176,7 +175,7 @@ public class FeatureTypes {
                         geometryType.getLocalName(), geometryType.getBinding(), geometryType.isNillable(),
                         0, geometryType.createDefaultValue(), crs);
 
-                if (defaultGeometryType == null || geometryType == schema.getPrimaryGeometry()) {
+                if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
                     defaultGeometryType = forced;
                 }
                 tb.add(forced);
@@ -184,8 +183,8 @@ public class FeatureTypes {
                 tb.add(attributeType);
             }
         }
-        if (schema.getPrimaryGeometry() != null) {
-            tb.setDefaultGeometry(schema.getPrimaryGeometry().getLocalName());
+        if (schema.getDefaultGeometry() != null) {
+            tb.setDefaultGeometry(schema.getDefaultGeometry().getLocalName());
         }
         
         tb.setSuperType((SimpleFeatureType) schema.getSuper());
@@ -208,16 +207,13 @@ public class FeatureTypes {
             throws MismatchedDimensionException, TransformException, IllegalAttributeException {
         feature = schema.create(feature.getAttributes(null), feature.getID());
 
-        GeometryAttributeType geomType = schema.getPrimaryGeometry();
+        GeometryAttributeType geomType = schema.getDefaultGeometry();
         Geometry geom = (Geometry) feature.getAttribute(geomType.getLocalName());
 
         geom = JTS.transform(geom, transform);
 
-        try {
-            feature.setAttribute(geomType.getLocalName(), geom);
-        } catch (IllegalAttributeException shouldNotHappen) {
-            // we are expecting the transform to return the same geometry type
-        }
+        feature.setAttribute(geomType.getLocalName(), geom);
+        
         return feature;
     }
 

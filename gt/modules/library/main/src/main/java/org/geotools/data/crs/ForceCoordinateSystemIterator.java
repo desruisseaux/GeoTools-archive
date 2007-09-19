@@ -88,7 +88,7 @@ public class ForceCoordinateSystemIterator implements Iterator {
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");
         }        
-        CoordinateReferenceSystem originalCs = type.getPrimaryGeometry()
+        CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
                                                    .getCoordinateSystem();
 
         if (cs.equals(originalCs)) {

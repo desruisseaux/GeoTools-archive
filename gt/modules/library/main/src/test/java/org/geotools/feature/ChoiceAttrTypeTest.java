@@ -169,7 +169,7 @@ public class ChoiceAttrTypeTest extends TestCase {
 
         //FeatureType a = FeatureTypeFactory.newFeatureType(new AttributeType[]{},"noAttribs");
         //FeatureType b = FeatureTypeFactory.newFeatureType(new AttributeType[]{AttributeTypeFactory.newAttributeType("testAttribute", Double.class)},"oneAttribs");
-        //Direct construction should never be used like this, however it is the only way to test
+        //Direct construction should never be used like this, however it is the only way to test    `
         //the code fully
         //AttributeType feat = AttributeTypeFactory.newAttributeType( "good",a, false);        
     }

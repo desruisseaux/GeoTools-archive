@@ -99,7 +99,7 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                 if (info == null) {
                     //calculate some meta data based on the feature type
                     FeatureType type = getFeatureSource(monitor).getSchema();
-                    CoordinateReferenceSystem crs = type.getPrimaryGeometry()
+                    CoordinateReferenceSystem crs = type.getDefaultGeometry()
                                                         .getCoordinateSystem();
                     URI schema = type.getNamespace();
                     String name = type.getTypeName();

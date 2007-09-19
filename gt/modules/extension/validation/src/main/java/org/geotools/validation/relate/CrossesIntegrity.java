@@ -184,18 +184,18 @@ public class CrossesIntegrity extends RelationIntegrity
 			while (fr1.hasNext())
 			{
 				Feature f1 = fr1.next();
-				Geometry g1 = f1.getPrimaryGeometry();
+				Geometry g1 = f1.getDefaultGeometry();
 				fr2 = featureResultsB.features();
 				
 				while (fr2 != null && fr2.hasNext())
 				{
 					Feature f2 = fr2.next();
-					Geometry g2 = f2.getPrimaryGeometry();
+					Geometry g2 = f2.getDefaultGeometry();
 					//System.out.println("Do the two overlap?->" + g1.overlaps(g2));
 					//System.out.println("Does the one contain the other?->" + g1.contains(g2));
 					if(g1.overlaps(g2) != expected || g1.contains(g2) != expected)
 					{
-						results.error( f1, f1.getPrimaryGeometry().getGeometryType()+" "+getGeomTypeRefA()+" overlapped "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
+						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" overlapped "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
 						success = false;
 					}
 				}		
@@ -272,7 +272,7 @@ public class CrossesIntegrity extends RelationIntegrity
 //				System.out.println("f1 = " + f1.getDefaultGeometry().getEnvelope());
 //				System.out.println("env1 = " + bBox);
 				
-				Geometry g1 = f1.getPrimaryGeometry();
+				Geometry g1 = f1.getDefaultGeometry();
 				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
 
 				//FeatureResults featureResults2 = featureSourceA.getFeatures(filter2);
@@ -282,7 +282,7 @@ public class CrossesIntegrity extends RelationIntegrity
 				{			
 					Feature f2 = fr2.next();
 					//System.out.println("Filter2 " + filter2.contains(f2));
-					Geometry g2 = f2.getPrimaryGeometry();
+					Geometry g2 = f2.getDefaultGeometry();
 					//System.out.println("Do the two overlap?->" + g1.overlaps(g2));
 					//System.out.println("Does the one contain the other?->" + g1.contains(g2));
 					if (!usedIDs.contains(f2.getID()))
@@ -294,7 +294,7 @@ public class CrossesIntegrity extends RelationIntegrity
 							{
 								//results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
 								results.error( f1, getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+")");
-								System.out.println(f1.getPrimaryGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
+								System.out.println(f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
 								success = false;
 							}
 						}
@@ -319,7 +319,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	{
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
-		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getPrimaryGeometry().getLocalName());
+		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getDefaultGeometry().getLocalName());
 		GeometryFilter containsFilter = ff.createGeometryFilter(Filter.GEOMETRY_DISJOINT);
 		containsFilter.addLeftGeometry(bboxExpr);
 		containsFilter.addRightGeometry(geomExpr);

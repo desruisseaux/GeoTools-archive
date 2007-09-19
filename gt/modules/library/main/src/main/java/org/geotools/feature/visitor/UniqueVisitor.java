@@ -22,9 +22,9 @@ import java.util.Set;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
-import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -62,7 +62,7 @@ public class UniqueVisitor implements FeatureCalc {
         this.expr = expr;
     }
 
-    public void init(FeatureCollectionType collection) {
+    public void init(FeatureCollection collection) {
     	//do nothing
     }
     

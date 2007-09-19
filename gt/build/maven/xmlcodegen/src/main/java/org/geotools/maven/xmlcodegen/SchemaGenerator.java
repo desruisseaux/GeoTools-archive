@@ -36,9 +36,8 @@ import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDConstants;
 import org.eclipse.xsd.util.XSDUtil;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.feature.type.TypeFactoryImpl;
-import org.geotools.feature.type.TypeName;
 import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.build.basic.BasicDirectedGraphGenerator;
 import org.geotools.graph.structure.Graph;
@@ -53,10 +52,10 @@ import org.geotools.xml.Schemas;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.Schema;
-import org.opengis.feature.type.TypeFactory;
-
 
 /**
  * Parses an XML schema to procuce an instance of
@@ -84,7 +83,7 @@ public class SchemaGenerator extends AbstractGenerator {
     /**
      * Factory used to build geotools types.
      */
-    TypeFactory factory;
+    FeatureTypeFactory factory;
     /**
      * Flag indicating wether simple types should be processed.
      */
@@ -119,7 +118,7 @@ public class SchemaGenerator extends AbstractGenerator {
 
     public SchemaGenerator(XSDSchema schema) {
         this.schema = schema;
-        this.factory = new TypeFactoryImpl();
+        this.factory = new FeatureTypeFactoryImpl();
         types = new HashMap();
         simpleTypes = true;
         complexTypes = true;
@@ -212,7 +211,7 @@ public class SchemaGenerator extends AbstractGenerator {
      * Adds an imported schema to be used for type lookups.
      */
     public void addImport(Schema imported) {
-        imports.put(imported.namespace().getURI(), imported);
+        imports.put(imported.getURI(), imported);
     }
 
     /**
@@ -346,9 +345,9 @@ public class SchemaGenerator extends AbstractGenerator {
 				ComplexType cType = (ComplexType) type;
 				
 				//add an edge for each descriptor
-				Collection atts = cType.attributes();
+				Collection atts = cType.getProperties();
 				for (Iterator aitr = atts.iterator(); aitr.hasNext();) {
-					AttributeDescriptor ad = (AttributeDescriptor) aitr.next();
+					PropertyDescriptor ad = (PropertyDescriptor) aitr.next();
 					gg.add(new Object[]{type,ad.getType()});
 				}
 			}
@@ -430,7 +429,7 @@ public class SchemaGenerator extends AbstractGenerator {
 
         //TODO: actually derive valus from type
 		AttributeType gtType = factory.createAttributeType(
-			typeName(xsdType), Object.class, false, false, Collections.EMPTY_SET, 
+			name(xsdType), Object.class, false, false, Collections.EMPTY_LIST, 
 			superType, null
 		);
         types.put(xsdType, gtType);
@@ -499,15 +498,15 @@ public class SchemaGenerator extends AbstractGenerator {
 		//TODO: restrictions
 		//TODO: description
 		ComplexType gtType = factory.createComplexType(
-			typeName(xsdType), properties, false, xsdType.isAbstract(), 
-			Collections.EMPTY_SET, superType, null
+			name(xsdType), properties, false, xsdType.isAbstract(), 
+			Collections.EMPTY_LIST, superType, null
 		);
 		types.put(xsdType,gtType);
 		return gtType;
 	}
 	
     private AttributeType findType(XSDTypeDefinition xsdType) {
-        TypeName name = typeName(xsdType);
+        Name name = name(xsdType);
 
         if (imports != null) {
             for (Iterator itr = imports.values().iterator(); itr.hasNext();) {
@@ -529,14 +528,7 @@ public class SchemaGenerator extends AbstractGenerator {
         return new org.geotools.feature.Name(type.getTargetNamespace(),
             type.getName());
     }
-    /**
-     * Convenience method for gettign the typeName of a type.
-     */
-    private TypeName typeName(XSDTypeDefinition type) {
-        return new org.geotools.feature.type.TypeName(type.getTargetNamespace(),
-            type.getName());
-    }
-
+   
     public static void main(String[] args) throws Exception {
         XSDSchema schema = XSDUtil.getSchemaForSchema(XSDConstants.SCHEMA_FOR_SCHEMA_URI_2001);
 

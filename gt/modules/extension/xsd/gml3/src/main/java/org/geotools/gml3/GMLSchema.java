@@ -35,7 +35,6 @@ import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.feature.type.ComplexTypeImpl;
 import org.geotools.feature.type.FeatureTypeImpl;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.feature.type.TypeName;
 import org.geotools.gml3.smil.SMIL20LANGSchema;
 import org.geotools.gml3.smil.SMIL20Schema;
 import org.geotools.xs.XSSchema;
@@ -62,9 +61,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CARTESIANCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CARTESIANCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CartesianCSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -85,9 +84,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTPOSITIONALACCURACYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTPOSITIONALACCURACYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractPositionalAccuracyType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -112,9 +111,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RELATIVEINTERNALPOSITIONALACCURACYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RELATIVEINTERNALPOSITIONALACCURACYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RelativeInternalPositionalAccuracyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             ABSTRACTPOSITIONALACCURACYTYPE_TYPE, null);
 
     /**
@@ -142,9 +141,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SURFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SURFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SurfacePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -165,9 +164,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCMINUTESTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ARCMINUTESTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcMinutesType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.NONNEGATIVEINTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.NONNEGATIVEINTEGER_TYPE, null);
 
     /**
      * <p>
@@ -186,9 +185,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECALENDARPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECALENDARPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeCalendarPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -212,9 +211,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType METADATAPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType METADATAPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MetaDataPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -241,9 +240,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CODETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CODETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CodeType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -266,9 +265,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType STRINGORREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType STRINGORREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "StringOrRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -292,9 +291,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BOUNDINGSHAPETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BOUNDINGSHAPETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BoundingShapeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -324,9 +323,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LOCATIONPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LOCATIONPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LocationPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -362,9 +361,9 @@ public class GMLSchema extends SchemaImpl {
                 new Name("http://www.opengis.net/gml", "name"), 0, 2147483647, false, null));
     }
 
-    public static final ComplexType ABSTRACTGMLTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGMLTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGMLType"), ABSTRACTGMLTYPE_TYPE_schema,
-            false, true, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -398,9 +397,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTGEOMETRYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ABSTRACTGEOMETRYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeometryType"), Geometry.class, false, true,
-            Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -421,9 +420,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGEOMETRICAGGREGATETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGEOMETRICAGGREGATETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeometricAggregateType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, ABSTRACTGEOMETRYTYPE_TYPE,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, ABSTRACTGEOMETRYTYPE_TYPE,
             null);
 
     /**
@@ -454,9 +453,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOINTTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTIPOINTTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiPointType"), MultiPoint.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -487,9 +486,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DOMAINSETTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DOMAINSETTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DomainSetType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -512,9 +511,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RECTIFIEDGRIDDOMAINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RECTIFIEDGRIDDOMAINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RectifiedGridDomainType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOMAINSETTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOMAINSETTYPE_TYPE, null);
 
     /**
      * <p>
@@ -532,9 +531,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOVOLUMEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOVOLUMEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoVolumePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -552,9 +551,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTOPOLOGYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTOPOLOGYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTopologyType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -580,9 +579,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOCURVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOCURVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoCurveType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTOPOLOGYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTOPOLOGYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -609,9 +608,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALDATUMTYPETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALDATUMTYPETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalDatumTypeType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, CODETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, CODETYPE_TYPE, null);
 
     /**
      * <p>
@@ -629,9 +628,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOPOINTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOPOINTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoPointPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -678,9 +677,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NULLENUMERATION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NULLENUMERATION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NullEnumeration"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -699,9 +698,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTSURFACEPATCHTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTSURFACEPATCHTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractSurfacePatchType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -735,9 +734,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RECTANGLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RECTANGLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RectangleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTSURFACEPATCHTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTSURFACEPATCHTYPE_TYPE, null);
 
     /**
      * <p>
@@ -768,9 +767,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BASESTYLEDESCRIPTORTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BASESTYLEDESCRIPTORTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BaseStyleDescriptorType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -806,9 +805,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOLOGYSTYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOLOGYSTYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopologyStyleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, BASESTYLEDESCRIPTORTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, BASESTYLEDESCRIPTORTYPE_TYPE, null);
 
     /**
      * <p>
@@ -838,9 +837,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTIGEOMETRYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTIGEOMETRYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiGeometryType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -862,9 +861,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LINEARCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LINEARCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LinearCSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -888,9 +887,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEEDGEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEEDGEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeEdgePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -909,9 +908,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimePrimitivePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -949,9 +948,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RELATEDTIMETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RELATEDTIMETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RelatedTimeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, TIMEPRIMITIVEPROPERTYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, TIMEPRIMITIVEPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -973,9 +972,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VALUEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VALUEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ValuePropertyType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1000,9 +999,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CATEGORYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CATEGORYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CategoryPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, VALUEPROPERTYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, VALUEPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1023,9 +1022,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FILEVALUEMODELTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType FILEVALUEMODELTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FileValueModelType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -1048,9 +1047,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTOPOPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTOPOPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTopoPrimitiveType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTTOPOLOGYTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTTOPOLOGYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1077,9 +1076,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType EDGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType EDGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EdgeType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1102,9 +1101,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeometricPrimitiveType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, ABSTRACTGEOMETRYTYPE_TYPE,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, ABSTRACTGEOMETRYTYPE_TYPE,
             null);
 
     /**
@@ -1126,9 +1125,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTSOLIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTSOLIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractSolidType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1166,9 +1165,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITESOLIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITESOLIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeSolidType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTSOLIDTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTSOLIDTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1197,9 +1196,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DEFINITIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DEFINITIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DefinitionType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1226,9 +1225,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCoordinateOperationBaseType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1272,9 +1271,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCOORDINATEOPERATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCOORDINATEOPERATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCoordinateOperationType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE, null);
 
     /**
@@ -1312,9 +1311,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeneralTransformationType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTCOORDINATEOPERATIONTYPE_TYPE, null);
 
     /**
@@ -1347,9 +1346,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TRANSFORMATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TRANSFORMATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TransformationType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1369,9 +1368,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTEDNODEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTEDNODEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectedNodePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1395,9 +1394,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FORMULATYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FORMULATYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FormulaType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1431,9 +1430,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGENERALCONVERSIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGENERALCONVERSIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeneralConversionType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTCOORDINATEOPERATIONTYPE_TYPE, null);
 
     /**
@@ -1466,9 +1465,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONVERSIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONVERSIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConversionType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGENERALCONVERSIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGENERALCONVERSIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1486,9 +1485,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOSURFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOSURFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoSurfacePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1510,9 +1509,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCURVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCURVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCurveType"), Collections.EMPTY_LIST, false,
-            true, Collections.EMPTY_SET, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
+            true, Collections.EMPTY_LIST, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1543,9 +1542,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CURVETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType CURVETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CurveType"), MultiLineString.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTCURVETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTCURVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1618,9 +1617,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType AFFINEPLACEMENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType AFFINEPLACEMENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AffinePlacementType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1654,9 +1653,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GEOMETRYPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GEOMETRYPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometryPropertyType"), Geometry.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1680,9 +1679,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MEASURETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MEASURETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MeasureType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.DOUBLE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.DOUBLE_TYPE, null);
 
     /**
      * <p>
@@ -1703,9 +1702,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SPEEDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SPEEDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SpeedType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1732,9 +1731,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ELLIPSOIDBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ELLIPSOIDBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EllipsoidBaseType"), Collections.EMPTY_LIST, false,
-            true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1770,9 +1769,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ELLIPSOIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ELLIPSOIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EllipsoidType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ELLIPSOIDBASETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ELLIPSOIDBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1794,9 +1793,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType USERDEFINEDCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType USERDEFINEDCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "UserDefinedCSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1818,9 +1817,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATEREFERENCESYSTEMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATEREFERENCESYSTEMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinateReferenceSystemRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -1855,9 +1855,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ORIENTABLECURVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ORIENTABLECURVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OrientableCurveType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCURVETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCURVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1876,9 +1876,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEANORNULL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BOOLEANORNULL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "booleanOrNull"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -1900,9 +1900,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEODETICDATUMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEODETICDATUMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeodeticDatumRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1924,9 +1924,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GENERALCONVERSIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GENERALCONVERSIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeneralConversionRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -1958,9 +1958,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CURVEINTERPOLATIONTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType CURVEINTERPOLATIONTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CurveInterpolationType"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -1978,9 +1978,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LineStringSegmentArrayPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -2001,9 +2002,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractParametricCurveSurfaceType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             ABSTRACTSURFACEPATCHTYPE_TYPE, null);
 
     /**
@@ -2073,9 +2074,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGRIDDEDSURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGRIDDEDSURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGriddedSurfaceType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE, null);
 
     /**
@@ -2134,9 +2135,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SPHERETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SPHERETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SphereType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTGRIDDEDSURFACETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGRIDDEDSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2157,9 +2158,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RINGPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RINGPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RingPropertyType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2181,9 +2182,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2205,9 +2206,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ELLIPSOIDALCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ELLIPSOIDALCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EllipsoidalCSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2226,9 +2227,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGERLIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType INTEGERLIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "integerList"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2249,9 +2250,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTRINGTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTRINGTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractRingType"), Collections.EMPTY_LIST, false,
-            true, Collections.EMPTY_SET, ABSTRACTGEOMETRYTYPE_TYPE, null);
+            true, Collections.EMPTY_LIST, ABSTRACTGEOMETRYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2302,9 +2303,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINEARRINGTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LINEARRINGTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LinearRingType"), LinearRing.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTRINGTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTRINGTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2335,9 +2336,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEPOSITIONUNION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType TIMEPOSITIONUNION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimePositionUnion"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2368,9 +2369,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEPOSITIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEPOSITIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimePositionType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, TIMEPOSITIONUNION_TYPE, null);
+            false, Collections.EMPTY_LIST, TIMEPOSITIONUNION_TYPE, null);
 
     /**
      * <p>
@@ -2389,9 +2390,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITECURVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITECURVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeCurvePropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -2411,9 +2413,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTEDTOPOSOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTEDTOPOSOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectedTopoSolidPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -2437,9 +2440,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SIGNTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SIGNTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SignType"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -2464,9 +2467,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SYMBOLTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SYMBOLTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SymbolType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2488,9 +2491,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalCRSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2513,9 +2516,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTICURVEDOMAINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTICURVEDOMAINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiCurveDomainType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOMAINSETTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOMAINSETTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2536,9 +2539,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTSTYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTSTYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractStyleType"), Collections.EMPTY_LIST, false,
-            true, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            true, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2564,9 +2567,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType STYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType STYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "StyleType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTSTYLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTSTYLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2588,9 +2591,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGENERALOPERATIONPARAMETERREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGENERALOPERATIONPARAMETERREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeneralOperationParameterRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -2612,9 +2616,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TRANSFORMATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TRANSFORMATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TransformationRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2635,9 +2639,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMEOBJECTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMEOBJECTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimeObjectType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2663,9 +2667,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMEPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMEPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimePrimitiveType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTTIMEOBJECTTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTTIMEOBJECTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2690,9 +2694,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimeTopologyPrimitiveType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTTIMEPRIMITIVETYPE_TYPE, null);
 
     /**
@@ -2720,9 +2724,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEEDGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEEDGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeEdgeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2744,9 +2748,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRAPHTYPETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType GRAPHTYPETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GraphTypeType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -2768,9 +2772,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SPHERICALCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SPHERICALCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SphericalCSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2800,9 +2804,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDFUNCTIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDFUNCTIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridFunctionType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2827,9 +2831,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType INDEXMAPTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType INDEXMAPTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "IndexMapType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, GRIDFUNCTIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, GRIDFUNCTIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2850,9 +2854,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGENERALPARAMETERVALUETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGENERALPARAMETERVALUETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeneralParameterValueType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -2887,9 +2891,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PARAMETERVALUETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PARAMETERVALUETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ParameterValueType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGENERALPARAMETERVALUETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGENERALPARAMETERVALUETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2916,9 +2920,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimeGeometricPrimitiveType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTTIMEPRIMITIVETYPE_TYPE, null);
 
     /**
@@ -2949,9 +2953,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEPERIODTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEPERIODTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimePeriodType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -2992,9 +2996,9 @@ public class GMLSchema extends SchemaImpl {
                 new Name("http://www.opengis.net/gml", "location"), 0, 1, false, null));
     }
 
-    public static final FeatureType ABSTRACTFEATURETYPE_TYPE = new FeatureTypeImpl(new TypeName(
+    public static final FeatureType ABSTRACTFEATURETYPE_TYPE = new FeatureTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractFeatureType"),
-            ABSTRACTFEATURETYPE_TYPE_schema, null, null, true, Collections.EMPTY_SET,
+            ABSTRACTFEATURETYPE_TYPE_schema, null, true, Collections.EMPTY_LIST,
             ABSTRACTGMLTYPE_TYPE, null);
 
     /**
@@ -3018,9 +3022,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DYNAMICFEATURETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DYNAMICFEATURETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DynamicFeatureType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTFEATURETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTFEATURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -3045,9 +3049,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TARGETPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TARGETPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TargetPropertyType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3069,9 +3073,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCSECONDSTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType ARCSECONDSTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcSecondsType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.DECIMAL_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.DECIMAL_TYPE, null);
 
     /**
      * <p>
@@ -3123,9 +3127,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEORDINALERATYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEORDINALERATYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeOrdinalEraType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3150,9 +3154,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTILINESTRINGTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTILINESTRINGTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiLineStringType"), MultiLineString.class, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -3173,9 +3177,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType AREATYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType AREATYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AreaType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -3208,9 +3212,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COMPASSPOINTENUMERATION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType COMPASSPOINTENUMERATION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompassPointEnumeration"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -3242,9 +3246,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATESTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATESTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinatesType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -3265,9 +3269,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SOLIDARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SOLIDARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SolidArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3300,9 +3304,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType POINTPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PointPropertyType"), Point.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3321,9 +3325,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TINTYPE_CONTROLPOINT_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TINTYPE_CONTROLPOINT_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TinType_controlPoint"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3352,9 +3356,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DEFINITIONPROXYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DEFINITIONPROXYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DefinitionProxyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3381,9 +3385,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCoverageType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTFEATURETYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTFEATURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -3408,9 +3412,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTDISCRETECOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTDISCRETECOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractDiscreteCoverageType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, ABSTRACTCOVERAGETYPE_TYPE,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, ABSTRACTCOVERAGETYPE_TYPE,
             null);
 
     /**
@@ -3440,9 +3444,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTICURVECOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTICURVECOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiCurveCoverageType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -3460,9 +3464,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOCURVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOCURVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoCurvePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3484,9 +3488,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType POLARCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType POLARCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolarCSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3510,9 +3514,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INCREMENTORDER_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType INCREMENTORDER_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "IncrementOrder"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -3535,9 +3539,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOMETRYSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOMETRYSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometryStylePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3564,9 +3568,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTICURVEPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTICURVEPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiCurvePropertyType"), MultiLineString[].class,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3588,9 +3592,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PROJECTEDCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PROJECTEDCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ProjectedCRSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3612,9 +3616,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DRAWINGTYPETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DRAWINGTYPETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DrawingTypeType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -3641,9 +3645,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCoordinateSystemBaseType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3682,9 +3686,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCOORDINATESYSTEMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCOORDINATESYSTEMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCoordinateSystemType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE, null);
 
     /**
@@ -3706,9 +3710,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType POLARCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType POLARCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolarCSType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3731,9 +3735,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTIPOINTDOMAINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTIPOINTDOMAINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiPointDomainType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOMAINSETTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOMAINSETTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3762,9 +3766,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOLYGONPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTIPOLYGONPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiPolygonPropertyType"), MultiPolygon.class,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3789,9 +3793,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOPOINTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOPOINTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoPointType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTOPOLOGYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTOPOLOGYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3818,9 +3822,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimeReferenceSystemType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3847,9 +3851,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEORDINALREFERENCESYSTEMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEORDINALREFERENCESYSTEMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeOrdinalReferenceSystemType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
@@ -3872,9 +3876,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONPARAMETERGROUPREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONPARAMETERGROUPREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationParameterGroupRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -3895,9 +3900,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType KNOTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType KNOTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "KnotPropertyType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3918,9 +3923,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDLENGTHTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDLENGTHTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridLengthType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -3945,9 +3950,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTIONVECTORTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTIONVECTORTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectionVectorType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -3984,9 +3989,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCURVESEGMENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCURVESEGMENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractCurveSegmentType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4059,9 +4064,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARCBYCENTERPOINTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARCBYCENTERPOINTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcByCenterPointType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4082,9 +4087,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CIRCLEBYCENTERPOINTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CIRCLEBYCENTERPOINTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CircleByCenterPointType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ARCBYCENTERPOINTTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ARCBYCENTERPOINTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4105,9 +4110,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTSURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTSURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractSurfaceType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4137,9 +4142,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SURFACETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SURFACETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SurfaceType"), Polygon.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTSURFACETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4172,9 +4177,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TRIANGULATEDSURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TRIANGULATEDSURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TriangulatedSurfaceType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, SURFACETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, SURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4257,9 +4262,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TinType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, TRIANGULATEDSURFACETYPE_TYPE, null);
+            Collections.EMPTY_LIST, TRIANGULATEDSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4280,9 +4285,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTRINGPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTRINGPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractRingPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4369,9 +4374,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CLOTHOIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CLOTHOIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ClothoidType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4398,9 +4403,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SolidPropertyType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4427,9 +4432,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTDATUMBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTDATUMBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractDatumBaseType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4467,9 +4472,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTDATUMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTDATUMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractDatumType"), Collections.EMPTY_LIST, false,
-            true, Collections.EMPTY_SET, ABSTRACTDATUMBASETYPE_TYPE, null);
+            true, Collections.EMPTY_LIST, ABSTRACTDATUMBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4494,9 +4499,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType IMAGEDATUMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType IMAGEDATUMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ImageDatumType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTDATUMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTDATUMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4522,9 +4527,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LABELSTYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LABELSTYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LabelStyleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, BASESTYLEDESCRIPTORTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, BASESTYLEDESCRIPTORTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4545,9 +4550,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LINEARCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LINEARCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LinearCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4566,9 +4571,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGERORNULL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType INTEGERORNULL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "integerOrNull"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4599,9 +4604,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FEATURESTYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FEATURESTYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FeatureStyleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4628,9 +4633,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PRIMEMERIDIANBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PRIMEMERIDIANBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PrimeMeridianBaseType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4665,9 +4670,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PRIMEMERIDIANTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PRIMEMERIDIANTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PrimeMeridianType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, PRIMEMERIDIANBASETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, PRIMEMERIDIANBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4698,9 +4703,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATESYSTEMAXISBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATESYSTEMAXISBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinateSystemAxisBaseType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4737,9 +4742,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATESYSTEMAXISTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATESYSTEMAXISTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinateSystemAxisType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, COORDINATESYSTEMAXISBASETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, COORDINATESYSTEMAXISBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -4761,9 +4766,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType IMAGECRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType IMAGECRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ImageCRSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4785,9 +4790,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ANGLECHOICETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ANGLECHOICETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AngleChoiceType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4809,9 +4814,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FEATUREPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FEATUREPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FeaturePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4838,9 +4843,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTREFERENCESYSTEMBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTREFERENCESYSTEMBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractReferenceSystemBaseType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4876,9 +4881,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTREFERENCESYSTEMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTREFERENCESYSTEMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractReferenceSystemType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTREFERENCESYSTEMBASETYPE_TYPE, null);
 
     /**
@@ -4905,9 +4910,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGENERALDERIVEDCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGENERALDERIVEDCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeneralDerivedCRSType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
@@ -4934,9 +4939,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DERIVEDCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DERIVEDCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DerivedCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGENERALDERIVEDCRSTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGENERALDERIVEDCRSTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4958,9 +4963,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CYLINDRICALCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CYLINDRICALCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CylindricalCSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -4992,9 +4997,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RINGTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RINGTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RingType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTRINGTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTRINGTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5015,9 +5020,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SCALETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SCALETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ScaleType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5036,9 +5041,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMEORNULLLIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NAMEORNULLLIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NameOrNullList"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5065,9 +5070,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CODEORNULLLISTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CODEORNULLLISTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CodeOrNullListType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, NAMEORNULLLIST_TYPE, null);
+            false, Collections.EMPTY_LIST, NAMEORNULLLIST_TYPE, null);
 
     /**
      * <p>
@@ -5090,9 +5095,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CATEGORYEXTENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CATEGORYEXTENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CategoryExtentType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, CODEORNULLLISTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, CODEORNULLLISTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5113,9 +5118,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ANGLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ANGLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AngleType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5165,9 +5170,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType EXTENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType EXTENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ExtentType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5188,9 +5193,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LENGTHTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LENGTHTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LengthType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5211,9 +5216,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SURFACEPATCHARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SURFACEPATCHARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SurfacePatchArrayPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -5239,9 +5245,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TRIANGLEPATCHARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TRIANGLEPATCHARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TrianglePatchArrayPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             SURFACEPATCHARRAYPROPERTYTYPE_TYPE, null);
 
     /**
@@ -5272,9 +5278,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITESURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITESURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeSurfaceType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTSURFACETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5297,9 +5303,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SECONDDEFININGPARAMETERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SECONDDEFININGPARAMETERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SecondDefiningParameterType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -5321,9 +5328,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONCATENATEDOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONCATENATEDOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConcatenatedOperationRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -5348,9 +5356,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMETOPOLOGYCOMPLEXPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMETOPOLOGYCOMPLEXPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeTopologyComplexPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -5382,9 +5391,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DICTIONARYENTRYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DICTIONARYENTRYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DictionaryEntryType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5407,9 +5416,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DEFAULTSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DEFAULTSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DefaultStylePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5428,9 +5437,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTMETADATATYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTMETADATATYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractMetaDataType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5455,9 +5464,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GENERICMETADATATYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GENERICMETADATATYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GenericMetaDataType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTMETADATATYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTMETADATATYPE_TYPE, null);
 
     /**
      * <p>
@@ -5479,9 +5488,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalCRSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5503,9 +5512,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalCSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5527,9 +5536,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONMETHODREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONMETHODREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationMethodRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5556,9 +5565,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType NODETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType NODETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NodeType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5580,9 +5589,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOGRAPHICCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOGRAPHICCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeographicCRSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5609,9 +5618,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FaceType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5632,9 +5641,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SPHERICALCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SPHERICALCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SphericalCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5661,9 +5670,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTGEOMETRYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGEOMETRYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5689,9 +5698,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RECTIFIEDGRIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RECTIFIEDGRIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RectifiedGridType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, GRIDTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, GRIDTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5713,9 +5722,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOCENTRICCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOCENTRICCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeocentricCRSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5760,9 +5769,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECLOCKTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECLOCKTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeClockType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5835,9 +5844,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BSPLINETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BSPLINETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BSplineType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5909,9 +5918,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BEZIERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BEZIERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BezierType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, BSPLINETYPE_TYPE, null);
+            Collections.EMPTY_LIST, BSPLINETYPE_TYPE, null);
 
     /**
      * <p>
@@ -5929,9 +5938,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType _ISSPHERE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType _ISSPHERE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "_isSphere"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -5953,9 +5962,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DATUMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DATUMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DatumRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -5982,9 +5991,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTISURFACEPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTISURFACEPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSurfacePropertyType"), MultiPolygon.class,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6019,9 +6028,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConeType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTGRIDDEDSURFACETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGRIDDEDSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6051,9 +6060,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITECURVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITECURVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeCurveType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCURVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCURVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6078,9 +6087,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OBSERVATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OBSERVATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ObservationType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTFEATURETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTFEATURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6102,9 +6111,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTEDOBSERVATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTEDOBSERVATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectedObservationType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, OBSERVATIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, OBSERVATIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6126,9 +6135,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTEDOBSERVATIONATDISTANCETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTEDOBSERVATIONATDISTANCETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectedObservationAtDistanceType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             DIRECTEDOBSERVATIONTYPE_TYPE, null);
 
     /**
@@ -6148,9 +6157,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLEORNULL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DOUBLEORNULL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "doubleOrNull"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6172,9 +6181,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONTAINERPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONTAINERPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ContainerPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6206,9 +6215,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType AESHETICCRITERIATYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType AESHETICCRITERIATYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AesheticCriteriaType"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -6285,9 +6294,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OFFSETCURVETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OFFSETCURVETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OffsetCurveType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6316,9 +6325,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOUNDCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOUNDCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompoundCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6340,9 +6349,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType IMAGEDATUMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType IMAGEDATUMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ImageDatumRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6364,9 +6373,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALDATUMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALDATUMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalDatumRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6390,9 +6399,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CALDATE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType CALDATE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CalDate"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6423,9 +6432,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECALENDARTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECALENDARTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeCalendarType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6456,9 +6465,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CYLINDERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CYLINDERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CylinderType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGRIDDEDSURFACETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGRIDDEDSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6485,9 +6494,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONMETHODBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONMETHODBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationMethodBaseType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6529,9 +6538,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONMETHODTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONMETHODTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationMethodType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, OPERATIONMETHODBASETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, OPERATIONMETHODBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6588,9 +6597,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARCSTRINGTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARCSTRINGTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcStringType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6641,9 +6650,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARCTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARCTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ARCSTRINGTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ARCSTRINGTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6664,9 +6673,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CIRCLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CIRCLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CircleType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ARCTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ARCTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6685,9 +6694,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLELIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DOUBLELIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "doubleList"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6717,9 +6726,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTPOSITIONLISTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTPOSITIONLISTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectPositionListType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOUBLELIST_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOUBLELIST_TYPE, null);
 
     /**
      * <p>
@@ -6740,9 +6749,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType USERDEFINEDCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType USERDEFINEDCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "UserDefinedCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6767,9 +6776,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOSURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOSURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoSurfaceType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTOPOLOGYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTOPOLOGYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6802,9 +6811,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CURVEPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType CURVEPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CurvePropertyType"), MultiLineString.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6833,9 +6842,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONCATENATEDOPERATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONCATENATEDOPERATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConcatenatedOperationType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCOORDINATEOPERATIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCOORDINATEOPERATIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6869,9 +6878,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ORIENTABLESURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ORIENTABLESURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OrientableSurfaceType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTSURFACETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6892,9 +6901,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMECOMPLEXTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMECOMPLEXTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimeComplexType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTTIMEOBJECTTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTTIMEOBJECTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6919,9 +6928,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMETOPOLOGYCOMPLEXTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMETOPOLOGYCOMPLEXTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeTopologyComplexType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTTIMECOMPLEXTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTTIMECOMPLEXTYPE_TYPE, null);
 
     /**
      * <p>
@@ -6947,9 +6956,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDCOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDCOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridCoverageType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -6971,9 +6980,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATEOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATEOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinateOperationRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -7018,9 +7028,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ENVELOPETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ENVELOPETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EnvelopeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7046,9 +7056,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ENVELOPEWITHTIMEPERIODTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ENVELOPEWITHTIMEPERIODTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EnvelopeWithTimePeriodType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, ENVELOPETYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, ENVELOPETYPE_TYPE, null);
 
     /**
      * <p>
@@ -7073,9 +7083,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BOOLEANPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BOOLEANPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BooleanPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, VALUEPROPERTYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, VALUEPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7099,9 +7109,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7130,9 +7140,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTISURFACECOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTISURFACECOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSurfaceCoverageType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -7154,9 +7164,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDENVELOPETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDENVELOPETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridEnvelopeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7178,9 +7188,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalCSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7233,9 +7243,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LINESTRINGSEGMENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LINESTRINGSEGMENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LineStringSegmentType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7256,9 +7266,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FEATUREARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FEATUREARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FeatureArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7280,9 +7290,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SINGLEOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SINGLEOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SingleOperationRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7302,9 +7312,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTEDFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTEDFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectedFacePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7325,9 +7335,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VALUEARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VALUEARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ValueArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7349,9 +7359,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType REFERENCESYSTEMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType REFERENCESYSTEMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ReferenceSystemRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7406,9 +7416,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECALENDARERATYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECALENDARERATYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeCalendarEraType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7434,9 +7444,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7458,9 +7468,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CURVEARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CURVEARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CurveArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7490,9 +7500,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PARAMETERVALUEGROUPTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PARAMETERVALUEGROUPTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ParameterValueGroupType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTGENERALPARAMETERVALUETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTGENERALPARAMETERVALUETYPE_TYPE, null);
 
     /**
      * <p>
@@ -7521,9 +7531,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTISOLIDCOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTISOLIDCOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSolidCoverageType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -7544,9 +7554,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINEARRINGPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LINEARRINGPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LinearRingPropertyType"), LinearRing.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7576,9 +7586,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTISURFACETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTISURFACETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSurfaceType"), MultiPolygon.class, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -7613,9 +7623,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType KNOTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType KNOTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "KnotType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7638,9 +7648,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COVERAGEFUNCTIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COVERAGEFUNCTIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoverageFunctionType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7661,9 +7671,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SURFACEARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SURFACEARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SurfaceArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7686,9 +7696,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRAPHSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRAPHSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GraphStylePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7713,9 +7723,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOMETRICCOMPLEXTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOMETRICCOMPLEXTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometricComplexType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTGEOMETRYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTGEOMETRYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7740,9 +7750,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTCONTINUOUSCOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTCONTINUOUSCOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractContinuousCoverageType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, ABSTRACTCOVERAGETYPE_TYPE,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, ABSTRACTCOVERAGETYPE_TYPE,
             null);
 
     /**
@@ -7777,9 +7787,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COVARIANCEMATRIXTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COVARIANCEMATRIXTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CovarianceMatrixType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTPOSITIONALACCURACYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTPOSITIONALACCURACYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7807,9 +7817,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DMSANGLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DMSANGLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DMSAngleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7833,9 +7843,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARRAYASSOCIATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARRAYASSOCIATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArrayAssociationType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7860,9 +7870,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MEASURELISTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MEASURELISTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MeasureListType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, DOUBLELIST_TYPE, null);
+            false, Collections.EMPTY_LIST, DOUBLELIST_TYPE, null);
 
     /**
      * <p>
@@ -7883,9 +7893,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7909,9 +7919,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RANGEPARAMETERSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RANGEPARAMETERSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RangeParametersType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7940,9 +7950,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType IMAGECRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType IMAGECRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ImageCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7964,9 +7974,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ELLIPSOIDREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ELLIPSOIDREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EllipsoidRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -7993,9 +8003,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOINTPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTIPOINTPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiPointPropertyType"), MultiPoint.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8019,10 +8029,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PRIORITYLOCATIONPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PRIORITYLOCATIONPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PriorityLocationPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, LOCATIONPROPERTYTYPE_TYPE,
-            null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
+            LOCATIONPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8045,9 +8055,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTISOLIDDOMAINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTISOLIDDOMAINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSolidDomainType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOMAINSETTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOMAINSETTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8077,9 +8087,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PASSTHROUGHOPERATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PASSTHROUGHOPERATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PassThroughOperationType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCOORDINATEOPERATIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCOORDINATEOPERATIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8148,9 +8158,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CUBICSPLINETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CUBICSPLINETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CubicSplineType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8172,9 +8182,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ENGINEERINGCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ENGINEERINGCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EngineeringCRSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8210,9 +8220,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DICTIONARYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DICTIONARYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DictionaryType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8246,9 +8256,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINESTRINGPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LINESTRINGPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LineStringPropertyType"), LineString.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8268,9 +8278,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType REFERENCETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType REFERENCETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ReferenceType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8294,9 +8304,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMENODEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMENODEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeNodePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8327,9 +8337,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType POLYGONPATCHTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType POLYGONPATCHTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolygonPatchType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTSURFACEPATCHTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTSURFACEPATCHTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8359,9 +8369,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALDATUMBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALDATUMBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalDatumBaseType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTDATUMTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTDATUMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8386,9 +8396,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALDATUMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALDATUMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalDatumType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, TEMPORALDATUMBASETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, TEMPORALDATUMBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -8407,9 +8417,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECLOCKPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECLOCKPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeClockPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8431,9 +8441,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOUNDCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOUNDCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompoundCRSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8455,9 +8465,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FILETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FILETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FileType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8476,9 +8486,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMEORNULL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NAMEORNULL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NameOrNull"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -8504,9 +8514,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SEQUENCERULENAMES_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SEQUENCERULENAMES_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SequenceRuleNames"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -8526,9 +8536,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SEQUENCERULETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SEQUENCERULETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SequenceRuleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, SEQUENCERULENAMES_TYPE, null);
+            false, Collections.EMPTY_LIST, SEQUENCERULENAMES_TYPE, null);
 
     /**
      * <p>
@@ -8550,9 +8560,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINETYPETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LINETYPETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LineTypeType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -8579,9 +8589,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PIXELINCELLTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PIXELINCELLTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PixelInCellType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, CODETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, CODETYPE_TYPE, null);
 
     /**
      * <p>
@@ -8603,9 +8613,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONVERSIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONVERSIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConversionRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8624,9 +8634,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NULLTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NULLTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NullType"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -8652,9 +8662,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType UNITDEFINITIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType UNITDEFINITIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "UnitDefinitionType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8679,9 +8689,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BASEUNITTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BASEUNITTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BaseUnitType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, UNITDEFINITIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, UNITDEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8708,9 +8718,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VECTORTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VECTORTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VectorType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, DOUBLELIST_TYPE, null);
+            Collections.EMPTY_LIST, DOUBLELIST_TYPE, null);
 
     /**
      * <p>
@@ -8748,9 +8758,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BAGTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BAGTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BagType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8772,9 +8782,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOPRIMITIVEMEMBERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOPRIMITIVEMEMBERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoPrimitiveMemberType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8804,9 +8814,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEINTERVALLENGTHTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEINTERVALLENGTHTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeIntervalLengthType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.DECIMAL_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.DECIMAL_TYPE, null);
 
     /**
      * <p>
@@ -8828,9 +8838,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATESYSTEMAXISREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATESYSTEMAXISREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinateSystemAxisRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -8859,9 +8870,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECOORDINATESYSTEMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECOORDINATESYSTEMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeCoordinateSystemType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8895,9 +8906,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TRIANGLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TRIANGLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TriangleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTSURFACEPATCHTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTSURFACEPATCHTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8926,9 +8937,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONVENTIONALUNITTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONVENTIONALUNITTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConventionalUnitType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, UNITDEFINITIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, UNITDEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8947,9 +8958,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMECALENDARERAPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMECALENDARERAPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeCalendarEraPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -8971,9 +8983,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONPARAMETERREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONPARAMETERREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationParameterRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -8995,9 +9007,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PASSTHROUGHOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PASSTHROUGHOPERATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PassThroughOperationRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -9018,9 +9031,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ELLIPSOIDALCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ELLIPSOIDALCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EllipsoidalCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9045,9 +9058,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DERIVEDUNITTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DERIVEDUNITTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DerivedUnitType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, UNITDEFINITIONTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, UNITDEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9068,9 +9081,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9089,9 +9102,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEANLIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BOOLEANLIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "booleanList"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9120,9 +9133,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOCENTRICCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOCENTRICCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeocentricCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9147,9 +9160,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSOLUTEEXTERNALPOSITIONALACCURACYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSOLUTEEXTERNALPOSITIONALACCURACYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbsoluteExternalPositionalAccuracyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             ABSTRACTPOSITIONALACCURACYTYPE_TYPE, null);
 
     /**
@@ -9171,9 +9184,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CARTESIANCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CARTESIANCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CartesianCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9195,9 +9208,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALDATUMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALDATUMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalDatumRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9222,9 +9235,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEINSTANTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEINSTANTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeInstantType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9243,9 +9256,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEGEOMETRICPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEGEOMETRICPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeGeometricPrimitivePropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -9265,9 +9279,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ISOLATEDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ISOLATEDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "IsolatedPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9286,9 +9300,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEORDINALERAPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEORDINALERAPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeOrdinalEraPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -9309,9 +9324,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CURVESEGMENTARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CURVESEGMENTARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CurveSegmentArrayPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -9338,9 +9354,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DERIVEDCRSTYPETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DERIVEDCRSTYPETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DerivedCRSTypeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, CODETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, CODETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9361,9 +9377,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9386,9 +9402,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType KNOTTYPESTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType KNOTTYPESTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "KnotTypesType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -9410,9 +9426,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOCOMPLEXMEMBERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOCOMPLEXMEMBERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoComplexMemberType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9435,9 +9451,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType QUERYGRAMMARENUMERATION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType QUERYGRAMMARENUMERATION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "QueryGrammarEnumeration"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -9456,9 +9472,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEANORNULLLIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType BOOLEANORNULLLIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "booleanOrNullList"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9492,9 +9508,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType POLYHEDRALSURFACETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType POLYHEDRALSURFACETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolyhedralSurfaceType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, SURFACETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, SURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9520,9 +9536,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITEVALUETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITEVALUETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeValueType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9545,9 +9561,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VALUEARRAYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VALUEARRAYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ValueArrayType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, COMPOSITEVALUETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, COMPOSITEVALUETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9573,9 +9589,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType POLYGONPATCHARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType POLYGONPATCHARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolygonPatchArrayPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             SURFACEPATCHARRAYPROPERTYTYPE_TYPE, null);
 
     /**
@@ -9606,9 +9622,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTISOLIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTISOLIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSolidType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9637,9 +9653,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTIPOINTCOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTIPOINTCOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiPointCoverageType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9658,9 +9674,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMELIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NAMELIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NameList"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9686,9 +9702,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CODELISTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CODELISTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CodeListType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, NAMELIST_TYPE, null);
+            false, Collections.EMPTY_LIST, NAMELIST_TYPE, null);
 
     /**
      * <p>
@@ -9718,9 +9734,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOCOMPLEXTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOCOMPLEXTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoComplexType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTOPOLOGYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTOPOLOGYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9742,9 +9758,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PRIMEMERIDIANREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PRIMEMERIDIANREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PrimeMeridianRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9769,9 +9785,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGeneralOperationParameterType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET, DEFINITIONTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST, DEFINITIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9799,9 +9815,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONPARAMETERBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONPARAMETERBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationParameterBaseType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE, null);
 
     /**
@@ -9836,9 +9852,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONPARAMETERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONPARAMETERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationParameterType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, OPERATIONPARAMETERBASETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, OPERATIONPARAMETERBASETYPE_TYPE, null);
 
     /**
      * <p>
@@ -9872,9 +9888,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOMETRICPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOMETRICPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometricPrimitivePropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -9896,9 +9913,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COORDINATESYSTEMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COORDINATESYSTEMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CoordinateSystemRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9926,9 +9943,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTILINESTRINGPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTILINESTRINGPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiLineStringPropertyType"),
-            MultiLineString.class, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            MultiLineString.class, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9951,9 +9968,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOLOGYSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOLOGYSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopologyStylePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -9979,9 +9996,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOGRAPHICCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOGRAPHICCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeographicCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10006,9 +10023,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COUNTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COUNTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CountPropertyType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, VALUEPROPERTYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, VALUEPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10029,9 +10046,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VOLUMETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VOLUMETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VolumeType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, MEASURETYPE_TYPE, null);
+            Collections.EMPTY_LIST, MEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -10050,9 +10067,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITESURFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITESURFACEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeSurfacePropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -10074,9 +10092,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ENGINEERINGDATUMREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ENGINEERINGDATUMREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EngineeringDatumRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10099,9 +10117,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LABELTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LABELTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LabelType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10120,9 +10138,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COMPOSITESOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COMPOSITESOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CompositeSolidPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -10144,9 +10163,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOMETRYARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOMETRYARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometryArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10168,9 +10187,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CRSRefType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10194,9 +10213,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CLOTHOIDTYPE_REFLOCATION_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CLOTHOIDTYPE_REFLOCATION_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ClothoidType_refLocation"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10225,9 +10244,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ENGINEERINGCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ENGINEERINGCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EngineeringCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10248,9 +10267,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType INDIRECTENTRYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType INDIRECTENTRYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "IndirectEntryType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10277,9 +10296,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOPRIMITIVEARRAYASSOCIATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOPRIMITIVEARRAYASSOCIATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoPrimitiveArrayAssociationType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -10302,9 +10322,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FEATURESTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FEATURESTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FeatureStylePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10331,9 +10351,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTIGEOMETRYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTIGEOMETRYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiGeometryPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10365,9 +10385,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType BOUNDEDFEATURETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType BOUNDEDFEATURETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "BoundedFeatureType"), Collections.EMPTY_LIST, false,
-            true, Collections.EMPTY_SET, ABSTRACTFEATURETYPE_TYPE, null);
+            true, Collections.EMPTY_LIST, ABSTRACTFEATURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -10388,9 +10408,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ENGINEERINGDATUMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ENGINEERINGDATUMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "EngineeringDatumType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTDATUMTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTDATUMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10413,9 +10433,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTISURFACEDOMAINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTISURFACEDOMAINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSurfaceDomainType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOMAINSETTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOMAINSETTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10439,9 +10459,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEINDETERMINATEVALUETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType TIMEINDETERMINATEVALUETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeIndeterminateValueType"),
-            java.lang.Object.class, false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            java.lang.Object.class, false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -10470,9 +10490,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SUCCESSIONTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SUCCESSIONTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SuccessionType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -10543,9 +10563,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARCSTRINGBYBULGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARCSTRINGBYBULGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcStringByBulgeType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10609,9 +10629,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARCBYBULGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARCBYBULGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArcByBulgeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ARCSTRINGBYBULGETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ARCSTRINGBYBULGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -10642,9 +10662,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType IDENTIFIERTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType IDENTIFIERTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "IdentifierType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10678,9 +10698,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRAPHSTYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRAPHSTYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GraphStyleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, BASESTYLEDESCRIPTORTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, BASESTYLEDESCRIPTORTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10703,9 +10723,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType COVARIANCEELEMENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType COVARIANCEELEMENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CovarianceElementType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10730,9 +10750,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType QUANTITYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType QUANTITYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "QuantityPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, VALUEPROPERTYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, VALUEPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10760,9 +10780,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLYGONPROPERTYTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType POLYGONPROPERTYTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolygonPropertyType"), Polygon.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10789,9 +10809,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MULTISOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MULTISOLIDPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiSolidPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10812,9 +10832,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CYLINDRICALCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CYLINDRICALCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CylindricalCSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10838,9 +10858,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType UNITOFMEASURETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType UNITOFMEASURETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "UnitOfMeasureType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -10874,9 +10894,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType CONVERSIONTOPREFERREDUNITTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType CONVERSIONTOPREFERREDUNITTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ConversionToPreferredUnitType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, UNITOFMEASURETYPE_TYPE,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, UNITOFMEASURETYPE_TYPE,
             null);
 
     /**
@@ -10935,9 +10955,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINESTRINGTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType LINESTRINGTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LineStringType"), LineString.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTCURVETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTCURVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -10970,9 +10990,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOMETRICCOMPLEXPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOMETRICCOMPLEXPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometricComplexPropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -10994,9 +11015,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DATABLOCKTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DATABLOCKTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DataBlockType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11021,9 +11042,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOLYGONTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTIPOLYGONTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiPolygonType"), MultiPolygon.class, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11045,9 +11066,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DERIVEDCRSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DERIVEDCRSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DerivedCRSRefType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11066,9 +11087,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType QNAMELIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType QNAMELIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "QNameList"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11105,9 +11126,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RANGESETTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RANGESETTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RangeSetType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11128,9 +11149,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType HISTORYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType HISTORYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "HistoryPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11155,9 +11176,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TRACKTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TRACKTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TrackType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, HISTORYPROPERTYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, HISTORYPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11193,9 +11214,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEOMETRYSTYLETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEOMETRYSTYLETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeometryStyleType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, BASESTYLEDESCRIPTORTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, BASESTYLEDESCRIPTORTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11220,9 +11241,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTIONPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTIONPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectionPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11241,9 +11262,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NCNAMELIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType NCNAMELIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "NCNameList"), java.lang.Object.class, false, false,
-            Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11265,9 +11286,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DECIMALMINUTESTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DECIMALMINUTESTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DecimalMinutesType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.DECIMAL_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.DECIMAL_TYPE, null);
 
     /**
      * <p>
@@ -11295,9 +11316,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTTIMESLICETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTTIMESLICETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractTimeSliceType"), Collections.EMPTY_LIST,
-            false, true, Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            false, true, Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11329,9 +11350,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MOVINGOBJECTSTATUSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MOVINGOBJECTSTATUSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MovingObjectStatusType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTTIMESLICETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTTIMESLICETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11355,9 +11376,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType STYLEVARIATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType STYLEVARIATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "StyleVariationType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -11383,9 +11404,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SCALARVALUEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SCALARVALUEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ScalarValuePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, VALUEPROPERTYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, VALUEPROPERTYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11404,9 +11425,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGERORNULLLIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType INTEGERORNULLLIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "integerOrNullList"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11427,9 +11448,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COUNTEXTENTTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType COUNTEXTENTTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "CountExtentType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, INTEGERORNULLLIST_TYPE, null);
+            false, Collections.EMPTY_LIST, INTEGERORNULLLIST_TYPE, null);
 
     /**
      * <p>
@@ -11455,9 +11476,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTPOSITIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTPOSITIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectPositionType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, DOUBLELIST_TYPE, null);
+            false, Collections.EMPTY_LIST, DOUBLELIST_TYPE, null);
 
     /**
      * <p>
@@ -11482,9 +11503,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMETOPOLOGYPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMETOPOLOGYPRIMITIVEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeTopologyPrimitivePropertyType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -11502,9 +11524,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDLIMITSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDLIMITSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridLimitsType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11526,9 +11548,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType POINTARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType POINTARRAYPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PointArrayPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11547,9 +11569,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEPERIODPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEPERIODPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimePeriodPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11575,9 +11597,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEODETICDATUMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEODETICDATUMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeodeticDatumType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTDATUMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTDATUMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11603,9 +11625,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType RECTIFIEDGRIDCOVERAGETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType RECTIFIEDGRIDCOVERAGETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "RectifiedGridCoverageType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTDISCRETECOVERAGETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11624,9 +11646,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLEORNULLLIST_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DOUBLEORNULLLIST_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "doubleOrNullList"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11652,9 +11674,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType MEASUREORNULLLISTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType MEASUREORNULLLISTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MeasureOrNullListType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, DOUBLEORNULLLIST_TYPE, null);
+            false, false, Collections.EMPTY_LIST, DOUBLEORNULLLIST_TYPE, null);
 
     /**
      * <p>
@@ -11677,9 +11699,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType QUANTITYEXTENTTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType QUANTITYEXTENTTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "QuantityExtentType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, MEASUREORNULLLISTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, MEASUREORNULLLISTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11704,9 +11726,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOSOLIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOSOLIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoSolidType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTOPOPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11734,9 +11756,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONPARAMETERGROUPBASETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONPARAMETERGROUPBASETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationParameterGroupBaseType"),
-            Collections.EMPTY_LIST, false, true, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, true, Collections.EMPTY_LIST,
             ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE, null);
 
     /**
@@ -11777,9 +11799,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OPERATIONPARAMETERGROUPTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OPERATIONPARAMETERGROUPTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "OperationParameterGroupType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             OPERATIONPARAMETERGROUPBASETYPE_TYPE, null);
 
     /**
@@ -11802,9 +11824,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OBLIQUECARTESIANCSREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OBLIQUECARTESIANCSREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ObliqueCartesianCSRefType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11838,9 +11860,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEUNITTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType TIMEUNITTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeUnitType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -11865,9 +11887,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ARRAYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ARRAYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ArrayType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTGMLTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGMLTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11890,9 +11912,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SYMBOLTYPEENUMERATION_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SYMBOLTYPEENUMERATION_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SymbolTypeEnumeration"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -11932,9 +11954,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEODESICSTRINGTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEODESICSTRINGTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeodesicStringType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTCURVESEGMENTTYPE_TYPE, null);
 
     /**
      * <p>
@@ -11962,9 +11984,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GEODESICTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GEODESICTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeodesicType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, GEODESICSTRINGTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, GEODESICSTRINGTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12008,9 +12030,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType POINTTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PointType"), Point.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12047,9 +12069,9 @@ public class GMLSchema extends SchemaImpl {
                 new Name("http://www.opengis.net/gml", "featureMembers"), 0, 1, false, null));
     }
 
-    public static final FeatureType ABSTRACTFEATURECOLLECTIONTYPE_TYPE = new FeatureTypeImpl(new TypeName(
+    public static final FeatureType ABSTRACTFEATURECOLLECTIONTYPE_TYPE = new FeatureTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractFeatureCollectionType"),
-            ABSTRACTFEATURECOLLECTIONTYPE_TYPE_schema, null, null, true, Collections.EMPTY_SET,
+            ABSTRACTFEATURECOLLECTIONTYPE_TYPE_schema, null, true, Collections.EMPTY_LIST,
             ABSTRACTFEATURETYPE_TYPE, null);
 
     /**
@@ -12071,9 +12093,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType FEATURECOLLECTIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType FEATURECOLLECTIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "FeatureCollectionType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTFEATURECOLLECTIONTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTFEATURECOLLECTIONTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12096,9 +12118,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DYNAMICFEATURECOLLECTIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DYNAMICFEATURECOLLECTIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DynamicFeatureCollectionType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET,
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST,
             FEATURECOLLECTIONTYPE_TYPE, null);
 
     /**
@@ -12124,9 +12146,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType VERTICALDATUMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType VERTICALDATUMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "VerticalDatumType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTDATUMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTDATUMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12149,9 +12171,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DERIVATIONUNITTERMTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DERIVATIONUNITTERMTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DerivationUnitTermType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, UNITOFMEASURETYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, UNITOFMEASURETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12172,9 +12194,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DEGREEVALUETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType DEGREEVALUETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DegreeValueType"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.NONNEGATIVEINTEGER_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.NONNEGATIVEINTEGER_TYPE, null);
 
     /**
      * <p>
@@ -12213,9 +12235,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DEGREESTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DEGREESTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DegreesType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, DEGREEVALUETYPE_TYPE, null);
+            Collections.EMPTY_LIST, DEGREEVALUETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12233,9 +12255,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ABSTRACTGRIDDEDSURFACETYPE_ROW_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ABSTRACTGRIDDEDSURFACETYPE_ROW_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AbstractGriddedSurfaceType_row"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -12255,9 +12278,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType DIRECTEDEDGEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType DIRECTEDEDGEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "DirectedEdgePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12287,9 +12310,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTICURVETYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType MULTICURVETYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "MultiCurveType"), MultiLineString[].class, false,
-            false, Collections.EMPTY_SET, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGEOMETRICAGGREGATETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12318,9 +12341,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMENODETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMENODETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeNodeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12339,9 +12362,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType STRINGORNULL_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType STRINGORNULL_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "stringOrNull"), java.lang.Object.class, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYSIMPLETYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYSIMPLETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12390,9 +12413,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType SOLIDTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType SOLIDTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SolidType"), Collections.EMPTY_LIST, false, false,
-            Collections.EMPTY_SET, ABSTRACTSOLIDTYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTSOLIDTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12418,9 +12441,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TEMPORALCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TEMPORALCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TemporalCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTREFERENCESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12443,9 +12466,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType LABELSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType LABELSTYLEPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "LabelStylePropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12466,9 +12489,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType OBLIQUECARTESIANCSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType OBLIQUECARTESIANCSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ObliqueCartesianCSType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, ABSTRACTCOORDINATESYSTEMTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12493,9 +12516,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType PROJECTEDCRSTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType PROJECTEDCRSTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "ProjectedCRSType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTGENERALDERIVEDCRSTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTGENERALDERIVEDCRSTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12514,9 +12537,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TIMEINSTANTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TIMEINSTANTPROPERTYTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TimeInstantPropertyType"), Collections.EMPTY_LIST,
-            false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12539,9 +12562,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GRIDDOMAINTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GRIDDOMAINTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GridDomainType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, DOMAINSETTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, DOMAINSETTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12567,9 +12590,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLYGONTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType POLYGONTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "PolygonType"), Polygon.class, false, false,
-            Collections.EMPTY_SET, ABSTRACTSURFACETYPE_TYPE, null);
+            Collections.EMPTY_LIST, ABSTRACTSURFACETYPE_TYPE, null);
 
     /**
      * <p>
@@ -12601,9 +12624,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType ASSOCIATIONTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType ASSOCIATIONTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "AssociationType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE, null);
 
     /**
      * <p>
@@ -12625,9 +12648,10 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType GENERALTRANSFORMATIONREFTYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType GENERALTRANSFORMATIONREFTYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "GeneralTransformationRefType"),
-            Collections.EMPTY_LIST, false, false, Collections.EMPTY_SET, XSSchema.ANYTYPE_TYPE, null);
+            Collections.EMPTY_LIST, false, false, Collections.EMPTY_LIST, XSSchema.ANYTYPE_TYPE,
+            null);
 
     /**
      * <p>
@@ -12658,9 +12682,9 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SURFACEINTERPOLATIONTYPE_TYPE = new AttributeTypeImpl(new TypeName(
+    public static final AttributeType SURFACEINTERPOLATIONTYPE_TYPE = new AttributeTypeImpl(new Name(
                 "http://www.opengis.net/gml", "SurfaceInterpolationType"), java.lang.Object.class,
-            false, false, Collections.EMPTY_SET, XSSchema.STRING_TYPE, null);
+            false, false, Collections.EMPTY_LIST, XSSchema.STRING_TYPE, null);
 
     /**
      * <p>
@@ -12685,677 +12709,634 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final ComplexType TOPOVOLUMETYPE_TYPE = new ComplexTypeImpl(new TypeName(
+    public static final ComplexType TOPOVOLUMETYPE_TYPE = new ComplexTypeImpl(new Name(
                 "http://www.opengis.net/gml", "TopoVolumeType"), Collections.EMPTY_LIST, false,
-            false, Collections.EMPTY_SET, ABSTRACTTOPOLOGYTYPE_TYPE, null);
+            false, Collections.EMPTY_LIST, ABSTRACTTOPOLOGYTYPE_TYPE, null);
 
     public GMLSchema() {
         super("http://www.opengis.net/gml");
 
-        put(new TypeName("http://www.opengis.net/gml", "CartesianCSRefType"),
-            CARTESIANCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractPositionalAccuracyType"),
+        put(new Name("http://www.opengis.net/gml", "CartesianCSRefType"), CARTESIANCSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractPositionalAccuracyType"),
             ABSTRACTPOSITIONALACCURACYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RelativeInternalPositionalAccuracyType"),
+        put(new Name("http://www.opengis.net/gml", "RelativeInternalPositionalAccuracyType"),
             RELATIVEINTERNALPOSITIONALACCURACYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SurfacePropertyType"),
-            SURFACEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcMinutesType"), ARCMINUTESTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeCalendarPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "SurfacePropertyType"), SURFACEPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArcMinutesType"), ARCMINUTESTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeCalendarPropertyType"),
             TIMECALENDARPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGMLType"), ABSTRACTGMLTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeometryType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGMLType"), ABSTRACTGMLTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractGeometryType"),
             ABSTRACTGEOMETRYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeometricAggregateType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGeometricAggregateType"),
             ABSTRACTGEOMETRICAGGREGATETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiPointType"), MULTIPOINTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DomainSetType"), DOMAINSETTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RectifiedGridDomainType"),
+        put(new Name("http://www.opengis.net/gml", "MultiPointType"), MULTIPOINTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DomainSetType"), DOMAINSETTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "RectifiedGridDomainType"),
             RECTIFIEDGRIDDOMAINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoVolumePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TopoVolumePropertyType"),
             TOPOVOLUMEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTopologyType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractTopologyType"),
             ABSTRACTTOPOLOGYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoCurveType"), TOPOCURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CodeType"), CODETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalDatumTypeType"),
+        put(new Name("http://www.opengis.net/gml", "TopoCurveType"), TOPOCURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CodeType"), CODETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VerticalDatumTypeType"),
             VERTICALDATUMTYPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoPointPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TopoPointPropertyType"),
             TOPOPOINTPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NullEnumeration"), NULLENUMERATION_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractSurfacePatchType"),
+        put(new Name("http://www.opengis.net/gml", "NullEnumeration"), NULLENUMERATION_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractSurfacePatchType"),
             ABSTRACTSURFACEPATCHTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RectangleType"), RECTANGLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BaseStyleDescriptorType"),
+        put(new Name("http://www.opengis.net/gml", "RectangleType"), RECTANGLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BaseStyleDescriptorType"),
             BASESTYLEDESCRIPTORTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopologyStyleType"), TOPOLOGYSTYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiGeometryType"), MULTIGEOMETRYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LinearCSRefType"), LINEARCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeEdgePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TopologyStyleType"), TOPOLOGYSTYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiGeometryType"), MULTIGEOMETRYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LinearCSRefType"), LINEARCSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeEdgePropertyType"),
             TIMEEDGEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimePrimitivePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimePrimitivePropertyType"),
             TIMEPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RelatedTimeType"), RELATEDTIMETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ValuePropertyType"), VALUEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CategoryPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "RelatedTimeType"), RELATEDTIMETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ValuePropertyType"), VALUEPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CategoryPropertyType"),
             CATEGORYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FileValueModelType"),
-            FILEVALUEMODELTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTopoPrimitiveType"),
+        put(new Name("http://www.opengis.net/gml", "FileValueModelType"), FILEVALUEMODELTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractTopoPrimitiveType"),
             ABSTRACTTOPOPRIMITIVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EdgeType"), EDGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeometricPrimitiveType"),
+        put(new Name("http://www.opengis.net/gml", "EdgeType"), EDGETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractGeometricPrimitiveType"),
             ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractSolidType"), ABSTRACTSOLIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeSolidType"),
-            COMPOSITESOLIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DefinitionType"), DEFINITIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCoordinateOperationBaseType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractSolidType"), ABSTRACTSOLIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompositeSolidType"), COMPOSITESOLIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DefinitionType"), DEFINITIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractCoordinateOperationBaseType"),
             ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCoordinateOperationType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractCoordinateOperationType"),
             ABSTRACTCOORDINATEOPERATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeneralTransformationType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGeneralTransformationType"),
             ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TransformationType"),
-            TRANSFORMATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectedNodePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TransformationType"), TRANSFORMATIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DirectedNodePropertyType"),
             DIRECTEDNODEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FormulaType"), FORMULATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeneralConversionType"),
+        put(new Name("http://www.opengis.net/gml", "FormulaType"), FORMULATYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractGeneralConversionType"),
             ABSTRACTGENERALCONVERSIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConversionType"), CONVERSIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoSurfacePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "ConversionType"), CONVERSIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoSurfacePropertyType"),
             TOPOSURFACEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCurveType"), ABSTRACTCURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CurveType"), CURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AffinePlacementType"),
-            AFFINEPLACEMENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometryPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractCurveType"), ABSTRACTCURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CurveType"), CURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AffinePlacementType"), AFFINEPLACEMENTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeometryPropertyType"),
             GEOMETRYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MeasureType"), MEASURETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SpeedType"), SPEEDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EllipsoidBaseType"), ELLIPSOIDBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EllipsoidType"), ELLIPSOIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "UserDefinedCSRefType"),
+        put(new Name("http://www.opengis.net/gml", "MeasureType"), MEASURETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SpeedType"), SPEEDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EllipsoidBaseType"), ELLIPSOIDBASETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EllipsoidType"), ELLIPSOIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "UserDefinedCSRefType"),
             USERDEFINEDCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinateReferenceSystemRefType"),
+        put(new Name("http://www.opengis.net/gml", "CoordinateReferenceSystemRefType"),
             COORDINATEREFERENCESYSTEMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OrientableCurveType"),
-            ORIENTABLECURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "booleanOrNull"), BOOLEANORNULL_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeodeticDatumRefType"),
+        put(new Name("http://www.opengis.net/gml", "OrientableCurveType"), ORIENTABLECURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "booleanOrNull"), BOOLEANORNULL_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeodeticDatumRefType"),
             GEODETICDATUMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeneralConversionRefType"),
+        put(new Name("http://www.opengis.net/gml", "GeneralConversionRefType"),
             GENERALCONVERSIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CurveInterpolationType"),
+        put(new Name("http://www.opengis.net/gml", "CurveInterpolationType"),
             CURVEINTERPOLATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LineStringSegmentArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "LineStringSegmentArrayPropertyType"),
             LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractParametricCurveSurfaceType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractParametricCurveSurfaceType"),
             ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGriddedSurfaceType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGriddedSurfaceType"),
             ABSTRACTGRIDDEDSURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SphereType"), SPHERETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RingPropertyType"), RINGPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationRefType"), OPERATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EllipsoidalCSRefType"),
+        put(new Name("http://www.opengis.net/gml", "SphereType"), SPHERETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "RingPropertyType"), RINGPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "OperationRefType"), OPERATIONREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EllipsoidalCSRefType"),
             ELLIPSOIDALCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "integerList"), INTEGERLIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractRingType"), ABSTRACTRINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LinearRingType"), LINEARRINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimePositionUnion"), TIMEPOSITIONUNION_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimePositionType"), TIMEPOSITIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeCurvePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "integerList"), INTEGERLIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractRingType"), ABSTRACTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LinearRingType"), LINEARRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimePositionUnion"), TIMEPOSITIONUNION_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimePositionType"), TIMEPOSITIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompositeCurvePropertyType"),
             COMPOSITECURVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectedTopoSolidPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "DirectedTopoSolidPropertyType"),
             DIRECTEDTOPOSOLIDPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SignType"), SIGNTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SymbolType"), SYMBOLTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalCRSRefType"),
-            TEMPORALCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiCurveDomainType"),
+        put(new Name("http://www.opengis.net/gml", "SignType"), SIGNTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SymbolType"), SYMBOLTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TemporalCRSRefType"), TEMPORALCRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiCurveDomainType"),
             MULTICURVEDOMAINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractStyleType"), ABSTRACTSTYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "StyleType"), STYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeneralOperationParameterRefType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractStyleType"), ABSTRACTSTYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "StyleType"), STYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractGeneralOperationParameterRefType"),
             ABSTRACTGENERALOPERATIONPARAMETERREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TransformationRefType"),
+        put(new Name("http://www.opengis.net/gml", "TransformationRefType"),
             TRANSFORMATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimeObjectType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractTimeObjectType"),
             ABSTRACTTIMEOBJECTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimePrimitiveType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractTimePrimitiveType"),
             ABSTRACTTIMEPRIMITIVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimeTopologyPrimitiveType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractTimeTopologyPrimitiveType"),
             ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeEdgeType"), TIMEEDGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GraphTypeType"), GRAPHTYPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SphericalCSRefType"),
-            SPHERICALCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridFunctionType"), GRIDFUNCTIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "IndexMapType"), INDEXMAPTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeneralParameterValueType"),
+        put(new Name("http://www.opengis.net/gml", "TimeEdgeType"), TIMEEDGETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GraphTypeType"), GRAPHTYPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SphericalCSRefType"), SPHERICALCSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GridFunctionType"), GRIDFUNCTIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "IndexMapType"), INDEXMAPTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractGeneralParameterValueType"),
             ABSTRACTGENERALPARAMETERVALUETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ParameterValueType"),
-            PARAMETERVALUETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimeGeometricPrimitiveType"),
+        put(new Name("http://www.opengis.net/gml", "ParameterValueType"), PARAMETERVALUETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractTimeGeometricPrimitiveType"),
             ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimePeriodType"), TIMEPERIODTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractFeatureType"),
-            ABSTRACTFEATURETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DynamicFeatureType"),
-            DYNAMICFEATURETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TargetPropertyType"),
-            TARGETPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcSecondsType"), ARCSECONDSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeOrdinalEraType"),
-            TIMEORDINALERATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiLineStringType"),
-            MULTILINESTRINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AreaType"), AREATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompassPointEnumeration"),
+        put(new Name("http://www.opengis.net/gml", "TimePeriodType"), TIMEPERIODTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractFeatureType"), ABSTRACTFEATURETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DynamicFeatureType"), DYNAMICFEATURETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TargetPropertyType"), TARGETPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArcSecondsType"), ARCSECONDSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeOrdinalEraType"), TIMEORDINALERATYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiLineStringType"), MULTILINESTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AreaType"), AREATYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompassPointEnumeration"),
             COMPASSPOINTENUMERATION_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinatesType"), COORDINATESTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SolidArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "CoordinatesType"), COORDINATESTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SolidArrayPropertyType"),
             SOLIDARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PointPropertyType"), POINTPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TinType_controlPoint"),
+        put(new Name("http://www.opengis.net/gml", "PointPropertyType"), POINTPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TinType_controlPoint"),
             TINTYPE_CONTROLPOINT_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DefinitionProxyType"),
-            DEFINITIONPROXYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "DefinitionProxyType"), DEFINITIONPROXYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractCoverageType"),
             ABSTRACTCOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractDiscreteCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractDiscreteCoverageType"),
             ABSTRACTDISCRETECOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiCurveCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "MultiCurveCoverageType"),
             MULTICURVECOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoCurvePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TopoCurvePropertyType"),
             TOPOCURVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolarCSRefType"), POLARCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "IncrementOrder"), INCREMENTORDER_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometryStylePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "PolarCSRefType"), POLARCSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "IncrementOrder"), INCREMENTORDER_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeometryStylePropertyType"),
             GEOMETRYSTYLEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiCurvePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "MultiCurvePropertyType"),
             MULTICURVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ProjectedCRSRefType"),
-            PROJECTEDCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "StringOrRefType"), STRINGORREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DrawingTypeType"), DRAWINGTYPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCoordinateSystemBaseType"),
+        put(new Name("http://www.opengis.net/gml", "ProjectedCRSRefType"), PROJECTEDCRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "StringOrRefType"), STRINGORREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DrawingTypeType"), DRAWINGTYPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractCoordinateSystemBaseType"),
             ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCoordinateSystemType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractCoordinateSystemType"),
             ABSTRACTCOORDINATESYSTEMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolarCSType"), POLARCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiPointDomainType"),
+        put(new Name("http://www.opengis.net/gml", "PolarCSType"), POLARCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiPointDomainType"),
             MULTIPOINTDOMAINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiPolygonPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "MultiPolygonPropertyType"),
             MULTIPOLYGONPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoPointType"), TOPOPOINTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimeReferenceSystemType"),
+        put(new Name("http://www.opengis.net/gml", "TopoPointType"), TOPOPOINTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractTimeReferenceSystemType"),
             ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeOrdinalReferenceSystemType"),
+        put(new Name("http://www.opengis.net/gml", "TimeOrdinalReferenceSystemType"),
             TIMEORDINALREFERENCESYSTEMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationParameterGroupRefType"),
+        put(new Name("http://www.opengis.net/gml", "OperationParameterGroupRefType"),
             OPERATIONPARAMETERGROUPREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "KnotPropertyType"), KNOTPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridLengthType"), GRIDLENGTHTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectionVectorType"),
-            DIRECTIONVECTORTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractCurveSegmentType"),
+        put(new Name("http://www.opengis.net/gml", "KnotPropertyType"), KNOTPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GridLengthType"), GRIDLENGTHTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DirectionVectorType"), DIRECTIONVECTORTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractCurveSegmentType"),
             ABSTRACTCURVESEGMENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcByCenterPointType"),
+        put(new Name("http://www.opengis.net/gml", "ArcByCenterPointType"),
             ARCBYCENTERPOINTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CircleByCenterPointType"),
+        put(new Name("http://www.opengis.net/gml", "CircleByCenterPointType"),
             CIRCLEBYCENTERPOINTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractSurfaceType"),
-            ABSTRACTSURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SurfaceType"), SURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TriangulatedSurfaceType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractSurfaceType"), ABSTRACTSURFACETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SurfaceType"), SURFACETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TriangulatedSurfaceType"),
             TRIANGULATEDSURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TinType"), TINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractRingPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TinType"), TINTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractRingPropertyType"),
             ABSTRACTRINGPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ClothoidType"), CLOTHOIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SolidPropertyType"), SOLIDPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractDatumBaseType"),
+        put(new Name("http://www.opengis.net/gml", "ClothoidType"), CLOTHOIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SolidPropertyType"), SOLIDPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractDatumBaseType"),
             ABSTRACTDATUMBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractDatumType"), ABSTRACTDATUMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ImageDatumType"), IMAGEDATUMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LabelStyleType"), LABELSTYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LinearCSType"), LINEARCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "integerOrNull"), INTEGERORNULL_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FeatureStyleType"), FEATURESTYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PrimeMeridianBaseType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractDatumType"), ABSTRACTDATUMTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ImageDatumType"), IMAGEDATUMTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LabelStyleType"), LABELSTYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LinearCSType"), LINEARCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "integerOrNull"), INTEGERORNULL_TYPE);
+        put(new Name("http://www.opengis.net/gml", "FeatureStyleType"), FEATURESTYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PrimeMeridianBaseType"),
             PRIMEMERIDIANBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PrimeMeridianType"), PRIMEMERIDIANTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinateSystemAxisBaseType"),
+        put(new Name("http://www.opengis.net/gml", "PrimeMeridianType"), PRIMEMERIDIANTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CoordinateSystemAxisBaseType"),
             COORDINATESYSTEMAXISBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinateSystemAxisType"),
+        put(new Name("http://www.opengis.net/gml", "CoordinateSystemAxisType"),
             COORDINATESYSTEMAXISTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ImageCRSRefType"), IMAGECRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AngleChoiceType"), ANGLECHOICETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FeaturePropertyType"),
-            FEATUREPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractReferenceSystemBaseType"),
+        put(new Name("http://www.opengis.net/gml", "ImageCRSRefType"), IMAGECRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AngleChoiceType"), ANGLECHOICETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "FeaturePropertyType"), FEATUREPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractReferenceSystemBaseType"),
             ABSTRACTREFERENCESYSTEMBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractReferenceSystemType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractReferenceSystemType"),
             ABSTRACTREFERENCESYSTEMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeneralDerivedCRSType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGeneralDerivedCRSType"),
             ABSTRACTGENERALDERIVEDCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DerivedCRSType"), DERIVEDCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CylindricalCSRefType"),
+        put(new Name("http://www.opengis.net/gml", "DerivedCRSType"), DERIVEDCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CylindricalCSRefType"),
             CYLINDRICALCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RingType"), RINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ScaleType"), SCALETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NameOrNullList"), NAMEORNULLLIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CodeOrNullListType"),
-            CODEORNULLLISTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CategoryExtentType"),
-            CATEGORYEXTENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AngleType"), ANGLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ExtentType"), EXTENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LengthType"), LENGTHTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SurfacePatchArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "RingType"), RINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ScaleType"), SCALETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "NameOrNullList"), NAMEORNULLLIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CodeOrNullListType"), CODEORNULLLISTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CategoryExtentType"), CATEGORYEXTENTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AngleType"), ANGLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ExtentType"), EXTENTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LengthType"), LENGTHTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SurfacePatchArrayPropertyType"),
             SURFACEPATCHARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TrianglePatchArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TrianglePatchArrayPropertyType"),
             TRIANGLEPATCHARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeSurfaceType"),
+        put(new Name("http://www.opengis.net/gml", "CompositeSurfaceType"),
             COMPOSITESURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SecondDefiningParameterType"),
+        put(new Name("http://www.opengis.net/gml", "SecondDefiningParameterType"),
             SECONDDEFININGPARAMETERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConcatenatedOperationRefType"),
+        put(new Name("http://www.opengis.net/gml", "ConcatenatedOperationRefType"),
             CONCATENATEDOPERATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeTopologyComplexPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimeTopologyComplexPropertyType"),
             TIMETOPOLOGYCOMPLEXPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DictionaryEntryType"),
-            DICTIONARYENTRYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DefaultStylePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "DictionaryEntryType"), DICTIONARYENTRYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DefaultStylePropertyType"),
             DEFAULTSTYLEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractMetaDataType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractMetaDataType"),
             ABSTRACTMETADATATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GenericMetaDataType"),
-            GENERICMETADATATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalCRSRefType"),
-            VERTICALCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalCSRefType"), VERTICALCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationMethodRefType"),
+        put(new Name("http://www.opengis.net/gml", "GenericMetaDataType"), GENERICMETADATATYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VerticalCRSRefType"), VERTICALCRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VerticalCSRefType"), VERTICALCSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "OperationMethodRefType"),
             OPERATIONMETHODREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NodeType"), NODETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeographicCRSRefType"),
+        put(new Name("http://www.opengis.net/gml", "NodeType"), NODETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeographicCRSRefType"),
             GEOGRAPHICCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FaceType"), FACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SphericalCSType"), SPHERICALCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridType"), GRIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RectifiedGridType"), RECTIFIEDGRIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeocentricCRSRefType"),
+        put(new Name("http://www.opengis.net/gml", "FaceType"), FACETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SphericalCSType"), SPHERICALCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GridType"), GRIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "RectifiedGridType"), RECTIFIEDGRIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeocentricCRSRefType"),
             GEOCENTRICCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeClockType"), TIMECLOCKTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BSplineType"), BSPLINETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BezierType"), BEZIERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "_isSphere"), _ISSPHERE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DatumRefType"), DATUMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSurfacePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimeClockType"), TIMECLOCKTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BSplineType"), BSPLINETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BezierType"), BEZIERTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "_isSphere"), _ISSPHERE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DatumRefType"), DATUMREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiSurfacePropertyType"),
             MULTISURFACEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConeType"), CONETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeCurveType"),
-            COMPOSITECURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ObservationType"), OBSERVATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectedObservationType"),
+        put(new Name("http://www.opengis.net/gml", "ConeType"), CONETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompositeCurveType"), COMPOSITECURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ObservationType"), OBSERVATIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DirectedObservationType"),
             DIRECTEDOBSERVATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectedObservationAtDistanceType"),
+        put(new Name("http://www.opengis.net/gml", "DirectedObservationAtDistanceType"),
             DIRECTEDOBSERVATIONATDISTANCETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "doubleOrNull"), DOUBLEORNULL_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ContainerPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "doubleOrNull"), DOUBLEORNULL_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ContainerPropertyType"),
             CONTAINERPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AesheticCriteriaType"),
+        put(new Name("http://www.opengis.net/gml", "AesheticCriteriaType"),
             AESHETICCRITERIATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OffsetCurveType"), OFFSETCURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompoundCRSType"), COMPOUNDCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ImageDatumRefType"), IMAGEDATUMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalDatumRefType"),
+        put(new Name("http://www.opengis.net/gml", "OffsetCurveType"), OFFSETCURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompoundCRSType"), COMPOUNDCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ImageDatumRefType"), IMAGEDATUMREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VerticalDatumRefType"),
             VERTICALDATUMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CalDate"), CALDATE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MetaDataPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "CalDate"), CALDATE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MetaDataPropertyType"),
             METADATAPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeCalendarType"), TIMECALENDARTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CylinderType"), CYLINDERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationMethodBaseType"),
+        put(new Name("http://www.opengis.net/gml", "TimeCalendarType"), TIMECALENDARTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CylinderType"), CYLINDERTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "OperationMethodBaseType"),
             OPERATIONMETHODBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationMethodType"),
-            OPERATIONMETHODTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcStringType"), ARCSTRINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcType"), ARCTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CircleType"), CIRCLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "doubleList"), DOUBLELIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectPositionListType"),
+        put(new Name("http://www.opengis.net/gml", "OperationMethodType"), OPERATIONMETHODTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArcStringType"), ARCSTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArcType"), ARCTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CircleType"), CIRCLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "doubleList"), DOUBLELIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DirectPositionListType"),
             DIRECTPOSITIONLISTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "UserDefinedCSType"), USERDEFINEDCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoSurfaceType"), TOPOSURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CurvePropertyType"), CURVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConcatenatedOperationType"),
+        put(new Name("http://www.opengis.net/gml", "UserDefinedCSType"), USERDEFINEDCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoSurfaceType"), TOPOSURFACETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CurvePropertyType"), CURVEPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ConcatenatedOperationType"),
             CONCATENATEDOPERATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OrientableSurfaceType"),
+        put(new Name("http://www.opengis.net/gml", "OrientableSurfaceType"),
             ORIENTABLESURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimeComplexType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractTimeComplexType"),
             ABSTRACTTIMECOMPLEXTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeTopologyComplexType"),
+        put(new Name("http://www.opengis.net/gml", "TimeTopologyComplexType"),
             TIMETOPOLOGYCOMPLEXTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridCoverageType"), GRIDCOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinateOperationRefType"),
+        put(new Name("http://www.opengis.net/gml", "GridCoverageType"), GRIDCOVERAGETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CoordinateOperationRefType"),
             COORDINATEOPERATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EnvelopeType"), ENVELOPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EnvelopeWithTimePeriodType"),
+        put(new Name("http://www.opengis.net/gml", "EnvelopeType"), ENVELOPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EnvelopeWithTimePeriodType"),
             ENVELOPEWITHTIMEPERIODTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BooleanPropertyType"),
-            BOOLEANPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordType"), COORDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSurfaceCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "BooleanPropertyType"), BOOLEANPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CoordType"), COORDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiSurfaceCoverageType"),
             MULTISURFACECOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridEnvelopeType"), GRIDENVELOPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalCSRefType"), TEMPORALCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LineStringSegmentType"),
+        put(new Name("http://www.opengis.net/gml", "GridEnvelopeType"), GRIDENVELOPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TemporalCSRefType"), TEMPORALCSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LineStringSegmentType"),
             LINESTRINGSEGMENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FeatureArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "FeatureArrayPropertyType"),
             FEATUREARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SingleOperationRefType"),
+        put(new Name("http://www.opengis.net/gml", "SingleOperationRefType"),
             SINGLEOPERATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectedFacePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "DirectedFacePropertyType"),
             DIRECTEDFACEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ValueArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "ValueArrayPropertyType"),
             VALUEARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ReferenceSystemRefType"),
+        put(new Name("http://www.opengis.net/gml", "ReferenceSystemRefType"),
             REFERENCESYSTEMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeCalendarEraType"),
-            TIMECALENDARERATYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalCRSType"), VERTICALCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CurveArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimeCalendarEraType"), TIMECALENDARERATYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VerticalCRSType"), VERTICALCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CurveArrayPropertyType"),
             CURVEARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ParameterValueGroupType"),
+        put(new Name("http://www.opengis.net/gml", "ParameterValueGroupType"),
             PARAMETERVALUEGROUPTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSolidCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "MultiSolidCoverageType"),
             MULTISOLIDCOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LinearRingPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "LinearRingPropertyType"),
             LINEARRINGPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSurfaceType"), MULTISURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "KnotType"), KNOTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoverageFunctionType"),
+        put(new Name("http://www.opengis.net/gml", "MultiSurfaceType"), MULTISURFACETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "KnotType"), KNOTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CoverageFunctionType"),
             COVERAGEFUNCTIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SurfaceArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "SurfaceArrayPropertyType"),
             SURFACEARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GraphStylePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "GraphStylePropertyType"),
             GRAPHSTYLEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometricComplexType"),
+        put(new Name("http://www.opengis.net/gml", "GeometricComplexType"),
             GEOMETRICCOMPLEXTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractContinuousCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractContinuousCoverageType"),
             ABSTRACTCONTINUOUSCOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CovarianceMatrixType"),
+        put(new Name("http://www.opengis.net/gml", "CovarianceMatrixType"),
             COVARIANCEMATRIXTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DMSAngleType"), DMSANGLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArrayAssociationType"),
+        put(new Name("http://www.opengis.net/gml", "DMSAngleType"), DMSANGLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArrayAssociationType"),
             ARRAYASSOCIATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MeasureListType"), MEASURELISTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalCSType"), TEMPORALCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RangeParametersType"),
-            RANGEPARAMETERSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ImageCRSType"), IMAGECRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EllipsoidRefType"), ELLIPSOIDREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiPointPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "MeasureListType"), MEASURELISTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TemporalCSType"), TEMPORALCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "RangeParametersType"), RANGEPARAMETERSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ImageCRSType"), IMAGECRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EllipsoidRefType"), ELLIPSOIDREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiPointPropertyType"),
             MULTIPOINTPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LocationPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "LocationPropertyType"),
             LOCATIONPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PriorityLocationPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "PriorityLocationPropertyType"),
             PRIORITYLOCATIONPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSolidDomainType"),
+        put(new Name("http://www.opengis.net/gml", "MultiSolidDomainType"),
             MULTISOLIDDOMAINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PassThroughOperationType"),
+        put(new Name("http://www.opengis.net/gml", "PassThroughOperationType"),
             PASSTHROUGHOPERATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CubicSplineType"), CUBICSPLINETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EngineeringCRSRefType"),
+        put(new Name("http://www.opengis.net/gml", "CubicSplineType"), CUBICSPLINETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EngineeringCRSRefType"),
             ENGINEERINGCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DictionaryType"), DICTIONARYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LineStringPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "DictionaryType"), DICTIONARYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LineStringPropertyType"),
             LINESTRINGPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ReferenceType"), REFERENCETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeNodePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "ReferenceType"), REFERENCETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeNodePropertyType"),
             TIMENODEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolygonPatchType"), POLYGONPATCHTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalDatumBaseType"),
+        put(new Name("http://www.opengis.net/gml", "PolygonPatchType"), POLYGONPATCHTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TemporalDatumBaseType"),
             TEMPORALDATUMBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalDatumType"), TEMPORALDATUMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeClockPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TemporalDatumType"), TEMPORALDATUMTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeClockPropertyType"),
             TIMECLOCKPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompoundCRSRefType"),
-            COMPOUNDCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FileType"), FILETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NameOrNull"), NAMEORNULL_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SequenceRuleNames"), SEQUENCERULENAMES_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SequenceRuleType"), SEQUENCERULETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LineTypeType"), LINETYPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PixelInCellType"), PIXELINCELLTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConversionRefType"), CONVERSIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NullType"), NULLTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "UnitDefinitionType"),
-            UNITDEFINITIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BaseUnitType"), BASEUNITTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VectorType"), VECTORTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BagType"), BAGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoPrimitiveMemberType"),
+        put(new Name("http://www.opengis.net/gml", "CompoundCRSRefType"), COMPOUNDCRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "FileType"), FILETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "NameOrNull"), NAMEORNULL_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SequenceRuleNames"), SEQUENCERULENAMES_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SequenceRuleType"), SEQUENCERULETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LineTypeType"), LINETYPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PixelInCellType"), PIXELINCELLTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ConversionRefType"), CONVERSIONREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "NullType"), NULLTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "UnitDefinitionType"), UNITDEFINITIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BaseUnitType"), BASEUNITTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VectorType"), VECTORTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BagType"), BAGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoPrimitiveMemberType"),
             TOPOPRIMITIVEMEMBERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeIntervalLengthType"),
+        put(new Name("http://www.opengis.net/gml", "TimeIntervalLengthType"),
             TIMEINTERVALLENGTHTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinateSystemAxisRefType"),
+        put(new Name("http://www.opengis.net/gml", "CoordinateSystemAxisRefType"),
             COORDINATESYSTEMAXISREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeCoordinateSystemType"),
+        put(new Name("http://www.opengis.net/gml", "TimeCoordinateSystemType"),
             TIMECOORDINATESYSTEMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TriangleType"), TRIANGLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConventionalUnitType"),
+        put(new Name("http://www.opengis.net/gml", "TriangleType"), TRIANGLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ConventionalUnitType"),
             CONVENTIONALUNITTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeCalendarEraPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimeCalendarEraPropertyType"),
             TIMECALENDARERAPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationParameterRefType"),
+        put(new Name("http://www.opengis.net/gml", "OperationParameterRefType"),
             OPERATIONPARAMETERREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PassThroughOperationRefType"),
+        put(new Name("http://www.opengis.net/gml", "PassThroughOperationRefType"),
             PASSTHROUGHOPERATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EllipsoidalCSType"), ELLIPSOIDALCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DerivedUnitType"), DERIVEDUNITTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeType"), TIMETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "booleanList"), BOOLEANLIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeocentricCRSType"), GEOCENTRICCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbsoluteExternalPositionalAccuracyType"),
+        put(new Name("http://www.opengis.net/gml", "EllipsoidalCSType"), ELLIPSOIDALCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DerivedUnitType"), DERIVEDUNITTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeType"), TIMETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "booleanList"), BOOLEANLIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeocentricCRSType"), GEOCENTRICCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbsoluteExternalPositionalAccuracyType"),
             ABSOLUTEEXTERNALPOSITIONALACCURACYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CartesianCSType"), CARTESIANCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalDatumRefType"),
+        put(new Name("http://www.opengis.net/gml", "CartesianCSType"), CARTESIANCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TemporalDatumRefType"),
             TEMPORALDATUMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeInstantType"), TIMEINSTANTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeGeometricPrimitivePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimeInstantType"), TIMEINSTANTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeGeometricPrimitivePropertyType"),
             TIMEGEOMETRICPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "IsolatedPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "IsolatedPropertyType"),
             ISOLATEDPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeOrdinalEraPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimeOrdinalEraPropertyType"),
             TIMEORDINALERAPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CurveSegmentArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "CurveSegmentArrayPropertyType"),
             CURVESEGMENTARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DerivedCRSTypeType"),
-            DERIVEDCRSTYPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalCSType"), VERTICALCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "KnotTypesType"), KNOTTYPESTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoComplexMemberType"),
+        put(new Name("http://www.opengis.net/gml", "DerivedCRSTypeType"), DERIVEDCRSTYPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VerticalCSType"), VERTICALCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "KnotTypesType"), KNOTTYPESTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoComplexMemberType"),
             TOPOCOMPLEXMEMBERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "QueryGrammarEnumeration"),
+        put(new Name("http://www.opengis.net/gml", "QueryGrammarEnumeration"),
             QUERYGRAMMARENUMERATION_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "booleanOrNullList"), BOOLEANORNULLLIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolyhedralSurfaceType"),
+        put(new Name("http://www.opengis.net/gml", "booleanOrNullList"), BOOLEANORNULLLIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PolyhedralSurfaceType"),
             POLYHEDRALSURFACETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeValueType"),
-            COMPOSITEVALUETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ValueArrayType"), VALUEARRAYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolygonPatchArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "CompositeValueType"), COMPOSITEVALUETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ValueArrayType"), VALUEARRAYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PolygonPatchArrayPropertyType"),
             POLYGONPATCHARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSolidType"), MULTISOLIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiPointCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "MultiSolidType"), MULTISOLIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiPointCoverageType"),
             MULTIPOINTCOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NameList"), NAMELIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CodeListType"), CODELISTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoComplexType"), TOPOCOMPLEXTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BoundingShapeType"), BOUNDINGSHAPETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PrimeMeridianRefType"),
+        put(new Name("http://www.opengis.net/gml", "NameList"), NAMELIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CodeListType"), CODELISTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoComplexType"), TOPOCOMPLEXTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BoundingShapeType"), BOUNDINGSHAPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PrimeMeridianRefType"),
             PRIMEMERIDIANREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGeneralOperationParameterType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGeneralOperationParameterType"),
             ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationParameterBaseType"),
+        put(new Name("http://www.opengis.net/gml", "OperationParameterBaseType"),
             OPERATIONPARAMETERBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationParameterType"),
+        put(new Name("http://www.opengis.net/gml", "OperationParameterType"),
             OPERATIONPARAMETERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometricPrimitivePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "GeometricPrimitivePropertyType"),
             GEOMETRICPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CoordinateSystemRefType"),
+        put(new Name("http://www.opengis.net/gml", "CoordinateSystemRefType"),
             COORDINATESYSTEMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiLineStringPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "MultiLineStringPropertyType"),
             MULTILINESTRINGPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopologyStylePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TopologyStylePropertyType"),
             TOPOLOGYSTYLEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeographicCRSType"), GEOGRAPHICCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CountPropertyType"), COUNTPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VolumeType"), VOLUMETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeSurfacePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "GeographicCRSType"), GEOGRAPHICCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CountPropertyType"), COUNTPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "VolumeType"), VOLUMETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompositeSurfacePropertyType"),
             COMPOSITESURFACEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EngineeringDatumRefType"),
+        put(new Name("http://www.opengis.net/gml", "EngineeringDatumRefType"),
             ENGINEERINGDATUMREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LabelType"), LABELTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CompositeSolidPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "LabelType"), LABELTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CompositeSolidPropertyType"),
             COMPOSITESOLIDPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometryArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "GeometryArrayPropertyType"),
             GEOMETRYARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CRSRefType"), CRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ClothoidType_refLocation"),
+        put(new Name("http://www.opengis.net/gml", "CRSRefType"), CRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ClothoidType_refLocation"),
             CLOTHOIDTYPE_REFLOCATION_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EngineeringCRSType"),
-            ENGINEERINGCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "IndirectEntryType"), INDIRECTENTRYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoPrimitiveArrayAssociationType"),
+        put(new Name("http://www.opengis.net/gml", "EngineeringCRSType"), ENGINEERINGCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "IndirectEntryType"), INDIRECTENTRYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoPrimitiveArrayAssociationType"),
             TOPOPRIMITIVEARRAYASSOCIATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FeatureStylePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "FeatureStylePropertyType"),
             FEATURESTYLEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiGeometryPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "MultiGeometryPropertyType"),
             MULTIGEOMETRYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "BoundedFeatureType"),
-            BOUNDEDFEATURETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "EngineeringDatumType"),
+        put(new Name("http://www.opengis.net/gml", "BoundedFeatureType"), BOUNDEDFEATURETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "EngineeringDatumType"),
             ENGINEERINGDATUMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSurfaceDomainType"),
+        put(new Name("http://www.opengis.net/gml", "MultiSurfaceDomainType"),
             MULTISURFACEDOMAINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeIndeterminateValueType"),
+        put(new Name("http://www.opengis.net/gml", "TimeIndeterminateValueType"),
             TIMEINDETERMINATEVALUETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SuccessionType"), SUCCESSIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcStringByBulgeType"),
+        put(new Name("http://www.opengis.net/gml", "SuccessionType"), SUCCESSIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArcStringByBulgeType"),
             ARCSTRINGBYBULGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArcByBulgeType"), ARCBYBULGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "IdentifierType"), IDENTIFIERTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GraphStyleType"), GRAPHSTYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CovarianceElementType"),
+        put(new Name("http://www.opengis.net/gml", "ArcByBulgeType"), ARCBYBULGETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "IdentifierType"), IDENTIFIERTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GraphStyleType"), GRAPHSTYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CovarianceElementType"),
             COVARIANCEELEMENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "QuantityPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "QuantityPropertyType"),
             QUANTITYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolygonPropertyType"),
-            POLYGONPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiSolidPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "PolygonPropertyType"), POLYGONPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiSolidPropertyType"),
             MULTISOLIDPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CylindricalCSType"), CYLINDRICALCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "UnitOfMeasureType"), UNITOFMEASURETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ConversionToPreferredUnitType"),
+        put(new Name("http://www.opengis.net/gml", "CylindricalCSType"), CYLINDRICALCSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "UnitOfMeasureType"), UNITOFMEASURETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ConversionToPreferredUnitType"),
             CONVERSIONTOPREFERREDUNITTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LineStringType"), LINESTRINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometricComplexPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "LineStringType"), LINESTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeometricComplexPropertyType"),
             GEOMETRICCOMPLEXPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DataBlockType"), DATABLOCKTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiPolygonType"), MULTIPOLYGONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DerivedCRSRefType"), DERIVEDCRSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "QNameList"), QNAMELIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RangeSetType"), RANGESETTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "HistoryPropertyType"),
-            HISTORYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TrackType"), TRACKTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeometryStyleType"), GEOMETRYSTYLETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectionPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "DataBlockType"), DATABLOCKTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiPolygonType"), MULTIPOLYGONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DerivedCRSRefType"), DERIVEDCRSREFTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "QNameList"), QNAMELIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "RangeSetType"), RANGESETTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "HistoryPropertyType"), HISTORYPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TrackType"), TRACKTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeometryStyleType"), GEOMETRYSTYLETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DirectionPropertyType"),
             DIRECTIONPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "NCNameList"), NCNAMELIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DecimalMinutesType"),
-            DECIMALMINUTESTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractTimeSliceType"),
+        put(new Name("http://www.opengis.net/gml", "NCNameList"), NCNAMELIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DecimalMinutesType"), DECIMALMINUTESTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractTimeSliceType"),
             ABSTRACTTIMESLICETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MovingObjectStatusType"),
+        put(new Name("http://www.opengis.net/gml", "MovingObjectStatusType"),
             MOVINGOBJECTSTATUSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "StyleVariationType"),
-            STYLEVARIATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ScalarValuePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "StyleVariationType"), STYLEVARIATIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ScalarValuePropertyType"),
             SCALARVALUEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "integerOrNullList"), INTEGERORNULLLIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "CountExtentType"), COUNTEXTENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectPositionType"),
-            DIRECTPOSITIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeTopologyPrimitivePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "integerOrNullList"), INTEGERORNULLLIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CountExtentType"), COUNTEXTENTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DirectPositionType"), DIRECTPOSITIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeTopologyPrimitivePropertyType"),
             TIMETOPOLOGYPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridLimitsType"), GRIDLIMITSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PointArrayPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "GridLimitsType"), GRIDLIMITSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PointArrayPropertyType"),
             POINTARRAYPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimePeriodPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "TimePeriodPropertyType"),
             TIMEPERIODPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeodeticDatumType"), GEODETICDATUMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "RectifiedGridCoverageType"),
+        put(new Name("http://www.opengis.net/gml", "GeodeticDatumType"), GEODETICDATUMTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "RectifiedGridCoverageType"),
             RECTIFIEDGRIDCOVERAGETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "doubleOrNullList"), DOUBLEORNULLLIST_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MeasureOrNullListType"),
+        put(new Name("http://www.opengis.net/gml", "doubleOrNullList"), DOUBLEORNULLLIST_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MeasureOrNullListType"),
             MEASUREORNULLLISTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "QuantityExtentType"),
-            QUANTITYEXTENTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoSolidType"), TOPOSOLIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationParameterGroupBaseType"),
+        put(new Name("http://www.opengis.net/gml", "QuantityExtentType"), QUANTITYEXTENTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoSolidType"), TOPOSOLIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "OperationParameterGroupBaseType"),
             OPERATIONPARAMETERGROUPBASETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "OperationParameterGroupType"),
+        put(new Name("http://www.opengis.net/gml", "OperationParameterGroupType"),
             OPERATIONPARAMETERGROUPTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ObliqueCartesianCSRefType"),
+        put(new Name("http://www.opengis.net/gml", "ObliqueCartesianCSRefType"),
             OBLIQUECARTESIANCSREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeUnitType"), TIMEUNITTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ArrayType"), ARRAYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SymbolTypeEnumeration"),
+        put(new Name("http://www.opengis.net/gml", "TimeUnitType"), TIMEUNITTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "ArrayType"), ARRAYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SymbolTypeEnumeration"),
             SYMBOLTYPEENUMERATION_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeodesicStringType"),
-            GEODESICSTRINGTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeodesicType"), GEODESICTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PointType"), POINTTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractFeatureCollectionType"),
+        put(new Name("http://www.opengis.net/gml", "GeodesicStringType"), GEODESICSTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeodesicType"), GEODESICTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PointType"), POINTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractFeatureCollectionType"),
             ABSTRACTFEATURECOLLECTIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "FeatureCollectionType"),
+        put(new Name("http://www.opengis.net/gml", "FeatureCollectionType"),
             FEATURECOLLECTIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DynamicFeatureCollectionType"),
+        put(new Name("http://www.opengis.net/gml", "DynamicFeatureCollectionType"),
             DYNAMICFEATURECOLLECTIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "VerticalDatumType"), VERTICALDATUMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DerivationUnitTermType"),
+        put(new Name("http://www.opengis.net/gml", "VerticalDatumType"), VERTICALDATUMTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DerivationUnitTermType"),
             DERIVATIONUNITTERMTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DegreeValueType"), DEGREEVALUETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DegreesType"), DEGREESTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AbstractGriddedSurfaceType_row"),
+        put(new Name("http://www.opengis.net/gml", "DegreeValueType"), DEGREEVALUETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "DegreesType"), DEGREESTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractGriddedSurfaceType_row"),
             ABSTRACTGRIDDEDSURFACETYPE_ROW_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "DirectedEdgePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "DirectedEdgePropertyType"),
             DIRECTEDEDGEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "MultiCurveType"), MULTICURVETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeNodeType"), TIMENODETYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "stringOrNull"), STRINGORNULL_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SolidType"), SOLIDTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TemporalCRSType"), TEMPORALCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "LabelStylePropertyType"),
+        put(new Name("http://www.opengis.net/gml", "MultiCurveType"), MULTICURVETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeNodeType"), TIMENODETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "stringOrNull"), STRINGORNULL_TYPE);
+        put(new Name("http://www.opengis.net/gml", "SolidType"), SOLIDTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TemporalCRSType"), TEMPORALCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LabelStylePropertyType"),
             LABELSTYLEPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ObliqueCartesianCSType"),
+        put(new Name("http://www.opengis.net/gml", "ObliqueCartesianCSType"),
             OBLIQUECARTESIANCSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "ProjectedCRSType"), PROJECTEDCRSTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TimeInstantPropertyType"),
+        put(new Name("http://www.opengis.net/gml", "ProjectedCRSType"), PROJECTEDCRSTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TimeInstantPropertyType"),
             TIMEINSTANTPROPERTYTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GridDomainType"), GRIDDOMAINTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "PolygonType"), POLYGONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "AssociationType"), ASSOCIATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "GeneralTransformationRefType"),
+        put(new Name("http://www.opengis.net/gml", "GridDomainType"), GRIDDOMAINTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PolygonType"), POLYGONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AssociationType"), ASSOCIATIONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "GeneralTransformationRefType"),
             GENERALTRANSFORMATIONREFTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "SurfaceInterpolationType"),
+        put(new Name("http://www.opengis.net/gml", "SurfaceInterpolationType"),
             SURFACEINTERPOLATIONTYPE_TYPE);
-        put(new TypeName("http://www.opengis.net/gml", "TopoVolumeType"), TOPOVOLUMETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "TopoVolumeType"), TOPOVOLUMETYPE_TYPE);
     }
 }

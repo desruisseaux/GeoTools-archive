@@ -320,7 +320,7 @@ public class MIFFileTest extends TestCase {
 
             FeatureType ft = mif.getSchema();
 
-            assertEquals(ft.getPrimaryGeometry().getBinding(), Geometry.class);
+            assertEquals(ft.getDefaultGeometry().getBinding(), Geometry.class);
 
             FeatureReader fr = mif.getFeatureReader();
 
@@ -432,7 +432,7 @@ public class MIFFileTest extends TestCase {
 
             FeatureType ft = mif.getSchema();
 
-            assertEquals(geomClass, ft.getPrimaryGeometry().getBinding());
+            assertEquals(geomClass, ft.getDefaultGeometry().getBinding());
 
             FeatureReader fr = mif.getFeatureReader();
 

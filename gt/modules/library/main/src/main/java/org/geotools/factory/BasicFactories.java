@@ -19,8 +19,8 @@ package org.geotools.factory;
 import java.util.Map;
 
 // OpenGIS dependencies
-import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.display.FeatureDisplayFactory;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.go.CommonCapabilities;
 import org.opengis.go.CommonFactory;
@@ -141,11 +141,29 @@ public class BasicFactories implements CommonFactory {
      *
      * @throws FactoryNotFoundException if no factory was found for the requested type.
      * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
+     * 
+     * @deprecated use {@link #getFeatureTypeFactory()}.
      */
-    public TypeFactory getTypeFactory() throws FactoryRegistryException {
-        throw new FactoryNotFoundException(unsupportedFactory(TypeFactory.class));
+    public FeatureTypeFactory getTypeFactory() throws FactoryRegistryException {
+        return getFeatureTypeFactory();
     }
 
+    /**
+     * Returns the {@linkplain FeatureTypeFactory feature type factory} singleton.
+     * <p>
+     * <strong>NOTE:</strong> This method is not yet supported in Geotools.
+     * The default implementation thrown an exception in all case.
+     *
+     * @throws FactoryNotFoundException if no factory was found for the requested type.
+     * @throws FactoryRegistryException if the factory can't be obtained for an other reason.
+     * 
+     * @deprecated use {@link #getFeatureTypeFactory()}.
+     * @since 2.5
+     */
+    public FeatureTypeFactory getFeatureTypeFactory() throws FactoryRegistryException {
+        throw new FactoryNotFoundException(unsupportedFactory(FeatureTypeFactory.class));
+    }
+    
     /**
      * Returns the {@linkplain FilterFactory filter factory} singleton.
      * <p>

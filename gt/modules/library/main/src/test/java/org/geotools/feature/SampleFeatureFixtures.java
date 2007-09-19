@@ -22,6 +22,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geotools.feature.type.ChoiceAttributeType;
+import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 
 
 /**
@@ -142,19 +143,15 @@ public class SampleFeatureFixtures {
     }
 
     public static FeatureType createChoiceFeatureType() {
-        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance("test");
-        typeFactory.addType(getChoiceAttrType1());
-        typeFactory.addType(getChoiceAttrType2());
-        typeFactory.addType(getChoiceGeomType());
-        typeFactory.setDefaultGeometry((GeometryAttributeType) typeFactory.get(
-                2));
-
-        try {
-            return typeFactory.getFeatureType();
-        } catch (SchemaException se) {
-            throw new RuntimeException("Programmer error making choice ftype",
-                se);
-        }
+        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        tb.setName( "test" );
+        
+        tb.add(getChoiceAttrType1());
+        tb.add(getChoiceAttrType2());
+        tb.add(getChoiceGeomType());
+        tb.setDefaultGeometry(getChoiceGeomType());
+        
+        return tb.buildFeatureType();
     }
 
     /**
@@ -164,32 +161,49 @@ public class SampleFeatureFixtures {
      * @throws SchemaException
      */
     public static FeatureType createTestType() throws SchemaException {
-        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance("test");
-        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-                "testGeometry", Point.class));
-
-        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-                "testBoolean", Boolean.class));
-
-        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-                "testCharacter", Character.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType("testByte",
-                Byte.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType("testShort",
-                Short.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-                "testInteger", Integer.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType("testLong",
-                Long.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType("testFloat",
-                Float.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-                "testDouble", Double.class));
-        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-                "testString", String.class));
-        typeFactory.setDefaultGeometry((GeometryAttributeType) typeFactory.get(
-                0));
-
-        return typeFactory.getFeatureType();
+        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        tb.setName("test");
+        
+        tb.add("testGeometry", Point.class);
+        tb.add("testBoolean", Boolean.class);
+        tb.add("testCharacter", Character.class);
+        tb.add("testByte", Byte.class);
+        tb.add("testShort", Short.class);
+        tb.add("testInteger", Integer.class);
+        tb.add("testLong", Long.class);
+        tb.add("testFloat", Float.class);
+        tb.add("testDouble", Double.class);
+        tb.add("testString", String.class);
+        
+        tb.setDefaultGeometry("testGeometry");
+        return tb.buildFeatureType();
+        
+//        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance("test");
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
+//                "testGeometry", Point.class));
+//
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
+//                "testBoolean", Boolean.class));
+//
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
+//                "testCharacter", Character.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testByte",
+//                Byte.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testShort",
+//                Short.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
+//                "testInteger", Integer.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testLong",
+//                Long.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testFloat",
+//                Float.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
+//                "testDouble", Double.class));
+//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
+//                "testString", String.class));
+//        typeFactory.setDefaultGeometry((GeometryAttributeType) typeFactory.get(
+//                0));
+//
+//        return typeFactory.getFeatureType();
     }
 }

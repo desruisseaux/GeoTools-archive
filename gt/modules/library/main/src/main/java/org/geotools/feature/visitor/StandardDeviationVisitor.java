@@ -16,7 +16,7 @@
 package org.geotools.feature.visitor;
 
 import org.geotools.feature.Feature;
-import org.opengis.feature.type.FeatureCollectionType;
+import org.geotools.feature.FeatureCollection;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -49,7 +49,7 @@ public class StandardDeviationVisitor implements FeatureCalc {
 		//at the moment we're assuming we won't know who the feature collection is, and need the average as input
 	}
 
-	public void init(FeatureCollectionType collection) {
+	public void init(FeatureCollection collection) {
 		//do nothing
 	}
 	

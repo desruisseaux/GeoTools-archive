@@ -12,7 +12,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.GeoTools;
-import org.opengis.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -76,7 +76,7 @@ public class ShapefileRead2 {
 		try {
 			while (iterator.hasNext()) {
 				SimpleFeature feature = (SimpleFeature) iterator.next();
-				Geometry geometry = (Geometry) feature.getDefaultGeometryValue();
+				Geometry geometry = (Geometry) feature.getDefaultGeometry();
 				
 				length += geometry.getLength();
 			}

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -53,6 +54,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -272,14 +274,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         return byteOrder;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
-     */
-    public GeometryAttributeType getPrimaryGeometry() {
-    	return featureType.getPrimaryGeometry();
-    }
-    
     /**
      * Gets the value of the description of table content. This is nice to
      * have, but I don't know how to make use of it.
@@ -1091,22 +1085,39 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         return featureType.find(attName);
 	}
 
+	public List<AttributeDescriptor> getAttributes() {
+	    return featureType.getAttributes();
+	}
+	
 	public AttributeDescriptor getAttribute(String name) {
 		return featureType.getAttribute(name);
+	}
+	
+	public AttributeDescriptor getAttribute(Name name) {
+	    return featureType.getAttribute(name);
 	}
 
 	public AttributeDescriptor getAttribute(int index) {
 		return featureType.getAttribute(index);
 	}
 
-	public GeometryType getDefaultGeometryType() {
-		return featureType.getDefaultGeometryType();
+	public PropertyDescriptor getProperty(Name name) {
+	    return featureType.getProperty(name);
 	}
-
-	public org.opengis.feature.type.AttributeType getType(String name) {
+	
+	public PropertyDescriptor getProperty(String name) {
+	    return featureType.getProperty(name);
+	}
+	
+	public org.opengis.feature.type.AttributeType getType(Name name) {
 		return featureType.getType( name );
 	}
 
+	public org.opengis.feature.type.AttributeType getType(String name) {
+        return featureType.getType( name );
+	}
+
+	   
 	public org.opengis.feature.type.AttributeType getType(int index) {
 		return featureType.getType( index );
 	}
@@ -1119,16 +1130,8 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 		return featureType.getCRS();
 	}
 
-	public AttributeDescriptor getDefaultGeometry() {
+	public GeometryAttributeType getDefaultGeometry() {
 		return featureType.getDefaultGeometry();
-	}
-
-	public Collection associations() {
-		return featureType.associations(); 
-	}
-
-	public Collection attributes() {
-		return featureType.attributes();
 	}
 
 	public Class getBinding() {
@@ -1143,11 +1146,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 		return featureType.isInline();
 	}
 
-	public Collection getOperations() {
-		return featureType.getOperations();
-	}
-
-	public Set getRestrictions() {
+	public List getRestrictions() {
 		return featureType.getRestrictions();
 	}
 
@@ -1167,19 +1166,17 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 		return featureType.getName();
 	}
 
-	public Object getUserData(Object key) {
-		return featureType.getUserData(key);
-	}
-
-	public void putUserData(Object key, Object data) {
-		featureType.putUserData(key, data);
-	}
-	
 	public int indexOf(String name) {
 		return featureType.indexOf(name);
 	}
 
-    public List getAttributes() {
-        return (List) attributes();
-    }
+	public int indexOf(Name name) {
+	    return featureType.indexOf(name);
+	}
+	
+	public Map<Object, Object> getUserData() {
+	    return featureType.getUserData();
+	}
+	
+	
 }

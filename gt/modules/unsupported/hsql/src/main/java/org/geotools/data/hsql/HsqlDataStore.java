@@ -363,7 +363,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      * @throws IOException
      * @throws DataSourceException If the connection can not be obtained.
      */
-    protected Connection getConnection(Transaction transaction)
+    public Connection getConnection(Transaction transaction)
         throws IOException {
         if (transaction != Transaction.AUTO_COMMIT) {
             // we will need to save a JDBC connection is
@@ -429,8 +429,8 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 			for( int i = 0; i < atts.length; i++ ) {
 				//if( i != 0 ) 
 				sql += ",";
-				colName = atts[i].getName();
-				colClass = atts[i].getType();
+				colName = atts[i].getName().getLocalPart();
+				colClass = atts[i].getType().getBinding();
 				if (colClass.isAssignableFrom(int.class) 
 						|| colClass.isAssignableFrom(Integer.class)) {
 					colType = "integer";
@@ -514,7 +514,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 	 */
 	private void addTypeTable(String typeName, String namespace, AttributeType attribute) {
 		addTypeTable(typeName, namespace, 
-				attribute.getName().toUpperCase(), attribute.getType().getName());
+				attribute.getName().getLocalPart().toUpperCase(), attribute.getType().getName().getLocalPart());
 	}
 	
 	/**

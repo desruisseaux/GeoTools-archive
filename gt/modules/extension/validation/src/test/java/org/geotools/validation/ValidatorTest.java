@@ -99,7 +99,7 @@ public class ValidatorTest extends TestCase {
     	for( int i=0; i<LAKE.getAttributeCount(); i++){
     		AttributeType attr = LAKE.getAttributeType( i );
     		// System.out.println( i+" "+attr.getType()+":"+attr.getName()+"="+feature.getAttribute( i )  );
-    		if( LAKE.getPrimaryGeometry() == attr ){
+    		if( LAKE.getDefaultGeometry() == attr ){
     			GeometryFactory factory = new GeometryFactory();
     			Coordinate coords[] = new Coordinate[]{
     					new Coordinate( 1, 1 ),new Coordinate( 2, 2 ),

@@ -15,9 +15,6 @@
  */
 package org.geotools.feature;
 
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
-import org.opengis.feature.simple.SimpleFeatureType;
-
 
 /**
  * A SimpleFeatureCollectionType indicating that the contents are stored using the
@@ -28,9 +25,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * <ul>
  * <li>FeatureCollectioType.getMemberType()
  * @author Jody Garnett (Refractions Research)
- * @deprecated Please use SimpleFeatureCollectionType
  */
-public interface FeatureCollectionType extends FeatureType, SimpleFeatureCollectionType {
+public interface FeatureCollectionType extends FeatureType {
     /**
      * Explicitly documents the FeatureCollection as containing this FeatureType.
      */

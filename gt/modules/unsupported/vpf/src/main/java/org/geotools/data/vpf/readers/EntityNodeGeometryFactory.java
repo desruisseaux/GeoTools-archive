@@ -59,6 +59,6 @@ public class EntityNodeGeometryFactory extends VPFGeometryFactory implements Fil
         VPFFile nodeFile = VPFFileFactory.getInstance().getFile(nodeTableName);
         Feature row = nodeFile.getRowFromId("id", nodeId);
         result = (Geometry)row.getAttribute("coordinate");
-        values.setPrimaryGeometry(result);
+        values.setDefaultGeometry(result);
     }
 }

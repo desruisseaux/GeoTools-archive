@@ -86,7 +86,7 @@ public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
     }
 
     public final Geometry getDefaultGeometry() {
-    	return getPrimaryGeometry();
+    	return getDefaultGeometry();
     }
     
     public Geometry getPrimaryGeometry() {
@@ -119,7 +119,7 @@ public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
 
     public final void setDefaultGeometry(Geometry geometry)
             throws IllegalAttributeException {
-        setPrimaryGeometry(geometry);
+        setDefaultGeometry(geometry);
     }
 
     public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {

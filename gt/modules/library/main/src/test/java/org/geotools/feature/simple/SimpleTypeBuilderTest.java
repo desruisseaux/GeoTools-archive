@@ -1,24 +1,19 @@
 package org.geotools.feature.simple;
 
 import java.util.Collections;
-import java.util.List;
 
-import org.geotools.feature.AttributeTypeFactory;
+import junit.framework.TestCase;
+
 import org.geotools.feature.Name;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.feature.type.TypeFactoryImpl;
-import org.geotools.feature.type.TypeName;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Schema;
 
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-
-import junit.framework.TestCase;
 
 public class SimpleTypeBuilderTest extends TestCase {
 
@@ -29,16 +24,16 @@ public class SimpleTypeBuilderTest extends TestCase {
 	protected void setUp() throws Exception {
 		Schema schema = new SchemaImpl( "test" );
 		
-		TypeFactoryImpl typeFactory = new TypeFactoryImpl();
+		FeatureTypeFactoryImpl typeFactory = new FeatureTypeFactoryImpl();
 		AttributeType pointType = 
-			typeFactory.createGeometryType( new TypeName( "test", "pointType" ), Point.class, null, false, false, Collections.EMPTY_SET, null, null);		
+			typeFactory.createGeometryType( new Name( "test", "pointType" ), Point.class, null, false, false, Collections.EMPTY_LIST, null, null);		
 		schema.put( new Name( "test", "pointType" ), pointType );
 		
 		AttributeType intType = 
-			typeFactory.createAttributeType( new TypeName( "test", "intType" ), Integer.class, false, false, Collections.EMPTY_SET, null, null);
+			typeFactory.createAttributeType( new Name( "test", "intType" ), Integer.class, false, false, Collections.EMPTY_LIST, null, null);
 		schema.put( new Name( "test", "intType" ), intType );
 		
-		builder = new SimpleFeatureTypeBuilder( new SimpleTypeFactoryImpl() );
+		builder = new SimpleFeatureTypeBuilder( new FeatureTypeFactoryImpl() );
 		builder.setBindings(schema);
 	}
 	
@@ -61,7 +56,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 		assertNotNull( t );
 		assertEquals( Integer.class, t.getBinding() );
 		
-		t = type.getDefaultGeometryType();
+		t = type.getDefaultGeometry().getType();
 		assertNotNull( t );
 		assertEquals( Point.class, t.getBinding() );
 	}
@@ -77,7 +72,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 		SimpleFeatureType type = builder.buildFeatureType();
 		assertEquals( DefaultGeographicCRS.WGS84, type.getCRS() );
 		
-		assertNull( type.getDefaultGeometryType().getCRS() );
+		assertNull( type.getDefaultGeometry().getType().getCRS() );
 		assertEquals( DefaultGeographicCRS.WGS84, ((GeometryType)type.getType("point2")).getCRS());
 	}
 }

@@ -11,17 +11,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.feature.AttributeTypeBuilder;
-import org.geotools.feature.type.TypeFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.referencing.CRS;
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureTypeFactory;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.Schema;
-import org.opengis.feature.type.TypeFactory;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.Schema;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -38,7 +37,7 @@ import org.opengis.util.InternationalString;
  *  //set global state
  *  builder.setName( "testType" );
  *  builder.setNamespaceURI( "http://www.geotools.org/" );
- *  builder.setCRS( "EPSG:4326" );
+ *  builder.setSRS( "EPSG:4326" );
  *  
  *  //add attributes
  *  builder.add( "intProperty", Integer.class );
@@ -93,7 +92,7 @@ public class SimpleFeatureTypeBuilder {
 	/**
 	 * factories
 	 */
-	protected SimpleTypeFactory factory;
+	protected FeatureTypeFactory factory;
 
 	/**
 	 * Map of java class bound to properties types.
@@ -125,7 +124,7 @@ public class SimpleFeatureTypeBuilder {
 	/**
 	 * Additional restrictions on the type.
 	 */
-	protected Set restrictions;
+	protected List restrictions;
 
 	/** 
 	 * Name of the default geometry to use 
@@ -156,14 +155,14 @@ public class SimpleFeatureTypeBuilder {
 	 * Constructs the builder.
 	 */
 	public SimpleFeatureTypeBuilder() {
-		this( new SimpleTypeFactoryImpl() );
+		this( new FeatureTypeFactoryImpl() );
 	}
 	
 	/**
 	 * Constructs the builder specifying the factory for creating feature and 
 	 * feature collection types.
 	 */
-	public SimpleFeatureTypeBuilder(SimpleTypeFactory factory) {
+	public SimpleFeatureTypeBuilder(FeatureTypeFactory factory) {
 		this.factory = factory;
 		
 		attributeBuilder = new AttributeTypeBuilder();
@@ -175,13 +174,13 @@ public class SimpleFeatureTypeBuilder {
 	/**
 	 * Sets the factory used to create feature and feature collection types.
 	 */
-	public void setSimpleTypeFactory(SimpleTypeFactory factory) {
+	public void setFeatureTypeFactory(FeatureTypeFactory factory) {
 		this.factory = factory;
 	}
 	/**
 	 * The factory used to create feature and feature collection types.
 	 */
-	public SimpleTypeFactory getSimpleTypeFactory() {
+	public FeatureTypeFactory getFeatureTypeFactory() {
 		return factory;
 	}
 	
@@ -202,7 +201,7 @@ public class SimpleFeatureTypeBuilder {
 		restrictions().addAll(type.getRestrictions());
 
 		attributes = null;
-		attributes().addAll(type.attributes());
+		attributes().addAll(type.getAttributes());
 		
 		isAbstract = type.isAbstract();
 		superType = (SimpleFeatureType) type.getSuper();
@@ -509,7 +508,7 @@ public class SimpleFeatureTypeBuilder {
 		//check if this is the name of the default geomtry, in that case we 
 		// better make it a geometry type
 		if ( defaultGeometry != null && defaultGeometry.equals( name ) ) {
-			add( name, binding, null );
+			add( name, binding, crs );
 			return;
 		}
 		
@@ -527,7 +526,7 @@ public class SimpleFeatureTypeBuilder {
 		attributeBuilder.setCRS(crs);
 		
 		GeometryType type = attributeBuilder.buildGeometryType();
-		AttributeDescriptor descriptor = attributeBuilder.buildDescriptor(name,type);
+		GeometryDescriptor descriptor = attributeBuilder.buildDescriptor(name,type);
 		attributes().add(descriptor);
 	}
 	
@@ -539,7 +538,7 @@ public class SimpleFeatureTypeBuilder {
 	 * @return The built feature type.
 	 */
 	public SimpleFeatureType buildFeatureType() {
-		AttributeDescriptor defaultGeometry = null;
+	    GeometryDescriptor defaultGeometry = null;
 		
 		//was a default geometry set?
 		if ( this.defaultGeometry != null ) {
@@ -547,14 +546,14 @@ public class SimpleFeatureTypeBuilder {
 			for ( int i = 0; i < atts.size(); i++) {
 				AttributeDescriptor att = (AttributeDescriptor) atts.get(i);
 				if ( this.defaultGeometry.equals( att.getName().getLocalPart() ) ) {
-					//ensure the type is a geometry type
-					if ( !(att.getType() instanceof GeometryType) ) {
+					//ensure the attribute is a geometry attribute
+					if ( !(att instanceof GeometryDescriptor ) ) {
 						attributeBuilder.init( att );
 						GeometryType type = attributeBuilder.buildGeometryType();
 						att = attributeBuilder.buildDescriptor(att.getName(),type);
 						atts.set( i, att );
 					}
-					defaultGeometry = att;
+					defaultGeometry = (GeometryDescriptor)att;
 					break;
 				}
 			}
@@ -570,8 +569,8 @@ public class SimpleFeatureTypeBuilder {
 			//none was set by name, look for first geometric type
 			for ( Iterator a = attributes().iterator(); a.hasNext(); ) {
 				AttributeDescriptor att = (AttributeDescriptor) a.next();
-				if ( att.getType() instanceof GeometryType ) {
-					defaultGeometry = att;
+				if ( att instanceof GeometryDescriptor ) {
+					defaultGeometry = (GeometryDescriptor) att;
 					break;
 				}
 			}
@@ -588,7 +587,7 @@ public class SimpleFeatureTypeBuilder {
 		
 		
 		SimpleFeatureType built = factory.createSimpleFeatureType(
-			name(), attributes(), defaultGeometry, crs, isAbstract, 
+			name(), attributes(), defaultGeometry, isAbstract, 
 			restrictions(), superType, description);
 		
 		init();
@@ -596,15 +595,15 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	// Internal api available for subclasses to override
-	//
-	/**
-	 * Determines if the attribute descriptor represents a geometric attribute.
-	 * 
-	 * @param descriptor The attribute descriptor.
-	 */
-	protected boolean isGeometry(Class binding) {
-		return false;
-	}
+//	//
+//	/**
+//	 * Determines if the attribute descriptor represents a geometric attribute.
+//	 * 
+//	 * @param descriptor The attribute descriptor.
+//	 */
+//	protected boolean isGeometry(Class binding) {
+//		return false;
+//	}
 	
 	/**
 	 * Creates a descriptor from the name/binding of an attribute.
@@ -720,7 +719,7 @@ public class SimpleFeatureTypeBuilder {
 		if (local == null)
 			return null;
 		
-		return new org.geotools.feature.type.TypeName(uri, local);
+		return new org.geotools.feature.Name(uri, local);
 	}
 
 	/**
@@ -735,9 +734,9 @@ public class SimpleFeatureTypeBuilder {
 	/**
 	 * Accessor for restrictions.
 	 */
-	protected Set restrictions(){
+	protected List restrictions(){
 		if (restrictions == null) {
-			restrictions = newSet();
+			restrictions = newList();
 		}
 		return restrictions;		
 	}

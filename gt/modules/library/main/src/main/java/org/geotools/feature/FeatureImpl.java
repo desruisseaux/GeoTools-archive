@@ -11,7 +11,9 @@ import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.geometry.BoundingBox;
@@ -30,15 +32,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 
-	private Map userData = new HashMap();
-
 	/**
-	 * Optional, may be null
-	 */
-	CoordinateReferenceSystem crs;
-
-	/**
-	 * Optional, may be null
+	 * Default geometry attribute
 	 */
 	GeometryAttribute defaultGeometry;
 
@@ -49,11 +44,10 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 	 * @param desc Nested descriptor
 	 * @param id Feature ID
 	 */
-	public FeatureImpl(Collection properties, AttributeDescriptor desc, String id) {
+	public FeatureImpl(Collection<Property> properties, AttributeDescriptor desc, String id) {
 		super(properties, desc, id);
-		// super takes care of checking id since type is always
-		// identified
 	}
+	
 	/**
 	 * Create a Feature with the following content.
 	 * 
@@ -61,54 +55,14 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 	 * @param type Type of feature to be created
 	 * @param id Feature ID
 	 */
-	public FeatureImpl(Collection properties, FeatureType type, String id) {
+	public FeatureImpl(Collection<Property> properties, FeatureType type, String id) {
 		super(properties, type, id);
 	}
 
-	public void putUserData(Object key, Object value) {
-		userData.put(key, value);
+	public FeatureType getType() {
+	    return (FeatureType) super.getType();
 	}
-
-	public Object getUserData(Object key) {
-		return userData.get(key);
-	}
-
-	public void setCRS(CoordinateReferenceSystem crs) {
-		this.crs = crs;
-	}
-
-	public CoordinateReferenceSystem getCRS() {
-		// JD: commenting out the implementation of this method, there is too
-		// much jumping through hoops here, this is a data object, it should
-		// contain this logic. The logic should be present in the object
-		// constructing the feature.
-		return crs;
-		// FeatureType type = (FeatureType)getType();
-		// CoordinateReferenceSystem crs = type.getCRS();
-		// if (crs != null)
-		// return crs;
-		//        
-		// GeometryType defaultGeomType =
-		// (GeometryType) type.getDefaultGeometry().getType();
-		//        
-		// if (defaultGeomType != null) {
-		// // use the value of the Attribute, if found. Else
-		// // the one of the default type
-		// Geometry geom = (Geometry)getDefaultGeometry();
-		// if (geom != null) {
-		// Object instanceMetadata = geom.getUserData();
-		// if (instanceMetadata instanceof CoordinateReferenceSystem) {
-		// crs = (CoordinateReferenceSystem) instanceMetadata;
-		// }
-		// }
-		//			 
-		// if (crs == null) {
-		// crs = defaultGeomType.getCRS();
-		// }
-		// }
-		// return crs;
-	}
-
+	
 	/**
 	 * Get the total bounds of this feature which is calculated by doing a union
 	 * of the bounds of each geometry this feature is associated with.
@@ -121,26 +75,18 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 	 */
 	public BoundingBox getBounds() {
 
-		ReferencedEnvelope bounds = new ReferencedEnvelope(getCRS());
-		//if (((FeatureType) getType()).getDefaultGeometry() != null) {
-			for (Iterator itr = attributes().iterator(); itr.hasNext();) {
-				Attribute attribute = (Attribute) itr.next();
-				if (attribute instanceof GeometryAttribute) {
-					 bounds.include(((GeometryAttribute)attribute).getBounds());
-					 
-//					// JD: unsafe cast to geometry
-//					Geometry geom = (Geometry) ((GeometryAttribute) attribute)
-//							.get();
-//					if (geom != null) {
-//						bounds.expandToInclude(geom.getEnvelopeInternal());
-//					}
-				}
+		ReferencedEnvelope bounds = new ReferencedEnvelope(getType().getCRS());
+		for (Iterator itr = getValue().iterator(); itr.hasNext();) {
+			Property property = (Property) itr.next();
+			if (property instanceof GeometryAttribute) {
+				 bounds.include(((GeometryAttribute)property).getBounds());
 			}
-		//}
+		}
+
 		return bounds;
 	}
 
-	public GeometryAttribute getDefaultGeometry() {
+	public GeometryAttribute getDefaultGeometryProperty() {
 		if ( defaultGeometry != null ) {
 			return defaultGeometry;
 		}
@@ -152,15 +98,15 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 					return null;
 				}
 				
-				GeometryType geometryType = (GeometryType)
-				 	((FeatureType)getType()).getDefaultGeometry().getType();
+				GeometryType geometryType = 
+				 	(GeometryType) getType().getDefaultGeometry().getType();
 				
 				 if (geometryType != null) {
-					 for (Iterator itr = attributes().iterator(); itr.hasNext();) {
-						 Attribute attribute = (Attribute) itr.next();
-						 if (attribute instanceof GeometryAttribute) {
-							 if (attribute.getType().equals(geometryType)) {
-								 defaultGeometry = (GeometryAttribute)attribute;	 
+					 for (Iterator itr = getValue().iterator(); itr.hasNext();) {
+						 Property property =  (Property) itr.next();
+						 if (property instanceof GeometryAttribute) {
+							 if (property.getType().equals(geometryType)) {
+								 defaultGeometry = (GeometryAttribute)property;	 
 								 break;
 							 }
 						 }
@@ -173,56 +119,14 @@ public class FeatureImpl extends ComplexAttributeImpl implements Feature {
 		return defaultGeometry;
 	}
 
-	public void setDefaultGeometry(GeometryAttribute defaultGeometry) {
-		synchronized (this) {
-			this.defaultGeometry = defaultGeometry;	
-		}
-	}
-
-//	public void setDefaultGeometry(Geometry g) {
-//		AttributeDescriptor geometry = ((FeatureType) getType())
-//				.getDefaultGeometry();
-//		if (geometry == null) {
-//			throw new IllegalArgumentException(
-//					"FeatureType has no default geometry attribute");
-//		}
-//
-//		List/* <Attribute> */geoms = get(geometry.getName());
-//		if (geoms.size() > 0) {
-//			Attribute att = (Attribute) geoms.get(0);
-//			att.set(g);
-//		}
-//	}
-
-	public String toString() {
-		StringBuffer sb = new StringBuffer(getClass().getName());
-		Collection/* <Attribute> */atts = this.properties;
-
-		sb.append("<").append(this.ID);
-		if (DESCRIPTOR != null) {
-			sb.append(",").append(DESCRIPTOR.getName().getLocalPart());
-		}
-		sb.append(">");
-		
-		sb.append(getType().getName().getLocalPart()).append("=[");
-		for (Iterator itr = atts.iterator(); itr.hasNext();) {
-			Attribute att = (Attribute) itr.next();
-			sb.append(att.getDescriptor().getName().getLocalPart());
-			if( !(att instanceof ComplexAttribute)){
-				sb.append('=');
-				sb.append(att.getValue());
-			}
-			if( itr.hasNext()) sb.append(",");
-		}
-		sb.append("]");
-		return sb.toString();
-	}
-
-	// public Object clone(){
-	// //TODO: use builder to create new feature
-	// FeatureImpl copy = new FeatureImpl(ID, DESCRIPTOR,builder);
-	// copy.set(get());
-	// copy.setProperties(new HashMap(properties));
-	// return copy;
-	// }
+	public void setDefaultGeometryProperty(GeometryAttribute defaultGeometry) {
+	    if (!getValue().contains(defaultGeometry)) {
+	        throw new IllegalArgumentException("specified attribute is not one of: " + getValue());
+	    }
+	    
+	    synchronized (this) {
+            this.defaultGeometry = defaultGeometry; 
+        }
+	}	
+	
 }

@@ -233,8 +233,7 @@ public interface Feature extends SimpleFeature {
      *
      * @see Feature#setAttribute(String, Object)
      */
-    void setAttribute(int position, Object val)
-        throws IllegalAttributeException, ArrayIndexOutOfBoundsException;
+    void setAttribute(int position, Object val);
 
     /**
      * Get the number of attributes this feature has. This is NOT simply a
@@ -276,26 +275,8 @@ public interface Feature extends SimpleFeature {
      * </p>
      *
      * @return Default geometry for this feature, or <code>null</code>
-     * @deprecated use {@link #getPrimaryGeometry()}
      */
-
-    //Geometry getPrimaryGeometry();
-
-    /**
-     * Gets the default or primary geometry for this feature.
-     * <p>
-     * This method will return <code>null</code> if no PrimaryGeometry has been
-     * defined by the schema.
-     * </p>
-     * <p>
-     * This method is a replacement for {@link #getDefaultGeometry()} in order
-     * to resolve a naming conflict with the geoapi feature model.
-     * </p>
-     * @return Primary geometry for this feature, or <code>null</code>
-     * @see org.opengis.feature.Feature#getDefaultGeometry()
-     * @since 2.4
-     */
-    Geometry getPrimaryGeometry();
+    Geometry getDefaultGeometry();
 
     /**
      * Sets the default geometry for this feature.
@@ -304,26 +285,8 @@ public interface Feature extends SimpleFeature {
      *
      * @throws IllegalAttributeException If the AttributeType is not a
      *         geometry, or is invalid for some other reason.
-     * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
      */
-
-    //void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException;
-
-    /**
-     * Sets the primary or default geometry for this feature.
-     * <p>
-     * This method is a replacement for {@link #setDefaultGeometry(Geometry)} in order
-     * to resolve a naming conflict with the geoapi feature model.
-     * </p>
-     * @param geometry The geometry to set.
-     *
-     * @throws IllegalAttributeException If the AttributeType is not a
-     *         geometry, or is invalid for some other reason.
-     *
-     * @see org.opengis.feature.Feature#setDefaultGeometry(org.opengis.feature.GeometryAttribute)
-     * @since 2.4
-     */
-    void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException;
+    void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException;
 
     /**
      * Get the total bounds of this feature which is calculated by doing a

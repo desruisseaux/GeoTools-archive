@@ -312,7 +312,7 @@ public interface FeatureType extends SimpleFeatureType {
      * @return The attribute type of the default geometry, which will contain the position.
      * @since 2.4
      */
-    GeometryAttributeType getPrimaryGeometry();
+    GeometryAttributeType getDefaultGeometry();
 
     /**
      * The number of attribues defined by this schema.

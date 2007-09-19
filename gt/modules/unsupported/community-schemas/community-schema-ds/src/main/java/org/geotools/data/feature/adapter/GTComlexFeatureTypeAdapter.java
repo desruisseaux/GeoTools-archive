@@ -143,7 +143,7 @@ public class GTComlexFeatureTypeAdapter implements FeatureType {
         return types;
     }
 
-    public GeometryAttributeType getPrimaryGeometry() {
+    public GeometryAttributeType getDefaultGeometry() {
     	return defaultGeom;
     }
 

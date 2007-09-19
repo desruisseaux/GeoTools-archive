@@ -30,7 +30,6 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.simple.SimpleFeatureCollectionImpl;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.type.AttributeType;
@@ -68,7 +67,7 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
         this( collection, null );
     }
 	public SubFeatureCollection(FeatureCollection collection, Filter subfilter ){
-		super(null,collection.getFeatureCollectionType());
+		super(null,collection.getSchema());
 		
 		if (subfilter != null && subfilter.equals(Filter.EXCLUDE)) {
 			throw new IllegalArgumentException("A subcollection with Filter.EXCLUDE is a null operation");
@@ -167,14 +166,6 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
         return collection.getSchema();
 	}
 
-    /**
-     * Accepts a visitor, which then visits each feature in the collection.
-     * @throws IOException 
-     */
-    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-        accepts((org.opengis.feature.FeatureVisitor) visitor, (org.opengis.util.ProgressListener) progress);
-    }
-    
 	public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
 		Iterator iterator = null;
         // if( progress == null ) progress = new NullProgressListener();

@@ -2,14 +2,14 @@ package org.geotools.feature;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -31,31 +31,23 @@ public class DecoratingFeature implements Feature {
         this.delegate = delegate;
     }
 
-    public Collection associations() {
-        return delegate.associations();
-    }
-
-    public Collection attributes() {
-        return delegate.attributes();
-    }
-
-    public PropertyDescriptor descriptor() {
-        return delegate.descriptor();
-    }
-
-    public List get(Name name) {
-        return delegate.get(name);
-    }
-
     public Object getAttribute(int index) {
         return delegate.getAttribute(index);
+    }
+
+    public Object getAttribute(Name arg0) {
+        return delegate.getAttribute(arg0);
     }
 
     public Object getAttribute(String path) {
         return delegate.getAttribute(path);
     }
 
-    public List getAttributes() {
+    public int getAttributeCount() {
+        return delegate.getAttributeCount();
+    }
+
+    public List<Object> getAttributes() {
         return delegate.getAttributes();
     }
 
@@ -67,16 +59,12 @@ public class DecoratingFeature implements Feature {
         return delegate.getBounds();
     }
 
-    public CoordinateReferenceSystem getCRS() {
-        return delegate.getCRS();
-    }
-
-    public GeometryAttribute getDefaultGeometry() {
+    public Geometry getDefaultGeometry() {
         return delegate.getDefaultGeometry();
     }
 
-    public Object getDefaultGeometryValue() {
-        return delegate.getDefaultGeometryValue();
+    public GeometryAttribute getDefaultGeometryProperty() {
+        return delegate.getDefaultGeometryProperty();
     }
 
     public AttributeDescriptor getDescriptor() {
@@ -91,107 +79,85 @@ public class DecoratingFeature implements Feature {
         return delegate.getID();
     }
 
+    public Name getName() {
+        return delegate.getName();
+    }
+
     public int getNumberOfAttributes() {
         return delegate.getNumberOfAttributes();
     }
 
-    public Geometry getPrimaryGeometry() {
-        return delegate.getPrimaryGeometry();
+    public Collection<Property> getProperties(Name arg0) {
+        return delegate.getProperties(arg0);
     }
 
-    public AttributeType getType() {
+    public Collection<Property> getProperties(String arg0) {
+        return delegate.getProperties(arg0);
+    }
+
+    public Property getProperty(Name arg0) {
+        return delegate.getProperty(arg0);
+    }
+
+    public Property getProperty(String arg0) {
+        return delegate.getProperty(arg0);
+    }
+
+    public SimpleFeatureType getType() {
         return delegate.getType();
     }
 
-    public List getTypes() {
-        return delegate.getTypes();
+    public Map<Object, Object> getUserData() {
+        return delegate.getUserData();
     }
 
-    public Object getUserData(Object key) {
-        return delegate.getUserData(key);
-    }
-
-    public Object getValue() {
+    public Collection<? extends Property> getValue() {
         return delegate.getValue();
     }
 
-    public Object getValue(int index) {
-        return delegate.getValue(index);
+    public boolean isNillable() {
+        return delegate.isNillable();
     }
 
-    public Object getValue(String name) {
-        return delegate.getValue(name);
-    }
-
-    public List getValues() {
-        return delegate.getValues();
-    }
-
-    public Name name() {
-        return delegate.name();
-    }
-
-    public boolean nillable() {
-        return delegate.nillable();
-    }
-
-    public Object operation(Name name, List parameters) {
-        return delegate.operation(name, parameters);
-    }
-
-    public void putUserData(Object key, Object value) {
-        delegate.putUserData(key, value);
-    }
-
-    public void setAttribute(int position, Object val)
-            throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+    public void setAttribute(int position, Object val) {
         delegate.setAttribute(position, val);
     }
 
-    public void setAttribute(String path, Object attribute)
-            throws IllegalAttributeException {
+    public void setAttribute(Name arg0, Object arg1) {
+        delegate.setAttribute(arg0, arg1);
+    }
+
+    public void setAttribute(String path, Object attribute) {
         delegate.setAttribute(path, attribute);
     }
 
-    public void setCRS(CoordinateReferenceSystem crs) {
-        delegate.setCRS(crs);
+    public void setAttributes(List<Object> arg0) {
+        delegate.setAttributes(arg0);
     }
 
-    public void setDefaultGeometry(GeometryAttribute geometryAttribute) {
-        delegate.setDefaultGeometry(geometryAttribute);
+    public void setAttributes(Object[] arg0) {
+        delegate.setAttributes(arg0);
     }
 
-    public void setDefaultGeometryValue(Object geometry) {
-        delegate.setDefaultGeometryValue(geometry);
+    public void setDefaultGeometry(Object arg0) {
+        delegate.setDefaultGeometry(arg0);
     }
 
-    public void setPrimaryGeometry(Geometry geometry)
+    public void setDefaultGeometryProperty(GeometryAttribute arg0) {
+        delegate.setDefaultGeometryProperty(arg0);
+    }
+
+    public void setDefaultGeometry(Geometry geometry)
             throws IllegalAttributeException {
-        delegate.setPrimaryGeometry(geometry);
+        delegate.setDefaultGeometry(geometry);
     }
 
-    public void setValue(int index, Object value) {
-        delegate.setValue(index, value);
-    }
-
-    public void setValue(List arg0) {
+    public void setValue(Collection<Property> arg0) {
         delegate.setValue(arg0);
     }
 
     public void setValue(Object arg0) {
         delegate.setValue(arg0);
-    }
-
-    public void setValue(String name, Object value) {
-        delegate.setValue(name, value);
-    }
-
-    public void setValues(List values) {
-        delegate.setValues(values);
-    }
-
-    public void setValues(Object[] values) {
-        delegate.setValues(values);
     }
 
     

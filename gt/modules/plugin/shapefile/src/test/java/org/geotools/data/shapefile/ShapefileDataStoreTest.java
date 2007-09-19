@@ -178,7 +178,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         //assertEquals("Number of Features loaded",3, count);           // JAR
         
         FeatureType schema = firstFeature(features).getFeatureType();
-        assertNotNull(schema.getPrimaryGeometry());
+        assertNotNull(schema.getDefaultGeometry());
         assertEquals("Number of Attributes",253,schema.getAttributeTypes().length);
         assertEquals("Value of statename is wrong",firstFeature(features).getAttribute("STATE_NAME"),"Illinois");
         assertEquals("Value of land area is wrong",((Double)firstFeature(features).getAttribute("LAND_KM")).doubleValue(),143986.61,0.001);
@@ -224,8 +224,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureType after = ds.getSchema();
         
         assertNotSame( before, after );        
-        assertNull( "4326", before.getPrimaryGeometry().getCoordinateSystem() );
-        assertEquals( "NAD83 / BC Albers", after.getPrimaryGeometry().getCoordinateSystem().getName().getCode() );
+        assertNull( "4326", before.getDefaultGeometry().getCoordinateSystem() );
+        assertEquals( "NAD83 / BC Albers", after.getDefaultGeometry().getCoordinateSystem().getName().getCode() );
                 
         file.deleteOnExit();        
         file=new File("test.dbf");
@@ -543,7 +543,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         // verify
         while (fci.hasNext()) {
             Feature f = fci.next();
-            Geometry fromShape = f.getPrimaryGeometry();
+            Geometry fromShape = f.getDefaultGeometry();
             
             if (fromShape instanceof GeometryCollection) {
                 if ( ! (geom instanceof GeometryCollection) ) {

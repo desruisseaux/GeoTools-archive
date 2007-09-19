@@ -35,14 +35,14 @@ public class SimpleFeatureBuilderTest extends TestCase {
 		builder.add( new Integer( 1 ) );
 		builder.add( new Float( 2.0 ) );
 		
-		SimpleFeature feature = builder.feature( "fid" );
+		SimpleFeature feature = builder.build( "fid" );
 		assertNotNull( feature );
 		
-		assertEquals( 3, feature.getNumberOfAttributes() );
+		assertEquals( 3, feature.getAttributeCount() );
 		
-		assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getValue( "point" ) ) );
-		assertEquals( new Integer( 1 ) , feature.getValue( "integer" ) );
-		assertEquals( new Float( 2.0 ) , feature.getValue( "float" ) );
+		assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getAttribute( "point" ) ) );
+		assertEquals( new Integer( 1 ) , feature.getAttribute( "integer" ) );
+		assertEquals( new Float( 2.0 ) , feature.getAttribute( "float" ) );
 	}
 	
 	public void testTooFewAttributes() throws Exception {
@@ -50,14 +50,14 @@ public class SimpleFeatureBuilderTest extends TestCase {
         builder.add( gf.createPoint( new Coordinate( 0, 0 ) ) );
         builder.add( new Integer( 1 ) );
         
-        SimpleFeature feature = builder.feature( "fid" );
+        SimpleFeature feature = builder.build( "fid" );
         assertNotNull( feature );
         
-        assertEquals( 3, feature.getNumberOfAttributes() );
+        assertEquals( 3, feature.getAttributeCount() );
         
-        assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getValue( "point" ) ) );
-        assertEquals( new Integer( 1 ) , feature.getValue( "integer" ) );
-        assertNull( feature.getValue( "float" ) );
+        assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getAttribute( "point" ) ) );
+        assertEquals( new Integer( 1 ) , feature.getAttribute( "integer" ) );
+        assertNull( feature.getAttribute( "float" ) );
 	}
 	
 	public void testSetSequential() throws Exception {
@@ -66,14 +66,14 @@ public class SimpleFeatureBuilderTest extends TestCase {
         builder.set( "integer", new Integer( 1 ) );
         builder.set( "float",  new Float( 2.0 ) );
         
-        SimpleFeature feature = builder.feature( "fid" );
+        SimpleFeature feature = builder.build( "fid" );
         assertNotNull( feature );
         
-        assertEquals( 3, feature.getNumberOfAttributes() );
+        assertEquals( 3, feature.getAttributeCount() );
         
-        assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getValue( 0 ) ) );
-        assertEquals( new Integer( 1 ) , feature.getValue( 1 ) );
-        assertEquals( new Float( 2.0 ) , feature.getValue( 2 ) );
+        assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getAttribute( 0 ) ) );
+        assertEquals( new Integer( 1 ) , feature.getAttribute( 1 ) );
+        assertEquals( new Float( 2.0 ) , feature.getAttribute( 2 ) );
 	}
 	
 	public void testSetNonSequential() throws Exception {
@@ -82,25 +82,25 @@ public class SimpleFeatureBuilderTest extends TestCase {
 	    builder.set( "point", gf.createPoint( new Coordinate( 0, 0 ) ) );
         builder.set( "integer", new Integer( 1 ) );
         
-        SimpleFeature feature = builder.feature( "fid" );
+        SimpleFeature feature = builder.build( "fid" );
         assertNotNull( feature );
         
-        assertEquals( 3, feature.getNumberOfAttributes() );
+        assertEquals( 3, feature.getAttributeCount() );
         
-        assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getValue( 0 ) ) );
-        assertEquals( new Integer( 1 ) , feature.getValue( 1 ) );
-        assertEquals( new Float( 2.0 ) , feature.getValue( 2 ) );
+        assertTrue( gf.createPoint( new Coordinate( 0, 0) ).equals( (Geometry) feature.getAttribute( 0 ) ) );
+        assertEquals( new Integer( 1 ) , feature.getAttribute( 1 ) );
+        assertEquals( new Float( 2.0 ) , feature.getAttribute( 2 ) );
 	}
 	
 	public void testSetTooFew() throws Exception {
 	    builder.set("integer", new Integer(1));
-	    SimpleFeature feature = builder.feature( "fid" );
+	    SimpleFeature feature = builder.build( "fid" );
         assertNotNull( feature );
         
-        assertEquals( 3, feature.getNumberOfAttributes() );
+        assertEquals( 3, feature.getAttributeCount() );
         
-        assertNull( feature.getValue( 0 ) );
-        assertEquals( new Integer( 1 ) , feature.getValue( 1 ) );
-        assertNull( feature.getValue( 2 ) );
+        assertNull( feature.getAttribute( 0 ) );
+        assertEquals( new Integer( 1 ) , feature.getAttribute( 1 ) );
+        assertNull( feature.getAttribute( 2 ) );
 	}
 }

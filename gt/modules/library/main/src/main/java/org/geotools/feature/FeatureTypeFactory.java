@@ -250,7 +250,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
     	FeatureTypeFactory builder = FeatureTypeFactory.newInstance(original.getTypeName());
         builder.importType(original);
         builder.setNamespace(original.getNamespace());
-        builder.setDefaultGeometry(original.getPrimaryGeometry());
+        builder.setDefaultGeometry(original.getDefaultGeometry());
 
         FeatureType[] ancestors = original.getAncestors();
 

@@ -32,13 +32,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.DefaultTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
@@ -297,7 +292,7 @@ public class GML2MockData {
         builder.add(new Integer(1));
         builder.add(new Date());
 
-        return (Feature) builder.feature("fid.1");
+        return (Feature) builder.build("fid.1");
     }
 
     static Element featureMember(Document document, Node parent) {

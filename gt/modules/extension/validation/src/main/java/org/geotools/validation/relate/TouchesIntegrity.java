@@ -150,16 +150,16 @@ public class TouchesIntegrity extends RelationIntegrity {
 			while (fr1.hasNext())
 			{
 				Feature f1 = fr1.next();
-				Geometry g1 = f1.getPrimaryGeometry();
+				Geometry g1 = f1.getDefaultGeometry();
 				fr2 = collectionB.features();
 				try {
     				while (fr2 != null && fr2.hasNext())
     				{
     					Feature f2 = fr2.next();
-    					Geometry g2 = f2.getPrimaryGeometry();
+    					Geometry g2 = f2.getDefaultGeometry();
     					if(g1.touches(g2) != expected )
     					{
-    						results.error( f1, f1.getPrimaryGeometry().getGeometryType()+" "+getGeomTypeRefA()+" touches "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
+    						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" touches "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
     						success = false;
     					}
     				}
@@ -233,18 +233,18 @@ public class TouchesIntegrity extends RelationIntegrity {
 			while (fr1.hasNext())
 			{
 				Feature f1 = fr1.next();
-				Geometry g1 = f1.getPrimaryGeometry();
+				Geometry g1 = f1.getDefaultGeometry();
 				fr2 = collection.features();
 				try {
     				while (fr2 != null && fr2.hasNext())
     				{
     					Feature f2 = fr2.next();
-    					Geometry g2 = f2.getPrimaryGeometry();
+    					Geometry g2 = f2.getDefaultGeometry();
     					if (!f1.getID().equals(f2.getID()))	// if they are the same feature, move onto the next one
     					{
     						if(g1.touches(g2) != expected )
     						{
-    							results.error( f1, f1.getPrimaryGeometry().getGeometryType()+" "+getGeomTypeRefA()+" touches "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
+    							results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" touches "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
     							success = false;
     						}
     					}

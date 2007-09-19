@@ -78,7 +78,7 @@ public final class MemorySpatialIndex {
 		index = new com.vividsolutions.jts.index.strtree.STRtree();
 		while (it.hasNext()) {
 			final Feature f = it.next();
-			final Geometry g = f.getPrimaryGeometry();
+			final Geometry g = f.getDefaultGeometry();
 			index.insert(g.getEnvelopeInternal(), f);
 		}
 		// closing he iterator to free some resources.

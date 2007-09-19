@@ -61,6 +61,6 @@ public class TextGeometryFactory extends VPFGeometryFactory implements FileConst
         Feature row = textFile.getRowFromId("id", textId);
         result = (Geometry)row.getAttribute("shape_line");
         
-        values.setPrimaryGeometry(result);
+        values.setDefaultGeometry(result);
     }
 }

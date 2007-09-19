@@ -72,7 +72,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
     
     public ReprojectingFeatureCollection(FeatureCollection delegate,
             CoordinateReferenceSystem target) {
-        this( delegate, delegate.getSchema().getPrimaryGeometry().getCoordinateSystem(), target );
+        this( delegate, delegate.getSchema().getDefaultGeometry().getCoordinateSystem(), target );
     }
     
     public ReprojectingFeatureCollection(
@@ -226,7 +226,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
 
             while (r.hasNext()) {
                 feature = r.next();
-                internal = feature.getPrimaryGeometry().getEnvelopeInternal();
+                internal = feature.getDefaultGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
             return ReferencedEnvelope.reference(newBBox);

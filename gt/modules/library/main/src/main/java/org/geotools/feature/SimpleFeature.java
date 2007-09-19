@@ -79,6 +79,8 @@ package org.geotools.feature;
  *       contain one Object).  This would seem to make the api a bit cleaner
  *       in my mind.
  * @since 2.1
+ * 
+ * @deprecated use {@link org.opengis.feature.simple.SimpleFeature}
  */
 public interface SimpleFeature extends Feature {
     /**
@@ -146,7 +148,7 @@ public interface SimpleFeature extends Feature {
      * @throws ArrayIndexOutOfBoundsException if an invalid position is given
      */
     void setAttribute(int position, Object val)
-        throws IllegalAttributeException, ArrayIndexOutOfBoundsException;
+        throws IllegalAttributeException, IndexOutOfBoundsException;
 
     /**
      * Allows this feature to turn itself to a Complex Feature - that is one

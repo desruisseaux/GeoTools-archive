@@ -1,18 +1,18 @@
 package org.geotools.feature.type;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
+import org.geotools.feature.FeatureImplUtils;
 import org.geotools.resources.Utilities;
-import org.opengis.feature.type.AssociationDescriptor;
-import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
-import org.opengis.feature.type.StructuralDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.Filter;
 import org.opengis.util.InternationalString;
 
 /**
@@ -22,15 +22,12 @@ import org.opengis.util.InternationalString;
  */
 public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 
-	protected Collection/*<StructuralDescriptor>*/ PROPERTIES = null;
-	
-	protected Collection/*<AttributeDescriptor>*/ ATTRIBUTES = null;
-
-	protected Collection/*<AssociationDescriptor>*/ ASSOCIATIONS = null;
+	protected Collection<PropertyDescriptor> properties = null;
 	
 	public ComplexTypeImpl(
-		Name name, Collection properties, boolean identified, boolean isAbstract,
-		Set/*<Filter>*/ restrictions, AttributeType superType, InternationalString description
+		Name name, Collection<PropertyDescriptor> properties, boolean identified, 
+		boolean isAbstract, List<Filter> restrictions, AttributeType superType, 
+		InternationalString description
 	) {
 		
 		super(
@@ -38,76 +35,49 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
 			superType, description
 		);
 		
-		PROPERTIES = properties;
+		this.properties = properties != null ? properties : Collections.EMPTY_LIST;
 		
-		ATTRIBUTES = null;
-		ASSOCIATIONS = null;
-		
-		if (properties != null) {
-			//split out attributes and associatoins
-			try {
-				ATTRIBUTES = (Collection) PROPERTIES.getClass().newInstance();
-				ASSOCIATIONS = (Collection) PROPERTIES.getClass().newInstance();
-			} 
-			catch(Exception e) {
-				//default to list
-				ATTRIBUTES = new ArrayList();
-				ASSOCIATIONS = new ArrayList();
-			}
-			
-			for (Iterator itr = PROPERTIES.iterator(); itr.hasNext();) {
-				StructuralDescriptor sd = (StructuralDescriptor) itr.next();
-				if (sd instanceof AttributeDescriptor) {
-					ATTRIBUTES.add(sd);
-				}
-				else if (sd instanceof AssociationDescriptor) {
-					ASSOCIATIONS.add(sd);
-				}
-			}
-		}
-		else {
-			PROPERTIES = Collections.EMPTY_LIST;
-			ATTRIBUTES = Collections.EMPTY_LIST;
-			ASSOCIATIONS = Collections.EMPTY_LIST;
-		}
 	}
 
-	public AttributeType getSuper() {
-		return SUPER;
-	}
-
-	public Collection getProperties() {
-		return PROPERTIES;
+	public Class<Collection<Property>> getBinding() {
+	    return (Class<Collection<Property>>) super.getBinding();
 	}
 	
-	public Collection attributes() {
-		return ATTRIBUTES;
+	public Collection<PropertyDescriptor> getProperties() {
+		return FeatureImplUtils.unmodifiable(properties);
 	}
 	
-	public Collection associations() {
-		return ASSOCIATIONS;
-	}
-
-	//package visibility
-	void setAttributes(Collection SCHEMA) {
-		this.ATTRIBUTES = SCHEMA;
+	public PropertyDescriptor getProperty(Name name) {
+	    for ( Iterator<PropertyDescriptor> p = properties.iterator(); p.hasNext(); ) {
+	        PropertyDescriptor property = p.next();
+	        if ( property.getName().equals( name ) ) {
+	            return property;
+	        }
+	    }
+	    
+	    return null;
 	}
 	
-	//JD: not sure about this, ask JG
+	public PropertyDescriptor getProperty(String name) {
+	    return getProperty(new org.geotools.feature.Name( name ) );
+	}
+	
 	public boolean isInline() {
-		return false;
+	    //JD: at this point "inlining" is unused... we might want to kill it 
+	    // from the interface
+	    return false;
 	}
 	
 	public boolean equals(Object o){
-    	if(!(o instanceof ComplexType)){
+    	if(!(o instanceof ComplexTypeImpl)){
     		return false;
     	}
     	if(!super.equals(o)){
     		return false;
     	}
     	
-    	ComplexType other = (ComplexType)o;
-    	if ( !Utilities.equals( PROPERTIES, other.getProperties() ) ) {
+    	ComplexTypeImpl other = (ComplexTypeImpl)o;
+    	if ( !Utilities.equals( properties, other.properties ) ) {
     		return false;
     	}
     	
@@ -115,15 +85,15 @@ public class ComplexTypeImpl extends AttributeTypeImpl implements ComplexType {
     }
     
 	public int hashCode(){
-    	return super.hashCode() * PROPERTIES.hashCode();
+    	return super.hashCode() * properties.hashCode();
     }
     
 	public String toString() {
 		StringBuffer sb = new StringBuffer(Utilities.getShortClassName(this));
-		sb.append("[name=").append(getName()).append(", binding=").append(BINDING)
+		sb.append("[name=").append(getName()).append(", binding=").append(binding)
 				.append(", abstrsct= ").append(isAbstract()).append(", identified=")
-				.append(IDENTIFIED).append(", restrictions=").append(getRestrictions())
-				.append(", superType=").append(SUPER).append(", schema=").append(ATTRIBUTES).append("]");
+				.append(identified).append(", restrictions=").append(getRestrictions())
+				.append(", superType=").append(superType).append(", schema=").append(properties).append("]");
 
 		return sb.toString();
 	}

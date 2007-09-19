@@ -218,9 +218,9 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 				// like to avoid accessing the data, so check the type for 
 				// crs info
 				FeatureType schema = source.getSchema();
-				if ( schema.getPrimaryGeometry() != null ) {
+				if ( schema.getDefaultGeometry() != null ) {
 					CoordinateReferenceSystem crs = 
-						schema.getPrimaryGeometry().getCoordinateSystem();
+						schema.getDefaultGeometry().getCoordinateSystem();
 					
 					if ( crs != null ) {
 						rBounds = new ReferencedEnvelope( bounds, crs );
@@ -249,8 +249,8 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 			
 			FeatureType schema = source.getSchema();
 			CoordinateReferenceSystem crs = null;
-			if ( schema.getPrimaryGeometry() != null ) {
-				crs = schema.getPrimaryGeometry().getCoordinateSystem();
+			if ( schema.getDefaultGeometry() != null ) {
+				crs = schema.getDefaultGeometry().getCoordinateSystem();
 			}
 			
 			rBounds = new ReferencedEnvelope( bounds, crs );

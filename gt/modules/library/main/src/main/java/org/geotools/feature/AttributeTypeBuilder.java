@@ -1,16 +1,16 @@
 package org.geotools.feature;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.geotools.feature.type.TypeFactoryImpl;
-import org.geotools.feature.type.TypeName;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureTypeFactory;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeFactory;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -66,7 +66,7 @@ public class AttributeTypeBuilder {
 	/**
 	 * factory
 	 */
-	protected TypeFactory factory;
+	protected FeatureTypeFactory factory;
 	
 	//AttributeType
 	//
@@ -85,7 +85,7 @@ public class AttributeTypeBuilder {
 	/**
 	 * restrictions
 	 */
-	protected Set/*<Filter>*/ restrictions;
+	protected List/*<Filter>*/ restrictions;
 	/**
 	 * string description
 	 */
@@ -132,7 +132,7 @@ public class AttributeTypeBuilder {
 	 *
 	 */
 	public AttributeTypeBuilder() {
-		this( new TypeFactoryImpl() );
+		this( new FeatureTypeFactoryImpl() );
 	}
 	
 	/**
@@ -140,7 +140,7 @@ public class AttributeTypeBuilder {
 	 * types.
 	 * 
 	 */
-	public AttributeTypeBuilder( TypeFactory factory ) {
+	public AttributeTypeBuilder( FeatureTypeFactory factory ) {
 		this.factory = factory;
 	}
 	
@@ -169,7 +169,7 @@ public class AttributeTypeBuilder {
 		isNillable = true;
 	}
 	
-	public void setFactory(TypeFactory factory) {
+	public void setFactory(FeatureTypeFactory factory) {
 		this.factory = factory;
 	}
 	
@@ -271,7 +271,7 @@ public class AttributeTypeBuilder {
 	 */
 	public AttributeType buildType() {
 		AttributeType type = factory.createAttributeType(
-			new TypeName(namespaceURI,name), binding, isIdentifiable, isAbstract, 
+			new org.geotools.feature.Name(namespaceURI,name), binding, isIdentifiable, isAbstract, 
 			restrictions, superType, description != null ? new SimpleInternationalString(description) : null);
 		resetTypeState();
 		
@@ -286,7 +286,7 @@ public class AttributeTypeBuilder {
 	 */
 	public GeometryType buildGeometryType() {
 		GeometryType type = factory.createGeometryType(
-			new TypeName(namespaceURI,name), binding, crs, isIdentifiable, isAbstract, 
+			new org.geotools.feature.Name(namespaceURI,name), binding, crs, isIdentifiable, isAbstract, 
 			restrictions, superType, description != null ? new SimpleInternationalString(description) : null);
 		
 		resetTypeState();
@@ -328,7 +328,20 @@ public class AttributeTypeBuilder {
 	 *
 	 */
 	public AttributeDescriptor buildDescriptor(String name, AttributeType type) {
-		return buildDescriptor(new TypeName(name), type );
+		return buildDescriptor(new org.geotools.feature.Name(name), type );
+	}
+	   
+    /**
+     * Builds a geometry descriptor specifying its attribute type.
+     * <p>
+     * Internal state is reset after the descriptor is built.
+     * </p>
+     * @param name The name of the descriptor.
+     * @param type The geometry type referenced by the descriptor.
+     *
+     */
+	public GeometryDescriptor buildDescriptor(String name, GeometryType type) {
+	    return buildDescriptor( new org.geotools.feature.Name(name), type );
 	}
 	
 	public AttributeDescriptor buildDescriptor(Name name, AttributeType type ) {
@@ -339,21 +352,23 @@ public class AttributeTypeBuilder {
 		return descriptor;
 	}
 	
+	public GeometryDescriptor buildDescriptor(Name name, GeometryType type ) {
+	    GeometryDescriptor descriptor = factory.createGeometryDescriptor(
+            type, name, minOccurs, maxOccurs, isNillable, defaultValue);
+    
+        resetDescriptorState();
+        return descriptor;
+    }
+	
 	// internal / subclass api
 	//
 	
-	protected Set restrictions() {
+	protected List restrictions() {
 		if (restrictions == null ) {
-			restrictions = newSet();
+			restrictions = new ArrayList();		
 		}
 		
 		return restrictions;
 	}
 	
-	/**
-	 * Instantiates a new set.
-	 */
-	protected Set newSet() {
-		return new HashSet();
-	}
 }

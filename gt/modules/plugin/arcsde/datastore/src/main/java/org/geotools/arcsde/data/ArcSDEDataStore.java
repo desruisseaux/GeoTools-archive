@@ -354,7 +354,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
          * SimpleFeatureType"); }
          */
 
-        if (featureType.getPrimaryGeometry() == null) {
+        if (featureType.getDefaultGeometry() == null) {
             throw new IllegalArgumentException(
                     "FeatureType must have at least a geometry attribute");
         }

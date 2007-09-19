@@ -10,6 +10,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.units.NonSI;
 
@@ -128,8 +129,10 @@ public final class JTSUtils {
                 (com.vividsolutions.jts.geom.GeometryCollection) jtsGeom;
             int n = jtsCollection.getNumGeometries();
             MultiPrimitive result = gf.createMultiPrimitive();
+            Set elements = result.getElements();
             for (int i=0; i<n; i++) {
-                result.getElements().add(jtsToGo1(jtsCollection.getGeometryN(i), crs));
+                //result.getElements().add(jtsToGo1(jtsCollection.getGeometryN(i), crs));
+                elements.add(jtsToGo1(jtsCollection.getGeometryN(i), crs));
             }
             return result;
         

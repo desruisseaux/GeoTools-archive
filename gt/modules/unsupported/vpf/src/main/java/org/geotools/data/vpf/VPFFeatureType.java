@@ -20,6 +20,7 @@ package org.geotools.data.vpf;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.geotools.feature.AttributeType;
@@ -28,9 +29,11 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -183,13 +186,6 @@ public class VPFFeatureType implements FeatureType {
         return featureClass.getCoverage();
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getPrimaryGeometry()
-     */
-    public GeometryAttributeType getPrimaryGeometry() {
-    	return featureClass.getPrimaryGeometry();
-    }
-    
     /**
      * @return The <code>String</code> path for the directory containing the
      *         <code>VPFFeatureClass</code> that this <code>FeatureType</code> 
@@ -308,10 +304,14 @@ public class VPFFeatureType implements FeatureType {
 		return featureClass.getAttributes();
 	}
 
-	public GeometryType getDefaultGeometryType() {
-		return featureClass.getDefaultGeometryType();
+	public PropertyDescriptor getProperty(Name name) {
+	    return featureClass.getProperty(name);
 	}
-
+	
+	public PropertyDescriptor getProperty(String name) {
+	    return featureClass.getProperty(name);
+	}
+	
 	public org.opengis.feature.type.AttributeType getType(Name name) {
 		return featureClass.getType( name );
 	}
@@ -332,16 +332,8 @@ public class VPFFeatureType implements FeatureType {
 		return featureClass.getCRS();
 	}
 
-	public AttributeDescriptor getDefaultGeometry() {
-		return featureClass.getDefaultGeometry();
-	}
-
-	public Collection associations() {
-		return featureClass.associations(); 
-	}
-
-	public Collection attributes() {
-		return featureClass.attributes();
+	public GeometryAttributeType getDefaultGeometry() {
+	    return featureClass.getDefaultGeometry();
 	}
 
 	public Class getBinding() {
@@ -356,11 +348,8 @@ public class VPFFeatureType implements FeatureType {
 		return featureClass.isInline();
 	}
 
-	public Collection getOperations() {
-		return featureClass.getOperations();
-	}
-
-	public Set getRestrictions() {
+	
+	public List getRestrictions() {
 		return featureClass.getRestrictions();
 	}
 
@@ -380,15 +369,16 @@ public class VPFFeatureType implements FeatureType {
 		return featureClass.getName();
 	}
 
-	public Object getUserData(Object key) {
-		return featureClass.getUserData(key);
-	}
-
-	public void putUserData(Object key, Object data) {
-		featureClass.putUserData(key, data);
+	public Map<Object, Object> getUserData() {
+	    return featureClass.getUserData();
 	}
 
 	public int indexOf(String name) {
 		return featureClass.indexOf(name);
+	}
+	
+	public int indexOf(Name name) {
+	    return featureClass.indexOf(name);
+	   
 	}
 }

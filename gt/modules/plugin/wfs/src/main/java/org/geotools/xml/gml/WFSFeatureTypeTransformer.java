@@ -61,7 +61,7 @@ public class WFSFeatureTypeTransformer {
                 geometryType.getLocalName(), geometryType.getBinding(), geometryType.isNillable(),
                 0, geometryType.createDefaultValue(), crs);
 
-        if (defaultGeometryType == null || geometryType == schema.getPrimaryGeometry()) {
+        if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
             defaultGeometryType = geometry;
         }
         factory.addType(geometry);
@@ -76,7 +76,7 @@ public class WFSFeatureTypeTransformer {
                 geometryType.getLocalName(), geometryType.getChoices(), geometryType.getBinding(), geometryType.isNillable(),
                 geometryType.getMinOccurs(), geometryType.getMaxOccurs(), geometryType.createDefaultValue(), crs, geometryType.getRestriction());
 
-        if (defaultGeometryType == null || geometryType == schema.getPrimaryGeometry()) {
+        if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
             defaultGeometryType = geometry;
         }
         factory.addType(geometry);

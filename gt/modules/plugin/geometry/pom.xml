@@ -163,7 +163,7 @@
       <exclusions>      
         <exclusion>
           <groupId>org.opengis</groupId>
-          <artifactId>geoapi-nogenerics</artifactId>
+          <artifactId>geoapi</artifactId>
         </exclusion>
       </exclusions>	  
     </dependency>

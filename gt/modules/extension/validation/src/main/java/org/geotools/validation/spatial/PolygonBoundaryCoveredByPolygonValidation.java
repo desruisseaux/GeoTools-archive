@@ -97,7 +97,7 @@ public class PolygonBoundaryCoveredByPolygonValidation
 
         for (int i = 0; i < polys.length; i++) {
             Feature tmp = (Feature) polys[i];
-            Geometry gt = tmp.getPrimaryGeometry();
+            Geometry gt = tmp.getDefaultGeometry();
 
             if (gt instanceof Polygon) {
             	Polygon ls = (Polygon) gt;
@@ -105,7 +105,7 @@ public class PolygonBoundaryCoveredByPolygonValidation
                 boolean r = false;
                 for (int j = 0; j < polyRs.length && !r; j++) {
                     Feature tmp2 = (Feature) polyRs[j];
-                    Geometry gt2 = tmp2.getPrimaryGeometry();
+                    Geometry gt2 = tmp2.getDefaultGeometry();
 
                     if (gt2 instanceof Polygon) {
                     	Polygon pt = (Polygon) gt2;

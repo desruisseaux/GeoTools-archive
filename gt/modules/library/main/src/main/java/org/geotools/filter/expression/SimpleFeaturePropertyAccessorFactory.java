@@ -117,10 +117,10 @@ public class SimpleFeaturePropertyAccessorFactory implements
         }
         public Object get(Object object, String xpath, Class target) {
         	if ( object instanceof Feature ) {
-        		return ((Feature) object).getPrimaryGeometry();
+        		return ((Feature) object).getDefaultGeometry();
         	}
         	if ( object instanceof FeatureType ) {
-        		return ((FeatureType)object).getPrimaryGeometry();
+        		return ((FeatureType)object).getDefaultGeometry();
         	}
             
         	return null;
@@ -130,7 +130,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
                 throws IllegalAttributeException {
             
         	if ( object instanceof Feature ) {
-        		((Feature) object).setPrimaryGeometry( (Geometry) value );
+        		((Feature) object).setDefaultGeometry( (Geometry) value );
         	}
         	if ( object instanceof FeatureType ) {
         		throw new IllegalAttributeException("feature type is immutable");

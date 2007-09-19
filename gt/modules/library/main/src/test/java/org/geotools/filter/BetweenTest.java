@@ -29,6 +29,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -85,19 +86,19 @@ public class BetweenTest extends TestCase {
 
         GeometryFactory gf = new GeometryFactory(new PrecisionModel());
         Feature f1 = schema.create(new Object[] {
-                    new Integer(12), gf.createGeometryCollection(null)
+                    new Integer(12), gf.createPoint(new Coordinate(12,12))
                 });
         Feature f2 = schema.create(new Object[] {
-                    new Integer(3), gf.createGeometryCollection(null)
+                    new Integer(3), gf.createPoint(new Coordinate(3,3))
                 });
         Feature f3 = schema.create(new Object[] {
-                    new Integer(15), gf.createGeometryCollection(null)
+                    new Integer(15), gf.createPoint(new Coordinate(15,15))
                 });
         Feature f4 = schema.create(new Object[] {
-                    new Integer(5), gf.createGeometryCollection(null)
+                    new Integer(5), gf.createPoint(new Coordinate(5,5))
                 });
         Feature f5 = schema.create(new Object[] {
-                    new Integer(30), gf.createGeometryCollection(null)
+                    new Integer(30), gf.createPoint(new Coordinate(30,30))
                 });
 
         assertEquals(true, a.contains(f1)); // in between

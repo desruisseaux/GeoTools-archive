@@ -19,24 +19,20 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.geotools.data.FeatureReader;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.ProgressListener;
 import org.opengis.feature.GeometryAttribute;
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -51,65 +47,83 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
     public MockFeatureCollection() {
     }
 
-    public void addListener( CollectionListener listener ) {
+    public void accepts(FeatureVisitor visitor, ProgressListener progress)
+            throws IOException {
+    }
+    
+    public void accepts(org.opengis.feature.FeatureVisitor visitor,
+            org.opengis.util.ProgressListener progress) {
+    }
+
+    public void addListener(CollectionListener listener)
+            throws NullPointerException {
+    }
+
+    public void close(FeatureIterator close) {
+    }
+
+    public void close(Iterator close) {
     }
 
     public FeatureIterator features() {
         return null;
     }
 
-    public ReferencedEnvelope getBounds() {
+    public FeatureType getSchema() {
         return null;
     }
 
-    public void removeListener( CollectionListener listener ) {
-
+    public void removeListener(CollectionListener listener)
+            throws NullPointerException {
     }
 
-    public boolean add( Object o ) {
+    public FeatureCollection sort(SortBy order) {
+        return null;
+    }
+
+    public FeatureCollection subCollection(Filter filter) {
+        return null;
+    }
+
+    public Iterator iterator() {
+        return null;
+    }
+
+    public void purge() {
+    }
+
+    public boolean add(Object o) {
         return false;
     }
 
-    public boolean addAll( java.util.Collection c ) {
+    public boolean addAll(Collection c) {
         return false;
     }
 
     public void clear() {
     }
 
-    public boolean contains( Object o ) {
+    public boolean contains(Object o) {
         return false;
     }
 
-    public boolean containsAll( java.util.Collection c ) {
+    public boolean containsAll(Collection c) {
         return false;
-    }
-
-    public boolean equals( Object o ) {
-        return false;
-    }
-
-    public int hashCode() {
-        return 0;
     }
 
     public boolean isEmpty() {
         return false;
     }
 
-    public java.util.Iterator iterator() {
-        return null;
-    }
-
-    public boolean remove( Object o ) {
+    public boolean remove(Object o) {
         return false;
     }
 
-    public boolean removeAll( java.util.Collection c ) {
+    public boolean removeAll(Collection c) {
         return false;
     }
 
-    public boolean retainAll( java.util.Collection c ) {
+    public boolean retainAll(Collection c) {
         return false;
     }
 
@@ -121,306 +135,129 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
         return null;
     }
 
-    public Object[] toArray( Object[] a ) {
+    public Object[] toArray(Object[] a) {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.FeatureCollection#getFeatureType()
-     */
+    public Object getAttribute(String path) {
+        return null;
+    }
+
+    public Object getAttribute(int index) {
+        return null;
+    }
+
+    public Object[] getAttributes(Object[] attributes) {
+        return null;
+    }
+
+    public ReferencedEnvelope getBounds() {
+        return null;
+    }
+
+    public Geometry getDefaultGeometry() {
+        return null;
+    }
+
     public FeatureType getFeatureType() {
-
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#getParent()
-     */
-    public FeatureCollection getParent() {
-
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#setParent(org.geotools.feature.FeatureCollection)
-     */
-    public void setParent( FeatureCollection collection ) {
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#getID()
-     */
     public String getID() {
-
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#getAttributes(java.lang.Object[])
-     */
-    public Object[] getAttributes( Object[] attributes ) {
-
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#getAttribute(java.lang.String)
-     */
-    public Object getAttribute( String xPath ) {
-
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#getAttribute(int)
-     */
-    public Object getAttribute( int index ) {
-
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#setAttribute(int, java.lang.Object)
-     */
-    public void setAttribute( int position, Object val ) throws IllegalAttributeException,
-            ArrayIndexOutOfBoundsException {
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#getNumberOfAttributes()
-     */
     public int getNumberOfAttributes() {
-
         return 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.geotools.feature.Feature#setAttribute(java.lang.String, java.lang.Object)
-     */
-    public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
-
+    public void setAttribute(int position, Object val) {
     }
 
-    public Geometry getPrimaryGeometry() {
+    public void setAttribute(String path, Object attribute)
+            throws IllegalAttributeException {
+    }
 
+    public void setDefaultGeometry(Geometry geometry)
+            throws IllegalAttributeException {
+    }
+
+    public Object getAttribute(Name name) {
         return null;
     }
 
-    public void setPrimaryGeometry( Geometry geometry ) throws IllegalAttributeException {
-
-    }
-
-    public FeatureType getSchema() {
-        return null;
-    }
-
-    public FeatureReader reader() throws IOException {
-        return null;
-    }
-
-    public int getCount() throws IOException {
+    public int getAttributeCount() {
         return 0;
     }
 
-    public FeatureCollection collection() throws IOException {
+    public List<Object> getAttributes() {
         return null;
     }
 
-    public void close( Iterator iterator ) {
-    }
-
-    public void close( FeatureIterator iterator ) {
-    }
-
-    public void accepts( FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-    }
-
-    public FeatureCollection subCollection( Filter filter ) {
-
+    public SimpleFeatureType getType() {
         return null;
     }
 
-    public FeatureCollection sort( SortBy order ) {
+    public void setAttribute(Name name, Object value) {
+    }
 
+    public void setAttributes(List<Object> values) {
+    }
+
+    public void setAttributes(Object[] values) {
+    }
+
+    public void setDefaultGeometry(Object geometry) {
+    }
+
+    public GeometryAttribute getDefaultGeometryProperty() {
         return null;
     }
 
-    public void purge() {
-
+    public void setDefaultGeometryProperty(GeometryAttribute geometryAttribute) {
     }
 
-    public Object getDefaultGeometryValue() {
-
+    public Collection<Property> getProperties(Name name) {
         return null;
     }
 
-    public SimpleFeatureCollectionType getType() {
+    public Collection<Property> getProperties(String name) {
         return null;
     }
 
-    public List getTypes() {
-
+    public Property getProperty(Name name) {
         return null;
     }
 
-    public Object getValue( String name ) {
-
+    public Property getProperty(String name) {
         return null;
     }
 
-    public Object getValue( int index ) {
-
+    public Collection<? extends Property> getValue() {
         return null;
     }
 
-    public List getValues() {
-
-        return null;
-    }
-
-    public Object operation( String name, Object parameters ) {
-
-        return null;
-    }
-
-    public void setDefaultGeometryValue( Object geometry ) {
-
-    }
-
-    public void setValue( String name, Object value ) {
-
-    }
-
-    public void setValue( int index, Object value ) {
-
-    }
-
-    public void setValues( List values ) {
-
-    }
-
-    public void setValues( Object[] values ) {
-
-    }
-
-    public CoordinateReferenceSystem getCRS() {
-
-        return null;
-    }
-
-    public GeometryAttribute getDefaultGeometry() {
-
-        return null;
-    }
-
-    public Object getUserData( Object key ) {
-
-        return null;
-    }
-
-    public void putUserData( Object key, Object value ) {
-
-    }
-
-    public void setCRS( CoordinateReferenceSystem crs ) {
-
-    }
-
-    public void setDefaultGeometry( GeometryAttribute geometryAttribute ) {
-
-    }
-
-    public Collection associations() {
-
-        return null;
-    }
-
-    public Collection attributes() {
-
-        return null;
-    }
-
-    public Object getValue() {
-
-        return null;
-    }
-
-    public List get( Name name ) {
-
-        return null;
+    public void setValue(Collection<Property> values) {
     }
 
     public AttributeDescriptor getDescriptor() {
-
         return null;
     }
 
-    public void setValue( Object newValue ) throws IllegalArgumentException {
-
+    public Name getName() {
+        return null;
     }
-    public void setValue( List values ) {
 
+    public Map<Object, Object> getUserData() {
+        return null;
     }
-    public boolean nillable() {
 
+    public boolean isNillable() {
         return false;
     }
 
-    public Object operation( Name name, List parameters ) {
-
-        return null;
+    public void setValue(Object newValue) {
     }
 
-    public PropertyDescriptor descriptor() {
-
-        return null;
-    }
-
-    public Name name() {
-
-        return null;
-    }
-
-    public SimpleFeatureCollectionType getFeatureCollectionType() {
-        return null;
-    }
-
-    public List getAttributes() {
-        return null;
-    }
-    public SimpleFeatureType getMemberType() {
-
-        return null;
-    }
-
-    public Collection memberTypes() {
-        return Collections.EMPTY_SET;
-    }
-
-    public void accepts( org.opengis.feature.FeatureVisitor visitor,
-            org.opengis.util.ProgressListener progress ) {
-
-    }
+   
 }

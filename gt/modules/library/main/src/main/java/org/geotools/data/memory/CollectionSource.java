@@ -67,7 +67,7 @@ public final class CollectionSource {
     }
 
     public Name getName() {
-        return new org.geotools.feature.type.TypeName("localhost/memory");
+        return new org.geotools.feature.Name("localhost/memory");
     }
 
     public void setTransaction( Transaction t ) {

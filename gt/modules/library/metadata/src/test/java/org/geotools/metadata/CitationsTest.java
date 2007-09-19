@@ -83,7 +83,7 @@ public class CitationsTest extends TestCase {
             // This is the expected exception.
         }
         try {
-            Citations.EPSG.getIdentifiers().add("Dummy");
+            Citations.EPSG.getIdentifiers().add(null);
             fail("Pre-defined metadata should be unmodifiable.");
         } catch (UnsupportedOperationException e) {
             // This is the expected exception.

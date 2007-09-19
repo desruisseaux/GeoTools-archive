@@ -94,11 +94,11 @@ public class PolygonNotCoveredByPolygonValidation
 
         for (int i = 0; i < poly2.length; i++) {
             Feature tmp = (Feature) poly2[i];
-            Geometry gt = tmp.getPrimaryGeometry();
+            Geometry gt = tmp.getDefaultGeometry();
 
             for (int j = 0; j < poly1.length; j++) {
                 Feature tmp2 = (Feature) poly1[j];
-                Geometry gt2 = tmp2.getPrimaryGeometry();
+                Geometry gt2 = tmp2.getDefaultGeometry();
 
                 if (gt2.within(gt)) {
                     return false;

@@ -39,6 +39,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
@@ -84,14 +86,14 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 			public void setAttributes(Object[] attributes) throws IllegalAttributeException{}
 			//	used
 			public void setAttribute(String xPath, Object attribute)throws IllegalAttributeException{attrs.put(xPath,attribute);}
-			public Geometry getPrimaryGeometry() {return null;}
-			public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException{}
+			
+			public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException{}
 			public ReferencedEnvelope getBounds(){return null;}
 			public Object getDefaultGeometryValue() {
 				
 				return null;
 			}
-			public AttributeType getType() {
+			public SimpleFeatureType getType() {
 				
 				return null;
 			}
@@ -139,9 +141,8 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 				
 				return null;
 			}
-			public GeometryAttribute getDefaultGeometry() {
-				
-				return null;
+			public Geometry getDefaultGeometry() {
+			    return null;
 			}
 			public Object getUserData(Object key) {
 				
@@ -203,8 +204,7 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
                 
                 return null;
             }
-            public Object getValue() {
-                
+            public Collection<? extends Property> getValue() {
                 return null;
             }
             public void setValue( List values ) {
@@ -212,6 +212,47 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
             }
             public void setValue( Object values ) {
                 
+            }
+            public Object getAttribute(Name name) {
+                return null;
+            }
+            public int getAttributeCount() {
+                return 0;
+            }
+            public void setAttribute(Name name, Object value) {
+            }
+            public void setAttributes(List<Object> values) {
+            }
+            public void setDefaultGeometry(Object geometry) {
+            }
+            public GeometryAttribute getDefaultGeometryProperty() {
+                return null;
+            }
+            public void setDefaultGeometryProperty(
+                    GeometryAttribute geometryAttribute) {
+            }
+            public Collection<Property> getProperties(Name name) {
+                return null;
+            }
+            public Collection<Property> getProperties(String name) {
+                return null;
+            }
+            public Property getProperty(Name name) {
+                return null;
+            }
+            public Property getProperty(String name) {
+                return null;
+            }
+            public void setValue(Collection<Property> values) {
+            }
+            public Name getName() {
+                return null;
+            }
+            public Map<Object, Object> getUserData() {
+                return null;
+            }
+            public boolean isNillable() {
+                return false;
             }
 		}
 		Feature f = new TestFeature();

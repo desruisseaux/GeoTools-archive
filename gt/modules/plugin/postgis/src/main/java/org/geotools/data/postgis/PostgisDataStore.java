@@ -444,7 +444,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             Envelope envelope = null;
     		    	
         	FeatureType schema = getSchema(typeName);
-        	String geomName = schema.getPrimaryGeometry().getLocalName();
+        	String geomName = schema.getDefaultGeometry().getLocalName();
         	
 	    	// optimization, postgis version >= 1.0 contains estimated_extent
             // function to query the stats of the table to determine the bbox,
@@ -784,8 +784,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         encoder.setSupportsGEOS(useGeos);
         encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
 
-        if (info.getSchema().getPrimaryGeometry() != null) {
-            String geom = info.getSchema().getPrimaryGeometry().getLocalName();
+        if (info.getSchema().getDefaultGeometry() != null) {
+            String geom = info.getSchema().getDefaultGeometry().getLocalName();
             srid = info.getSRID(geom);
             encoder.setDefaultGeometry(geom);
         }

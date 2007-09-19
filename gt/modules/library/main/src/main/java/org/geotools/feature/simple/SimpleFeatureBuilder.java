@@ -2,27 +2,19 @@ package org.geotools.feature.simple;
 
 import java.rmi.server.UID;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureCollection;
-import org.opengis.feature.simple.SimpleFeatureCollectionType;
-import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.ComplexType;
-import org.opengis.feature.type.FeatureCollectionType;
-import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * A builder used to construct an instanceof {@link org.opengis.feature.simple.SimpleFeature}.
@@ -54,12 +46,16 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Justin Deoliveira
  * @author Jody Garnett
  */
-public class SimpleFeatureBuilder  {
-	
+public class SimpleFeatureBuilder {
+	/**
+	 * logger
+	 */
+    static Logger LOGGER = Logger.getLogger("org.geotools.feature");
+    
 	/**
 	 * factory
 	 */
-	protected SimpleFeatureFactory factory;
+	protected FeatureFactory factory;
 	/**
 	 * list of attributes
 	 */
@@ -75,39 +71,36 @@ public class SimpleFeatureBuilder  {
 	/**
 	 * coordinate reference system
 	 */
-	protected CoordinateReferenceSystem crs;
+	//protected CoordinateReferenceSystem crs;
 	
 	/**
 	 * Constructs the builder.
 	 */
 	public SimpleFeatureBuilder() {
-		this( new SimpleFeatureFactoryImpl());
+		this( new FeatureFactoryImpl());
 	}
 	
 	/**
 	 * Constructs the builder specifying the factory to use for creating features.
 	 */
-    public SimpleFeatureBuilder(SimpleFeatureFactory factory) {
+    public SimpleFeatureBuilder(FeatureFactory factory) {
     	this.factory = factory;
 	}
 
     /**
      * Sets the factory used to create features.
      */
-	public void setSimpleFeatureFactory(SimpleFeatureFactory factory) {
-		this.factory = (SimpleFeatureFactoryImpl) factory;
+	public void setFeatureFactory(FeatureFactory factory) {
+		this.factory = factory;
 	}
 
     public void setType( SimpleFeatureType featureType ){
     	this.featureType = featureType; 
     }
     
-    public void setType( SimpleFeatureCollectionType collectionType ){
-    	//this.collectionType = collectionType;
-    }
-    public void setCRS(CoordinateReferenceSystem crs) {
-        this.crs = crs;
-    }
+//    public void setCRS(CoordinateReferenceSystem crs) {
+//        this.crs = crs;
+//    }
 
     /**
      * Initialize the builder with the provided feature.
@@ -120,11 +113,11 @@ public class SimpleFeatureBuilder  {
     public void init( SimpleFeature feature ) {
 		init();
 		this.featureType = (SimpleFeatureType) feature.getType();
-		for ( int i = 0; i < feature.getNumberOfAttributes(); i++ ) {
-			add( feature.getValue( i ) );
+		for ( int i = 0; i < feature.getAttributeCount(); i++ ) {
+			add( feature.getAttribute( i ) );
 		}
-		defaultGeometry = feature.getDefaultGeometry();
-		crs = feature.getCRS();
+		//defaultGeometry = feature.getDefaultGeometryProperty();
+		//crs = feature.getType().getCRS();
 	}
     
     protected void init() {
@@ -136,9 +129,21 @@ public class SimpleFeatureBuilder  {
     	AttributeDescriptor descriptor = featureType.getAttribute(attributes().size());
     	Attribute attribute = null;
     	
-    	if ( isGeometry( descriptor ) ) {
+    	//make sure the type of the value and the binding of the type match up
+    	if ( value != null ) {
+    	    Class target = descriptor.getType().getBinding(); 
+    	    if ( !target.isAssignableFrom(value.getClass()) ) {
+    	        //try to convert
+    	        LOGGER.fine("value: " + value + " does not match type: " + target.getName() + ". Converting.");
+    	        Object converted = Converters.convert(value, target);
+    	        if ( converted != null ) {
+    	            value = converted;
+    	        }
+    	    }
+    	}
+    	if ( descriptor instanceof GeometryDescriptor ) {
     		//TODO: set crs on teh builder
-    		attribute = factory.createGeometryAttribute(value, descriptor, null, featureType.getCRS() );
+    		attribute = factory.createGeometryAttribute(value, (GeometryDescriptor) descriptor, null, featureType.getCRS() );
     		
     		//is this the default geometry?
     		if ( descriptor.equals( featureType.getDefaultGeometry() ) ) {
@@ -179,20 +184,8 @@ public class SimpleFeatureBuilder  {
         }
     }
     
-    public Object build( String id ){
-    	if( featureType != null ){
-    		if ( id == null ) {
-    			id = createDefaultFeatureId();
-    		}
-    		return feature( id );
-    	}
-
-    	
-    	return null;
-    }
- 
     protected boolean isGeometry( AttributeDescriptor value ) {
-    	return value.getType() instanceof GeometryType;
+    	return value instanceof GeometryDescriptor;
     }
     
     protected String createDefaultFeatureId() {
@@ -203,13 +196,18 @@ public class SimpleFeatureBuilder  {
         // NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
         // We have to fix the generated UID replacing all non word chars with an _ (it seems
         // they area all ":")
-//        return "fid-" + NON_WORD_PATTERN.matcher(new UID().toString()).replaceAll("_");
+        //return "fid-" + NON_WORD_PATTERN.matcher(new UID().toString()).replaceAll("_");
         // optimization, since the UID toString uses only ":" and converts long and integers
         // to strings for the rest, so the only non word character is really ":"
         return "fid-" + new UID().toString().replace(':', '_');
     }
     
-    public SimpleFeature feature(String id) {
+    public SimpleFeature build(String id) {
+        //ensure id
+        if ( id == null ) {
+            id = createDefaultFeatureId();
+        }
+        
         //ensure they specified enough values
         int n = featureType.getAttributeCount();
         while( attributes().size() < n ) {
@@ -218,99 +216,15 @@ public class SimpleFeatureBuilder  {
         
         //build the feature
     	SimpleFeature feature = factory.createSimpleFeature( attributes, featureType, id );
-    	feature.setDefaultGeometry(defaultGeometry);
-    	
-    	//check for crs
-    	if ( crs != null ) {
-    	    feature.setCRS(crs);
-    	}
-    	else {
-    	    //if no crs set, use the one from the defaultGeometry type
-    	    if ( defaultGeometry != null ) {
-    	        feature.setCRS(defaultGeometry.getCRS());
-    	    }
+    	if ( defaultGeometry != null ) {
+    	    feature.setDefaultGeometryProperty(defaultGeometry);
     	}
     	
     	init();
     	return feature;
     }
     
-//    public SimpleFeatureCollection collection(String id) {
-//    	return factory.createSimpleFeatureCollection( collectionType, id );
-//    }
-    
-//    protected Attribute create(
-//            Object value, AttributeType type, AttributeDescriptor descriptor, String id
-//        ) {        
-//            if (descriptor != null) {
-//                type = descriptor.getType();
-//            }
-//            
-//            Attribute attribute = null;
-//            if (type instanceof SimpleFeatureCollectionType) {
-//                attribute = factory.createSimpleFeatureCollection((SimpleFeatureCollectionType)type,id);
-//            }
-//            else if (type instanceof FeatureCollectionType) {
-//                attribute =  descriptor != null ? 
-//                    factory.createFeatureCollection((Collection)value,descriptor,id) :
-//                    factory.createFeatureCollection((Collection)value,(FeatureCollectionType)type,id);
-//            }
-//            else if (type instanceof SimpleFeatureType) {
-//                attribute =  factory.createSimpleFeature( (SimpleFeatureType) type, id, null );
-//            }
-//            else if (type instanceof FeatureType) {
-//                attribute = descriptor != null ? 
-//                    factory.createFeature((Collection)value,descriptor,id) :
-//                    factory.createFeature((Collection)value,(FeatureType)type,id);
-//            }
-//            else if (type instanceof ComplexType) {
-//                attribute = descriptor != null ?
-//                    factory.createComplexAttribute((Collection)value, descriptor, id) : 
-//                    factory.createComplexAttribute((Collection)value, (ComplexType)type,id);
-//            }
-//            else if (type instanceof GeometryType) {
-//                attribute = factory.createGeometryAttribute(value,descriptor,id,null);
-//            }
-//            else {
-//                //use a normal attribute builder to create a "primitive" type
-//                
-//                //use the binding to create specific "simple" types
-//                Class binding = descriptor.getType().getBinding();
-//                if (Number.class.isAssignableFrom(binding)) {
-//                    attribute = 
-//                        factory.createNumericAttribute( (Number) value, descriptor );
-//                }
-//                else if (binding.isAssignableFrom(CharSequence.class)) {
-//                    attribute = 
-//                        factory.createTextAttribute((CharSequence)value,descriptor);
-//                }
-//                else if (binding.isAssignableFrom(Date.class)) {
-//                    attribute = 
-//                        factory.createTemporalAttribute((Date) value, descriptor);
-//                }
-//                else if (Boolean.class == binding) {
-//                    attribute = 
-//                        factory.createBooleanAttribute( (Boolean) value, descriptor );
-//                }
-//                else {
-//                    attribute = factory.createAttribute(value,descriptor,id);    
-//                }
-//                
-//            }
-//            
-//            return attribute;
-//        }
-
-   
-//	public void init(SimpleFeature feature) {
-//		init();
-//		this.featureType = (SimpleFeatureType) feature.getType();
-//		for( Iterator i=feature.attributes().iterator(); i.hasNext();){
-//			this.attributes.add( i.next() ); // TODO: copy
-//		}		
-//	}
-	
-	protected List attributes() {
+    protected List attributes() {
 		if ( attributes == null ) {
 			attributes = newList();
 		}

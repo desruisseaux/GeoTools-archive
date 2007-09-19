@@ -24,9 +24,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.Name;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
-import org.geotools.feature.type.TypeName;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
 
 /**
  * An empty FeatureType implementation used in the AbstractDataSourceTest
@@ -38,7 +37,7 @@ public class DummyFeatureType extends SimpleFeatureTypeImpl implements FeatureTy
     
     /** Creates a new instance of DummyFeatureType */
     public DummyFeatureType(String typeName) {
-    	super(new Name(typeName),Collections.EMPTY_LIST, (AttributeDescriptor) null, null, false, Collections.EMPTY_SET, null, null);
+    	super(new Name(typeName),Collections.EMPTY_LIST, (GeometryDescriptor) null, false, Collections.EMPTY_LIST, null, null);
     }
     
     public org.geotools.feature.Feature create(Object[] attributes) throws org.geotools.feature.IllegalAttributeException {
@@ -77,7 +76,7 @@ public class DummyFeatureType extends SimpleFeatureTypeImpl implements FeatureTy
         return new org.geotools.feature.AttributeType[] {};
     }
    
-    public GeometryAttributeType getPrimaryGeometry() {
+    public GeometryAttributeType getDefaultGeometry() {
     	return null;
     }
     

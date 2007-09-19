@@ -15,9 +15,8 @@
  */
 package org.geotools.feature.collection;
 
-import org.opengis.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.FeatureVisitor;
-import org.opengis.feature.type.FeatureCollectionType;
 
 /**
  * An abstract class to reduce the amount of work needed when working with FeatureVisitor.
@@ -35,6 +34,6 @@ import org.opengis.feature.type.FeatureCollectionType;
  * @author Jody Garnett
  */
 public abstract class AbstractFeatureVisitor implements FeatureVisitor {
-    public void init( FeatureCollectionType collection ) {
+    public void init( FeatureCollection collection ) {
     }
 }

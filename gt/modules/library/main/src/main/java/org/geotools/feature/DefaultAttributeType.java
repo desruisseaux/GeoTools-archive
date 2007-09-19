@@ -394,8 +394,8 @@ public class DefaultAttributeType extends AttributeDescriptorImpl
      */
     public static org.opengis.feature.type.AttributeType createAttributeType(String name,Class binding,Filter restriction) {
     	return new AttributeTypeImpl( 
-			new org.geotools.feature.type.TypeName(name),binding,false,false,
-			restriction != null ? Collections.singleton(restriction) : Collections.EMPTY_SET, 
+			new org.geotools.feature.Name(name),binding,false,false,
+			restriction != null ? Collections.singletonList(restriction) : Collections.EMPTY_LIST, 
 			null,null);
     }
     

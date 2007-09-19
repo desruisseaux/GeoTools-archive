@@ -214,7 +214,7 @@ public class DefaultFeatureValidation implements FeatureValidation {
      * @throws ClassCastException If feature.getDefaultGeometry is the wrong type
      */
     protected LineString getDefaultLineString( Feature feature ) throws ClassCastException {
-        Geometry geom = feature.getPrimaryGeometry();
+        Geometry geom = feature.getDefaultGeometry();
         if (geom == null) {
             // Ignore null value, user can use NullZero check
             return null;

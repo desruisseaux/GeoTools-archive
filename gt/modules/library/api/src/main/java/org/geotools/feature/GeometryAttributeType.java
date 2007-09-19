@@ -18,6 +18,7 @@ package org.geotools.feature;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 //import org.geotools.cs.CoordinateSystem;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -47,7 +48,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Jody Garnett, Refractions Research, Inc.
  * @source $URL$
  */
-public interface GeometryAttributeType extends AttributeType, PrimativeAttributeType {
+public interface GeometryAttributeType extends AttributeType, PrimativeAttributeType,
+    GeometryDescriptor {
     /**
      * Type must be an sub type of Geometry.class.
      * <p>

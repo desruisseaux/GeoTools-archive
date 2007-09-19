@@ -77,10 +77,10 @@ public class HsqlSQLBuilder extends DefaultSQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            String colName = attributes[i].getName();
+            String colName = attributes[i].getLocalName();
 
             //if (attributes[i].isGeometry()) {
-            if (Geometry.class.isAssignableFrom(attributes[i].getType())) {
+            if (Geometry.class.isAssignableFrom(attributes[i].getType().getBinding())) {
                 //Don't think we need this...geometries are stored as text in the DB
                 //sql.append("toText(" + attributes[i].getName() + ") AS " + attributes[i].getName());
                 sql.append(colName);

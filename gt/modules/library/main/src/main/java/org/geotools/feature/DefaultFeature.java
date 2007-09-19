@@ -121,7 +121,7 @@ public class DefaultFeature extends SimpleFeatureImpl
 				new AttributeImpl( values[i], schema.getAttribute(i),null) {
 					public void set(Object newValue) throws IllegalArgumentException, IllegalStateException {
 						 newValue = parse(newValue);
-						 content = newValue;
+						 value = newValue;
 					}
 				}
 			);
@@ -203,7 +203,7 @@ public class DefaultFeature extends SimpleFeatureImpl
     public Object[] getAttributes(Object[] array) {
         Object[] retArray;
 
-        List values = getValues();
+        List values = getAttributes();
         if (array == null) {
             //retArray = new Object[attributes.length];
         	retArray = new Object[values.size()];
@@ -223,9 +223,8 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @return Attribute.
      */
-    public Object getAttribute(String xPath) {
-    	return getValue( xPath );
-    	
+//    public Object getAttribute(String xPath) {
+//    	
 //        int idx = schema.find(xPath);
 //
 //        if (idx == -1) {
@@ -233,7 +232,7 @@ public class DefaultFeature extends SimpleFeatureImpl
 //        }
 //
 //        return attributes[idx];
-    }
+//    }
 
     /**
      * Gets an attribute by the given zero-based index.
@@ -242,10 +241,9 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @return The attribute at the given index.
      */
-    public Object getAttribute(int index) {
-        //return attributes[index];
-        return getValue( index );
-    }
+//    public Object getAttribute(int index) {
+//        return attributes[index];
+//    }
 
     /**
      * Sets the attribute at position to val.
@@ -256,15 +254,16 @@ public class DefaultFeature extends SimpleFeatureImpl
      * @throws IllegalAttributeException if the passed in val does not validate
      *         against the AttributeType at that position.
      */
-    public void setAttribute(int position, Object val)
-        throws IllegalAttributeException {
-    	 try {
-    		 setValue( position, val );
-    	 }
-    	 catch( IllegalArgumentException e ) {
-    		 throw (IllegalAttributeException) new IllegalAttributeException("").initCause(e);
-    	 }
-    	
+    public void setAttribute(int position, Object val) {
+        try {
+            super.setAttribute(position, val);
+        }
+        catch( IndexOutOfBoundsException ioobe ) {
+            throw ioobe;
+        }
+        catch( Exception e ) {
+            throw (IllegalAttributeException) new IllegalAttributeException(e.getLocalizedMessage()).initCause(e);
+        }
 //        AttributeType type = schema.getAttributeType(position);
 //
 //        try {
@@ -285,10 +284,9 @@ public class DefaultFeature extends SimpleFeatureImpl
      * @param position the index of the attribute to set.
      * @param val the new value to give the attribute at position.
      */
-    protected void setAttributeValue(int position, Object val) {
-        //attributes[position] = val;
-        setValue( position, val );
-    }
+//    protected void setAttributeValue(int position, Object val) {
+//        attributes[position] = val;
+//    }
 
     /**
      * Sets all attributes for this feature, passed as an array.  All
@@ -301,14 +299,13 @@ public class DefaultFeature extends SimpleFeatureImpl
      */
     public void setAttributes(Object[] attributes)
         throws IllegalAttributeException {
-    	
-    	try {
-    		setValues( attributes );
-    	}
-    	catch( IllegalArgumentException e ) {
-    		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
-    	}
-    	
+        try {
+            super.setAttributes(attributes);
+        }
+        catch( Exception e ) {
+            throw (IllegalAttributeException) new IllegalAttributeException(e.getLocalizedMessage()).initCause(e);
+        }
+//
 //    	
 //        // the passed in attributes were null, lets make that a null array
 //        Object[] newAtts = attributes;
@@ -341,15 +338,13 @@ public class DefaultFeature extends SimpleFeatureImpl
      */
     public void setAttribute(String xPath, Object attribute)
         throws IllegalAttributeException {
-    	try {
-    		setValue( xPath, attribute );	
-    	}
-    	catch( IllegalArgumentException e ) {
-    		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
-    	}
-    	
-    	
-//        int idx = schema.find(xPath);
+        try {
+            super.setAttribute(xPath, attribute);
+        }
+        catch( Exception e ) {
+            throw (IllegalAttributeException) new IllegalAttributeException(e.getLocalizedMessage()).initCause(e);
+        }
+        //        int idx = schema.find(xPath);
 //
 //        if (idx < 0) {
 //            throw new IllegalAttributeException("No attribute named " + xPath);
@@ -362,11 +357,10 @@ public class DefaultFeature extends SimpleFeatureImpl
      * Gets the geometry for this feature.
      *
      * @return Geometry for this feature.
-     * @deprecated use {@link #getPrimaryGeometry()}.
+     * @deprecated use {@link #getDefaultGeometry()}.
      */
-    public Geometry getPrimaryGeometry() {
-    	return (Geometry) getDefaultGeometryValue();
-    	
+    public Geometry getDefaultGeometry() {
+        return (Geometry) super.getDefaultGeometry();
 //    	 int idx = schema.defaultGeomIdx;
 //
 //         if (idx == -1) {
@@ -383,21 +377,17 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @throws IllegalAttributeException if the feature does not have a
      *         geometry.
-     * @deprecated use {@link #setPrimaryGeometry(Geometry)}.
+     * @deprecated use {@link #setDefaultGeometry(Geometry)}.
      */
-    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
-    	
-    	if ( geometry == null ) {
-    		throw new IllegalAttributeException("geometry cannot be set to null");
-    	}
-    	
+    public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
     	try {
-    		setDefaultGeometryValue(geometry);	
+    	    super.setDefaultGeometry(geometry);    	    
     	}
-    	catch( IllegalArgumentException e ) {
-			 throw (IllegalAttributeException) new IllegalAttributeException("").initCause(e);
-		}
-//    	
+    	catch( Exception e ) {
+    	    throw (IllegalAttributeException) new IllegalAttributeException(e.getLocalizedMessage()).initCause(e);
+    	}
+        
+
 //    	 int idx = schema.defaultGeomIdx;
 //
 //         if (idx < 0) {
@@ -416,9 +406,10 @@ public class DefaultFeature extends SimpleFeatureImpl
      *
      * @return The total number of attributes this Feature contains.
      */
-//    public int getNumberOfAttributes() {
-//        return attributes.length;
-//    }
+    public int getNumberOfAttributes() {
+        return getAttributeCount();
+        //return attributes.length;
+    }
 
     /**
      * Get the total bounds of this feature which is calculated by doing a
@@ -474,8 +465,7 @@ public class DefaultFeature extends SimpleFeatureImpl
     public Object clone() {
         try {
             DefaultFeature clone = (DefaultFeature) super.clone();
-            List values = getValues();
-            clone.setValues(values);
+            clone.setValue(getValue());
             
 //            for (int i = 0; i < values.size(); i++) {
 //                try {
@@ -500,7 +490,7 @@ public class DefaultFeature extends SimpleFeatureImpl
         String retString = "Feature[ id=" + getID() + " , ";
         FeatureType featType = getFeatureType();
 
-        List attributes = getValues();
+        List attributes = getValue();
         for (int i = 0, n = attributes.size(); i < n; i++) {
             retString += (featType.getAttributeType(i).getLocalName() + "=");
             retString += attributes.get(i);
@@ -685,8 +675,8 @@ public class DefaultFeature extends SimpleFeatureImpl
          *       has implications of letting people blow away their  multiple
          *       attributes, but for here there are no such dangers. -ch
          */
-        public void setAttribute(int index, Object value)
-            throws IllegalAttributeException {
+        public void setAttribute(int index, Object value) { 
+            
             checkList(value);
 
             List valList = (List) value;
@@ -701,7 +691,7 @@ public class DefaultFeature extends SimpleFeatureImpl
                 try {
                     Object parsed = type.parse(val);
                     type.validate(parsed);
-                    setAttributeValue(index, wrapInList(parsed));
+                    super.setAttribute(index, wrapInList(parsed));
                 } catch (IllegalArgumentException iae) {
                     throw new IllegalAttributeException(type, val, iae);
                 }
@@ -740,8 +730,8 @@ public class DefaultFeature extends SimpleFeatureImpl
          * @task TODO: Revisit xPath stuff - get it working or do external
          *       implementation.
          */
-        public void setAttribute(String xPath, Object attribute)
-            throws IllegalAttributeException {
+        public void setAttribute(String xPath, Object attribute) {
+            
             int idx = super.getFeatureType().find(xPath);
 
             if (idx < 0) {
@@ -750,6 +740,7 @@ public class DefaultFeature extends SimpleFeatureImpl
             }
 
             setAttribute(idx, attribute);
+            
         }
         /**
          * Takes the raw arrayof values provided and returns them as a bunch
@@ -765,7 +756,7 @@ public class DefaultFeature extends SimpleFeatureImpl
     				new AttributeImpl( wrapInList(values[i]), schema.getAttribute(i),null) {
     					public void setValue(Object newValue) throws IllegalArgumentException, IllegalStateException {
     						 newValue = parse(newValue);
-    						 content = newValue;
+    						 value = newValue;
     					}
     					
     					protected Object parse(Object value) throws IllegalArgumentException {

@@ -2,15 +2,17 @@ package org.geotools.feature.type;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -23,35 +25,51 @@ import org.opengis.util.InternationalString;
  */
 public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	
-	protected AttributeDescriptor DEFAULT;
+	protected GeometryDescriptor defaultGeometry;
 
-	protected CoordinateReferenceSystem CRS;
-	
 	public FeatureTypeImpl(
-		Name name, Collection schema, AttributeDescriptor defaultGeom, 
-		CoordinateReferenceSystem crs, boolean isAbstract, 
-		Set/*<Filter>*/ restrictions, AttributeType superType, InternationalString description
+		Name name, Collection<PropertyDescriptor> schema, GeometryDescriptor defaultGeometry, 
+		boolean isAbstract, List<Filter> restrictions, AttributeType superType, 
+		InternationalString description
 	) {
 		super(name, schema, true, isAbstract, restrictions, superType, description);
-		DEFAULT = defaultGeom;
-        CRS = crs;
+		this.defaultGeometry = defaultGeometry;
+		
+		if ( defaultGeometry != null && 
+		        !(defaultGeometry.getType() instanceof GeometryType ) )  {
+		    throw new IllegalArgumentException( "defaultGeometry must have a GeometryType");
+		}
+        
 	}
 
 	public CoordinateReferenceSystem getCRS() {
-		return CRS;
+	    if ( defaultGeometry != null && defaultGeometry.getType().getCRS() != null) {
+	        return defaultGeometry.getType().getCRS();
+	    }
+		for( Iterator<PropertyDescriptor> p = properties.iterator(); p.hasNext(); ) {
+		    PropertyDescriptor property = p.next();
+		    if ( property instanceof GeometryDescriptor ) {
+		        GeometryDescriptor geometry = (GeometryDescriptor) property;
+		        if ( geometry.getType().getCRS() != null ) {
+		            return geometry.getType().getCRS();
+		        }
+		    }
+		}
+		
+		return null;
 	}
 	
-	public AttributeDescriptor getDefaultGeometry() {
-		if (DEFAULT == null) {
-			for (Iterator itr = attributes().iterator(); itr.hasNext();) {
-				AttributeDescriptor desc = (AttributeDescriptor) itr.next();
-				if (desc.getType() instanceof GeometryType) {
-					DEFAULT = desc; 
-					break;
-				}
-			}
-		}
-		return DEFAULT;
+	public GeometryDescriptor getDefaultGeometry() {
+	    if (defaultGeometry == null) {
+            for (Iterator<PropertyDescriptor> p = properties.iterator(); p.hasNext();) {
+                PropertyDescriptor property = p.next();
+                if (property instanceof GeometryDescriptor ) {
+                    defaultGeometry = (GeometryDescriptor) property; 
+                    break;
+                }
+            }
+        }
+        return defaultGeometry;
 	}
 	
 	public boolean equals(Object o) {
@@ -63,11 +81,7 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
     	}
     	
     	FeatureType other = (FeatureType) o;
-    	if (!Utilities.equals( DEFAULT, other.getDefaultGeometry())) {
-    		return false;
-    	}
-    	
-    	if (!Utilities.equals( CRS, other.getCRS()) ) {
+    	if (!Utilities.equals( defaultGeometry, other.getDefaultGeometry())) {
     		return false;
     	}
     	
@@ -77,28 +91,10 @@ public class FeatureTypeImpl extends ComplexTypeImpl implements FeatureType {
 	public int hashCode() {
 		int hashCode = super.hashCode();
 		
-		if ( DEFAULT != null ) {
-			hashCode = hashCode ^ DEFAULT.hashCode();
-		}
-		
-		if ( CRS != null ) {
-			hashCode = hashCode ^ CRS.hashCode();
+		if ( defaultGeometry != null ) {
+			hashCode = hashCode ^ defaultGeometry.hashCode();
 		}
 		
 		return hashCode;
 	}
-	
-//	public GeometryType getDefaultGeometry() {
-//		
-//		if (DEFAULT == null) {
-//			for (Iterator itr = getAttributes().iterator(); itr.hasNext();) {
-//				AttributeDescriptor desc = (AttributeDescriptor) itr.next();
-//				if (desc.getType() instanceof GeometryType) {
-//					DEFAULT = (GeometryType) desc.getType(); 
-//					break;
-//				}
-//			}
-//		}
-//		return DEFAULT;
-//	}
 }

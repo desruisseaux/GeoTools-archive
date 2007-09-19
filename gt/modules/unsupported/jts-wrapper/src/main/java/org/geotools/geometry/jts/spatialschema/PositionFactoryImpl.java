@@ -98,8 +98,14 @@ public class PositionFactoryImpl implements PositionFactory {
 	public PointArray createPointArray(final double[] array,
 			final int start, final int end) {
 		PointArray pointArray = (PointArray) createPointArray();
-		for (int i=start; i<array.length && i <= end; i++) {
-			pointArray.add(array[i]);
+		int n = crs.getCoordinateSystem().getDimension();
+		double[] ordinates = new double[n]; 
+		for (int i=start; i<array.length && i <= end; i += n) {
+		    for ( int j = i; j < i + n; j++ ) {
+		        ordinates[j-i] = array[j]; 
+		    }
+		    
+			pointArray.add(createDirectPosition(ordinates));
 		}
 		return pointArray;
 	}

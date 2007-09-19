@@ -269,6 +269,6 @@ public class AreaGeometryFactory extends VPFGeometryFactory
             result = geometryFactory.createPolygon(outerRing, ringArray);
         }
 
-        values.setPrimaryGeometry(result);
+        values.setDefaultGeometry(result);
     }
 }

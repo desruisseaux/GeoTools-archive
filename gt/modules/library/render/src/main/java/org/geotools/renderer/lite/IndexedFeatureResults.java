@@ -61,7 +61,7 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 			Envelope env;
 			while (reader.hasNext()) {
 				f = reader.next();
-				env = f.getPrimaryGeometry().getEnvelopeInternal();
+				env = f.getDefaultGeometry().getEnvelopeInternal();
 				bounds.expandToInclude(env);
 				count++;
 				index.insert(env, f);

@@ -48,7 +48,7 @@ public class FirstProject {
         DefaultQuery query = new DefaultQuery();
         query.setTypeName(typeName);
 
-        CoordinateReferenceSystem prj = schema.getPrimaryGeometry()
+        CoordinateReferenceSystem prj = schema.getDefaultGeometry()
                 .getCoordinateSystem();
         if (prj == null) {
             prj = getCoordinateReferenceSystem("No projection fround for "

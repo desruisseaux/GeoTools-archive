@@ -91,7 +91,7 @@ public class ReprojectFeatureReader implements FeatureReader {
         }
 
         FeatureType type = reader.getFeatureType();
-        CoordinateReferenceSystem original = type.getPrimaryGeometry()
+        CoordinateReferenceSystem original = type.getDefaultGeometry()
                                                  .getCoordinateSystem();
 
         if (cs.equals(original)) {

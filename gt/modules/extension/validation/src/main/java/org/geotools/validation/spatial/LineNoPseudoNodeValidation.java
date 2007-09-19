@@ -87,7 +87,7 @@ public class LineNoPseudoNodeValidation extends LineAbstractValidation {
                 
         while(fLine.hasNext()){
         	Feature line = fLine.next();
-        	Geometry lineGeom = line.getPrimaryGeometry();
+        	Geometry lineGeom = line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){

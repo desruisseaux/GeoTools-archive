@@ -199,7 +199,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
         try {
             return FeatureTypeBuilder.newFeatureType(ats, ft.getTypeName(), ft.getNamespace(), ft
-                    .isAbstract(), ft.getAncestors(), ft.getPrimaryGeometry());
+                    .isAbstract(), ft.getAncestors(), ft.getDefaultGeometry());
         } catch (SchemaException e) {
             throw new DataSourceException(
                     "Error converting FeatureType from versioned (internal) schema "
@@ -1007,7 +1007,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // gather bbox, we need it for the first commit msg
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
-                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getPrimaryGeometry()
+                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
                         .getCoordinateSystem();
                 if (crs != null)
                     envelope = JTS.toGeographic(envelope, crs);
@@ -1134,7 +1134,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // gather bbox, we need it for the first commit msg
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
-                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getPrimaryGeometry()
+                CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
                         .getCoordinateSystem();
                 if (crs != null)
                     envelope = JTS.toGeographic(envelope, crs);

@@ -86,7 +86,7 @@ public class LinesNotIntersectValidation extends LineLineAbstractValidation {
                  {
                     // check if it intersects any of the previous features
                     Feature feature = features.next();
-                    Geometry geom = feature.getPrimaryGeometry();
+                    Geometry geom = feature.getDefaultGeometry();
 
                     for (int i = 0; i < geoms.size(); i++) // for each existing geometry
                      {

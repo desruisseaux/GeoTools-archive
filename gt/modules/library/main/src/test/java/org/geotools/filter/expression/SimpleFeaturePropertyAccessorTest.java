@@ -1,17 +1,12 @@
 package org.geotools.filter.expression;
 
+import junit.framework.TestCase;
+
 import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
-import org.geotools.filter.expression.SimpleFeaturePropertyAccessorFactory;
-
-import junit.framework.TestCase;
 
 public class SimpleFeaturePropertyAccessorTest extends TestCase {
 
@@ -34,7 +29,7 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 
-		feature = (Feature) builder.feature( "fid" );
+		feature = (Feature) builder.build( "fid" );
 		accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	}
 	

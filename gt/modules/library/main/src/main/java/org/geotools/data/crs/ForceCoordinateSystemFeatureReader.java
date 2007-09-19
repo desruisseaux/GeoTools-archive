@@ -105,7 +105,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         }
 
         FeatureType type = reader.getFeatureType();
-        CoordinateReferenceSystem originalCs = type.getPrimaryGeometry()
+        CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
                                                    .getCoordinateSystem();
 
         if (!cs.equals(originalCs)) {

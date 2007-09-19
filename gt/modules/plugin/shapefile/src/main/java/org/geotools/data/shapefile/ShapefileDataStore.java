@@ -403,7 +403,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected FeatureReader getFeatureReader(String typeName, Query query)
         throws IOException {
         String[] propertyNames = query.getPropertyNames();
-        String defaultGeomName = schema.getPrimaryGeometry().getLocalName();
+        String defaultGeomName = schema.getDefaultGeometry().getLocalName();
         
         // gather attributes needed by the query tool, they will be used by the query filter
         StyleAttributeExtractor extractor = new StyleAttributeExtractor();
@@ -453,7 +453,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         if (!readDbf) {
             LOGGER.fine(
                 "The DBF file won't be opened since no attributes will be read from it");
-            atts = new AttributeType[] { schema.getPrimaryGeometry() };
+            atts = new AttributeType[] { schema.getDefaultGeometry() };
 
             return new Reader(atts, openShapeReader(), null);
         }
@@ -785,13 +785,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         clear();
         schema = featureType;
 
-        CoordinateReferenceSystem cs = featureType.getPrimaryGeometry()
+        CoordinateReferenceSystem cs = featureType.getDefaultGeometry()
                                                   .getCoordinateSystem();
 
         long temp = System.currentTimeMillis();
 
         if (isLocal()) {
-            Class geomType = featureType.getPrimaryGeometry().getBinding();
+            Class geomType = featureType.getDefaultGeometry().getBinding();
             ShapeType shapeType;
 
             if (Point.class.isAssignableFrom(geomType)) {
@@ -907,7 +907,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
             if (schema != null) {
                 return new ReferencedEnvelope(env,
-                    schema.getPrimaryGeometry().getCoordinateSystem());
+                    schema.getDefaultGeometry().getCoordinateSystem());
             }
 
             return new ReferencedEnvelope(env, null);
@@ -1432,7 +1432,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             // another problem.
             if ((records <= 0) && (shapeType == null)) {
                 GeometryAttributeType geometryAttributeType = featureType
-                    .getPrimaryGeometry();
+                    .getDefaultGeometry();
 
                 Class gat = geometryAttributeType.getBinding();
                 shapeType = JTSUtilities.getShapeType(gat);
@@ -1607,7 +1607,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
 
             // writing of Geometry
-            Geometry g = currentFeature.getPrimaryGeometry();
+            Geometry g = currentFeature.getDefaultGeometry();
 
             // if this is the first Geometry, find the shapeType and handler
             if (shapeType == null) {

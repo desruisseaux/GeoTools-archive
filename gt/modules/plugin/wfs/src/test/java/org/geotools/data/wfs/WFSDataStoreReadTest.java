@@ -85,13 +85,13 @@ public class WFSDataStoreReadTest extends TestCase {
             // get
             FeatureType ft = wfs.getSchemaGet(wfs.getTypeNames()[i]);
             assertNotNull("FeatureType was null",ft);
-            assertTrue(wfs.getTypeNames()[i]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getPrimaryGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+            assertTrue(wfs.getTypeNames()[i]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
         }
         if(post){
             // post
             FeatureType ft = wfs.getSchemaPost(wfs.getTypeNames()[i]);
             assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getPrimaryGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+            assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
         }
         }catch(java.net.SocketException se){
             se.printStackTrace();
@@ -140,7 +140,7 @@ public class WFSDataStoreReadTest extends TestCase {
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
         
         String[] props;
-        props = new String[] {ft.getPrimaryGeometry().getLocalName()};
+        props = new String[] {ft.getDefaultGeometry().getLocalName()};
         
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
@@ -242,7 +242,7 @@ public class WFSDataStoreReadTest extends TestCase {
         
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         BBoxExpression theBBox = factory.createBBoxExpression( bbox );
-        AttributeExpression theGeom = factory.createAttributeExpression( ft, ft.getPrimaryGeometry().getLocalName() );
+        AttributeExpression theGeom = factory.createAttributeExpression( ft, ft.getDefaultGeometry().getLocalName() );
         
         GeometryFilter filter = factory.createGeometryFilter( FilterType.GEOMETRY_BBOX );
         filter.addLeftGeometry( theGeom );

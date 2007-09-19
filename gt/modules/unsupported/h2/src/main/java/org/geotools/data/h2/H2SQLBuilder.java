@@ -922,8 +922,8 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
                 crs = (CoordinateReferenceSystem) data;
             } else {
                 //check the feature type
-                if (featureType.getPrimaryGeometry() != null) {
-                    crs = featureType.getPrimaryGeometry().getCoordinateSystem();
+                if (featureType.getDefaultGeometry() != null) {
+                    crs = featureType.getDefaultGeometry().getCoordinateSystem();
                 }
             }
 

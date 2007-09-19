@@ -252,7 +252,7 @@ public class JDBCFeatureSource implements FeatureSource {
     public Envelope getBounds(Query query) throws IOException {
         if (query.getFilter() == Filter.EXCLUDE) {
             if(featureType!=null)
-                return new ReferencedEnvelope(new Envelope(),featureType.getPrimaryGeometry().getCoordinateSystem());
+                return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCoordinateSystem());
             return new Envelope();
         }               
         return null; // too expensive right now :-)

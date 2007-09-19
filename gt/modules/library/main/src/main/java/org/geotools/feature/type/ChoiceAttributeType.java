@@ -15,15 +15,19 @@
  */
 package org.geotools.feature.type;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.Name;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.util.Arrays;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 
 /**
@@ -408,6 +412,11 @@ public class ChoiceAttributeType extends AttributeDescriptorImpl implements Attr
             super(name, children);
         }
 
+        public GeometryType getType() {
+           return new GeometryTypeImpl( getName(), Geometry.class, getCoordinateSystem(), false, false, null, null, null);
+        }
+        
+        
         public CoordinateReferenceSystem getCoordinateSystem() {
             //Hack - this is not guaranteed to be right, since right now we
             //don't check in the constructors that all crses are the same.

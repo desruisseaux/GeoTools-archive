@@ -127,7 +127,7 @@ public class ShapeReader {
 	            for( int count=0; iterator.hasNext(); count++) {
 	                Feature feature = (Feature) iterator.next();
 	                System.out.print(feature.getID() + "\t");
-	                System.out.println(feature.getPrimaryGeometry());
+	                System.out.println(feature.getDefaultGeometry());
 	                System.out.println();
 	                
 	                if( count == 10) break; // only 10

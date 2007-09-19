@@ -82,10 +82,10 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         Feature f1=original.next();
         Feature f2=modified.next();
         
-        assertEquals(f1.getPrimaryGeometry().getCoordinate(),f2.getPrimaryGeometry().getCoordinate());
-        assertFalse( f1.getFeatureType().getPrimaryGeometry().getCoordinateSystem().equals(f2.getFeatureType().getPrimaryGeometry().getCoordinateSystem()) );
-        assertEquals( srcCRS, f1.getFeatureType().getPrimaryGeometry().getCoordinateSystem());
-        assertEquals( destCRS, f2.getFeatureType().getPrimaryGeometry().getCoordinateSystem());
+        assertEquals(f1.getDefaultGeometry().getCoordinate(),f2.getDefaultGeometry().getCoordinate());
+        assertFalse( f1.getFeatureType().getDefaultGeometry().getCoordinateSystem().equals(f2.getFeatureType().getDefaultGeometry().getCoordinateSystem()) );
+        assertEquals( srcCRS, f1.getFeatureType().getDefaultGeometry().getCoordinateSystem());
+        assertEquals( destCRS, f2.getFeatureType().getDefaultGeometry().getCoordinateSystem());
         
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );
@@ -126,10 +126,10 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         Feature f1=original.next();
         Feature f2=modified.next();
         
-        assertEquals(f1.getPrimaryGeometry().getCoordinate(),f2.getPrimaryGeometry().getCoordinate());
-        assertFalse( f2.getFeatureType().getPrimaryGeometry().getCoordinateSystem().equals(f1.getFeatureType().getPrimaryGeometry().getCoordinateSystem()) );
-        assertEquals( srcCRS, f1.getFeatureType().getPrimaryGeometry().getCoordinateSystem());
-        assertEquals( destCRS, f2.getFeatureType().getPrimaryGeometry().getCoordinateSystem());
+        assertEquals(f1.getDefaultGeometry().getCoordinate(),f2.getDefaultGeometry().getCoordinate());
+        assertFalse( f2.getFeatureType().getDefaultGeometry().getCoordinateSystem().equals(f1.getFeatureType().getDefaultGeometry().getCoordinateSystem()) );
+        assertEquals( srcCRS, f1.getFeatureType().getDefaultGeometry().getCoordinateSystem());
+        assertEquals( destCRS, f2.getFeatureType().getDefaultGeometry().getCoordinateSystem());
         
         assertFalse( original.hasNext() );
         assertFalse( modified.hasNext() );

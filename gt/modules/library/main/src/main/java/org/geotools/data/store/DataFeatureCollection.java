@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -32,21 +31,15 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.BaseFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.SubFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureCollectionImpl;
-import org.geotools.feature.simple.SimpleFeatureCollectionTypeImpl;
-import org.geotools.feature.type.FeatureAttributeType;
-import org.geotools.feature.type.TypeName;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.SortBy2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -55,7 +48,6 @@ import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -522,12 +514,8 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
                     Feature newFeature = writer.next(); // grab a "new" Feature
                     Object values[] = feature.getAttributes( null );
                     for( int a=0; a<values.length; a++){
-                        try {
-							newFeature.setAttribute( a, values[a] );
-						} catch (IllegalAttributeException e) {
-							throw new IllegalArgumentException(e);
-						}                        
-                    }
+                    	newFeature.setAttribute( a, values[a] );
+					}
                     writer.write();
                 }                
             } catch (IOException io) {
@@ -545,7 +533,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         }
     }
 
-    public void setAttribute( String xPath, Object attribute ) throws IllegalAttributeException {
+    public void setAttribute( String xPath, Object attribute ) {
         if(xPath.indexOf(getFeatureType().getTypeName())>-1){
             if(xPath.endsWith("]")){
                 // TODO get index and grab it
@@ -576,20 +564,13 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
         }*/
     }
 
-    public Geometry getPrimaryGeometry() {
+    public Geometry getDefaultGeometry() {
     	return null;
     }
    
-    public void setPrimaryGeometry(Geometry geometry) throws IllegalAttributeException {
+    public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
     	throw new IllegalAttributeException( "DefaultGeometry not supported" );
     }
-    /**
-     * Accepts a visitor, which then visits each feature in the collection.
-     * @throws IOException 
-     */
-    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-    	accepts((org.opengis.feature.FeatureVisitor) visitor, (org.opengis.util.ProgressListener) progress);
-	}
     
     public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
     	Iterator iterator = null;

@@ -561,10 +561,10 @@ class ArcSDEQuery {
         FeatureType queryFt = ds.getSchema(query.getTypeName());
         HashSet pnames = new HashSet();
         pnames.addAll(Arrays.asList(query.getPropertyNames()));
-        if (!pnames.contains(queryFt.getPrimaryGeometry().getLocalName())) {
+        if (!pnames.contains(queryFt.getDefaultGeometry().getLocalName())) {
             //we're calculating the bounds, so we'd better be sure and add the spatial
             //column to the query's propertynames
-            pnames.add(queryFt.getPrimaryGeometry().getLocalName());
+            pnames.add(queryFt.getDefaultGeometry().getLocalName());
             DefaultQuery realQuery = new DefaultQuery(query);
             realQuery.setPropertyNames(Arrays.asList(pnames.toArray(new String[pnames.size()])));
             query = realQuery;
@@ -664,7 +664,7 @@ class ArcSDEQuery {
         try {
             SeExtent extent = null;
             
-            String[] spatialCol = { schema.getPrimaryGeometry().getLocalName() };
+            String[] spatialCol = { schema.getDefaultGeometry().getLocalName() };
 
             extentQuery = createSeQueryForQueryInfo(connection);
 

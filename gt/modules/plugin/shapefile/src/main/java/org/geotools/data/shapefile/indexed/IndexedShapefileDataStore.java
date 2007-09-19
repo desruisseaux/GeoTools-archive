@@ -368,7 +368,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			return new EmptyFeatureReader(getSchema());
 
 		String[] propertyNames = query.getPropertyNames()==null?new String[0]:query.getPropertyNames();
-		String defaultGeomName = schema.getPrimaryGeometry().getLocalName();
+		String defaultGeomName = schema.getDefaultGeometry().getLocalName();
 
         FilterAttributeExtractor fae= new FilterAttributeExtractor();
         query.getFilter().accept(fae, null);
@@ -478,7 +478,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		if (!readDbf) {
 			LOGGER.fine("The DBF file won't be opened since no attributes "
 					+ "will be read from it");
-			atts = new AttributeType[] { schema.getPrimaryGeometry() };
+			atts = new AttributeType[] { schema.getDefaultGeometry() };
 
 			if (!readGeometry) {
 				atts = new AttributeType[0];
@@ -1421,7 +1421,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		protected void flush() throws IOException {
 			if ((records <= 0) && (shapeType == null)) {
 				GeometryAttributeType geometryAttributeType = featureType
-						.getPrimaryGeometry();
+						.getDefaultGeometry();
 
 				Class gat = geometryAttributeType.getBinding();
 				shapeType = JTSUtilities.getShapeType(gat);
@@ -1730,7 +1730,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 				indexedFidWriter.write();
 			}
 			// writing of Geometry
-			Geometry g = currentFeature.getPrimaryGeometry();
+			Geometry g = currentFeature.getDefaultGeometry();
 
 			// if this is the first Geometry, find the shapeType and handler
 			if (shapeType == null) {

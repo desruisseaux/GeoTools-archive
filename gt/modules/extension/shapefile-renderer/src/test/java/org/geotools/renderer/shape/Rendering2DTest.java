@@ -128,7 +128,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
-            map.getLayer(0).getFeatureSource().getSchema().getPrimaryGeometry()
+            map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
         ReferencedEnvelope env = map.getLayerBounds();
@@ -147,7 +147,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
-            map.getLayer(0).getFeatureSource().getSchema().getPrimaryGeometry()
+            map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
         ReferencedEnvelope env = map.getLayerBounds();
@@ -166,7 +166,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
-            map.getLayer(0).getFeatureSource().getSchema().getPrimaryGeometry()
+            map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
         ReferencedEnvelope env = map.getLayerBounds();
@@ -184,7 +184,7 @@ public class Rendering2DTest extends TestCase {
         MapContext map = renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
-            map.getLayer(0).getFeatureSource().getSchema().getPrimaryGeometry()
+            map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
         ReferencedEnvelope env = map.getLayerBounds();

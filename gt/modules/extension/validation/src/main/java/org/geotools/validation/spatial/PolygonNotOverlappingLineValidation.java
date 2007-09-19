@@ -87,11 +87,11 @@ public class PolygonNotOverlappingLineValidation
 
         for (int i = 0; i < poly1.length; i++) {
             Feature tmp = (Feature) poly1[i];
-            Geometry gt = tmp.getPrimaryGeometry();
+            Geometry gt = tmp.getDefaultGeometry();
 
             for (int j = 0; j < poly2.length; j++) {
                 Feature tmp2 = (Feature) poly2[j];
-                Geometry gt2 = tmp2.getPrimaryGeometry();
+                Geometry gt2 = tmp2.getDefaultGeometry();
 
                 if (gt2.touches(gt)) {
                     return false;

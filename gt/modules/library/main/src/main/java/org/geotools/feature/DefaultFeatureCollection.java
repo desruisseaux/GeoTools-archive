@@ -117,12 +117,12 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
 //    private FeatureType featureType;
     private FeatureType childType;
 
-    public SimpleFeatureType getMemberType() {
-    	if ( childType != null ) {
-    		return childType;
-    	}
+    public FeatureType getSchema() {
+        if ( childType != null ) {
+            return childType;
+        }
     
-    	return super.getMemberType();
+        return super.getSchema();
     }
     
     /**
@@ -212,7 +212,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         if( this.childType == null ) {
         	this.childType = feature.getFeatureType(); 
         }
-        FeatureType childType = (FeatureType) getMemberType();
+        FeatureType childType = (FeatureType) getSchema();
 //        if ( childType==null ){
 //        	//this.childType=
 //        }else{
@@ -715,14 +715,6 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         return Collections.unmodifiableSet( contents.keySet() );
     }
 
-    /**
-     * Accepts a visitor, which then visits each feature in the collection.
-     * @throws IOException 
-     */
-    public final void accepts(FeatureVisitor visitor, ProgressListener progress ) throws IOException {
-    	accepts((org.opengis.feature.FeatureVisitor) visitor, (org.opengis.util.ProgressListener) progress);
-    }
-    
     public void accepts(org.opengis.feature.FeatureVisitor visitor, org.opengis.util.ProgressListener progress) {
     	Iterator iterator = null;
         if (progress == null) progress = new NullProgressListener();

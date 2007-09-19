@@ -114,8 +114,8 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
-        CoordinateReferenceSystem originalCs = startingType.getPrimaryGeometry() != null ? 
-            startingType.getPrimaryGeometry().getCoordinateSystem() : null;
+        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry() != null ? 
+            startingType.getDefaultGeometry().getCoordinateSystem() : null;
         
         if (forcedCS.equals(originalCs)) {
             return startingType;

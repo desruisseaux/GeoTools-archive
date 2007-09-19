@@ -26,6 +26,7 @@ import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.LineString;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.SurfaceBoundary;
@@ -39,6 +40,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -563,11 +565,14 @@ public class WKTParser {
         }
         MultiPrimitive multi = geometryFactory.createMultiPrimitive();
         Surface surface  = readPolygonText(tokenizer);
-        multi.getElements().add(surface);
+        //multi.getElements().add(surface);
+        Set elements = multi.getElements();
+        elements.add(surface);
         nextToken = getNextCloserOrComma(tokenizer);
         while (nextToken.equals(COMMA)) {
             surface = readPolygonText(tokenizer);
-            multi.getElements().add(surface);
+            //multi.getElements().add(surface);
+            elements.add(surface);
             nextToken = getNextCloserOrComma(tokenizer);
         }
         return multi;
@@ -592,11 +597,14 @@ public class WKTParser {
         }
         MultiPrimitive multi = geometryFactory.createMultiPrimitive();        
         Point point = primitiveFactory.createPoint(getPreciseCoordinate(tokenizer));
-        multi.getElements().add(point);
+        //multi.getElements().add(point);
+        Set elements = multi.getElements();
+        elements.add(point);
         nextToken = getNextCloserOrComma(tokenizer);
         while (nextToken.equals(COMMA)) {
         	point = primitiveFactory.createPoint(getPreciseCoordinate(tokenizer));
-            multi.getElements().add(point);
+            //multi.getElements().add(point);
+        	elements.add(point);
             nextToken = getNextCloserOrComma(tokenizer);
         }
         return multi;
@@ -619,11 +627,14 @@ public class WKTParser {
         }
         MultiPrimitive multi = geometryFactory.createMultiPrimitive();
         Geometry geom = readGeometryTaggedText(tokenizer);
-        multi.getElements().add(geom);
+        //multi.getElements().add(geom);
+        Set elements = multi.getElements();
+        elements.add(geom);
         nextToken = getNextCloserOrComma(tokenizer);
         while (nextToken.equals(COMMA)) {
             geom  = readGeometryTaggedText(tokenizer);
-            multi.getElements().add(geom);
+            //multi.getElements().add(geom);
+            elements.add(geom);
             nextToken = getNextCloserOrComma(tokenizer);
         }
         return multi;
@@ -646,11 +657,14 @@ public class WKTParser {
         }
         MultiPrimitive multi = geometryFactory.createMultiPrimitive();
     	Curve curve = readLineStringText(tokenizer);
-        multi.getElements().add(curve);
+        //multi.getElements().add(curve);
+        Set elements = multi.getElements();
+        elements.add(curve);
         nextToken = getNextCloserOrComma(tokenizer);
         while (nextToken.equals(COMMA)) {
             curve = readLineStringText(tokenizer);
-            multi.getElements().add(curve);
+            //multi.getElements().add(curve);
+            elements.add(curve);
             nextToken = getNextCloserOrComma(tokenizer);
         }
         return multi;

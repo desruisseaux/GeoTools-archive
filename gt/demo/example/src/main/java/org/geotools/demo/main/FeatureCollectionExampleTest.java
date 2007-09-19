@@ -1,5 +1,6 @@
 package org.geotools.demo.main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,29 +9,20 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollectionImpl;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
 import org.geotools.filter.function.Classifier;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureCollection;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.FeatureCollectionType;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -55,7 +47,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author Jody Garnett
  */
 public class FeatureCollectionExampleTest extends TestCase {
-    SimpleFeatureCollection features;
+    FeatureCollection features;
     private Feature feature1;
     
     @Override
@@ -84,10 +76,10 @@ public class FeatureCollectionExampleTest extends TestCase {
      * implementation we can make available.
      */
     public void testNewDefaultFeatureCollection(){
-        SimpleFeatureCollection collection = new DefaultFeatureCollection("internal", null );        
+        FeatureCollection collection = new DefaultFeatureCollection("internal", null );        
     }
     public void testFeatureCollectionsNewCollection(){
-        SimpleFeatureCollection collection = FeatureCollections.newCollection("internal");
+        FeatureCollection collection = FeatureCollections.newCollection("internal");
     }
     
     public void testAddingContentToYourFeatureCollection() throws Exception{
@@ -130,20 +122,25 @@ public class FeatureCollectionExampleTest extends TestCase {
     
     /** The easiest way to work with data */
     public void testFeatureVisitor(){
-        CoordinateReferenceSystem crs = features.getMemberType().getCRS();
+        CoordinateReferenceSystem crs = features.getSchema().getCRS();
         final BoundingBox bounds = new ReferencedEnvelope( crs );
         
-        features.accepts( new AbstractFeatureVisitor(){
-            public void visit( org.opengis.feature.Feature feature ) {
-                bounds.include( feature.getBounds() );
-            }            
-        }, null );
+        try {
+            features.accepts( new AbstractFeatureVisitor(){
+                public void visit( org.opengis.feature.Feature feature ) {
+                    bounds.include( feature.getBounds() );
+                }            
+            }, null );
+        } 
+        catch (IOException e) {
+            fail( e.getLocalizedMessage() );
+        }
         assertFalse( bounds.isEmpty() );
     }
     
     /** IMPORTANT - You must close your iterator */
     public void testIterator(){
-        CoordinateReferenceSystem crs = features.getMemberType().getCRS();
+        CoordinateReferenceSystem crs = features.getSchema().getCRS();
         BoundingBox bounds = new ReferencedEnvelope( crs );
         
         Iterator iterator = features.iterator();
@@ -183,7 +180,7 @@ public class FeatureCollectionExampleTest extends TestCase {
     public void testFeatureIterator(){
         FeatureCollection collection = (FeatureCollection) features;
         
-        CoordinateReferenceSystem crs = features.getMemberType().getCRS();
+        CoordinateReferenceSystem crs = features.getSchema().getCRS();
         Envelope bounds = new Envelope();
         
         FeatureIterator features = collection.features();

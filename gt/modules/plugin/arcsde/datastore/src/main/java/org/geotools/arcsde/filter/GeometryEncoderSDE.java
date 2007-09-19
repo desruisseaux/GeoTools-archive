@@ -266,7 +266,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
         //HACK:  we want to support <namespace>:SHAPE, but current FM doesn't
         //support it.  I guess we should try stripping the prefix and seeing if that
         //matches...
-        final String spatialCol = featureType.getPrimaryGeometry().getLocalName();
+        final String spatialCol = featureType.getDefaultGeometry().getLocalName();
         final String rawPropName = propertyExpr.getPropertyName();
         String localPropName = rawPropName;
         if (rawPropName.indexOf(":") != -1) {

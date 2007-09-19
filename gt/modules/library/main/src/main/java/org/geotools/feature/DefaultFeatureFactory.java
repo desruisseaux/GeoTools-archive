@@ -2,9 +2,8 @@ package org.geotools.feature;
 
 import java.util.List;
 
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureFactory;
+
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -20,9 +19,10 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @since 2.5
  *
  */
-public class DefaultFeatureFactory extends SimpleFeatureFactoryImpl {
+public class DefaultFeatureFactory extends FeatureFactoryImpl {
 
 	public SimpleFeature createSimpleFeature(List properties, SimpleFeatureType type, String id) {
 		return new DefaultFeature( properties, (DefaultFeatureType) type, id );
 	}
+
 }

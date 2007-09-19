@@ -9,7 +9,7 @@ import java.util.Collection;
  * Helper class that notifies the containing geometry when the list has changed
  * so that it can invalidate any cached JTS objects it had.
  */
-public class NotifyingArrayList extends ArrayList {
+public class NotifyingArrayList<T> extends ArrayList<T> {
     private JTSGeometry parent;
 
     public NotifyingArrayList() {
@@ -27,21 +27,22 @@ public class NotifyingArrayList extends ArrayList {
     public void invalidateCachedJTSPeer(){
         if (parent != null) parent.invalidateCachedJTSPeer();
     }
-    public void add(int index, Object element) {
+    public void add(int index, T element) {
         super.add(index, element);
         if (parent != null) parent.invalidateCachedJTSPeer();
     }
-    public boolean add(Object o) {
+    public boolean add(T o) {
         boolean result = super.add(o);
         if (parent != null) parent.invalidateCachedJTSPeer();
         return result;
     }
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<? extends T> c) {
         boolean result = super.addAll(c);
         if (parent != null) parent.invalidateCachedJTSPeer();
         return result;
     }
-    public boolean addAll(int index, Collection c) {
+    
+    public boolean addAll(int index, Collection<? extends T> c) {
         boolean result = super.addAll(index, c);
         if (parent != null) parent.invalidateCachedJTSPeer();
         return result;
@@ -50,13 +51,13 @@ public class NotifyingArrayList extends ArrayList {
         super.clear();
         if (parent != null) parent.invalidateCachedJTSPeer();
     }
-    public Object remove(int index) {
-        Object result = super.remove(index);
+    public T remove(int index) {
+        T result = super.remove(index);
         if (parent != null) parent.invalidateCachedJTSPeer();
         return result;
     }
-    public Object set(int index, Object element) {
-        Object result = super.set(index, element);
+    public T set(int index, T element) {
+        T result = super.set(index, element);
         if (parent != null) parent.invalidateCachedJTSPeer();
         return result;
     }

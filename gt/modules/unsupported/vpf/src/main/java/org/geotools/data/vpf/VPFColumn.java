@@ -17,6 +17,8 @@
  */
 package org.geotools.data.vpf;
 
+import java.util.Map;
+
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.io.TripletId;
 import org.geotools.data.vpf.util.DataUtils;
@@ -329,11 +331,8 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
 	public Object getDefaultValue() {
 		return attribute.getDefaultValue();
 	}
-	public Object getUserData(Object key) {
-		return attribute.getUserData(key);
-	}
-	public void putUserData(Object key, Object data) {
-		attribute.putUserData(key, data);
+	public Map<Object, Object> getUserData() {
+	    return attribute.getUserData();
 	}
 	public PropertyType type() {
 		return attribute.getType();

@@ -119,7 +119,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         fidMapper = postgisDataStore.getFIDMapper(tableName);
         sqlBuilder = (PostgisSQLBuilder) postgisDataStore.getSqlBuilder(tableName);
 
-        AttributeType geomType = featureType.getPrimaryGeometry();
+        AttributeType geomType = featureType.getDefaultGeometry();
         encoder = new SQLEncoderPostgis();
         encoder.setFeatureType( featureType );
         encoder.setFIDMapper(postgisDataStore.getFIDMapper(featureType.getTypeName()));
@@ -909,14 +909,14 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 			if(!query.retrieveAllProperties()) {
 				try {
                     schemaNew = DataUtilities.createSubType(schema, query.getPropertyNames());
-                    if (schemaNew.getPrimaryGeometry() == null)  // does the sub-schema have a geometry in it?
+                    if (schemaNew.getDefaultGeometry() == null)  // does the sub-schema have a geometry in it?
                     {
                     	//uh-oh better get one!
-                    	if (schema.getPrimaryGeometry() != null)  // does the entire schema have a geometry in it? 
+                    	if (schema.getDefaultGeometry() != null)  // does the entire schema have a geometry in it? 
                     	{
                     		//buff-up the sub-schema so it has the default geometry in it.
 	                    	ArrayList al = new ArrayList (Arrays.asList(query.getPropertyNames()));
-	                    	al.add(schema.getPrimaryGeometry().getLocalName());
+	                    	al.add(schema.getDefaultGeometry().getLocalName());
 	                    	schemaNew = DataUtilities.createSubType(schema, (String[]) al.toArray(new String[1]) );       
                     	}
                     }
@@ -945,8 +945,8 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             LOGGER.finer("returning bounds " + retEnv);
 
-            if ( (schemaNew!=null) && (schemaNew.getPrimaryGeometry() != null) )
-                return new ReferencedEnvelope(retEnv,schemaNew.getPrimaryGeometry().getCoordinateSystem());
+            if ( (schemaNew!=null) && (schemaNew.getDefaultGeometry() != null) )
+                return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCoordinateSystem());
             if(query.getCoordinateSystem()!=null)
                 return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
             return new ReferencedEnvelope(retEnv,null);

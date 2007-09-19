@@ -43,7 +43,7 @@ public class AbstractFeatureTypeBindingTest extends GML3TestSupport {
 
         assertEquals("fid.1", f.getID());
 
-        Point p = (Point) f.getPrimaryGeometry();
+        Point p = (Point) f.getDefaultGeometry();
         assertNotNull(p);
         assertEquals(1.0, p.getX(), 0d);
         assertEquals(2.0, p.getY(), 0d);

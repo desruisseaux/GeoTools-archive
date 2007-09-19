@@ -20,7 +20,7 @@ package org.geotools.feature;
  * Indicates client class has attempted to create an invalid feature.
  * @source $URL$
  */
-public class IllegalAttributeException extends Exception {
+public class IllegalAttributeException extends RuntimeException {
     private static final long serialVersionUID = -4964013824521988182L;
 
     /** The expected attribute type. */

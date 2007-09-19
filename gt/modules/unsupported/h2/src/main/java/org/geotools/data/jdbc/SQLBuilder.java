@@ -449,12 +449,12 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      *
      */
     protected void geometry(FeatureType featureType) {
-    	if ( featureType.getPrimaryGeometry() == null ) {
+    	if ( featureType.getDefaultGeometry() == null ) {
     		String msg = "No geometry column to encode";
     		throw new IllegalStateException( msg );
     	}
     	
-    	name( featureType.getPrimaryGeometry().getLocalName() );
+    	name( featureType.getDefaultGeometry().getLocalName() );
     }
     
     /**
@@ -646,8 +646,8 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
                 crs = (CoordinateReferenceSystem) data;
             } else {
                 //check the feature type
-                if (featureType.getPrimaryGeometry() != null) {
-                    crs = featureType.getPrimaryGeometry().getCoordinateSystem();
+                if (featureType.getDefaultGeometry() != null) {
+                    crs = featureType.getDefaultGeometry().getCoordinateSystem();
                 }
             }
 

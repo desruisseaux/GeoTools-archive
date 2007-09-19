@@ -106,7 +106,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             //((DefaultQuery) this.query).setCoordinateSystemReproject(query.getCoordinateSystemReproject());
         }
        
-        if( origionalType.getPrimaryGeometry() == null ){
+        if( origionalType.getDefaultGeometry() == null ){
             return; // no transform needed
         }
         
@@ -116,7 +116,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         } else if (query.getCoordinateSystem() != null) {
             cs = query.getCoordinateSystem();
         }     
-        CoordinateReferenceSystem origionalCRS = origionalType.getPrimaryGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem origionalCRS = origionalType.getDefaultGeometry().getCoordinateSystem();
         if( query.getCoordinateSystem() != null ){
             origionalCRS = query.getCoordinateSystem();
         }

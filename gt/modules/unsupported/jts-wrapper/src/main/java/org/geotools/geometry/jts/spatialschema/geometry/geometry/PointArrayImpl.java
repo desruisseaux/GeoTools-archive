@@ -44,7 +44,7 @@ import org.geotools.geometry.jts.JTSUtils;
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  * @version 2.0
  */
-public class PointArrayImpl extends NotifyingArrayList implements PointArray, JTSGeometry {
+public class PointArrayImpl extends NotifyingArrayList<Position> implements PointArray, JTSGeometry {
     private static final long serialVersionUID = -9202900942004287122L;
 
     //*************************************************************************
@@ -133,7 +133,7 @@ public class PointArrayImpl extends NotifyingArrayList implements PointArray, JT
      * @revisit Should we specify that changes to the returned point will not be reflected
      *          to this array, or should we left the decision to the implementor?
      */
-    public Object get(int column) throws IndexOutOfBoundsException {
+    public Position get(int column) throws IndexOutOfBoundsException {
         return (DirectPosition) ((DirectPosition)super.get(column)).clone();
     }
 

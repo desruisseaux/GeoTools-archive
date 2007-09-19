@@ -66,7 +66,7 @@ public class Descriptors {
 	 * 
 	 * @return The matching attribute descriptor, or <code>null</code>.
 	 */
-	public final static AttributeDescriptor find( List descriptors, TypeName name ){
+	public final static AttributeDescriptor find( List descriptors, Name name ){
 		if( name == null ) return null;
 		for( Iterator i = descriptors.iterator(); i.hasNext(); ){
 			AttributeDescriptor attributeType = (AttributeDescriptor) i.next();
@@ -393,7 +393,7 @@ public class Descriptors {
      * @return
      */
     static public AttributeType type(ComplexType schema, String name) {
-        return type(schema, Types.attributeName(name));
+        return type(schema, new org.geotools.feature.Name(name));
     }
 
     /**
@@ -619,7 +619,7 @@ public class Descriptors {
         ArrayList list = new ArrayList();
 
         if (type instanceof ComplexType) {
-            list = new ArrayList(((ComplexType) type).attributes());
+            list = new ArrayList(((ComplexType) type).getProperties());
         }
 
         return list;

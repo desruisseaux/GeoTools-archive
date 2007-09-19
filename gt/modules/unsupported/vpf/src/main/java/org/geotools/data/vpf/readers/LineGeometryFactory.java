@@ -59,6 +59,6 @@ public class LineGeometryFactory extends VPFGeometryFactory implements FileConst
         VPFFile edgeFile = VPFFileFactory.getInstance().getFile(edgeTableName);
         Feature row = edgeFile.getRowFromId("id", edgeId);
         result = (Geometry)row.getAttribute("coordinates");
-        values.setPrimaryGeometry(result);
+        values.setDefaultGeometry(result);
     }
 }

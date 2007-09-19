@@ -1154,8 +1154,8 @@ public final class StreamingRenderer implements GTRenderer {
 			// DJB:geos-469 if the default geometry was used in the style, we
 			// need to grab it.
 			if (sae.getDefaultGeometryUsed()
-					&& (!atts.contains(schema.getPrimaryGeometry().getLocalName()))) {
-				atts.add(schema.getPrimaryGeometry().getLocalName());
+					&& (!atts.contains(schema.getDefaultGeometry().getLocalName()))) {
+				atts.add(schema.getDefaultGeometry().getLocalName());
 			}
 		} catch (Exception e) {
 			// might not be a geometry column. That will cause problems down the
@@ -1429,7 +1429,7 @@ public final class StreamingRenderer implements GTRenderer {
         // The correct value is in sourceCrs.
 
         // this is the reader's CRS
-        CoordinateReferenceSystem rCS = features.getSchema().getPrimaryGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem rCS = features.getSchema().getDefaultGeometry().getCoordinateSystem();
 
         // sourceCrs == source's real SRS
         // if we need to recode the incoming geometries
@@ -1519,7 +1519,7 @@ public final class StreamingRenderer implements GTRenderer {
         if ( featureSource != null ) {
 			final FeatureType schema = featureSource.getSchema();
 	        
-			final GeometryAttributeType geometryAttribute = schema.getPrimaryGeometry();
+			final GeometryAttributeType geometryAttribute = schema.getDefaultGeometry();
 			sourceCrs = geometryAttribute.getCoordinateSystem();
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.fine(new StringBuffer("processing ").append(
@@ -2022,7 +2022,7 @@ public final class StreamingRenderer implements GTRenderer {
 		Geometry geom;
 		if(geomName == null) {
 		    if(drawMe instanceof Feature)
-		        geom = ((Feature) drawMe).getPrimaryGeometry();
+		        geom = ((Feature) drawMe).getDefaultGeometry();
 		    else
 		        geom = (Geometry) defaultGeometryPropertyName.evaluate(drawMe, Geometry.class);
 		} else {
@@ -2083,7 +2083,7 @@ public final class StreamingRenderer implements GTRenderer {
             String geomName = propertyName != null ? propertyName.getPropertyName() : null;        
             if (geomName == null || "".equals(geomName)) {
                 FeatureType schema = f.getFeatureType();
-                GeometryAttributeType geom = schema.getPrimaryGeometry();
+                GeometryAttributeType geom = schema.getDefaultGeometry();
                 return geom.getCoordinateSystem();
             } else {
                 FeatureType schema = f.getFeatureType();

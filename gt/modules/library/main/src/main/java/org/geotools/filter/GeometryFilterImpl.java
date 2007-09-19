@@ -182,7 +182,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
              //LOGGER.finer("leftGeom = " + o.toString()); 
              return (Geometry) obj;
          } else if (feature instanceof Feature) {
-             return ((Feature)feature).getPrimaryGeometry();
+             return ((Feature)feature).getDefaultGeometry();
          }
     	 return null;
     }
@@ -197,7 +197,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     	 if (rightGeometry != null) {
              return (Geometry) rightGeometry.evaluate(feature,Geometry.class);
          } else if(feature instanceof Feature){
-             return ((Feature)feature).getPrimaryGeometry();
+             return ((Feature)feature).getDefaultGeometry();
          }
     	 return null;
     }

@@ -361,7 +361,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
         
         // make sure the geometry is nillable and has minOccurrs to 0
-        AttributeType dg = actual.getPrimaryGeometry();
+        AttributeType dg = actual.getDefaultGeometry();
         assertTrue(dg.isNillable());
         assertEquals(0, dg.getMinOccurs());
 
@@ -396,7 +396,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
         
         // make sure the geometry is nillable and has minOccurrs to 0
-        AttributeType dg = actual.getPrimaryGeometry();
+        AttributeType dg = actual.getDefaultGeometry();
         assertTrue(dg.isNillable());
         assertEquals(0, dg.getMinOccurs());
 
@@ -489,7 +489,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         Feature f = it.next();
         it.close();
         
-        LineString ls = (LineString) f.getPrimaryGeometry();
+        LineString ls = (LineString) f.getDefaultGeometry();
         assertTrue(ls.getCoordinateSequence() instanceof LiteCoordinateSequence);
     }
     
@@ -504,7 +504,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         Feature f = it.next();
         it.close();
         
-        LineString ls = (LineString) f.getPrimaryGeometry();
+        LineString ls = (LineString) f.getDefaultGeometry();
         assertTrue(ls.getCoordinateSequence() instanceof LiteCoordinateSequence);
     }
     
@@ -1467,8 +1467,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
         }
 
-        assertNull(type.getPrimaryGeometry()); // geometry is null, therefore no bounds
-        assertEquals(type.getPrimaryGeometry(), actual.getPrimaryGeometry());
+        assertNull(type.getDefaultGeometry()); // geometry is null, therefore no bounds
+        assertEquals(type.getDefaultGeometry(), actual.getDefaultGeometry());
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();

@@ -85,13 +85,13 @@ public class LineNotTouchingPolygonInteriorValidation
         while(fLine.hasNext()){
         	Feature line = fLine.next();
         	FeatureIterator fPoly = fcPoly.features();
-        	Geometry lineGeom = line.getPrimaryGeometry();
+        	Geometry lineGeom = line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){
         			while(fPoly.hasNext()){
         				Feature poly = fPoly.next();
-        				Geometry polyGeom = poly.getPrimaryGeometry(); 
+        				Geometry polyGeom = poly.getDefaultGeometry(); 
         				if(envelope.contains(polyGeom.getEnvelopeInternal())){
         					if(Polygon.class.isAssignableFrom(polyGeom.getClass())){
         						Polygon p = (Polygon)polyGeom;

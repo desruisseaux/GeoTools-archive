@@ -52,6 +52,9 @@ import com.vividsolutions.jts.io.WKTReader;
  * @since 0.3
  * TODO: test wkt geometry parse.
  * @source $URL$
+ * 
+ * @deprecated use {@link GeometryTypeImpl}.
+ *
  */
 public class GeometricAttributeType extends DefaultAttributeType implements org.geotools.feature.GeometryAttributeType{
     /** CoordianteSystem used by this GeometryAttributeType */
@@ -91,6 +94,10 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
 		super(type, name, min, max, isNillable,defaultValue);
 	}
 
+    public GeometryType getType() {
+        return (GeometryType) super.getType();
+    }
+    
 	public CoordinateReferenceSystem getCoordinateSystem() {
         return ((GeometryType)getType()).getCRS();
     }
@@ -125,8 +132,8 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
     
     public static GeometryType createAttributeType(String name,Class binding,CoordinateReferenceSystem crs,Filter restriction) {
     	return new GeometryTypeImpl( 
-			new org.geotools.feature.type.TypeName(name),binding,crs,false,false,
-			restriction != null ? Collections.singleton(restriction) : Collections.EMPTY_SET, 
+			new org.geotools.feature.Name(name),binding,crs,false,false,
+			restriction != null ? Collections.singletonList(restriction) : Collections.EMPTY_LIST, 
 			null,null);
     }
 }
