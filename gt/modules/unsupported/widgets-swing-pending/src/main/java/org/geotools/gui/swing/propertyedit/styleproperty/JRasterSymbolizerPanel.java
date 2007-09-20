@@ -19,18 +19,23 @@ package org.geotools.gui.swing.propertyedit.styleproperty;
 import javax.swing.JComponent;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
+import org.geotools.styling.Symbolizer;
 
 /**
  *
  * @author  johann sorel
  */
-public class RasterStylePanel extends javax.swing.JPanel implements DetailPanel{
+public class JRasterSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel{
     
     /** Creates new form RasterStylePanel */
-    public RasterStylePanel(MapLayer layer) {
+    public JRasterSymbolizerPanel(MapLayer layer) {
         initComponents();
     }
     
+    public Symbolizer getSymbolizer(){
+        
+        return null;
+    }
     
      public Style getStyle(){
      /*   StyleBuilder sb = new StyleBuilder();

@@ -14,18 +14,34 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.propertyedit.styleproperty;
+package org.geotools.gui.swing.misc.filtre;
+import java.io.File;
+import javax.swing.filechooser.FileFilter;
 
-import javax.swing.JComponent;
-import org.geotools.styling.Style;
 
 /**
- * @author Johann Sorel
+ * Filtre par ficher SLD
+ * @author johann Sorel
  */
-public interface DetailPanel {
-
-    public Style getStyle();
-            
-    public JComponent getComponent();
+public class FiltreSLD extends FileFilter{
+    
+    
+    /** Creates a new instance of FiltreDGN */
+    public FiltreSLD() {
+    }
+    public boolean accept(File fichier) {
+        
+        String nom = fichier.getName();
+        
+        if ( nom.toLowerCase().endsWith(".sld") || fichier.isDirectory() ){
+            return true;
+        } else{
+            return false;
+        }
+    }
+    
+    public String getDescription() {
+        return "Style Layer Descriptor (.sld)";
+    }
     
 }

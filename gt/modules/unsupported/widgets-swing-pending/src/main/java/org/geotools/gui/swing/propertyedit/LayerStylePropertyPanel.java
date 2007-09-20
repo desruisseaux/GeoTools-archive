@@ -27,11 +27,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
-import org.geotools.gui.swing.propertyedit.styleproperty.SimpleStylePanel;
+import org.geotools.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
 import org.geotools.gui.swing.propertyedit.styleproperty.StyleNode;
 import org.geotools.gui.swing.propertyedit.styleproperty.StylePanel;
 import org.geotools.gui.swing.propertyedit.styleproperty.StyleTreeRenderer;
-import org.geotools.gui.swing.propertyedit.styleproperty.XMLStylePanel;
+import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
 import org.geotools.map.MapLayer;
 
 /**
@@ -56,8 +56,8 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
         tree.setCellRenderer(new StyleTreeRenderer());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        addStylePanel(new SimpleStylePanel());
-        addStylePanel(new XMLStylePanel());
+        addStylePanel(new JSimpleStylePanel());
+        addStylePanel(new JXMLStylePanel());
 
 
         tree.addTreeSelectionListener(new TreeSelectionListener() {

@@ -48,13 +48,13 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @author  johann sorel
  */
-public class FileDataPanel extends javax.swing.JPanel implements DataPanel {
+public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
     private static File LASTPATH = null;
     private EventListenerList listeners = new EventListenerList();
 
     /** Creates new form DefaultShapeTypeChooser */
-    public FileDataPanel() {
+    public JFileDataPanel() {
         initComponents();
        
         but_nouveau.setText(TextBundle.getResource().getString("new"));

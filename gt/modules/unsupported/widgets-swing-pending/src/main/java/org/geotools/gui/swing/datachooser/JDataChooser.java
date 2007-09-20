@@ -325,16 +325,16 @@ public class JDataChooser extends javax.swing.JPanel implements DataListener {
 
     public static List<MapLayer> showDialog() {
         List<DataPanel> lst = new ArrayList<DataPanel>();
-        lst.add(new FileDataPanel());
-        lst.add(new DatabaseDataPanel());
+        lst.add(new JFileDataPanel());
+        lst.add(new JDatabaseDataPanel());
         lst.add(new ServerDataPanel());
         return showDialog(lst, STATE.TABBED);
     }
 
     public static List<MapLayer> showDialog(STATE state) {
         List<DataPanel> lst = new ArrayList<DataPanel>();
-        lst.add(new FileDataPanel());
-        lst.add(new DatabaseDataPanel());
+        lst.add(new JFileDataPanel());
+        lst.add(new JDatabaseDataPanel());
         lst.add(new ServerDataPanel());
         return showDialog(lst, state);
     }

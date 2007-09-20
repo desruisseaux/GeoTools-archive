@@ -39,13 +39,13 @@ import org.geotools.styling.Style;
  *
  * @author johann sorel
  */
-public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel {
+public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel {
 
     private DataStore store;
     private EventListenerList listeners = new EventListenerList();
     
     /** Creates new form DefaultShapeTypeChooser */
-    public DatabaseDataPanel() {
+    public JDatabaseDataPanel() {
         initComponents();
 
         lbl_dbtype.setText(TextBundle.getResource().getString("dbtype"));

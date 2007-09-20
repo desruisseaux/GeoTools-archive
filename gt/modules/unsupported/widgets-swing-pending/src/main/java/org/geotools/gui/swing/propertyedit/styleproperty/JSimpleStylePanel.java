@@ -35,13 +35,13 @@ import org.geotools.styling.FeatureTypeStyle;
  *
  * @author  johann sorel
  */
-public class SimpleStylePanel extends javax.swing.JPanel implements StylePanel {
+public class JSimpleStylePanel extends javax.swing.JPanel implements StylePanel {
 
     private MapLayer layer;
-    private DetailPanel detail = null;
+    private SymbolizerPanel detail = null;
 
     /** Creates new form XMLStylePanel */
-    public SimpleStylePanel() {
+    public JSimpleStylePanel() {
         initComponents();
         setLayout(new BorderLayout());
     }
@@ -99,16 +99,16 @@ public class SimpleStylePanel extends javax.swing.JPanel implements StylePanel {
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
                 if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {
-                    detail = new RasterStylePanel(layer);
+                    detail = new JRasterSymbolizerPanel(layer);
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Polygon.class) || val.equals(MultiPolygon.class)) {
-                    detail = new PolygonStylePanel(layer);
+                    detail = new JPolygonSymbolizerPanel(layer);
                    add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(MultiLineString.class) || val.equals(LineString.class)) {
-                    detail = new LineStylePanel(layer);
+                    detail = new JLineSymbolizerPanel(layer);
                    add(BorderLayout.CENTER, detail.getComponent() );
                 } else if (val.equals(Point.class) || val.equals(MultiPoint.class)) {
-                    detail = new PointStylePanel(layer);
+                    detail = new JPointSymbolizerPanel(layer);
                     add(BorderLayout.CENTER, detail.getComponent() );
                 } else {        
                     detail = null;

@@ -44,14 +44,14 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  *
  * @author johann sorel
  */
-public class PointStylePanel extends javax.swing.JPanel implements DetailPanel {
+public class JPointSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel {
 
     private MapLayer layer = null;
 
     /** Creates new form LineStylePanel
      * @param layer
      */
-    public PointStylePanel(MapLayer layer) {
+    public JPointSymbolizerPanel(MapLayer layer) {
         initComponents();
 
         this.layer = layer;
@@ -168,10 +168,9 @@ public class PointStylePanel extends javax.swing.JPanel implements DetailPanel {
         }
     }
 
-    public Style getStyle() {
-
+    public Symbolizer getSymbolizer(){
         StyleBuilder sb = new StyleBuilder();
-
+        
         Stroke stroke = sb.createStroke(but_bord_color.getBackground(), jsp_bord_width.getIntValue());
         stroke.setLineCap(pan_linecap.getLinecap());
         stroke.setLineJoin(pan_linejoin.getLineJoin());
@@ -187,10 +186,17 @@ public class PointStylePanel extends javax.swing.JPanel implements DetailPanel {
         gra.setRotation(sb.literalExpression(clock.getDegree()));
         gra.setSize(sb.literalExpression(jsp_gen_size.getIntValue()));
         PointSymbolizer ps = sb.createPointSymbolizer(gra);
+        
+        return ps;
+    }
+    
+    
+    public Style getStyle() {
+
+        StyleBuilder sb = new StyleBuilder();
 
         Style style = sb.createStyle();
-        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
-
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle( getSymbolizer() ));
 
         return style;
     }

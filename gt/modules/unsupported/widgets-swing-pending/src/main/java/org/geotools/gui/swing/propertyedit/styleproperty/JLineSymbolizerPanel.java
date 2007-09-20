@@ -42,7 +42,7 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  *
  * @author johann sorel
  */
-public class LineStylePanel extends javax.swing.JPanel implements DetailPanel {
+public class JLineSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel {
 
     private int width = 2;
     private double opa = 100d;
@@ -54,7 +54,7 @@ public class LineStylePanel extends javax.swing.JPanel implements DetailPanel {
     /** Creates new form LineStylePanel
      * @param layer
      */
-    public LineStylePanel(MapLayer layer) {
+    public JLineSymbolizerPanel(MapLayer layer) {
         initComponents();
         this.layer = layer;
 
@@ -152,8 +152,8 @@ public class LineStylePanel extends javax.swing.JPanel implements DetailPanel {
         }
     }
 
-    public Style getStyle() {
-
+    public Symbolizer getSymbolizer(){
+        
         width = jsp_width.getIntValue();
         opa = jsp_alpha.getIntValue() / 100d;
 
@@ -166,11 +166,17 @@ public class LineStylePanel extends javax.swing.JPanel implements DetailPanel {
         stroke.setDashArray(pan_dashes.getDashes());
         stroke.setDashOffset(pan_dashes.getOffset());
         Symbolizer ps = sb.createLineSymbolizer(stroke);
-
-
+        
+        return ps;
+    }
+    
+    
+    public Style getStyle() {
+        StyleBuilder sb = new StyleBuilder();
+               
         Style style = sb.createStyle();
 
-        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle( getSymbolizer()));
 
         return style;
     }
@@ -204,7 +210,7 @@ public class LineStylePanel extends javax.swing.JPanel implements DetailPanel {
         jsp_table = new javax.swing.JScrollPane();
         tab_demo = new org.jdesktop.swingx.JXTable();
 
-        pan_contour.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Contour", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11), new java.awt.Color(0, 0, 0)));
+        pan_contour.setBorder(javax.swing.BorderFactory.createTitledBorder("Contour"));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 

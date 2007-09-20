@@ -42,7 +42,7 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  *
  * @author  johann sorel
  */
-public class PolygonStylePanel extends javax.swing.JPanel implements DetailPanel {
+public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel {
 
     private int b_width = 2;
     private double b_opa = 100d;
@@ -55,7 +55,7 @@ public class PolygonStylePanel extends javax.swing.JPanel implements DetailPanel
     /** Creates new form LineStylePanel
      * @param layer
      */
-    public PolygonStylePanel(MapLayer layer) {
+    public JPolygonSymbolizerPanel(MapLayer layer) {
         initComponents();
         this.layer = layer;
 
@@ -169,8 +169,7 @@ public class PolygonStylePanel extends javax.swing.JPanel implements DetailPanel
         }
     }
 
-    public Style getStyle() {
-
+    public Symbolizer getSymbolizer(){
         b_width = jsp_b_width.getIntValue();
         b_opa = jsp_b_alpha.getIntValue() / 100d;
         i_opa = jsp_i_alpha.getIntValue() / 100d;
@@ -184,11 +183,17 @@ public class PolygonStylePanel extends javax.swing.JPanel implements DetailPanel
         stroke.setDashOffset(pan_dashes.getOffset());
         stroke.setOpacity(sb.literalExpression(b_opa));
         
-
         Symbolizer ps = sb.createPolygonSymbolizer(stroke, sb.createFill(but_i_color.getBackground(), i_opa));
         
+        return ps;
+    }
+    
+    
+    public Style getStyle() {       
+        StyleBuilder sb = new StyleBuilder();
+        
         Style style = sb.createStyle();
-        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle( getSymbolizer() ));
 
         return style;
     }
@@ -253,7 +258,7 @@ public class PolygonStylePanel extends javax.swing.JPanel implements DetailPanel
             .add(jsp_table, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
         );
 
-        pan_interieur.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Interieur", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11), new java.awt.Color(0, 0, 0)));
+        pan_interieur.setBorder(javax.swing.BorderFactory.createTitledBorder("Interieur"));
 
         lbl_alpha1.setText("_");
 
@@ -300,7 +305,7 @@ public class PolygonStylePanel extends javax.swing.JPanel implements DetailPanel
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pan_contour.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Contour", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11), new java.awt.Color(0, 0, 0)));
+        pan_contour.setBorder(javax.swing.BorderFactory.createTitledBorder("Contour"));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 

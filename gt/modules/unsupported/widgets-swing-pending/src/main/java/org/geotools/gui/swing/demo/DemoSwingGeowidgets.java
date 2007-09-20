@@ -21,8 +21,8 @@ import org.geotools.gui.swing.contexttree.TreeEvent;
 import org.geotools.gui.swing.contexttree.TreeListener;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.datachooser.DataPanel;
-import org.geotools.gui.swing.datachooser.DatabaseDataPanel;
-import org.geotools.gui.swing.datachooser.FileDataPanel;
+import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
+import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.ServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -47,12 +48,6 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
-import org.geotools.gui.swing.propertyedit.JPropertyDialog;
-import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
-import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
-import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -69,6 +64,12 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * @author johann sorel
  */
 public class DemoSwingGeowidgets extends javax.swing.JFrame {
+    
+    private ImageIcon ICO_CHECK = IconBundle.getResource().getIcon("16_check");
+    private ImageIcon ICO_ERROR = IconBundle.getResource().getIcon("16_error");
+    private ImageIcon ICO_WARNING = IconBundle.getResource().getIcon("16_warning");
+    private ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
+    
     
     private MapContext _context;
     private MapLayer _layer;
@@ -92,8 +93,6 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         MapLayer layer;
         try {
             _context = new DefaultMapContext(CRS.decode("EPSG:4326"));
-            
-                     
             
             hash = new HashMap();
             hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
@@ -128,14 +127,9 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         }
         _context.setTitle("DemoContext");
         
-        /************************LABEL*****************************************/
-        lbl_check.setIcon(IconBundle.getResource().getIcon("CP22_actions_ok"));
-        lbl_checking.setIcon(IconBundle.getResource().getIcon("CP22_actions_spellcheck"));
-        lbl_working.setIcon(IconBundle.getResource().getIcon("CP22_apps_service_manager"));
-        lbl_stop.setIcon(IconBundle.getResource().getIcon("CP22_actions_stop"));
-        
+               
         /************************JCONTEXTTREE**********************************/
-        titled_jcontexttree.setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_actions_spellcheck"))  );
+        titled_jcontexttree.setLeftDecoration( new JLabel( ICO_INFORMATION )  );
         tree = new JContextTree(true);
         tree.addMapContext(_context);
         tree.getTreeTable().expandAll();
@@ -150,44 +144,27 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         pan_jmappane.setLayout(new GridLayout(1,1));
         pan_jmappane.add(map);
         
-        try {
+        /*try {
             map.setMapArea(map.getContext().getLayerBounds());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        map.revalidate();
+        map.revalidate();*/
         
         /************************JLIGHTMAPPANECONTROL**************************/
-        pan_lightmappanecontrol.setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_actions_spellcheck"))  );
+        pan_lightmappanecontrol.setLeftDecoration( new JLabel(ICO_INFORMATION)  );
         lightcontrol = new JLightMapPaneControl();
         lightcontrol.setMapPane(map);
         pan_lightmappanecontrol.add(lightcontrol);
         
-        /************************JDATACHOOSER**********************************/
-        titled_jdatachooser.setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_apps_service_manager"))  );
         
-        /************************DATAPANEL*************************************/
-        titled_datapanel.setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_actions_spellcheck"))  );
-        lbl_filedatapanel.setIcon(IconBundle.getResource().getIcon("CP22_apps_service_manager"));
-        lbl_databasedatapanel.setIcon(IconBundle.getResource().getIcon("CP22_actions_stop"));
-        lbl_serverdatapanel.setIcon(IconBundle.getResource().getIcon("CP22_actions_stop"));
-        
+         
         /************************LISTENER**************************************/
         pan_listener.setLayout(new GridLayout(1,1));
         ContextTreeListener ecouteur = new ContextTreeListener( map );
         pan_listener.add( ecouteur );
         tree.addTreeListener( ecouteur );
-        
-        /************************JPropertyDialog**********************************/
-        titled_jpropertydialog.setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_actions_spellcheck"))  );
-        
-        /************************PROPERTYPANEL*********************************/
-        titled_propertypanel.setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_actions_spellcheck"))  );
-        lbl_contextcrspropertypanel.setIcon(IconBundle.getResource().getIcon("CP22_actions_stop"));
-        lbl_layerfeaturepropertypanel.setIcon(IconBundle.getResource().getIcon("CP22_apps_service_manager"));
-        lbl_layerfilterpropertypanel.setIcon(IconBundle.getResource().getIcon("CP22_actions_stop"));
-        lbl_layerstylepropertypanel.setIcon(IconBundle.getResource().getIcon("CP22_actions_stop"));
-        
+               
     }
     
     /** This method is called from within the constructor to
@@ -199,65 +176,136 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private void initComponents() {
 
         group_jdatachooser = new javax.swing.ButtonGroup();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        dia_about = new javax.swing.JDialog();
+        jXImagePanel1 = new org.jdesktop.swingx.JXImagePanel();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
+        jPanel5 = new javax.swing.JPanel();
+        lbl_check = new javax.swing.JLabel();
+        lbl_checking = new javax.swing.JLabel();
+        lbl_working = new javax.swing.JLabel();
+        lbl_stop = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel2 = new javax.swing.JPanel();
-        pan_lightmappanecontrol = new org.jdesktop.swingx.JXTitledPanel();
         pan_jmappane = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         titled_jcontexttree = new org.jdesktop.swingx.JXTitledPanel();
         pan_jcontexttree = new javax.swing.JPanel();
         pan_listener = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        titled_jdatachooser = new org.jdesktop.swingx.JXTitledPanel();
-        jButton1 = new javax.swing.JButton();
-        jrb_tabbed = new javax.swing.JRadioButton();
-        jrb_buttoned = new javax.swing.JRadioButton();
-        chk_file = new javax.swing.JCheckBox();
-        chk_database = new javax.swing.JCheckBox();
-        chk_server = new javax.swing.JCheckBox();
-        titled_datapanel = new org.jdesktop.swingx.JXTitledPanel();
-        lbl_filedatapanel = new javax.swing.JLabel();
-        lbl_databasedatapanel = new javax.swing.JLabel();
-        lbl_serverdatapanel = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
-        titled_jpropertydialog = new org.jdesktop.swingx.JXTitledPanel();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JSeparator();
-        titled_propertypanel = new org.jdesktop.swingx.JXTitledPanel();
-        jSeparator2 = new javax.swing.JSeparator();
-        lbl_contextcrspropertypanel = new javax.swing.JLabel();
-        lbl_layerfeaturepropertypanel = new javax.swing.JLabel();
-        lbl_layerfilterpropertypanel = new javax.swing.JLabel();
-        lbl_layerstylepropertypanel = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        lbl_check = new javax.swing.JLabel();
-        lbl_checking = new javax.swing.JLabel();
-        lbl_working = new javax.swing.JLabel();
-        lbl_stop = new javax.swing.JLabel();
+        pan_lightmappanecontrol = new org.jdesktop.swingx.JXTitledPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JSeparator();
+        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
+        jSeparator4 = new javax.swing.JSeparator();
+        chk_file = new javax.swing.JCheckBoxMenuItem();
+        chk_database = new javax.swing.JCheckBoxMenuItem();
+        chk_server = new javax.swing.JCheckBoxMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+
+        jXImagePanel1.setImage(IconBundle.getResource().getIcon("about").getImage());
+        jXImagePanel1.setStyle(org.jdesktop.swingx.JXImagePanel.Style.SCALED_KEEP_ASPECT_RATIO);
+
+        org.jdesktop.layout.GroupLayout jXImagePanel1Layout = new org.jdesktop.layout.GroupLayout(jXImagePanel1);
+        jXImagePanel1.setLayout(jXImagePanel1Layout);
+        jXImagePanel1Layout.setHorizontalGroup(
+            jXImagePanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 137, Short.MAX_VALUE)
+        );
+        jXImagePanel1Layout.setVerticalGroup(
+            jXImagePanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 203, Short.MAX_VALUE)
+        );
+
+        jLabel1.setText("GT Swing Widget Team :");
+
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Johann Sorel" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(jList1);
+
+        org.jdesktop.layout.GroupLayout dia_aboutLayout = new org.jdesktop.layout.GroupLayout(dia_about.getContentPane());
+        dia_about.getContentPane().setLayout(dia_aboutLayout);
+        dia_aboutLayout.setHorizontalGroup(
+            dia_aboutLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(dia_aboutLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(jXImagePanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(dia_aboutLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel1)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        dia_aboutLayout.setVerticalGroup(
+            dia_aboutLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(dia_aboutLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(dia_aboutLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(dia_aboutLayout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
+                    .add(jXImagePanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
+        lbl_check.setIcon(ICO_CHECK);
+        lbl_check.setText("Working");
+
+        lbl_checking.setIcon(ICO_INFORMATION);
+        lbl_checking.setText("Working but will be improved");
+
+        lbl_working.setIcon(ICO_WARNING);
+        lbl_working.setText("In work");
+
+        lbl_stop.setIcon(ICO_ERROR);
+        lbl_stop.setText("Not yet begin");
+
+        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(lbl_check)
+                .add(30, 30, 30)
+                .add(lbl_checking)
+                .add(31, 31, 31)
+                .add(lbl_working)
+                .add(31, 31, 31)
+                .add(lbl_stop)
+                .addContainerGap(273, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(lbl_check, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanel5Layout.createSequentialGroup()
+                        .add(0, 0, 0)
+                        .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(lbl_checking, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, lbl_working, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(lbl_stop, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
+        );
+
         jSplitPane1.setDividerLocation(200);
-
-        pan_lightmappanecontrol.setTitle("JLightMapPaneControl");
-
-        org.jdesktop.layout.GroupLayout pan_lightmappanecontrolLayout = new org.jdesktop.layout.GroupLayout(pan_lightmappanecontrol.getContentContainer());
-        pan_lightmappanecontrol.getContentContainer().setLayout(pan_lightmappanecontrolLayout);
-        pan_lightmappanecontrolLayout.setHorizontalGroup(
-            pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 368, Short.MAX_VALUE)
-        );
-        pan_lightmappanecontrolLayout.setVerticalGroup(
-            pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
-        );
 
         pan_jmappane.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -265,33 +313,14 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         pan_jmappane.setLayout(pan_jmappaneLayout);
         pan_jmappaneLayout.setHorizontalGroup(
             pan_jmappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 352, Short.MAX_VALUE)
+            .add(0, 448, Short.MAX_VALUE)
         );
         pan_jmappaneLayout.setVerticalGroup(
             pan_jmappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 345, Short.MAX_VALUE)
+            .add(0, 356, Short.MAX_VALUE)
         );
 
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(10, 10, 10)
-                .add(pan_jmappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(pan_jmappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jSplitPane1.setRightComponent(jPanel2);
+        jSplitPane1.setRightComponent(pan_jmappane);
 
         titled_jcontexttree.setTitle(" JContextTree");
 
@@ -303,7 +332,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         );
         pan_jcontexttreeLayout.setVerticalGroup(
             pan_jcontexttreeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 256, Short.MAX_VALUE)
+            .add(0, 219, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout titled_jcontexttreeLayout = new org.jdesktop.layout.GroupLayout(titled_jcontexttree.getContentContainer());
@@ -355,299 +384,17 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
 
         jSplitPane1.setLeftComponent(jPanel4);
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+        pan_lightmappanecontrol.setTitle("JLightMapPaneControl");
+
+        org.jdesktop.layout.GroupLayout pan_lightmappanecontrolLayout = new org.jdesktop.layout.GroupLayout(pan_lightmappanecontrol.getContentContainer());
+        pan_lightmappanecontrol.getContentContainer().setLayout(pan_lightmappanecontrolLayout);
+        pan_lightmappanecontrolLayout.setHorizontalGroup(
+            pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 650, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("for the map", jPanel1);
-
-        titled_jdatachooser.setTitle("JDataChooser");
-
-        jButton1.setText("Show");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataChooserAction(evt);
-            }
-        });
-
-        group_jdatachooser.add(jrb_tabbed);
-        jrb_tabbed.setText("tabbed");
-        jrb_tabbed.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jrb_tabbed.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jrb_tabbed.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionDataTabbed(evt);
-            }
-        });
-
-        group_jdatachooser.add(jrb_buttoned);
-        jrb_buttoned.setSelected(true);
-        jrb_buttoned.setText("buttoned");
-        jrb_buttoned.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jrb_buttoned.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jrb_buttoned.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionDataButtoned(evt);
-            }
-        });
-
-        chk_file.setSelected(true);
-        chk_file.setText("FileDataPanel");
-        chk_file.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chk_file.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-        chk_database.setText("DatabaseDataPanel");
-        chk_database.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chk_database.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-        chk_server.setText("ServerDataPanel");
-        chk_server.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        chk_server.setMargin(new java.awt.Insets(0, 0, 0, 0));
-
-        org.jdesktop.layout.GroupLayout titled_jdatachooserLayout = new org.jdesktop.layout.GroupLayout(titled_jdatachooser.getContentContainer());
-        titled_jdatachooser.getContentContainer().setLayout(titled_jdatachooserLayout);
-        titled_jdatachooserLayout.setHorizontalGroup(
-            titled_jdatachooserLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_jdatachooserLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(titled_jdatachooserLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(titled_jdatachooserLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, chk_server, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jrb_buttoned)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jrb_tabbed))
-                    .add(chk_database)
-                    .add(chk_file)
-                    .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        titled_jdatachooserLayout.setVerticalGroup(
-            titled_jdatachooserLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_jdatachooserLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jrb_tabbed)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jrb_buttoned)
-                .add(27, 27, 27)
-                .add(chk_file)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(chk_database)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(chk_server)
-                .add(24, 24, 24)
-                .add(jButton1)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        titled_datapanel.setTitle("DataPanel");
-
-        lbl_filedatapanel.setText("FileDataPanel");
-
-        lbl_databasedatapanel.setText("DatabaseDataPanel");
-
-        lbl_serverdatapanel.setText("ServerDataPanel");
-
-        org.jdesktop.layout.GroupLayout titled_datapanelLayout = new org.jdesktop.layout.GroupLayout(titled_datapanel.getContentContainer());
-        titled_datapanel.getContentContainer().setLayout(titled_datapanelLayout);
-        titled_datapanelLayout.setHorizontalGroup(
-            titled_datapanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_datapanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(titled_datapanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(lbl_filedatapanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
-                    .add(lbl_databasedatapanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
-                    .add(lbl_serverdatapanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        titled_datapanelLayout.setVerticalGroup(
-            titled_datapanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_datapanelLayout.createSequentialGroup()
-                .add(49, 49, 49)
-                .add(lbl_filedatapanel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(lbl_databasedatapanel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(lbl_serverdatapanel)
-                .addContainerGap(23, Short.MAX_VALUE))
-        );
-
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, titled_datapanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, titled_jdatachooser, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(titled_jdatachooser, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(titled_datapanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab("for Data", jPanel3);
-
-        titled_jpropertydialog.setTitle("JPropertyDialog");
-
-        jButton3.setText("MapContext");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionPropertyDialogContext(evt);
-            }
-        });
-
-        jButton4.setText("MapLayer");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionPropertyDialogLayer(evt);
-            }
-        });
-
-        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
-
-        org.jdesktop.layout.GroupLayout titled_jpropertydialogLayout = new org.jdesktop.layout.GroupLayout(titled_jpropertydialog.getContentContainer());
-        titled_jpropertydialog.getContentContainer().setLayout(titled_jpropertydialogLayout);
-        titled_jpropertydialogLayout.setHorizontalGroup(
-            titled_jpropertydialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_jpropertydialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jButton3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 258, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        titled_jpropertydialogLayout.setVerticalGroup(
-            titled_jpropertydialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, titled_jpropertydialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(titled_jpropertydialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jButton3)
-                    .add(jButton4)
-                    .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        titled_propertypanel.setTitle("PropertyPanel");
-
-        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
-
-        lbl_contextcrspropertypanel.setText("ContextCRSPropertyPanel");
-
-        lbl_layerfeaturepropertypanel.setText("LayerFeaturePropertyPanel");
-
-        lbl_layerfilterpropertypanel.setText("LayerFilterPropertyPanel");
-
-        lbl_layerstylepropertypanel.setText("LayerStylePropertyPanel");
-
-        org.jdesktop.layout.GroupLayout titled_propertypanelLayout = new org.jdesktop.layout.GroupLayout(titled_propertypanel.getContentContainer());
-        titled_propertypanel.getContentContainer().setLayout(titled_propertypanelLayout);
-        titled_propertypanelLayout.setHorizontalGroup(
-            titled_propertypanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_propertypanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(lbl_contextcrspropertypanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 258, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(titled_propertypanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(lbl_layerfeaturepropertypanel)
-                    .add(lbl_layerfilterpropertypanel)
-                    .add(lbl_layerstylepropertypanel))
-                .addContainerGap(143, Short.MAX_VALUE))
-        );
-        titled_propertypanelLayout.setVerticalGroup(
-            titled_propertypanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(titled_propertypanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(titled_propertypanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(titled_propertypanelLayout.createSequentialGroup()
-                        .add(lbl_layerfeaturepropertypanel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(lbl_layerfilterpropertypanel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(lbl_layerstylepropertypanel))
-                    .add(lbl_contextcrspropertypanel)
-                    .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, titled_propertypanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, titled_jpropertydialog, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(titled_jpropertydialog, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(titled_propertypanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab("to edit", jPanel6);
-
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
-
-        lbl_check.setText("Working");
-
-        lbl_checking.setText("Working but not much tests");
-
-        lbl_working.setText("In work");
-
-        lbl_stop.setText("Not yet begin");
-
-        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lbl_check)
-                .add(30, 30, 30)
-                .add(lbl_checking)
-                .add(31, 31, 31)
-                .add(lbl_working)
-                .add(31, 31, 31)
-                .add(lbl_stop)
-                .addContainerGap(207, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(lbl_check, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanel5Layout.createSequentialGroup()
-                        .add(0, 0, 0)
-                        .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(lbl_checking, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lbl_working, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(lbl_stop, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap())
+        pan_lightmappanecontrolLayout.setVerticalGroup(
+            pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 30, Short.MAX_VALUE)
         );
 
         jMenu1.setText("File");
@@ -662,14 +409,78 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
+        jMenu2.setText("Data");
+
+        jMenuItem3.setIcon(ICO_CHECK);
+        jMenuItem3.setText("Add Data");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataChooserAction(evt);
+            }
+        });
+        jMenu2.add(jMenuItem3);
+        jMenu2.add(jSeparator3);
+
+        group_jdatachooser.add(jRadioButtonMenuItem1);
+        jRadioButtonMenuItem1.setText("tabbed");
+        jRadioButtonMenuItem1.setIcon(ICO_CHECK);
+        jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionDataTabbed(evt);
+            }
+        });
+        jMenu2.add(jRadioButtonMenuItem1);
+
+        group_jdatachooser.add(jRadioButtonMenuItem2);
+        jRadioButtonMenuItem2.setSelected(true);
+        jRadioButtonMenuItem2.setText("buttoned");
+        jRadioButtonMenuItem2.setIcon(ICO_CHECK);
+        jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionDataButtoned(evt);
+            }
+        });
+        jMenu2.add(jRadioButtonMenuItem2);
+        jMenu2.add(jSeparator4);
+
+        chk_file.setSelected(true);
+        chk_file.setText("FileDataPanel");
+        chk_file.setIcon(ICO_INFORMATION);
+        jMenu2.add(chk_file);
+
+        chk_database.setSelected(true);
+        chk_database.setText("DatabaseDataPanel");
+        chk_database.setIcon(ICO_INFORMATION);
+        jMenu2.add(chk_database);
+
+        chk_server.setSelected(true);
+        chk_server.setText("ServerDataPanel");
+        chk_server.setIcon(ICO_ERROR);
+        jMenu2.add(chk_server);
+
+        jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("?");
+
+        jMenuItem2.setText("About");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAbout(evt);
+            }
+        });
+        jMenu3.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu3);
+
         setJMenuBar(jMenuBar1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
             .add(jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -677,27 +488,14 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
                 .addContainerGap()
                 .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE))
+                .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-    private void actionPropertyDialogContext(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionPropertyDialogContext
-        ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
-        lst.add(new ContextCRSPropertyPanel());
-        JPropertyDialog.showDialog(lst, _context);
-    }//GEN-LAST:event_actionPropertyDialogContext
-    
-    private void actionPropertyDialogLayer(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionPropertyDialogLayer
-        ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
-        lst.add(new LayerFilterPropertyPanel());
-        lst.add(new LayerStylePropertyPanel());
-        lst.add(new LayerFeaturePropertyPanel());
-        JPropertyDialog.showDialog(lst, _layer);
-        
-    }//GEN-LAST:event_actionPropertyDialogLayer
-    
+            
     private void actionAddContext(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddContext
         DefaultMapContext context;
         try {
@@ -724,8 +522,8 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
         List<DataPanel> lst = new ArrayList<DataPanel>();        
         
-        if(chk_file.isSelected()) lst.add(new FileDataPanel());
-        if(chk_database.isSelected()) lst.add(new DatabaseDataPanel());        
+        if(chk_file.isSelected()) lst.add(new JFileDataPanel());
+        if(chk_database.isSelected()) lst.add(new JDatabaseDataPanel());        
         if(chk_server.isSelected()) lst.add(new ServerDataPanel());        
         JDataChooser.showDialog(lst,state);
         
@@ -734,6 +532,12 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private void exitAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitAction
         System.exit(0);
     }//GEN-LAST:event_exitAction
+
+    private void menuAbout(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAbout
+        dia_about.setLocationRelativeTo(null);
+        dia_about.setSize(400, 200);
+        dia_about.setVisible(true);
+    }//GEN-LAST:event_menuAbout
     
     /**
      * @param args the command line arguments
@@ -753,58 +557,44 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         }
         
         
-        
-        //java.awt.EventQueue.invokeLater(new Runnable() {
-         //   public void run() {
-                new DemoSwingGeowidgets().setVisible(true);
-          //  }
-        //});
+        new DemoSwingGeowidgets().setVisible(true);
+ 
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox chk_database;
-    private javax.swing.JCheckBox chk_file;
-    private javax.swing.JCheckBox chk_server;
+    private javax.swing.JCheckBoxMenuItem chk_database;
+    private javax.swing.JCheckBoxMenuItem chk_file;
+    private javax.swing.JCheckBoxMenuItem chk_server;
+    private javax.swing.JDialog dia_about;
     private javax.swing.ButtonGroup group_jdatachooser;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JRadioButton jrb_buttoned;
-    private javax.swing.JRadioButton jrb_tabbed;
+    private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JLabel lbl_check;
     private javax.swing.JLabel lbl_checking;
-    private javax.swing.JLabel lbl_contextcrspropertypanel;
-    private javax.swing.JLabel lbl_databasedatapanel;
-    private javax.swing.JLabel lbl_filedatapanel;
-    private javax.swing.JLabel lbl_layerfeaturepropertypanel;
-    private javax.swing.JLabel lbl_layerfilterpropertypanel;
-    private javax.swing.JLabel lbl_layerstylepropertypanel;
-    private javax.swing.JLabel lbl_serverdatapanel;
     private javax.swing.JLabel lbl_stop;
     private javax.swing.JLabel lbl_working;
     private javax.swing.JPanel pan_jcontexttree;
     private javax.swing.JPanel pan_jmappane;
     private org.jdesktop.swingx.JXTitledPanel pan_lightmappanecontrol;
     private javax.swing.JPanel pan_listener;
-    private org.jdesktop.swingx.JXTitledPanel titled_datapanel;
     private org.jdesktop.swingx.JXTitledPanel titled_jcontexttree;
-    private org.jdesktop.swingx.JXTitledPanel titled_jdatachooser;
-    private org.jdesktop.swingx.JXTitledPanel titled_jpropertydialog;
-    private org.jdesktop.swingx.JXTitledPanel titled_propertypanel;
     // End of variables declaration//GEN-END:variables
     
 }
@@ -825,7 +615,7 @@ class ContextTreeListener extends JXTitledPanel implements TreeListener {
         super();
         this.map = map;
         setTitle("TreeListener");
-        setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("CP22_actions_spellcheck"))  );
+        setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("16_information"))  );
         txt.setFont(new Font("Arial", Font.PLAIN, 8));
         setPreferredSize(new Dimension(100, 120));
         add(BorderLayout.CENTER, new JScrollPane(txt));
