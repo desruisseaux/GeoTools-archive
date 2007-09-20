@@ -723,8 +723,9 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     
     private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
         List<DataPanel> lst = new ArrayList<DataPanel>();        
+        
         if(chk_file.isSelected()) lst.add(new FileDataPanel());
-        if(chk_database.isSelected()) lst.add(new DatabaseDataPanel());
+        if(chk_database.isSelected()) lst.add(new DatabaseDataPanel());        
         if(chk_server.isSelected()) lst.add(new ServerDataPanel());        
         JDataChooser.showDialog(lst,state);
         

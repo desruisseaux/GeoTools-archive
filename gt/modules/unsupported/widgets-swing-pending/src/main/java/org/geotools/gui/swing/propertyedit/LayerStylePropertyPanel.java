@@ -126,9 +126,7 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
             .add(0, 295, Short.MAX_VALUE)
         );
 
-        lbl_title.setForeground(new java.awt.Color(0, 0, 0));
         lbl_title.setTitle("Style");
-        lbl_title.setFont(new java.awt.Font("Tahoma", 1, 12));
 
         org.jdesktop.layout.GroupLayout jpanel0Layout = new org.jdesktop.layout.GroupLayout(jpanel0);
         jpanel0.setLayout(jpanel0Layout);

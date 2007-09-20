@@ -16,34 +16,82 @@
 
 package org.geotools.gui.swing.datachooser;
 
+import java.io.IOException;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.ImageIcon;
+import javax.swing.event.EventListenerList;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.postgis.PostgisDataStoreFactory;
+import org.geotools.gui.swing.datachooser.model.DBModel;
+import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
+import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
+import org.geotools.styling.Style;
 
 /**
  *
  * @author johann sorel
  */
-public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
+public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel {
+
+    private DataStore store;
+    private EventListenerList listeners = new EventListenerList();
     
     /** Creates new form DefaultShapeTypeChooser */
     public DatabaseDataPanel() {
         initComponents();
-        
-        lbl_dbtype.setText( TextBundle.getResource().getString("dbtype"));
-        lbl_host.setText( TextBundle.getResource().getString("host"));
-        lbl_port.setText( TextBundle.getResource().getString("port"));
-        lbl_schema.setText( TextBundle.getResource().getString("schema"));
-        lbl_database.setText( TextBundle.getResource().getString("database"));
-        lbl_user.setText( TextBundle.getResource().getString("user"));
-        lbl_password.setText( TextBundle.getResource().getString("password"));
-        but_refresh.setText( TextBundle.getResource().getString("refresh"));
-        
+
+        lbl_dbtype.setText(TextBundle.getResource().getString("dbtype"));
+        lbl_host.setText(TextBundle.getResource().getString("host"));
+        lbl_port.setText(TextBundle.getResource().getString("port"));
+        lbl_schema.setText(TextBundle.getResource().getString("schema"));
+        lbl_database.setText(TextBundle.getResource().getString("database"));
+        lbl_user.setText(TextBundle.getResource().getString("user"));
+        lbl_password.setText(TextBundle.getResource().getString("password"));
+        but_refresh.setText(TextBundle.getResource().getString("refresh"));
+        but_add.setText(TextBundle.getResource().getString("add"));
+
         tab_table.setTableHeader(null);
+        tab_table.setModel(new DBModel(tab_table));
+    }
+
+    public Map getProperties() {
+        Map config = new HashMap();
+        config.put(PostgisDataStoreFactory.DBTYPE.key, jcb_dbtype.getSelectedItem());
+        config.put(PostgisDataStoreFactory.HOST.key, txt_host.getText());
+        config.put(PostgisDataStoreFactory.PORT.key, txt_port.getText());
+        config.put(PostgisDataStoreFactory.SCHEMA.key,  txt_schema.getText());
+        config.put(PostgisDataStoreFactory.DATABASE.key,  txt_database.getText());
+        config.put(PostgisDataStoreFactory.USER.key,  txt_user.getText());
+        config.put(PostgisDataStoreFactory.PASSWD.key,  String.valueOf(txt_password.getPassword()) );
+        return config;
+    }
+
+    private void refreshTable(){
+        
+        if(store!= null){
+            ((DBModel) tab_table.getModel()).clean();
+            try {
+                ((DBModel) tab_table.getModel()).add(store.getTypeNames());
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+        }
+        
+    }
+    
+    private void fireEvent(MapLayer[] layers){
+        for( DataListener lst : listeners.getListeners(DataListener.class)){
+            lst.addLayers(layers);
+        }
+        
     }
     
     /** This method is called from within the constructor to
@@ -71,6 +119,7 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
         tab_table = new org.jdesktop.swingx.JXTable();
         jcb_dbtype = new javax.swing.JComboBox();
         txt_password = new javax.swing.JPasswordField();
+        but_add = new javax.swing.JButton();
 
         lbl_dbtype.setText("jLabel1");
 
@@ -93,6 +142,11 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
         txt_schema.setText("default");
 
         but_refresh.setText("jButton1");
+        but_refresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionRefresh(evt);
+            }
+        });
 
         tab_table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -105,6 +159,13 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
         jScrollPane1.setViewportView(tab_table);
 
         jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis" }));
+
+        but_add.setText("jButton1");
+        but_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionAdd(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -146,8 +207,10 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
                                 .add(lbl_schema)
                                 .add(18, 18, 18)
                                 .add(txt_schema, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))
-                .add(18, 18, 18)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, but_add)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -160,7 +223,10 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 202, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(layout.createSequentialGroup()
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 177, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(but_add))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(lbl_dbtype)
@@ -200,10 +266,52 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
 
     }// </editor-fold>//GEN-END:initComponents
 
+    private void actionRefresh(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionRefresh
+        
+        try {
+            store = DataStoreFinder.getDataStore(getProperties());
+            refreshTable();
+        } catch (IOException ex) {
+            store = null;
+            System.out.println(ex);
+        }       
+        
+    }//GEN-LAST:event_actionRefresh
+
+    private void actionAdd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAdd
+       ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
+        
+        if(store!=null){
+            
+            for(int i=0;i<tab_table.getSelectedRows().length; i++){
+                try {
+                    DBModel model = (DBModel) tab_table.getModel();
+                    String name = (String) model.getValueAt( tab_table.getSelectedRows()[i],0);
+                    FeatureSource fs = store.getFeatureSource(name);
+                    Style style = RandomStyleFactory.createRandomVectorStyle(fs);
+                    
+                    MapLayer layer = new DefaultMapLayer(fs,style);
+                    layer.setTitle( jcb_dbtype.getSelectedItem().toString() +"-"+ name);
+                    layers.add(layer);
+                } catch (IOException ex) {
+                    System.out.println(ex);
+                }                
+            }
+            
+            if(layers.size()>0){
+                MapLayer[] lys = new MapLayer[layers.size()];
+                for(int i=0;i<layers.size();i++){
+                    lys[i] =  layers.get(i);
+                }
+                fireEvent( lys );
+            }
+        }
+    }//GEN-LAST:event_actionAdd
+
     public ImageIcon getIcon16() {
         return IconBundle.getResource().getIcon("16_database");
     }
-        
+
     public ImageIcon getIcon48() {
         return IconBundle.getResource().getIcon("48_database");
     }
@@ -216,21 +324,17 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
         return this;
     }
 
-    public List<MapLayer> read() {
-        ArrayList<MapLayer> lst = new ArrayList<MapLayer>();        
-        return lst;
-    }
-
     public void addListener(DataListener listener) {
+        listeners.add(DataListener.class, listener);
     }
 
     public void removeListener(DataListener listener) {
+        listeners.remove(DataListener.class, listener);
     }
-
-
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton but_add;
     private javax.swing.JButton but_refresh;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox jcb_dbtype;
@@ -249,5 +353,4 @@ public class DatabaseDataPanel extends javax.swing.JPanel implements DataPanel{
     private javax.swing.JTextField txt_schema;
     private javax.swing.JTextField txt_user;
     // End of variables declaration//GEN-END:variables
-    
 }

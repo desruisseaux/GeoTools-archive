@@ -157,8 +157,13 @@ public class FileDataPanel extends javax.swing.JPanel implements DataPanel {
                 LASTPATH = f;
             }
             
-            if(layers.size()>0)
-                fireEvent( (MapLayer[])layers.toArray());
+            if(layers.size()>0){
+                MapLayer[] lys = new MapLayer[layers.size()];
+                for(int i=0;i<layers.size();i++){
+                    lys[i] =  layers.get(i);
+                }
+                fireEvent( lys );
+            }
             
         }
     }//GEN-LAST:event_actionNouveau

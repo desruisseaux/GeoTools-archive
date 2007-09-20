@@ -6,11 +6,7 @@
             http://www.geotools.org/                                            
                                                                                 
         Version: $Id$              
-     ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                               http://maven.apache.org/maven-v4_0_0.xsd">
+     ======================================================================= --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                                 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -62,19 +58,13 @@
   <name>widgets-swing-pending</name>
   <url>http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/</url>
   <scm>
-    <connection>
-      scm:http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/
-    </connection>
+    <connection>scm:http://docs.codehaus.org/display/GEOTOOLS/widgets-swing-pending/</connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/unsupported/widgets-swing-pending/</url>
   </scm>
   
-  <description>
-     Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.
-  </description>
+  <description>Swing widgets, coming from project AlterSIG. Will be added in module swing widgets once cleaned up.</description>
   
   <organization>
-    <name></name>
-    <url></url>
   </organization>
   
   <!-- for your project. -->
@@ -100,7 +90,6 @@
       <id>johann.sorel</id>
       <name>Johann Sorel</name>
       <email>sorel.johann@inbox.com</email>
-      <organization></organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -394,7 +383,7 @@
     </dependency>
     
   </dependencies>
-
+ 
 
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
@@ -420,6 +409,29 @@
         </configuration>
       </plugin>
       
+      <!-- ====    Execute         =============================== -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+            <executable>java</executable>
+            <arguments>                        
+              <argument>-classpath</argument>
+              <!-- automatically creates the classpath using all project dependencies,also adding the project build directory -->
+              <classpath></classpath>
+              <argument>org.geotools.gui.swing.demo.DemoSwingGeowidgets</argument>
+            </arguments>
+          </configuration>
+       </plugin>
+
+
       <!-- ====    Testing          ============================== -->
       <!-- ====    Code Formatting  ============================== -->
       <!--
