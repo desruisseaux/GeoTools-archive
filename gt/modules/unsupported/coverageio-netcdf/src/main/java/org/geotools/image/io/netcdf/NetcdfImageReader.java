@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -35,9 +35,13 @@ import ucar.ma2.Range;
 import ucar.ma2.DataType;
 import ucar.ma2.IndexIterator;
 import ucar.ma2.InvalidRangeException;
+import ucar.nc2.dataset.AxisType;
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.CoordSysBuilder;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
+import ucar.nc2.dataset.VariableEnhanced;
 import ucar.nc2.util.CancelTask;
 import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
@@ -55,12 +59,27 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Base implementation for NetCDF image reader. Pixels are assumed organized according the COARDS
  * convention (a precursor of <A HREF="http://www.cfconventions.org/">CF Metadata conventions</A>),
  * i.e. in (<var>t</var>,<var>z</var>,<var>y</var>,<var>x</var>) order, where <var>x</var> varies
- * faster. The image is created from the two last dimensions (<var>x</var>,<var>y</var>) and the
- * <var>z</var> is taken as the bands. Additional dimensions like <var>t</var> are ignored.
+ * faster. The image is created from the two last dimensions (<var>x</var>,<var>y</var>).
+ * Additional dimensions (if any) are handled as below in the default implementation:
  * <p>
- * Users should select the <var>z</var> value using {@link ImageReadParam#setSourceBands}. If no
- * band is selected, the default selection is the first band (0) only. Note that this is different
- * than the usual Image I/O default, which is all bands.
+ * <ul>
+ *   <li>The third dimension (<var>z</var> in the above sequence) is assigned to bands. Users
+ *       can change this behavior by invoking the {@link NetcdfReadParam#setBandDimensionTypes}
+ *       method.</li>
+ *   <li>Additional dimensions like <var>t</var> are ignored; only the first slice is selected.
+ *       Users can change this behavior by invoking the {@link NetcdfReadParam#setSliceIndice}
+ *       method.</li>
+ * </ul>
+ * <p>
+ * <b>Example:</b><br>
+ * Assuming that:
+ * <ul>
+ *   <li>None of the above methods has been invoked</li>
+ *   <li>Axis are (<var>t</var>,<var>z</var>,<var>y</var>,<var>x</var>)</li>
+ * </ul>
+ * Then the users can select the <var>z</var> value using {@link ImageReadParam#setSourceBands}.
+ * If no band is selected, then the default selection is the first band (0) only. Note that this
+ * is different than the usual Image I/O default, which is all bands.
  *
  * @since 2.4
  * @source $URL$
@@ -69,12 +88,6 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  */
 public class NetcdfImageReader extends FileImageReader implements CancelTask {
-    /**
-     * The default source bands to read from the NetCDF file.
-     * Also the default destination bands in the buffered image.
-     */
-    private static final int[] DEFAULT_BANDS = new int[] {0};
-
     /**
      * The dimension <strong>relative to the rank</strong> in {@link #variable} to use as image
      * width. The actual dimension is {@code variable.getRank() - X_DIMENSION}. Is hard-coded
@@ -90,19 +103,20 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     private static final int Y_DIMENSION = 2;
 
     /**
-     * The dimension <strong>relative to the rank</strong> in {@link #variable} to use as image
-     * bands. The actual dimension is {@code variable.getRank() - Z_DIMENSION}. Is hard-coded
-     * because the loop in the {@code read} method expects this order.
-     *
-     * @todo In this particular case, the "hard constant" could be relaxed into a modifiable
-     *       parameter.
+     * The default dimension <strong>relative to the rank</strong> in {@link #variable} to use
+     * as image bands. The actual dimension is {@code variable.getRank() - Z_DIMENSION}.
+     * <p>
+     * At the difference of {@link #X_DIMENSION} and {@link #Y_DIMENSION}, this dimension doesn't
+     * need to be hard-coded. User can invoke {@link NetcdfReadParam#setBandDimensionTypes} in
+     * order to provide a different value.
      */
     private static final int Z_DIMENSION = 3;
 
     /**
-     * The NetCDF file, or {@code null} if not yet open.
+     * The NetCDF dataset, or {@code null} if not yet open. The NetCDF file is open by
+     * {@link #ensureOpen} when first needed.
      */
-    private NetcdfDataset file;
+    private NetcdfDataset dataset;
 
     /**
      * The name of the {@linkplain Variable variables} to be read in a NetCDF file.
@@ -117,11 +131,10 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     private int variableIndex;
 
     /**
-     * The data from the NetCDF file. Should be an instance of {@link VariableDS},
-     * but we will avoid casting before needed (in case we got something else for
-     * some reason).
+     * The data from the NetCDF file. The value for this field is set by {@link #prepareVariable}
+     * when first needed. This is typically (but not necessarly) an instance of {@link VariableDS}.
      */
-    private Variable variable;
+    protected Variable variable;
 
     /**
      * The last error from the NetCDF library.
@@ -144,7 +157,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     private IIOMetadata imageMetadata;
 
-    /** 
+    /**
      * Constructs a new NetCDF reader.
      *
      * @param spi The service provider.
@@ -195,6 +208,18 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         ensureFileOpen();
         // TODO: consider returning the actual number of images in the file.
         return variableNames.length;
+    }
+
+    /**
+     * Convenience method returning the first (and only) sample converter in the specified
+     * array, or a default converter if the specified array contains a null element.
+     */
+    private static SampleConverter first(final SampleConverter[] converters) {
+        SampleConverter converter = converters[0];
+        if (converter == null) {
+            converter = SampleConverter.IDENTITY;
+        }
+        return converter;
     }
 
     /**
@@ -257,7 +282,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     private void ensureMetadataLoaded() throws IOException {
         if (!metadataLoaded) {
-            CoordSysBuilder.addCoordinateSystems(file, this);
+            CoordSysBuilder.addCoordinateSystems(dataset, this);
             metadataLoaded = true;
         }
     }
@@ -270,7 +295,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         if (streamMetadata == null && !ignoreMetadata) {
             ensureFileOpen();
             ensureMetadataLoaded();
-            streamMetadata = createMetadata(file);
+            streamMetadata = createMetadata(dataset);
         }
         return streamMetadata;
     }
@@ -343,40 +368,68 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     }
 
     /**
-     * Convenience method returning the first (and only) sample converter in the specified
-     * array, or a default converter if the specified array contains a null element.
+     * Returns the slice to select for the specified axis type.
+     *
+     * @return The axis type.
+     * @return The indice as a value from 0 inclusive to {@link Dimension#getLength} exclusive.
+     * @throws IOException If an error occured while reading the data.
      */
-    private static SampleConverter first(final SampleConverter[] converters) {
-        SampleConverter converter = converters[0];
-        if (converter == null) {
-            converter = SampleConverter.IDENTITY;
+    private int getSliceIndice(final ImageReadParam param, final int dimension) throws IOException {
+        if (param instanceof NetcdfReadParam) {
+            final NetcdfReadParam p = (NetcdfReadParam) param;
+            if (p.hasNonDefaultIndices()) {
+                final AxisType type = getAxisType(dimension);
+                if (type != null) {
+                    return p.getSliceIndice(type);
+                }
+            }
         }
-        return converter;
+        return NetcdfReadParam.DEFAULT_INDICE;
     }
 
     /**
-     * Returns parameters initialized with default values appropriate for this format.
+     * Returns the axis type at the specified dimension. The {@link #prepareVariable} method
+     * must be invoked prior this method (this is not verified).
+     * <p>
+     * This method is not public because it duplicates (in a different form) the informations
+     * already provided in image metadata. We use it when we want only this specific information
+     * without the the rest of metadata. In many cases this method will not be invoked at all,
+     * thus avoiding the need to load metadata.
      *
-     * @return Parameters which may be used to control the decoding process using a set
-     *         of default settings.
+     * @param  dimension The dimension.
+     * @return The axis type, or {@code null} if unknown.
+     * @throws IOException If an error occured while loading the axis informations.
      */
-    //@Override
-    public ImageReadParam getDefaultReadParam() {
-        final ImageReadParam param = super.getDefaultReadParam();
-        param.setSourceBands     (DEFAULT_BANDS);
-        param.setDestinationBands(DEFAULT_BANDS);
-        return param;
+    private AxisType getAxisType(final int dimension) throws IOException {
+        if (variable instanceof VariableDS) {
+            ensureMetadataLoaded();
+            final List sys = ((VariableDS) variable).getCoordinateSystems();
+            if (sys != null) {
+                final int count = sys.size();
+                for (int i=0; i<count; i++) {
+                    final CoordinateSystem cs = (CoordinateSystem) sys.get(i);
+                    final List axes = cs.getCoordinateAxes();
+                    if (axes != null && axes.size() > dimension) {
+                        final CoordinateAxis axis = (CoordinateAxis) axes.get(dimension);
+                        if (axis != null) {
+                            return axis.getAxisType();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
      * Returns {@code true} if the specified variable is a dimension of an other variable.
      * Such dimensions will be excluded from the list returned by {@link #getVariables}.
-     * 
+     *
      * @param  candidate The variable to test.
      * @param  variables The list of variables.
      * @return {@code true} if the specified variable is a dimension of an other variable.
      */
-    private static boolean isDimension(final VariableIF candidate, final List variables) {
+    private static boolean isAxis(final VariableIF candidate, final List variables) {
         final String name = candidate.getName();
         final int size = variables.size();
         for (int i=0; i<size; i++) {
@@ -387,18 +440,18 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
                     if (dim.getName().equals(name)) {
                         return true;
                     }
-                }                
-            }            
+                }
+            }
         }
         return false;
     }
 
     /**
      * Ensures that the NetCDF file is open, but do not load any variable yet.
-     * Variable will be read by {@link #prepareVariable} only.
+     * The {@linkplain #variable} will be read by {@link #prepareVariable} only.
      */
     private void ensureFileOpen() throws IOException {
-        if (file == null) {
+        if (dataset == null) {
             /*
              * Clears the 'abort' flag here (instead of in 'read' method only) because
              * we pass this ImageReader instance to the NetCDF DataSet as a CancelTask.
@@ -407,8 +460,8 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             clearAbortRequest();
             final File inputFile = getInputFile();
             // TODO: consider using NetcdfDatasetCache.acquire(...) below.
-            file = NetcdfDataset.openDataset(inputFile.getPath(), false, this);
-            if (file == null) {
+            dataset = NetcdfDataset.openDataset(inputFile.getPath(), false, this);
+            if (dataset == null) {
                 throw new FileNotFoundException(Errors.format(
                         ErrorKeys.FILE_DOES_NOT_EXIST_$1, inputFile));
             }
@@ -421,12 +474,12 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
                  * variable. The "longitude" variable is usually not of direct interest to the user
                  * (the interresting variable is "temperature"), so we exclude it.
                  */
-                final List variables = file.getVariables();
+                final List variables = dataset.getVariables();
                 final String[] filtered = new String[variables.size()];
                 int count = 0;
                 for (int i=0; i<filtered.length; i++) {
                     final VariableIF candidate = (VariableIF) variables.get(i);
-                    if (!isDimension(candidate, variables)) {
+                    if (!isAxis(candidate, variables)) {
                         filtered[count++] = candidate.getName();
                     }
                 }
@@ -436,23 +489,36 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
     }
 
     /**
-     * Ensures that data are loaded in the {@link #variable}. If data are already loaded,
-     * then this method do nothing.
-     * 
+     * Ensures that data are loaded in the NetCDF {@linkplain #variable}. If data are already
+     * loaded, then this method do nothing.
+     * <p>
+     * This method is invoked automatically before any operation that require the NetCDF
+     * variable, including (but not limited to):
+     * <ul>
+     *   <li>{@link #getWidth}</li>
+     *   <li>{@link #getHeight}</li>
+     *   <li>{@link #getStatistics}</li>
+     *   <li>{@link #getImageMetadata}</li>
+     *   <li>{@link #getRawDataType}</li>
+     *   <li>{@link #read(int,ImageReadParam)}</li>
+     * </ul>
+     *
      * @param   imageIndex The image index.
+     * @return  {@code true} if the {@linkplain #variable} changed as a result of this call,
+     *          or {@code false} if the current value is already appropriate.
      * @throws  IndexOutOfBoundsException if the specified index is outside the expected range.
      * @throws  IllegalStateException If {@link #input} is not set.
      * @throws  IOException If the operation failed because of an I/O error.
      */
-    private void prepareVariable(final int imageIndex) throws IOException {
+    protected boolean prepareVariable(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
         if (variable == null || variableIndex != imageIndex) {
             ensureFileOpen();
             final String name = variableNames[imageIndex];
-            final Variable candidate = file.findVariable(name);
+            final Variable candidate = dataset.findVariable(name);
             if (candidate == null) {
                 throw new IIOException(Errors.format(
-                        ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, name, file.getLocation()));
+                        ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, name, dataset.getLocation()));
             }
             final int rank = candidate.getRank();
             if (rank < Math.max(X_DIMENSION, Y_DIMENSION)) {
@@ -462,7 +528,20 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             variable      = candidate;
             variableIndex = imageIndex;
             imageMetadata = null;
+            return true;
         }
+        return false;
+    }
+
+    /**
+     * Returns parameters initialized with default values appropriate for this format.
+     *
+     * @return Parameters which may be used to control the decoding process using a set
+     *         of default settings.
+     */
+    //@Override
+    public ImageReadParam getDefaultReadParam() {
+        return new NetcdfReadParam(this);
     }
 
     /**
@@ -488,14 +567,27 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             srcBands = null;
             dstBands = null;
         }
+        final int rank = variable.getRank();
+        int bandDimension = rank - Z_DIMENSION;
+        if (param instanceof NetcdfReadParam) {
+            final NetcdfReadParam p = (NetcdfReadParam) param;
+            if (variable instanceof VariableEnhanced) {
+                ensureMetadataLoaded(); // Build the CoordinateSystems
+                bandDimension = p.getBandDimension((VariableEnhanced) variable);
+                final int relative = rank - bandDimension;
+                if (relative < 0 || relative == X_DIMENSION || relative == Y_DIMENSION) {
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
+                            "bandDimension", new Integer(bandDimension)));
+                }
+            }
+        }
         /*
          * Gets the destination image of appropriate size. We create it now
          * since it is a convenient way to get the number of destination bands.
          */
+        final int width  = variable.getDimension(rank - X_DIMENSION).getLength();
+        final int height = variable.getDimension(rank - Y_DIMENSION).getLength();
         final SampleConverter[] converters = new SampleConverter[1];
-        final int            rank   = variable.getRank();
-        final int            width  = variable.getDimension(rank - X_DIMENSION).getLength();
-        final int            height = variable.getDimension(rank - Y_DIMENSION).getLength();
         final BufferedImage  image  = getDestination(imageIndex, param, width, height, converters);
         final WritableRaster raster = image.getRaster();
         final SampleConverter converter = first(converters);
@@ -503,9 +595,9 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
          * Checks the band setting. If the NetCDF file is at least 3D, the
          * data along the 'z' dimension are considered as different bands.
          */
-        final boolean hasZ    = (rank >= Z_DIMENSION);
-        final int numSrcBands = hasZ ? variable.getDimension(rank - Z_DIMENSION).getLength() : 1;
-        final int numDstBands = raster.getNumBands();
+        final boolean hasBands = (bandDimension >= 0 && bandDimension < rank);
+        final int  numSrcBands = hasBands ? variable.getDimension(bandDimension).getLength() : 1;
+        final int  numDstBands = raster.getNumBands();
         if (param != null) {
             // Do not test when 'param == null' since our default 'srcBands'
             // value is not the same than the one documented in Image I/O.
@@ -536,7 +628,11 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
                     break;
                 }
                 default: {
-                    first  = 0;
+                    if (i == bandDimension) {
+                        first = NetcdfReadParam.DEFAULT_INDICE;
+                    } else {
+                        first = getSliceIndice(param, i);
+                    }
                     length = 1;
                     stride = 1;
                     break;
@@ -564,8 +660,8 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             final int dstBand = (dstBands == null) ? zi : dstBands[zi];
             final Array array;
             try {
-                if (hasZ) {
-                    ranges[rank - Z_DIMENSION] = new Range(srcBand, srcBand, 1);
+                if (hasBands) {
+                    ranges[bandDimension] = new Range(srcBand, srcBand, 1);
                     // No need to update 'sections' since it wraps directly the 'ranges' array.
                 }
                 array = variable.read(sections);
@@ -619,7 +715,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * Wraps a generic exception into a {@link IIOException}.
      */
     private IIOException netcdfFailure(final Exception e) throws IOException {
-        return new IIOException(Errors.format(ErrorKeys.CANT_READ_$1, file.getLocation()), e);
+        return new IIOException(Errors.format(ErrorKeys.CANT_READ_$1, dataset.getLocation()), e);
     }
 
     /**
@@ -648,9 +744,9 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         imageMetadata  = null;
         lastError      = null;
         variable       = null;
-        if (file != null) {
-            file.close();
-            file = null;
+        if (dataset != null) {
+            dataset.close();
+            dataset = null;
         }
         super.close();
     }
@@ -659,7 +755,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
 
     /**
      * The service provider for {@link NetcdfImageReader}.
-     * 
+     *
      * @version $Id$
      * @author Antoine Hnawia
      * @author Martin Desruisseaux

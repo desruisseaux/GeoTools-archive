@@ -25,12 +25,8 @@ import java.io.Serializable;
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.PixelInCell;
-import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
@@ -514,7 +510,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Returns a string représentation of this grid geometry. The returned string
+     * Returns a string representation of this grid geometry. The returned string
      * is implementation dependent. It is usually provided for debugging purposes.
      */
     public String toString() {

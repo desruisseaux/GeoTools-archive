@@ -44,7 +44,6 @@ import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.geometry.Envelope2D;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.DimensionFilter;
@@ -82,7 +81,9 @@ public class GridGeometry2D extends GeneralGridGeometry {
     private static FactoryGroup FACTORY_GROUP;
 
     /**
-     * The offset for various pixel orientations.
+     * The offset for various pixel orientations. Keys must be upper-case names.
+     *
+     * @todo Uncomment the additional enums if we add those code lists to GeoAPI.
      */
     private static Map/*<PixelOrientation, Point2D.Double>*/ ORIENTATIONS = new HashMap(8);
     static {
@@ -91,6 +92,10 @@ public class GridGeometry2D extends GeneralGridGeometry {
         ORIENTATIONS.put(PixelOrientation.UPPER_RIGHT, new Point2D.Double( 0.5, -0.5));
         ORIENTATIONS.put(PixelOrientation.LOWER_LEFT,  new Point2D.Double(-0.5,  0.5));
         ORIENTATIONS.put(PixelOrientation.LOWER_RIGHT, new Point2D.Double( 0.5,  0.5));
+//      ORIENTATIONS.put(PixelOrientation.LEFT,        new Point2D.Double(-0.5,  0.0));
+//      ORIENTATIONS.put(PixelOrientation.RIGHT,       new Point2D.Double( 0.5,  0.0));
+//      ORIENTATIONS.put(PixelOrientation.UPPER,       new Point2D.Double( 0.0, -0.5));
+//      ORIENTATIONS.put(PixelOrientation.LOWER,       new Point2D.Double( 0.0,  0.5));
     }
 
     /**
@@ -371,7 +376,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         e.initCause(cause); // TODO: Move in constructor's argument when we
         throw e;            //       will be allowed to compile for J2SE 1.5.
     }
-    
+
     /**
      * Inverses the specified math transform. This method is invoked by constructors only. It wraps
      * {@link NoninvertibleTransformException} into {@link IllegalArgumentException}, since failures
@@ -502,14 +507,14 @@ public class GridGeometry2D extends GeneralGridGeometry {
         assert !isDefined(GRID_RANGE);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
     }
-    
+
     /**
      * @deprecated Renamed as {@link #getGridToCRS2D()}.
      */
     public MathTransform2D getGridToCoordinateSystem2D() throws InvalidGridGeometryException {
         return getGridToCRS2D();
     }
-    
+
     /**
      * Returns a math transform for the two dimensional part. This is a convenience method for
      * working on horizontal data while ignoring vertical or temporal dimensions.
@@ -578,18 +583,52 @@ public class GridGeometry2D extends GeneralGridGeometry {
         if (PixelOrientation.CENTER.equals(orientation)) {
             return gridToCRS;
         }
-        final Point2D.Double offset = (Point2D.Double) ORIENTATIONS.get(orientation);
-        if (offset == null) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "orientation", orientation));
-        }
+        final Point2D.Double offset = getDirectPixelTranslation(orientation);
         final int dimension = gridToCRS.getSourceDimensions();
         final Matrix matrix = MatrixFactory.create(dimension + 1);
         matrix.setElement(gridDimensionX, dimension, offset.x);
         matrix.setElement(gridDimensionY, dimension, offset.y);
         return ConcatenatedTransform.create(ProjectiveTransform.create(matrix), gridToCRS);
     }
-    
+
+    /**
+     * Like {@link #getPixelTranslation} but without cloning the returned value.
+     */
+    private static Point2D.Double getDirectPixelTranslation(final PixelOrientation orientation)
+            throws IllegalArgumentException
+    {
+        final Point2D.Double offset = (Point2D.Double) ORIENTATIONS.get(orientation);
+        if (offset == null) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "orientation", orientation));
+        }
+        return offset;
+    }
+
+    /**
+     * Returns the specified position relative to the pixel center.
+     * This method returns a value from the following table:
+     * <p>
+     * <table>
+     *   <tr><th>Pixel orientation</th>                               <th>  x </th><th>  y </th></tr>
+     *   <tr><td>{@link PixelOrientation#CENTER      CENTER}</td>     <td> 0.0</td><td> 0.0</td></tr>
+     *   <tr><td>{@link PixelOrientation#UPPER_LEFT  UPPER_LEFT}</td> <td>-0.5</td><td>-0.5</td></tr>
+     *   <tr><td>{@link PixelOrientation#UPPER_RIGHT UPPER_RIGHT}</td><td>+0.5</td><td>-0.5</td></tr>
+     *   <tr><td>{@link PixelOrientation#LOWER_LEFT  LOWER_LEFT}</td> <td>-0.5</td><td>+0.5</td></tr>
+     *   <tr><td>{@link PixelOrientation#LOWER_RIGHT LOWER_RIGHT}</td><td>+0.5</td><td>+0.5</td></tr>
+     * </table>
+     *
+     * @param  orientation The pixel orientation.
+     * @return The position relative to the pixel center.
+     * @throws IllegalArgumentException if the specified orientation is not known.
+     * @since 2.4
+     */
+    public static Point2D getPixelTranslation(final PixelOrientation orientation)
+            throws IllegalArgumentException
+    {
+        return (Point2D) getDirectPixelTranslation(orientation).clone();
+    }
+
     /**
      * Transforms a point using the inverse of {@link #getGridToCRS2D()}.
      *
@@ -610,7 +649,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         }
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
-    
+
     /**
      * Returns the pixel coordinate of a rectangle containing the
      * specified geographic area. If the rectangle can't be computed,

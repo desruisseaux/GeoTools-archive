@@ -254,13 +254,13 @@ public class NetcdfMetadata extends GeographicMetadata {
         if (axis instanceof CoordinateAxis1D) {
             final CoordinateAxis1D axis1D = (CoordinateAxis1D) axis;
             final ImageGeometry geometry = getGeometry();
-            if (axis1D.isRegular()) {
+            final int length = axis1D.getDimension(0).getLength();
+            if (length > 2 && axis1D.isRegular()) {
                 // Reminder: pixel orientation is "center", maximum value is inclusive.
                 final double increment = axis1D.getIncrement();
                 final double start     = axis1D.getStart();
-                final int    length    = axis1D.getDimension(0).getLength() - 1;
-                final double end       = start + increment * length;
-                geometry.addCoordinateRange(0, length, start, end);
+                final double end       = start + increment * (length - 1); // Inclusive
+                geometry.addCoordinateRange(0, length-1, start, end);
             } else {
                 final double[] values = axis1D.getCoordValues();
                 geometry.addCoordinateValues(0, values);
