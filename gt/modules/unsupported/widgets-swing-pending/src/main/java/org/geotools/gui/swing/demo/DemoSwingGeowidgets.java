@@ -64,13 +64,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * @author johann sorel
  */
 public class DemoSwingGeowidgets extends javax.swing.JFrame {
-    
+
     private ImageIcon ICO_CHECK = IconBundle.getResource().getIcon("16_check");
     private ImageIcon ICO_ERROR = IconBundle.getResource().getIcon("16_error");
     private ImageIcon ICO_WARNING = IconBundle.getResource().getIcon("16_warning");
     private ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
-    
-    
     private MapContext _context;
     private MapLayer _layer;
     private JContextTree tree;
@@ -78,14 +76,13 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private JLightMapPaneControl lightcontrol;
     private JDataChooser.STATE state = JDataChooser.STATE.BUTTONED;
     private int nb = 1;
-    
-    
+
     /** Creates new form DemoSwingGeowidgets */
     public DemoSwingGeowidgets() {
         initComponents();
         setLocationRelativeTo(null);
 
-        
+
         Map hash;
         DataStore store;
         FeatureSource fs;
@@ -93,80 +90,78 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         MapLayer layer;
         try {
             _context = new DefaultMapContext(CRS.decode("EPSG:4326"));
-            
+
             hash = new HashMap();
             hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
-            store = DataStoreFinder.getDataStore( hash );
+            store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RandomStyleFactory.createRandomVectorStyle(fs);
-            layer = new DefaultMapLayer(fs,style);
-            layer.setTitle( "demo_polygon.shp" );
+            layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("demo_polygon.shp");
             _context.addLayer(layer);
             _layer = layer;
-            
+
             hash = new HashMap();
             hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
-            store = DataStoreFinder.getDataStore( hash );
+            store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RandomStyleFactory.createRandomVectorStyle(fs);
-            layer = new DefaultMapLayer(fs,style);
-            layer.setTitle( "demo_line.shp" );
+            layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("demo_line.shp");
             _context.addLayer(layer);
-            
+
             hash = new HashMap();
             hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
-            store = DataStoreFinder.getDataStore( hash );
+            store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RandomStyleFactory.createRandomVectorStyle(fs);
-            layer = new DefaultMapLayer(fs,style);
-            layer.setTitle( "demo_point.shp" );
+            layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("demo_point.shp");
             _context.addLayer(layer);
-            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         _context.setTitle("DemoContext");
-        
-               
+
+
         /************************JCONTEXTTREE**********************************/
-        titled_jcontexttree.setLeftDecoration( new JLabel( ICO_INFORMATION )  );
+        titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
         tree = new JContextTree(true);
         tree.addMapContext(_context);
         tree.getTreeTable().expandAll();
-        pan_jcontexttree.setLayout(new GridLayout(1,1));
+        pan_jcontexttree.setLayout(new GridLayout(1, 1));
         pan_jcontexttree.add(tree);
-        
+
         /***********************JMAPPANE***************************************/
         map = new JMapPane();
         map.setOpaque(false);
-        map.setRenderer( new ShapefileRenderer());
+        map.setRenderer(new ShapefileRenderer());
         map.setContext(_context);
-        pan_jmappane.setLayout(new GridLayout(1,1));
+        pan_jmappane.setLayout(new GridLayout(1, 1));
         pan_jmappane.add(map);
-        
+
         /*try {
-            map.setMapArea(map.getContext().getLayerBounds());
+        map.setMapArea(map.getContext().getLayerBounds());
         } catch (IOException ex) {
-            ex.printStackTrace();
+        ex.printStackTrace();
         }
         map.revalidate();*/
-        
+
         /************************JLIGHTMAPPANECONTROL**************************/
-        pan_lightmappanecontrol.setLeftDecoration( new JLabel(ICO_INFORMATION)  );
+        pan_lightmappanecontrol.setLeftDecoration(new JLabel(ICO_INFORMATION));
         lightcontrol = new JLightMapPaneControl();
         lightcontrol.setMapPane(map);
         pan_lightmappanecontrol.add(lightcontrol);
-        
-        
-         
+
+
+
         /************************LISTENER**************************************/
-        pan_listener.setLayout(new GridLayout(1,1));
-        ContextTreeListener ecouteur = new ContextTreeListener( map );
-        pan_listener.add( ecouteur );
-        tree.addTreeListener( ecouteur );
-               
+        pan_listener.setLayout(new GridLayout(1, 1));
+        ContextTreeListener ecouteur = new ContextTreeListener(map);
+        pan_listener.add(ecouteur);
+        tree.addTreeListener(ecouteur);
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -495,7 +490,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-            
+
     private void actionAddContext(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddContext
         DefaultMapContext context;
         try {
@@ -508,27 +503,39 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         } catch (FactoryException ex) {
             ex.printStackTrace();
         }
-        
     }//GEN-LAST:event_actionAddContext
-    
+
     private void actionDataButtoned(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDataButtoned
         state = JDataChooser.STATE.BUTTONED;
     }//GEN-LAST:event_actionDataButtoned
-    
+
     private void actionDataTabbed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDataTabbed
         state = JDataChooser.STATE.TABBED;
     }//GEN-LAST:event_actionDataTabbed
-    
+
     private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
-        List<DataPanel> lst = new ArrayList<DataPanel>();        
-        
-        if(chk_file.isSelected()) lst.add(new JFileDataPanel());
-        if(chk_database.isSelected()) lst.add(new JDatabaseDataPanel());        
-        if(chk_server.isSelected()) lst.add(new ServerDataPanel());        
-        JDataChooser.showDialog(lst,state);
-        
+
+        if (tree.getActiveContext() != null) {
+            List<DataPanel> lst = new ArrayList<DataPanel>();
+
+            if (chk_file.isSelected()) {
+                lst.add(new JFileDataPanel());
+            }
+            if (chk_database.isSelected()) {
+                lst.add(new JDatabaseDataPanel());
+            }
+            if (chk_server.isSelected()) {
+                lst.add(new ServerDataPanel());
+            }
+            List<MapLayer> layers = JDataChooser.showDialog(lst, state);
+
+
+            for (MapLayer layer : layers) {
+                tree.getActiveContext().addLayer(layer);
+            }
+        }
     }//GEN-LAST:event_dataChooserAction
-    
+
     private void exitAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitAction
         System.exit(0);
     }//GEN-LAST:event_exitAction
@@ -538,12 +545,12 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         dia_about.setSize(400, 200);
         dia_about.setVisible(true);
     }//GEN-LAST:event_menuAbout
-    
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-                
+    public static void main(String[] args) {
+
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
@@ -555,12 +562,10 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         } catch (IllegalAccessException ex) {
             ex.printStackTrace();
         }
-        
-        
+
+
         new DemoSwingGeowidgets().setVisible(true);
- 
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBoxMenuItem chk_database;
     private javax.swing.JCheckBoxMenuItem chk_file;
@@ -596,54 +601,50 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private javax.swing.JPanel pan_listener;
     private org.jdesktop.swingx.JXTitledPanel titled_jcontexttree;
     // End of variables declaration//GEN-END:variables
-    
 }
 
-
-
-
 class ContextTreeListener extends JXTitledPanel implements TreeListener {
-    
+
     private JTextArea txt = new JTextArea();
     private JMapPane map;
     private String message = "";
-    
-    /** Creates a new instance of JXTreeTableFrameListener 
-     * @param map 
+
+    /** Creates a new instance of JXTreeTableFrameListener
+     * @param map
      */
     public ContextTreeListener(JMapPane map) {
         super();
         this.map = map;
         setTitle("TreeListener");
-        setLeftDecoration( new JLabel(IconBundle.getResource().getIcon("16_information"))  );
+        setLeftDecoration(new JLabel(IconBundle.getResource().getIcon("16_information")));
         txt.setFont(new Font("Arial", Font.PLAIN, 8));
         setPreferredSize(new Dimension(100, 120));
         add(BorderLayout.CENTER, new JScrollPane(txt));
     }
-    
+
     public void ContextAdded(TreeEvent event) {
         message = "ADDED index: ";
         message += event.getFromIndex();
         message += "  who: " + event.getMapContext().getTitle();
         txt.setText(txt.getText() + message + "\n");
     }
-    
+
     public void ContextRemoved(TreeEvent event) {
         message = "REMOVED index: ";
         message += event.getFromIndex();
         message += "  who: " + event.getMapContext().getTitle();
         txt.setText(txt.getText() + message + "\n");
     }
-    
+
     public void ContextActivated(TreeEvent event) {
         message = "ACTIVATED index: ";
         message += event.getFromIndex();
         message += "  who: " + ((event.getMapContext() != null) ? event.getMapContext().getTitle() : "null");
         txt.setText(txt.getText() + message + "\n");
-        
+
         map.setContext(event.getMapContext());
-        
-        if(map.getContext() != null){
+
+        if (map.getContext() != null) {
             try {
                 map.setMapArea(map.getContext().getLayerBounds());
                 map.setReset(true);
@@ -653,9 +654,8 @@ class ContextTreeListener extends JXTitledPanel implements TreeListener {
                 Logger.getLogger(ContextTreeListener.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-       
     }
-    
+
     public void ContextMoved(TreeEvent event) {
         message = "MOVED indexes: ";
         message += event.getFromIndex() + " > " + event.getToIndex();

@@ -65,7 +65,7 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
                 final Object obj = node.getUserObject();
-                
+
                 if (obj != null) {
                     if (obj instanceof StylePanel) {
                         activePanel = (StylePanel) obj;
@@ -73,6 +73,7 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
                         lbl_title.setIcon(((StylePanel) obj).getIcon());
 
                         SwingUtilities.invokeLater(new Runnable() {
+
                             public void run() {
                                 pan_style.removeAll();
                                 pan_style.add(((StylePanel) obj).getPanel());
@@ -208,6 +209,13 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
     private void init() {
         for (StylePanel pan : types) {
             pan.setTarget(layer);
+        }
+
+        if (types.size() > 0) {
+            pan_style.removeAll();
+            pan_style.add(types.get(0).getPanel());
+            pan_style.revalidate();
+            pan_style.repaint();
         }
     }
 

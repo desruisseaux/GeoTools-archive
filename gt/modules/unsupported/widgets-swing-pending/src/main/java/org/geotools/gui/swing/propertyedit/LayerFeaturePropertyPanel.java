@@ -20,11 +20,13 @@ import org.geotools.gui.swing.i18n.TextBundle;
 import com.vividsolutions.jts.geom.Geometry;
 import java.awt.Color;
 import java.awt.Component;
+import java.io.IOException;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.gui.swing.propertyedit.model.FeatureSourceModel;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellEditor;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellRenderer;
 import org.geotools.map.MapLayer;
@@ -88,19 +90,17 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
 
         tab_data.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         jScrollPane1.setViewportView(tab_data);
 
         jcb_edit.setText("Editer");
         jcb_edit.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jcb_edit.setEnabled(false);
         jcb_edit.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jcb_edit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -109,7 +109,9 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         });
 
         jbu_action.setText("Action");
+        jbu_action.setEnabled(false);
 
+        jcb_collection.setEnabled(false);
         jcb_collection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionCollection(evt);
@@ -120,7 +122,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jcb_collection, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -132,14 +134,14 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jbu_action)
                     .add(jcb_collection, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jcb_edit))
-                .addContainerGap())
+                    .add(jcb_edit)
+                    .add(jbu_action))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -170,22 +172,26 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     // End of variables declaration//GEN-END:variables
 
     public void setTarget(Object target) {
-        /* store = null;
-        layer = (MapLayer)target;
-        source = layer.getFeatureSource();
-        if( source instanceof FeatureStore ){
-        store = (FeatureStore) source;
-        editable = true;
-        } else {
-        editable = false;
+
+        if (target instanceof MapLayer) {
+            store = null;
+            source = null;
+            layer = (MapLayer) target;
+            source = layer.getFeatureSource();
+
+            if (source instanceof FeatureStore) {
+                store = (FeatureStore) source;
+                editable = true;
+            } else {
+                editable = false;
+            }
+            setEditable(editable);
+            
+            tab_data.setModel(new FeatureSourceModel(tab_data,source));
         }
-        setEditable(editable);
-        try {
-        FeatureCollection col = source.getFeatures(layer.getQuery());
-        tab_data.setModel(new FeatureSourceModel(tab_data,col,source));
-        } catch (IOException ex) {
-        ex.printStackTrace();
-        }*/
+
+            
+        
     }
 
     public void apply() {
@@ -217,9 +223,9 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }
 
     private void setEditable(boolean editable) {
-        jcb_collection.setEnabled(editable);
+        /*jcb_collection.setEnabled(editable);
         jcb_edit.setEnabled(editable);
-        jbu_action.setEnabled(editable);
+        jbu_action.setEnabled(editable);*/
     }
 
     public void revert() {
