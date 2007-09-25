@@ -52,6 +52,8 @@ import org.geotools.resources.i18n.Errors;
  *
  * @see <A HREF="http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/WarpGrid.html">WarpGrid at JAI </A>
  *
+ * @source $URL$
+ * @version $id$
  * @author jezekjan
  *
  */
@@ -449,11 +451,11 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             }
            
         	WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,                   
-        			values[0].length,
-                    values.length,1, null);
+        			values[0].length ,
+                    values.length  ,1, null);
             for (int i = 0; i < values.length; i++) {
-                for (int j = 1; j < values[0].length; j++) {
-                    
+                for (int j = 0; j < values[0].length; j++) {
+                   
                     raster.setSample(j, i, 0, values[i][j]);
                     
                 
