@@ -156,7 +156,10 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 }
             }
         }
-        return new ProjectiveTransform(matrix);
+        switch (dimension) {
+            case 2:  return new ProjectiveTransform2D(matrix);
+            default: return new ProjectiveTransform  (matrix);
+        }
     }
 
     /**
