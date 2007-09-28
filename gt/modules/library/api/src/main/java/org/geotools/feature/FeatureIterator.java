@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeature;
+
 
 /**
  * A drop in replacement for Iterator that does not require casting for Java 1.4 code.
@@ -42,7 +44,7 @@ public interface FeatureIterator {
      *
      * @throws java.util.NoSuchElementException If no more Features exist.
      */
-    public Feature next() throws java.util.NoSuchElementException;
+    public SimpleFeature next() throws java.util.NoSuchElementException;
 
     /**
      * Required so FeatureCollection classes can implement close( FeatureIterator ).
