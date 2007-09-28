@@ -26,6 +26,7 @@ import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.*;
 import org.opengis.filter.expression.*;
 import org.opengis.filter.spatial.*;
@@ -662,21 +663,21 @@ public class DataUtilities {
      * @throws IOException If provided features Are null or empty
      * @throws NoSuchElementException DOCUMENT ME!
      */
-    public static FeatureReader reader(final Feature[] features)
+    public static FeatureReader reader(final SimpleFeature[] features)
         throws IOException {
         if ((features == null) || (features.length == 0)) {
             throw new IOException("Provided features where empty");
         }
     
         return new FeatureReader() {
-                Feature[] array = features;
+                SimpleFeature[] array = features;
                 int offset = -1;
 
-                public FeatureType getFeatureType() {
+                public SimpleFeatureType getFeatureType() {
                     return features[0].getFeatureType();
                 }
 
-                public Feature next(){
+                public SimpleFeature next(){
                     if (!hasNext()) {
                         throw new NoSuchElementException("No more features");
                     }
@@ -1161,17 +1162,16 @@ public class DataUtilities {
      * @return The string "specification" for the featureType
      */
     public static String spec(SimpleFeatureType featureType) {
-        AttributeType[] types = featureType.getAttributeTypes();
         StringBuffer buf = new StringBuffer();
 
-        for (int i = 0; i < types.length; i++) {
-            buf.append(types[i].getLocalName());
+        for (Iterator<AttributeDescriptor> it = featureType.getAttributes().iterator(); it.hasNext();) {
+        	AttributeDescriptor ad = it.next();
+            buf.append(ad.getLocalName());
             buf.append(":");
-            buf.append(typeMap(types[i].getBinding()));
+            buf.append(typeMap(ad.getType().getBinding()));
 
-            if (i < (types.length - 1)) {
+            if (it.hasNext())
                 buf.append(",");
-            }
         }
 
         return buf.toString();
