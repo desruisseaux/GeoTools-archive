@@ -25,7 +25,8 @@ import java.util.logging.Logger;
 
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.SimpleFeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -573,7 +574,7 @@ public abstract class AbstractDataStore implements DataStore {
      * @throws SchemaNotFoundException 
      * @throws IOException
      */
-    protected Envelope getBounds(Query query) throws IOException{
+    protected ReferencedEnvelope getBounds(Query query) throws IOException{
         return null; // too expensive
     }
 
