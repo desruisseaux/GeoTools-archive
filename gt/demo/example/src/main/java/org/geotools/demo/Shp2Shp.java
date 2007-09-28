@@ -23,7 +23,10 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -46,7 +49,7 @@ public class Shp2Shp {
 	 */
 	public static void main(String[] args) throws Exception {
 		File file = getCSVFile(args);
-		FeatureType type = DataUtilities.createType("Location", "location:Point,name:String");		
+		SimpleFeatureType type = DataUtilities.createType("Location", "location:Point,name:String");
 
 		FeatureCollection collection = FeatureCollections.newCollection();
 		BufferedReader reader = new BufferedReader( new FileReader( file ));
@@ -61,7 +64,7 @@ public class Shp2Shp {
 				
 				GeometryFactory factory = new GeometryFactory();
 				Point point = factory.createPoint( new Coordinate(longitude,latitude));
-				Feature feature = type.create( new Object[]{point, name} );
+				SimpleFeature feature = SimpleFeatureBuilder.build(  type, new Object[]{point, name}, null );
 
 				collection.add( feature );
 			}

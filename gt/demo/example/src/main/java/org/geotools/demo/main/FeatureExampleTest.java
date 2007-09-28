@@ -1,18 +1,14 @@
 package org.geotools.demo.main;
 
-import junit.framework.TestCase;
-
-import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import junit.framework.TestCase;
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.Feature;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * This class collects several examples on the use of DefaultFeature.
@@ -31,21 +27,22 @@ public class FeatureExampleTest extends TestCase {
 
     public void testHowToCreateAFeature() throws Exception{
         GeometryFactory geomFactory = new GeometryFactory();
-        FeatureType type = DataUtilities.createType("location","geom:Point,name:String");
+        SimpleFeatureType type = DataUtilities.createType("location","geom:Point,name:String");
         Object attributes[] = new Object[2];
         attributes[0] = geomFactory.createPoint( new Coordinate(40,50));
         attributes[1] = "fred";
-        Feature feature = type.create( attributes );        
+        SimpleFeature feature = SimpleFeatureBuilder.build( type, attributes, null );
     }
     
     public void testDefaultAttributeValues() throws Exception {
-        FeatureType type = DataUtilities.createType("location","geom:Point,name:String");
+        SimpleFeatureType type = DataUtilities.createType("location","geom:Point,name:String");
         
         Object defaultValues[] = new Object[ type.getAttributeCount() ];
         for( int i = 0 ; i < type.getAttributeCount(); i++) {
            AttributeDescriptor attributeType = type.getAttribute( i );
            defaultValues[ i ] = attributeType.getDefaultValue();
         }
-        Feature feature = type.create( defaultValues );
+
+        SimpleFeature feature = SimpleFeatureBuilder.build(  type, defaultValues, null );
     }
 }

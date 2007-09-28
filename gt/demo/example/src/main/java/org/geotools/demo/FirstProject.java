@@ -22,9 +22,9 @@ import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class FirstProject {
     public static void main(String[] args) throws Exception {
@@ -42,14 +42,13 @@ public class FirstProject {
         System.out.println("Reading content " + typeName);
         FeatureSource featureSource = dataStore.getFeatureSource(typeName);
 
-        FeatureType schema = featureSource.getSchema();
-        System.out.println("Header: " + DataUtilities.spec(schema));
+        SimpleFeatureType simpleFeatureType = featureSource.getSchema();
+        System.out.println("Header: " + DataUtilities.spec( simpleFeatureType ));
 
         DefaultQuery query = new DefaultQuery();
         query.setTypeName(typeName);
 
-        CoordinateReferenceSystem prj = schema.getDefaultGeometry()
-                .getCoordinateSystem();
+        CoordinateReferenceSystem prj = simpleFeatureType.getCRS();
         if (prj == null) {
             prj = getCoordinateReferenceSystem("No projection fround for "
                     + file + " please choose one:");

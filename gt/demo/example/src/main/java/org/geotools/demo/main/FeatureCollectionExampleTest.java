@@ -1,33 +1,28 @@
 package org.geotools.demo.main;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import junit.framework.TestCase;
-
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.*;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.function.Classifier;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class collects several examples on the use of DefaultFeatureCollection.
@@ -47,26 +42,26 @@ import com.vividsolutions.jts.geom.Point;
  * @author Jody Garnett
  */
 public class FeatureCollectionExampleTest extends TestCase {
-    FeatureCollection features;
-    private Feature feature1;
+    private FeatureCollection features;
+    private SimpleFeature feature1;
     
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         GeometryFactory geomFactory = new GeometryFactory();
         
-        FeatureType type = DataUtilities.createType("location","geom:Point,name:String,age:Integer");
-        List<Feature> list = new ArrayList<Feature>();
+        SimpleFeatureType type = DataUtilities.createType("location","geom:Point,name:String,age:Integer");
+        List<SimpleFeature> list = new ArrayList<SimpleFeature>();
         Point point1 = geomFactory.createPoint( new Coordinate(40,50));
-        feature1 = type.create( new Object[]{ point1, "name1", 17} );
+        feature1 = SimpleFeatureBuilder.build( type, new Object[]{ point1, "name1", 17}, null );
         list.add( feature1 );
         
         Point point2 = geomFactory.createPoint( new Coordinate(30,45));
-        list.add( type.create( new Object[]{ point2, "name2",24} ) );
+        list.add( SimpleFeatureBuilder.build( type, new Object[]{ point2, "name2", 24 }, null ) );
         
         Point point3 = geomFactory.createPoint( new Coordinate(35,46));
-        list.add( type.create( new Object[]{ point3, "name2",24} ) );
-        
+        list.add( SimpleFeatureBuilder.build( type, new Object[]{ point3, "name3", 24 }, null ) );
+
         features = DataUtilities.collection( list );        
     }
     /**
@@ -89,10 +84,13 @@ public class FeatureCollectionExampleTest extends TestCase {
         
         FeatureCollection collection = FeatureCollections.newCollection("internal");
         
-        FeatureType type = DataUtilities.createType("location","geom:Point,name:String");        
-        collection.add( type.create( new Object[]{ point1, "name1"} ) );
-        collection.add( type.create( new Object[]{ point2, "name2"} ) );        
+        SimpleFeatureType type = DataUtilities.createType("location","geom:Point,name:String");
+        final SimpleFeature feature1 = SimpleFeatureBuilder.build( type, new Object[]{ point1, "name1" }, null );
+        final SimpleFeature feature2 = SimpleFeatureBuilder.build( type, new Object[]{ point2, "name2" }, null );
+        collection.add( feature1 );
+        collection.add( feature2 );
     }
+
     public void testSum(){
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
         Function sum = ff.function("Collection_Sum", ff.property("age"));
@@ -178,16 +176,15 @@ public class FeatureCollectionExampleTest extends TestCase {
     }
     /** This example also works with Java 1.4 */
     public void testFeatureIterator(){
-        FeatureCollection collection = (FeatureCollection) features;
+        FeatureCollection collection = features;
         
-        CoordinateReferenceSystem crs = features.getSchema().getCRS();
         Envelope bounds = new Envelope();
         
         FeatureIterator features = collection.features();
         try {
             while( features.hasNext()){
-                Feature feature = features.next();
-                bounds.expandToInclude( feature.getBounds() );
+                SimpleFeature feature = features.next();
+                bounds.expandToInclude( new ReferencedEnvelope( feature.getBounds() ) );
             }
         }
         finally{

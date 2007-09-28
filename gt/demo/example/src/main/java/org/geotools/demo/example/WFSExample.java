@@ -28,6 +28,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.Intersects;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -66,7 +67,7 @@ public class WFSExample {
 		// Step 3 - discouvery
 		String typeNames[] = data.getTypeNames();
 		String typeName = typeNames[0];
-		FeatureType schema = data.getSchema( typeName );
+		SimpleFeatureType schema = data.getSchema( typeName );
 		System.out.println( "Schema Attributes:"+schema.getAttributeCount() );
 		
 		// Step 4 - target
@@ -111,7 +112,7 @@ public class WFSExample {
 		// Step 3 - discouvery
 		String typeNames[] = data.getTypeNames();
 		String typeName = typeNames[0];
-		FeatureType schema = data.getSchema( typeName );
+		SimpleFeatureType schema = data.getSchema( typeName );
 		System.out.println( "Schema Attributes:"+schema.getAttributeCount() );
 		
 		// Step 4 - target

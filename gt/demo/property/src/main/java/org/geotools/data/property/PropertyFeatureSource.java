@@ -31,6 +31,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 public class PropertyFeatureSource extends AbstractFeatureLocking {
+
+
     String typeName;
     SimpleFeatureType featureType;
     PropertyDataStore store;

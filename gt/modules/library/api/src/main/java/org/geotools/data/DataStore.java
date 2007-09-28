@@ -16,10 +16,9 @@
 package org.geotools.data;
 
 import java.io.IOException;
-
-import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.geotools.feature.SchemaException;
 
 
 /**
@@ -145,8 +144,10 @@ public interface DataStore {
      *
      * @throws IOException If typeName cannot be found
      */
+
     //FeatureType getSchema(String typeName) throws IOException;
     SimpleFeatureType getSchema(String typeName) throws IOException;
+
     /**
      * Access a FeatureSource for Query providing a high-level API.
      * <p>

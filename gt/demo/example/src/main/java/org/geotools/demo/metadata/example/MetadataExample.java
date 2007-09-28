@@ -34,6 +34,7 @@ public class MetadataExample {
         CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         System.out.println( crs.toWKT() );
     }
+    
     public static void main( String[] args ) {
         referenceDocument( Citations.EPSG );
         referenceDocument( Citations.OGC );

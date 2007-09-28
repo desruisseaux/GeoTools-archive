@@ -17,11 +17,11 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -88,6 +88,7 @@ public interface FeatureReader {
      *
      * @return the FeatureType of the Features this FeatureReader will create.
      */
+
     //FeatureType getFeatureType();
     SimpleFeatureType getFeatureType();
 
@@ -102,9 +103,10 @@ public interface FeatureReader {
      * @throws NoSuchElementException If there are no more Features in the
      *         Reader.
      */
+
     //Feature next() throws IOException, IllegalAttributeException, NoSuchElementException;
     SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException;
-    
+
     /**
      * Query whether this FeatureReader has another Feature.
      *

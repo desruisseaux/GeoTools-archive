@@ -17,10 +17,9 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Set;
-
-import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.geotools.feature.FeatureCollection;
 
 
 /**
@@ -76,10 +75,12 @@ public interface FeatureStore extends FeatureSource {
      *         length, if the object types do not match the attribute types,
      *         or if there are backend errors.
      */
+
     //void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
     //    throws IOException;
     void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
         throws IOException;
+
     /**
      * Modifies the passed attribute types with the passed objects in all
      * features that correspond to the passed OGS filter.  A convenience
@@ -92,11 +93,12 @@ public interface FeatureStore extends FeatureSource {
      * @throws IOException If modificaton is not supported, if the object type
      *         do not match the attribute type.
      */
+
     //void modifyFeatures(AttributeType type, Object value, Filter filter)
     //    throws IOException;
     void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
         throws IOException;
-    
+
     /**
      * Deletes the all the current Features of this datasource and adds the new
      * collection.  Primarily used as a convenience method for file

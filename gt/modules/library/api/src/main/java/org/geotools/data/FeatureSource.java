@@ -15,16 +15,15 @@
  */
 package org.geotools.data;
 
-import java.awt.RenderingHints;
-import java.io.IOException;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.awt.RenderingHints;
+import java.io.IOException;
+import java.util.Set;
 
 
 /**
@@ -155,6 +154,7 @@ public interface FeatureSource {
      * @task REVISIT: we could also just use DataStore to capture multi
      *       FeatureTypes?
      */
+
     //FeatureType getSchema();
     SimpleFeatureType getSchema();
 

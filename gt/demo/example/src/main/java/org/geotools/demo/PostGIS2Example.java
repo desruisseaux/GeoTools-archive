@@ -36,6 +36,8 @@ import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.gui.swing.ProgressWindow;
 import org.opengis.filter.Filter;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.PropertyDescriptor;
 
 public class PostGIS2Example {
 	
@@ -47,8 +49,8 @@ public class PostGIS2Example {
 		System.out.println("Reading content " + typeName);
 		FeatureSource featureSource = dataStore.getFeatureSource(typeName);
 
-		FeatureType schema = featureSource.getSchema();
-		System.out.println("Header: "+DataUtilities.spec( schema ));
+		SimpleFeatureType simpleFeatureType = featureSource.getSchema();
+		System.out.println("Header: "+DataUtilities.spec( simpleFeatureType ));
 		
 		JQuery dialog = new JQuery( dataStore );
 		dialog.show();
@@ -121,8 +123,8 @@ public class PostGIS2Example {
 				public void actionPerformed(ActionEvent e){
 					try {
 						String typeName = (String) typeNameSelect.getSelectedItem();
-						FeatureType schema = dataStore.getSchema( typeName );
-						display( schema );
+						SimpleFeatureType simpleFeatureType = dataStore.getSchema( typeName );
+						display( simpleFeatureType );
 					} catch (Throwable t ){
 						display( t );
 					}
@@ -209,7 +211,7 @@ public class PostGIS2Example {
 			show.setText( xml );
 		}
 
-		public void display(FeatureType schema) {
+		public void display(SimpleFeatureType schema) {
 			if( schema == null ){
 				show.setText("");
 				return;
@@ -222,7 +224,7 @@ public class PostGIS2Example {
 			buf.append( schema.getNamespace() );
 			buf.append("attributes = ([\n");
 			
-			for( AttributeType type : schema.getAttributeTypes() ){
+			for( PropertyDescriptor type : schema.getProperties() ){
 				buf.append( type.getLocalName() );
 				buf.append(" [\n");					
 				
@@ -274,7 +276,7 @@ public class PostGIS2Example {
 				return;
 			}
 			final StringBuffer buf = new StringBuffer();
-			final FeatureType schema = features.getSchema();
+			final SimpleFeatureType schema = features.getSchema();
 			buf.append( DataUtilities.spec( schema ));
 			buf.append("\n");
 			features.accepts( new AbstractFeatureVisitor(){

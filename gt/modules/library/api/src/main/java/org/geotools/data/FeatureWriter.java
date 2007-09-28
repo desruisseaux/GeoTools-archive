@@ -16,7 +16,6 @@
 package org.geotools.data;
 
 import java.io.IOException;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -66,6 +65,7 @@ public interface FeatureWriter {
      *
      * @return FeatureType this writer has been configured to create.
      */
+
     //FeatureType getFeatureType();
     SimpleFeatureType getFeatureType();
 
@@ -82,6 +82,7 @@ public interface FeatureWriter {
      *
      * @throws IOException DOCUMENT ME!
      */
+
     //Feature next() throws IOException;
     SimpleFeature next() throws IOException;
 

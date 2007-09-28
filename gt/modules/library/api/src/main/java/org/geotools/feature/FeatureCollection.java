@@ -17,13 +17,12 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
-
-import org.geotools.data.collection.ResourceCollection;
-import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.util.ProgressListener;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
+import org.geotools.data.collection.ResourceCollection;
+import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.util.ProgressListener;
 
 
 /**
@@ -262,6 +261,7 @@ public interface FeatureCollection extends ResourceCollection, Feature {
      *  </p>
      * @return FeatureType describing the "common" schema to all child features of this collection
      */
+
     //org.geotools.feature.FeatureType getSchema();
     SimpleFeatureType getSchema();
 

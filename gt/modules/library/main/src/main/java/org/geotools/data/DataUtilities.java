@@ -15,99 +15,28 @@
  */
 package org.geotools.data;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Map.Entry;
-
+import com.vividsolutions.jts.geom.*;
 import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.feature.*;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.And;
-import org.opengis.filter.ExcludeFilter;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.Id;
-import org.opengis.filter.IncludeFilter;
-import org.opengis.filter.Not;
-import org.opengis.filter.Or;
-import org.opengis.filter.PropertyIsBetween;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.PropertyIsGreaterThan;
-import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
-import org.opengis.filter.PropertyIsLessThan;
-import org.opengis.filter.PropertyIsLessThanOrEqualTo;
-import org.opengis.filter.PropertyIsLike;
-import org.opengis.filter.PropertyIsNotEqualTo;
-import org.opengis.filter.PropertyIsNull;
-import org.opengis.filter.expression.Add;
-import org.opengis.filter.expression.Divide;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.ExpressionVisitor;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.Multiply;
-import org.opengis.filter.expression.NilExpression;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.expression.Subtract;
-import org.opengis.filter.spatial.BBOX;
-import org.opengis.filter.spatial.Beyond;
-import org.opengis.filter.spatial.Contains;
-import org.opengis.filter.spatial.Crosses;
-import org.opengis.filter.spatial.DWithin;
-import org.opengis.filter.spatial.Disjoint;
-import org.opengis.filter.spatial.Equals;
-import org.opengis.filter.spatial.Intersects;
-import org.opengis.filter.spatial.Overlaps;
-import org.opengis.filter.spatial.Touches;
-import org.opengis.filter.spatial.Within;
+import org.opengis.filter.*;
+import org.opengis.filter.expression.*;
+import org.opengis.filter.spatial.*;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -899,28 +828,29 @@ public class DataUtilities {
      * <p>
      * Often used when gathering a FeatureCollection into memory.
      * 
-     * @param features FeatureCollection
+     * @param featureCollection the features to add to a new feature collection.
      * @return FeatureCollection
      */
     public static FeatureCollection collection( FeatureCollection featureCollection ){
         return new DefaultFeatureCollection( featureCollection );
     }
+
     /**
      * Copies the provided features into a FeatureCollection.
      * <p>
      * Often used when gathering a FeatureCollection into memory.
-     * 
-     * @param features FeatureCollection
+     *
+     * @param list features to add to a new FeatureCollection
      * @return FeatureCollection
      */
-    public static FeatureCollection collection( List<Feature> list ) {
+    public static FeatureCollection collection( List<SimpleFeature> list ) {
         FeatureCollection collection = FeatureCollections.newCollection();
-        for ( Feature feature : list ){
-            collection.add( list );
+        for ( SimpleFeature feature : list ){
+            collection.add( feature );
         }
         return collection;
     }
-    
+
     /**
      * Copies the provided features into a FeatureCollection.
      * <p>
@@ -928,14 +858,15 @@ public class DataUtilities {
      * featureStore.addFeatures( DataUtilities.collection(feature));
      * </code></pre>
      * 
-     * @param features Array of features
+     * @param feature a feature to add to a new collection
      * @return FeatureCollection
      */
-    public static FeatureCollection collection( Feature feature ){
+    public static FeatureCollection collection( SimpleFeature feature ){
         FeatureCollection collection = FeatureCollections.newCollection();
         collection.add(feature);
         return collection;
     }
+
     /**
      * Copies the provided reader into a FeatureCollection, reader will be closed.
      * <p>
@@ -943,7 +874,6 @@ public class DataUtilities {
      * featureStore.addFeatures( DataUtilities.collection(reader));
      * </code></pre>
      * 
-     * @param features Array of features
      * @return FeatureCollection
      */
     public static FeatureCollection collection(FeatureReader reader) throws IOException {
@@ -971,7 +901,6 @@ public class DataUtilities {
      * featureStore.addFeatures( DataUtilities.collection(reader));
      * </code></pre>
      * 
-     * @param features Array of features
      * @return FeatureCollection
      */
     public static FeatureCollection collection(FeatureIterator reader) throws IOException {
