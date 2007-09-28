@@ -22,6 +22,7 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
 
 
@@ -328,4 +329,13 @@ public interface FeatureCollection extends ResourceCollection, Feature {
      * @param order
      */
     public FeatureCollection sort(SortBy order);
+    
+    /**
+     * Get the total bounds of this collection which is calculated by doing a
+     * union of the bounds of each feature inside of it
+     *
+     * @return An Envelope containing the total bounds of this collection.
+     */
+    ReferencedEnvelope getBounds();
+
 }
