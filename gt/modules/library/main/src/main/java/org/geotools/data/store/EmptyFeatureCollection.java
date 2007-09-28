@@ -13,6 +13,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
@@ -29,7 +30,7 @@ public class EmptyFeatureCollection extends DataFeatureCollection {
 		bounds.setToNull();
 	}
 	
-	public EmptyFeatureCollection( FeatureType schema ) {
+	public EmptyFeatureCollection( SimpleFeatureType schema ) {
 		super(null,schema);
 	}
 	
