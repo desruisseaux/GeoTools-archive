@@ -2,6 +2,7 @@ package org.geotools.feature.simple;
 
 import java.rmi.server.UID;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -379,5 +380,19 @@ public class SimpleFeatureBuilder {
 	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
 	    builder.init(original);
 	    return builder.buildFeature(original.getID());
+	}
+	
+	/**
+	 * Builds a new feature whose attribute values are the default ones
+	 * @param featureType
+	 * @param featureId
+	 * @return
+	 */
+	public static SimpleFeature template(SimpleFeatureType featureType, String featureId) {
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
+		for (AttributeDescriptor ad : featureType.getAttributes()) {
+			builder.add(ad.getDefaultValue());
+		}
+		return builder.buildFeature(featureId);
 	}
 }
