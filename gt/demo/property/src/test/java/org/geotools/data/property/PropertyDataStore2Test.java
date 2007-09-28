@@ -24,9 +24,10 @@ import junit.framework.TestCase;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -98,7 +99,7 @@ public class PropertyDataStore2Test extends TestCase {
         
         
         FeatureSource road = store.getFeatureSource( "road" );
-        FeatureType origionalType = road.getSchema();
+        SimpleFeatureType origionalType = road.getSchema();
         
         DefaultQuery query = new DefaultQuery( "road", Filter.INCLUDE,
                 new String[]{ "geom", "name" } );
@@ -107,13 +108,14 @@ public class PropertyDataStore2Test extends TestCase {
         query.setCoordinateSystemReproject( world ); // TO
                 
         FeatureCollection features = road.getFeatures( query );
-        FeatureType resultType = features.getSchema();
+        SimpleFeatureType resultType = features.getSchema();
         
         
         assertNotNull( resultType );
         assertNotSame( resultType, origionalType );
-        
-        GeometryAttributeType resultGeometryType = resultType.getDefaultGeometry();
-        assertEquals( world, resultGeometryType.getCoordinateSystem() );
+
+        assertEquals( world, resultType.getCRS() );
+
+        GeometryDescriptor geometryDescriptor = resultType.getDefaultGeometry();        
     }
 }
