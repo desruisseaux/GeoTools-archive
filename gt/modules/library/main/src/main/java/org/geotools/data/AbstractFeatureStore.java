@@ -21,11 +21,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
 
@@ -93,9 +92,9 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      *
      * @throws IOException If modification could not be made
      */
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
         throws IOException {
-        modifyFeatures(new AttributeType[] { type, }, new Object[] { value, },
+        modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, },
             filter);
     }
 
@@ -132,12 +131,12 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
      * @throws IOException If we could not modify Feature
      * @throws DataSourceException See IOException
      */
-    public void modifyFeatures(AttributeType[] type, Object[] value,
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
         Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 filter, getTransaction());
-        Feature feature;
+        SimpleFeature feature;
 
         try {
             while (writer.hasNext()) {
@@ -206,7 +205,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
     public Set addFeatures(FeatureReader reader) throws IOException {
         Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
-        Feature feature = null;
+        SimpleFeature feature = null;
         SimpleFeature newFeature;
         FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
@@ -223,7 +222,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
                 newFeature = (SimpleFeature)writer.next();
 
                 try {
-                    newFeature.setAttributes(feature.getAttributes(null));
+                    newFeature.setAttributes(feature.getAttributes());
                 } catch (Exception writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
@@ -244,7 +243,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
     public Set addFeatures(FeatureCollection collection) throws IOException {
     	Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
-        Feature feature = null;
+        SimpleFeature feature = null;
         SimpleFeature newFeature;
         FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
@@ -253,10 +252,10 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         try {
         	
             while (iterator.hasNext()) {
-                feature = (Feature) iterator.next();
+                feature = (SimpleFeature) iterator.next();
                 newFeature = (SimpleFeature)writer.next();
                 try {
-                    newFeature.setAttributes(feature.getAttributes(null));
+                    newFeature.setAttributes(feature.getAttributes());
                 } catch (Exception writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
@@ -352,7 +351,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         String typeName = getSchema().getTypeName();
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 getTransaction());
-        Feature feature;
+        SimpleFeature feature;
         SimpleFeature newFeature;
 
         try {
@@ -372,7 +371,7 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
                 newFeature = (SimpleFeature)writer.next();
 
                 try {
-                    newFeature.setAttributes(feature.getAttributes(null));
+                    newFeature.setAttributes(feature.getAttributes());
                 } catch (IllegalAttributeException writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
