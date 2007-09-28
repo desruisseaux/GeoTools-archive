@@ -21,10 +21,12 @@ import junit.framework.TestCase;
 import org.geotools.data.*;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.*;
-import org.geotools.filter.*;
+import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.filter.*;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Or;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -130,26 +132,15 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         Object val2 = reader.next().getAttribute(0);
         reader.close();
 
-        final org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
+        final FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
+        final Or filter = ff.or( ff.equals( ff.literal( val1 ), ff.property( attName ) ),
+                                 ff.equals( ff.literal( val2 ), ff.property( attName ) ) );
 
-
-
-        LogicFilter or = ff.createLogicFilter(FilterType.LOGIC_OR);
-        CompareFilter eq = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-        eq.addLeftValue(ff.createLiteralExpression(val1));
-        eq.addRightValue(ff.createAttributeExpression(schema, attName));
-        or.addFilter(eq);
-        eq = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-        eq.addLeftValue(ff.createLiteralExpression(val2));
-        eq.addRightValue(ff.createAttributeExpression(schema, attName));
-        or.addFilter(eq);
-
-        FeatureWriter writer = ds.getFeatureWriter(typeName, or,
-                Transaction.AUTO_COMMIT);
+        FeatureWriter writer = ds.getFeatureWriter(typeName, filter, Transaction.AUTO_COMMIT);
 
         assertTrue(writer.hasNext());
 
-        Feature feature = writer.next();
+        org.opengis.feature.simple.SimpleFeature feature = writer.next();
         assertEquals(val1, feature.getAttribute(0));
         writer.remove();
 
