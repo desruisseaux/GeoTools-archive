@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
@@ -59,7 +61,7 @@ public class StyleGeneratorTest extends DataTestCase {
             FeatureIterator it = filteredCollection.features();
 
             while (it.hasNext()) {
-                Feature feature = it.next();
+                SimpleFeature feature = (SimpleFeature) it.next();
                 filterInfo += ("'" + feature.getAttribute(attribName) + "'");
 
                 if (it.hasNext()) {
