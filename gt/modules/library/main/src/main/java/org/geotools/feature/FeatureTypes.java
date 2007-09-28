@@ -310,7 +310,7 @@ public class FeatureTypes {
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
     public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name, URI ns,
-            boolean isAbstract, SimpleFeatureType[] superTypes, GeometryDescriptor defaultGeometry )
+            boolean isAbstract, SimpleFeatureType[] superTypes, GeometryDescriptor   defaultGeometry )
             throws FactoryConfigurationError, SchemaException {
         return newFeatureType(types,name,ns,isAbstract,superTypes,(AttributeDescriptor)defaultGeometry);
     }
