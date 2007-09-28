@@ -553,14 +553,25 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * if it is, itself is returned. If not <code>new ReferencedEnvelpe(e,null)</code>
      * is returned.
      * </p>
-     * @param e The envelope.
-     * @return
+     * <p>
+     * If e is null, null is returned.
+     * </p>
+     * @param e The envelope.  Can be null.
+     * @return A ReferencedEnvelope using the specified envelope, or null if the envelope was null.
      */
     public static ReferencedEnvelope reference(Envelope e) {
-        if (e instanceof ReferencedEnvelope) {
-            return (ReferencedEnvelope) e;
-        }
 
-        return new ReferencedEnvelope(e, null);
+        if ( e == null )
+        {
+            return null;
+        }
+        else
+        {
+            if (e instanceof ReferencedEnvelope) {
+                return (ReferencedEnvelope) e;
+            }
+
+            return new ReferencedEnvelope(e, null);
+        }
     }
 }
