@@ -26,18 +26,17 @@ import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.FeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public class PropertyFeatureSource extends AbstractFeatureLocking {
     String typeName;
-    FeatureType featureType;
+    SimpleFeatureType featureType;
     PropertyDataStore store;
     
     long cacheTimestamp = 0;
-    Envelope cacheBounds = null;
+    ReferencedEnvelope cacheBounds = null;
     int cacheCount = -1;
     
     PropertyFeatureSource( PropertyDataStore propertyDataStore, String typeName ) throws IOException{
@@ -71,7 +70,7 @@ public class PropertyFeatureSource extends AbstractFeatureLocking {
         store.listenerManager.removeFeatureListener(this, listener);
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return featureType;
     }
     
@@ -97,7 +96,7 @@ public class PropertyFeatureSource extends AbstractFeatureLocking {
             return -1;
         }
     }
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         File file = new File( store.directory, typeName+".properties" );                
         if( cacheBounds != null && file.lastModified() == cacheTimestamp ){            
             // we have the cache
