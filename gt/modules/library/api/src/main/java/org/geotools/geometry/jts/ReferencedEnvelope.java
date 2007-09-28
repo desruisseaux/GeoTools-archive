@@ -574,4 +574,25 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
             return new ReferencedEnvelope(e, null);
         }
     }
+    
+    /**
+     * Utility method to ensure that an BoundingBox in a ReferencedEnvelope.
+     * <p>
+     * This method first checks if <tt>e</tt> is an instanceof {@link ReferencedEnvelope},
+     * if it is, itself is returned. If not <code>new ReferencedEnvelpe(e)</code>
+     * is returned.
+     * </p>
+     * @param e The envelope.
+     * @return
+     */
+    public static ReferencedEnvelope reference(BoundingBox e) {
+    	if(e == null)
+    		return null; 
+    	
+        if (e instanceof ReferencedEnvelope) {
+            return (ReferencedEnvelope) e;
+        }
+
+        return new ReferencedEnvelope(e);
+    }
 }
