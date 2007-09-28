@@ -18,7 +18,7 @@
 package org.geotools.feature;
 
 import java.util.Iterator;
-
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * The FeatureCollectionIteration provides a depth first traversal of a
@@ -179,7 +179,7 @@ public class FeatureCollectionIteration {
          *
          * @param f The Feature that was visited.
          */
-        void endFeature(Feature f);
+        void endFeature(SimpleFeature f);
 
         /**
          * The handler is visiting an Attribute of a Feature.

@@ -15,7 +15,6 @@
  */
 package org.geotools.gml.producer;
 
-import com.sun.org.omg.CORBA.AttributeDescription;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.FeatureReader;
@@ -23,10 +22,17 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.type.DateUtil;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -410,15 +416,19 @@ public class FeatureTransformer extends TransformerBase {
                     //Did FeatureResult[] so that we are sure they're all the same type.
                     //Could also consider collections here...  
                     FeatureCollection[] results = (FeatureCollection[]) o;
-                    Envelope bounds = new Envelope();
+                    ReferencedEnvelope bounds = null;
 
                     for (int i = 0; i < results.length; i++) {
-                        bounds.expandToInclude(results[i].getBounds());
+                        ReferencedEnvelope more = results[i].getBounds();
+                        if( bounds == null ){
+                            bounds = new ReferencedEnvelope( more );
+                        }
+                        else {
+                           bounds.expandToInclude(more);
+                        }
                     }
-
                     startFeatureCollection();
                     writeBounds(bounds);
-
                     for (int i = 0; i < results.length; i++) {
                         handleFeatureIterator(results[i].features());
                     }
@@ -474,9 +484,11 @@ public class FeatureTransformer extends TransformerBase {
     
                     SimpleFeatureType t = f.getFeatureType();
     
-                    for (int i = 0, ii = f.getNumberOfAttributes(); i < ii;
+                    for (int i = 0, ii = f.getAttributeCount(); i < ii;
                             i++) {
-                        handleAttribute(t.getAttributeType(i), f.getAttribute(i));
+                        AttributeDescriptor descriptor = t.getAttribute(i);
+                        Object value = f.getAttribute(i);
+                        handleAttribute( descriptor, i );
                     }
                     endFeature(f);
                 }
@@ -494,14 +506,15 @@ public class FeatureTransformer extends TransformerBase {
             throws IOException {
             try {
                 while (reader.hasNext() && running) {
-                    Feature f = reader.next();
+                    SimpleFeature f = (SimpleFeature) reader.next();
                     handleFeature(f);
 
-                    FeatureType t = f.getFeatureType();
+                    SimpleFeatureType t = f.getFeatureType();
 
-                    for (int i = 0, ii = f.getNumberOfAttributes(); i < ii;
-                            i++) {
-                        handleAttribute(t.getAttributeType(i), f.getAttribute(i));
+                    for (int i = 0, ii = f.getAttributeCount(); i < ii; i++) {
+                        AttributeDescriptor descriptor = t.getAttribute(i);
+                        Object value = f.getAttribute(i);
+                        handleAttribute( descriptor, value );
                     }
 
                     endFeature(f);
@@ -557,7 +570,7 @@ public class FeatureTransformer extends TransformerBase {
          * @throws RuntimeException if it is thorwn while writing the element
          *         or coordinates
          */
-        public void writeBounds(Envelope bounds) {
+        public void writeBounds(BoundingBox bounds) {
             try {
                 String boundedBy = geometryTranslator.getDefaultPrefix() + ":"
                     + "boundedBy";
@@ -588,12 +601,12 @@ public class FeatureTransformer extends TransformerBase {
          */
         public void endFeature(Feature f) {
             try {
-                String name = f.getFeatureType().getTypeName();
+                Name typeName = f.getType().getName();
+                String name = typeName.getLocalPart();
 
                 if (currentPrefix != null) {
                     name = currentPrefix + ":" + name;
                 }
-
                 contentHandler.endElement("", "", name);
                 contentHandler.endElement("", "", memberString);
             } catch (Exception e) {
@@ -604,15 +617,15 @@ public class FeatureTransformer extends TransformerBase {
         /**
          * handles sax for an attribute.
          *
-         * @param type DOCUMENT ME!
+         * @param descriptor DOCUMENT ME!
          * @param value DOCUMENT ME!
          *
          * @throws RuntimeException DOCUMENT ME!
          */
-        public void handleAttribute(AttributeDescription type, Object value) {
+        public void handleAttribute(AttributeDescriptor descriptor, Object value) {
             try {
                 if (value != null) {
-                    String name = type.getLocalName();
+                    String name = descriptor.getLocalName();
 
                     //HACK: this should be user configurable, along with the
 
@@ -626,7 +639,16 @@ public class FeatureTransformer extends TransformerBase {
                             && (name.equals("boundedBy")
                             && Geometry.class.isAssignableFrom(value.getClass()))) {
 
-                        writeBounds(((Geometry) value).getEnvelopeInternal());
+                        Envelope envelopeInternal = ((Geometry) value).getEnvelopeInternal();
+                        CoordinateReferenceSystem crs = null;
+                        if( descriptor instanceof GeometryDescriptor ){
+                            GeometryDescriptor geometryDescriptor = (GeometryDescriptor) descriptor;
+                            crs = geometryDescriptor.getCRS();
+                        }                     
+                        ReferencedEnvelope
+                            bounds = new ReferencedEnvelope( envelopeInternal, crs );
+                                    
+                        writeBounds( bounds);
                     } else {
                         String thisPrefix = currentPrefix;
 
@@ -682,9 +704,7 @@ public class FeatureTransformer extends TransformerBase {
 
                 SimpleFeatureType type = f.getFeatureType();
                 String name = type.getTypeName();
-                currentPrefix = getNamespaceSupport().getPrefix(f.getFeatureType()
-                                                                 .getNamespace()
-                                                                 .toString());
+                currentPrefix = getNamespaceSupport().getPrefix( type.getName().getNamespaceURI() );
 
                 if (currentPrefix == null) {
                     currentPrefix = types.findPrefix(f.getFeatureType());
@@ -693,8 +713,7 @@ public class FeatureTransformer extends TransformerBase {
                 if (currentPrefix == null) {
                     throw new RuntimeException(
                         "Could not locate namespace for FeatureType : "
-                        + type.getTypeName() + ":" + type.getNamespace()
-                        + "look up in: " + types);
+                        + name + "look up in: " + types);
                 }
 
                 if (currentPrefix != null) {
