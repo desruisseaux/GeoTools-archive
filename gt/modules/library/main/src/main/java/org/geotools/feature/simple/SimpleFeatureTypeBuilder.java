@@ -266,6 +266,14 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	/**
+	 * Sets the local name and namespace uri of the built type.
+	 */
+	public void setName(Name name) {
+	    setName( name.getLocalPart() );
+	    setNamespaceURI( name.getNamespaceURI() );
+	}
+	
+	/**
 	 * Sets the description of the built type.
 	 */
 	public void setDescription(InternationalString description) {
