@@ -449,6 +449,19 @@ public class SimpleFeatureTypeBuilder {
 		return this;
 	}
 	/**
+	 * Adds a collection of restrictions to the next attribute added to the 
+	 * <p>
+     * This value is reset after a call to {@link #add(String, Class)}
+     * </p>
+	 */
+	public SimpleFeatureTypeBuilder restrictions( List<Filter> filters ) {
+	    for ( Filter f : filters ) {
+	        attributeBuilder.addRestriction(f);
+	    }
+	    return this;
+	}
+	
+	/**
 	 * Sets the description of the next attribute added to the feature type.
 	 * <p>
 	 * This value is reset after a call to {@link #add(String, Class)}
@@ -500,6 +513,30 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	/**
+	 * Sets all the attribute specific state from a single descriptor.
+	 * <p>
+	 * This method is convenience for:
+	 * <code>
+	 * builder.minOccurs( descriptor.getMinOccurs() ).maxOccurs( descriptor.getMaxOccurs() )
+	 *     .nillable( descriptor.isNillable() )...
+	 * </code>
+	 * </p>
+	 */
+	public SimpleFeatureTypeBuilder descriptor( AttributeDescriptor descriptor ) {
+	    minOccurs( descriptor.getMinOccurs() );
+	    maxOccurs( descriptor.getMaxOccurs() );
+	    nillable( descriptor.isNillable() );
+	    namespaceURI( descriptor.getName().getNamespaceURI() );
+	    defaultValue( descriptor.getDefaultValue() );
+	    
+	    if ( descriptor instanceof GeometryDescriptor ) {
+	        crs( ( (GeometryDescriptor) descriptor).getCRS() );
+	    }
+	    
+	    return this;
+	}
+	
+	/**
 	 * Adds a new attribute w/ provided name and class.
 	 * 
 	 * <p>
@@ -544,6 +581,28 @@ public class SimpleFeatureTypeBuilder {
 		
         
 		attributes().add(descriptor);
+	}
+	
+	/**
+	 * Adds a descriptor directly to the builder.
+	 * <p>
+	 * Use of this method is discouraged. Consider using {@link #add(String, Class)}. 
+	 * </p>
+	 */
+	public void add( AttributeDescriptor descriptor ) {
+	    attributes().add(descriptor);
+	}
+
+	/**
+     * Adds an array of descriptors directly to the builder.
+     * <p>
+     * Use of this method is discouraged. Consider using {@link #add(String, Class)}.
+     * </p>
+     */
+	public void addAll( AttributeDescriptor[] descriptors ) {
+	    for ( AttributeDescriptor ad : descriptors ) {
+	        add( ad );
+	    }
 	}
 	
 	/**
