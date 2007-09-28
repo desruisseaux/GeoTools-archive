@@ -16,42 +16,18 @@
  */
 package org.geotools.arcsde.data;
 
+import com.vividsolutions.jts.geom.*;
+import junit.framework.TestCase;
+import org.geotools.data.*;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.*;
+import org.geotools.filter.*;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.*;
+
 import java.io.IOException;
 import java.util.logging.Logger;
-
-import junit.framework.TestCase;
-
-import org.geotools.data.DataStore;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
-import org.geotools.data.Transaction;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.SchemaException;
-import org.geotools.feature.SimpleFeature;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.LogicFilter;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -117,7 +93,7 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
 
         assertTrue(writer.hasNext());
 
-        Feature feature = writer.next();
+        org.opengis.feature.simple.SimpleFeature feature = writer.next();
         assertEquals(fid, feature.getID());
         writer.remove();
         assertFalse(writer.hasNext());
@@ -145,8 +121,8 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
 
         //get 2 features and build an OR'ed PropertyIsEqualTo filter
         FeatureSource fs = ds.getFeatureSource(typeName);
-        FeatureType schema = fs.getSchema();
-        AttributeType att = schema.getAttributeType(0);
+        SimpleFeatureType schema = fs.getSchema();
+        AttributeDescriptor att = schema.getAttribute(0);
         String attName = att.getLocalName();
 
         FeatureIterator reader = fs.getFeatures().features();
@@ -154,7 +130,10 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         Object val2 = reader.next().getAttribute(0);
         reader.close();
 
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        final org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
+
+
+
         LogicFilter or = ff.createLogicFilter(FilterType.LOGIC_OR);
         CompareFilter eq = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
         eq.addLeftValue(ff.createLiteralExpression(val1));

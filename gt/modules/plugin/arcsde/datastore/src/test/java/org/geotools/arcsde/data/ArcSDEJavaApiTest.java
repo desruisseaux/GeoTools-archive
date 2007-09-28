@@ -629,11 +629,11 @@ public class ArcSDEJavaApiTest extends TestCase {
 			 * Valid keywords are defined in the dbtune table.
 			 */
             if (LOGGER.isLoggable(Level.FINE)) {
-        		System.out.println("\n--> Creating a table using DBMS Default Keyword");
+        		LOGGER.fine( "\n--> Creating a table using DBMS Default Keyword");
             }                
 			table.create(colDefs, testData.getConfigKeyword());
             if (LOGGER.isLoggable(Level.FINE)) {
-    			System.out.println(" - Done.");
+    			LOGGER.fine( " - Done.");
             }
 			/*
 			 * Define the attributes of the spatial column
@@ -668,16 +668,15 @@ public class ArcSDEJavaApiTest extends TestCase {
 			 * Spatially enable the new table...
 			 */
             if (LOGGER.isLoggable(Level.FINE)) {
-        		System.out.println("\n--> Adding spatial column \"SHAPE\"...");
+        		LOGGER.fine( "\n--> Adding spatial column \"SHAPE\"...");
             }
             layer.setCreationKeyword(testData.getConfigKeyword());
 			layer.create(3, 4);
             if (LOGGER.isLoggable(Level.FINE)) {
-        		System.out.println(" - Done.");
+        		LOGGER.fine( " - Done.");
             }
 		} catch (SeException e) {
-			System.out.println(e.getSeError().getErrDesc());
-			e.printStackTrace();
+            LOGGER.throwing( this.getClass().getName(),  "testCreateBaseTable", e );
 			throw e;
 		} 
 	} // End method createBaseTable
@@ -795,21 +794,20 @@ public class ArcSDEJavaApiTest extends TestCase {
 			 * Spatially enable the new table...
 			 */
             if (LOGGER.isLoggable(Level.FINE)) {
-        		System.out.println("\n--> Adding spatial column \"SHAPE\"...");
+                LOGGER.fine("\n--> Adding spatial column \"SHAPE\"...");
             }
             layer.setCreationKeyword(testData.getConfigKeyword());
             
 			layer.create(3, 4);
             if (LOGGER.isLoggable(Level.FINE)) {
-        		System.out.println(" - Done.");
+        		LOGGER.fine(" - Done.");
             }
 
 			table.addColumn(colDefs[4]);
 			table.addColumn(colDefs[5]);
 			table.addColumn(colDefs[6]);
 		} catch (SeException e) {
-			System.out.println(e.getSeError().getErrDesc());
-			e.printStackTrace();
+            LOGGER.throwing( this.getClass().getName(),  "testCreateNonStandardSchema", e );
 			throw e;
 		} finally {
 			try {

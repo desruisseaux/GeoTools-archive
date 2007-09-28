@@ -266,12 +266,6 @@ public class ArcSDEAdapter {
 
     /**
      * Fetchs the schema for the "SQL SELECT" like view definition
-     * 
-     * @param connPool
-     * @param typeName
-     * @param viewDef
-     * @return
-     * @throws IOException
      */
     public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace, SeQueryInfo queryInfo) throws IOException {
 
@@ -628,8 +622,7 @@ public class ArcSDEAdapter {
      * qualified name of the featureclass prepended to the ArcSDE feature id.
      * ej: SDE.SDE.SOME_LAYER.1
      * 
-     * @param fid
-     *            a geotools FeatureID
+     * @param id a geotools FeatureID
      * 
      * @return an ArcSDE feature ID
      * 
@@ -653,7 +646,7 @@ public class ArcSDEAdapter {
     /**
      * DOCUMENT ME!
      * 
-     * @param stringFids
+     * @param identifiers 
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!

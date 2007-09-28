@@ -16,51 +16,24 @@
  */
 package org.geotools.arcsde.data;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.esri.sde.sdk.client.*;
+import com.vividsolutions.jts.geom.Envelope;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-
 import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-import org.geotools.data.AbstractDataStore;
-import org.geotools.data.AttributeReader;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DefaultFeatureReader;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
-import org.geotools.data.Transaction;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.data.*;
+import org.geotools.feature.*;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeCoordinateReference;
-import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeLayer;
-import com.esri.sde.sdk.client.SeQueryInfo;
-import com.esri.sde.sdk.client.SeRegistration;
-import com.esri.sde.sdk.client.SeTable;
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implements a DataStore to work upon an ArcSDE spatial database gateway.
@@ -1015,7 +988,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * 
      * @throws IOException
      */
-    protected Envelope getBounds(Query query) throws IOException {
+    protected ReferencedEnvelope getBounds(Query query) throws IOException {
         LOGGER.fine("getBounds");
 
         Envelope ev;
@@ -1039,7 +1012,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 LOGGER.fine("ArcSDE couldn't process all filters in this query, so optimized getBounds() returns null.");
         }
 
-        return ev;
+        return ReferencedEnvelope.reference( ev );
     }
 
     /**

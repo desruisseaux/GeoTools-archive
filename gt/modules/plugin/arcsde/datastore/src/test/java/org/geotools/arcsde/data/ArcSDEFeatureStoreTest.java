@@ -1,48 +1,26 @@
 package org.geotools.arcsde.data;
 
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.*;
 import junit.framework.TestCase;
-
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
-import org.geotools.data.DataStore;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
-import org.geotools.data.Transaction;
+import org.geotools.data.*;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.SchemaException;
-import org.geotools.feature.SimpleFeature;
+import org.geotools.feature.*;
 import org.geotools.feature.type.GeometricAttributeType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsEqualTo;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
@@ -112,7 +90,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         assertTrue(writer.hasNext());
 
-        Feature feature = writer.next();
+        SimpleFeature feature = writer.next();
         assertEquals(fid, feature.getID());
         writer.remove();
         assertFalse(writer.hasNext());
@@ -140,8 +118,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         //get 2 features and build an OR'ed PropertyIsEqualTo filter
         FeatureSource fs = ds.getFeatureSource(typeName);
-        FeatureType schema = fs.getSchema();
-        AttributeType att = schema.getAttributeType(0);
+        SimpleFeatureType schema = fs.getSchema();
+        AttributeDescriptor att = schema.getAttribute(0);
         String attName = att.getLocalName();
 
         FeatureIterator reader = fs.getFeatures().features();
@@ -159,7 +137,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         assertTrue(writer.hasNext());
 
-        Feature feature = writer.next();
+        SimpleFeature feature = writer.next();
         assertEquals(val1, feature.getAttribute(0));
         writer.remove();
 
@@ -333,13 +311,13 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         FeatureWriter writer = ds.getFeatureWriterAppend(typeName,
                 Transaction.AUTO_COMMIT);
 
-        Feature source;
+        SimpleFeature source;
         SimpleFeature dest;
 
         for (FeatureIterator fi = features.features(); fi.hasNext();) {
             source = fi.next();
-            dest = (SimpleFeature)writer.next();
-            dest.setAttributes(source.getAttributes((Object[]) null));
+            dest = writer.next();
+            dest.setAttributes(source.getAttributes());
             writer.write();
         }
 
@@ -407,7 +385,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             FeatureWriter writer = ds.getFeatureWriter(this.testData.getTemp_table(),
                     Transaction.AUTO_COMMIT);
-            Feature f = writer.next();
+            SimpleFeature f = writer.next();
             f.setAttribute(0, new Integer(1));
         
             writer.write();
@@ -420,7 +398,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             assertTrue(r.hasNext());
             f = r.next();
             LOGGER.info("recovered geometry " + f.getDefaultGeometry() + " from single inserted feature.");
-            assertTrue(f.getDefaultGeometry().isEmpty());
+            assertTrue(((Geometry)f.getDefaultGeometry()).isEmpty());
             //save the ID to update the feature later
             String newId = f.getID();
             assertFalse(r.hasNext());
@@ -446,7 +424,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             LineString[] lines = { gf.createLineString(coords1), gf.createLineString(coords2) };
             MultiLineString sampleMultiLine = gf.createMultiLineString(lines);
             
-            Feature toBeUpdated  = writer.next();
+            SimpleFeature toBeUpdated  = writer.next();
             toBeUpdated.setAttribute(1,sampleMultiLine);
             writer.write();
             writer.close();
@@ -500,7 +478,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.INCLUDE,
                 transaction);
 
-        Feature source;
+        SimpleFeature source;
         SimpleFeature dest;
 
         int count = 0;
@@ -512,8 +490,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         	}
 
         	source = fi.next();
-            dest = (SimpleFeature)writer.next();
-            dest.setAttributes(source.getAttributes((Object[]) null));
+            dest = writer.next();
+            dest.setAttributes(source.getAttributes());
             writer.write();
         }
 
@@ -552,14 +530,14 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         FeatureWriter writer = ds.getFeatureWriterAppend(typeName,
                 Transaction.AUTO_COMMIT);
         
-        Feature source;
+        SimpleFeature source;
         SimpleFeature dest;
 
         for (FeatureIterator fi = features.features(); fi.hasNext();) {
             assertFalse(writer.hasNext());
             source = fi.next();
-            dest = (SimpleFeature)writer.next();
-            dest.setAttributes(source.getAttributes((Object[]) null));
+            dest = writer.next();
+            dest.setAttributes(source.getAttributes());
             writer.write();
         }
 

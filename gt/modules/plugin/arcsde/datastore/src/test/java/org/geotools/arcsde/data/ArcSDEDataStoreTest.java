@@ -58,6 +58,8 @@ import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.helpers.ParserAdapter;
 
 import com.esri.sde.sdk.pe.PeFactory;
@@ -250,7 +252,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals(initialAvailableCount, pool.getAvailableCount());
             assertEquals(initialPoolSize, pool.getPoolSize());
 
-            FeatureType schema = source.getSchema();
+            SimpleFeatureType schema = source.getSchema();
 
             assertEquals("After getSchema()", initialAvailableCount, pool.getAvailableCount());
             assertEquals("After getSchema()", initialPoolSize, pool.getPoolSize());
@@ -271,7 +273,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                     layerBounds.getMinY() + 10,
                     layerBounds.getMaxX() - 10,
                     layerBounds.getMaxY() - 10,
-                    schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
+                    schema.getCRS().getName().getCode());
             
             for(int i = 0; i < 20; i++){
             	LOGGER.fine("Running iteration #" + i);
@@ -328,7 +330,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      */
     public void testGetSchema() throws IOException {
-        FeatureType schema;
+        SimpleFeatureType schema;
 
         schema = store.getSchema(testData.getPoint_table());
         assertNotNull(schema);
@@ -427,19 +429,19 @@ public class ArcSDEDataStoreTest extends TestCase {
         throws IOException, IllegalAttributeException {
         final String typeName = testData.getPoint_table();
         final DataStore ds = testData.getDataStore();
-        final FeatureType schema = ds.getSchema(typeName);
+        final SimpleFeatureType schema = ds.getSchema(typeName);
         final int queriedAttributeCount = schema.getAttributeCount() - 3;
         final String[] queryAtts = new String[queriedAttributeCount];
 
         for (int i = 0; i < queryAtts.length; i++) {
-            queryAtts[i] = schema.getAttributeType(i).getLocalName();
+            queryAtts[i] = schema.getAttribute( i).getLocalName();
         }
 
         //build the query asking for a subset of attributes
         final Query query = new DefaultQuery(typeName, Filter.INCLUDE, queryAtts);
 
         FeatureReader reader = null;
-        FeatureType resultSchema;
+        SimpleFeatureType resultSchema;
         try {
             reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
             resultSchema = reader.getFeatureType();
@@ -453,7 +455,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         for (int i = 0; i < queriedAttributeCount; i++) {
             assertEquals(queryAtts[i],
-                resultSchema.getAttributeType(i).getLocalName());
+                resultSchema.getAttribute(i).getLocalName());
         }
     }
 
@@ -468,14 +470,14 @@ public class ArcSDEDataStoreTest extends TestCase {
         throws IOException, IllegalAttributeException {
         final String typeName = testData.getPoint_table();
         final DataStore ds = testData.getDataStore();
-        final FeatureType schema = ds.getSchema(typeName);
+        final SimpleFeatureType schema = ds.getSchema(typeName);
         final int queriedAttributeCount = schema.getAttributeCount();
         final String[] queryAtts = new String[queriedAttributeCount];
 
         //build the attnames in inverse order
         for (int i = queryAtts.length, j = 0; i > 0; j++) {
             --i;
-            queryAtts[j] = schema.getAttributeType(i).getLocalName();
+            queryAtts[j] = schema.getAttribute(i).getLocalName();
         }
 
         //build the query asking for a subset of attributes
@@ -485,11 +487,11 @@ public class ArcSDEDataStoreTest extends TestCase {
         reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
         try {
 
-            FeatureType resultSchema = reader.getFeatureType();
+            SimpleFeatureType resultSchema = reader.getFeatureType();
             assertEquals(queriedAttributeCount, resultSchema.getAttributeCount());
 
             for (int i = 0; i < queriedAttributeCount; i++) {
-                assertEquals(queryAtts[i], resultSchema.getAttributeType(i).getLocalName());
+                assertEquals(queryAtts[i], resultSchema.getAttribute(i).getLocalName());
             }
         } finally {
             reader.close();
@@ -509,12 +511,12 @@ public class ArcSDEDataStoreTest extends TestCase {
     private boolean testNext(FeatureReader r)
         throws IOException, IllegalAttributeException {
         if (r.hasNext()) {
-            Feature f = r.next();
+            SimpleFeature f = r.next();
             assertNotNull(f);
             assertNotNull(f.getFeatureType());
             assertNotNull(f.getBounds());
 
-            Geometry geom = f.getDefaultGeometry();
+            Object geom = f.getDefaultGeometry();
             assertNotNull(geom);
 
             return true;
@@ -535,7 +537,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     private FeatureReader getReader(String typeName) throws IOException {
         Query q = new DefaultQuery(typeName, Filter.INCLUDE);
         FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
-        FeatureType retType = reader.getFeatureType();
+        SimpleFeatureType retType = reader.getFeatureType();
         assertNotNull(retType.getDefaultGeometry());
         assertTrue(reader.hasNext());
 
@@ -626,33 +628,33 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void testAttributeOnlyQuery() throws Exception {
         DataStore ds = testData.getDataStore();
         FeatureSource fSource = ds.getFeatureSource(testData.getLine_table());
-        FeatureType type = fSource.getSchema();
+        SimpleFeatureType type = fSource.getSchema();
         DefaultQuery attOnlyQuery = new DefaultQuery(type.getTypeName());
         List propNames = new ArrayList(type.getAttributeCount() - 1);
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
-            if (type.getAttributeType(i) instanceof GeometryAttributeType) {
+            if (type.getAttribute(i) instanceof GeometryAttributeType) {
                 continue;
             }
 
-            propNames.add(type.getAttributeType(i).getLocalName());
+            propNames.add(type.getAttribute(i).getLocalName());
         }
 
         attOnlyQuery.setPropertyNames(propNames);
 
         FeatureCollection results = fSource.getFeatures(attOnlyQuery);
-        FeatureType resultSchema = results.getSchema();
+        SimpleFeatureType resultSchema = results.getSchema();
         assertEquals(propNames.size(), resultSchema.getAttributeCount());
 
         for (int i = 0; i < propNames.size(); i++) {
             assertEquals(propNames.get(i),
-                resultSchema.getAttributeType(i).getLocalName());
+                resultSchema.getAttribute(i).getLocalName());
         }
 
         //the problem described in GEOT-408 arises in attribute reader, so
         //we must to try fetching features
         FeatureIterator iterator = results.features();
-        Feature feature = iterator.next();
+        SimpleFeature feature = iterator.next();
         iterator.close();
         assertNotNull(feature);
 
@@ -1055,10 +1057,10 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     private Filter getBBoxfilter(FeatureSource fs) throws Exception {
-        FeatureType schema = fs.getSchema();
+        SimpleFeatureType schema = fs.getSchema();
         BBOX bbe = ff.bbox(schema.getDefaultGeometry().getLocalName(),
                 -60, -55, -40, -20,
-                schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
+                schema.getCRS().getName().getCode());
         return bbe;
     }
 
