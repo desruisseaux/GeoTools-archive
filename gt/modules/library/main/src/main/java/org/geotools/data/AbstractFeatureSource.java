@@ -27,8 +27,8 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.OperationNotFoundException;
@@ -115,7 +115,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
     public FeatureCollection getFeatures(Query query) throws IOException {
-        FeatureType schema = getSchema();        
+    	SimpleFeatureType schema = getSchema();        
         String typeName = schema.getTypeName();
         
         if( query.getTypeName() == null ){ // typeName unspecified we will "any" use a default
