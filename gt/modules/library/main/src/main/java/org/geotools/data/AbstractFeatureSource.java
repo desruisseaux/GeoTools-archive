@@ -28,6 +28,7 @@ import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
@@ -191,7 +192,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
 //        return getBounds(Query.ALL); // DZ should this not return just the bounds for this type?
         return getBounds(getSchema()==null?Query.ALL:new DefaultQuery(getSchema().getTypeName()));
     }
@@ -213,9 +214,9 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         if (query.getFilter() == Filter.EXCLUDE) {
-            return new Envelope();
+            return new ReferencedEnvelope(new Envelope(), getSchema().getCRS());
         }
         
         DataStore dataStore = getDataStore();
