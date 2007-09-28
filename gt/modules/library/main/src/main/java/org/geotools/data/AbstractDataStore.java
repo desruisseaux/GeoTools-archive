@@ -24,8 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.view.DefaultView;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -163,7 +163,7 @@ public abstract class AbstractDataStore implements DataStore {
     public abstract String[] getTypeNames() throws IOException;
 
     /** Retrive schema information for typeName */
-    public abstract FeatureType getSchema(String typeName)
+    public abstract SimpleFeatureType getSchema(String typeName)
         throws IOException;
 
     /**
@@ -219,13 +219,13 @@ public abstract class AbstractDataStore implements DataStore {
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    public void createSchema(FeatureType featureType) throws IOException{
+    public void createSchema(SimpleFeatureType featureType) throws IOException{
         throw new UnsupportedOperationException("Schema creation not supported");
     }
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String, org.geotools.feature.FeatureType)
      */
-    public void updateSchema(String typeName, FeatureType featureType){
+    public void updateSchema(String typeName, SimpleFeatureType featureType){
         throw new UnsupportedOperationException("Schema modification not supported");
     }
 
@@ -246,7 +246,7 @@ public abstract class AbstractDataStore implements DataStore {
      */
     public FeatureSource getFeatureSource(final String typeName)
         throws IOException {
-        final FeatureType featureType = getSchema(typeName);
+        final SimpleFeatureType featureType = getSchema(typeName);
 
         if (isWriteable) {
             if (lockingManager != null)
@@ -264,7 +264,7 @@ public abstract class AbstractDataStore implements DataStore {
                         listenerManager.removeFeatureListener(this, listener);
                     }
 
-                    public FeatureType getSchema() {
+                    public SimpleFeatureType getSchema() {
                         return featureType;
                     }
                 };
@@ -282,7 +282,7 @@ public abstract class AbstractDataStore implements DataStore {
                         listenerManager.removeFeatureListener(this, listener);
                     }
 
-                    public FeatureType getSchema() {
+                    public SimpleFeatureType getSchema() {
                         return featureType;
                     }
                 };
@@ -300,7 +300,7 @@ public abstract class AbstractDataStore implements DataStore {
                     listenerManager.removeFeatureListener(this, listener);
                 }
 
-                public FeatureType getSchema() {
+                public SimpleFeatureType getSchema() {
                     return featureType;
                 }
             };
@@ -328,7 +328,7 @@ public abstract class AbstractDataStore implements DataStore {
                 "getFeatureReader requires Transaction: "
                 + "did you mean to use Transaction.AUTO_COMMIT?");
         }
-        FeatureType featureType = getSchema( query.getTypeName() );
+        SimpleFeatureType featureType = getSchema( query.getTypeName() );
 
         if( propertyNames != null || query.getCoordinateSystem()!=null ){
             try {
@@ -485,7 +485,7 @@ public abstract class AbstractDataStore implements DataStore {
         }
 
         if (filter == Filter.EXCLUDE) {
-            FeatureType featureType = getSchema(typeName);
+        	SimpleFeatureType featureType = getSchema(typeName);
 
             return new EmptyFeatureWriter(featureType);
         }
