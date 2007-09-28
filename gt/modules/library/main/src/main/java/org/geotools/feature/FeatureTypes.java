@@ -17,16 +17,28 @@ package org.geotools.feature;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.filter.LengthFunction;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.factory.epsg.AnsiDialectEpsgFactory;
+import org.geotools.resources.Utilities;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
@@ -72,9 +84,9 @@ public class FeatureTypes {
 	}
 	
 	/** abstract base type for all feature types */
-    public final static FeatureType ABSTRACT_FEATURE_TYPE;
+    public final static SimpleFeatureType ABSTRACT_FEATURE_TYPE;
     static {
-        FeatureType featureType = null;
+        SimpleFeatureType featureType = null;
         try {
             featureType = FeatureTypes.newFeatureType(null, "Feature",new URI("http://www.opengis.net/gml"), true);
         }
@@ -103,34 +115,36 @@ public class FeatureTypes {
      * 
      * @return an int indicating the max length of field in characters, or ANY_LENGTH
      */
-    public static int getFieldLength( AttributeType type ) {
+    public static int getFieldLength( AttributeDescriptor descriptor ) {
 
+        AttributeType type = descriptor.getType(); 
         Class colType = type.getBinding();
-        String colName = type.getLocalName();
+        String colName = descriptor.getLocalName();
 
         int fieldLen = -1;
-        Filter f = type.getRestriction();
-        if (f != null
+        for ( Filter f : type.getRestrictions()) {
+            if (f != null
                 && f != Filter.EXCLUDE
                 && f != Filter.INCLUDE
                 && (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)) {
-            try {
-                BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
-                if (cf.getExpression1() instanceof LengthFunction) {
-                    return Integer.parseInt(((Literal) cf.getExpression2()).getValue()
-                            .toString());
-                } else if (cf.getExpression2() instanceof LengthFunction) {
-                    return Integer.parseInt(((Literal) cf.getExpression1()).getValue()
-                            .toString());
-                } else {
+                try {
+                    BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
+                    if (cf.getExpression1() instanceof LengthFunction) {
+                        return Integer.parseInt(((Literal) cf.getExpression2()).getValue()
+                                .toString());
+                    } else if (cf.getExpression2() instanceof LengthFunction) {
+                        return Integer.parseInt(((Literal) cf.getExpression1()).getValue()
+                                .toString());
+                    } else {
+                        return ANY_LENGTH;
+                    }
+                } catch (NumberFormatException e) {
                     return ANY_LENGTH;
                 }
-            } catch (NumberFormatException e) {
-                return ANY_LENGTH;
             }
-        } else {
-            return ANY_LENGTH;
         }
+            
+        return ANY_LENGTH;
     }
     
     /**
@@ -140,7 +154,7 @@ public class FeatureTypes {
      * @return
      * @throws SchemaException
      */
-    public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs )
+    public static SimpleFeatureType transform( SimpleFeatureType schema, CoordinateReferenceSystem crs )
         throws SchemaException {
         return transform(schema, crs, false);
     }
@@ -154,31 +168,26 @@ public class FeatureTypes {
      * @return
      * @throws SchemaException
      */
-    public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs, boolean forceOnlyMissing)
+    public static SimpleFeatureType transform( SimpleFeatureType schema, CoordinateReferenceSystem crs, boolean forceOnlyMissing)
             throws SchemaException {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName(schema.getTypeName());
-        tb.setNamespaceURI( schema.getNamespace() );
+        tb.setNamespaceURI( schema.getName().getNamespaceURI() );
         tb.setAbstract(schema.isAbstract());
         
-        GeometryAttributeType defaultGeometryType = null;
+        GeometryDescriptor defaultGeometryType = null;
         for( int i = 0; i < schema.getAttributeCount(); i++ ) {
-            AttributeType attributeType = schema.getAttributeType(i);
-            if (attributeType instanceof GeometryAttributeType) {
-                GeometryAttributeType geometryType = (GeometryAttributeType) attributeType;
-                GeometryAttributeType forced;
+            AttributeDescriptor attributeType = schema.getAttribute(i);
+            if (attributeType instanceof GeometryDescriptor) {
+                GeometryDescriptor geometryType = (GeometryDescriptor) attributeType;
+                AttributeDescriptor forced;
 
-                if(forceOnlyMissing && geometryType.getCoordinateSystem() != null)
-                    forced = geometryType;
-                else
-                    forced = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
-                        geometryType.getLocalName(), geometryType.getBinding(), geometryType.isNillable(),
-                        0, geometryType.createDefaultValue(), crs);
-
-                if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
-                    defaultGeometryType = forced;
+                tb.descriptor( geometryType );
+                if ( !forceOnlyMissing || geometryType.getCRS() == null ) {
+                    tb.crs( crs );
                 }
-                tb.add(forced);
+                
+                tb.add( geometryType.getLocalName(), geometryType.getType().getBinding() );
             } else {
                 tb.add(attributeType);
             }
@@ -203,11 +212,11 @@ public class FeatureTypes {
      * @throws MismatchedDimensionException
      * @throws IllegalAttributeException
      */
-    public static Feature transform( Feature feature, FeatureType schema, MathTransform transform )
+    public static SimpleFeature transform( SimpleFeature feature, SimpleFeatureType schema, MathTransform transform )
             throws MismatchedDimensionException, TransformException, IllegalAttributeException {
-        feature = schema.create(feature.getAttributes(null), feature.getID());
-
-        GeometryAttributeType geomType = schema.getDefaultGeometry();
+        feature = SimpleFeatureBuilder.copy(feature); 
+            
+        GeometryDescriptor geomType = schema.getDefaultGeometry();
         Geometry geom = (Geometry) feature.getAttribute(geomType.getLocalName());
 
         geom = JTS.transform(geom, transform);
@@ -230,8 +239,8 @@ public class FeatureTypes {
      * @throws FactoryConfigurationError If there are problems creating a factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
-    public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns,
-            boolean isAbstract, FeatureType[] superTypes ) throws FactoryConfigurationError,
+    public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name, URI ns,
+            boolean isAbstract, SimpleFeatureType[] superTypes ) throws FactoryConfigurationError,
             SchemaException {
         return newFeatureType(types, name, ns, isAbstract, superTypes, null);
     }
@@ -249,14 +258,15 @@ public class FeatureTypes {
      * @throws FactoryConfigurationError If there are problems creating a factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
-    public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns,
-            boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry )
+    public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name, URI ns,
+            boolean isAbstract, SimpleFeatureType[] superTypes, AttributeDescriptor defaultGeometry )
             throws FactoryConfigurationError, SchemaException {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        
         tb.setName(name);
         tb.setNamespaceURI(ns);
         tb.setAbstract(isAbstract);
-        tb.add(types);
+        tb.addAll(types);
         
         if ( defaultGeometry != null ) {
             //make sure that the default geometry was one of the types specified
@@ -283,7 +293,7 @@ public class FeatureTypes {
             //use the default super type
             tb.setSuperType(ABSTRACT_FEATURE_TYPE);
         }
-        return (FeatureType) tb.buildFeatureType();
+        return (SimpleFeatureType) tb.buildFeatureType();
     }
 
     /**
@@ -299,10 +309,10 @@ public class FeatureTypes {
      * @throws FactoryConfigurationError If there are problems creating a factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
-    public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns,
-            boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry )
+    public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name, URI ns,
+            boolean isAbstract, SimpleFeatureType[] superTypes, GeometryDescriptor defaultGeometry )
             throws FactoryConfigurationError, SchemaException {
-        return newFeatureType(types,name,ns,isAbstract,superTypes,(AttributeType)defaultGeometry);
+        return newFeatureType(types,name,ns,isAbstract,superTypes,(AttributeDescriptor)defaultGeometry);
     }
 
     /**
@@ -317,7 +327,7 @@ public class FeatureTypes {
      * @throws FactoryConfigurationError If there are problems creating a factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
-    public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns,
+    public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name, URI ns,
             boolean isAbstract ) throws FactoryConfigurationError, SchemaException {
         return newFeatureType(types, name, ns, isAbstract, null);
     }
@@ -333,7 +343,7 @@ public class FeatureTypes {
      * @throws FactoryConfigurationError If there are problems creating a factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
-    public static FeatureType newFeatureType( AttributeType[] types, String name, URI ns )
+    public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name, URI ns )
             throws FactoryConfigurationError, SchemaException {
         return newFeatureType(types, name, ns, false);
     }
@@ -349,11 +359,28 @@ public class FeatureTypes {
      * @throws FactoryConfigurationError If there are problems creating a factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in some way.
      */
-    public static FeatureType newFeatureType( AttributeType[] types, String name )
+    public static SimpleFeatureType newFeatureType( AttributeDescriptor[] types, String name )
             throws FactoryConfigurationError, SchemaException {
         return newFeatureType(types, name, DEFAULT_NAMESPACE, false);
     }
 
+    /**
+     * Walks up the type hierachy of the feature returning all super types of 
+     * the specified feature type.
+     */
+    public static List getAncestors( FeatureType featureType ) {
+        List ancestors = new ArrayList();
+        while ( featureType.getSuper() != null ) {
+            ancestors.add( featureType.getSuper() );
+            if ( featureType.getSuper() instanceof FeatureType ) {
+                ancestors.add( featureType.getSuper() );
+                featureType = (FeatureType) featureType.getSuper();
+            }
+        }
+        
+        return ancestors;
+    }
+    
     /**
      * A query of the the types ancestor information.
      * <p>
@@ -372,50 +399,42 @@ public class FeatureTypes {
      * @param typeName typename to match against, or null for a "wildcard"
      * @return true if featureType is a decendent of the indicated namespace & typeName
      */
-    public static boolean isDecendedFrom( FeatureType featureType, URI namespace, String typeName ) {
+    public static boolean isDecendedFrom( SimpleFeatureType featureType, URI namespace, String typeName ) {
         if (featureType == null)
             return false;
-        FeatureType ancestors[] = featureType.getAncestors();
-        if (ancestors != null) {
-            TEST: for( int i = 0; i < ancestors.length; i++ ) {
-                FeatureType ancestor = ancestors[i];
-                if (namespace != null && !namespace.equals(ancestor.getNamespace())) {
-                    continue TEST;
+        
+        List ancestors = getAncestors(featureType);
+        for ( Iterator a = ancestors.iterator(); a.hasNext(); ) {
+            FeatureType superType = (FeatureType) a.next();
+            if ( namespace == null ) {
+                //dont match on namespace
+                if ( Utilities.equals(superType.getName().getLocalPart(), typeName) ) {
+                    return true;
                 }
-                if (typeName != null && !namespace.equals(ancestor.getTypeName())) {
-                    continue TEST;
-                }
-                return true; // we have a match
             }
+            else {
+                if ( Utilities.equals(superType.getName().getNamespaceURI(),namespace) && 
+                        Utilities.equals(superType.getName().getLocalPart(), typeName)) {
+                    return true;
+                }    
+            }
+            
         }
+        
         return false;
     }
-    public static boolean isDecendedFrom( FeatureType featureType, FeatureType isParentType ) {
-        if (featureType == null || isParentType == null)
-            return false;
-        FeatureType ancestors[] = featureType.getAncestors();
-        if (ancestors != null) {
-            TEST: for( int i = 0; i < ancestors.length; i++ ) {
-                FeatureType ancestor = ancestors[i];
-                if (isParentType == ancestor)
-                    return true;
-                if (false) {
-                    // hack idea #1?
-                    if (isParentType.getNamespace().equals(ancestor.getNamespace())) {
-                        continue TEST;
-                    }
-                    if (isParentType.equals(ancestor.getTypeName())) {
-                        continue TEST;
-                    }
-                    return true; // match based on namespace, typeName
-                }
-            }
+    
+    public static boolean isDecendedFrom( SimpleFeatureType featureType, SimpleFeatureType isParentType ) {
+        try {
+            return isDecendedFrom(featureType, new URI(isParentType.getName().getNamespaceURI()), isParentType.getName().getLocalPart() );
+        } 
+        catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        return false;
     }
 
     /** Exact equality based on typeNames, namespace, attributes and ancestors */
-    public static boolean equals( FeatureType typeA, FeatureType typeB ) {
+    public static boolean equals( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
         if (typeA == typeB)
             return true;
 
@@ -423,11 +442,18 @@ public class FeatureTypes {
             return false;
         }
         return equalsId(typeA, typeB)
-                && equals(typeA.getAttributeTypes(), typeB.getAttributeTypes()) &&
+                && equals(typeA.getAttributes(), typeB.getAttributes()) &&
                 equalsAncestors( typeA, typeB );
     }
     
-    public static boolean equals( AttributeType attributesA[], AttributeType attributesB[] ) {
+    public static boolean equals( List attributesA, List attributesB ) {
+        return equals( 
+            (AttributeDescriptor[]) attributesA.toArray(new AttributeDescriptor[attributesA.size()]), 
+            (AttributeDescriptor[]) attributesB.toArray(new AttributeDescriptor[attributesB.size()])
+        );
+    }
+    
+    public static boolean equals( AttributeDescriptor attributesA[], AttributeDescriptor attributesB[] ) {
         if (attributesA.length != attributesB.length)
             return false;
 
@@ -446,23 +472,22 @@ public class FeatureTypes {
      * @param typeA
      * @param typeB
      */
-    public static boolean equalsAncestors( FeatureType typeA, FeatureType typeB ) {
+    public static boolean equalsAncestors( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
         return ancestors( typeA ).equals( typeB );
     }
     
-    public static Set ancestors( FeatureType featureType ) {
-        if (featureType == null || featureType.getAncestors() == null
-                || featureType.getAncestors().length == 0) {
+    public static Set ancestors( SimpleFeatureType featureType ) {
+        if (featureType == null || getAncestors(featureType).isEmpty()) {
             return Collections.EMPTY_SET;
         }
-        return new HashSet(Arrays.asList(featureType.getAncestors()));
+        return new HashSet(getAncestors(featureType));
     }
     
-    public static boolean equals( AttributeType a, AttributeType b ) {
+    public static boolean equals( AttributeDescriptor a, AttributeDescriptor b ) {
         return a == b || (a != null && a.equals(b));
     }
     /** Quick check of namespace and typename */
-    public static boolean equalsId( FeatureType typeA, FeatureType typeB ) {
+    public static boolean equalsId( SimpleFeatureType typeA, SimpleFeatureType typeB ) {
         if (typeA == typeB)
             return true;
 
@@ -477,8 +502,8 @@ public class FeatureTypes {
         else if (!typeNameA.equals(typeNameB))
             return false;
 
-        URI namespaceA = typeA.getNamespace();
-        URI namespaceB = typeB.getNamespace();
+        String namespaceA = typeA.getName().getNamespaceURI();
+        String namespaceB = typeB.getName().getNamespaceURI();
         if (namespaceA == null && namespaceB != null)
             return false;
         else if (!namespaceA.equals(namespaceB))
