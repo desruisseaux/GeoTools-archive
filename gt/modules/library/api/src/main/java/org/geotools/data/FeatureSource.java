@@ -18,10 +18,12 @@ package org.geotools.data;
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.Set;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.filter.Filter;
+
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -152,7 +154,8 @@ public interface FeatureSource {
      * @task REVISIT: we could also just use DataStore to capture multi
      *       FeatureTypes?
      */
-    FeatureType getSchema();
+    //FeatureType getSchema();
+    SimpleFeatureType getSchema();
 
     /**
      * Gets the bounding box of this datasource.

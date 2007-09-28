@@ -16,8 +16,9 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -65,7 +66,8 @@ public interface FeatureWriter {
      *
      * @return FeatureType this writer has been configured to create.
      */
-    FeatureType getFeatureType();
+    //FeatureType getFeatureType();
+    SimpleFeatureType getFeatureType();
 
     /**
      * Reads a Feature from the underlying AttributeReader.
@@ -80,7 +82,8 @@ public interface FeatureWriter {
      *
      * @throws IOException DOCUMENT ME!
      */
-    Feature next() throws IOException;
+    //Feature next() throws IOException;
+    SimpleFeature next() throws IOException;
 
     /**
      * Removes current Feature, must be called before hasNext.

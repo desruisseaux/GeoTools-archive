@@ -16,9 +16,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import org.opengis.filter.Filter;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -85,7 +86,7 @@ public interface DataStore {
      *
      * @throws IOException If featureType cannot be created
      */
-    void createSchema(FeatureType featureType) throws IOException;
+    void createSchema(SimpleFeatureType featureType) throws IOException;
 
     /**
      * Used to force namespace and CS info into a persistent change.
@@ -104,7 +105,7 @@ public interface DataStore {
      * @param typeName
      * @throws IOException
      */
-    void updateSchema(String typeName, FeatureType featureType)
+    void updateSchema(String typeName, SimpleFeatureType featureType)
         throws IOException;
 
     /**
@@ -144,8 +145,8 @@ public interface DataStore {
      *
      * @throws IOException If typeName cannot be found
      */
-    FeatureType getSchema(String typeName) throws IOException;
-
+    //FeatureType getSchema(String typeName) throws IOException;
+    SimpleFeatureType getSchema(String typeName) throws IOException;
     /**
      * Access a FeatureSource for Query providing a high-level API.
      * <p>
