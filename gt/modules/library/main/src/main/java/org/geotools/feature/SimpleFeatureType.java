@@ -24,6 +24,7 @@ import java.util.Collection;
  * @author Ian Schneider
  * @source $URL$
  * @version $Id$
+ * @deprecated use {@link SimpleFeatureType}.
  */
 public class SimpleFeatureType extends DefaultFeatureType{
 
