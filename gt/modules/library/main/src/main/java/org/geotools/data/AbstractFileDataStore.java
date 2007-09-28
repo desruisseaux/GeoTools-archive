@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.geotools.feature.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -53,10 +54,9 @@ public abstract class AbstractFileDataStore extends AbstractDataStore {
     /**
      * Singular version, calls parent with getSchema().getTypeName()
      *
-     * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
-     *      org.geotools.feature.FeatureType)
+     * @see org.geotools.data.DataStore#updateSchema(java.lang.String,SimpleFeatureType)
      */
-    public void updateSchema(FeatureType featureType) throws IOException {
+    public void updateSchema( SimpleFeatureType featureType) throws IOException {
         updateSchema(getSchema().getTypeName(), featureType);
     }
 

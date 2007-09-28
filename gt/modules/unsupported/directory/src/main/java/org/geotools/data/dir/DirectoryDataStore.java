@@ -39,6 +39,7 @@ import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.opengis.filter.Filter;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -51,6 +52,7 @@ import org.opengis.filter.Filter;
  * @source $URL$
  */
 public class DirectoryDataStore implements DataStore, LockingManager {
+
     // the directory for this ds
     private File dir;
 
@@ -140,10 +142,8 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         return null;
     }
 
-    /**
-     * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
-     */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema( final SimpleFeatureType featureType ) throws IOException
+    {
         boolean notDone = true;
         int i = 0;
 
@@ -165,12 +165,8 @@ public class DirectoryDataStore implements DataStore, LockingManager {
         }
     }
 
-    /**
-     * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
-     *      org.geotools.feature.FeatureType)
-     */
-    public void updateSchema(String typeName, FeatureType featureType)
-        throws IOException {
+    public void updateSchema( final String typeName, final SimpleFeatureType featureType ) throws IOException
+    {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(typeName);
 
         if (afds != null) {
@@ -210,7 +206,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
 
     /**
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
-     *      org.geotools.filter.Filter, org.geotools.data.Transaction)
+            Filter, org.geotools.data.Transaction)
      */
     public FeatureWriter getFeatureWriter(String typeName, Filter filter,
         Transaction transaction) throws IOException {
