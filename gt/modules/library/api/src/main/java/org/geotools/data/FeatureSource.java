@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
@@ -178,7 +179,7 @@ public interface FeatureSource {
      *
      * @task REVISIT: Do we need this or can we use getBounds( Query.ALL )?
      */
-    Envelope getBounds() throws IOException;
+    ReferencedEnvelope getBounds() throws IOException;
 
     /**
      * Gets the bounding box of the features that would be returned by this

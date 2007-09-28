@@ -24,9 +24,10 @@ import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -88,7 +89,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 	 * to:
 	 * <ul>
 	 * 	<li>{@link FeatureSourceGeoResource}
-	 * 	<li>{@link FeatureType}
+	 * 	<li>{@link SimpleFeatureType}
 	 *  <li>{@link DataStore}
 	 *  </ul>
 	 * <p>
@@ -102,7 +103,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 		return adaptee.isAssignableFrom( Service.class ) || 
 			adaptee.isAssignableFrom( GeoResourceInfo.class ) || 
 			adaptee.isAssignableFrom( FeatureSource.class ) || 
-			adaptee.isAssignableFrom( FeatureType.class ) || 
+			adaptee.isAssignableFrom( SimpleFeatureType.class ) || 
 			adaptee.isAssignableFrom( DataStore.class );
 	}
 	
@@ -111,7 +112,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 	 * to:
 	 * <ul>
 	 * 	<li>{@link FeatureSourceGeoResource}
-	 * 	<li>{@link FeatureType}
+	 * 	<li>{@link SimpleFeatureType}
 	 *  <li>{@link DataStore}
 	 *  </ul>
 	 * <p>
@@ -133,7 +134,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 		if ( adaptee.isAssignableFrom( FeatureSource.class ) ) 
 			return featureSource( monitor );
 		
-		if ( adaptee.isAssignableFrom( FeatureType.class ) )
+		if ( adaptee.isAssignableFrom( SimpleFeatureType.class ) )
 			return parent.dataStore( monitor ).getSchema( name );
 		
 		if ( adaptee.isAssignableFrom( DataStore.class) )
@@ -191,8 +192,8 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 	 * 
 	 * <ul>
 	 * 	<li>{@link FeatureSource#getBounds()} -> {@link GeoResourceInfo#getBounds()}
-	 * 	<li>{@link FeatureType#getTypeName()} -> {@link GeoResourceInfo#getName()}
-	 * 	<li>{@link FeatureType#getNamespace()()} -> {@link GeoResourceInfo#getSchema()()}
+	 * 	<li>{@link SimpleFeatureType#getTypeName()} -> {@link GeoResourceInfo#getName()}
+	 * 	<li>{@link SimpleFeatureType#getNamespace()()} -> {@link GeoResourceInfo#getSchema()()}
 	 * </ul>
 	 * </p>
 	 * 
@@ -206,7 +207,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 
 		//calculate bounds
 		ReferencedEnvelope rBounds = null;
-		Envelope bounds = source.getBounds();
+		ReferencedEnvelope bounds = source.getBounds();
 		if ( bounds != null ) {
 			//we have an "optmized bounds", do we have a crs?
 			if ( bounds instanceof ReferencedEnvelope ) {
@@ -217,11 +218,9 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 				//since we had an optimized bounds from feature source, we would
 				// like to avoid accessing the data, so check the type for 
 				// crs info
-				FeatureType schema = source.getSchema();
+				SimpleFeatureType schema = source.getSchema();
 				if ( schema.getDefaultGeometry() != null ) {
-					CoordinateReferenceSystem crs = 
-						schema.getDefaultGeometry().getCoordinateSystem();
-					
+					CoordinateReferenceSystem crs = schema.getCRS();					
 					if ( crs != null ) {
 						rBounds = new ReferencedEnvelope( bounds, crs );
 					}
@@ -236,29 +235,33 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 			}
 		}
 		else {
+		    
 			//manually calculate the bounds
-			bounds = new Envelope();
+			bounds = new ReferencedEnvelope(source.getSchema().getCRS());
 			
 			FeatureIterator itr = source.getFeatures().features();
-			if ( itr.hasNext() ) {
-				bounds.init( itr.next().getBounds() );
-				while( itr.hasNext() ) {
-					bounds.expandToInclude( itr.next().getBounds() );
-				}
+			while( itr.hasNext() ) {
+				BoundingBox more = itr.next().getBounds();
+                bounds.include( more );
 			}
 			
-			FeatureType schema = source.getSchema();
+			
+			SimpleFeatureType schema = source.getSchema();
 			CoordinateReferenceSystem crs = null;
 			if ( schema.getDefaultGeometry() != null ) {
-				crs = schema.getDefaultGeometry().getCoordinateSystem();
+				crs = schema.getCRS();
 			}
 			
 			rBounds = new ReferencedEnvelope( bounds, crs );
 		}
 		
 		String name = source.getSchema().getTypeName();
-		URI schema = source.getSchema().getNamespace();
-		
+		URI schema;
+        try {
+            schema = new URI( source.getSchema().getName().getNamespaceURI() );
+        } catch (URISyntaxException e) {
+            schema = null;
+        }		
 		return new DefaultGeoResourceInfo( null, name, null, schema, rBounds, null, null );
 	}
 	
@@ -312,7 +315,7 @@ public class FeatureSourceGeoResource extends AbstractGeoResource {
 		return source;
 	}
 	
-	protected FeatureType featureType( ProgressListener monitor ) {
+	protected SimpleFeatureType featureType( ProgressListener monitor ) {
 		 if ( featureSource( monitor ) != null ) 
 			 return featureSource( monitor ).getSchema();
 		 

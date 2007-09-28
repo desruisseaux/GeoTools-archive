@@ -15,18 +15,18 @@
  */
 package org.geotools.gml.producer;
 
+import com.sun.org.omg.CORBA.AttributeDescription;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.type.DateUtil;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -469,10 +469,10 @@ public class FeatureTransformer extends TransformerBase {
             throws IOException {
             try {
                 while (iterator.hasNext() && running) {
-                    Feature f = iterator.next();
+                    SimpleFeature f = (SimpleFeature) iterator.next();
                     handleFeature(f);
     
-                    FeatureType t = f.getFeatureType();
+                    SimpleFeatureType t = f.getFeatureType();
     
                     for (int i = 0, ii = f.getNumberOfAttributes(); i < ii;
                             i++) {
@@ -609,7 +609,7 @@ public class FeatureTransformer extends TransformerBase {
          *
          * @throws RuntimeException DOCUMENT ME!
          */
-        public void handleAttribute(AttributeType type, Object value) {
+        public void handleAttribute(AttributeDescription type, Object value) {
             try {
                 if (value != null) {
                     String name = type.getLocalName();
@@ -676,11 +676,11 @@ public class FeatureTransformer extends TransformerBase {
          *
          * @throws RuntimeException DOCUMENT ME!
          */
-        public void handleFeature(Feature f) {
+        public void handleFeature(SimpleFeature f) {
             try {
                 contentHandler.startElement("", "", memberString, NULL_ATTS);
 
-                FeatureType type = f.getFeatureType();
+                SimpleFeatureType type = f.getFeatureType();
                 String name = type.getTypeName();
                 currentPrefix = getNamespaceSupport().getPrefix(f.getFeatureType()
                                                                  .getNamespace()
