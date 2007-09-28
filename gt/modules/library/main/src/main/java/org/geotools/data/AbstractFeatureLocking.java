@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
 /**
@@ -152,7 +153,7 @@ public abstract class AbstractFeatureLocking extends AbstractFeatureStore
         //
         FeatureIterator reader = getFeatures(query).features();
         String typeName = query.getTypeName();
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
 
         try {
@@ -228,7 +229,7 @@ public abstract class AbstractFeatureLocking extends AbstractFeatureStore
         //
         FeatureIterator reader = getFeatures(query).features();
         String typeName = query.getTypeName();
-        Feature feature;
+        SimpleFeature feature;
 
         try {
             while (reader.hasNext()) {
