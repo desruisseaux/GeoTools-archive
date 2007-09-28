@@ -36,6 +36,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -71,16 +73,16 @@ public class ShapeReader {
             FeatureSource featureSource = dataStore.getFeatureSource(typeName);
             FeatureCollection featureCollection = featureSource.getFeatures();
 
-            FeatureType featureType = featureSource.getSchema();
+            SimpleFeatureType featureType = (SimpleFeatureType) featureSource.getSchema();
             System.out.println("FID\t");
 
             // print out the normal (non geometry) attributes
             //
             for (int i = 0; i < featureType.getAttributeCount(); i++) {
-                AttributeType attributeType = featureType.getAttributeType(i);
+                AttributeDescriptor attribute = featureType.getAttribute(i);
 
-                if ( !(attributeType instanceof GeometryAttributeType)) {
-                    System.out.print(attributeType.getBinding().getName() + "\t");
+                if ( !(attribute instanceof GeometryAttributeType)) {
+                    System.out.print(attribute.getBinding().getName() + "\t");
                 }
             }
 
@@ -88,10 +90,10 @@ public class ShapeReader {
             // print out the geometry attributes
             //
             for (int i = 0; i < featureType.getAttributeCount(); i++) {
-                AttributeType at = featureType.getAttributeType(i);
+                AttributeDescriptor attribute = featureType.getAttribute(i);
 
-                if ( at instanceof GeometryAttributeType) {
-                    System.out.print(at.getLocalName() + "\t");
+                if ( attribute instanceof GeometryAttributeType) {
+                    System.out.print(attribute.getLocalName() + "\t");
                 }
             }
 

@@ -54,6 +54,7 @@ import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -1156,7 +1157,7 @@ public class DataUtilities {
      *
      * @throws SchemaException
      */
-    public static FeatureType createType(String identification, String typeSpec)
+    public static SimpleFeatureType createType(String identification, String typeSpec)
         throws SchemaException {
         int split = identification.lastIndexOf('.');
         String namespace = (split == -1) ? null
@@ -1224,13 +1225,13 @@ public class DataUtilities {
     /**
      * A "quick" String representation of a FeatureType.
      * <p>
-     * This string represenation may be used with createType( name, spec ).
+     * This string representation may be used with createType( name, spec ).
      * </p>
      * @param featureType FeatureType to represent
      *
      * @return The string "specification" for the featureType
      */
-    public static String spec(FeatureType featureType) {
+    public static String spec(SimpleFeatureType featureType) {
         AttributeType[] types = featureType.getAttributeTypes();
         StringBuffer buf = new StringBuffer();
 

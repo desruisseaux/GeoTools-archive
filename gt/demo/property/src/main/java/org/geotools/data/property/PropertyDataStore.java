@@ -29,8 +29,8 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Sample DataStore implementation, please see formal tutorial included
@@ -69,11 +69,11 @@ public class PropertyDataStore extends AbstractDataStore {
         return list;
     }
     // START SNIPPET: getSchema
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         //look for type name
-	String typeSpec = property( typeName, "_");
+        String typeSpec = property( typeName, "_");
         try {
-        		return DataUtilities.createType( namespaceURI+"."+typeName,typeSpec );
+            return DataUtilities.createType( namespaceURI+"."+typeName,typeSpec );
         } catch (SchemaException e) {
             e.printStackTrace();
             throw new DataSourceException( typeName+" schema not available", e);
@@ -102,7 +102,7 @@ public class PropertyDataStore extends AbstractDataStore {
     protected FeatureWriter getFeatureWriter(String typeName) throws IOException {
         return new PropertyFeatureWriter( this, typeName );
     }
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
         String typeName = featureType.getTypeName();
         File file = new File( directory, typeName+".properties");
         BufferedWriter writer = new BufferedWriter( new FileWriter( file ) );
@@ -111,7 +111,7 @@ public class PropertyDataStore extends AbstractDataStore {
         writer.close();
     }
     //
-    // Access to Optimiations
+    // Access to Optimizations
     //
     public FeatureSource getFeatureSource(final String typeName) throws IOException {
         return new PropertyFeatureSource( this, typeName );
