@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -28,21 +29,21 @@ import org.geotools.feature.FeatureType;
  * @source $URL$
  */
 public class EmptyFeatureReader implements FeatureReader {
-    FeatureType featureType;
+	SimpleFeatureType featureType;
 
     /**
      * An Empty FeatureReader of the provided <code>featureType</code>.
      *
      * @param featureType
      */
-    public EmptyFeatureReader(FeatureType featureType) {
+    public EmptyFeatureReader(SimpleFeatureType featureType) {
         this.featureType = featureType;
     }
 
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 

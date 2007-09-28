@@ -816,7 +816,7 @@ public class DataUtilities {
      * @param features Array of features
      * @return FeatureCollection
      */
-    public static FeatureCollection collection(Feature[] features) {
+    public static FeatureCollection collection(SimpleFeature[] features) {
         FeatureCollection collection = FeatureCollections.newCollection();
 		final int length = features.length;
 		for (int i = 0; i < length; i++) {

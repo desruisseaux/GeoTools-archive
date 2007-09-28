@@ -20,14 +20,15 @@ import java.util.NoSuchElementException;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.FidFilter;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -41,7 +42,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * A set of constructs and utility methods used to test the data module.
  * <p>
- * By isolating a common set of {@link Feature}s, {@link FeatureType}s and {@link Filter}s
+ * By isolating a common set of {@link SimpleFeature}s, {@link SimpleFeatureType}s and {@link Filter}s
  * we are able to reduce the amount of overhead in setting up new tests.
  * </p>
  * <p>
@@ -61,8 +62,8 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class DataTestCase extends TestCase {
     protected GeometryFactory gf;
-    protected FeatureType roadType; // road: id,geom,name
-    protected FeatureType subRoadType; // road: id,geom    
+    protected SimpleFeatureType roadType; // road: id,geom,name
+    protected SimpleFeatureType subRoadType; // road: id,geom    
     protected SimpleFeature[] roadFeatures;
     protected Envelope roadBounds;
     protected Envelope rd12Bounds;    
@@ -71,15 +72,15 @@ public class DataTestCase extends TestCase {
     protected Filter rd12Filter;
     protected SimpleFeature newRoad;
     
-    protected FeatureType riverType; // river: id, geom, river, flow
-    protected FeatureType subRiverType; // river: river, flow     
-    protected Feature[] riverFeatures;
+    protected SimpleFeatureType riverType; // river: id, geom, river, flow
+    protected SimpleFeatureType subRiverType; // river: river, flow     
+    protected SimpleFeature[] riverFeatures;
     protected Envelope riverBounds;
     protected Filter rv1Filter;
-    protected Feature newRiver;    
+    protected SimpleFeature newRiver;    
 
-    protected FeatureType lakeType; // lake: id, geom, name
-    protected Feature[] lakeFeatures;
+    protected SimpleFeatureType lakeType; // lake: id, geom, name
+    protected SimpleFeature[] lakeFeatures;
     protected Envelope lakeBounds;
     protected FilterFactory ff;
     
@@ -118,7 +119,7 @@ public class DataTestCase extends TestCase {
         //  2,2 +-----+-----+ 4,2
         //     /     rd1     \
         // 1,1+               +5,1
-        roadFeatures[0] = (SimpleFeature)roadType.create(new Object[] {
+        roadFeatures[0] = SimpleFeatureBuilder.build(roadType, new Object[] {
                 new Integer(1),
                 line(new int[] { 1, 1, 2, 2, 4, 2, 5, 1 }),
                 "r1",
@@ -131,7 +132,7 @@ public class DataTestCase extends TestCase {
         //  rd2  + 3,2
         //       |
         //    3,0+
-        roadFeatures[1] = (SimpleFeature)roadType.create(new Object[] {
+        roadFeatures[1] = SimpleFeatureBuilder.build(roadType, new Object[] {
                 new Integer(2), line(new int[] { 3, 0, 3, 2, 3, 3, 3, 4 }),
                 "r2"
             },
@@ -141,16 +142,16 @@ public class DataTestCase extends TestCase {
         //     rd3     + 5,3
         //            / 
         //  3,2 +----+ 4,2
-        roadFeatures[2] = (SimpleFeature)roadType.create(new Object[] {
+        roadFeatures[2] = SimpleFeatureBuilder.build(roadType, new Object[] {
                 new Integer(3),
                 line(new int[] { 3, 2, 4, 2, 5, 3 }), "r3"
             },
             "road.rd3"
         );
         roadBounds = new Envelope();
-        roadBounds.expandToInclude( roadFeatures[0].getBounds() );
-        roadBounds.expandToInclude( roadFeatures[1].getBounds() );
-        roadBounds.expandToInclude( roadFeatures[2].getBounds() );
+        roadBounds.expandToInclude( new ReferencedEnvelope(roadFeatures[0].getBounds()) );
+        roadBounds.expandToInclude( new ReferencedEnvelope(roadFeatures[1].getBounds()) );
+        roadBounds.expandToInclude( new ReferencedEnvelope(roadFeatures[2].getBounds()) );
                 
         rd1Filter = ff.createFidFilter("road.rd1");
         rd2Filter = ff.createFidFilter("road.rd2");
@@ -162,12 +163,12 @@ public class DataTestCase extends TestCase {
         rd12Filter = create;
         
         rd12Bounds = new Envelope();
-        rd12Bounds.expandToInclude(roadFeatures[0].getBounds());
-        rd12Bounds.expandToInclude(roadFeatures[1].getBounds());        
+        rd12Bounds.expandToInclude(new ReferencedEnvelope(roadFeatures[0].getBounds()));
+        rd12Bounds.expandToInclude(new ReferencedEnvelope(roadFeatures[1].getBounds()));        
         //   + 2,3
         //  / rd4
         // + 1,2
-        newRoad = roadType.create(new Object[] {
+        newRoad = SimpleFeatureBuilder.build(roadType, new Object[] {
                     new Integer(4), line(new int[] { 1, 2, 2, 3 }), "r4"
                 }, "road.rd4");
 
@@ -176,7 +177,7 @@ public class DataTestCase extends TestCase {
         subRiverType = DataUtilities.createType(namespace+".river",
                 "river:String,flow:0.0");
         gf = new GeometryFactory();
-        riverFeatures = new Feature[2];
+        riverFeatures = new SimpleFeature[2];
 
         //       9,7     13,7
         //        +------+
@@ -184,7 +185,7 @@ public class DataTestCase extends TestCase {
         //  +---+ rv1
         //   7,5 \
         //    9,3 +----+ 11,3
-        riverFeatures[0] = riverType.create(new Object[] {
+        riverFeatures[0] = SimpleFeatureBuilder.build(riverType, new Object[] {
                     new Integer(1),
                     lines(new int[][] {
                             { 5, 5, 7, 4 },
@@ -198,15 +199,15 @@ public class DataTestCase extends TestCase {
         //    rv2+ 4,8
         //       |
         //   4,6 +
-        riverFeatures[1] = riverType.create(new Object[] {
+        riverFeatures[1] = SimpleFeatureBuilder.build(riverType, new Object[] {
                     new Integer(2),
                     lines(new int[][] {
                             { 4, 6, 4, 8, 6, 10 }
                         }), "rv2", new Double(3.0)
                 }, "river.rv2");
         riverBounds = new Envelope();
-        riverBounds.expandToInclude( riverFeatures[0].getBounds());
-        riverBounds.expandToInclude( riverFeatures[1].getBounds());
+        riverBounds.expandToInclude(ReferencedEnvelope.reference(riverFeatures[0].getBounds()));
+        riverBounds.expandToInclude(ReferencedEnvelope.reference(riverFeatures[1].getBounds()));
                 
         rv1Filter = FilterFactoryFinder.createFilterFactory().createFidFilter("river.rv1");
 
@@ -215,7 +216,7 @@ public class DataTestCase extends TestCase {
         //     rv3  \ 
         //           + 13,3
         //                     
-        newRiver = riverType.create(new Object[] {
+        newRiver = SimpleFeatureBuilder.build(riverType, new Object[] {
                 new Integer(3),
                 lines(new int[][] {
                         { 9, 5, 11, 5, 13, 3 }
@@ -226,14 +227,14 @@ public class DataTestCase extends TestCase {
         
         lakeType = DataUtilities.createType(namespace+".lake",
                     "id:0,geom:Polygon:nillable,name:String");
-        lakeFeatures = new Feature[1];
+        lakeFeatures = new SimpleFeature[1];
         //             + 14,8
         //            / \
         //      12,6 +   + 16,6
         //            \  | 
         //        14,4 +-+ 16,4
         //
-        lakeFeatures[0] = lakeType.create( new Object[]{
+        lakeFeatures[0] = SimpleFeatureBuilder.build(lakeType, new Object[]{
                 new Integer(0),
                 polygon( new int[]{ 12,6, 14,8, 16,6, 16,4, 14,4, 12,6} ),
                 "muddy"
@@ -241,7 +242,7 @@ public class DataTestCase extends TestCase {
             "lake.lk1"
         );
         lakeBounds = new Envelope();
-        lakeBounds.expandToInclude(lakeFeatures[0].getBounds());                 
+        lakeBounds.expandToInclude(ReferencedEnvelope.reference(lakeFeatures[0].getBounds()));                 
     }
 
     /**

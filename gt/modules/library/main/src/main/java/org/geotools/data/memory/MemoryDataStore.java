@@ -31,15 +31,17 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -77,7 +79,7 @@ public class MemoryDataStore extends AbstractDataStore {
         addFeatures(collection);
     }
 
-    public MemoryDataStore(Feature[] array){
+    public MemoryDataStore(SimpleFeature[] array){
         addFeatures(array);
     }
 
@@ -98,13 +100,13 @@ public class MemoryDataStore extends AbstractDataStore {
      */
     public void addFeatures(FeatureReader reader) throws IOException {
         try {
-            FeatureType featureType;
+            SimpleFeatureType featureType;
             // use an order preserving map, so that features are returned in the same
             // order as they were inserted. This is important for repeatable rendering
             // of overlapping features.
             Map featureMap = new LinkedHashMap();
             String typeName;
-            Feature feature;
+            SimpleFeature feature;
 
             feature = reader.next();
 
@@ -142,10 +144,10 @@ public class MemoryDataStore extends AbstractDataStore {
      */
     public void addFeatures(FeatureIterator reader) throws IOException {
         try {
-            FeatureType featureType;
+            SimpleFeatureType featureType;
             Map featureMap = new HashMap();
             String typeName;
-            Feature feature;
+            SimpleFeature feature;
 
             feature = reader.next();
 
@@ -188,7 +190,7 @@ public class MemoryDataStore extends AbstractDataStore {
 
         synchronized (memory) {
             for (Iterator i = collection.iterator(); i.hasNext();) {
-                addFeatureInternal((Feature) i.next());
+                addFeatureInternal((SimpleFeature) i.next());
             }
         }
     }
@@ -200,7 +202,7 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @throws IllegalArgumentException If provided feature array is empty
      */
-    public void addFeatures(Feature[] features) {
+    public void addFeatures(SimpleFeature[] features) {
         if ((features == null) || (features.length == 0)) {
             throw new IllegalArgumentException("Provided features are empty");
         }
@@ -226,18 +228,18 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @param feature Individual feature to add
      */
-    public void addFeature(Feature feature) {
+    public void addFeature(SimpleFeature feature) {
         synchronized (memory) {
             addFeatureInternal(feature);
         }
     }
 
-    private void addFeatureInternal(Feature feature) {
+    private void addFeatureInternal(SimpleFeature feature) {
         if (feature == null) {
             throw new IllegalArgumentException("Provided Feature is empty");
         }
 
-        FeatureType featureType;
+        SimpleFeatureType featureType;
         featureType = feature.getFeatureType();
 
         String typeName = featureType.getTypeName();
@@ -298,21 +300,21 @@ public class MemoryDataStore extends AbstractDataStore {
     }
 
     /**
-     * FeatureType access by <code>typeName</code>.
+     * SimpleFeatureType access by <code>typeName</code>.
      *
      * @param typeName
      *
-     * @return FeatureType for <code>typeName</code>
+     * @return SimpleFeatureType for <code>typeName</code>
      *
      * @throws IOException
      * @throws SchemaNotFoundException DOCUMENT ME!
      *
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         synchronized (memory) {
             if (schema.containsKey(typeName)) {
-                return (FeatureType) schema.get(typeName);
+                return (SimpleFeatureType) schema.get(typeName);
             }
                 throw new SchemaNotFoundException(typeName);
         }
@@ -326,13 +328,13 @@ public class MemoryDataStore extends AbstractDataStore {
      * is already in use.
      * </p>
      *
-     * @param featureType FeatureType to be added
+     * @param featureType SimpleFeatureType to be added
      *
      * @throws IOException If featureType already exists
      *
-     * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
+     * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.SimpleFeatureType)
      */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
         String typeName = featureType.getTypeName();
 
         if (memory.containsKey(typeName)) {
@@ -363,21 +365,21 @@ public class MemoryDataStore extends AbstractDataStore {
     public FeatureReader getFeatureReader(final String typeName)
         throws IOException {
         return new FeatureReader() {
-                FeatureType featureType = getSchema(typeName);
+                SimpleFeatureType featureType = getSchema(typeName);
                 Iterator iterator = features(typeName).values().iterator();
 
-                public FeatureType getFeatureType() {
+                public SimpleFeatureType getFeatureType() {
                     return featureType;
                 }
 
-                public Feature next()
+                public SimpleFeature next()
                     throws IOException, IllegalAttributeException, NoSuchElementException {
                     if (iterator == null) {
                         throw new IOException("Feature Reader has been closed");
                     }
 
                     try {
-                        return featureType.duplicate((Feature) iterator.next());
+                        return SimpleFeatureBuilder.copy((SimpleFeature) iterator.next());
                     } catch (NoSuchElementException end) {
                         throw new DataSourceException("There are no more Features", end);
                     }
@@ -418,24 +420,24 @@ public class MemoryDataStore extends AbstractDataStore {
     public FeatureWriter createFeatureWriter(final String typeName, final Transaction transaction)
         throws IOException {
         return new FeatureWriter() {
-                FeatureType featureType = getSchema(typeName);
+                SimpleFeatureType featureType = getSchema(typeName);
                 Map contents = features(typeName);
                 Iterator iterator = contents.values().iterator();
                 SimpleFeature live = null;
 
-                Feature current = null; // current Feature returned to user        
+                SimpleFeature current = null; // current Feature returned to user        
 
-                public FeatureType getFeatureType() {
+                public SimpleFeatureType getFeatureType() {
                     return featureType;
                 }
 
-                public Feature next() throws IOException, NoSuchElementException {
+                public SimpleFeature next() throws IOException, NoSuchElementException {
                     if (hasNext()) {
                         // existing content
                         live = (SimpleFeature) iterator.next();
 
                         try {
-                            current = featureType.duplicate(live);
+                            current = SimpleFeatureBuilder.copy(live);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Unable to edit " + live.getID() + " of "
                                 + typeName);
@@ -445,7 +447,7 @@ public class MemoryDataStore extends AbstractDataStore {
                         live = null;
 
                         try {
-                            current = DataUtilities.template(featureType);
+                            current = SimpleFeatureBuilder.template(featureType, null);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Unable to add additional Features of "
                                 + typeName);
@@ -468,7 +470,7 @@ public class MemoryDataStore extends AbstractDataStore {
                         // remove existing content
                         iterator.remove();
                         listenerManager.fireFeaturesRemoved(typeName, transaction,
-                            live.getBounds(), true);
+                            new ReferencedEnvelope(live.getBounds()), true);
                         live = null;
                         current = null;
                     } else {
@@ -496,15 +498,15 @@ public class MemoryDataStore extends AbstractDataStore {
                             // accept modifications
                             //
                             try {
-                                live.setAttributes(current.getAttributes(null));
+                                live.setAttributes(current.getAttributes());
                             } catch (Exception e) {
                                 throw new DataSourceException("Unable to accept modifications to "
                                     + live.getID() + " on " + typeName);
                             }
 
                             Envelope bounds = new Envelope();
-                            bounds.expandToInclude(live.getBounds());
-                            bounds.expandToInclude(current.getBounds());
+                            bounds.expandToInclude(new ReferencedEnvelope(live.getBounds()));
+                            bounds.expandToInclude(new ReferencedEnvelope(current.getBounds()));
                             listenerManager.fireFeaturesChanged(typeName, transaction,
                                 bounds, true);
                             live = null;
@@ -515,7 +517,7 @@ public class MemoryDataStore extends AbstractDataStore {
                         //
                         contents.put(current.getID(), current);
                         listenerManager.fireFeaturesAdded(typeName, transaction,
-                            current.getBounds(), true);
+                        		new ReferencedEnvelope(current.getBounds()), true);
                         current = null;
                     }
                 }
@@ -548,26 +550,27 @@ public class MemoryDataStore extends AbstractDataStore {
      * @see org.geotools.data.AbstractDataStore#getBounds(java.lang.String,
      *      org.geotools.data.Query)
      */
-    protected Envelope getBounds(Query query)
+    protected ReferencedEnvelope getBounds(Query query)
         throws IOException {
         String typeName = query.getTypeName();
         Map contents = features(typeName);
         Iterator iterator = contents.values().iterator();
 
-        Envelope envelope = null;
+        ReferencedEnvelope envelope = null;
 
         if (iterator.hasNext()) {
             int count = 1;
             Filter filter = query.getFilter();
-            Feature first = (Feature) iterator.next();
-            envelope = new Envelope(first.getDefaultGeometry().getEnvelopeInternal());
+            SimpleFeature first = (SimpleFeature) iterator.next();
+            Envelope env = ((Geometry) first.getDefaultGeometry()).getEnvelopeInternal();
+			envelope = new ReferencedEnvelope(env, first.getType().getCRS());
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
-                Feature feature = (Feature) iterator.next();
+                SimpleFeature feature = (SimpleFeature) iterator.next();
 
                 if (filter.evaluate(feature)) {
                     count++;
-                    envelope.expandToInclude(feature.getDefaultGeometry().getEnvelopeInternal());
+                    envelope.expandToInclude(((Geometry) first.getDefaultGeometry()).getEnvelopeInternal());
                 }
             }
         }
@@ -589,7 +592,7 @@ public class MemoryDataStore extends AbstractDataStore {
         Filter filter = query.getFilter();
 
         while (iterator.hasNext() && (count < query.getMaxFeatures())) {
-            if (filter.evaluate((Feature) iterator.next())) {
+            if (filter.evaluate((SimpleFeature) iterator.next())) {
                 count++;
             }
         }
