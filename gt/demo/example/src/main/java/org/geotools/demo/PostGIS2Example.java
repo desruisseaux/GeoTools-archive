@@ -38,6 +38,7 @@ import org.geotools.gui.swing.ProgressWindow;
 import org.opengis.filter.Filter;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.feature.type.AttributeDescriptor;
 
 public class PostGIS2Example {
 	
@@ -229,7 +230,7 @@ public class PostGIS2Example {
 				buf.append(" [\n");					
 				
 				buf.append("\t binding=");
-				buf.append( type.getBinding() );
+				buf.append( type.getType().getBinding() );
 				buf.append("\n");
 				
 				buf.append("\t minOccurs=");
@@ -283,7 +284,7 @@ public class PostGIS2Example {
 				public void visit(Feature feature) {
 					buf.append( feature.getID() );
 					buf.append(" [\n");
-					for( AttributeType type : schema.getAttributeTypes() ){
+					for( AttributeDescriptor type : schema.getAttributes() ){
 						String name = type.getLocalName();
 						buf.append("\t");
 						buf.append( name );

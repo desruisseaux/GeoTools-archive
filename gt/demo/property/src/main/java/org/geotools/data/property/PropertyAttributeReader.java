@@ -29,6 +29,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.Converters;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
@@ -76,7 +78,7 @@ public class PropertyAttributeReader implements AttributeReader {
     BufferedReader reader;
 
     /** DOCUMENT ME! */
-    FeatureType type;
+    SimpleFeatureType type;
 
     /** DOCUMENT ME! */
     String line;
@@ -168,9 +170,9 @@ public class PropertyAttributeReader implements AttributeReader {
      *
      * @throws ArrayIndexOutOfBoundsException DOCUMENT ME!
      */
-    public AttributeType getAttributeType(int index)
+    public AttributeDescriptor getAttributeType(int index)
         throws ArrayIndexOutOfBoundsException {
-        return type.getAttributeType(index);
+        return type.getAttribute( index );
     }
 
     /**
