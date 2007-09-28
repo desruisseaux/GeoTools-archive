@@ -23,8 +23,8 @@ import junit.framework.TestCase;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -69,7 +69,7 @@ public class DataTestCase extends TestCase {
     protected Filter rd1Filter;
     protected Filter rd2Filter;
     protected Filter rd12Filter;
-    protected Feature newRoad;
+    protected SimpleFeature newRoad;
     
     protected FeatureType riverType; // river: id, geom, river, flow
     protected FeatureType subRiverType; // river: river, flow     

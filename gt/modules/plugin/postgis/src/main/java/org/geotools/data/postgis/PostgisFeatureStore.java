@@ -49,6 +49,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FidFilter;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -527,7 +528,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         FeatureIterator it = features.features();
         try {
             while( it.hasNext() ) {
-                Feature feature = it.next();
+                SimpleFeature feature = (SimpleFeature) it.next();
                 fidFilter.addFid(feature.getID());
             }
         } finally {

@@ -31,6 +31,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
 
@@ -70,7 +71,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
     }
 
     /**
-     * Provide a FeatureLock for locking opperations to opperate against.
+     * Provide a FeatureLock for locking operations to operate against.
      * 
      * <p>
      * Initial Transactional duration locks can be restored with
@@ -163,7 +164,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
         Query optimizedQuery = new DefaultQuery(typeName, query.getFilter(),
                 query.getMaxFeatures(), Query.NO_NAMES, query.getHandle());
         FeatureIterator reader = getFeatures(query).features();
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
         LOGGER.info("got reader from query " + optimizedQuery
             + ", reader has next " + reader.hasNext());
@@ -171,7 +172,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
         try {
             while (reader.hasNext()) {
                 try {
-                    feature = reader.next();
+                    feature = (SimpleFeature) reader.next();
                     lockingManager.lockFeatureID(typeName, feature.getID(),
                         transaction, featureLock);
                     count++;
@@ -179,7 +180,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
                 } catch (FeatureLockException locked) {
                     LOGGER.info("feature lock exception");
 
-                    // could not aquire - don't increment count                
+                    // could not acquire - don't increment count                
                 } catch (NoSuchElementException nosuch) {
                     throw new DataSourceException("Problem with "
                         + query.getHandle() + " while locking", nosuch);
@@ -278,12 +279,12 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
         //
         FeatureIterator reader = getFeatures(query).features();
         String typeName = getSchema().getTypeName();
-        Feature feature;
+        SimpleFeature feature;
 
         try {
             while (reader.hasNext()) {
                 try {
-                    feature = reader.next();
+                    feature = (SimpleFeature) reader.next();
                     lockingManager.unLockFeatureID(typeName, feature.getID(),
                         getTransaction(), featureLock);
                 } catch (NoSuchElementException nosuch) {
