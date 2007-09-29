@@ -22,13 +22,14 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.graph.build.line.LineStringGraphGenerator;
 import org.geotools.graph.structure.Edge;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -41,7 +42,7 @@ public class FeatureGraphGeneratorTest extends TestCase {
 		FeatureGraphGenerator fgg = new FeatureGraphGenerator( new LineStringGraphGenerator() );
 		
 		LineString[] lines = lines();
-		Feature[] features = features( lines );
+		SimpleFeature[] features = features( lines );
 		
 		List el1 = new ArrayList();
 		List el2 = new ArrayList();
@@ -55,10 +56,10 @@ public class FeatureGraphGeneratorTest extends TestCase {
 			Edge e2 = (Edge) el2.get( i );
 			
 			assertTrue( e1.getObject() instanceof LineString );
-			assertTrue( e2.getObject() instanceof Feature );
+			assertTrue( e2.getObject() instanceof SimpleFeature );
 			
 			LineString line = (LineString) e1.getObject();
-			Feature feature = (Feature) e2.getObject();
+			SimpleFeature feature = (SimpleFeature) e2.getObject();
 			
 			assertEquals( line, feature.getDefaultGeometry() );
 		}
@@ -79,16 +80,20 @@ public class FeatureGraphGeneratorTest extends TestCase {
 		return lines;
 	}
 	
-	Feature[] features( LineString[] lines ) throws SchemaException, IllegalAttributeException {
+	SimpleFeature[] features( LineString[] lines ) throws SchemaException, IllegalAttributeException {
 		
-		FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance( "test" );
-		typeFactory.addType( AttributeTypeFactory.newAttributeType( "the_geom", LineString.class ) );
-		typeFactory.addType( AttributeTypeFactory.newAttributeType( "id", Integer.class ) );
 		
-		FeatureType schema = typeFactory.getFeatureType();
-		Feature[] features = new Feature[ lines.length ];
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName( "test");
+		b.add("the_geom", LineString.class);
+		b.add("id", Integer.class);
+		SimpleFeatureType schema = b.buildFeatureType();
+		SimpleFeature[] features = new SimpleFeature[ lines.length ];
+		
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
 		for ( int i = 0; i < lines.length; i++) {
-			features[i] = schema.create( new Object[] { lines[i], new Integer( i ) } );
+			Integer id = new Integer(i);
+			features[i] = SimpleFeatureBuilder.build(schema, new Object[] {lines[i], id}, "fid" + id.toString());
 		}
 		
 		return features;

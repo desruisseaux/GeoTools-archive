@@ -16,7 +16,7 @@
  */
 package org.geotools.graph.build.feature;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.build.basic.BasicGraphGenerator;
@@ -52,7 +52,7 @@ public class FeatureGraphGenerator extends BasicGraphGenerator {
 	}
 	
 	public Graphable add( Object obj ) {
-		Feature feature = (Feature) obj;
+		SimpleFeature feature = (SimpleFeature) obj;
 		Graphable g = decorated.add( feature.getDefaultGeometry() );
 		g.setObject( feature );
 	
@@ -60,12 +60,12 @@ public class FeatureGraphGenerator extends BasicGraphGenerator {
 	}
 	
 	public Graphable remove( Object obj ) {
-		Feature feature = (Feature) obj;
+		SimpleFeature feature = (SimpleFeature) obj;
 		return decorated.remove( feature.getDefaultGeometry() );
 	}
 	
 	public Graphable get(Object obj) {
-		Feature feature = (Feature) obj;
+		SimpleFeature feature = (SimpleFeature) obj;
 		return decorated.get( feature.getDefaultGeometry() );
 	}
 }
