@@ -25,13 +25,14 @@ import java.util.List;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -53,11 +54,11 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
     
 	AbstractResourceCollection rc;
 
-	protected AbstractFeatureCollection( FeatureType memberType ) {
+	protected AbstractFeatureCollection( SimpleFeatureType memberType ) {
 		super(null,memberType);
 	}
 	
-	protected AbstractFeatureCollection( FeatureType memberType, AbstractResourceCollection rc ) {
+	protected AbstractFeatureCollection( SimpleFeatureType memberType, AbstractResourceCollection rc ) {
 		super(null,memberType);
 		this.rc = rc;
 	}
@@ -169,7 +170,7 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
             for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext();){
                 if (size > 0) progress.progress( position++/size );
                 try {
-                    Feature feature = (Feature) iterator.next();
+                    SimpleFeature feature = (SimpleFeature) iterator.next();
                     visitor.visit(feature);
                 }
                 catch( Exception erp ){

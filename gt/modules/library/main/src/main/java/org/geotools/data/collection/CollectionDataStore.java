@@ -26,14 +26,16 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -42,7 +44,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class CollectionDataStore extends AbstractDataStore {
-    FeatureType featureType;
+    SimpleFeatureType featureType;
     FeatureCollection collection;
 
     /**
@@ -54,12 +56,12 @@ public class CollectionDataStore extends AbstractDataStore {
         this.collection = collection;
 
         if (collection.size() == 0) {
-            this.featureType = DefaultFeatureType.EMPTY;
+            this.featureType = FeatureTypes.EMPTY;
         } else {
             Iterator iter = null;
             try {
                 iter = collection.iterator();
-                this.featureType = ((Feature) iter.next()).getFeatureType();
+                this.featureType = ((SimpleFeature) iter.next()).getFeatureType();
             } finally {
                 if (iter != null)
                     collection.close(iter);
@@ -79,7 +81,7 @@ public class CollectionDataStore extends AbstractDataStore {
     /**
      * @see org.geotools.data.DataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         if ((typeName != null) && typeName.equals(featureType.getTypeName())) {
             return featureType;
         }
@@ -120,7 +122,7 @@ public class CollectionDataStore extends AbstractDataStore {
      * @see org.geotools.data.AbstractDataStore#getBounds(java.lang.String,
      *      org.geotools.data.Query)
      */
-    protected Envelope getBounds(Query query) throws SchemaNotFoundException{
+    protected ReferencedEnvelope getBounds(Query query) throws SchemaNotFoundException{
         String featureTypeName = query.getTypeName();
         if (!featureType.getTypeName().equals(featureTypeName)) {
             throw new SchemaNotFoundException(featureTypeName);
@@ -132,26 +134,26 @@ public class CollectionDataStore extends AbstractDataStore {
     /**
      * @param query
      */
-    protected Envelope getBoundsInternal(Query query) {
+    protected ReferencedEnvelope getBoundsInternal(Query query) {
         FeatureIterator iterator = collection.features();
         Envelope envelope = null;
 
         if (iterator.hasNext()) {
             int count = 1;
             Filter filter = query.getFilter();
-            envelope = iterator.next().getDefaultGeometry().getEnvelopeInternal();
+            envelope = ((Geometry)iterator.next().getDefaultGeometry()).getEnvelopeInternal();
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
-                Feature feature = iterator.next();
+                SimpleFeature feature = iterator.next();
 
                 if (filter.evaluate(feature)) {
                     count++;
-                    envelope.expandToInclude(feature.getDefaultGeometry().getEnvelopeInternal());
+                    envelope.expandToInclude(((Geometry)feature.getDefaultGeometry()).getEnvelopeInternal());
                 }
             }
         }
 
-        return envelope;
+        return ReferencedEnvelope.reference(envelope);
         
     }
 
@@ -186,7 +188,7 @@ public class CollectionDataStore extends AbstractDataStore {
     private class FeatureCollectionListener implements CollectionListener {
         public void collectionChanged(CollectionEvent tce) {
             String typeName = featureType.getTypeName();
-            Envelope bounds = null;
+            ReferencedEnvelope bounds = null;
 
             bounds = getBoundsInternal(Query.ALL);
 

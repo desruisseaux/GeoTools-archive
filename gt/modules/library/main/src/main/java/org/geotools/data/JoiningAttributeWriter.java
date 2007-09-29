@@ -17,7 +17,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /** Provides ...
  * 
@@ -27,7 +27,7 @@ import org.geotools.feature.AttributeType;
 public class JoiningAttributeWriter implements AttributeWriter {
     private AttributeWriter[] writers;
     private int[] index;
-    private AttributeType[] metaData;
+    private AttributeDescriptor[] metaData;
 
     /**
      * 
@@ -37,14 +37,14 @@ public class JoiningAttributeWriter implements AttributeWriter {
         metaData = joinMetaData(writers);
     }
 
-    private AttributeType[] joinMetaData(AttributeWriter[] writers) {
+    private AttributeDescriptor[] joinMetaData(AttributeWriter[] writers) {
         int total = 0;
         index = new int[writers.length];
         for (int i = 0, ii = writers.length; i < ii; i++) {
             index[i] = total;
             total += writers[i].getAttributeCount();
         }
-        AttributeType[] md = new AttributeType[total];
+        AttributeDescriptor[] md = new AttributeDescriptor[total];
         int idx = 0;
         for (int i = 0, ii = writers.length; i < ii; i++) {
             for (int j = 0, jj = writers[i].getAttributeCount(); j < jj; j++) {
@@ -110,7 +110,7 @@ public class JoiningAttributeWriter implements AttributeWriter {
         return metaData.length;
     }
 
-    public AttributeType getAttributeType(int i) {
+    public AttributeDescriptor getAttributeType(int i) {
         return metaData[i];
     }
 }

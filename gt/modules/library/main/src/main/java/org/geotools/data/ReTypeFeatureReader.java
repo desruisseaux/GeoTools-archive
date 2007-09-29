@@ -17,11 +17,11 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
-
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 
 /**
@@ -52,8 +52,8 @@ import org.geotools.feature.IllegalAttributeException;
  */
 public class ReTypeFeatureReader implements FeatureReader {
     FeatureReader reader;
-    FeatureType featureType;
-    AttributeType[] types;
+    SimpleFeatureType featureType;
+    AttributeDescriptor[] types;
     boolean clone;
 
     /**
@@ -62,7 +62,7 @@ public class ReTypeFeatureReader implements FeatureReader {
      * @param reader Origional FeatureReader
      * @param featureType Target FeatureType
      */
-    public ReTypeFeatureReader(FeatureReader reader, FeatureType featureType) {
+    public ReTypeFeatureReader(FeatureReader reader, SimpleFeatureType featureType) {
         this(reader, featureType, true);
     }
     
@@ -73,7 +73,7 @@ public class ReTypeFeatureReader implements FeatureReader {
      * @param featureType Target FeatureType
      * @since 2.3
      */
-    public ReTypeFeatureReader(FeatureReader reader, FeatureType featureType, boolean clone) {
+    public ReTypeFeatureReader(FeatureReader reader, SimpleFeatureType featureType, boolean clone) {
         this.reader = reader;
         this.featureType = featureType;
         this.clone = clone;
@@ -94,8 +94,8 @@ public class ReTypeFeatureReader implements FeatureReader {
      *
      * @throws IllegalArgumentException if unable to provide a mapping
      */
-    protected AttributeType[] typeAttributes(FeatureType target,
-        FeatureType origional) {
+    protected AttributeDescriptor[] typeAttributes(SimpleFeatureType target,
+        SimpleFeatureType origional) {
         if (target.equals(origional)) {
             throw new IllegalArgumentException(
                 "FeatureReader allready produces contents with the correct schema");
@@ -107,14 +107,14 @@ public class ReTypeFeatureReader implements FeatureReader {
         }
 
         String xpath;
-        AttributeType[] types = new AttributeType[target.getAttributeCount()];
+        AttributeDescriptor[] types = new AttributeDescriptor[target.getAttributeCount()];
 
         for (int i = 0; i < target.getAttributeCount(); i++) {
-            AttributeType attrib = target.getAttributeType(i);
+            AttributeDescriptor attrib = target.getAttribute(i);
             xpath = attrib.getLocalName();
             types[i] = attrib;
 
-            if (!attrib.equals(origional.getAttributeType(xpath))) {
+            if (!attrib.equals(origional.getAttribute(xpath))) {
                 throw new IllegalArgumentException(
                     "Unable to retype FeatureReader (origional does not cover "
                     + xpath + ")");
@@ -127,20 +127,20 @@ public class ReTypeFeatureReader implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (reader == null) {
             throw new IOException("FeatureReader has been closed");
         }
 
-        Feature next = reader.next();
+        SimpleFeature next = reader.next();
         String id = next.getID();
 
         Object[] attributes = new Object[types.length];
@@ -149,12 +149,12 @@ public class ReTypeFeatureReader implements FeatureReader {
         for (int i = 0; i < types.length; i++) {
             xpath = types[i].getLocalName();
             if(clone)
-                attributes[i] = types[i].duplicate(next.getAttribute(xpath));
+                attributes[i] = DataUtilities.duplicate(next.getAttribute(xpath));
             else
                 attributes[i] = next.getAttribute(xpath);
         }
 
-        return featureType.create(attributes, id);
+        return SimpleFeatureBuilder.build(featureType, attributes, id);
     }
 
     /**

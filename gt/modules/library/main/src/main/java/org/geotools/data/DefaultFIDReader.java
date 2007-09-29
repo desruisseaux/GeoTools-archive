@@ -17,8 +17,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-import org.geotools.feature.FeatureType;
-
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * A Default FIDReader.  Just auto-increments an index.   May be sufficient for
@@ -43,7 +42,7 @@ public class DefaultFIDReader implements FIDReader {
         len = typeName.length() + 1;
     }
 
-    public DefaultFIDReader(FeatureType featureType) {
+    public DefaultFIDReader(SimpleFeatureType featureType) {
         this(featureType.getTypeName());
     }
 

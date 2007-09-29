@@ -17,6 +17,8 @@ package org.geotools.data;
 
 import java.io.IOException;
 
+import org.opengis.feature.type.AttributeDescriptor;
+
 /** - Added hasNext to support the FeatureWriter API.
  *  - Changed order of writer parameters to match Collections, JDBC API.
  *  - Added IOExceptions on all methods.
@@ -38,7 +40,7 @@ public interface AttributeWriter {
     /**
      * Retrieve the AttributeType at the given index.
      */
-    org.geotools.feature.AttributeType getAttributeType(int i) throws ArrayIndexOutOfBoundsException;
+    AttributeDescriptor getAttributeType(int i) throws ArrayIndexOutOfBoundsException;
         
     /**
      * Advance the AttributeWriter, all calls to write will correspond to the

@@ -20,10 +20,10 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * A FeatureReader that wraps up a normal FeatureIterator.
@@ -38,22 +38,22 @@ import org.geotools.feature.IllegalAttributeException;
  */
 public class DelegateFeatureReader implements FeatureReader {
 	FeatureIterator delegate;
-	FeatureType schema;
-	public DelegateFeatureReader( FeatureType featureType, FeatureIterator features ){
+	SimpleFeatureType schema;
+	public DelegateFeatureReader( SimpleFeatureType featureType, FeatureIterator features ){
 		this.schema = featureType;
 		this.delegate = features;
 	}
 	
-	public FeatureType getFeatureType() {
+	public SimpleFeatureType getFeatureType() {
 		return schema;
 	}
 
-	public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+	public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
 		if (delegate == null) {
             throw new IOException("Feature Reader has been closed");
         }		
         try {
-        	Feature feature = delegate.next();
+        	SimpleFeature feature = delegate.next();
         	// obj = schema.duplicate( obj );
         	return feature;        	
         } catch (NoSuchElementException end) {

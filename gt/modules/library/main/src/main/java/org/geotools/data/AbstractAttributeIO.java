@@ -15,7 +15,7 @@
  */
 package org.geotools.data;
 
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * Provides support for creating AttributeReaders.
@@ -26,9 +26,9 @@ import org.geotools.feature.AttributeType;
  */
 public abstract class AbstractAttributeIO {
     
-    protected AttributeType[] metaData;
+    protected AttributeDescriptor[] metaData;
     
-    protected AbstractAttributeIO(AttributeType[] metaData) {
+    protected AbstractAttributeIO(AttributeDescriptor[] metaData) {
         this.metaData = metaData;
     }
     
@@ -39,8 +39,8 @@ public abstract class AbstractAttributeIO {
         this(copy(defs));
     }
     
-    public static AttributeType[] copy(AttributeReader defs) {
-        AttributeType[] d = new AttributeType[defs.getAttributeCount()];
+    public static AttributeDescriptor[] copy(AttributeReader defs) {
+        AttributeDescriptor[] d = new AttributeDescriptor[defs.getAttributeCount()];
         for (int i = 0, ii = d.length; i < ii; i++) {
             d[i] = defs.getAttributeType(i);
         }
@@ -51,7 +51,7 @@ public abstract class AbstractAttributeIO {
         return metaData.length;
     }
     
-    public final AttributeType getAttributeType(int position) {
+    public final AttributeDescriptor getAttributeType(int position) {
         return metaData[position];
     }
     

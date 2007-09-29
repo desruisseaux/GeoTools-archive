@@ -15,10 +15,11 @@
  */
 package org.geotools.data;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +37,7 @@ import java.util.NoSuchElementException;
 public class CollectionFeatureReader implements FeatureReader {
     private FeatureCollection collection;
     private Iterator features;
-    private FeatureType type;
+    private SimpleFeatureType type;
     private boolean closed = false;
 
     /**
@@ -45,7 +46,7 @@ public class CollectionFeatureReader implements FeatureReader {
      * @param featuresArg a colleciton of features.  <b>All features must be of the same FeatureType</b> 
      * @param typeArg the Feature type of of the features.
      */
-    public CollectionFeatureReader(Collection featuresArg, FeatureType typeArg) {
+    public CollectionFeatureReader(Collection featuresArg, SimpleFeatureType typeArg) {
         assert !featuresArg.isEmpty();
 
         if (featuresArg instanceof FeatureCollection) {
@@ -63,7 +64,7 @@ public class CollectionFeatureReader implements FeatureReader {
      * @param typeArg the Feature type of of the features.
      */
     public CollectionFeatureReader(FeatureCollection featuresArg,
-        FeatureType typeArg) {
+        SimpleFeatureType typeArg) {
         assert !featuresArg.isEmpty();
         collection = featuresArg;
         this.features = featuresArg.iterator();
@@ -75,7 +76,7 @@ public class CollectionFeatureReader implements FeatureReader {
      *
      * @param featuresArg an of features.  <b>All features must be of the same FeatureType</b> 
      */
-    public CollectionFeatureReader(Feature[] featuresArg) {
+    public CollectionFeatureReader(SimpleFeature[] featuresArg) {
         assert featuresArg.length > 0;
         this.features = Arrays.asList(featuresArg).iterator();
         type = featuresArg[0].getFeatureType();
@@ -84,20 +85,20 @@ public class CollectionFeatureReader implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return type;
     }
 
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (closed) {
             throw new NoSuchElementException("Reader has been closed");
         }
 
-        return (Feature) features.next();
+        return (SimpleFeature) features.next();
     }
 
     /**

@@ -19,16 +19,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.geotools.feature.collection.AbstractResourceCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -36,6 +36,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -96,7 +97,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
                         
         this.results = origionalCollection( results );        
         
-        CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCRS();
         this.transform = CRS.findMathTransform(originalCs,destinationCS, true);
         
         setResourceCollection(createResourceCollection());
@@ -134,7 +135,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         }
         return results;
     }
-    private static FeatureType origionalType( FeatureCollection results ){
+    private static SimpleFeatureType origionalType( FeatureCollection results ){
         while( true ){
             if ( results instanceof ReprojectFeatureResults ) {
                 results = ((ReprojectFeatureResults) results).getOrigin();
@@ -147,11 +148,11 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         return results.getSchema();
     }
     
-    private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS ) throws SchemaException{
+    private static SimpleFeatureType forceType( SimpleFeatureType startingType, CoordinateReferenceSystem forcedCS ) throws SchemaException{
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
-        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry().getCRS();
         
         if (forcedCS.equals(originalCs)) {
             return startingType;
@@ -179,11 +180,11 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         try {            
             Envelope newBBox = new Envelope();
             Envelope internal;
-            Feature feature;
+            SimpleFeature feature;
 
             while ( r.hasNext()) {
                 feature = r.next();
-                internal = feature.getDefaultGeometry().getEnvelopeInternal();
+                internal = ((Geometry)feature.getDefaultGeometry()).getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
             return ReferencedEnvelope.reference(newBBox);

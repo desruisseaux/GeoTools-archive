@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;

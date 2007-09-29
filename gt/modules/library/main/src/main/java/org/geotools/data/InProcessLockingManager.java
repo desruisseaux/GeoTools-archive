@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.Transaction.State;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -297,17 +297,17 @@ public class InProcessLockingManager implements LockingManager {
      */
     public FeatureWriter checkedWriter(final FeatureWriter writer,
         final Transaction transaction) {
-        FeatureType featureType = writer.getFeatureType();
+        SimpleFeatureType featureType = writer.getFeatureType();
         final String typeName = featureType.getTypeName();
 
         return new FeatureWriter() {
-                Feature live = null;
+                SimpleFeature live = null;
 
-                public FeatureType getFeatureType() {
+                public SimpleFeatureType getFeatureType() {
                     return writer.getFeatureType();
                 }
 
-                public Feature next() throws IOException {
+                public SimpleFeature next() throws IOException {
                     live = writer.next();
 
                     return live;

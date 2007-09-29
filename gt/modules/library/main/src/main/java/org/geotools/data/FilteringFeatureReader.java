@@ -18,9 +18,9 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 
@@ -45,7 +45,7 @@ import org.opengis.filter.Filter;
 public class FilteringFeatureReader implements FeatureReader {
     protected final FeatureReader featureReader;
     protected final Filter filter;
-    protected Feature next;
+    protected SimpleFeature next;
 
     /**
      * Creates a new instance of AbstractFeatureReader
@@ -71,9 +71,9 @@ public class FilteringFeatureReader implements FeatureReader {
     	return featureReader;
     }
     
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
-        Feature f = null;
+        SimpleFeature f = null;
 
         if (hasNext()) {
             // hasNext() ensures that next != null
@@ -90,7 +90,7 @@ public class FilteringFeatureReader implements FeatureReader {
         featureReader.close();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureReader.getFeatureType();
     }
 
@@ -119,7 +119,7 @@ public class FilteringFeatureReader implements FeatureReader {
             return true;
         }
         try {
-            Feature peek;
+            SimpleFeature peek;
 
             while (featureReader.hasNext()) {
                 peek = featureReader.next();

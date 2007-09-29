@@ -31,20 +31,22 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.BaseFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.SubFeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.SortBy2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
@@ -95,26 +97,26 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     }
     
     /** Subclass must think about what consitructors it needs. */
-    protected DataFeatureCollection( String id, FeatureType memberType ){
+    protected DataFeatureCollection( String id, SimpleFeatureType memberType ){
     	super(id,memberType);
     }
     
     /**
      * To let listeners know that something has changed.
      */
-    protected void fireChange(Feature[] features, int type) {        
+    protected void fireChange(SimpleFeature[] features, int type) {        
         CollectionEvent cEvent = new CollectionEvent(this, features, type);
         
         for (int i = 0, ii = listeners.size(); i < ii; i++) {
             ((CollectionListener) listeners.get(i)).collectionChanged(cEvent);
         }
     }
-    protected void fireChange(Feature feature, int type) {
-        fireChange(new Feature[] {feature}, type);
+    protected void fireChange(SimpleFeature feature, int type) {
+        fireChange(new SimpleFeature[] {feature}, type);
     }    
     protected void fireChange(Collection coll, int type) {
-        Feature[] features = new Feature[coll.size()];
-        features = (Feature[]) coll.toArray(features);
+        SimpleFeature[] features = new SimpleFeature[coll.size()];
+        features = (SimpleFeature[]) coll.toArray(features);
         fireChange(features, type);
     }
     
@@ -127,7 +129,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     // 
     // To be implemented by subclass
     //    
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
     	return super.getSchema();
     }
 
@@ -313,8 +315,8 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     }
 
     public boolean contains( Object o ) {
-        if( !(o instanceof Feature) ) return false;
-        Feature value = (Feature) o;
+        if( !(o instanceof SimpleFeature) ) return false;
+        SimpleFeature value = (SimpleFeature) o;
         String ID = value.getID();
         
         FeatureReader reader = null;
@@ -322,7 +324,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
             reader = reader();
             try {
                 while( reader.hasNext() ){
-                    Feature feature = reader.next();
+                    SimpleFeature feature = reader.next();
                     if( !ID.equals( feature.getID() )){
                         continue; // skip with out full equal check
                     }
@@ -351,7 +353,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
     }
 
     public Object[] toArray() {
-        return toArray( new Feature[ size() ]);
+        return toArray( new SimpleFeature[ size() ]);
     }
 
     public Object[] toArray( Object[] array ) {
@@ -466,12 +468,12 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
             FeatureReader reader = null;
             try {
                 reader = reader();
-                FeatureType schema = getSchema();
+                SimpleFeatureType schema = getSchema();
                 
                 List list = new ArrayList();
                 while( reader.hasNext() ){
-                    Feature feature = reader.next();
-                    Feature copy = schema.duplicate( feature );
+                    SimpleFeature feature = reader.next();
+                    SimpleFeature copy = SimpleFeatureBuilder.copy( feature );
                     list.add( copy );
                 }
                 return list;
@@ -507,14 +509,14 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
                     writer.remove();
                 }
                 // add in list contents
-                Feature feature = null;                
+                SimpleFeature feature = null;                
                 for( Iterator i = list.iterator(); i.hasNext(); ){
-                    feature = (Feature) i.next();    
+                    feature = (SimpleFeature) i.next();    
                     
-                    Feature newFeature = writer.next(); // grab a "new" Feature
-                    Object values[] = feature.getAttributes( null );
-                    for( int a=0; a<values.length; a++){
-                    	newFeature.setAttribute( a, values[a] );
+                    SimpleFeature newFeature = writer.next(); // grab a "new" Feature
+                    List values = feature.getAttributes( );
+                    for( int a=0; a<values.size(); a++){
+                    	newFeature.setAttribute( a, values.get(a) );
 					}
                     writer.write();
                 }                
@@ -581,7 +583,7 @@ public abstract class DataFeatureCollection extends BaseFeatureCollection implem
             progress.started();
         	for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
                 try {
-                    Feature feature = (Feature) iterator.next();
+                    SimpleFeature feature = (SimpleFeature) iterator.next();
                     visitor.visit(feature);
                 }
                 catch( Exception erp ){

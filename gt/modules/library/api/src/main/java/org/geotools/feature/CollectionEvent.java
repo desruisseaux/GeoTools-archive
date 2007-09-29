@@ -17,6 +17,7 @@ package org.geotools.feature;
 
 import java.util.EventObject;
 import org.geotools.data.FeatureEvent;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -48,7 +49,7 @@ public class CollectionEvent extends EventObject {
     private int type;
 
     /** Holds value of property features. */
-    private Feature[] features;
+    private SimpleFeature[] features;
 
     public CollectionEvent(FeatureCollection collection, FeatureEvent event) {
         super(collection);
@@ -83,7 +84,7 @@ public class CollectionEvent extends EventObject {
      * @param involvedFeatures DOCUMENT ME!
      * @param type DOCUMENT ME!
      */
-    public CollectionEvent(FeatureCollection source, Feature[] involvedFeatures, int type) {
+    public CollectionEvent(FeatureCollection source, SimpleFeature[] involvedFeatures, int type) {
         super(source);
         this.type = type;
         this.features = involvedFeatures;
@@ -114,7 +115,7 @@ public class CollectionEvent extends EventObject {
      *
      * @return Value of property features.
      */
-    public Feature[] getFeatures() {
+    public SimpleFeature[] getFeatures() {
         return this.features;
     }
 }

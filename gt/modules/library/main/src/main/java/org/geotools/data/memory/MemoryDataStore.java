@@ -504,7 +504,7 @@ public class MemoryDataStore extends AbstractDataStore {
                                     + live.getID() + " on " + typeName);
                             }
 
-                            Envelope bounds = new Envelope();
+                            ReferencedEnvelope bounds = new ReferencedEnvelope();
                             bounds.expandToInclude(new ReferencedEnvelope(live.getBounds()));
                             bounds.expandToInclude(new ReferencedEnvelope(current.getBounds()));
                             listenerManager.fireFeaturesChanged(typeName, transaction,

@@ -17,8 +17,7 @@ package org.geotools.data;
 
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 
@@ -56,7 +55,7 @@ public class EmptyFeatureReader implements FeatureReader {
      *
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next() throws NoSuchElementException {
+    public SimpleFeature next() throws NoSuchElementException {
         throw new NoSuchElementException("FeatureReader is empty");
     }
 

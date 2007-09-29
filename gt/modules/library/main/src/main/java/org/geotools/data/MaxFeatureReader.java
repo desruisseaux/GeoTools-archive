@@ -18,9 +18,9 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -47,7 +47,7 @@ public class MaxFeatureReader implements FeatureReader {
         this.maxFeatures = maxFeatures;
     }
 
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (hasNext()) {
             counter++;
@@ -62,7 +62,7 @@ public class MaxFeatureReader implements FeatureReader {
         featureReader.close();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureReader.getFeatureType();
     }
 

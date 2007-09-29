@@ -19,13 +19,12 @@ package org.geotools.data;
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.Set;
-
-import org.geotools.feature.FeatureCollection;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Highlevel API for Features from a specific location.
@@ -208,7 +207,7 @@ public interface FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    Envelope getBounds(Query query) throws IOException;
+    ReferencedEnvelope getBounds(Query query) throws IOException;
 
     /**
      * Gets the number of the features that would be returned by this query.

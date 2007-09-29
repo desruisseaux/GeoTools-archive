@@ -24,17 +24,18 @@ import java.util.logging.Logger;
 
 import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.store.DataFeatureCollection;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.SubFeatureList;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -89,7 +90,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
     	super(null,getSchemaInternal(source,query));
     	this.featureSource = source;        
         
-        FeatureType origionalType = source.getSchema();
+        SimpleFeatureType origionalType = source.getSchema();
         
         String typeName = origionalType.getTypeName();        
         if( typeName.equals( query.getTypeName() ) ){
@@ -116,7 +117,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         } else if (query.getCoordinateSystem() != null) {
             cs = query.getCoordinateSystem();
         }     
-        CoordinateReferenceSystem origionalCRS = origionalType.getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem origionalCRS = origionalType.getDefaultGeometry().getCRS();
         if( query.getCoordinateSystem() != null ){
             origionalCRS = query.getCoordinateSystem();
         }
@@ -129,9 +130,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         }
     }
 
-    static FeatureType getSchemaInternal( FeatureSource featureSource, Query query ) {
-    	FeatureType origionalType = featureSource.getSchema();
-    	FeatureType schema = null;
+    static SimpleFeatureType getSchemaInternal( FeatureSource featureSource, Query query ) {
+    	SimpleFeatureType origionalType = featureSource.getSchema();
+    	SimpleFeatureType schema = null;
     	
     	 CoordinateReferenceSystem cs = null;        
          if (query.getCoordinateSystemReproject() != null) {
@@ -179,7 +180,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return super.getSchema();        
     }
 
@@ -226,9 +227,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      */
     protected FeatureReader boundsReader() throws IOException {
         List attributes = new ArrayList();
-        FeatureType schema = featureSource.getSchema();
+        SimpleFeatureType schema = featureSource.getSchema();
         for (int i = 0; i < schema.getAttributeCount(); i++) {
-            AttributeType at = schema.getAttributeType(i);
+            AttributeDescriptor at = schema.getAttribute(i);
             if(at instanceof GeometricAttributeType)
                 attributes.add(at.getLocalName());
         }
@@ -262,36 +263,36 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * @see org.geotools.data.FeatureResults#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        Envelope bounds;
+        ReferencedEnvelope bounds;
 
         try {
             bounds = featureSource.getBounds(query);
         } catch (IOException e1) {
-            bounds = new Envelope();
+            bounds = new ReferencedEnvelope((CoordinateReferenceSystem)null);
         }
 
         if (bounds == null) {
         	try {
-	            Feature feature;
-	            bounds = new Envelope();
+	            SimpleFeature feature;
+	            bounds = new ReferencedEnvelope();
 	
 	            FeatureReader reader = boundsReader();
 	
 	            while (reader.hasNext()) {
 	                feature = reader.next();
-	                bounds.expandToInclude(feature.getBounds());
+	                bounds.include(feature.getBounds());
 	            }
 	
 	            reader.close();
         	} catch (IllegalAttributeException e) {
 	            //throw new DataSourceException("Could not read feature ", e);
-	            bounds = new Envelope();
+	            bounds = new ReferencedEnvelope();
 	        } catch (IOException e) {
-	            bounds = new Envelope();
+	            bounds = new ReferencedEnvelope();
 	        }
         }
         
-        return ReferencedEnvelope.reference(bounds);
+        return bounds;
     }
 
     /**
@@ -341,7 +342,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             FeatureCollection collection = FeatureCollections.newCollection();
             //Feature feature;
             FeatureReader reader = reader();
-            //FeatureType type = reader.getFeatureType();
+            //SimpleFeatureType type = reader.getFeatureType();
             while (reader.hasNext()) {
                 collection.add(reader.next());
             }

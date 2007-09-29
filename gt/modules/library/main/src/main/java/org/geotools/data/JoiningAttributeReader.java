@@ -17,7 +17,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 
 /**
@@ -30,7 +30,7 @@ import org.geotools.feature.AttributeType;
 public class JoiningAttributeReader implements AttributeReader {
     private AttributeReader[] readers;
     private int[] index;
-    private AttributeType[] metaData;
+    private AttributeDescriptor[] metaData;
 
     /**
      * Creates a new instance of JoiningAttributeReader
@@ -43,7 +43,7 @@ public class JoiningAttributeReader implements AttributeReader {
         this.metaData = joinMetaData(readers);
     }
 
-    private AttributeType[] joinMetaData(AttributeReader[] readers) {
+    private AttributeDescriptor[] joinMetaData(AttributeReader[] readers) {
         int total = 0;
         index = new int[readers.length];
 
@@ -52,7 +52,7 @@ public class JoiningAttributeReader implements AttributeReader {
             total += readers[i].getAttributeCount();
         }
 
-        AttributeType[] md = new AttributeType[total];
+        AttributeDescriptor[] md = new AttributeDescriptor[total];
         int idx = 0;
 
         for (int i = 0, ii = readers.length; i < ii; i++) {
@@ -122,7 +122,7 @@ public class JoiningAttributeReader implements AttributeReader {
         return metaData.length;
     }
 
-    public AttributeType getAttributeType(int i) {
+    public AttributeDescriptor getAttributeType(int i) {
         return metaData[i];
     }
 }

@@ -26,7 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Another Quick hack of a DataRepository as a bridge to the Opperations api.
@@ -60,8 +60,8 @@ public class FeatureSourceRepository implements Repository {
     	Set prefix = new HashSet();
     	for( Iterator i=featuresources.values().iterator(); i.hasNext();){
     		FeatureSource fs = (FeatureSource) i.next();
-    		FeatureType schema = fs.getSchema();
-    		prefix.add( schema.getNamespace().toString() );
+    		SimpleFeatureType schema = fs.getSchema();
+    		prefix.add( schema.getName().getNamespaceURI());
     	}
         return prefix;
     }
@@ -69,7 +69,7 @@ public class FeatureSourceRepository implements Repository {
     	SortedSet typeNames = new TreeSet();
     	for( Iterator i=featuresources.values().iterator(); i.hasNext();){
     		FeatureSource fs = (FeatureSource) i.next();
-    		FeatureType schema = fs.getSchema();
+    		SimpleFeatureType schema = fs.getSchema();
     		typeNames.add( schema.getTypeName() );
     	}
         return typeNames;    	    	

@@ -20,14 +20,14 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -73,10 +73,10 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class ReprojectFeatureReader implements FeatureReader {
     FeatureReader reader;
-    FeatureType schema;
+    SimpleFeatureType schema;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 
-    public ReprojectFeatureReader(FeatureReader reader, FeatureType schema,
+    public ReprojectFeatureReader(FeatureReader reader, SimpleFeatureType schema,
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
@@ -90,9 +90,9 @@ public class ReprojectFeatureReader implements FeatureReader {
             throw new NullPointerException("CoordinateSystem required");
         }
 
-        FeatureType type = reader.getFeatureType();
+        SimpleFeatureType type = reader.getFeatureType();
         CoordinateReferenceSystem original = type.getDefaultGeometry()
-                                                 .getCoordinateSystem();
+                                                 .getCRS();
 
         if (cs.equals(original)) {
             throw new IllegalArgumentException("CoordinateSystem " + cs
@@ -116,7 +116,7 @@ public class ReprojectFeatureReader implements FeatureReader {
      *
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         if (schema == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
@@ -140,14 +140,14 @@ public class ReprojectFeatureReader implements FeatureReader {
      *
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
 
-        Feature next = reader.next();
-        Object[] attributes = next.getAttributes(null);
+        SimpleFeature next = reader.next();
+        Object[] attributes = next.getAttributes().toArray();
 
         try {
             for (int i = 0; i < attributes.length; i++) {
@@ -160,7 +160,7 @@ public class ReprojectFeatureReader implements FeatureReader {
                 e);
         }
 
-        return schema.create(attributes, next.getID());
+        return SimpleFeatureBuilder.build(schema, attributes, next.getID());
     }
 
     /**

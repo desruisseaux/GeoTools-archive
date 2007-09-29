@@ -18,12 +18,13 @@ package org.geotools.data.crs;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -61,14 +62,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class ForceCoordinateSystemIterator implements Iterator {
     protected FeatureIterator reader;
-    protected FeatureType schema;
+    protected SimpleFeatureType schema;
 
     /**
      * Shortcut constructor that can be used if the new schema has already been computed
      * @param reader
      * @param schema
      */
-    ForceCoordinateSystemIterator(FeatureIterator reader, FeatureType schema) {
+    ForceCoordinateSystemIterator(FeatureIterator reader, SimpleFeatureType schema) {
         this.reader = reader;
         this.schema = schema;
     }
@@ -83,13 +84,13 @@ public class ForceCoordinateSystemIterator implements Iterator {
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public ForceCoordinateSystemIterator(FeatureIterator reader, FeatureType type,
+    public ForceCoordinateSystemIterator(FeatureIterator reader, SimpleFeatureType type,
         CoordinateReferenceSystem cs) throws SchemaException {
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");
         }        
         CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
-                                                   .getCoordinateSystem();
+                                                   .getCRS();
 
         if (cs.equals(originalCs)) {
             schema = FeatureTypes.transform(type, cs);
@@ -101,7 +102,7 @@ public class ForceCoordinateSystemIterator implements Iterator {
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         if (reader == null || schema == null ) {
             throw new IllegalStateException("Reader has already been closed");
         }        
@@ -117,12 +118,12 @@ public class ForceCoordinateSystemIterator implements Iterator {
             throw new IllegalStateException("Reader has already been closed");
         }
 
-        Feature next = reader.next();
+        SimpleFeature next = reader.next();
         if( schema==null )
             return next;
         
         try {
-            return schema.create(next.getAttributes(null), next.getID());
+            return SimpleFeatureBuilder.copy(next);
         }
         catch( IllegalAttributeException eep){
             throw (IllegalStateException) new IllegalStateException(eep.getMessage()).initCause(eep );

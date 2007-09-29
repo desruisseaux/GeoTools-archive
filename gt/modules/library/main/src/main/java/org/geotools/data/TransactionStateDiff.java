@@ -25,14 +25,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.geotools.data.Transaction.State;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -194,7 +193,7 @@ public class TransactionStateDiff implements State {
         	writer = store.getFeatureWriter(typeName);
 		}
         SimpleFeature feature;
-        Feature update;
+        SimpleFeature update;
         String fid;
 
         try {
@@ -203,23 +202,23 @@ public class TransactionStateDiff implements State {
                 fid = feature.getID();
 
                 if (diff.modified2.containsKey(fid)) {
-                    update = (Feature) diff.modified2.get(fid);
+                    update = (SimpleFeature) diff.modified2.get(fid);
 
                     if (update == NULL) {
                         writer.remove();
 
                         // notify
                         store.listenerManager.fireFeaturesRemoved(typeName,
-                            transaction, feature.getBounds(), true);
+                            transaction, ReferencedEnvelope.reference(feature.getBounds()), true);
                     } else {
                         try {
-                            feature.setAttributes(update.getAttributes(null));
+                            feature.setAttributes(update.getAttributes());
                             writer.write();
 
                             // notify                        
-                            Envelope bounds = new Envelope();
-                            bounds.expandToInclude(feature.getBounds());
-                            bounds.expandToInclude(update.getBounds());
+                            ReferencedEnvelope bounds = new ReferencedEnvelope((CoordinateReferenceSystem)null);
+                            bounds.include(feature.getBounds());
+                            bounds.include(update.getBounds());
                             store.listenerManager.fireFeaturesChanged(typeName,
                                 transaction, bounds, true);
                         } catch (IllegalAttributeException e) {
@@ -230,12 +229,12 @@ public class TransactionStateDiff implements State {
                 }
             }
 
-            Feature addedFeature;
+            SimpleFeature addedFeature;
             SimpleFeature nextFeature;
             
             synchronized (diff) {
             	for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
-            		addedFeature = (Feature) i.next();
+            		addedFeature = (SimpleFeature) i.next();
             		
             		fid = addedFeature.getID();
             		
@@ -246,12 +245,12 @@ public class TransactionStateDiff implements State {
             		} else {
             			try {
             				nextFeature.setAttributes(addedFeature
-            						.getAttributes(null));
+            						.getAttributes());
             				writer.write();
             				
             				// notify                        
             				store.listenerManager.fireFeaturesAdded(typeName,
-            						transaction, nextFeature.getBounds(), true);
+            						transaction, ReferencedEnvelope.reference(nextFeature.getBounds()), true);
             			} catch (IllegalAttributeException e) {
             				throw new DataSourceException("Could update " + fid,
             						e);
@@ -326,7 +325,7 @@ public class TransactionStateDiff implements State {
         FeatureReader reader = new FilteringFeatureReader(store.getFeatureReader(typeName, new DefaultQuery(typeName, filter)), filter);
 
         return new DiffFeatureWriter(reader, diff, filter) {
-                public void fireNotification(int eventType, Envelope bounds) {
+                public void fireNotification(int eventType, ReferencedEnvelope bounds) {
                     switch (eventType) {
                     case FeatureEvent.FEATURES_ADDED:
                         store.listenerManager.fireFeaturesAdded(typeName,
@@ -350,7 +349,7 @@ public class TransactionStateDiff implements State {
             };
     }
     
-    public static final Feature NULL=new Feature( ){
+    public static final SimpleFeature NULL=new SimpleFeature( ){
 
         public Object getAttribute(String path) {
             return null;
@@ -372,7 +371,7 @@ public class TransactionStateDiff implements State {
             return null;
         }
 
-        public FeatureType getFeatureType() {
+        public SimpleFeatureType getFeatureType() {
             return null;
         }
 

@@ -366,6 +366,17 @@ public class SimpleFeatureBuilder {
 	}
 	
 	/**
+	 * * Static method to build a new feature.
+     * <p>
+     * If multiple features need to be created, this method should not be used
+     * and instead an instance should be instantiated directly.
+     * </p>
+	 */
+	public static SimpleFeature build( SimpleFeatureType type, List values, String id ) {
+	    return build( type, values.toArray(), id );
+	}
+	
+	/**
      * Static method to copy an existing feature.
      * <p>
      * If multiple features need to be copied, this method should not be used

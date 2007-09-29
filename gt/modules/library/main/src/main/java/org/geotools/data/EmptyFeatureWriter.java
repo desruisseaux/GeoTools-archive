@@ -18,9 +18,8 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Represents an Empty, Typed, FeatureWriter.
@@ -29,21 +28,21 @@ import org.geotools.feature.FeatureType;
  * @source $URL$
  */
 public class EmptyFeatureWriter implements FeatureWriter {
-    FeatureType featureType;
+    SimpleFeatureType featureType;
 
     /**
      * An Empty FeatureWriter of the provided <code>featureType</code>.
      *
      * @param featureType
      */
-    public EmptyFeatureWriter(FeatureType featureType) {
+    public EmptyFeatureWriter(SimpleFeatureType featureType) {
         this.featureType = featureType;
     }
 
     /**
      * @see org.geotools.data.FeatureWriter#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 
@@ -56,7 +55,7 @@ public class EmptyFeatureWriter implements FeatureWriter {
      *
      * @see org.geotools.data.FeatureWriter#next()
      */
-    public Feature next() throws NoSuchElementException {
+    public SimpleFeature next() throws NoSuchElementException {
         throw new NoSuchElementException("FeatureWriter is empty");
     }
 

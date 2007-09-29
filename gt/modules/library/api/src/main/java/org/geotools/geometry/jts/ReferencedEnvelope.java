@@ -65,6 +65,13 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
     private CoordinateReferenceSystem crs;
 
     /**
+     * Creates a null envelope with a null coordinate reference system.
+     */
+    public ReferencedEnvelope() {
+        this( (CoordinateReferenceSystem) null );
+    }
+    
+    /**
      * Creates a null envelope with the specified coordinate reference system.
      *
      * @param crs The coordinate reference system.

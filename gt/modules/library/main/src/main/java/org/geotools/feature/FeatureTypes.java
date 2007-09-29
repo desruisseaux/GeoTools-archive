@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import DefaultFeatureType;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import java.util.Set;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.filter.LengthFunction;
 import org.geotools.geometry.jts.JTS;
@@ -103,6 +106,11 @@ public class FeatureTypes {
 	/** represent an unbounded field length */
     final public static int ANY_LENGTH = -1;
 
+    /** An feature type with no attributes */
+    public static final SimpleFeatureType EMPTY = new SimpleFeatureTypeImpl(
+        new Name( "Empty" ), Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST, null, null
+    );
+    
     /**
      * This is a 'suitable replacement for extracting the expected field length of an attribute
      * absed on its "facets" (ie Filter describing type restrictions);

@@ -19,11 +19,12 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -54,7 +55,7 @@ public class FIDFeatureReader implements FeatureReader {
     /** The logger for the data module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
     private final AttributeReader attributeReader;
-    private final FeatureType schema;
+    private final SimpleFeatureType schema;
     private final FIDReader fidReader;
     protected final Object[] attributes;
 
@@ -69,7 +70,7 @@ public class FIDFeatureReader implements FeatureReader {
      *         FeatureType
      */
     public FIDFeatureReader(AttributeReader attributeReader,
-        FIDReader fidReader, FeatureType schema) throws SchemaException {
+        FIDReader fidReader, SimpleFeatureType schema) throws SchemaException {
         this.attributeReader = attributeReader;
         this.fidReader = fidReader;
 
@@ -86,7 +87,7 @@ public class FIDFeatureReader implements FeatureReader {
         this(attributeReader, fidReader, null);
     }
 
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (attributeReader.hasNext()) {
             attributeReader.next();
@@ -98,18 +99,19 @@ public class FIDFeatureReader implements FeatureReader {
         }
     }
 
-    protected FeatureType createSchema() throws SchemaException {
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance("xxx");
-
+    protected SimpleFeatureType createSchema() throws SchemaException {
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName( "xxx" );
+        
         for (int i = 0, ii = attributeReader.getAttributeCount(); i < ii;
                 i++) {
-            factory.addType(attributeReader.getAttributeType(i));
+            b.add(attributeReader.getAttributeType(i));
         }
 
-        return factory.getFeatureType();
+        return b.buildFeatureType();
     }
 
-    protected Feature readFeature(AttributeReader atts)
+    protected SimpleFeature readFeature(AttributeReader atts)
         throws IllegalAttributeException, IOException {
 
         //Seems like doing it here could be a bit expensive.
@@ -122,7 +124,7 @@ public class FIDFeatureReader implements FeatureReader {
             attributes[i] = atts.read(i);
         }
 
-        return schema.create(attributes, fid);
+        return SimpleFeatureBuilder.build(schema, attributes, fid);
     }
 
     public void close() throws IOException {
@@ -130,7 +132,7 @@ public class FIDFeatureReader implements FeatureReader {
         attributeReader.close();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return schema;
     }
 

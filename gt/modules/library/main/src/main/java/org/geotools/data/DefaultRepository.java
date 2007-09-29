@@ -33,7 +33,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Quick hack of a DataRepository allows me to bridge the existing DataStore
@@ -131,8 +131,8 @@ public class DefaultRepository implements Repository {
     	for( Iterator i=datastores.values().iterator(); i.hasNext();){
     		DataStore ds = (DataStore) i.next();
     		for( Iterator t = types( ds ).values().iterator(); t.hasNext();){
-    			FeatureType schema = (FeatureType) t.next();
-    			prefix.add( schema.getNamespace().toString() );
+    			SimpleFeatureType schema = (SimpleFeatureType) t.next();
+    			prefix.add( schema.getName().getNamespaceURI());
     		}
     	}
         return prefix;
@@ -163,7 +163,7 @@ public class DefaultRepository implements Repository {
     		String id = (String) entry.getKey();
     		DataStore ds = (DataStore) entry.getValue();
     		for( Iterator t = types( ds ).values().iterator(); t.hasNext();){
-    			FeatureType schema = (FeatureType) t.next();
+    			SimpleFeatureType schema = (SimpleFeatureType) t.next();
     			map.put( id+":"+schema.getTypeName(), schema );
     		}
     	}

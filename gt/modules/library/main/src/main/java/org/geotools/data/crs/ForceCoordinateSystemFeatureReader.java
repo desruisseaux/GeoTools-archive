@@ -19,11 +19,12 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -61,14 +62,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class ForceCoordinateSystemFeatureReader implements FeatureReader {
     protected FeatureReader reader;
-    protected FeatureType schema;
+    protected SimpleFeatureType schema;
 
     /**
      * Shortcut constructor that can be used if the new schema has already been computed
      * @param reader
      * @param schema
      */
-    ForceCoordinateSystemFeatureReader(FeatureReader reader, FeatureType schema) {
+    ForceCoordinateSystemFeatureReader(FeatureReader reader, SimpleFeatureType schema) {
         this.reader = reader;
         this.schema = schema;
     }
@@ -104,9 +105,8 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
             throw new NullPointerException("CoordinateSystem required");
         }
 
-        FeatureType type = reader.getFeatureType();
-        CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
-                                                   .getCoordinateSystem();
+        SimpleFeatureType type = reader.getFeatureType();
+        CoordinateReferenceSystem originalCs = type.getCRS();
 
         if (!cs.equals(originalCs)) {
             schema = FeatureTypes.transform(type, cs, forceOnlyMissing);
@@ -118,7 +118,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
@@ -132,16 +132,16 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
 
-        Feature next = reader.next();
+        SimpleFeature next = reader.next();
         if( schema==null )
             return next;
-        return schema.create(next.getAttributes(null), next.getID());
+        return SimpleFeatureBuilder.copy(next);
     }
 
     /**

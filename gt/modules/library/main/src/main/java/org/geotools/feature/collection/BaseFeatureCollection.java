@@ -2,26 +2,18 @@ package org.geotools.feature.collection;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
-
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.Name;
-import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -54,7 +46,7 @@ public abstract class BaseFeatureCollection extends SimpleFeatureImpl
 	 * @param id The identifier of the feature collection.
 	 */
     protected BaseFeatureCollection( String id ){
-    	this(id,(FeatureType)null);
+    	this(id,(SimpleFeatureType)null);
     }
     
     /**
@@ -63,7 +55,7 @@ public abstract class BaseFeatureCollection extends SimpleFeatureImpl
 	 * @param id The identifier of the feature collection.
 	 * @param memberType The type of the members of the collection.
 	 */
-    protected BaseFeatureCollection( String id, FeatureType memberType ){
+    protected BaseFeatureCollection( String id, SimpleFeatureType memberType ){
     	super( Collections.EMPTY_LIST, new BaseFeatureCollectionType(memberType), id );
     }
     
@@ -97,8 +89,8 @@ public abstract class BaseFeatureCollection extends SimpleFeatureImpl
         return (BaseFeatureCollectionType) super.getType();
     }
     
-    public FeatureType getSchema() {
-    	return (FeatureType) getType().getMemberType();
+    public SimpleFeatureType getSchema() {
+    	return (SimpleFeatureType) getType().getMemberType();
     }
     
     public Object[] getAttributes(Object[] attributes) {

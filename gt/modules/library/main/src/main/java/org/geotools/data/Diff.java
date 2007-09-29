@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.geotools.feature.Feature;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 
 // TODO: replace by java.util.concurrent.ConcurrentHashMap when we will be allowed to target J2SE 1.5
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
@@ -112,51 +114,51 @@ public class Diff{
 		mutex=this;
 	}
 	
-	public void modify(String fid, Feature f) {
+	public void modify(String fid, SimpleFeature f) {
 		synchronized (mutex) {
-			Feature old;
+			SimpleFeature old;
             if( addedFeatures.containsKey(fid) ){
-            	old=(Feature) addedFeatures.get(fid);
+            	old=(SimpleFeature) addedFeatures.get(fid);
                 addedFeatures.put(fid, f);
             }else{
-            	old=(Feature) modifiedFeatures.get(fid);
+            	old=(SimpleFeature) modifiedFeatures.get(fid);
                 modifiedFeatures.put(fid, f);
             }
             if(old != null) {
-            	spatialIndex.remove(old.getBounds(), old);
+            	spatialIndex.remove(ReferencedEnvelope.reference(old.getBounds()), old);
             }
             addToSpatialIndex(f);
 		}
 	}
 	
-	public void add(String fid, Feature f) {
+	public void add(String fid, SimpleFeature f) {
 		synchronized (mutex) {
 			addedFeatures.put(fid, f);
 			addToSpatialIndex(f);
 		}
 	}
 	
-	protected void addToSpatialIndex(Feature f) {
+	protected void addToSpatialIndex(SimpleFeature f) {
 		if (f.getDefaultGeometry() != null) {
-			Envelope bounds = f.getBounds();
-			if( !bounds.isNull() )
-				spatialIndex.insert(bounds, f);
+			BoundingBox bounds = f.getBounds();
+			if( !bounds.isEmpty() )
+				spatialIndex.insert(ReferencedEnvelope.reference(bounds), f);
 		}
 	}
 	
 	public void remove(String fid) {
 		synchronized (mutex) {
-			Feature old = null;
+			SimpleFeature old = null;
 			
 			if( addedFeatures.containsKey(fid) ){
-				old = (Feature) addedFeatures.get(fid);
+				old = (SimpleFeature) addedFeatures.get(fid);
 				addedFeatures.remove(fid);
 			} else {
-				old = (Feature) modifiedFeatures.get(fid);
+				old = (SimpleFeature) modifiedFeatures.get(fid);
 				modifiedFeatures.put(fid, TransactionStateDiff.NULL);
 			}
 			if( old != null ) {
-				spatialIndex.remove(old.getBounds(), old);
+				spatialIndex.remove(ReferencedEnvelope.reference(old.getBounds()), old);
 			}			
 		}
 	}
@@ -174,16 +176,16 @@ public class Diff{
 			Iterator i = diff.added.entrySet().iterator();
 			while (i.hasNext()) {
 				Entry e = (Map.Entry) i.next();
-				Feature f = (Feature) e.getValue();
+				SimpleFeature f = (SimpleFeature) e.getValue();
 				if (!diff.modifiedFeatures.containsKey(f.getID())) {
-					tree.insert(f.getBounds(), f);
+					tree.insert(ReferencedEnvelope.reference(f.getBounds()), f);
 				}
 			}
 			Iterator j = diff.modified2.entrySet().iterator();
 			while( j.hasNext() ){
 				Entry e = (Map.Entry) j.next();
-				Feature f = (Feature) e.getValue();
-				tree.insert(f.getBounds(), f);
+				SimpleFeature f = (SimpleFeature) e.getValue();
+				tree.insert(ReferencedEnvelope.reference(f.getBounds()), f);
 			}
 		}
 		

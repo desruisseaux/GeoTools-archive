@@ -21,8 +21,7 @@ import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
-import com.vividsolutions.jts.geom.Envelope;
-
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
  * This class is used by DataStore implementations to provide FeatureListener
@@ -179,7 +178,7 @@ public class FeatureListenerManager {
      *        unknown)
      */
     public void fireFeaturesAdded(String typeName, Transaction transaction,
-        Envelope bounds, boolean commit) {
+        ReferencedEnvelope bounds, boolean commit) {
         if (commit) {
             fireCommit(typeName, transaction, FeatureEvent.FEATURES_ADDED, bounds );
         } else {
@@ -217,7 +216,7 @@ public class FeatureListenerManager {
      *        unknown)
      */
     public void fireFeaturesChanged(String typeName, Transaction transaction,
-        Envelope bounds, boolean commit) {
+        ReferencedEnvelope bounds, boolean commit) {
         if (commit) {
             fireCommit(typeName, transaction, FeatureEvent.FEATURES_CHANGED, bounds );
         } else {
@@ -272,7 +271,7 @@ public class FeatureListenerManager {
      * @param typeName
      * @param transaction
      */
-    private void fireCommit( String typeName, Transaction transaction, int type, Envelope bounds) {
+    private void fireCommit( String typeName, Transaction transaction, int type, ReferencedEnvelope bounds) {
         Map.Entry entry;
         FeatureSource featureSource;
         FeatureListener[] listeners;
@@ -298,7 +297,7 @@ public class FeatureListenerManager {
         }
     }
 
-    private void fireEvent( String typeName, Transaction transaction, int type, Envelope bounds) {
+    private void fireEvent( String typeName, Transaction transaction, int type, ReferencedEnvelope bounds) {
         Map.Entry entry;
         FeatureSource featureSource;
         FeatureListener[] listeners;
@@ -346,7 +345,7 @@ public class FeatureListenerManager {
      *        unknown)
      */
     public void fireFeaturesRemoved(String typeName, Transaction transaction,
-        Envelope bounds, boolean commit ) {
+        ReferencedEnvelope bounds, boolean commit ) {
         if (commit) {
             fireCommit(typeName, transaction, FeatureEvent.FEATURES_REMOVED, bounds );
         } else {

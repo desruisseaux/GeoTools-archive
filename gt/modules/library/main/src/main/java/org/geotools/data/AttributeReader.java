@@ -17,6 +17,8 @@ package org.geotools.data;
 
 import java.io.IOException;
 
+import org.opengis.feature.type.AttributeDescriptor;
+
 
 /**
  * The low-level attribute reading API.  An AttributeReader is responsible for
@@ -43,7 +45,7 @@ public interface AttributeReader {
      *
      * @return AttributeType at given index
      */
-    org.geotools.feature.AttributeType getAttributeType(int index)
+    AttributeDescriptor getAttributeType(int index)
         throws ArrayIndexOutOfBoundsException;
 
     /**

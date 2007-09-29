@@ -2,17 +2,17 @@ package org.geotools.feature.collection;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.Name;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.resources.Utilities;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 /**
  * Limited implementation of SimpleFeatureCollectionType for internal use
@@ -23,15 +23,13 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * </p>
  * @author Justin Deoliveira (The Open Planning Project)
  */
-public class BaseFeatureCollectionType extends DefaultFeatureType 
-	implements org.geotools.feature.FeatureType {
-    final FeatureType memberType;
+public class BaseFeatureCollectionType extends SimpleFeatureTypeImpl  {
     
-	public BaseFeatureCollectionType(FeatureType memberType) {
+    final SimpleFeatureType memberType;
+    
+	public BaseFeatureCollectionType(SimpleFeatureType memberType) {
 	    super( new Name( FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType") ,
-	           null, // no attribute types
-	           null, // no super types (although I wish we had "AbstractFeatureColletionType"
-	           null  // no default geometry
+            Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST, null, null
 	    );		           
 	    this.memberType = memberType;
 		//super( new TypeName(FeatureTypes.DEFAULT_NAMESPACE.toString(), "AbstractFeatureColletionType"), memberType, null );
@@ -48,19 +46,19 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 //	    AssociationDescriptorImpl member = new AssociationDescriptorImpl( null, new Name("member"), 0, Integer.MAX_VALUE );
 //	    return Collections.singleton( member );
 //	}
-	public Feature create(Object[] attributes) throws IllegalAttributeException {
+	public SimpleFeature create(Object[] attributes) throws IllegalAttributeException {
 	    throw new UnsupportedOperationException("Types of feature collection do not support feature creation");
 	}
 
-	public Feature create(Object[] attributes, String featureID) throws IllegalAttributeException {
+	public SimpleFeature create(Object[] attributes, String featureID) throws IllegalAttributeException {
 		throw new UnsupportedOperationException("Types of feature collection do not support feature creation");
 	}
 
-	public Feature duplicate(Feature feature) throws IllegalAttributeException {
+	public SimpleFeature duplicate(SimpleFeature feature) throws IllegalAttributeException {
 		throw new UnsupportedOperationException("Types of feature collection do not support feature creation");
 	}
 
-	public int find(AttributeType type) {
+	public int find(AttributeDescriptor type) {
 		return find( type.getLocalName() );
 	}
 
@@ -68,20 +66,20 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 		return indexOf(attName);
 	}
 
-	public FeatureType[] getAncestors() {
-		return new FeatureType[]{};
+	public SimpleFeatureType[] getAncestors() {
+		return new SimpleFeatureType[]{};
 	}
 
-	public AttributeType getAttributeType(String xPath) {
-		return (AttributeType) getAttribute(name);
+	public AttributeDescriptor getAttributeType(String xPath) {
+		return (AttributeDescriptor) getAttribute(name);
 	}
 
-	public AttributeType getAttributeType(int position) {
-		return (AttributeType) getAttribute(position);
+	public AttributeDescriptor getAttributeType(int position) {
+		return (AttributeDescriptor) getAttribute(position);
 	}
 
-	public AttributeType[] getAttributeTypes() {
-		return new AttributeType[]{};
+	public AttributeDescriptor[] getAttributeTypes() {
+		return new AttributeDescriptor[]{};
 	}
 
 	public URI getNamespace() {
@@ -94,8 +92,8 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 		}
 	}
 
-	public GeometryAttributeType getDefaultGeometry() {
-		return (GeometryAttributeType) super.getDefaultGeometry();
+	public GeometryDescriptor getDefaultGeometry() {
+		return (GeometryDescriptor) super.getDefaultGeometry();
 	}
 
 	public String getTypeName() {
@@ -110,7 +108,7 @@ public class BaseFeatureCollectionType extends DefaultFeatureType
 		return false;
 	}
 
-	public boolean isDescendedFrom(FeatureType type) {
+	public boolean isDescendedFrom(SimpleFeatureType type) {
 		return false;
 	}
 

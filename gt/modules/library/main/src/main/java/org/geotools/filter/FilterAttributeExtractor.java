@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.expression.PropertyName;
 
 
@@ -36,7 +36,7 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
     /** Last set visited */
     protected Set attributeNames = new HashSet();
     /** feature type to evaluate against */
-    protected FeatureType featureType;
+    protected SimpleFeatureType featureType;
 
     /**
      * @deprecated Should use {@link #FilterAttributeExtractor(FeatureType)}.
@@ -44,7 +44,7 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
     public FilterAttributeExtractor() {
         this(null);
     }
-    public FilterAttributeExtractor(FeatureType featureType) {
+    public FilterAttributeExtractor(SimpleFeatureType featureType) {
         this.featureType = featureType;
     }
     /**
@@ -80,7 +80,7 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
             //evaluate against the feature type instead of using straight name
             // since the path from the property name may be an xpath or a 
             // namespace prefixed string
-            AttributeType type = (AttributeType) expression.evaluate( featureType );
+            AttributeDescriptor type = (AttributeDescriptor) expression.evaluate( featureType );
             if ( type != null ) {
                attributeNames.add( type.getLocalName() );
             }

@@ -17,14 +17,16 @@ package org.geotools.data.crs;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
@@ -67,10 +69,10 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class ReprojectFeatureIterator implements Iterator {
     FeatureIterator reader;
-    FeatureType schema;
+    SimpleFeatureType schema;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 
-    public ReprojectFeatureIterator(FeatureIterator reader, FeatureType schema,
+    public ReprojectFeatureIterator(FeatureIterator reader, SimpleFeatureType schema,
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
@@ -89,7 +91,7 @@ public class ReprojectFeatureIterator implements Iterator {
      *
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         if (schema == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
@@ -119,13 +121,13 @@ public class ReprojectFeatureIterator implements Iterator {
             throw new IllegalStateException("Reader has already been closed");
         }
 
-        Feature next = reader.next();
-        Object[] attributes = next.getAttributes(null);
+        SimpleFeature next = reader.next();
+        List attributes = next.getAttributes();
 
         try {
-            for (int i = 0; i < attributes.length; i++) {
-                if (attributes[i] instanceof Geometry) {
-                    attributes[i] = transformer.transform((Geometry) attributes[i]);
+            for (int i = 0; i < attributes.size(); i++) {
+                if (attributes.get(i) instanceof Geometry) {
+                    attributes.set(i,transformer.transform((Geometry) attributes.get(i)));
                 }
             }
         } catch (TransformException e) {
@@ -133,7 +135,7 @@ public class ReprojectFeatureIterator implements Iterator {
         }
 
         try {
-            return schema.create(attributes, next.getID());
+            return SimpleFeatureBuilder.build(schema, attributes, next.getID());
         } catch (IllegalAttributeException e) {
             throw (IllegalStateException) new IllegalStateException("Problem occured during reprojection").initCause(e);                    
         }

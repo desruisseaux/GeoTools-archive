@@ -18,8 +18,8 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 
@@ -41,19 +41,19 @@ import org.opengis.filter.Filter;
 public class FilteringFeatureWriter implements FeatureWriter {
     FeatureWriter writer;
     Filter filter;
-    Feature next = null; // next feature as peeked by hasNext()
-    Feature current = null; // holds current Feature returned to user
+    SimpleFeature next = null; // next feature as peeked by hasNext()
+    SimpleFeature current = null; // holds current Feature returned to user
 
     public FilteringFeatureWriter(FeatureWriter writer, Filter filter) {
         this.writer = writer;
         this.filter = filter;
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return writer.getFeatureType();
     }
 
-    public Feature next() throws IOException {
+    public SimpleFeature next() throws IOException {
         if (hasNext()) {
             // use hasNext() to and peek ahead
             // 
@@ -128,7 +128,7 @@ public class FilteringFeatureWriter implements FeatureWriter {
             current = null;
         }
 
-        Feature peek;
+        SimpleFeature peek;
 
         while (writer.hasNext()) {
             peek = writer.next();

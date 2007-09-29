@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.geotools.feature.collection.AbstractResourceCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -75,7 +75,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         setResourceCollection(createResourceCollection());
     }
     
-    private static FeatureType origionalType( FeatureCollection results ){
+    private static SimpleFeatureType origionalType( FeatureCollection results ){
         while( true ){
             if ( results instanceof ReprojectFeatureResults ) {
                 results = ((ReprojectFeatureResults) results).getOrigin();
@@ -110,12 +110,12 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
     	};
     }
     
-    private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing ) throws SchemaException{
+    private static SimpleFeatureType forceType( SimpleFeatureType startingType, CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing ) throws SchemaException{
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
         CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry() != null ? 
-            startingType.getDefaultGeometry().getCoordinateSystem() : null;
+            startingType.getDefaultGeometry().getCRS() : null;
         
         if (forcedCS.equals(originalCs)) {
             return startingType;
@@ -131,7 +131,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
      * @see org.geotools.data.FeatureResults#getBounds()
      */
     public ReferencedEnvelope getBounds() {
-        return ReferencedEnvelope.reference( results.getBounds() );
+        return results.getBounds();
     }
 
    

@@ -18,11 +18,13 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -34,7 +36,7 @@ import org.geotools.feature.SchemaException;
  */
 public class DefaultFeatureReader implements FeatureReader {
     private final AttributeReader attributeReader;
-    private final FeatureType schema;
+    private final SimpleFeatureType schema;
     protected final Object[] attributes;
 
     /**
@@ -46,7 +48,7 @@ public class DefaultFeatureReader implements FeatureReader {
      * @throws SchemaException If Schema could not be obtained
      */
     public DefaultFeatureReader(AttributeReader attributeReader,
-        FeatureType schema) throws SchemaException {
+        SimpleFeatureType schema) throws SchemaException {
         this.attributeReader = attributeReader;
 
         if (schema == null) {
@@ -62,9 +64,9 @@ public class DefaultFeatureReader implements FeatureReader {
         this(attributeReader, null);
     }
 
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
-        Feature f = null;
+        SimpleFeature f = null;
 
         if (attributeReader.hasNext()) {
             attributeReader.next();
@@ -74,31 +76,31 @@ public class DefaultFeatureReader implements FeatureReader {
         return f;
     }
 
-    protected FeatureType createSchema() throws SchemaException {
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance("xxx");
-
+    protected SimpleFeatureType createSchema() throws SchemaException {
+        
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         for (int i = 0, ii = attributeReader.getAttributeCount(); i < ii;
                 i++) {
-            factory.addType(attributeReader.getAttributeType(i));
+            builder.add(attributeReader.getAttributeType(i));
         }
 
-        return factory.getFeatureType();
+        return builder.buildFeatureType();
     }
 
-    protected Feature readFeature(AttributeReader atts)
+    protected SimpleFeature readFeature(AttributeReader atts)
         throws IllegalAttributeException, IOException {
         for (int i = 0, ii = atts.getAttributeCount(); i < ii; i++) {
             attributes[i] = atts.read(i);
         }
 
-        return schema.create(attributes);
+        return SimpleFeatureBuilder.build( schema, attributes, null );
     }
 
     public void close() throws IOException {
         attributeReader.close();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return schema;
     }
 

@@ -19,13 +19,13 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.geotools.feature.collection.AbstractResourceCollection;
 
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.RandomFeatureAccess;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Implement a FeatureCollection by burning memory!
@@ -45,12 +45,12 @@ import org.geotools.feature.collection.RandomFeatureAccess;
 public class MemoryFeatureCollection extends AbstractFeatureCollection implements RandomFeatureAccess {
     TreeMap contents = new TreeMap();
     
-    public MemoryFeatureCollection( FeatureType schema ){
+    public MemoryFeatureCollection( SimpleFeatureType schema ){
         super( schema );
         setResourceCollection(
     		new AbstractResourceCollection() {
     			public boolean add( Object o ) {
-    		        Feature feature = (Feature) o;
+    		        SimpleFeature feature = (SimpleFeature) o;
     		        contents.put( feature.getID(), feature );
     		        return true;
     			}
@@ -102,16 +102,16 @@ public class MemoryFeatureCollection extends AbstractFeatureCollection implement
     //
     // RandomFeatureAccess 
     //
-    public Feature getFeatureMember( String id ) throws NoSuchElementException {
+    public SimpleFeature getFeatureMember( String id ) throws NoSuchElementException {
         if( contents.containsKey( id ) ){
-            return (Feature) contents.get( id );
+            return (SimpleFeature) contents.get( id );
         }
         throw new NoSuchElementException( id );
     }
 
-    public Feature removeFeatureMember( String id ) {
+    public SimpleFeature removeFeatureMember( String id ) {
         if( contents.containsKey( id ) ){
-            Feature old = (Feature) contents.get( id );
+            SimpleFeature old = (SimpleFeature) contents.get( id );
             contents.remove( id );
             return old;
         }
