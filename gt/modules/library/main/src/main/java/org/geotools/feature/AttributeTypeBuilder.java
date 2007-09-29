@@ -214,58 +214,111 @@ public class AttributeTypeBuilder {
 	 * Initializes builder state from another attribute descriptor.
 	 */
 
-	public AttributeTypeBuilder init( AttributeDescriptor descriptor ) {
+	public void init( AttributeDescriptor descriptor ) {
 		init( descriptor.getType() );
 		minOccurs = descriptor.getMinOccurs();
 		maxOccurs = descriptor.getMaxOccurs();
 		isNillable = descriptor.isNillable();
-		return this;
 	}
 	
 	// Type methods
 	//
 	
-	public AttributeTypeBuilder setBinding(Class binding) {
+	public void setBinding(Class binding) {
 		this.binding = binding;
-		return this;
 	}
 
-	public AttributeTypeBuilder setName(String name) {
+	public void setName(String name) {
 		this.name = name;
-		return this;
 	}
 
-	public AttributeTypeBuilder setNamespaceURI(String namespaceURI) {
+	public void setNamespaceURI(String namespaceURI) {
 		this.namespaceURI = namespaceURI;
-		return this;
 	}
 	
-	public AttributeTypeBuilder setCRS(CoordinateReferenceSystem crs) {
+	public void setCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 		isCrsSet = true;
-		return this;
 	}
 
 	public boolean isCRSSet() {
         return isCrsSet;
     }
 	
-	public AttributeTypeBuilder setDescription(String description) {
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setAbstract(boolean isAbstract) {
+		this.isAbstract = isAbstract;
+	}
+
+	public void setIdentifiable(boolean isIdentifiable) {
+		this.isIdentifiable = isIdentifiable;
+	}
+
+	public void addRestriction(Filter restriction) {
+		restrictions().add(restriction);
+	}
+	
+	// Descriptor methods
+	//
+	
+	public void setNillable(boolean isNillable) {
+		this.isNillable = isNillable;
+	}
+
+	public void setMaxOccurs(int maxOccurs) {
+		this.maxOccurs = maxOccurs;
+	}
+
+	public void setMinOccurs(int minOccurs) {
+		this.minOccurs = minOccurs;
+	}
+	
+	public void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+	
+	public AttributeTypeBuilder binding(Class binding) {
+		this.binding = binding;
+		return this;
+	}
+
+	public AttributeTypeBuilder name(String name) {
+		this.name = name;
+		return this;
+	}
+
+	public AttributeTypeBuilder namespaceURI(String namespaceURI) {
+		this.namespaceURI = namespaceURI;
+		return this;
+		
+	}
+	
+	public AttributeTypeBuilder crs(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		isCrsSet = true;
+		return this;
+	}
+
+	public AttributeTypeBuilder description(String description) {
 		this.description = description;
 		return this;
 	}
 
-	public AttributeTypeBuilder setAbstract(boolean isAbstract) {
+	public AttributeTypeBuilder abstrct(boolean isAbstract) {
 		this.isAbstract = isAbstract;
+
 		return this;
 	}
 
-	public AttributeTypeBuilder setIdentifiable(boolean isIdentifiable) {
+	public AttributeTypeBuilder identifiable(boolean isIdentifiable) {
 		this.isIdentifiable = isIdentifiable;
 		return this;
 	}
 
-	public AttributeTypeBuilder addRestriction(Filter restriction) {
+	public AttributeTypeBuilder restriction(Filter restriction) {
 		restrictions().add(restriction);
 		return this;
 	}
@@ -273,22 +326,22 @@ public class AttributeTypeBuilder {
 	// Descriptor methods
 	//
 	
-	public AttributeTypeBuilder setNillable(boolean isNillable) {
+	public AttributeTypeBuilder nillable(boolean isNillable) {
 		this.isNillable = isNillable;
 		return this;
 	}
 
-	public AttributeTypeBuilder setMaxOccurs(int maxOccurs) {
+	public AttributeTypeBuilder maxOccurs(int maxOccurs) {
 		this.maxOccurs = maxOccurs;
 		return this;
 	}
 
-	public AttributeTypeBuilder setMinOccurs(int minOccurs) {
+	public AttributeTypeBuilder minOccurs(int minOccurs) {
 		this.minOccurs = minOccurs;
 		return this;
 	}
 	
-	public AttributeTypeBuilder setDefaultValue(Object defaultValue) {
+	public AttributeTypeBuilder defaultValue(Object defaultValue) {
 		this.defaultValue = defaultValue;
 		return this;
 	}
