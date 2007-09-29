@@ -15,14 +15,15 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import org.geotools.data.FIDReader;
-import org.geotools.feature.FeatureType;
 import java.io.IOException;
+
+import org.geotools.data.FIDReader;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
- * DOCUMENT ME!
- *
+ * Reader that returns FeatureIds in a quick fashion.
+ * 
  * @author Tommaso Nolli
  * @source $URL$
  */
@@ -43,7 +44,7 @@ public class ShapeFIDReader implements FIDReader {
         this.reader = reader;
     }
 
-    public ShapeFIDReader(FeatureType featureType,
+    public ShapeFIDReader(SimpleFeatureType featureType,
         IndexedShapefileDataStore.Reader reader) {
         this(featureType.getTypeName(), reader);
     }

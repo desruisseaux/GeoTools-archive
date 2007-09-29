@@ -30,5 +30,5 @@ public interface FeatureCollectionType extends FeatureType {
     /**
      * Explicitly documents the FeatureCollection as containing this FeatureType.
      */
-    public FeatureType getMemberType();
+    public SimpleFeatureType getMemberType();
 }

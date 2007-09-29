@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.type.AttributeDescriptor;
+
 
 /**
  * Indicates client class has attempted to create an invalid feature.
@@ -24,7 +26,7 @@ public class IllegalAttributeException extends RuntimeException {
     private static final long serialVersionUID = -4964013824521988182L;
 
     /** The expected attribute type. */
-    private final AttributeType expected;
+    private final AttributeDescriptor expected;
 
     /** The object that does not match the expected type. */
     private final Object invalid;
@@ -46,7 +48,7 @@ public class IllegalAttributeException extends RuntimeException {
      * @param expected the expected AttributeType.
      * @param invalid the attribute that does not validate against expected.
      */
-    public IllegalAttributeException(AttributeType expected, Object invalid) {
+    public IllegalAttributeException(AttributeDescriptor expected, Object invalid) {
         this(expected, invalid, null);
     }
 
@@ -58,7 +60,7 @@ public class IllegalAttributeException extends RuntimeException {
      * @param invalid the attribute that does not validate against expected.
      * @param cause the root cause of the error.
      */
-    public IllegalAttributeException(AttributeType expected, Object invalid, Throwable cause) {
+    public IllegalAttributeException(AttributeDescriptor expected, Object invalid, Throwable cause) {
         super(errorMessage(expected, invalid), cause);
         this.expected = expected;
         this.invalid = invalid;
@@ -70,7 +72,7 @@ public class IllegalAttributeException extends RuntimeException {
         }
 
         String message = "IllegalAttribute: "
-            + ((expected == null) ? "null" : expected.getBinding().getName());
+            + ((expected == null) ? "null" : expected.getType().getBinding().getName());
 
         message += (" , but got " + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
@@ -85,9 +87,9 @@ public class IllegalAttributeException extends RuntimeException {
      *
      * @return an error message reporting the problem.
      */
-    static String errorMessage(AttributeType expected, Object invalid) {
+    static String errorMessage(AttributeDescriptor expected, Object invalid) {
         String message = "expected "
-            + ((expected == null) ? "null" : expected.getBinding().getName());
+            + ((expected == null) ? "null" : expected.getType().getBinding().getName());
         message += (" , but got " + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
         return message;

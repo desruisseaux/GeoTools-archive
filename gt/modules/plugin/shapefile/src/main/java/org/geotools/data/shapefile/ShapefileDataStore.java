@@ -32,6 +32,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.nio.charset.Charset;
+
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
@@ -74,36 +75,18 @@ import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
-import org.geotools.filter.LengthFunction;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.styling.StyleAttributeExtractor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
-import org.opengis.filter.PropertyIsGreaterThan;
-import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
-import org.opengis.filter.PropertyIsLessThan;
-import org.opengis.filter.PropertyIsLessThanOrEqualTo;
-import org.opengis.filter.capability.Function;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Literal;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.AbstractCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.styling.StyleAttributeExtractor;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -668,8 +651,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             if (namespace != null) {
                 builder.setNamespaceURI( namespace );
             }
-            else {
-                builder.setNamespaceURI( FeatureTypes.DEFAULT_NAMESPACE );                       
+            else {                
+                builder.setNamespaceURI( BasicFeatureTypes.DEFAULT_NAMESPACE );                       
             }
             builder.setAbstract( false );
             if (parent != null) {
@@ -713,7 +696,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             build.setBinding(geometryClass);
             
             GeometryType geometryType = build.buildGeometryType();
-            attributes.add( build.buildDescriptor( "the_geom", geometryType ) );
+            attributes.add( build.buildDescriptor( BasicFeatureTypes.GEOMETRY_ATTRIBUTE_NAME, geometryType ) );
             
             // take care of the case where no dbf and query wants all => geometry only
             if (dbf != null) {

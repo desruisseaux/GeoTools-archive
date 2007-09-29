@@ -16,23 +16,23 @@
  */
 package org.geotools.index.rtree;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.apache.velocity.runtime.exception.NodeException;
-import org.opengis.filter.Filter;
-import org.geotools.filter.Filters;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.index.Data;
-import org.geotools.index.DataDefinition;
-import org.geotools.index.Lock;
-import org.geotools.index.LockTimeoutException;
-import org.geotools.index.TreeException;
-import org.geotools.index.UnsupportedFilterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.filter.Filters;
+import org.geotools.index.Data;
+import org.geotools.index.DataDefinition;
+import org.geotools.index.Lock;
+import org.geotools.index.LockTimeoutException;
+import org.geotools.index.TreeException;
+import org.geotools.index.UnsupportedFilterException;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -18,10 +18,8 @@ package org.geotools.feature.type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * Defines required attributes for Annotations.
@@ -71,6 +69,10 @@ public class BasicFeatureTypes
      */
     public static final String GEOMETRY_ATTRIBUTE_NAME = "the_geom";
 
+    /**
+     * Default namespace used for our POINT, LINE, POLYGON types.
+     */
+    public static final String DEFAULT_NAMESPACE = "http://www.opengis.net/gml";
     
     // Static initializer for the tyoe variables
     static {

@@ -15,7 +15,7 @@
  */
 package org.geotools.feature.visitor;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -28,5 +28,5 @@ import org.geotools.feature.Feature;
  * @deprecated use {@link org.opengis.feature.FeatureVisitor}.
  */
 public interface FeatureVisitor extends org.opengis.feature.FeatureVisitor {
-    public void visit(Feature feature);
+    public void visit(SimpleFeature feature);
 }

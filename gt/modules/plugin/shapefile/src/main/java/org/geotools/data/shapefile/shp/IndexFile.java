@@ -26,7 +26,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
 
 import org.geotools.data.shapefile.StreamLogging;
-import org.geotools.data.shapefile.shp.ShapefileHeader;
 import org.geotools.resources.NIOUtilities;
 
 
