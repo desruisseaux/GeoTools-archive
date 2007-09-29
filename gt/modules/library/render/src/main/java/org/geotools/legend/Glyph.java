@@ -31,8 +31,8 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 
-import org.geotools.feature.FeatureType;
 import org.geotools.styling.Rule;
+import org.opengis.feature.simple.SimpleFeatureType;
  
  
 /**
@@ -480,23 +480,24 @@ public class Glyph {
         return bi;
     }
  
-    public static BufferedImage icon( FeatureType ft ) {
+    public static BufferedImage icon( SimpleFeatureType ft ) {
         if( ft==null || ft.getDefaultGeometry()==null )
             return null;
  
-        if( Point.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
-        || MultiPoint.class.isAssignableFrom(ft.getDefaultGeometry().getBinding()) ){
+        Class binding = ft.getDefaultGeometry().getType().getBinding();
+		if( Point.class.isAssignableFrom(binding)
+        || MultiPoint.class.isAssignableFrom(binding) ){
             return point(DEFAULT_BORDER, DEFAULT_FILL);
         }
  
-        if( LineString.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
-        || MultiLineString.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
-        || LinearRing.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())){
+        if( LineString.class.isAssignableFrom(binding)
+        || MultiLineString.class.isAssignableFrom(binding)
+        || LinearRing.class.isAssignableFrom(binding)){
             return line(DEFAULT_BORDER, 1);
         }
  
-        if( Polygon.class.isAssignableFrom(ft.getDefaultGeometry().getBinding())
-        || MultiPolygon.class.isAssignableFrom(ft.getDefaultGeometry().getBinding()) ){
+        if( Polygon.class.isAssignableFrom(binding)
+        || MultiPolygon.class.isAssignableFrom(binding) ){
             return polygon(DEFAULT_BORDER, DEFAULT_FILL, 1);
         }
  

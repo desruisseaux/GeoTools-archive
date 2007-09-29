@@ -30,16 +30,15 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
@@ -66,6 +65,8 @@ import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -110,8 +111,7 @@ public class Rendering2DTest extends TestCase {
 
 	protected static final Map rendererHints = new HashMap();
 
-	protected static final FilterFactory filterFactory = FilterFactoryFinder
-			.createFilterFactory();
+	protected static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
 
 	{
 		rendererHints.put("optimizedDataLoadingEnabled", new Boolean(true));
@@ -230,71 +230,58 @@ public class Rendering2DTest extends TestCase {
 	FeatureCollection createTestFeatureCollection(
 			CoordinateReferenceSystem crs, GeometryFactory geomFac,
 			String typeName) throws Exception {
-
-		AttributeType[] types = new AttributeType[2];
-
+		
 		LineString line = makeSampleLineString(geomFac);
-		if (crs != null)
-			types[0] = AttributeTypeFactory.newAttributeType("collection", line
-					.getClass(), false, 0, null, crs);
-		else
-			types[0] = AttributeTypeFactory.newAttributeType("centerline", line
-					.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType lineType = FeatureTypes.newFeatureType(types, LINE);
-		Feature lineFeature = lineType
-				.create(new Object[] { line, "centerline" });
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.setName(LINE);
+        if (crs != null)
+        	builder.add("collection", line.getClass(), crs);
+        else
+        	builder.add("centerline", line.getClass());
+        builder.add("name", String.class);
+        SimpleFeatureType lineType = builder.buildFeatureType();
+        SimpleFeature lineFeature = SimpleFeatureBuilder.build(lineType, new Object[]{line, "centerline"}, null);
 
 		Polygon polygon = makeSamplePolygon(geomFac);
-
+		builder.setName(POLYGON);
 		if (crs != null)
-			types[0] = AttributeTypeFactory.newAttributeType("collection",
-					polygon.getClass(), false, 0, null, crs);
+			builder.add("collection", polygon.getClass(), crs);
 		else
-			types[0] = AttributeTypeFactory.newAttributeType("edge", polygon
-					.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType polygonType = FeatureTypes.newFeatureType(types, POLYGON);
-
-		Feature polygonFeature = polygonType.create(new Object[] { polygon,
-				"edge" });
+			builder.add("edge", polygon.getClass());
+		builder.add("name", String.class);
+		SimpleFeatureType polygonType = builder.buildFeatureType();
+		SimpleFeature polygonFeature = SimpleFeatureBuilder.build(polygonType, new Object[] { polygon,
+				"edge" }, null);
 
 		Point point = makeSamplePoint(geomFac);
+		builder.setName(POINT);
 		if (crs != null)
-			types[0] = AttributeTypeFactory.newAttributeType("collection",
-					point.getClass(), false, 0, null, crs);
+			builder.add("collection", point.getClass(), crs);
 		else
-			types[0] = AttributeTypeFactory.newAttributeType("centre", point
-					.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypes.newFeatureType(types, POINT);
-
-		Feature pointFeature = pointType
-				.create(new Object[] { point, "centre" });
+			builder.add("centre", point.getClass());
+		builder.add("name", String.class);
+		SimpleFeatureType pointType = builder.buildFeatureType();
+		SimpleFeature pointFeature = SimpleFeatureBuilder.build(pointType, new Object[] { point, "centre" }, null);
 
 		LinearRing ring = makeSampleLinearRing(geomFac);
+		builder.setName(RING);
 		if (crs != null)
-			types[0] = AttributeTypeFactory.newAttributeType("collection", line
-					.getClass(), false, 0, null, crs);
+			builder.add("collection", line.getClass(), crs);
 		else
-			types[0] = AttributeTypeFactory.newAttributeType("centerline", line
-					.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType lrType = FeatureTypes.newFeatureType(types, RING);
-		Feature ringFeature = lrType
-				.create(new Object[] { ring, "centerline" });
+			builder.add("centerline", line.getClass());
+		builder.add("name", String.class);
+		SimpleFeatureType lrType = builder.buildFeatureType();
+		SimpleFeature ringFeature = SimpleFeatureBuilder.build(lrType, new Object[] { ring, "centerline" }, null);
 
 		GeometryCollection coll = makeSampleGeometryCollection(geomFac);
+		builder.setName(COLLECTION);
 		if (crs != null)
-			types[0] = AttributeTypeFactory.newAttributeType("collection", coll
-					.getClass(), false, 0, null, crs);
+			builder.add("collection", coll.getClass(), crs);
 		else
-			types[0] = AttributeTypeFactory.newAttributeType("collection", coll
-					.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType collType = FeatureTypes.newFeatureType(types, COLLECTION);
-		Feature collFeature = collType
-				.create(new Object[] { coll, "collection" });
+			builder.add("collection", coll.getClass());
+		builder.add("name", String.class);
+		SimpleFeatureType collType = builder.buildFeatureType();
+		SimpleFeature collFeature = SimpleFeatureBuilder.build(collType, new Object[] { coll, "collection" }, null);
 
 		MemoryDataStore data = new MemoryDataStore();
 		data.addFeature(lineFeature);
@@ -886,37 +873,34 @@ public class Rendering2DTest extends TestCase {
 	private FeatureCollection createTestDefQueryFeatureCollection()
 			throws Exception {
 		MemoryDataStore data = new MemoryDataStore();
-		AttributeType[] types = new AttributeType[4];
-
-		types[0] = AttributeTypeFactory.newAttributeType("id", String.class);
-		types[1] = AttributeTypeFactory.newAttributeType("point", Point.class);
-		types[2] = AttributeTypeFactory.newAttributeType("line",
-				LineString.class);
-		types[3] = AttributeTypeFactory.newAttributeType("polygon",
-				Polygon.class);
-
-		FeatureType type = FeatureTypes.newFeatureType(types, "querytest");
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.setName("querytest");
+		builder.add("id", String.class);
+		builder.add("point", Point.class);
+		builder.add("line", LineString.class);
+		builder.add("polygon", Polygon.class);
+		SimpleFeatureType type = builder.buildFeatureType();
 
 		GeometryFactory gf = new GeometryFactory();
-		Feature f;
+		SimpleFeature f;
 		LineString l;
 		Polygon p;
 
 		l = line(gf, new int[] { 20, 20, 100, 20, 100, 100 });
 		p = (Polygon) l.convexHull();
-		f = type.create(new Object[] { "ft1", point(gf, 20, 20), l, p },
+		f = SimpleFeatureBuilder.build(type, new Object[] { "ft1", point(gf, 20, 20), l, p },
 				"test.1");
 		data.addFeature(f);
 
 		l = line(gf, new int[] { 130, 130, 110, 110, 110, 130, 30, 130 });
 		p = (Polygon) l.convexHull();
-		f = type.create(new Object[] { "ft2", point(gf, 130, 130), l, p },
+		f = SimpleFeatureBuilder.build(type, new Object[] { "ft2", point(gf, 130, 130), l, p },
 				"test.2");
 		data.addFeature(f);
 
 		l = line(gf, new int[] { 150, 150, 190, 140, 190, 190 });
 		p = (Polygon) l.convexHull();
-		f = type.create(new Object[] { "ft3", point(gf, 150, 150), l, p },
+		f = SimpleFeatureBuilder.build(type, new Object[] { "ft3", point(gf, 150, 150), l, p },
 				"test.3");
 		data.addFeature(f);
 
@@ -1119,8 +1103,8 @@ public class Rendering2DTest extends TestCase {
     public void testRenderEmptyLine() throws SchemaException, IllegalAttributeException {
         GeometryFactory gf = new GeometryFactory();
         StyleBuilder sb = new StyleBuilder();
-        FeatureType pointType = DataUtilities.createType("emptyLines", "geom:LineString,name:String");
-        Feature f = pointType.create(new Object[] {gf.createLineString((Coordinate[]) null), "name" });
+        SimpleFeatureType pointType = DataUtilities.createType("emptyLines", "geom:LineString,name:String");
+        SimpleFeature f = SimpleFeatureBuilder.build(pointType, new Object[] {gf.createLineString((Coordinate[]) null), "name" }, null);
         Style style = sb.createStyle(sb.createLineSymbolizer());
         
         renderEmptyGeometry(f, style);
@@ -1129,8 +1113,8 @@ public class Rendering2DTest extends TestCase {
     public void testRenderEmptyCollection() throws SchemaException, IllegalAttributeException {
         GeometryFactory gf = new GeometryFactory();
         StyleBuilder sb = new StyleBuilder();
-        FeatureType pointType = DataUtilities.createType("emptyPolygon", "geom:MultiPolygon,name:String");
-        Feature f = pointType.create(new Object[] {gf.createMultiPolygon((Polygon[]) null), "name" });
+        SimpleFeatureType pointType = DataUtilities.createType("emptyPolygon", "geom:MultiPolygon,name:String");
+        SimpleFeature f = SimpleFeatureBuilder.build(pointType, new Object[] {gf.createMultiPolygon((Polygon[]) null), "name" }, null);
         Style style = sb.createStyle(sb.createPolygonSymbolizer());
         
         renderEmptyGeometry(f, style);
@@ -1139,12 +1123,12 @@ public class Rendering2DTest extends TestCase {
     public void testRenderCollectionWithEmptyItems() throws SchemaException, IllegalAttributeException {
         GeometryFactory gf = new GeometryFactory();
         StyleBuilder sb = new StyleBuilder();
-        FeatureType pointType = DataUtilities.createType("emptyPolygon", "geom:MultiPolygon,name:String");
+        SimpleFeatureType pointType = DataUtilities.createType("emptyPolygon", "geom:MultiPolygon,name:String");
         Polygon p1 = gf.createPolygon(gf.createLinearRing((Coordinate[]) null), null);
         Polygon p2 = gf.createPolygon(gf.createLinearRing(new Coordinate[] {new Coordinate(0,0), 
                 new Coordinate(1, 1), new Coordinate(1, 0), new Coordinate(0,0)}), null);
         MultiPolygon mp = gf.createMultiPolygon(new Polygon[] {p1, p2});
-        Feature f = pointType.create(new Object[] {mp, "name" });
+        SimpleFeature f = SimpleFeatureBuilder.build(pointType, new Object[] {mp, "name" }, null);
         Style style = sb.createStyle(sb.createPolygonSymbolizer());
         
         renderEmptyGeometry(f, style);
@@ -1153,14 +1137,14 @@ public class Rendering2DTest extends TestCase {
     public void testRenderPolygonEmptyRings() throws SchemaException, IllegalAttributeException {
         GeometryFactory gf = new GeometryFactory();
         StyleBuilder sb = new StyleBuilder();
-        FeatureType pointType = DataUtilities.createType("emptyRings", "geom:MultiPolygon,name:String");
+        SimpleFeatureType pointType = DataUtilities.createType("emptyRings", "geom:MultiPolygon,name:String");
         LinearRing emptyRing = gf.createLinearRing((Coordinate[]) null);
         LinearRing realRing = gf.createLinearRing(new Coordinate[] {new Coordinate(0,0), 
                         new Coordinate(1, 1), new Coordinate(1, 0), new Coordinate(0,0)});
         Polygon p1 = gf.createPolygon(realRing, new LinearRing[] {emptyRing});
         Polygon p2 = gf.createPolygon(emptyRing, new LinearRing[] {emptyRing});
         MultiPolygon mp = gf.createMultiPolygon(new Polygon[] {p1, p2});
-        Feature f = pointType.create(new Object[] {mp, "name" });
+        SimpleFeature f = SimpleFeatureBuilder.build(pointType, new Object[] {mp, "name" }, null);
         Style style = sb.createStyle(sb.createPolygonSymbolizer());
         
         renderEmptyGeometry(f, style);
@@ -1169,12 +1153,12 @@ public class Rendering2DTest extends TestCase {
     public void testMixedEmptyMultiLine() throws SchemaException, IllegalAttributeException {
         GeometryFactory gf = new GeometryFactory();
         StyleBuilder sb = new StyleBuilder();
-        FeatureType pointType = DataUtilities.createType("emptyRings", "geom:MultiLineString,name:String");
+        SimpleFeatureType pointType = DataUtilities.createType("emptyRings", "geom:MultiLineString,name:String");
         LineString emptyLine = gf.createLineString((Coordinate[]) null);
         LineString realLine = gf.createLineString(new Coordinate[] {new Coordinate(0,0), 
                         new Coordinate(1, 1)});
         MultiLineString mls = gf.createMultiLineString(new LineString[] {emptyLine, realLine});
-        Feature f = pointType.create(new Object[] {mls, "name" });
+        SimpleFeature f = SimpleFeatureBuilder.build(pointType, new Object[] {mls, "name" }, null);
         Style style = sb.createStyle(sb.createPolygonSymbolizer());
         
         renderEmptyGeometry(f, style);
@@ -1182,7 +1166,7 @@ public class Rendering2DTest extends TestCase {
     
     
 
-    private void renderEmptyGeometry(Feature f, Style style) {
+    private void renderEmptyGeometry(SimpleFeature f, Style style) {
         FeatureCollection fc = DataUtilities.collection(f);
         MapContext mc = new DefaultMapContext();
         mc.addLayer(fc, style);
@@ -1191,7 +1175,7 @@ public class Rendering2DTest extends TestCase {
         BufferedImage bi = new BufferedImage(640, 480, BufferedImage.TYPE_4BYTE_ABGR);
         sr.addRenderListener(new RenderListener() {
         
-            public void featureRenderer(Feature feature) {
+            public void featureRenderer(SimpleFeature feature) {
             }
         
             public void errorOccurred(Exception e) {

@@ -6,14 +6,13 @@ import java.awt.image.BufferedImage;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -22,6 +21,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class ReprojectionTest extends TestCase {
 
-	private FeatureType pointFeautureType;
+	private SimpleFeatureType pointFeautureType;
 
 	private GeometryFactory gf = new GeometryFactory();
 
@@ -45,10 +46,11 @@ public class ReprojectionTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		AttributeType[] attributes = new AttributeType[] { AttributeTypeFactory
-				.newAttributeType("geom", LineString.class, false, 0, null,
-						DefaultGeographicCRS.WGS84) };
-		pointFeautureType = FeatureTypes.newFeatureType(attributes, "Lines");
+
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.setName("Lines");
+		builder.add("geom", LineString.class, DefaultGeographicCRS.WGS84);
+		pointFeautureType = builder.buildFeatureType();
 	}
 
 	public FeatureCollection createLineCollection() throws Exception {
@@ -60,12 +62,12 @@ public class ReprojectionTest extends TestCase {
 		return fc;
 	}
 
-	private Feature createLine(double x1, double y1, double x2, double y2)
+	private SimpleFeature createLine(double x1, double y1, double x2, double y2)
 			throws IllegalAttributeException {
 		Coordinate[] coords = new Coordinate[] { new Coordinate(x1, y1),
 				new Coordinate(x2, y2) };
-		return pointFeautureType.create(new Object[] { gf
-				.createLineString(coords) });
+		return SimpleFeatureBuilder.build(pointFeautureType, new Object[] { gf
+				.createLineString(coords) }, null);
 	}
 
 	private Style createLineStyle() {
@@ -96,7 +98,7 @@ public class ReprojectionTest extends TestCase {
 		sr.setContext(mapContext);
 		sr.addRenderListener(new RenderListener() {
 
-			public void featureRenderer(Feature feature) {
+			public void featureRenderer(SimpleFeature feature) {
 			}
 
 			public void errorOccurred(Exception e) {

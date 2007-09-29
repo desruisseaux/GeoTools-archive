@@ -59,7 +59,7 @@ import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
@@ -351,7 +351,7 @@ public class SLDStyleFactory {
      *
      * @throws UnsupportedOperationException if an unknown symbolizer is passed to this method
      */
-    public Style2D createDynamicStyle(Feature f, Symbolizer symbolizer, Range scaleRange) {
+    public Style2D createDynamicStyle(SimpleFeature f, Symbolizer symbolizer, Range scaleRange) {
         Style2D style = null;
 
         if (symbolizer instanceof PolygonSymbolizer) {
@@ -379,7 +379,7 @@ public class SLDStyleFactory {
         return style;
     }
 
-    Style2D createDynamicPolygonStyle(Feature feature, PolygonSymbolizer symbolizer,
+    Style2D createDynamicPolygonStyle(SimpleFeature feature, PolygonSymbolizer symbolizer,
         Range scaleRange) {
         PolygonStyle2D style = new DynamicPolygonStyle2D(feature, symbolizer);
 
@@ -401,7 +401,7 @@ public class SLDStyleFactory {
         return style;
     }
 
-    Style2D createDynamicLineStyle(Feature feature, LineSymbolizer symbolizer, Range scaleRange) {
+    Style2D createDynamicLineStyle(SimpleFeature feature, LineSymbolizer symbolizer, Range scaleRange) {
         LineStyle2D style = new DynamicLineStyle2D(feature, symbolizer);
         setScaleRange(style, scaleRange);
 

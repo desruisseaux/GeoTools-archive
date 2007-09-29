@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;

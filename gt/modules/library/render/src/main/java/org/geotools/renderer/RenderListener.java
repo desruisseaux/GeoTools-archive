@@ -15,7 +15,7 @@
  */
 package org.geotools.renderer;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * A RenderListener is notified each time a feature is rendered and each time
@@ -25,6 +25,6 @@ import org.geotools.feature.Feature;
  * @source $URL$
  */
 public interface RenderListener {
-    public void featureRenderer( Feature feature );
+    public void featureRenderer( SimpleFeature feature );
     public void errorOccurred( Exception e);
 }

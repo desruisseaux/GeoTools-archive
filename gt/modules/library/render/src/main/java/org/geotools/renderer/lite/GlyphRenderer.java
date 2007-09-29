@@ -21,7 +21,6 @@ package org.geotools.renderer.lite;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import org.geotools.feature.Feature;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.Graphic;
 

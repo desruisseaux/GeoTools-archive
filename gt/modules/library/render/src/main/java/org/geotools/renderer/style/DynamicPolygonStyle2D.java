@@ -20,9 +20,9 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Paint;
 
-import org.geotools.feature.Feature;
 import org.geotools.styling.Fill;
 import org.geotools.styling.PolygonSymbolizer;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -33,13 +33,13 @@ import org.geotools.styling.PolygonSymbolizer;
  * @source $URL$
  */
 public class DynamicPolygonStyle2D extends org.geotools.renderer.style.PolygonStyle2D {
-    Feature feature;
+	SimpleFeature feature;
     PolygonSymbolizer ps;
 
     /**
      * Creates a new instance of DynamicPolygonStyle2D
      */
-    public DynamicPolygonStyle2D(Feature f, PolygonSymbolizer sym) {
+    public DynamicPolygonStyle2D(SimpleFeature f, PolygonSymbolizer sym) {
         feature = f;
         ps = sym;
     }

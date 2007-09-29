@@ -21,9 +21,10 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Paint;
 
-import org.geotools.feature.Feature;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Stroke;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.expression.Expression;
 
 
@@ -36,7 +37,7 @@ import org.opengis.filter.expression.Expression;
  */
 public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D {
     /** The feature that will be styled as a polygon */
-    protected Feature feature;
+    protected SimpleFeature feature;
 
     /** The line symbolizer used to get stroke/composite/... */
     protected LineSymbolizer ls;
@@ -44,7 +45,7 @@ public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D 
     /**
      * Creates a new instance of DynamicLineStyle2D
      */
-    public DynamicLineStyle2D(Feature feature, LineSymbolizer sym) {
+    public DynamicLineStyle2D(SimpleFeature feature, LineSymbolizer sym) {
         this.feature = feature;
         ls = sym;
     }
@@ -149,7 +150,7 @@ public class DynamicLineStyle2D extends org.geotools.renderer.style.LineStyle2D 
      * Evaluates an expression over the passed feature, if the expression or the result is null,
      * the default value will be returned
      */
-    private String evaluateExpression(Expression e, Feature feature, String defaultValue) {
+    private String evaluateExpression(Expression e, SimpleFeature feature, String defaultValue) {
         String result = defaultValue;
 
         if (e != null) {

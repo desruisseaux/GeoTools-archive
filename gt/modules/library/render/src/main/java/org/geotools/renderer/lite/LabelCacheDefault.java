@@ -41,12 +41,12 @@ import java.util.Set;
 
 import javax.media.jai.util.Range;
 
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.Decimator;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
 import org.geotools.styling.TextSymbolizer;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -209,7 +209,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param symbolizer
 	 * @param feature
 	 */
-	public double getPriority(TextSymbolizer symbolizer, Feature feature) {
+	public double getPriority(TextSymbolizer symbolizer, SimpleFeature feature) {
 		if (symbolizer.getPriority() == null)
 			return DEFAULT_PRIORITY;
 
@@ -226,7 +226,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D,
 	 *      org.geotools.renderer.lite.LiteShape)
 	 */
-	public void put(String layerId, TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) 
+	public void put(String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, Range scaleRange) 
 	{
 		needsOrdering=true;
 		try{

@@ -57,10 +57,8 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
@@ -94,6 +92,10 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
@@ -330,7 +332,7 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	private void fireFeatureRenderedEvent(Object feature) {
-        if( !(feature instanceof Feature)){
+        if( !(feature instanceof SimpleFeature)){
             return;
         }
 		final Object[] objects = renderListeners.getListeners();
@@ -338,7 +340,7 @@ public final class StreamingRenderer implements GTRenderer {
 		RenderListener listener;
 		for (int i = 0; i < length; i++) {
 			listener = (RenderListener) objects[i];
-			listener.featureRenderer((Feature)feature);
+			listener.featureRenderer((SimpleFeature) feature);
 		}
 	}
 
@@ -666,7 +668,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * the moment the query is not filtered, that means all objects with all 
 	 * fields are read from the datastore for every call to this method. This 
 	 * method should work like 
-	 * {@link #queryLayer(MapLayer, FeatureSource, FeatureType, LiteFeatureTypeStyle[], Envelope, CoordinateReferenceSystem, CoordinateReferenceSystem, Rectangle, GeometryAttributeType)} 
+	 * {@link #queryLayer(MapLayer, FeatureSource, SimpleFeatureType, LiteFeatureTypeStyle[], Envelope, CoordinateReferenceSystem, CoordinateReferenceSystem, Rectangle, GeometryAttributeType)} 
 	 * and eventually replace it.</em>
 	 * </p>
 	 * 
@@ -752,10 +754,10 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	
 	FeatureCollection queryLayer(MapLayer currLayer, FeatureSource source,
-			FeatureType schema, LiteFeatureTypeStyle[] styles,
+			SimpleFeatureType schema, LiteFeatureTypeStyle[] styles,
 			Envelope mapArea, CoordinateReferenceSystem mapCRS,
 			CoordinateReferenceSystem featCrs, Rectangle screenSize,
-			GeometryAttributeType geometryAttribute,
+			GeometryDescriptor geometryAttribute,
             AffineTransform worldToScreenTransform)
 			throws IllegalFilterException, IOException,
 			IllegalAttributeException {
@@ -763,7 +765,6 @@ public final class StreamingRenderer implements GTRenderer {
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
 		Query definitionQuery;
 		String[] attributes;
-		AttributeType[] ats;
 		final int length;
 		Filter filter = null;
 		
@@ -784,11 +785,11 @@ public final class StreamingRenderer implements GTRenderer {
 			// for testing purposes we have a null case -->
 
 			if (styles == null) {
-				ats = schema.getAttributeTypes();
-				length = ats.length;
+				List<AttributeDescriptor> ats = schema.getAttributes();
+				length = ats.size();
 				attributes = new String[length];
 				for (int t = 0; t < length; t++) {
-					attributes[t] = ats[t].getLocalName();
+					attributes[t] = ats.get(t).getLocalName();
 				}
 			} else {
 				attributes = findStyleAttributes(styles, schema);
@@ -1083,7 +1084,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *         <code>layer</code>
 	 */
 	private String[] findStyleAttributes(LiteFeatureTypeStyle[] styles,
-			FeatureType schema) {
+			SimpleFeatureType schema) {
 		final StyleAttributeExtractor sae = new StyleAttributeExtractor();
 
 		LiteFeatureTypeStyle lfts;
@@ -1113,18 +1114,18 @@ public final class StreamingRenderer implements GTRenderer {
 		 * GR: if as result of sae.getAttributeNames() ftsAttributes already
 		 * contains geometry attribue names, they gets duplicated, wich produces
 		 * an error in AbstracDatastore when trying to create a derivate
-		 * FeatureType. So I'll add the default geometry only if it is not
+		 * SimpleFeatureType. So I'll add the default geometry only if it is not
 		 * already present, but: should all the geometric attributes be added by
 		 * default? I will add them, but don't really know what's the expected
 		 * behavior
 		 */
 		List atts = new LinkedList(Arrays.asList(ftsAttributes));
-		AttributeType[] attTypes = schema.getAttributeTypes();
+		List<AttributeDescriptor> attTypes = schema.getAttributes();
 		String attName;
 
-		final int attTypesLength = attTypes.length;
+		final int attTypesLength = attTypes.size();
 		for (int i = 0; i < attTypesLength; i++) {
-			attName = attTypes[i].getLocalName();
+			attName = attTypes.get(i).getLocalName();
 
 			// DJB: This geometry check was commented out. I think it should
 			// actually be back in or
@@ -1186,14 +1187,14 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @throws IllegalFilterException
 	 *             if something goes wrong creating the filter
 	 */
-	private Filter createBBoxFilters(FeatureType schema, String[] attributes,
+	private Filter createBBoxFilters(SimpleFeatureType schema, String[] attributes,
 			Envelope bbox) throws IllegalFilterException {
 		Filter filter = null;
 		final int length = attributes.length;
-		AttributeType attType;
+		AttributeDescriptor attType;
 		
 		for (int j = 0; j < length; j++) {
-			attType = schema.getAttributeType(attributes[j]);
+			attType = schema.getAttribute(attributes[j]);
 
 			// DJB: added this for better error messages!
 			if (attType == null) {
@@ -1243,7 +1244,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * </p>
 	 * 
 	 * <p><em><strong>Note:</strong> This method has a lot of duplication with 
-	 * {@link #createLiteFeatureTypeStyles(FeatureTypeStyle[], FeatureType, Graphics2D)}. 
+	 * {@link #createLiteFeatureTypeStyles(FeatureTypeStyle[], SimpleFeatureType, Graphics2D)}. 
 	 * </em></p>
 	 * 
 	 * @param featureStyles Styles to process
@@ -1323,7 +1324,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @return ArrayList<LiteFeatureTypeStyle>
 	 */
 	private ArrayList createLiteFeatureTypeStyles(
-			FeatureTypeStyle[] featureStyles, FeatureType ftype,
+			FeatureTypeStyle[] featureStyles, SimpleFeatureType ftype,
 			Graphics2D graphics) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("creating rules for scale denominator - "
@@ -1350,8 +1351,8 @@ public final class StreamingRenderer implements GTRenderer {
 			fts = featureStyles[i];
 
 			if ((typeName != null)
-					&& (ftype.isDescendedFrom(null, fts.getFeatureTypeName()) || typeName
-							.equalsIgnoreCase(fts.getFeatureTypeName()))) {
+					&& (typeName.equalsIgnoreCase(fts.getFeatureTypeName()) || 
+							FeatureTypes.isDecendedFrom(ftype, null, fts.getFeatureTypeName()))) {
 				// DJB: this FTS is compatible with this FT.
 
 				// get applicable rules at the current scale
@@ -1429,7 +1430,7 @@ public final class StreamingRenderer implements GTRenderer {
         // The correct value is in sourceCrs.
 
         // this is the reader's CRS
-        CoordinateReferenceSystem rCS = features.getSchema().getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem rCS = features.getSchema().getDefaultGeometry().getType().getCRS();
 
         // sourceCrs == source's real SRS
         // if we need to recode the incoming geometries
@@ -1517,10 +1518,10 @@ public final class StreamingRenderer implements GTRenderer {
         final ArrayList lfts ;
         
         if ( featureSource != null ) {
-			final FeatureType schema = featureSource.getSchema();
+			final SimpleFeatureType schema = featureSource.getSchema();
 	        
-			final GeometryAttributeType geometryAttribute = schema.getDefaultGeometry();
-			sourceCrs = geometryAttribute.getCoordinateSystem();
+			final GeometryDescriptor geometryAttribute = schema.getDefaultGeometry();
+			sourceCrs = geometryAttribute.getType().getCRS();
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.fine(new StringBuffer("processing ").append(
 						featureStylers.length).append(" stylers for ").append(
@@ -1743,9 +1744,9 @@ public final class StreamingRenderer implements GTRenderer {
 					fireErrorEvent(new RuntimeException(ae));
 					continue;
 				}
-				if (symbolizers[m] instanceof TextSymbolizer && drawMe instanceof Feature) {
+				if (symbolizers[m] instanceof TextSymbolizer && drawMe instanceof SimpleFeature) {
                     // TODO: double back and make labelCache work with Objects
-					labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (Feature)drawMe,
+					labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (SimpleFeature)drawMe,
 							shape, scaleRange);
 				} else {
 					Style2D style = styleFactory.createStyle(drawMe,
@@ -2021,8 +2022,8 @@ public final class StreamingRenderer implements GTRenderer {
 		// get the geometry
 		Geometry geom;
 		if(geomName == null) {
-		    if(drawMe instanceof Feature)
-		        geom = ((Feature) drawMe).getDefaultGeometry();
+		    if(drawMe instanceof SimpleFeature)
+		        geom = (Geometry) ((SimpleFeature) drawMe).getDefaultGeometry();
 		    else
 		        geom = (Geometry) defaultGeometryPropertyName.evaluate(drawMe, Geometry.class);
 		} else {
@@ -2076,19 +2077,19 @@ public final class StreamingRenderer implements GTRenderer {
 			MapLayer currLayer, Object drawMe, Symbolizer s) {
 
 
-        if( drawMe instanceof Feature ){
-            Feature f = (Feature) drawMe;
+        if( drawMe instanceof SimpleFeature ){
+            SimpleFeature f = (SimpleFeature) drawMe;
         
             PropertyName propertyName = getGeometryPropertyName(s);
             String geomName = propertyName != null ? propertyName.getPropertyName() : null;        
             if (geomName == null || "".equals(geomName)) {
-                FeatureType schema = f.getFeatureType();
-                GeometryAttributeType geom = schema.getDefaultGeometry();
-                return geom.getCoordinateSystem();
+                SimpleFeatureType schema = f.getFeatureType();
+                GeometryDescriptor geom = schema.getDefaultGeometry();
+                return geom.getType().getCRS();
             } else {
-                FeatureType schema = f.getFeatureType();
-                GeometryAttributeType geom = (GeometryAttributeType) schema.getAttributeType( geomName );
-                return geom.getCoordinateSystem();
+                SimpleFeatureType schema = f.getFeatureType();
+                GeometryDescriptor geom = (GeometryDescriptor) schema.getAttribute( geomName );
+                return geom.getType().getCRS();
             }
         }
         else if ( currLayer.getSource() != null ) {

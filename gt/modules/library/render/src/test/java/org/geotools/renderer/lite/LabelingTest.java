@@ -20,18 +20,20 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -97,7 +99,7 @@ public class LabelingTest extends TestCase {
 	}
 
 	private FeatureCollection createPointFeatureCollection() throws Exception {
-        AttributeType[] types = new AttributeType[2];
+		AttributeDescriptor[] types = new AttributeDescriptor[2];
 
         
         GeometryFactory geomFac=new GeometryFactory();
@@ -114,18 +116,16 @@ public class LabelingTest extends TestCase {
 	}
 
 
-	private Feature createPointFeature(int x, int y, String name, CoordinateReferenceSystem crs, GeometryFactory geomFac, AttributeType[] types) throws Exception{
+	private SimpleFeature createPointFeature(int x, int y, String name, CoordinateReferenceSystem crs, GeometryFactory geomFac, AttributeDescriptor[] types) throws Exception{
         Coordinate c = new Coordinate(x, y);
         Point point = geomFac.createPoint(c);
-		if (crs != null)
-            types[0] = AttributeTypeFactory.newAttributeType("point", point.getClass(), false, 0,
-                    null, crs);
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        if (crs != null)
+        	builder.add("point", point.getClass(), crs);
         else
-            types[0] = AttributeTypeFactory.newAttributeType("centre", point.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypes.newFeatureType(types, Rendering2DTest.POINT);
-		Feature pointFeature = pointType.create(new Object[]{point, name});
-		return pointFeature;
+        	builder.add("centre", point.getClass());
+        SimpleFeatureType type = builder.buildFeatureType();
+        return SimpleFeatureBuilder.build(type, new Object[]{point, name}, null);
 	}
 
    
@@ -147,7 +147,7 @@ public class LabelingTest extends TestCase {
 	}
 
 	private FeatureCollection createLineFeatureCollection() throws Exception {
-        AttributeType[] types = new AttributeType[2];
+        AttributeDescriptor[] types = new AttributeDescriptor[2];
 
         
         GeometryFactory geomFac=new GeometryFactory();
@@ -164,22 +164,20 @@ public class LabelingTest extends TestCase {
 	}
 
 
-	private Feature createLineFeature(int startx, int starty,int endx, int endy, String name, CoordinateReferenceSystem crs, GeometryFactory geomFac, AttributeType[] types) throws Exception{
+	private SimpleFeature createLineFeature(int startx, int starty,int endx, int endy, String name, CoordinateReferenceSystem crs, GeometryFactory geomFac, AttributeDescriptor[] types) throws Exception{
         Coordinate[] c = new Coordinate[]{new Coordinate(startx, starty),
         		new Coordinate(endx, endy)
         };
         LineString line= geomFac.createLineString(c);
-		if (crs != null)
-            types[0] = AttributeTypeFactory.newAttributeType("line", line.getClass(), false, 0,
-                    null, crs);
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        if (crs != null)
+        	builder.add("line", line.getClass(), crs);
         else
-            types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypes.newFeatureType(types, Rendering2DTest.LINE);
-		Feature pointFeature = pointType.create(new Object[]{line, name});
-		
-		return pointFeature;
+        	builder.add("centre", line.getClass());
+        SimpleFeatureType type = builder.buildFeatureType();
+        return SimpleFeatureBuilder.build(type, new Object[]{line, name}, null);
 	}
+	
 	public void testPolyLabeling() throws Exception{		
 //		FeatureCollection collection=createPolyFeatureCollection();
 //		Style style=loadStyle("PolyStyle.sld");
@@ -197,21 +195,18 @@ public class LabelingTest extends TestCase {
 	}
 
 	private FeatureCollection createPolyFeatureCollection() throws Exception {
-        AttributeType[] types = new AttributeType[2];
-
-        
         GeometryFactory geomFac=new GeometryFactory();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 
         MemoryDataStore data = new MemoryDataStore();
-        data.addFeature(createPolyFeature(CENTERX+5,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel1",crs, geomFac, types));
-        data.addFeature(createPolyFeature(CENTERX+0,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel2",crs, geomFac, types));
+        data.addFeature(createPolyFeature(CENTERX+5,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel1",crs, geomFac));
+        data.addFeature(createPolyFeature(CENTERX+0,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel2",crs, geomFac));
 
         return data.getFeatureSource(Rendering2DTest.POLYGON).getFeatures();
 	}
 
 
-	private Feature createPolyFeature(int startx, int starty,int width, int height, String name, CoordinateReferenceSystem crs, GeometryFactory geomFac, AttributeType[] types) throws Exception{
+	private SimpleFeature createPolyFeature(int startx, int starty,int width, int height, String name, CoordinateReferenceSystem crs, GeometryFactory geomFac) throws Exception{
         Coordinate[] c = new Coordinate[]{new Coordinate(startx, starty),
         		new Coordinate(startx+width, starty),
         		new Coordinate(startx+width, starty+height),
@@ -219,15 +214,14 @@ public class LabelingTest extends TestCase {
         };
         LinearRing line= geomFac.createLinearRing(c);
         Polygon poly = geomFac.createPolygon(line,null);
-		if (crs != null)
-            types[0] = AttributeTypeFactory.newAttributeType("polygon", poly.getClass(), false, 0,
-                    null, crs);
+        
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        if (crs != null)
+        	builder.add("polygon", poly.getClass(), crs);
         else
-            types[0] = AttributeTypeFactory.newAttributeType("centre", line.getClass());
-		types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
-		FeatureType pointType = FeatureTypes.newFeatureType(types, Rendering2DTest.POLYGON);
-		Feature pointFeature = pointType.create(new Object[]{poly, name});
-		
-		return pointFeature;
+        	builder.add("centre", line.getClass());
+        builder.add("name", String.class);
+        SimpleFeatureType type = builder.buildFeatureType();
+        return SimpleFeatureBuilder.build(type, new Object[]{poly, name}, null);
 	}
 }

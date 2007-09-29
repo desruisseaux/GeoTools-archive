@@ -22,15 +22,16 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.store.DataFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
@@ -57,11 +58,11 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 		count = 0;
 		try {
 			reader = results.features();
-			Feature f;
+			SimpleFeature f;
 			Envelope env;
 			while (reader.hasNext()) {
 				f = reader.next();
-				env = f.getDefaultGeometry().getEnvelopeInternal();
+				env = ((Geometry) f.getDefaultGeometry()).getEnvelopeInternal();
 				bounds.expandToInclude(env);
 				count++;
 				index.insert(env, f);
@@ -83,16 +84,16 @@ public final class IndexedFeatureResults extends DataFeatureCollection {
 			/**
 			 * @see org.geotools.data.FeatureReader#getFeatureType()
 			 */
-			public FeatureType getFeatureType() {
+			public SimpleFeatureType getFeatureType() {
 				return getSchema();
 			}
 
 			/**
 			 * @see org.geotools.data.FeatureReader#next()
 			 */
-			public Feature next() throws IOException,
+			public SimpleFeature next() throws IOException,
 					IllegalAttributeException, NoSuchElementException {
-				return (Feature) resultsIterator.next();
+				return (SimpleFeature) resultsIterator.next();
 			}
 
 			/**

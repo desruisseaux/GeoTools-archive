@@ -9,9 +9,9 @@ import java.util.List;
 
 import javax.media.jai.util.Range;
 
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.styling.TextSymbolizer;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Allow multiple thread to modify LabelCache.  
@@ -60,7 +60,7 @@ public class SynchronizedLabelCache implements LabelCache {
     }
 
     
-    public synchronized void put( String layerId, TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange ) {
+    public synchronized void put( String layerId, TextSymbolizer symbolizer, SimpleFeature feature, LiteShape2 shape, Range scaleRange ) {
         wrapped.put(layerId, symbolizer, feature, shape, scaleRange);
     }
 
