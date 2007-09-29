@@ -25,7 +25,7 @@ import org.geotools.feature.type.DateUtil;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
-import org.opengis.feature.Feature;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -599,7 +599,7 @@ public class FeatureTransformer extends TransformerBase {
          *
          * @throws RuntimeException DOCUMENT ME!
          */
-        public void endFeature(Feature f) {
+        public void endFeature(SimpleFeature f) {
             try {
                 Name typeName = f.getType().getName();
                 String name = typeName.getLocalPart();
@@ -739,7 +739,7 @@ public class FeatureTransformer extends TransformerBase {
             }
         }
         
-        protected Attributes encodeFeatureId( Feature f ) {
+        protected Attributes encodeFeatureId( SimpleFeature f ) {
         	AttributesImpl fidAtts = new org.xml.sax.helpers.AttributesImpl();
             String fid = f.getID();
 

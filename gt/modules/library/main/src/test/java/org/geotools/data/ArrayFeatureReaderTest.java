@@ -21,11 +21,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -38,7 +38,7 @@ public class ArrayFeatureReaderTest extends TestCase {
     private CollectionFeatureReader arrayReader;
     private CollectionFeatureReader collectionReader;
     private CollectionFeatureReader featureCollectionReader;
-    private FeatureType type;
+    private SimpleFeatureType type;
     private Feature[] features;
 
     protected void setUp() throws Exception {

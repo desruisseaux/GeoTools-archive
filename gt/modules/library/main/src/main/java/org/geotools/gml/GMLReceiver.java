@@ -15,8 +15,8 @@
  */
 package org.geotools.gml;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 
@@ -44,7 +44,7 @@ public class GMLReceiver extends XMLFilterImpl implements GMLHandlerFeature {
      *
      * @param feature the OGC feature
      */
-    public void feature(Feature feature) {
+    public void feature(SimpleFeature feature) {
         featureCollection.add(feature);
     }
 }

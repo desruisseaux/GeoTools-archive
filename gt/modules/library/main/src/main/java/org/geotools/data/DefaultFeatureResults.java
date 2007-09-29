@@ -17,31 +17,25 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.store.DataFeatureCollection;
-
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.collection.SubFeatureList;
-import org.geotools.feature.type.GeometricAttributeType;
+import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -230,7 +224,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         SimpleFeatureType schema = featureSource.getSchema();
         for (int i = 0; i < schema.getAttributeCount(); i++) {
             AttributeDescriptor at = schema.getAttribute(i);
-            if(at instanceof GeometricAttributeType)
+            if(at instanceof GeometryDescriptorImpl)
                 attributes.add(at.getLocalName());
         }
         

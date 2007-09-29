@@ -18,10 +18,10 @@ package org.geotools.feature.type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureTypeFactory;
 
 /**
  * Defines required attributes for Annotations.
@@ -54,7 +54,7 @@ public class AnnotationFeatureType
     /**
      * The FeatureType reference that should be used for Anotations.
      */
-    public static final FeatureType ANNOTATION;
+    public static final SimpleFeatureType ANNOTATION;
 
     /**
      * The attribute name used to store the attribute name containing the annotation text.
@@ -65,15 +65,13 @@ public class AnnotationFeatureType
     
     // Static initializer for the ANNOTATION variable
     static {
-        FeatureType tmp = null;
+        SimpleFeatureType tmp = null;
+        
         try {
-            tmp = FeatureTypeFactory.newFeatureType( new AttributeType[] {
-                AttributeTypeFactory.newAttributeType( ANNOTATION_ATTRIBUTE_NAME,
-                                                       String.class,
-                                                       true,
-                                                       -1,
-                                                       null  ) },
-                                               "annotation" );
+            SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+            tb.setName( "annotation" );
+            tb.add( ANNOTATION_ATTRIBUTE_NAME, String.class );
+            tmp = tb.buildFeatureType();
         } catch (Exception ex) {
             Logger.getLogger( "org.geotools.data.vpf.AnnotationFeatureType" ).log(
                Level.SEVERE, "Error creating ANNOTATION feature type", ex );

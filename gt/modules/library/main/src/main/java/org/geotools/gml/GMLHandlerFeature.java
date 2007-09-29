@@ -15,7 +15,7 @@
  */
 package org.geotools.gml;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.ContentHandler;
 
 
@@ -35,5 +35,5 @@ public interface GMLHandlerFeature extends ContentHandler {
     /**
      * Receives OGC simple feature from parent.
      */
-    void feature(Feature feature);
+    void feature(SimpleFeature feature);
 }

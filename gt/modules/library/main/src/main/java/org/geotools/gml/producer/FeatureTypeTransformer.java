@@ -21,13 +21,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.xml.transform.TransformerBase;
 import org.geotools.xml.transform.Translator;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
@@ -223,8 +224,8 @@ public class FeatureTypeTransformer extends TransformerBase {
          * @see org.geotools.xml.transform.Translator#encode(java.lang.Object)
          */
         public void encode(Object o) throws IllegalArgumentException {
-            if (o instanceof FeatureType) {
-                encode((FeatureType) o);
+            if (o instanceof SimpleFeatureType) {
+                encode((SimpleFeatureType) o);
             } else {
                 throw new IllegalArgumentException(
                     "Translator does not know how to translate "
@@ -239,14 +240,14 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @throws RuntimeException DOCUMENT ME!
          */
-        protected void encode(FeatureType type) {
-            AttributeType[] attributes = type.getAttributeTypes();
+        protected void encode(SimpleFeatureType type) {
+            List attributes = type.getAttributes();
 
             try {
-                startSchemaType(type.getTypeName(), type.getNamespace());
+                startSchemaType(type.getTypeName(), type.getName().getNamespaceURI());
 
-                for (int i = 0; i < attributes.length; i++) {
-                    encode(attributes[i]);
+                for (int i = 0; i < attributes.size(); i++) {
+                    encode((AttributeDescriptor) attributes.get(i));
                 }
 
                 endSchemaType();
@@ -263,7 +264,7 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @throws SAXException
          */
-        protected void startSchemaType(String name, URI namespace)
+        protected final void startSchemaType(String name, String namespace)
             throws SAXException {
             AttributesImpl atts = new AttributesImpl();
 
@@ -310,9 +311,9 @@ public class FeatureTypeTransformer extends TransformerBase {
          * @throws SAXException
          * @throws RuntimeException DOCUMENT ME!
          */
-        protected void encode(AttributeType attribute)
+        protected void encode(AttributeDescriptor attribute)
             throws SAXException {
-            Class type = attribute.getBinding();
+            Class type = attribute.getType().getBinding();
 
             if (Number.class.isAssignableFrom(type)) {
                 encodeNumber(attribute);
@@ -340,7 +341,7 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @throws SAXException
          */
-        protected void encodeBoolean(AttributeType attribute)
+        protected void encodeBoolean(AttributeDescriptor attribute)
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
@@ -358,26 +359,29 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @throws SAXException
          */
-        protected void encodeString(AttributeType attribute)
+        protected void encodeString(AttributeDescriptor attribute)
             throws SAXException {
-            int length = AttributeType.UNBOUNDED;
-            if(attribute.getRestriction()!=null && attribute.getRestriction()!=Filter.EXCLUDE && attribute.getRestriction()!=Filter.INCLUDE){
-            	try{
-            	Filter f = attribute.getRestriction();
-            	if(f instanceof PropertyIsLessThan ||
-                   f instanceof PropertyIsLessThanOrEqualTo ){
-            		BinaryComparisonOperator cf = (BinaryComparisonOperator) f;
-            		Expression e = cf.getExpression1();
-            		if(e!= null && e instanceof LengthFunction){
-            			length = Integer.parseInt(((Literal)cf.getExpression2()).getValue().toString());
-            		}else{
-            			if(cf.getExpression2() instanceof LengthFunction){
-            				length = Integer.parseInt(((Literal)cf.getExpression1()).getValue().toString());
-            			}
-            		}
-            	}
+            int length = Integer.MAX_VALUE;
+            
+            for ( Filter f : attribute.getType().getRestrictions() ) {
+            	if ( f == Filter.INCLUDE || f == Filter.EXCLUDE ) 
+            	    continue;
+            	
+                try{
+                	if(f instanceof PropertyIsLessThan ||
+                       f instanceof PropertyIsLessThanOrEqualTo ){
+                		BinaryComparisonOperator cf = (BinaryComparisonOperator) f;
+                		Expression e = cf.getExpression1();
+                		if(e!= null && e instanceof LengthFunction){
+                			length = Integer.parseInt(((Literal)cf.getExpression2()).getValue().toString());
+                		}else{
+                			if(cf.getExpression2() instanceof LengthFunction){
+                				length = Integer.parseInt(((Literal)cf.getExpression1()).getValue().toString());
+                			}
+                		}
+                	}
             	}catch(Throwable t){
-            		length = AttributeType.UNBOUNDED;
+            		length = Integer.MAX_VALUE;
             	}
             }
 
@@ -431,11 +435,11 @@ public class FeatureTypeTransformer extends TransformerBase {
          * @throws SAXException
          * @throws RuntimeException DOCUMENT ME!
          */
-        protected void encodeNumber(AttributeType attribute)
+        protected void encodeNumber(AttributeDescriptor attribute)
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            Class type = attribute.getBinding();
+            Class type = attribute.getType().getBinding();
 
             String typeString;
 
@@ -476,13 +480,14 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @throws SAXException
          */
-        protected void encodeDate(AttributeType attribute)
+        protected void encodeDate(AttributeDescriptor attribute)
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            if(java.sql.Date.class.isAssignableFrom(attribute.getBinding()))
+            Class binding = attribute.getType().getBinding();
+            if(java.sql.Date.class.isAssignableFrom(binding))
                 atts.addAttribute("", "type", "type", "", "xs:date");
-            else if(java.sql.Time.class.isAssignableFrom(attribute.getBinding()))
+            else if(java.sql.Time.class.isAssignableFrom(binding))
                 atts.addAttribute("", "type", "type", "", "xs:time");
             else
                 atts.addAttribute("", "type", "type", "", "xs:dateTime");
@@ -500,11 +505,11 @@ public class FeatureTypeTransformer extends TransformerBase {
          * @throws SAXException
          * @throws RuntimeException DOCUMENT ME!
          */
-        protected void encodeGeometry(AttributeType attribute)
+        protected void encodeGeometry(AttributeDescriptor attribute)
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            Class type = attribute.getBinding();
+            Class type = attribute.getType().getBinding();
 
             String typeString = "";
 
@@ -571,7 +576,7 @@ public class FeatureTypeTransformer extends TransformerBase {
          *         the standard attributes
          */
         protected AttributesImpl createStandardAttributes(
-            AttributeType attribute) {
+            AttributeDescriptor attribute) {
             AttributesImpl atts = new AttributesImpl();
 
             atts.addAttribute("", "name", "name", "", attribute.getLocalName());

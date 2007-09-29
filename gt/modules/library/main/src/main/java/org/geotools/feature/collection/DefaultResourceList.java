@@ -1,10 +1,5 @@
 package org.geotools.feature.collection;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
-
-import org.geotools.data.collection.ResourceList;
 
 public class DefaultResourceList extends AbstractResourceList {
 

@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionDOMParser;

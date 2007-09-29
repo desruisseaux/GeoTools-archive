@@ -22,36 +22,28 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.collection.BaseFeatureCollection;
-import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.FeatureIteratorImpl;
+import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
-import org.geotools.feature.type.FeatureAttributeType;
-import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.filter.SortBy2;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.NullProgressListener;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.BoundingBox;
-import org.geotools.filter.SortBy2;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.util.NullProgressListener;
-import org.geotools.util.ProgressListener;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

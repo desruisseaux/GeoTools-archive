@@ -17,11 +17,9 @@ package org.geotools.feature.collection;
 
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * This is *not* a Feature - it is a Delegate used by FeatureCollection
@@ -86,16 +84,16 @@ public class SubFeatureState extends FeatureState {
     public void removeListener(CollectionListener listener) {
         collection.removeListener( listener );
     }
-    protected void fireChange( Feature[] features, int type ) {
+    protected void fireChange( SimpleFeature[] features, int type ) {
         // 
     }
 	//
 	// Feature Methods
     //
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return collection.getFeatureType();
     }
-    public FeatureType getChildFeatureType() {
+    public SimpleFeatureType getChildFeatureType() {
         return collection.getSchema();
     }
     public String getId(){

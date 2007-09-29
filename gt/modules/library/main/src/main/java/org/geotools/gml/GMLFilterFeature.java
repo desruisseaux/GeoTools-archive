@@ -20,9 +20,10 @@ import java.net.URISyntaxException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
@@ -294,7 +295,9 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
         throws SAXException {
     	handleCharacters();
         if (isFeatureMember(localName)) {
-            FeatureTypeFactory factory = FeatureTypeFactory.newInstance(typeName);
+            SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+            tb.setName( typeName );
+            tb.setNamespaceURI( namespaceURI );
 
             //            AttributeType attDef[] = new AttributeTypeDefault[attributes.size()];
             //            for (int i = 0; i < attributes.size(); i++){
@@ -322,25 +325,14 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
             for (int i = 0, ii = attributes.size(); i < ii; i++) {
                 String name = (String) attributeNames.get(i);
                 Class clazz = attributes.get(i).getClass();
-                factory.addType(AttributeTypeFactory.newAttributeType(name,
-                        clazz));
+                tb.add( name, clazz );
             }
 
+            SimpleFeatureType featureType = tb.buildFeatureType();
+            
             try {
-                factory.setNamespace(new URI(namespaceURI));
-            } catch (URISyntaxException e) {
-                LOGGER.warning(e.toString());
-                throw new SAXException(e);
-            }
-
-            try {
-                Feature feature = factory.getFeatureType().create(attributes
-                        .toArray(), fid);
+                SimpleFeature feature = SimpleFeatureBuilder.build(featureType, attributes, fid);
                 parent.feature(feature);
-            } catch (org.geotools.feature.SchemaException sve) {
-                //TODO: work out what to do in this case!
-                //_log.error("Unable to create valid schema",sve);
-                // UNBELIEVABLE !!!!!!!!!!!!!!!!!!!!!!!!!!! - IanS
             } catch (org.geotools.feature.IllegalAttributeException ife) {
                 //TODO: work out what to do in this case!
                 //_log.error("Unable to build feature",ife);

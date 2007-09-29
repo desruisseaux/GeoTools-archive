@@ -16,30 +16,19 @@
 package org.geotools.feature.collection;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
-import org.geotools.util.ProgressListener;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Used as a reasonable default implementation for subCollection.
@@ -162,7 +151,7 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
 	}
 	
 
-	public FeatureType getSchema() {
+	public SimpleFeatureType getSchema() {
         return collection.getSchema();
 	}
 
@@ -175,7 +164,7 @@ public class SubFeatureCollection extends BaseFeatureCollection implements Featu
             progress.started();
             for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
                 try {
-                    Feature feature = (Feature) iterator.next();
+                    SimpleFeature feature = (SimpleFeature) iterator.next();
                     visitor.visit(feature);
                 }
                 catch( Exception erp ){

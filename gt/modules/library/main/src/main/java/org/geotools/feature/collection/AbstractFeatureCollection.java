@@ -15,31 +15,15 @@
  */
 package org.geotools.feature.collection;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.data.collection.DelegateFeatureReader;
-import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
-import org.geotools.util.ProgressListener;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Implement a feature collection just based on provision of iterator.

@@ -26,12 +26,10 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.geotools.data.collection.ResourceCollection;
 import org.geotools.data.collection.ResourceList;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -90,7 +88,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
     			        Iterator it = iterator();
     			        try {
     			            for( int i=0; it.hasNext(); i++){
-    			                Feature feature = (Feature) it.next();
+    			                SimpleFeature feature = (SimpleFeature) it.next();
     			                if( i == index ){
     			                    return feature;
     			                }
@@ -136,7 +134,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
         Iterator it = collection.iterator();
         try {            
             while( it.hasNext() ){
-                Feature feature = (Feature) it.next();
+                SimpleFeature feature = (SimpleFeature) it.next();
                 if( filter.evaluate(feature ) ){
                     fids.add( feature.getID() );
                 }
@@ -145,8 +143,8 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
                 final SortBy initialOrder = (SortBy) sort.get( sort.size() -1 );                
                 Collections.sort( fids, new Comparator(){
                     public int compare( Object key1, Object key2 ) {
-                        Feature feature1 = getFeatureMember( (String) key1 );
-                        Feature feature2 = getFeatureMember( (String) key2 );
+                        SimpleFeature feature1 = getFeatureMember( (String) key1 );
+                        SimpleFeature feature2 = getFeatureMember( (String) key2 );
                         
                         int compare = compare( feature1, feature2, initialOrder );
                         if( compare == 0 && sort.size() > 1 ){
@@ -156,7 +154,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
                         }                        
                         return compare;
                     }
-                    protected int compare( Feature feature1, Feature feature2, SortBy order){
+                    protected int compare( SimpleFeature feature1, SimpleFeature feature2, SortBy order){
                         PropertyName name = order.getPropertyName();
                         Comparable value1 = (Comparable) name.evaluate( feature1 );
                         Comparable value2 = (Comparable) name.evaluate( feature2 );
@@ -220,7 +218,7 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
     // RandomFeatureAccess
     //
     
-    public Feature getFeatureMember( String id ) throws NoSuchElementException {
+    public SimpleFeature getFeatureMember( String id ) throws NoSuchElementException {
         int position = index.indexOf( id );
         if( position == -1){
             throw new NoSuchElementException(id);
@@ -229,9 +227,9 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
             RandomFeatureAccess random = (RandomFeatureAccess) collection;
             random.getFeatureMember( id ); 
         }
-        return (Feature) get( position );
+        return (SimpleFeature) get( position );
     }
-    public Feature removeFeatureMember( String id ) {
+    public SimpleFeature removeFeatureMember( String id ) {
         int position = index.indexOf( id );
         if( position == -1){
             throw new NoSuchElementException(id);
@@ -241,6 +239,6 @@ public class SubFeatureList extends SubFeatureCollection implements RandomFeatur
             if( index != null ) index.remove( id );            
             return random.removeFeatureMember( id );            
         }
-        return (Feature) remove( position );
+        return (SimpleFeature) remove( position );
     }   
 }
