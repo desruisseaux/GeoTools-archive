@@ -50,6 +50,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -893,7 +894,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertSame(roadType, road.getSchema());
         assertSame(data, road.getDataStore());
         assertEquals(3, road.getCount(Query.ALL));
-        assertEquals(new Envelope(1, 5, 0, 4), road.getBounds(Query.ALL));
+        assertEquals(new ReferencedEnvelope(1, 5, 0, 4, null), road.getBounds(Query.ALL));
 
         FeatureCollection all = road.getFeatures();
         assertEquals(3, all.size());

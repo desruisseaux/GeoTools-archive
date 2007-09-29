@@ -22,6 +22,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.type.DateUtil;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
@@ -576,7 +577,7 @@ public class FeatureTransformer extends TransformerBase {
                     + "boundedBy";
                
                 contentHandler.startElement("", "", boundedBy, NULL_ATTS);
-                geometryTranslator.encode(bounds, srsName);
+                geometryTranslator.encode(JTS.toGeometry(bounds), srsName);
                 contentHandler.endElement("", "", boundedBy);
             } catch (SAXException se) {
                 throw new RuntimeException(se);

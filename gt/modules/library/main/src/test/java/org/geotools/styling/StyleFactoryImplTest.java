@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 public class StyleFactoryImplTest extends TestCase {
     static StyleFactory styleFactory;
     static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);        
-    static Feature feature;
+    static SimpleFeature feature;
     protected static final Logger LOGGER = Logger
     .getLogger("org.geotools.styling");
 

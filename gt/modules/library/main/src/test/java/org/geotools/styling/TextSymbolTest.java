@@ -23,12 +23,13 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 
@@ -81,26 +82,17 @@ public class TextSymbolTest extends TestCase {
         // Request extent
         GeometryFactory geomFac = new GeometryFactory();
         MemoryDataStore data = new MemoryDataStore();
-        AttributeType[] pointAttribute = new AttributeType[4];
-        pointAttribute[0] = AttributeTypeFactory.newAttributeType("centre",
-                com.vividsolutions.jts.geom.Point.class);
-        pointAttribute[1] = AttributeTypeFactory.newAttributeType("size",
-                Double.class);
-        pointAttribute[2] = AttributeTypeFactory.newAttributeType("rotation",
-                Double.class);
-        pointAttribute[3] = AttributeTypeFactory.newAttributeType("symbol",
-                String.class);
-
-        FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance(
-                "test");
-        feaTypeFactory.addTypes(pointAttribute);
-        feaTypeFactory.setName("testPoint");
-
-        FeatureType pointType = feaTypeFactory.getFeatureType();
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+		ftb.add("centre", com.vividsolutions.jts.geom.Point.class);
+		ftb.add("size", Double.class);
+		ftb.add("rotation", Double.class);
+		ftb.add("symbol", String.class);
+		ftb.setName("test");
+        SimpleFeatureType pointType = ftb.buildFeatureType();
 
         //FlatFeatureFactory pointFac = feaTypeFactory.(pointType);
         Point point;
-        Feature pointFeature;
+        SimpleFeature pointFeature;
 
         // load font 
         String[] symbol = {
@@ -115,10 +107,10 @@ public class TextSymbolTest extends TestCase {
             for (int i = 0; i < symbol.length; i++) {
                 point = makeSamplePoint(geomFac, ((double) i * 5.0) + 5.0,
                         5.0 + (j * 5));
-                pointFeature = pointType.create(new Object[] {
+                pointFeature = SimpleFeatureBuilder.build(pointType, new Object[] {
                             point, new Double(size), new Double(rotation),
                             symbol[i]
-                        });
+                        }, null);
                 data.addFeature(pointFeature);
             }
 

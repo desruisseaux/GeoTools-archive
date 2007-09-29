@@ -30,14 +30,15 @@ import org.geotools.data.memory.MemoryFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -105,16 +106,12 @@ public class UserLayerTest extends TestCase {
     public void testUserLayerWithInlineFeatures() throws Exception {
         // create the feature's schema ----------------------------------------
         final CoordinateReferenceSystem crs = CRS.parseWKT(CRS_WKT);
-        final AttributeType id = AttributeTypeFactory.newAttributeType(
-                ID_COLUMN, Integer.class);
-        final GeometryAttributeType geom = new GeometricAttributeType(
-                GEOMETRY_COLUMN, Point.class, false, null, crs, null);
-        final AttributeType label = AttributeTypeFactory.newAttributeType(
-                LABEL_COLUMN, String.class);
-        final AttributeType[] attributes = new AttributeType[] { id, geom,
-                label };
-        final FeatureType schema = FeatureTypes.newFeatureType(attributes,
-                MY_FEATURE, MY_URI, false, null, geom);
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.add(ID_COLUMN, Integer.class);
+		ftb.add(GEOMETRY_COLUMN, Point.class, crs);
+		ftb.add(LABEL_COLUMN, String.class);
+		ftb.setName(MY_FEATURE);
+        final SimpleFeatureType schema = ftb.buildFeatureType();
 
         // create a feature collection ----------------------------------------
         final FeatureCollection fc = new MemoryFeatureCollection(schema);
@@ -125,13 +122,11 @@ public class UserLayerTest extends TestCase {
 
         // create 1st point
         final Point g1 = jtsFactory.createPoint(new Coordinate(X_1, Y_1));
-        fc.add(schema
-                .create(new Object[] { new Integer(1), g1, LABEL_1 }, ID_1));
+        fc.add(SimpleFeatureBuilder.build(schema, new Object[] { new Integer(1), g1, LABEL_1 }, ID_1));
 
         // create 2nd point
         final Point g2 = jtsFactory.createPoint(new Coordinate(X_2, Y_2));
-        fc.add(schema
-                .create(new Object[] { new Integer(2), g2, LABEL_2 }, ID_2));
+        fc.add(SimpleFeatureBuilder.build(schema, new Object[] { new Integer(2), g2, LABEL_2 }, ID_2));
 
         final DataStore ds = new MemoryDataStore(fc);
 
@@ -188,10 +183,10 @@ public class UserLayerTest extends TestCase {
         final UserLayer uLayer = (UserLayer) sLayer;
         final String lName = uLayer.getName();
         assertEquals("Read layer name MUST match", LAYER_NAME, lName);
-        final FeatureType ft = uLayer.getInlineFeatureType();
+        final SimpleFeatureType ft = uLayer.getInlineFeatureType();
         assertNotNull("Unmarshalled feature type MUST NOT be null", ft);
         final String fName = ft.getTypeName();
         assertEquals("Read feature type name MUST match", MY_FEATURE, fName);
-        assertEquals(CRS.decode("EPSG:4326"), ft.getDefaultGeometry().getCoordinateSystem());
+        assertEquals(CRS.decode("EPSG:4326"), ft.getDefaultGeometry().getCRS());
     }
 }
