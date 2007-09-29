@@ -18,8 +18,8 @@ package org.geotools.feature.collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
 /**
@@ -74,7 +74,7 @@ public class FilteredIterator implements Iterator {
 	private Object getNext() {
 		Object item = null;
 		while (delegate.hasNext()) {
-			item = (Feature) delegate.next();
+			item = (SimpleFeature) delegate.next();
 			if (filter.evaluate( item )){
 				return item;
 			}

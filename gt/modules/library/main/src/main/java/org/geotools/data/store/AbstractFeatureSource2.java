@@ -13,8 +13,9 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -48,7 +49,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
 	}
 
 	public FeatureCollection getFeatures(Query query) throws IOException {
-		 FeatureType featureType = entry.getFeatureType();
+		 SimpleFeatureType featureType = entry.getFeatureType();
 		 
 		 Filter filter = query.getFilter();
 		 if (filter == null) {
@@ -74,7 +75,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
          //retyping
          if( propertyNames != null || query.getCoordinateSystem() != null ){
              try {
-                 FeatureType target = 
+                 SimpleFeatureType target = 
                 	 DataUtilities.createSubType( featureType, propertyNames, query.getCoordinateSystem() );
                  if ( !featureType.equals( target ) ) {
                 	 LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
@@ -116,15 +117,15 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
         return getFeatures();
 	}
 
-	public FeatureType getSchema() {
+	public SimpleFeatureType getSchema() {
 		return entry.getFeatureType();
 	}
 
-	public Envelope getBounds() throws IOException {
+	public ReferencedEnvelope getBounds() throws IOException {
 		return getFeatures().getBounds();
 	}
 
-	public Envelope getBounds(Query query) throws IOException {
+	public ReferencedEnvelope getBounds(Query query) throws IOException {
 		return getFeatures( query ).getBounds();
 	}
 

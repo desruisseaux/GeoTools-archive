@@ -36,25 +36,23 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
+
 import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-
-import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureTypeFactory;
+
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.Name;
 import org.geotools.feature.SchemaException;
-
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
@@ -64,9 +62,9 @@ import org.geotools.util.Converters;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
@@ -109,7 +107,6 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.sun.org.apache.xerces.internal.util.URI.MalformedURIException;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -1209,9 +1206,11 @@ public class DataUtilities {
         for (int i = 0; i < properties.length; i++) {
             types[i] = featureType.getAttribute(properties[i]);
 
-            if ((override != null) && types[i] instanceof AttributeDescriptor) {
-                types[i] = new GeometricAttributeType((GeometricAttributeType) types[i],
-                        override);
+            if ((override != null) && types[i] instanceof GeometryDescriptor) {
+                AttributeTypeBuilder ab = new AttributeTypeBuilder();
+                ab.init( types[i] );
+                ab.setCRS(override);
+                types[i] = ab.buildDescriptor(types[i].getLocalName());
             }
         }
 
@@ -1225,7 +1224,12 @@ public class DataUtilities {
             
             
         
-        return FeatureTypeFactory.newFeatureType(types, typeName, namespace);
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( typeName );
+        tb.setNamespaceURI( namespace );
+        tb.addAll(types);
+        
+        return tb.buildFeatureType();
     }
     
     private static boolean assertEquals(Object o1, Object o2){

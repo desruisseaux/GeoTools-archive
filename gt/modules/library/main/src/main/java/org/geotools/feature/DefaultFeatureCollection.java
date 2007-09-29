@@ -36,11 +36,15 @@ import org.geotools.feature.collection.BaseFeatureCollection;
 import org.geotools.feature.collection.FeatureState;
 import org.geotools.feature.collection.FeatureIteratorImpl;
 import org.geotools.feature.collection.SubFeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
+import org.opengis.geometry.BoundingBox;
 import org.geotools.filter.SortBy2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.NullProgressListener;
@@ -77,7 +81,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
     //private List listeners = new ArrayList(2);
 
     /** Internal envelope of bounds. */
-    private Envelope bounds = null;
+    private ReferencedEnvelope bounds = null;
         
     //private String id; /// fid
 
@@ -102,8 +106,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @param id may be null ... feature id
      * @param featureType optional, may be null
      */
-    public DefaultFeatureCollection(String id, FeatureType featureType) {
-    	super(id,featureType == null ? new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null) : featureType );
+    public DefaultFeatureCollection(String id, SimpleFeatureType featureType) {
+    	super(id,featureType == null ? new SimpleFeatureTypeImpl(new Name(FeatureTypes.DEFAULT_NAMESPACE.toString(),"AbstractFeatureType"), Collections.EMPTY_LIST, null, false, Collections.EMPTY_LIST,null,null ) : featureType );
+    	        
     	
 //    	this.id = id;
 //    	if(featureType == null){
@@ -115,9 +120,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         this.childType = null; // no children yet
     }
 //    private FeatureType featureType;
-    private FeatureType childType;
+    private SimpleFeatureType childType;
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         if ( childType != null ) {
             return childType;
         }
@@ -133,25 +138,25 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      */
     public ReferencedEnvelope getBounds() {
         if (bounds == null) {
-            bounds = new Envelope();
+            bounds = new ReferencedEnvelope();
 
             for (Iterator i = contents.values().iterator(); i.hasNext();) {
-                Envelope geomBounds = ((Feature) i.next()).getBounds();                
+                BoundingBox geomBounds = ((SimpleFeature) i.next()).getBounds();
                 // IanS - as of 1.3, JTS expandToInclude ignores "null" Envelope
                 // and simply adds the new bounds...
                 // This check ensures this behavior does not occur.
-                if ( ! geomBounds.isNull() ) {
-                    bounds.expandToInclude(geomBounds);
+                if ( ! geomBounds.isEmpty() ) {
+                    bounds.include(geomBounds);
                 }
             }
         }
-        return ReferencedEnvelope.reference(bounds);
+        return bounds;
     }
 
     /**
      * To let listeners know that something has changed.
      */
-    protected void fireChange(Feature[] features, int type) {
+    protected void fireChange(SimpleFeature[] features, int type) {
         bounds = null;
 
         CollectionEvent cEvent = new CollectionEvent(this, features, type);
@@ -161,13 +166,13 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         }
     }
         
-    protected void fireChange(Feature feature, int type) {
-        fireChange(new Feature[] {feature}, type);
+    protected void fireChange(SimpleFeature feature, int type) {
+        fireChange(new SimpleFeature[] {feature}, type);
     }
     
     protected void fireChange(Collection coll, int type) {
-        Feature[] features = new Feature[coll.size()];
-        features = (Feature[]) coll.toArray(features);
+        SimpleFeature[] features = new SimpleFeature[coll.size()];
+        features = (SimpleFeature[]) coll.toArray(features);
         fireChange(features, type);
     }
 
@@ -199,9 +204,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @return <tt>true</tt> if this collection changed as a result of the call
      */
     public boolean add(Object o) {
-        return add((Feature)o,true);
+        return add((SimpleFeature)o,true);
     }
-    protected boolean add(Feature feature, boolean fire) {
+    protected boolean add(SimpleFeature feature, boolean fire) {
         
         // This cast is neccessary to keep with the contract of Set!
         if( feature == null ) return false; // cannot add null!
@@ -212,7 +217,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         if( this.childType == null ) {
         	this.childType = feature.getFeatureType(); 
         }
-        FeatureType childType = (FeatureType) getSchema();
+        SimpleFeatureType childType = (SimpleFeatureType) getSchema();
 //        if ( childType==null ){
 //        	//this.childType=
 //        }else{
@@ -251,7 +256,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         try {
             List featuresAdded = new ArrayList(collection.size());
             while (iterator.hasNext()) {
-                Feature f = (Feature) iterator.next();
+                SimpleFeature f = (SimpleFeature) iterator.next();
                 boolean added = add(f,false);
                 changed |= added;
                 
@@ -279,8 +284,8 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
     public void clear() {
         if(contents.isEmpty() ) return;
             
-        Feature[] oldFeatures = new Feature[contents.size()];
-        oldFeatures = (Feature[]) contents.values().toArray(oldFeatures);
+        SimpleFeature[] oldFeatures = new SimpleFeature[contents.size()];
+        oldFeatures = (SimpleFeature[]) contents.values().toArray(oldFeatures);
 
         contents.clear();
         fireChange(oldFeatures, CollectionEvent.FEATURES_REMOVED);
@@ -300,9 +305,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         // The contract of Set doesn't say we have to cast here, but I think its
         // useful for client sanity to get a ClassCastException and not just a
         // false.
-        if( !(o instanceof Feature) ) return false;
+        if( !(o instanceof SimpleFeature) ) return false;
         
-        Feature feature = (Feature) o;
+        SimpleFeature feature = (SimpleFeature) o;
         final String ID = feature.getID();
             
         return contents.containsKey( ID ); // || contents.containsValue( feature );        
@@ -318,7 +323,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         Iterator iterator = collection.iterator();
         try {
             while (iterator.hasNext()) {
-                Feature feature = (Feature) iterator.next();
+                SimpleFeature feature = (SimpleFeature) iterator.next();
                 if( !contents.containsKey( feature.getID() )){
                     return false;
                 }                
@@ -353,14 +358,14 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         final Iterator iterator = contents.values().iterator();
 
         return new Iterator() {
-                Feature currFeature = null;
+                SimpleFeature currFeature = null;
             
                 public boolean hasNext() {
                     return iterator.hasNext();
                 }
 
                 public Object next() {
-                    currFeature = (Feature) iterator.next();
+                    currFeature = (SimpleFeature) iterator.next();
                     return currFeature;
                 }
 
@@ -395,9 +400,9 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
      * @return <tt>true</tt> if this collection changed as a result of the call
      */
     public boolean remove(Object o) {
-        if( !(o instanceof Feature)) return false;
+        if( !(o instanceof SimpleFeature)) return false;
         
-        Feature f = (Feature) o;
+        SimpleFeature f = (SimpleFeature) o;
         boolean changed = contents.values().remove(f);
 
         if (changed) {
@@ -425,7 +430,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         try {
             List removedFeatures = new ArrayList(collection.size());
             while (iterator.hasNext()) {
-                Feature f = (Feature) iterator.next();
+                SimpleFeature f = (SimpleFeature) iterator.next();
                 boolean removed = contents.values().remove(f);
                 
                 if(removed) {
@@ -465,7 +470,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         boolean modified = false;
         
         for(Iterator it = contents.values().iterator(); it.hasNext(); )  {
-            Feature f = (Feature) it.next();
+            SimpleFeature f = (SimpleFeature) it.next();
             if(!collection.contains(f)) {
                 it.remove();
                 modified = true;
@@ -625,7 +630,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
             
             contents.clear();
             for( Iterator i = nw.iterator(); i.hasNext(); ){
-                Feature feature = (Feature) i.next();    
+                SimpleFeature feature = (SimpleFeature) i.next();    
                 contents.put( feature.getID(), feature );
             }
 			fireChange(nw,0);
@@ -667,10 +672,10 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
     public FeatureReader reader() throws IOException {
         final FeatureIterator iterator = features(); 
         return new FeatureReader(){
-            public FeatureType getFeatureType() {
+            public SimpleFeatureType getFeatureType() {
                 return getSchema();
             }
-            public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+            public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
                 return iterator.next();
             }
 
@@ -692,10 +697,10 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
         FeatureCollection copy = new DefaultFeatureCollection( null, getFeatureType() );
         List list = new ArrayList( contents.size() );
         for( FeatureIterator iterator = features(); iterator.hasNext(); ){
-            Feature feature = iterator.next();
-            Feature duplicate;
+            SimpleFeature feature = iterator.next();
+            SimpleFeature duplicate;
             try {                
-                duplicate = feature.getFeatureType().duplicate( feature );
+                duplicate = SimpleFeatureBuilder.copy(feature);
             } catch (IllegalAttributeException e) {
                 throw new DataSourceException( "Unable to copy "+feature.getID(), e );
             }
@@ -724,7 +729,7 @@ public class DefaultFeatureCollection extends BaseFeatureCollection implements F
             progress.started();
             for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext(); progress.progress( position++/size )){
                 try {
-                    Feature feature = (Feature) iterator.next();
+                    SimpleFeature feature = (SimpleFeature) iterator.next();
                     visitor.visit(feature);
                 }
                 catch( Exception erp ){

@@ -17,6 +17,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeatureType;
+
 /**
  * Concrete extension to FeatureCollections to create
  * DefaultFeatureCollections.
@@ -42,7 +44,7 @@ public class DefaultFeatureCollections extends FeatureCollections {
     protected FeatureCollection createCollection(String id) {
         return new DefaultFeatureCollection(id,null);
     }
-    protected FeatureCollection createCollection(String id, FeatureType ft) {
+    protected FeatureCollection createCollection(String id, SimpleFeatureType ft) {
         return new DefaultFeatureCollection(id,ft);
     }
 }

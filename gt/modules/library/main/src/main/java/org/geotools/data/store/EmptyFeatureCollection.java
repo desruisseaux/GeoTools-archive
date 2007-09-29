@@ -4,21 +4,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.CollectionListener;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.util.ProgressListener;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 public class EmptyFeatureCollection extends DataFeatureCollection {
 

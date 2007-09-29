@@ -2,13 +2,15 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -33,7 +35,7 @@ public class ReprojectingIterator implements Iterator {
     /**
      * schema of reprojected features
      */
-    FeatureType schema;
+    SimpleFeatureType schema;
 
     /**
      * Transformer
@@ -41,7 +43,7 @@ public class ReprojectingIterator implements Iterator {
     GeometryCoordinateSequenceTransformer tx;
 
     public ReprojectingIterator(
-		Iterator delegate, MathTransform transform, FeatureType schema, 
+		Iterator delegate, MathTransform transform, SimpleFeatureType schema, 
 		GeometryCoordinateSequenceTransformer transformer
     ) throws OperationNotFoundException, FactoryRegistryException, FactoryException {
         this.delegate = delegate;
@@ -54,7 +56,7 @@ public class ReprojectingIterator implements Iterator {
 
     public ReprojectingIterator(
 		Iterator delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target,
-        FeatureType schema, GeometryCoordinateSequenceTransformer transformer
+        SimpleFeatureType schema, GeometryCoordinateSequenceTransformer transformer
     ) throws OperationNotFoundException, FactoryRegistryException, FactoryException {
         this.delegate = delegate;
         this.target = target;
@@ -79,7 +81,7 @@ public class ReprojectingIterator implements Iterator {
     }
 
     public Object next() {
-        Feature feature = (Feature) delegate.next();
+        SimpleFeature feature = (SimpleFeature) delegate.next();
         try {
             return reproject(feature);
         } catch (IOException e) {
@@ -87,17 +89,17 @@ public class ReprojectingIterator implements Iterator {
         }
     }
 
-    Feature reproject(Feature feature) throws IOException {
+    SimpleFeature reproject(SimpleFeature feature) throws IOException {
 
-        Object[] attributes = feature.getAttributes(null);
+        List attributes = feature.getAttributes();
 
-        for (int i = 0; i < attributes.length; i++) {
-            Object object = attributes[i];
+        for (int i = 0; i < attributes.size(); i++) {
+            Object object = attributes.get(i);
             if (object instanceof Geometry) {
                 // do the transformation
                 Geometry geometry = (Geometry) object;
                 try {
-                    attributes[i] = tx.transform(geometry);
+                    attributes.set(i, tx.transform(geometry));
                 } catch (TransformException e) {
                     String msg = "Error occured transforming "
                             + geometry.toString();
@@ -107,7 +109,7 @@ public class ReprojectingIterator implements Iterator {
         }
 
         try {
-            return schema.create(attributes, feature.getID());
+            return SimpleFeatureBuilder.build(schema, attributes, feature.getID());
         } catch (IllegalAttributeException e) {
             String msg = "Error creating reprojeced feature";
             throw (IOException) new IOException(msg).initCause(e);

@@ -18,6 +18,7 @@ package org.geotools.feature.collection;
 import java.util.NoSuchElementException;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -45,8 +46,8 @@ public interface RandomFeatureAccess extends FeatureCollection {
      * @return Feature with the indicated or id
      * @throws NoSuchElementException if a Feature with the indicated id is not present
      */
-    public Feature getFeatureMember(String id) throws NoSuchElementException;
+    public SimpleFeature getFeatureMember(String id) throws NoSuchElementException;
 
     /** Optional Method */
-    public Feature removeFeatureMember(String id);
+    public SimpleFeature removeFeatureMember(String id);
 }

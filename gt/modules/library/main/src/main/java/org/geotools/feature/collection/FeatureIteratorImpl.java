@@ -15,9 +15,9 @@
  */
 package org.geotools.feature.collection;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * A convenience class for dealing with FeatureCollection Iterators. DOES NOT
@@ -63,8 +63,8 @@ public class FeatureIteratorImpl implements FeatureIterator {
      *
      * @throws java.util.NoSuchElementException If no more Features exist.
      */
-    public Feature next() throws java.util.NoSuchElementException {
-        return (Feature) iterator.next();
+    public SimpleFeature next() throws java.util.NoSuchElementException {
+        return (SimpleFeature) iterator.next();
     }
     /**
      * Required so FeatureCollection classes can implement close( FeatureIterator ).

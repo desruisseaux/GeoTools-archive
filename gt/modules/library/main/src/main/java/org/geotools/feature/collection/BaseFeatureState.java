@@ -21,14 +21,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.data.collection.ResourceCollection;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.FeatureAttributeType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * This is *not* a Feature - it is a Delegate used by FeatureCollection
@@ -51,8 +53,8 @@ import org.geotools.feature.type.FeatureAttributeType;
  */
 public class BaseFeatureState extends FeatureState {
     //final ResourceCollection collection;
-	final FeatureType featureType;
-	final FeatureType schema;	
+	final SimpleFeatureType featureType;
+	final SimpleFeatureType schema;	
 	String id;
     
     /** Internal listener storage list */
@@ -73,16 +75,19 @@ public class BaseFeatureState extends FeatureState {
 	 * </p>
 	 * 
 	 */
-	public static FeatureType featureType( FeatureType schema ){
-		List ats = new LinkedList();
-        ats.add(new FeatureAttributeType(schema.getTypeName(), schema,false));
-        return new DefaultFeatureType("AbstractFeatureColletionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);        
+	public static SimpleFeatureType featureType( SimpleFeatureType schema ){
+	    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName("AbstractFeatureColletionType");
+        tb.setNamespaceURI( FeatureTypes.DEFAULT_NAMESPACE.toString() );
+        tb.namespaceURI(FeatureTypes.DEFAULT_NAMESPACE.toString()).add( "AbstractFeatureType", SimpleFeature.class );
+	    
+        return tb.buildFeatureType();
 	}
 
-	public BaseFeatureState( ResourceCollection collection, FeatureType schema ){
+	public BaseFeatureState( ResourceCollection collection, SimpleFeatureType schema ){
 		this( collection, featureType( schema ), schema );				
 	}
-	public BaseFeatureState( ResourceCollection collection, FeatureType featureType, FeatureType schema ){
+	public BaseFeatureState( ResourceCollection collection, SimpleFeatureType featureType, SimpleFeatureType schema ){
         super( collection );
 		//this.collection = collection;
 		this.featureType = featureType;
@@ -113,7 +118,7 @@ public class BaseFeatureState extends FeatureState {
     /**
      * To let listeners know that something has changed.
      */
-    protected void fireChange(Feature[] features, int type) {
+    protected void fireChange(SimpleFeature[] features, int type) {
     	bounds = null; // must recalculate bounds
 
         CollectionEvent cEvent = new CollectionEvent( (FeatureCollection) data, features, type);
@@ -123,22 +128,22 @@ public class BaseFeatureState extends FeatureState {
         }
     }
         
-    protected void fireChange(Feature feature, int type) {
-        fireChange(new Feature[] {feature}, type);
+    protected void fireChange(SimpleFeature feature, int type) {
+        fireChange(new SimpleFeature[] {feature}, type);
     }
     
     protected void fireChange(Collection coll, int type) {
-        Feature[] features = new Feature[coll.size()];
-        features = (Feature[]) coll.toArray(features);
+        SimpleFeature[] features = new SimpleFeature[coll.size()];
+        features = (SimpleFeature[]) coll.toArray(features);
         fireChange(features, type);
     }
 	//
-	// Feature Methods
+	// SimpleFeature Methods
     //
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
-    public FeatureType getChildFeatureType() {
+    public SimpleFeatureType getChildFeatureType() {
         return schema;
     }    
     public String getId() {

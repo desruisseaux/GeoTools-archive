@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * An iterator wrapper for a FeatureReader - for use with
@@ -57,7 +57,7 @@ final class FeatureReaderFeatureIterator implements FeatureIterator {
         }        
     }
 
-    public Feature next() {
+    public SimpleFeature next() {
         if( reader == null ) {
             throw new NoSuchElementException( "Iterator has been closed" );            
         }

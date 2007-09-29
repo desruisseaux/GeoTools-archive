@@ -19,8 +19,8 @@ import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -75,7 +75,7 @@ public interface TypeEntry {
      * @return Schema of this feature collection
      * @throws IOException If resoruce is unavailable
      */
-    FeatureType getFeatureType() throws IOException;
+    SimpleFeatureType getFeatureType() throws IOException;
         
     /**
      * Bounding box for associated Feature Collection, will be calcualted as needed.
@@ -118,14 +118,14 @@ public interface TypeEntry {
      * @param newFeature
      * @param transaction
      */
-    void fireAdded( Feature newFeature, Transaction transaction );
+    void fireAdded( SimpleFeature newFeature, Transaction transaction );
     /**
      * Change notifcation
      * 
      * @param removedFeature
      * @param transaction
      */
-    void fireRemoved( Feature removedFeature, Transaction transaction );
+    void fireRemoved( SimpleFeature removedFeature, Transaction transaction );
     /**
      * Change notifcation
      * 
@@ -133,7 +133,7 @@ public interface TypeEntry {
      * @param after
      * @param transaction
      */
-    void fireChanged( Feature before, Feature after, Transaction transaction ); 
+    void fireChanged( SimpleFeature before, SimpleFeature after, Transaction transaction ); 
     
     /**
      * Equals based only on resource definition information (not connection information).

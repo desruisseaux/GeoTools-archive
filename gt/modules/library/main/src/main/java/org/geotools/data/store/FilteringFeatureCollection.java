@@ -9,23 +9,13 @@ import java.util.List;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
-import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
-import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Decorates a feature collection with one that filters content.

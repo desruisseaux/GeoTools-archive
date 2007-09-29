@@ -2,10 +2,11 @@ package org.geotools.data.store;
 
 import java.util.Iterator;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * Iterator wrapper which re-types features on the fly based on a target 
@@ -23,13 +24,13 @@ public class ReTypingIterator implements Iterator {
 	/**
 	 * The target feature type
 	 */
-	FeatureType target;
+	SimpleFeatureType target;
 	/**
 	 * The matching types from target 
 	 */
-	AttributeType[] types;
+	AttributeDescriptor[] types;
 	
-	public ReTypingIterator( Iterator delegate, FeatureType source, FeatureType target ) {
+	public ReTypingIterator( Iterator delegate, SimpleFeatureType source, SimpleFeatureType target ) {
 		this.delegate = delegate;
 		this.target = target;
 		types = typeAttributes( source, target );
@@ -48,7 +49,7 @@ public class ReTypingIterator implements Iterator {
 	}
 
 	public Object next() {
-		Feature next = (Feature) delegate.next();
+		SimpleFeature next = (SimpleFeature) delegate.next();
         String id = next.getID();
 
         Object[] attributes = new Object[types.length];
@@ -61,7 +62,7 @@ public class ReTypingIterator implements Iterator {
 			    attributes[i] = next.getAttribute(xpath);
 			}
 
-			return target.create(attributes, id);
+			return SimpleFeatureBuilder.build(target, attributes, id);
 		} 
         catch (IllegalAttributeException e) {
         	throw new RuntimeException( e );
@@ -82,8 +83,8 @@ public class ReTypingIterator implements Iterator {
      *
      * @throws IllegalArgumentException if unable to provide a mapping
      */
-    protected AttributeType[] typeAttributes(FeatureType original,
-        FeatureType target) {
+    protected AttributeDescriptor[] typeAttributes(SimpleFeatureType original,
+        SimpleFeatureType target) {
         if (target.equals(original)) {
             throw new IllegalArgumentException(
                 "FeatureReader allready produces contents with the correct schema");
@@ -95,14 +96,14 @@ public class ReTypingIterator implements Iterator {
         }
 
         String xpath;
-        AttributeType[] types = new AttributeType[target.getAttributeCount()];
+        AttributeDescriptor[] types = new AttributeDescriptor[target.getAttributeCount()];
 
         for (int i = 0; i < target.getAttributeCount(); i++) {
-            AttributeType attrib = target.getAttributeType(i);
+            AttributeDescriptor attrib = target.getAttribute(i);
             xpath = attrib.getLocalName();
             types[i] = attrib;
 
-            if (!attrib.equals(original.getAttributeType(xpath))) {
+            if (!attrib.equals(original.getAttribute(xpath))) {
                 throw new IllegalArgumentException(
                     "Unable to retype FeatureReader (origional does not cover "
                     + xpath + ")");

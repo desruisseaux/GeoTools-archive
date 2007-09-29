@@ -32,8 +32,9 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 
@@ -178,7 +179,7 @@ public class AbstractDataStore2 implements DataStore {
         return null;
     }
     /** Retrive schema information for typeName */
-    public FeatureType getSchema(String typeName)
+    public SimpleFeatureType getSchema(String typeName)
         throws IOException{
         return entry( typeName ).getFeatureType();
     }
@@ -191,13 +192,13 @@ public class AbstractDataStore2 implements DataStore {
      * @throws IOException Subclass may throw IOException
      * @throws UnsupportedOperationException Subclass may implement
      */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
         throw new UnsupportedOperationException("Schema creation not supported");
     }
     /**
      * Subclass should implement to provide modification support.
      */
-    public void updateSchema(String typeName, FeatureType featureType)
+    public void updateSchema(String typeName, SimpleFeatureType featureType)
         throws IOException {
         throw new UnsupportedOperationException("Schema modification not supported");
     }
@@ -263,7 +264,7 @@ public class AbstractDataStore2 implements DataStore {
         }
 
         if (filter == Filter.EXCLUDE) {
-            FeatureType featureType = getSchema(typeName);
+            SimpleFeatureType featureType = getSchema(typeName);
 
             return new EmptyFeatureWriter(featureType);
         }

@@ -29,9 +29,9 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.Transaction.State;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -140,7 +140,7 @@ public class TypeDiffState implements State {
 
         FeatureWriter writer = entry.createWriter();
         SimpleFeature feature;
-        Feature update;
+        SimpleFeature update;
         String fid;
 
         try {
@@ -149,22 +149,22 @@ public class TypeDiffState implements State {
                 fid = feature.getID();
 
                 if (diff.modified2.containsKey(fid)) {
-                    update = (Feature) diff.modified2.get(fid);
+                    update = (SimpleFeature) diff.modified2.get(fid);
 
                     if (update == TransactionStateDiff.NULL) {
                         writer.remove();
 
                         // notify
-                        entry.listenerManager.fireFeaturesChanged( entry.getTypeName(), transaction, feature.getBounds(), true);
+                        entry.listenerManager.fireFeaturesChanged( entry.getTypeName(), transaction, ReferencedEnvelope.reference(feature.getBounds()), true);
                     } else {
                         try {
-                            feature.setAttributes(update.getAttributes(null));
+                            feature.setAttributes(update.getAttributes());
                             writer.write();
 
                             // notify                        
-                            Envelope bounds = new Envelope();
-                            bounds.expandToInclude(feature.getBounds());
-                            bounds.expandToInclude(update.getBounds());
+                            ReferencedEnvelope bounds = new ReferencedEnvelope();
+                            bounds.include(feature.getBounds());
+                            bounds.include(update.getBounds());
                             entry.listenerManager.fireFeaturesChanged( entry.getTypeName(),
                                 transaction, bounds, true);
                         } catch (IllegalAttributeException e) {
@@ -175,11 +175,11 @@ public class TypeDiffState implements State {
                 }
             }
 
-            Feature addedFeature;
+            SimpleFeature addedFeature;
             SimpleFeature nextFeature;
 
             for (Iterator i = diff.added.values().iterator(); i.hasNext();) {
-                addedFeature = (Feature) i.next();
+                addedFeature = (SimpleFeature) i.next();
 
                     fid = addedFeature.getID();
 
@@ -189,12 +189,11 @@ public class TypeDiffState implements State {
                         throw new DataSourceException("Could not add " + fid);
                     } else {
                         try {
-                            nextFeature.setAttributes(addedFeature
-                                .getAttributes(null));
+                            nextFeature.setAttributes(addedFeature.getAttributes());
                             writer.write();
 
                             // notify                        
-                            entry.listenerManager.fireFeaturesAdded( entry.getTypeName(),transaction, nextFeature.getBounds(), true);
+                            entry.listenerManager.fireFeaturesAdded( entry.getTypeName(),transaction, ReferencedEnvelope.reference(nextFeature.getBounds()), true);
                         } catch (IllegalAttributeException e) {
                             throw new DataSourceException("Could update " + fid,
                                 e);
@@ -251,7 +250,7 @@ public class TypeDiffState implements State {
         FeatureReader reader = entry.createReader();
 
         return new DiffFeatureWriter(reader, diff) {
-            protected void fireNotification(int eventType, Envelope bounds) {
+            protected void fireNotification(int eventType, ReferencedEnvelope bounds) {
                 switch (eventType) {
                 case FeatureEvent.FEATURES_ADDED:
                     entry.listenerManager.fireFeaturesAdded( entry.getTypeName(),

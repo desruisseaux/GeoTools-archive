@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeature;
+
 /**
  * A utility class for creating simple Comparators for Features.
  *
@@ -25,8 +27,8 @@ public final class FeatureComparators {
     /** A utility comparator for comparison by id. */
     public static final java.util.Comparator BY_ID = new java.util.Comparator() {
             public int compare(Object o1, Object o2) {
-                Feature f1 = (Feature) o1;
-                Feature f2 = (Feature) o2;
+                SimpleFeature f1 = (SimpleFeature) o1;
+                SimpleFeature f2 = (SimpleFeature) o2;
 
                 return f1.getID().compareTo(f2.getID());
             }
@@ -94,8 +96,8 @@ public final class FeatureComparators {
          * @return A value indicating less than, equal, or greater than.
          */
         public int compare(Object o1, Object o2) {
-            Feature f1 = (Feature) o1;
-            Feature f2 = (Feature) o2;
+            SimpleFeature f1 = (SimpleFeature) o1;
+            SimpleFeature f2 = (SimpleFeature) o2;
 
             return compareAtts(f1.getAttribute(idx), f2.getAttribute(idx));
         }
@@ -140,8 +142,8 @@ public final class FeatureComparators {
          * @return A value indicating less than, equal, or greater than.
          */
         public int compare(Object o1, Object o2) {
-            Feature f1 = (Feature) o1;
-            Feature f2 = (Feature) o2;
+            SimpleFeature f1 = (SimpleFeature) o1;
+            SimpleFeature f2 = (SimpleFeature) o2;
 
             return compareAtts(f1.getAttribute(name), f2.getAttribute(name));
         }

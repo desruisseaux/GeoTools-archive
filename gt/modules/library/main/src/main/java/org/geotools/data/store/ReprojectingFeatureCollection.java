@@ -9,10 +9,8 @@ import java.util.List;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -23,6 +21,8 @@ import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.FactoryException;
@@ -53,12 +53,12 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
     /**
      * The schema of reprojected features
      */
-    FeatureType schema;
+    SimpleFeatureType schema;
 
     /**
      * The feature type of the feature collection
      */
-    FeatureType featureType;
+    SimpleFeatureType featureType;
 
     /**
      * The target coordinate reference system
@@ -72,7 +72,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
     
     public ReprojectingFeatureCollection(FeatureCollection delegate,
             CoordinateReferenceSystem target) {
-        this( delegate, delegate.getSchema().getDefaultGeometry().getCoordinateSystem(), target );
+        this( delegate, delegate.getSchema().getDefaultGeometry().getCRS(), target );
     }
     
     public ReprojectingFeatureCollection(
@@ -81,10 +81,10 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
     	super(delegate);
     	this.delegate = delegate;
         this.target = target;
-        FeatureType schema = delegate.getSchema();
+        SimpleFeatureType schema = delegate.getSchema();
         this.schema = reType(schema, target);
        
-        FeatureType featureType = delegate.getFeatureType();
+        SimpleFeatureType featureType = delegate.getFeatureType();
         this.featureType = reType(featureType, target);
 
         if (source == null) {
@@ -112,7 +112,7 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         }
     }
 
-    private FeatureType reType(FeatureType type,
+    private SimpleFeatureType reType(SimpleFeatureType type,
             CoordinateReferenceSystem target) {
         try {
             return FeatureTypes.transform(type, target);
@@ -147,11 +147,11 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         delegate.close(iterator);
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return this.featureType;
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return this.schema;
     }
 
@@ -222,11 +222,11 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
         try {
             Envelope newBBox = new Envelope();
             Envelope internal;
-            Feature feature;
+            SimpleFeature feature;
 
             while (r.hasNext()) {
                 feature = r.next();
-                internal = feature.getDefaultGeometry().getEnvelopeInternal();
+                internal = ((Geometry)feature.getDefaultGeometry()).getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
             return ReferencedEnvelope.reference(newBBox);

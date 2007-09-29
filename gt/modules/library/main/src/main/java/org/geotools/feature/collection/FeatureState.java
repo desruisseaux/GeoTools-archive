@@ -27,10 +27,13 @@ import java.util.Set;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -56,7 +59,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public abstract class FeatureState {
 	    
-    protected Envelope bounds = null;
+    protected ReferencedEnvelope bounds = null;
     protected ResourceCollection data;
 
     protected FeatureState( ResourceCollection collection ){
@@ -84,15 +87,15 @@ public abstract class FeatureState {
     /**
      * To let listeners know that something has changed.
      */
-    abstract protected void fireChange(Feature[] features, int type);
+    abstract protected void fireChange(SimpleFeature[] features, int type);
     
-    protected void fireChange(Feature feature, int type) {
-        fireChange(new Feature[] {feature}, type);
+    protected void fireChange(SimpleFeature feature, int type) {
+        fireChange(new SimpleFeature[] {feature}, type);
     }
     
     protected void fireChange(Collection coll, int type) {
-        Feature[] features = new Feature[coll.size()];
-        features = (Feature[]) coll.toArray(features);
+        SimpleFeature[] features = new SimpleFeature[coll.size()];
+        features = (SimpleFeature[]) coll.toArray(features);
         fireChange(features, type);
     }
     
@@ -105,15 +108,15 @@ public abstract class FeatureState {
      * @return the envelope of the geometries contained by this feature
      *         collection.
      */
-    public Envelope getBounds() {
+    public ReferencedEnvelope getBounds() {
         if (bounds == null) {
-            bounds = new Envelope();
+            bounds = new ReferencedEnvelope();
             Iterator i = data.iterator();
             try {            	
 	            while(i.hasNext()) {
-	                Envelope geomBounds = ((Feature) i.next()).getBounds();                
-	                if ( ! geomBounds.isNull() ) {
-	                    bounds.expandToInclude(geomBounds);
+	                BoundingBox geomBounds = ((SimpleFeature) i.next()).getBounds();                
+	                if ( ! geomBounds.isEmpty() ) {
+	                    bounds.include(geomBounds);
 	                }
 	            }
             }
@@ -124,8 +127,8 @@ public abstract class FeatureState {
         return bounds;
     }
 
-    public abstract FeatureType getFeatureType();
-    public abstract FeatureType getChildFeatureType();
+    public abstract SimpleFeatureType getFeatureType();
+    public abstract SimpleFeatureType getChildFeatureType();
     
     public abstract String getId();
     
@@ -159,7 +162,7 @@ public abstract class FeatureState {
         	List list = new ArrayList();        	
             try {                
                 while( i.hasNext() ){
-                    Feature feature = (Feature) i.next();                    
+                    SimpleFeature feature = (SimpleFeature) i.next();                    
                     list.add( feature );
                 }
                 return list;
@@ -183,7 +186,7 @@ public abstract class FeatureState {
             Iterator i = newStuff.iterator();
             try {
 	            while( i.hasNext() ){
-	                Feature feature = (Feature) i.next();                
+	                SimpleFeature feature = (SimpleFeature) i.next();                
 	                data.add( feature );
 	            }
             }
@@ -241,7 +244,7 @@ public abstract class FeatureState {
         Set fids = new HashSet();
         try {
             while( iterator.hasNext() ){
-                Feature feature = (Feature) iterator.next();
+                SimpleFeature feature = (SimpleFeature) iterator.next();
                 fids.add( feature.getID() );
             }
         }
@@ -260,7 +263,7 @@ public abstract class FeatureState {
         Iterator i = stuff.iterator();
         try {
 	        while( i.hasNext() ){
-	            if(!(i.next() instanceof Feature))
+	            if(!(i.next() instanceof SimpleFeature))
 	                return false;
 	        }
         }

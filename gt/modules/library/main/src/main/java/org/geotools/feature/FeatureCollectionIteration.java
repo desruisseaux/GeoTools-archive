@@ -19,6 +19,8 @@ package org.geotools.feature;
 
 import java.util.Iterator;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * The FeatureCollectionIteration provides a depth first traversal of a
@@ -114,7 +116,7 @@ public class FeatureCollectionIteration {
      */
     protected void iterate(Iterator iterator) {
         while (iterator.hasNext()) {
-            walker((Feature) iterator.next());
+            walker((SimpleFeature) iterator.next());
         }
     }
 
@@ -123,22 +125,22 @@ public class FeatureCollectionIteration {
      *
      * @param feature The Feature to explore.
      */
-    protected void walker(Feature feature) {
-        final FeatureType schema = feature.getFeatureType();
+    protected void walker(SimpleFeature feature) {
+        final SimpleFeatureType schema = feature.getFeatureType();
         final int cnt = schema.getAttributeCount();
 
         handler.handleFeature(feature);
 
         for (int i = 0; i < cnt; i++) {
-            AttributeType type = schema.getAttributeType(i);
+            AttributeDescriptor type = schema.getAttribute(i);
 
             // recurse if attribute type is another collection
-            if (FeatureCollection.class.isAssignableFrom(type.getBinding())) {
+            if (FeatureCollection.class.isAssignableFrom(type.getType().getBinding())) {
                 walker((FeatureCollection) feature.getAttribute(i));
 //            } else if (type instanceof FeatureType) {
             } else if (type instanceof FeatureAttributeType ) {
                 // recurse if attribute type is another feature
-                walker((Feature) feature.getAttribute(i));
+                walker((SimpleFeature) feature.getAttribute(i));
             } else {
                 // normal handling
                 handler.handleAttribute(type, feature.getAttribute(i));
@@ -172,7 +174,7 @@ public class FeatureCollectionIteration {
          *
          * @param f The Feature the handler is visiting.
          */
-        void handleFeature(Feature f);
+        void handleFeature(SimpleFeature f);
 
         /**
          * The handler is ending its visit with a Feature.
@@ -187,6 +189,6 @@ public class FeatureCollectionIteration {
          * @param type The meta-data of the given attribute value.
          * @param value The attribute value, may be null.
          */
-        void handleAttribute(AttributeType type, Object value);
+        void handleAttribute(AttributeDescriptor type, Object value);
     }
 }

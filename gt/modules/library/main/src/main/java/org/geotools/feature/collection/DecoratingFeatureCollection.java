@@ -9,7 +9,7 @@ import java.util.Map;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -135,7 +135,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.getDescriptor();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return delegate.getFeatureType();
     }
 
@@ -167,7 +167,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.getProperty(name);
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return delegate.getSchema();
     }
 

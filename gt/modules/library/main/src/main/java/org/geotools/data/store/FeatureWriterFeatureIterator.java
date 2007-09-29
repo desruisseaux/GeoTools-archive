@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureWriter;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * An iterator wrapper for a FeatureWriter - for use with
@@ -65,7 +65,7 @@ final class FeatureWriterFeatureIterator implements FeatureIterator {
         }        
     }
 
-    public Feature next() {
+    public SimpleFeature next() {
         if( writer == null ) {
             throw new NoSuchElementException( "Iterator has been closed" );            
         }

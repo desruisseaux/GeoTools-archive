@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeature;
+
 /**
  * An Index is built up around a FeatureCollection, using one of the 
  * attributes in the FeatureCollection as a comparable reference.
@@ -50,5 +52,5 @@ public interface FeatureIndex extends CollectionListener {
      * @throws IllegalArgumentException If the key is incompatable with this index.
      * @param key A key to look up the Feature with.
      */    
-    Feature findFirst(Object key) throws IllegalArgumentException;
+    SimpleFeature findFirst(Object key) throws IllegalArgumentException;
 }

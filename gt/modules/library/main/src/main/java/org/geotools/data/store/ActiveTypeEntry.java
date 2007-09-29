@@ -45,13 +45,15 @@ import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.collection.DelegateFeatureReader;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -102,7 +104,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * </p>
      */
     protected DataStore parent;
-    private final FeatureType schema;    
+    private final SimpleFeatureType schema;    
     private final Map metadata;    
     private FeatureListenerManager listeners = new FeatureListenerManager();
     
@@ -112,7 +114,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
     /** Cached bounds */
     Envelope bounds; 
     
-    public ActiveTypeEntry( DataStore parent, FeatureType schema, Map metadata ) {
+    public ActiveTypeEntry( DataStore parent, SimpleFeatureType schema, Map metadata ) {
         this.schema = schema;
         this.metadata = metadata;
         this.parent = parent;
@@ -145,7 +147,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * @see org.geotools.data.TypeEntry#getFeatureType()
      * @throws IOException
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return schema;
     }
     /**
@@ -384,19 +386,21 @@ public abstract class ActiveTypeEntry implements TypeEntry {
             return state;
         }
     }    
-    public void fireAdded( Feature newFeature, Transaction transaction ){
-        Envelope bounds = newFeature != null ? newFeature.getBounds() : null;
+    public void fireAdded( SimpleFeature newFeature, Transaction transaction ){
+        ReferencedEnvelope bounds = 
+            ReferencedEnvelope.reference(newFeature != null ? newFeature.getBounds() : null);
         listenerManager.fireFeaturesAdded( schema.getTypeName(), transaction, bounds, false );
     }
-    public void fireRemoved( Feature removedFeature, Transaction transaction ){
-        Envelope bounds = removedFeature != null ? removedFeature.getBounds() : null;
+    public void fireRemoved( SimpleFeature removedFeature, Transaction transaction ){
+        ReferencedEnvelope bounds = 
+            ReferencedEnvelope.reference(removedFeature != null ? removedFeature.getBounds() : null);
         listenerManager.fireFeaturesRemoved( schema.getTypeName(), transaction, bounds, false );
     }
-    public void fireChanged( Feature before, Feature after, Transaction transaction ){
+    public void fireChanged( SimpleFeature before, SimpleFeature after, Transaction transaction ){
         String typeName = after.getFeatureType().getTypeName();
-        Envelope bounds = new Envelope();
-        bounds.expandToInclude( before.getBounds() );
-        bounds.expandToInclude( after.getBounds() );
+        ReferencedEnvelope bounds = new ReferencedEnvelope();
+        bounds.include( before.getBounds() );
+        bounds.include( after.getBounds() );
         listenerManager.fireFeaturesChanged( typeName, transaction, bounds, false );
     }    
     //
@@ -432,7 +436,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
      * Default implementation makes use of DataStore getReader( ... ), and listenerManager.
      * </p>
      */
-    protected FeatureSource createFeatureSource( final FeatureType featureType ) {
+    protected FeatureSource createFeatureSource( final SimpleFeatureType featureType ) {
         return new AbstractFeatureSource() {
             public DataStore getDataStore() {
                 return parent;
@@ -446,7 +450,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
                 listenerManager.removeFeatureListener(this, listener);
             }
 
-            public FeatureType getSchema() {
+            public SimpleFeatureType getSchema() {
                 return featureType;
             }
         };
@@ -475,7 +479,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
                 listenerManager.removeFeatureListener(this, listener);
             }
 
-            public FeatureType getSchema() {
+            public SimpleFeatureType getSchema() {
                 return schema;
             }
         };
@@ -502,7 +506,7 @@ public abstract class ActiveTypeEntry implements TypeEntry {
                 listenerManager.removeFeatureListener(this, listener);
             }
 
-            public FeatureType getSchema() {
+            public SimpleFeatureType getSchema() {
                 return schema;
             }
         };

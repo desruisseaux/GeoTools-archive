@@ -15,6 +15,8 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.simple.SimpleFeature;
+
 /**
  * An interface for the construction of Features.
  * <p>
@@ -51,7 +53,7 @@ public interface FeatureFactory {
      * @throws IllegalAttributeException if the FeatureType does not validate
      *         the attributes.
      */
-    Feature create(Object[] attributes) throws IllegalAttributeException;
+    SimpleFeature create(Object[] attributes) throws IllegalAttributeException;
 
     /**
      * Creates a new feature, with the proper featureID.
@@ -65,6 +67,6 @@ public interface FeatureFactory {
      * @throws IllegalAttributeException if the FeatureType does not validate
      *         the attributes.
      */
-    Feature create(Object[] attributes, String featureID)
+    SimpleFeature create(Object[] attributes, String featureID)
         throws IllegalAttributeException;
 }
