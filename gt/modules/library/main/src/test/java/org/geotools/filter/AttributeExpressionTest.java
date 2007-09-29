@@ -19,9 +19,7 @@ public class AttributeExpressionTest extends TestCase {
 		
 		SimpleFeatureType type = typeBuilder.buildFeatureType();
 		
-		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-		
-		builder.setType( type );
+		DefaultFeatureBuilder builder = new DefaultFeatureBuilder(type);
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 

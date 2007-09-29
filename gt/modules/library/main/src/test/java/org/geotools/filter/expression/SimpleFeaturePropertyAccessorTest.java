@@ -25,8 +25,7 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		
 		type = (SimpleFeatureType) typeBuilder.buildFeatureType();
 		
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
-		builder.setType( type );
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 

@@ -29,17 +29,19 @@ import org.apache.commons.beanutils.PropertyUtils;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/library/cql/src/main/java/org/geotools/filter/function/PropertyExistsFunction.java $
  */
 import java.lang.reflect.InvocationTargetException;
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.resources.Utilities;
 
-
+/**
+ * A new function to check if a property exists.
+ */
 public class PropertyExistsFunction extends FunctionExpressionImpl {
     public PropertyExistsFunction() {
         super("PropertyExists");
@@ -75,9 +77,9 @@ public class PropertyExistsFunction extends FunctionExpressionImpl {
      *         name passed as this function argument, {@link Boolean#FALSE}
      *         otherwise.
      */
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
         String propName = getPropertyName();
-        AttributeType attributeType = feature.getFeatureType().getAttributeType(propName);
+        AttributeDescriptor attributeType = feature.getFeatureType().getAttribute(propName);
 
         return Boolean.valueOf(attributeType != null);
     }
@@ -89,8 +91,8 @@ public class PropertyExistsFunction extends FunctionExpressionImpl {
      *         conventions for getters. {@link Boolean#FALSE} otherwise.
      */
     public Object evaluate(Object bean) {
-        if (bean instanceof Feature) {
-            return evaluate((Feature) bean);
+        if (bean instanceof SimpleFeature) {
+            return evaluate((SimpleFeature) bean);
         }
 
         final String propName = getPropertyName();

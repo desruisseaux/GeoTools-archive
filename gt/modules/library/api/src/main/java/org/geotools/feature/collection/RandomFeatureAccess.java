@@ -16,7 +16,6 @@
 package org.geotools.feature.collection;
 
 import java.util.NoSuchElementException;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 

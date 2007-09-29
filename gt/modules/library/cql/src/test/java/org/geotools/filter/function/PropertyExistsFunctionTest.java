@@ -15,18 +15,21 @@
  */
 package org.geotools.filter.function;
 
-import junit.framework.TestCase;
 import java.util.Collections;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.DataUtilities;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.metadata.iso.citation.CitationImpl;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Function;
 import org.opengis.metadata.citation.Citation;
-import org.geotools.data.DataUtilities;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.geotools.metadata.iso.citation.CitationImpl;
 
 
 /**
@@ -60,8 +63,11 @@ public class PropertyExistsFunctionTest extends TestCase {
     }
 
     public void testEvaluateFeature() throws SchemaException, IllegalAttributeException {
-        FeatureType type = DataUtilities.createType("ns", "name:string,geom:Geometry");
-        Feature feature = type.create(new Object[] { "testName", null });
+        SimpleFeatureType type = DataUtilities.createType("ns", "name:string,geom:Geometry");
+        SimpleFeatureBuilder build = new SimpleFeatureBuilder(type);
+        build.add("testName");
+        build.add(null);
+        SimpleFeature feature = build.buildFeature(null);
 
         f.setParameters(Collections.singletonList(ff.property("nonExistant")));
         assertEquals(Boolean.FALSE, f.evaluate(feature));

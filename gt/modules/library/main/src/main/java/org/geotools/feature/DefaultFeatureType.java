@@ -230,8 +230,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     	}
     	
     	try {
-    		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-        	builder.setType( this );
+    		DefaultFeatureBuilder builder = new DefaultFeatureBuilder( this );
         	builder.add( attributes );
         	
         	return (Feature) builder.buildFeature(featureID);	

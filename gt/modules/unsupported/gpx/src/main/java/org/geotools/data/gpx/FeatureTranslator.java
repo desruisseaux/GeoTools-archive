@@ -34,8 +34,7 @@ public class FeatureTranslator {
     private final SimpleFeatureType featureType;
     
     FeatureTranslator(SimpleFeatureType featureType) {
-        builder = new SimpleFeatureBuilder();
-        builder.setType(featureType);
+        builder = new SimpleFeatureBuilder(featureType);
         
         geomFactory = new GeometryFactory();
 

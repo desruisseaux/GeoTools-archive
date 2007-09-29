@@ -25,8 +25,7 @@ public class SimpleFeatureBuilderTest extends TestCase {
 		
 		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
 		
-		builder = new SimpleFeatureBuilder();
-		builder.setType( featureType );
+		builder = new SimpleFeatureBuilder(featureType);
 	}
 	
 	public void testSanity() throws Exception {

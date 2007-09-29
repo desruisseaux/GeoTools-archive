@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.type.SetAttributeType;
 import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.FeatureFactory;
@@ -122,17 +123,18 @@ public class SimpleFeatureBuilder {
 	protected GeometryAttribute defaultGeometry;
 	
 	/**
-	 * Constructs the builder.
-	 */
-	public SimpleFeatureBuilder() {
-		this( new FeatureFactoryImpl());
-	}
-	
+     * Constructs the builder.
+     */
+    public SimpleFeatureBuilder(SimpleFeatureType type) {
+        this( type, new FeatureFactoryImpl());
+    }
+    
 	/**
 	 * Constructs the builder specifying the factory to use for creating features.
 	 */
-    public SimpleFeatureBuilder(FeatureFactory factory) {
-    	this.factory = factory;
+    public SimpleFeatureBuilder(SimpleFeatureType simpleFeatureType, FeatureFactory factory) {
+        this.factory = factory;
+        this.featureType = simpleFeatureType;
 	}
 
     /**
@@ -141,13 +143,6 @@ public class SimpleFeatureBuilder {
 	public void setFeatureFactory(FeatureFactory factory) {
 		this.factory = factory;
 	}
-
-	/**
-	 * Sets the type of features created by the builder.
-	 */
-    public void setType( SimpleFeatureType featureType ){
-    	this.featureType = featureType; 
-    }
     
     /**
      * Initialize the builder with the provided feature.
@@ -165,7 +160,6 @@ public class SimpleFeatureBuilder {
 		//defaultGeometry = feature.getDefaultGeometryProperty();
 		//crs = feature.getType().getCRS();
 	}
-    
     /**
      * Internal method which initializes builder state.
      */
@@ -213,6 +207,28 @@ public class SimpleFeatureBuilder {
     	//add it
     	attributes().add(attributes().size(),attribute);
 	}
+    
+    /**
+     * Adds an array of attributes.
+     * <p>
+     * This method is convenience for: 
+     * <code>
+     *   <pre>
+     *   for (int i = 0; i < values.length; i++ ) {
+     *      add( values[i] );
+     *   }
+     *   </pre>
+     * </code>
+     * </p>
+     */
+    public void addAll(List values ) {
+        if ( values == null ) {
+            return;
+        }
+        for ( Object value : values ) {
+            add( values );
+        }
+    }
     
     /**
      * Adds an array of attributes.
@@ -359,8 +375,7 @@ public class SimpleFeatureBuilder {
 	 * </p>
 	 */
 	public static SimpleFeature build( SimpleFeatureType type, Object[] values, String id ) {
-	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
-	    builder.setType(type);
+	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
 	    builder.add(values);
 	    return builder.buildFeature(id);
 	}
@@ -388,8 +403,8 @@ public class SimpleFeatureBuilder {
      * </p>
      */
 	public static SimpleFeature copy( SimpleFeature original ) {
-	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
-	    builder.init(original);
+	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder(original.getFeatureType());
+	    builder.init(original); // this is a shallow copy
 	    return builder.buildFeature(original.getID());
 	}
 	
@@ -400,10 +415,14 @@ public class SimpleFeatureBuilder {
 	 * @return
 	 */
 	public static SimpleFeature template(SimpleFeatureType featureType, String featureId) {
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(featureType);
 		for (AttributeDescriptor ad : featureType.getAttributes()) {
 			builder.add(ad.getDefaultValue());
 		}
 		return builder.buildFeature(featureId);
 	}
+
+    public void setType(SimpleFeatureType schema) {
+        this.featureType = schema;
+    }
 }

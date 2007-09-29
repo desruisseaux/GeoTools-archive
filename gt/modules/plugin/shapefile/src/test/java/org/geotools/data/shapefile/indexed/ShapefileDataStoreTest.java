@@ -507,8 +507,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
     private FeatureCollection createFeatureCollection() throws Exception {
         SimpleFeatureType featureType = createExampleSchema();
-        SimpleFeatureBuilder build = new SimpleFeatureBuilder();
-        build.setType(featureType);
+        SimpleFeatureBuilder build = new SimpleFeatureBuilder(featureType);
         
         FeatureCollection features = FeatureCollections.newCollection();
         for (int i = 0, ii = 20; i < ii; i++) {

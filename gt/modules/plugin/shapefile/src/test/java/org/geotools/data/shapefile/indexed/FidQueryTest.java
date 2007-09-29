@@ -97,8 +97,7 @@ public class FidQueryTest extends FIDTestCase {
 		SimpleFeature feature = fids.values().iterator().next();
 		SimpleFeatureType schema = ds.getSchema();
 		
-		SimpleFeatureBuilder build = new SimpleFeatureBuilder();
-		build.setType( schema );
+		SimpleFeatureBuilder build = new SimpleFeatureBuilder(schema);
 		
 		SimpleFeature newFeature = build.buildFeature(null);
 		

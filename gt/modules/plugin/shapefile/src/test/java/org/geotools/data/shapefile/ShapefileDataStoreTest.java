@@ -408,8 +408,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      */
     private FeatureCollection createFeatureCollection() throws Exception {
         SimpleFeatureType featureType = createExampleSchema();
-        SimpleFeatureBuilder build = new SimpleFeatureBuilder();
-        build.setType(featureType);
+        SimpleFeatureBuilder build = new SimpleFeatureBuilder(featureType);
         
         FeatureCollection features = FeatureCollections.newCollection();
         for (int i = 0, ii = 20; i < ii; i++) {
@@ -468,8 +467,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         BigInteger bigInteger = new BigInteger("1234567890123456789");
 		BigDecimal bigDecimal = new BigDecimal( bigInteger, 2);
 		
-		SimpleFeatureBuilder build = new SimpleFeatureBuilder();
-		build.setType(type);
+		SimpleFeatureBuilder build = new SimpleFeatureBuilder(type);
 		build.add( new GeometryFactory().createPoint(new Coordinate(1, -1)) );
 		build.add( bigDecimal );
 		build.add( bigInteger );
@@ -553,9 +551,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         SimpleFeatureType type = DataUtilities.createType( "Junk", "a:Geometry" );
 
         FeatureCollection features = FeatureCollections.newCollection();
-        SimpleFeatureBuilder  build = new SimpleFeatureBuilder();
-        build.setType( type );
-        
+        SimpleFeatureBuilder  build = new SimpleFeatureBuilder(type);        
         for (int i = 0, ii = 20; i < ii; i++) {
             build.set(0, (Geometry) geom.clone() );
             SimpleFeature feature = build.buildFeature( null );
