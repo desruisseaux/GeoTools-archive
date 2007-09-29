@@ -22,8 +22,8 @@ import java.sql.Statement;
 
 import org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Generate FID based on an auto increment function, the most stable approach for
@@ -56,7 +56,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
             this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes; 
         }
         
-        public String createID( Connection conn, Feature feature, Statement statement ) throws IOException {
+        public String createID( Connection conn, SimpleFeature feature, Statement statement ) throws IOException {
             String id = retriveId(conn, feature, statement);
             if(id != null && returnFIDColumnsAsAttributes) {
                 // we have to udpate the attribute in the feature too
@@ -75,7 +75,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
          * 2. SELECT currval(sequence name) <-- using other methods to get name
          * 3. SELECT fid ... ORDER BY fid DESC LIMIT 1
          */
-        public String retriveId( Connection conn, Feature feature, Statement statement )
+        public String retriveId( Connection conn, SimpleFeature feature, Statement statement )
             throws IOException {
             ResultSet rs = null;
             if (can_usepg_get_serial_sequence) {
@@ -158,7 +158,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
         /**
          * Our last resort method for getting the FID. 
          */
-        private String findInsertedFID( Connection conn, Feature feature, Statement statement )
+        private String findInsertedFID( Connection conn, SimpleFeature feature, Statement statement )
             throws IOException {
             String sql = "SELECT \"" + getColumnName() + "\" FROM \"";
             String schema = getTableSchemaName();

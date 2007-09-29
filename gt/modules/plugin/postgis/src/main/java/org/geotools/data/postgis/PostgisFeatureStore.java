@@ -40,16 +40,15 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FidFilter;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -113,14 +112,14 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     /** the name of the column to use for the featureId */
     protected FIDMapper fidMapper;
 
-    public PostgisFeatureStore(PostgisDataStore postgisDataStore, FeatureType featureType)
+    public PostgisFeatureStore(PostgisDataStore postgisDataStore, SimpleFeatureType featureType)
         throws IOException {
         super(postgisDataStore, featureType);
         tableName = featureType.getTypeName();
         fidMapper = postgisDataStore.getFIDMapper(tableName);
         sqlBuilder = (PostgisSQLBuilder) postgisDataStore.getSqlBuilder(tableName);
 
-        AttributeType geomType = featureType.getDefaultGeometry();
+        AttributeDescriptor geomType = featureType.getDefaultGeometry();
         encoder = new SQLEncoderPostgis();
         encoder.setFeatureType( featureType );
         encoder.setFIDMapper(postgisDataStore.getFIDMapper(featureType.getTypeName()));
@@ -392,7 +391,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 //do actual delete
                 LOGGER.fine("sql statment is " + sql);
                 DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);
-                Envelope bounds=bounds(query);
+                ReferencedEnvelope bounds=bounds(query);
                 statement.executeUpdate(sql);
                 
                 if( bounds!=null && !bounds.isNull())
@@ -438,7 +437,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      *       now, but should be more fully implemented.
      * @task REVISIT: do some nice prepared statement stuff like oracle.
      */
-    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
         throws IOException {
         // check locks!
         // (won't do anything if we use our own
@@ -477,10 +476,10 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 sql = makeModifySql(type, value, whereStmt);
                 LOGGER.finer("encoded modify is " + sql);
                 DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);
-                Envelope bounds=bounds(query);
+                ReferencedEnvelope bounds=bounds(query);
                 statement.executeUpdate(sql);
                 if (bounds!=null && !bounds.isNull()) {
-                    Envelope afterBounds = bounds(query);
+                    ReferencedEnvelope afterBounds = bounds(query);
                     if(afterBounds != null)
                         bounds.expandToInclude(afterBounds);
                 } else {
@@ -546,7 +545,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      *
      * @return The fid without the leading tablename.
      */
-    private String formatFid(Feature feature) {
+    private String formatFid(SimpleFeature feature) {
         String fid = feature.getID();
 
         if (fid.startsWith(tableName)) {
@@ -569,9 +568,9 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      * @throws IOException If modificaton is not supported, if the object type
      *         do not match the attribute type.
      */
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
         throws IOException {
-        AttributeType[] singleType = { type };
+        AttributeDescriptor[] singleType = { type };
         Object[] singleVal = { value };
         modifyFeatures(singleType, singleVal, filter);
     }
@@ -587,7 +586,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      *
      * @throws IOException if the lengths of types and values don't match.
      */
-    private String makeModifySql(AttributeType[] types, Object[] values, String whereStmt)
+    private String makeModifySql(AttributeDescriptor[] types, Object[] values, String whereStmt)
         throws IOException {
         int arrLength = types.length;
 
@@ -596,7 +595,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             sqlStatement.append(sqlBuilder.encodeTableName(tableName) + " SET ");
 
             for (int i = 0; i < arrLength; i++) {
-                AttributeType curType = types[i];
+                AttributeDescriptor curType = types[i];
                 Object curValue = values[i];
                 String newValue;
 
@@ -666,7 +665,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         Filter filter = unpacker.getSupported();
         LOGGER.fine("Filter in making sql is " + filter);
 
-        AttributeType[] attributeTypes = getAttTypes(query);
+        AttributeDescriptor[] attributeTypes = getAttTypes(query);
         int numAttributes = attributeTypes.length;
 
         StringBuffer sqlStatement = new StringBuffer("SELECT ");
@@ -683,7 +682,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         for (int i = 0; i < numAttributes; i++) {
             String curAttName = attributeTypes[i].getLocalName();
 
-            if (Geometry.class.isAssignableFrom(attributeTypes[i].getBinding())) {
+            if (Geometry.class.isAssignableFrom(attributeTypes[i].getType().getBinding())) {
                 sqlStatement.append(", AsText(force_2d(\"" + curAttName + "\"))");
             } else {
                 sqlStatement.append(", \"" + curAttName + "\"");
@@ -733,7 +732,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         LOGGER.fine("Filter in making sql is " + encodableFilter);
 
-        AttributeType[] attributeTypes = getAttTypes(query);
+        AttributeDescriptor[] attributeTypes = getAttTypes(query);
         int numAttributes = attributeTypes.length;
 
         StringBuffer sqlStatement = new StringBuffer("SELECT ");
@@ -750,7 +749,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         for (int i = 0; i < numAttributes; i++) {
             String curAttName = attributeTypes[i].getLocalName();
 
-            if (Geometry.class.isAssignableFrom(attributeTypes[i].getBinding())) {
+            if (Geometry.class.isAssignableFrom(attributeTypes[i].getType().getBinding())) {
                 sqlStatement.append(", AsText(force_2d(\"" + curAttName + "\"))");
             } else {
                 sqlStatement.append(", \"" + curAttName + "\"");
@@ -818,14 +817,14 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      * @throws IOException if query contains a propertyName that is not a part
      *         of this type's schema.
      */
-    private AttributeType[] getAttTypes(Query query) throws IOException {
-        AttributeType[] schemaTypes = getSchema().getAttributeTypes();
+    private AttributeDescriptor[] getAttTypes(Query query) throws IOException {
+        AttributeDescriptor[] schemaTypes = (AttributeDescriptor[]) getSchema().getAttributes().toArray(new AttributeDescriptor[getSchema().getAttributes().size()]);
 
         if (query.retrieveAllProperties()) {
             return schemaTypes;
         } else {
             List attNames = Arrays.asList(query.getPropertyNames());
-            AttributeType[] retAttTypes = new AttributeType[attNames.size()];
+            AttributeDescriptor[] retAttTypes = new AttributeDescriptor[attNames.size()];
             int retPos = 0;
 
             for (int i = 0, n = schemaTypes.length; i < n; i++) {
@@ -849,7 +848,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         }
     }
 
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
         return getBounds(Query.ALL);
     }
 
@@ -872,7 +871,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         return bounds(query);
     }
 
@@ -883,10 +882,10 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         Filter filter = query.getFilter();
 
         if (filter == Filter.EXCLUDE) {
-            return new ReferencedEnvelope(new Envelope(), query.getCoordinateSystem());
+            return new ReferencedEnvelope(new ReferencedEnvelope(), query.getCoordinateSystem());
         }
 
-        FeatureType schema = getSchema();
+        SimpleFeatureType schema = getSchema();
         JDBCDataStore jdbc = (JDBCDataStore)getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(schema.getTypeName());
 
@@ -902,10 +901,10 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         try {
             conn = getConnection();
 
-            Envelope retEnv = new Envelope();
+            ReferencedEnvelope retEnv = new ReferencedEnvelope();
             Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
-            AttributeType[] attributeTypes = schema.getAttributeTypes();
-            FeatureType schemaNew = schema;
+            AttributeDescriptor[] attributeTypes = (AttributeDescriptor[]) schema.getAttributes().toArray(new AttributeDescriptor[schema.getAttributes().size()]);
+            SimpleFeatureType schemaNew = schema;
             	//DJB: this should ensure that schema has a geometry in it or the bounds query has no chance of working
 			if(!query.retrieveAllProperties()) {
 				try {
@@ -928,13 +927,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 			 // at this point, the query should have a geometry in it. 
 			 // BUT, if there's no geometry in the table, then the query will not (obviously) have a geometry in it.
 			 
-			 attributeTypes = schemaNew.getAttributeTypes();
+			 attributeTypes = (AttributeDescriptor[]) schema.getAttributes().toArray(new AttributeDescriptor[schema.getAttributes().size()]);
 				 
             for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
-                if (Geometry.class.isAssignableFrom(attributeTypes[j].getBinding())) // same as .isgeometry() - see new featuretype javadoc
+                if (Geometry.class.isAssignableFrom(attributeTypes[j].getType().getBinding())) // same as .isgeometry() - see new featuretype javadoc
                 {
                     String attName = attributeTypes[j].getLocalName();
-                    Envelope curEnv = getEnvelope(conn, attName, sqlBuilder, filter);
+                    ReferencedEnvelope curEnv = getEnvelope(conn, attName, sqlBuilder, filter);
 
                     if (curEnv == null) {
                         return null;
@@ -947,7 +946,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             LOGGER.finer("returning bounds " + retEnv);
 
             if ( (schemaNew!=null) && (schemaNew.getDefaultGeometry() != null) )
-                return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCoordinateSystem());
+                return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCRS());
             if(query.getCoordinateSystem()!=null)
                 return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
             return new ReferencedEnvelope(retEnv,null);
@@ -971,7 +970,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     //REVISIT: do we want maxFeatures here too?  If we don't have maxFeatures then the answer
     //is still always going to be right (and guaranteed to be right, as opposed to two selects
     // that could be slightly different).  And the performance hit shouldn't be all that much.
-    protected Envelope getEnvelope(
+    protected ReferencedEnvelope getEnvelope(
         Connection conn,
         String geomName,
         SQLBuilder sqlBuilder,
@@ -1004,12 +1003,12 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         results.next();
 
         String wkt = results.getString(1);
-        Envelope retEnv = null;
+        ReferencedEnvelope retEnv = null;
 
         if (wkt == null) {
             return null;
         } else {
-            retEnv = geometryReader.read(wkt).getEnvelopeInternal();
+            retEnv = ReferencedEnvelope.reference(geometryReader.read(wkt).getEnvelopeInternal());
         }
 
         results.close();

@@ -25,7 +25,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.datasource.DataSourceFinder;
 import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.jdbc.fidmapper.AbstractFIDMapper;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.postgresql.PGStatement;
 
 
@@ -81,7 +81,7 @@ public class OIDFidMapper extends AbstractFIDMapper {
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection, org.geotools.feature.Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature, Statement statement) throws IOException {
+    public String createID(Connection conn, SimpleFeature feature, Statement statement) throws IOException {
         try {
             if(!(statement instanceof PGStatement)) {
                 UnWrapper uw = DataSourceFinder.getUnWrapper(statement);

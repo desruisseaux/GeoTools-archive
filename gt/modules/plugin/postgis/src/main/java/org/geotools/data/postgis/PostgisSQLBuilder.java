@@ -18,13 +18,13 @@ package org.geotools.data.postgis;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * Builds sql for postgis.
@@ -62,7 +62,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
         this.config = config;
     }
     
-    public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config, FeatureType ft) {
+    public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config, SimpleFeatureType ft) {
     	super(encoder);
         this.config = config;
         this.ft = ft;
@@ -90,7 +90,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      * @param attributes
      */
     public void sqlColumns(StringBuffer sql, FIDMapper mapper,
-        AttributeType[] attributes) {
+        AttributeDescriptor[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
             sql.append("\""+mapper.getColumnName(i)+"\""); //DJB: add quotes in.  NOTE: if FID  mapper isnt oid (ie. PK - Primary Key), you could be requesting PK columns multiple times 
 

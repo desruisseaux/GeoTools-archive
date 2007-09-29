@@ -27,11 +27,10 @@ import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 
@@ -66,7 +65,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
     FeatureLock featureLock = FeatureLock.TRANSACTION;
 
     public PostgisFeatureLocking(PostgisDataStore postgisDataStore,
-        FeatureType featureType) throws IOException {
+        SimpleFeatureType featureType) throws IOException {
         super(postgisDataStore, featureType);
     }
 
@@ -205,7 +204,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
      * @throws IOException DOCUMENT ME!
      * @throws UnsupportedOperationException DOCUMENT ME!
      */
-    public int lockFeature(Feature feature) throws IOException {
+    public int lockFeature(SimpleFeature feature) throws IOException {
         LockingManager lockingManager = getDataStore().getLockingManager();
 
         if (lockingManager == null) {

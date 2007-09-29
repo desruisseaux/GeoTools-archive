@@ -69,11 +69,13 @@ import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.data.postgis.referencing.PostgisAuthorityFactory;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.CompareFilter;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
@@ -443,7 +445,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             ResultSet rs = null;
             Envelope envelope = null;
     		    	
-        	FeatureType schema = getSchema(typeName);
+        	SimpleFeatureType schema = getSchema(typeName);
         	String geomName = schema.getDefaultGeometry().getLocalName();
         	
 	    	// optimization, postgis version >= 1.0 contains estimated_extent
@@ -621,7 +623,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * Override this method to perform a few permission checks before the super 
      * class has a chance to do its thing.
      */
-    protected FeatureType buildSchema(String typeName, FIDMapper mapper) throws IOException {
+    protected SimpleFeatureType buildSchema(String typeName, FIDMapper mapper) throws IOException {
     	//be sure we can query the necessary tables
     	//TODO: should spatial_ref_sys be in here?
     	Connection conn = getConnection(Transaction.AUTO_COMMIT);
@@ -685,11 +687,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
      *      org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(final FeatureType requestType,
+    public FeatureReader getFeatureReader(final SimpleFeatureType requestType,
         final Filter filter, final Transaction transaction)
         throws IOException {
         String typeName = requestType.getTypeName();
-        FeatureType schemaType = getSchema(typeName);
+        SimpleFeatureType schemaType = getSchema(typeName);
 
         int compare = DataUtilities.compare(requestType, schemaType);
 
@@ -735,10 +737,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @throws IOException If we can't get the schema.
      */
-    protected String[] attributeNames(FeatureType featureType, Filter filter)
+    protected String[] attributeNames(SimpleFeatureType featureType, Filter filter)
         throws IOException {
         String typeName = featureType.getTypeName();
-        FeatureType original = getSchema(typeName);
+        SimpleFeatureType original = getSchema(typeName);
         SQLBuilder sqlBuilder = getSqlBuilder(typeName);
 
         if (featureType.getAttributeCount() == original.getAttributeCount()) {
@@ -932,13 +934,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
     */
     /**
-     * Constructs an AttributeType from a row in a ResultSet. The ResultSet
+     * Constructs an AttributeDescriptor from a row in a ResultSet. The ResultSet
      * contains the information retrieved by a call to getColumns() on the
      * DatabaseMetaData object. This information can be used to construct an
      * Attribute Type.
      * 
      * <p>
-     * This implementation construct an AttributeType using the default JDBC
+     * This implementation construct an AttributeDescriptor using the default JDBC
      * type mappings defined in JDBCDataStore. These type mappings only handle
      * native Java classes and SQL standard column types. If a geometry type
      * is found then getGeometryAttribute is called.
@@ -952,11 +954,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @param metadataRs The ResultSet containing the result of a
      *        DatabaseMetaData.getColumns call.
      *
-     * @return The AttributeType built from the ResultSet.
+     * @return The AttributeDescriptor built from the ResultSet.
      *
      * @throws IOException If an error occurs processing the ResultSet.
      */
-    protected AttributeType buildAttributeType(ResultSet metadataRs)
+    protected AttributeDescriptor buildAttributeType(ResultSet metadataRs)
         throws IOException {
         try {
             final int TABLE_NAME = 3;
@@ -1033,7 +1035,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @task This should probably take a Transaction, so if things mess up then
      *       we can rollback.
      */
-    AttributeType getGeometryAttribute(String tableName, String columnName, boolean nillable)
+    AttributeDescriptor getGeometryAttribute(String tableName, String columnName, boolean nillable)
         throws IOException {
         Connection dbConnection = null;
         Class type = null;
@@ -1134,7 +1136,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             crs = null;
         }
         
-        return AttributeTypeFactory.newAttributeType(columnName, type, nillable,  -1, null, crs);
+        return new AttributeTypeBuilder().name(columnName).binding(type)
+        	.nillable(nillable).crs(crs).buildDescriptor(columnName);
     }
 
     private PostgisAuthorityFactory getPostgisAuthorityFactory() {
@@ -1179,12 +1182,12 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *             if something goes horribly wrong or the table already exists
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
     	String tableName = featureType.getTypeName();
     	
     	String lcTableName = tableName.toLowerCase();
         
-        AttributeType[] attributeType = featureType.getAttributeTypes();
+        AttributeDescriptor[] attributeType = (AttributeDescriptor[]) featureType.getAttributes().toArray(new AttributeDescriptor[featureType.getAttributes().size()]);
         String dbSchema = config.getDatabaseSchemaName();
         
         PostgisSQLBuilder sqlb = createSQLBuilder();
@@ -1479,40 +1482,21 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 //        return typeName;
 //    }
 
-    private StringBuffer makeSqlCreate(AttributeType[] attributeType)
+    private StringBuffer makeSqlCreate(AttributeDescriptor[] attributeType)
         throws IOException {
         StringBuffer buf = new StringBuffer("");
 
         for (int i = 0; i < attributeType.length; i++) {
             String typeName = null;
-            typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getBinding());
+            typeName = (String) CLASS_MAPPINGS.get(attributeType[i].getType().getBinding());
             if (typeName == null)
-            	typeName = (String) GEOM_CLASS_MAPPINGS.get(attributeType[i].getBinding());
+            	typeName = (String) GEOM_CLASS_MAPPINGS.get(attributeType[i].getType().getBinding());
             	
             if (typeName != null) {
                 if (attributeType[i] instanceof GeometryAttributeType) {
                     typeName = "GEOMETRY";
                 } else if (typeName.equals("VARCHAR")) {
-                	int length = -1;
-                	Filter f = attributeType[i].getRestriction();
-                	if(f != null && f !=Filter.EXCLUDE && f != Filter.INCLUDE &&
-                       (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)){
-                		try{
-                		CompareFilter cf = (CompareFilter)f;
-                		if(cf.getLeftValue() instanceof LengthFunction){
-                			length = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
-                		}else{
-                			if(cf.getRightValue() instanceof LengthFunction){
-                    			length = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
-                    		}
-                		}
-                		}catch(NumberFormatException e){
-                			length = 256;
-                		}
-                	}else{
-                		length = 256;
-                	}
-                	
+                	int length = FeatureTypes.getFieldLength(attributeType[i]);
                 	if (length < 1) {
                 		LOGGER.warning("FeatureType did not specify string length; defaulted to 256");
                 		length = 256;
@@ -1529,7 +1513,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 }
 
                 //TODO review!!! Is toString() always OK???
-                Object defaultValue = attributeType[i].createDefaultValue();
+                Object defaultValue = attributeType[i].getDefaultValue();
 
                 if (defaultValue != null) {
                     typeName = typeName + " DEFAULT '"
@@ -1541,9 +1525,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             } else {
             	String msg;
             	if (attributeType[i] == null) {
-            		msg = "AttributeType was null!";
+            		msg = "AttributeDescriptor was null!";
             	} else {
-            		msg = "Type '" + attributeType[i].getBinding() + "' not supported!";
+            		msg = "Type '" + attributeType[i].getType().getBinding() + "' not supported!";
             	}
                 throw (new IOException(msg));
             }
@@ -1642,7 +1626,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
      *      org.geotools.feature.FeatureType)
      */
-    public void updateSchema(String typeName, FeatureType featureType)
+    public void updateSchema(String typeName, SimpleFeatureType featureType)
         throws IOException { 
     	throw new IOException("PostgisDataStore.updateSchema not yet implemented");
     	//TODO: implement updateSchema
@@ -1690,7 +1674,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     public PostgisFeatureLocking createFeatureLockingInternal(
-		PostgisDataStore ds, FeatureType type
+		PostgisDataStore ds, SimpleFeatureType type
 	) throws IOException {
     	
     	return new PostgisFeatureLocking(ds,type);
@@ -1802,9 +1786,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     /**
-     * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
+     * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeDescriptor)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type,
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type,
         QueryData queryData) {
         if (WKBEnabled) {
             Hints hints = queryData != null ? queryData.getHints() : GeoTools.getDefaultHints();
@@ -1929,7 +1913,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     	return OPTIMIZE_MODE;
     }
     
-	public FeatureType getSchema(String arg0) throws IOException {
+	public SimpleFeatureType getSchema(String arg0) throws IOException {
 		return super.getSchema(arg0);
 	}
     

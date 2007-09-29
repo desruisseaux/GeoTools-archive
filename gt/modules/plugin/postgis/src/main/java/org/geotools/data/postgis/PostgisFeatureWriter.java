@@ -24,13 +24,13 @@ import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBWriter;
@@ -127,9 +127,9 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
      * For postgres >= 8.1 NOWAIT is used (meaning you get a response).
      * Prior versions will block during concurrent editing.
      */
-    protected String makeSelectForUpdateSql(Feature current) {
+    protected String makeSelectForUpdateSql(SimpleFeature current) {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-        FeatureType featureType = ftInfo.getSchema();
+        SimpleFeatureType featureType = ftInfo.getSchema();
         String tableName = featureType.getTypeName();
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
@@ -137,7 +137,7 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
         
         StringBuffer sql = new StringBuffer("SELECT ");
         //fid will be picked up automatically
-        sqlBuilder.sqlColumns(sql, mapper, new AttributeType[] {});  
+        sqlBuilder.sqlColumns(sql, mapper, new AttributeDescriptor[] {});  
         sqlBuilder.sqlFrom(sql, tableName);
         try {
             sqlBuilder.sqlWhere(sql, fid);
