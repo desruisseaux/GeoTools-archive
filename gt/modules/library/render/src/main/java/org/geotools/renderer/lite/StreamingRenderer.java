@@ -59,7 +59,6 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeneralEnvelope;
@@ -1209,7 +1208,7 @@ public final class StreamingRenderer implements GTRenderer {
 						schema.getTypeName()).append(")").toString());
 			}
 
-			if (attType instanceof GeometryAttributeType) {                                
+			if (attType instanceof GeometryDescriptor) {                                
                 BBOX gfilter = filterFactory.bbox( attType.getLocalName(), bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), null );
                 
 				if (filter == null) {
