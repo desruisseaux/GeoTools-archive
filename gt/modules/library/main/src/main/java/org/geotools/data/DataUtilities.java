@@ -54,6 +54,8 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.feature.type.GeometricAttributeType;
+import org.geotools.feature.type.GeometryDescriptorImpl;
+import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -66,6 +68,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -1215,7 +1218,7 @@ public class DataUtilities {
         }
 
         if( typeName == null ) typeName = featureType.getTypeName();
-        if( namespace == null )
+        if( namespace == null && featureType.getName().getNamespaceURI() != null )
             try {
                 namespace = new URI(featureType.getName().getNamespaceURI());
             } catch (URISyntaxException e) {
@@ -1659,8 +1662,14 @@ public class DataUtilities {
                 }
             }
             
-            AttributeType at = new AttributeTypeImpl( new Name( name ), type(type), false, false, Collections.EMPTY_LIST, null, null );
-            return new AttributeDescriptorImpl( at, new Name(name), 1,1, nillable, null );
+            Class clazz = type(type);
+            if(Geometry.class.isAssignableFrom(clazz)) {
+            	GeometryType at = new GeometryTypeImpl(new Name( name ), clazz , crs, false, false, Collections.EMPTY_LIST, null, null );
+	            return new GeometryDescriptorImpl( at, new Name(name), 1,1, nillable, null );
+            } else {
+	            AttributeType at = new AttributeTypeImpl( new Name( name ), clazz , false, false, Collections.EMPTY_LIST, null, null );
+	            return new AttributeDescriptorImpl( at, new Name(name), 1,1, nillable, null );
+            }
         } catch (ClassNotFoundException e) {
             throw new SchemaException("Could not type " + name + " as:" + type);
         }

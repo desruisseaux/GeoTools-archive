@@ -110,8 +110,7 @@ public class ReprojectionTest extends TestCase {
 		sr.paint((Graphics2D) image.getGraphics(), new Rectangle(200, 200),
 				reUtm);
 		// we should get two errors since there are two features that cannot be
-		// projected
-		// but the renderer itself should not throw exceptions
+		// projected but the renderer itself should not throw exceptions
 		assertEquals(2, errors);
 	}
 }

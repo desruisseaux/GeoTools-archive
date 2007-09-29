@@ -49,6 +49,11 @@ import org.opengis.feature.simple.SimpleFeatureType;
 public class BasicFeatureTypes
 {
 
+	/**
+	 * The base type for all features
+	 */
+	public static final SimpleFeatureType FEATURE;
+	
     /**
      * The FeatureType reference that should be used for Polygons
      */
@@ -79,6 +84,7 @@ public class BasicFeatureTypes
         SimpleFeatureType tmpPoint = null;
         SimpleFeatureType tmpPolygon = null;
         SimpleFeatureType tmpLine = null;
+        SimpleFeatureType tmpFeature = null;
         try {
             SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
             
@@ -87,7 +93,8 @@ public class BasicFeatureTypes
             build.setName( "pointFeature" );
             tmpPoint = build.name("pointFeature").buildFeatureType();            
             tmpLine = build.name("lineFeature").buildFeatureType();
-            tmpPolygon  = build.name("polygonFeature").buildFeatureType();            
+            tmpPolygon  = build.name("polygonFeature").buildFeatureType();   
+            tmpFeature = build.name("Feature").buildFeatureType();
         } catch (Exception ex) {
             Logger.getLogger( "org.geotools.feature.type.BasicFeatureTypes" ).log(
                Level.SEVERE, "Error creating basic feature types", ex );
@@ -95,7 +102,7 @@ public class BasicFeatureTypes
         POINT = tmpPoint;
         LINE = tmpLine;
         POLYGON = tmpPolygon;
-        
+        FEATURE = tmpFeature;
     }
 
     /**

@@ -13,6 +13,7 @@ import java.util.Set;
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LengthFunction;
@@ -172,6 +173,7 @@ public class SimpleFeatureTypeBuilder {
 		
 		attributeBuilder = new AttributeTypeBuilder();
 		setBindings( new SimpleSchema() );
+		reset();
 	}
 	
 	// Dependency Injection
@@ -224,14 +226,14 @@ public class SimpleFeatureTypeBuilder {
 	 *
 	 */
 	protected void reset() {
-		uri = null;
+		uri = BasicFeatureTypes.DEFAULT_NAMESPACE;
 		local = null;
 		description = null;
 		restrictions = null;
 		attributes = null;
 		crs = null;
 		isAbstract = false;
-		superType = null;
+		superType = BasicFeatureTypes.FEATURE;
 	}
 	
 	/**
