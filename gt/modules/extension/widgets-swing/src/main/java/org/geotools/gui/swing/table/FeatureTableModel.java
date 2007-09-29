@@ -20,9 +20,9 @@ import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 
 // Geotools dependencies
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -44,7 +44,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
     /**
      * {@link #featureTable} as an array. Will be created only when first needed.
      */
-    private transient Feature[] featureArray;
+    private transient SimpleFeature[] featureArray;
 
     /**
      * Creates a new instance of feature table model.
@@ -84,7 +84,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
         if (featureTable==null || featureTable.isEmpty()) {
             return 0;
         }
-        return featureTable.features().next().getNumberOfAttributes();
+        return featureTable.features().next().getAttributeCount();
     }
 
     /**
@@ -112,9 +112,9 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
         if (featureTable==null || featureTable.isEmpty()) {
             return null;
         }
-        Feature firstFeature = featureTable.features().next();
-        FeatureType firstType = firstFeature.getFeatureType();
-        return firstType.getAttributeType(col).getLocalName();
+        SimpleFeature firstFeature = featureTable.features().next();
+        SimpleFeatureType firstType = firstFeature.getFeatureType();
+        return firstType.getAttribute(col).getLocalName();
     }
 
     /**
@@ -127,7 +127,7 @@ public class FeatureTableModel extends AbstractTableModel implements TableModel 
      */
     public Object getValueAt(final int row, final int col) {
         if (featureArray == null) {
-            featureArray = (Feature[]) featureTable.toArray(new Feature[featureTable.size()]);
+            featureArray = (SimpleFeature[]) featureTable.toArray(new SimpleFeature[featureTable.size()]);
         }
         return featureArray[row].getAttribute(col);
     }

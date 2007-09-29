@@ -35,15 +35,15 @@ import com.vividsolutions.jts.geom.TopologyException;
 
 // Geotools dependencies
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gui.swing.table.FeatureTableModel;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -68,12 +68,12 @@ public class FeatureTableModelTest extends TestBase {
     /**
      * Feature on which to perform tests.
      */
-    private static Feature testFeatures[] = null;
+    private static SimpleFeature testFeatures[] = null;
 
     /**
      * Feature type on which to perform tests.
      */
-    private static FeatureType testSchema;
+    private static SimpleFeatureType testSchema;
 
     /**
      * Creates a test case.
@@ -123,29 +123,25 @@ public class FeatureTableModelTest extends TestBase {
      * @throws IllegalAttributeException If problem setting up the feature.
      */
     protected void setUp() throws SchemaException, IllegalAttributeException, TopologyException {
-        AttributeType geometryAttribute = attFactory.newAttributeType("testGeometry", Geometry.class);
-        LOGGER.finest("created geometry attribute");
 
-        AttributeType booleanAttribute = attFactory.newAttributeType("testBoolean", Boolean.class);
-        LOGGER.finest("created boolean attribute");
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName("testSchema");
+        b.add("testGeometry", Geometry.class);
+        b.add("testBoolean", Boolean.class);
+        b.add("testCharacter", Character.class);
+        b.add("testByte",      Byte.class);
+        b.add("testShort",     Short.class);
+        b.add("testInteger",   Integer.class);
+        b.add("testLong",      Long.class);
+        b.add("testFloat",     Float.class);
+        b.add("testDouble",    Double.class);
+        b.add("testString",    String.class);
 
-        AttributeType charAttribute  = attFactory.newAttributeType("testCharacter", Character.class);
-        AttributeType byteAttribute  = attFactory.newAttributeType("testByte",      Byte     .class);
-        AttributeType shortAttribute = attFactory.newAttributeType("testShort",     Short    .class);
-        AttributeType intAttribute   = attFactory.newAttributeType("testInteger",   Integer  .class);
-        AttributeType longAttribute  = attFactory.newAttributeType("testLong",      Long     .class);
-        AttributeType floatAttribute = attFactory.newAttributeType("testFloat",     Float    .class);
-        AttributeType doubleAttribute= attFactory.newAttributeType("testDouble",    Double   .class);
-        AttributeType stringAttribute= attFactory.newAttributeType("testString",    String   .class);
-
-        AttributeType[] types = {
-            geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
-            shortAttribute, intAttribute, longAttribute, floatAttribute,
-            doubleAttribute, stringAttribute
-        };
 
         // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types,"testSchema");
+        testSchema = b.buildFeatureType();
+       
+        
 
         // Creates coordinates for a linestring
         Coordinate[] lineCoords = new Coordinate[3];
@@ -189,10 +185,11 @@ public class FeatureTableModelTest extends TestBase {
         attributesB[8] = new Double(200000.5);
         attributesB[9] = "feature B";
 
+        
         // Creates the feature itself
-        testFeatures = new Feature[2];
-        testFeatures[0] = testSchema.create(attributesA);
-        testFeatures[1] = testSchema.create(attributesB);
+        testFeatures = new SimpleFeature[2];
+        testFeatures[0] = SimpleFeatureBuilder.build(testSchema, attributesA, "fid.1");
+        testFeatures[1] = SimpleFeatureBuilder.build(testSchema, attributesB, "fid.2");
         //_log.debug("...flat features created");
     }
 }
