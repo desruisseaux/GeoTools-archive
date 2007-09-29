@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.LikeFilterImpl;
 import org.geotools.util.Converters;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
@@ -146,7 +146,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     protected FIDMapper mapper;
 
     /** the schmema the encoder will be used to be encode sql for */
-    protected FeatureType featureType;
+    protected SimpleFeatureType featureType;
 
     /**
      * Default constructor
@@ -215,7 +215,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
      * 
      * @param featureType
      */
-    public void setFeatureType(FeatureType featureType) {
+    public void setFeatureType(SimpleFeatureType featureType) {
         this.featureType = featureType;
     }
 
@@ -322,9 +322,9 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         Expression upperbounds = (Expression) filter.getUpperBoundary();
         
         Class context;
-        AttributeType attType = (AttributeType)expr.evaluate(featureType);
+        AttributeDescriptor attType = (AttributeDescriptor)expr.evaluate(featureType);
         if (attType != null) {
-            context = attType.getBinding();
+            context = attType.getType().getBinding();
         } else {
             //assume it's a string?
             context = String.class;
@@ -543,16 +543,16 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         if (left instanceof PropertyName) {
             // aha!  It's a propertyname, we should get the class and pass it in
             // as context to the tree walker.
-            AttributeType attType = (AttributeType)left.evaluate(featureType);
+            AttributeDescriptor attType = (AttributeDescriptor)left.evaluate(featureType);
             if (attType != null) {
-                rightContext = attType.getBinding();
+                rightContext = attType.getType().getBinding();
             }
         }
         
         if (right instanceof PropertyName) {
-            AttributeType attType = (AttributeType)right.evaluate(featureType);
+            AttributeDescriptor attType = (AttributeDescriptor)right.evaluate(featureType);
             if (attType != null) {
-                leftContext = attType.getBinding();
+                leftContext = attType.getType().getBinding();
             }
         }
 

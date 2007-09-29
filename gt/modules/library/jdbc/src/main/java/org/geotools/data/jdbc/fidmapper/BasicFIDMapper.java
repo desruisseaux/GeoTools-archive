@@ -19,12 +19,13 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.rmi.server.UID;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.Types;
+
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -118,7 +119,7 @@ public class BasicFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.fidmapper.FIDMapper#createID(Connection, Feature,
      *      Statement)
      */
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
         throws IOException {
     	//JD: replacing no word characters with underscore
     	//JD: forcing to start with a latter

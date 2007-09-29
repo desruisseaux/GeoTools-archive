@@ -15,7 +15,8 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -111,7 +112,7 @@ public interface FIDMapper extends Serializable {
      *
      * @throws IOException
      */
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
         throws IOException;
 
     /**

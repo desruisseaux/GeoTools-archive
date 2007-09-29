@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import javax.sql.DataSource;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.AttributeType;
 import org.opengis.filter.Filter;
 
 

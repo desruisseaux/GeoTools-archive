@@ -26,7 +26,8 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.JDBCUtils;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -396,7 +397,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapperFactory#getMapper(org.geotools.feature.FeatureType)
      */
-    public FIDMapper getMapper(FeatureType featureType) {
+    public FIDMapper getMapper(SimpleFeatureType featureType) {
         return new BasicFIDMapper("ID", 255, false);
     }
 

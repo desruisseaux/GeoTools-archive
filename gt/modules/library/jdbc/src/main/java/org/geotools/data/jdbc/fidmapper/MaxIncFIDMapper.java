@@ -24,7 +24,8 @@
 package org.geotools.data.jdbc.fidmapper;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -113,7 +114,7 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
      *      Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
         throws IOException {
         try {
             Statement stmt = conn.createStatement();

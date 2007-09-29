@@ -22,10 +22,11 @@ import java.sql.SQLException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  */
 public class JDBCFeatureReader implements FeatureReader {
-    FeatureType featureType;
+    SimpleFeatureType featureType;
     QueryData queryData;
     Object[] attributes;
     Object[] fidAttributes;
@@ -80,7 +81,7 @@ public class JDBCFeatureReader implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next() throws IllegalAttributeException, IOException {
+    public SimpleFeature next() throws IllegalAttributeException, IOException {
         if (queryData.isClosed()) {
             throw new IOException("The feature reader has been closed");
         }
@@ -93,7 +94,7 @@ public class JDBCFeatureReader implements FeatureReader {
      * @throws IllegalAttributeException
      * @throws IOException
      */
-    private Feature readFeature() throws IllegalAttributeException, IOException {
+    private SimpleFeature readFeature() throws IllegalAttributeException, IOException {
         queryData.next();
         
         for (int i = 0; i < fidAttributes.length; i++) {
@@ -109,10 +110,10 @@ public class JDBCFeatureReader implements FeatureReader {
         	//JD: check for a coordinate system, if present on the type, set on the geometry
         	// I know this is pretty loose, but its better then nothing
         	if ( attribute instanceof Geometry && 
-        			queryData.getFeatureType().getAttributeType( i ) instanceof GeometryAttributeType ) {
+        			queryData.getFeatureType().getAttribute( i ) instanceof GeometryAttributeType ) {
         		Geometry geometry = (Geometry) attribute;
         		GeometryAttributeType geometryType = 
-        			(GeometryAttributeType) queryData.getFeatureType().getAttributeType( i );
+        			(GeometryAttributeType) queryData.getFeatureType().getAttribute( i );
         		
         		if ( geometryType.getCoordinateSystem() != null ) {
         			geometry.setUserData( geometryType.getCoordinateSystem() );
@@ -122,13 +123,13 @@ public class JDBCFeatureReader implements FeatureReader {
             attributes[i] = attribute;
         }
 
-        return queryData.getFeatureType().create(attributes, fid);
+        return SimpleFeatureBuilder.build(queryData.getFeatureType(), attributes, fid);
     }
 
     /**
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return queryData.getFeatureType();
     }
 }

@@ -20,9 +20,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,12 +33,12 @@ import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 
@@ -151,12 +151,12 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @throws IOException
      */
-    protected String makeInsertSql(Feature feature) throws IOException {
+    protected String makeInsertSql(SimpleFeature feature) throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-        FeatureType featureType = ftInfo.getSchema();
+        SimpleFeatureType featureType = ftInfo.getSchema();
 
         String tableName = encodeName(featureType.getTypeName());
-        AttributeType[] attributeTypes = featureType.getAttributeTypes();
+        List<AttributeDescriptor> attributeTypes = featureType.getAttributes();
 
         String attrValue;
 
@@ -184,8 +184,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
         // encode insertion for attributes, but remember to avoid auto-increment ones, 
         // they may be included in the feature type as well
-        for (int i = 0; i < attributeTypes.length; i++) {
-            String attName = attributeTypes[i].getLocalName();
+        for (int i = 0; i < attributeTypes.size(); i++) {
+            String attName = attributeTypes.get(i).getLocalName();
             if(!autoincrementColumns.contains(attName) || feature.getAttribute(attName) != null) {
                 String colName = encodeColumnName(attName);
                 statementSQL.append(colName).append(",");
@@ -212,12 +212,12 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             }
         }
 
-        Object[] attributes = feature.getAttributes(null);
+        Object[] attributes = feature.getAttributes().toArray();
 
-        for (int i = 0; i < attributeTypes.length; i++) {
+        for (int i = 0; i < attributeTypes.size(); i++) {
             attrValue = null;
-            if (attributeTypes[i] instanceof GeometryAttributeType) {
-                String geomName = attributeTypes[i].getLocalName();
+            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+                String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 Geometry geometry = (Geometry) attributes[i];
                 if( geometry==null ){
@@ -225,7 +225,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 }else
                     attrValue = getGeometryInsertText(geometry, srid);
             } else {
-                if(!autoincrementColumns.contains(attributeTypes[i].getLocalName()) || attributes[i] != null)
+                if(!autoincrementColumns.contains(attributeTypes.get(i).getLocalName()) || attributes[i] != null)
                     attrValue = addQuotes(attributes[i]);
             }
 
@@ -306,7 +306,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         try {
             conn = queryData.getConnection();
             statement = conn.createStatement();
-            Envelope bounds = this.live.getBounds();
+            ReferencedEnvelope bounds = ReferencedEnvelope.reference(this.live.getBounds());
             String sql = makeDeleteSql(current);
             if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine(sql);
             
@@ -341,9 +341,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @throws IOException
      */
-    protected String makeDeleteSql(Feature feature) throws IOException {
+    protected String makeDeleteSql(SimpleFeature feature) throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-        FeatureType fetureType = ftInfo.getSchema();
+        SimpleFeatureType fetureType = ftInfo.getSchema();
 
         String tableName = encodeName(fetureType.getTypeName());
 
@@ -369,7 +369,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * @see org.geotools.data.jdbc.JDBCFeatureWriter#doUpdate(org.geotools.feature.Feature,
      *      org.geotools.feature.Feature)
      */
-    protected void doUpdate(Feature live, Feature current)
+    protected void doUpdate(SimpleFeature live, SimpleFeature current)
         throws IOException, SQLException {
         
     	if (LOGGER.isLoggable(Level.FINE)) 
@@ -445,7 +445,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * @param current
      * @return sql string or null
      */
-    protected String makeSelectForUpdateSql(Feature current) {
+    protected String makeSelectForUpdateSql(SimpleFeature current) {
         return null;
     }
     
@@ -458,18 +458,18 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @throws IOException
      */
-    protected String makeUpdateSql(Feature live, Feature current)
+    protected String makeUpdateSql(SimpleFeature live, SimpleFeature current)
         throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-        FeatureType featureType = ftInfo.getSchema();
-        AttributeType[] attributes = featureType.getAttributeTypes();
+        SimpleFeatureType featureType = ftInfo.getSchema();
+        AttributeDescriptor[] attributes = (AttributeDescriptor[]) featureType.getAttributes().toArray(new AttributeDescriptor[featureType.getAttributes().size()]);
 
         String tableName = encodeName(featureType.getTypeName());
 
         StringBuffer statementSQL = new StringBuffer("UPDATE " + tableName
                 + " SET ");
 
-        for (int i = 0; i < current.getNumberOfAttributes(); i++) {
+        for (int i = 0; i < current.getAttributeCount(); i++) {
             Object currAtt = current.getAttribute(i);
             Object liveAtt = live.getAttribute(i);
 

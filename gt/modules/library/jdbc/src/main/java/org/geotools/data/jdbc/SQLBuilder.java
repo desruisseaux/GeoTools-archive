@@ -18,7 +18,7 @@
 package org.geotools.data.jdbc;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
 import org.opengis.filter.sort.SortBy;
@@ -52,7 +52,7 @@ public interface SQLBuilder {
      * FIXME: This should change to a FilterToSQLException after SQLEncoder is dropped
      */
     public String buildSQLQuery(String typeName, FIDMapper mapper, 
-            AttributeType[] attrTypes, Filter filter) throws SQLEncoderException;
+            AttributeDescriptor[] attrTypes, Filter filter) throws SQLEncoderException;
     
     /**
      * Returns the Filter required for post processing.
@@ -86,7 +86,7 @@ public interface SQLBuilder {
      * @param mapper
      * @param attributes
      */
-    public void sqlColumns( StringBuffer sql, FIDMapper mapper, AttributeType attributes[] );
+    public void sqlColumns( StringBuffer sql, FIDMapper mapper, AttributeDescriptor attributes[] );
     
     /**
      * Consutrcts FROM clause for featureType

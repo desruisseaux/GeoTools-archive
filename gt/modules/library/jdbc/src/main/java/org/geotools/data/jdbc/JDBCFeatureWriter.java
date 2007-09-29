@@ -31,9 +31,11 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -50,8 +52,8 @@ public class JDBCFeatureWriter implements FeatureWriter {
             "org.geotools.data.jdbc");
     protected QueryData queryData;
     protected FeatureReader reader;
-    protected Feature live; // current for FeatureWriter
-    protected Feature current; // copy of live returned to user
+    protected SimpleFeature live; // current for FeatureWriter
+    protected SimpleFeature current; // copy of live returned to user
     protected boolean closed;
     protected Object[] fidAttributes;
 
@@ -63,24 +65,24 @@ public class JDBCFeatureWriter implements FeatureWriter {
     /**
      * @see org.geotools.data.FeatureWriter#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return reader.getFeatureType();
     }
 
     /**
      * @see org.geotools.data.FeatureWriter#next()
      */
-    public Feature next() throws IOException {
+    public SimpleFeature next() throws IOException {
         if (reader == null) {
             throw new IOException("FeatureWriter has been closed");
         }
 
-        FeatureType featureType = getFeatureType();
+        SimpleFeatureType featureType = getFeatureType();
 
         if (hasNext()) {
             try {
                 live = reader.next();
-                current = featureType.duplicate(live);
+                current = SimpleFeatureBuilder.copy(live);
                 LOGGER.finer("Calling next on writer");
             } catch (IllegalAttributeException e) {
                 throw new DataSourceException("Unable to edit " + live.getID()
@@ -91,7 +93,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
             live = null;
 
             try {
-                Feature temp = DataUtilities.template(featureType);
+                SimpleFeature temp = DataUtilities.template(featureType);
 
                 /* Here we create a Feature with a Mutable FID.
                  * We use data utilities to create a default set of attributes
@@ -105,8 +107,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                  *
                  */
                 current = new MutableFIDFeature((DefaultFeatureType) featureType,
-                        temp.getAttributes(
-                            new Object[temp.getNumberOfAttributes()]), null);
+                        temp.getAttributes().toArray(), null);
 
                 if (useQueryDataForInsert()) {
                     queryData.startInsert();
@@ -148,7 +149,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
         if (live != null) {
             LOGGER.fine("Removing " + live);
 
-            Envelope bounds = live.getBounds();
+            ReferencedEnvelope bounds = ReferencedEnvelope.reference(live.getBounds());
             live = null;
             current = null;
 
@@ -195,9 +196,9 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 try {
                     doUpdate(live, current);
                     
-                    Envelope bounds = new Envelope();
-                    bounds.expandToInclude(live.getBounds());
-                    bounds.expandToInclude(current.getBounds());                
+                    ReferencedEnvelope bounds = new ReferencedEnvelope();
+                    bounds.include(live.getBounds());
+                    bounds.include(current.getBounds());                
                     
                     queryData.fireFeaturesChanged(bounds, false);
                     
@@ -214,7 +215,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
 
             try {
                 doInsert((MutableFIDFeature) current);
-                queryData.fireFeaturesAdded( current.getBounds(), false );
+                queryData.fireFeaturesAdded(ReferencedEnvelope.reference(current.getBounds()), false );
             } catch (SQLException e) {
                 throw new DataSourceException("Row adding failed.", e);
             }
@@ -222,11 +223,11 @@ public class JDBCFeatureWriter implements FeatureWriter {
         }
     }
 
-    protected void doUpdate(Feature live, Feature current)
+    protected void doUpdate(SimpleFeature live, SimpleFeature current)
         throws IOException, SQLException {
         try {
             // Can we create for array getAttributes more efficiently?
-            for (int i = 0; i < current.getNumberOfAttributes(); i++) {
+            for (int i = 0; i < current.getAttributeCount(); i++) {
                 Object currAtt = current.getAttribute(i);
                 Object liveAtt = live.getAttribute(i);
 
@@ -309,9 +310,9 @@ public class JDBCFeatureWriter implements FeatureWriter {
         }
 
         // set up attributes and write row
-        for (int i = 0; i < current.getNumberOfAttributes(); i++) {
+        for (int i = 0; i < current.getAttributeCount(); i++) {
             Object currAtt = current.getAttribute(i);
-            String attName = current.getFeatureType().getAttributeType(i).getLocalName();
+            String attName = current.getFeatureType().getAttribute(i).getLocalName();
             if(!autoincrementColumns.contains(attName)) 
                 queryData.write(i, currAtt);
         }

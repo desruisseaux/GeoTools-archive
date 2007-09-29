@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.util.Converters;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.IncludeFilter;
 
@@ -136,7 +136,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     protected FIDMapper mapper;
 
     /** the schmema the encoder will be used to be encode sql for */
-    protected FeatureType featureType;
+    protected SimpleFeatureType featureType;
     
     /** 
      * A type to use as context when encoding literal.
@@ -158,7 +158,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
      * 
      * @param featureType
      */
-    public void setFeatureType(FeatureType featureType) {
+    public void setFeatureType(SimpleFeatureType featureType) {
 		this.featureType = featureType;
 	}
   
@@ -534,12 +534,12 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
         	// encode the namee
         	context = null;
         	if ( featureType != null ) {
-        		AttributeType attributeType = (AttributeType) expression.evaluate( featureType );
+        		AttributeDescriptor attributeType = (AttributeDescriptor) expression.evaluate( featureType );
             	if ( attributeType != null ) {
             		out.write( escapeName( attributeType.getLocalName() ) );
             		
             		//provide context for a literal being compared to this attribute
-            		context = attributeType.getBinding(); 
+            		context = attributeType.getType().getBinding(); 
             		return;
             	}
         	}

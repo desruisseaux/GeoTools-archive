@@ -25,9 +25,9 @@ import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 
@@ -68,7 +68,7 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
     FeatureLock featureLock = FeatureLock.TRANSACTION;
 
     public JDBCFeatureLocking(JDBC1DataStore jdbcDataStore,
-        FeatureType featureType) {
+        SimpleFeatureType featureType) {
         super(jdbcDataStore, featureType);
     }
 
@@ -154,7 +154,7 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
         //
         FeatureIterator reader = getFeatures(query).features();
         String typeName = query.getTypeName();
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
 
         try {
@@ -228,7 +228,7 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
         //
         FeatureIterator reader = getFeatures(query).features();
         String typeName = query.getTypeName();
-        Feature feature;
+        SimpleFeature feature;
 
         try {
             while (reader.hasNext()) {

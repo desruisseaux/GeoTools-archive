@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
@@ -32,11 +33,10 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * QueryData holds the ResultSet obtained from the sql query and has the following responsibilities:
@@ -125,16 +125,16 @@ public class QueryData implements AttributeReader, AttributeWriter {
         this.listenerManager = parentDataStore.listenerManager;
         this.hints = hints;
 
-        AttributeType[] attributeTypes = featureTypeInfo.getSchema().getAttributeTypes();
+        List<AttributeDescriptor> attributeTypes = featureTypeInfo.getSchema().getAttributes();
 
-        this.attributeHandlers = new AttributeIO[attributeTypes.length];
+        this.attributeHandlers = new AttributeIO[attributeTypes.size()];
 
         for (int i = 0; i < attributeHandlers.length; i++) {
-            if (attributeTypes[i] instanceof GeometryAttributeType) {
-                attributeHandlers[i] = parentDataStore.getGeometryAttributeIO(attributeTypes[i],
+            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+                attributeHandlers[i] = parentDataStore.getGeometryAttributeIO(attributeTypes.get(i),
                         this);
             } else {
-                attributeHandlers[i] = parentDataStore.getAttributeIO(attributeTypes[i]);
+                attributeHandlers[i] = parentDataStore.getAttributeIO(attributeTypes.get(i));
             }
         }
     }
@@ -266,7 +266,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
      * Returns the current feature type
      * 
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureTypeInfo.getSchema();
     }
 
@@ -354,8 +354,8 @@ public class QueryData implements AttributeReader, AttributeWriter {
     /**
      * @see org.geotools.data.AttributeReader#getAttributeType(int)
      */
-    public AttributeType getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
-        return featureTypeInfo.getSchema().getAttributeType(index);
+    public AttributeDescriptor getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
+        return featureTypeInfo.getSchema().getAttribute(index);
     }
 
     public FeatureListenerManager getListenerManager() {
@@ -363,19 +363,19 @@ public class QueryData implements AttributeReader, AttributeWriter {
     }
 
     /** Call after deleteCurrentRow() */
-    public void fireChangeRemoved(Envelope bounds, boolean isCommit) {
+    public void fireChangeRemoved(ReferencedEnvelope bounds, boolean isCommit) {
         String typeName = featureTypeInfo.getFeatureTypeName();
         listenerManager.fireFeaturesRemoved(typeName, transaction, bounds, isCommit);
     }
 
     /** Call after updateRow */
-    public void fireFeaturesChanged(Envelope bounds, boolean isCommit) {
+    public void fireFeaturesChanged(ReferencedEnvelope bounds, boolean isCommit) {
         String typeName = featureTypeInfo.getFeatureTypeName();
         listenerManager.fireFeaturesChanged(typeName, transaction, bounds, isCommit);
     }
 
     /** Call after doUpdate */
-    public void fireFeaturesAdded(Envelope bounds, boolean isCommit) {
+    public void fireFeaturesAdded(ReferencedEnvelope bounds, boolean isCommit) {
         String typeName = featureTypeInfo.getFeatureTypeName();
         listenerManager.fireFeaturesAdded(typeName, transaction, bounds, isCommit);
     }

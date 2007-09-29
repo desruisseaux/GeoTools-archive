@@ -30,9 +30,11 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
 
 
 /**
@@ -161,14 +163,14 @@ public class FeatureTypeHandler {
      *
      * @throws IOException 
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         FeatureTypeInfo info = getFeatureTypeInfo(typeName);
 
         return info.getSchema();
     }
 
     /**
-     * Retreives the FeatureTypeInfo object for a FeatureType.
+     * Retreives the FeatureTypeInfo object for a SimpleFeatureType.
      * 
      * <p>
      * This allows subclasses to get access to the information about a feature type, this includes
@@ -194,16 +196,14 @@ public class FeatureTypeHandler {
         if ((ftInfoTime == null) || ((now - ftInfoTime.longValue()) > cacheTimeOut)) {
             // make sure table exists
             FIDMapper mapper = getFIDMapper(featureTypeName);
-            FeatureType schema = dataStore.buildSchema(featureTypeName, mapper);
+            SimpleFeatureType schema = dataStore.buildSchema(featureTypeName, mapper);
             info = new FeatureTypeInfo(featureTypeName, schema, mapper);
 
-            AttributeType[] types = schema.getAttributeTypes();
-
             // get srdid for each geometry
-            for (int i = 0; i < types.length; i++) {
-                if (types[i] instanceof GeometryAttributeType ) {
-                    int srid = dataStore.determineSRID(featureTypeName, types[i].getLocalName());
-                    info.putSRID(types[i].getLocalName(), srid);
+            for (AttributeDescriptor ad : schema.getAttributes()) {
+                if (ad instanceof GeometryDescriptor ) {
+                    int srid = dataStore.determineSRID(featureTypeName, ad.getLocalName());
+                    info.putSRID(ad.getLocalName(), srid);
                 }
             }
 

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 
@@ -34,11 +34,11 @@ import org.geotools.feature.FeatureType;
  */
 public class FeatureTypeInfo {
 	private String featureTypeName;
-	private FeatureType schema;
+	private SimpleFeatureType schema;
 	private Map sridMap = new HashMap();
 	private FIDMapper mapper;
 
-	public FeatureTypeInfo(String typeName, FeatureType schema, FIDMapper mapper) {
+	public FeatureTypeInfo(String typeName, SimpleFeatureType schema, FIDMapper mapper) {
 		this.featureTypeName = typeName;
 		this.schema = schema;
 		this.mapper = mapper;
@@ -56,7 +56,7 @@ public class FeatureTypeInfo {
 	 * DOCUMENT ME!
 	 *
 	 */
-	public FeatureType getSchema() {
+	public SimpleFeatureType getSchema() {
 		return schema;
 	}
 

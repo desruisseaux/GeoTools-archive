@@ -24,8 +24,9 @@ import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
@@ -45,8 +46,8 @@ public class FilterToSQLTest extends TestCase {
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
     private static Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
     
-    private FeatureType integerFType;
-    private FeatureType stringFType;
+    private SimpleFeatureType integerFType;
+    private SimpleFeatureType stringFType;
 
     public FilterToSQLTest(String testName) throws Exception {
         super(testName);
@@ -62,13 +63,14 @@ public class FilterToSQLTest extends TestCase {
             log = log.getParent();
         }        
         
-        FeatureTypeBuilder ftBuilder = FeatureTypeBuilder.newInstance("testFeatureType");
-        ftBuilder.addType(AttributeTypeFactory.newAttributeType("testAttr", Integer.class));
-        integerFType = ftBuilder.getFeatureType();
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+		ftb.setName("testFeatureType");
+		ftb.add("testAttr", Integer.class);
+        integerFType = ftb.buildFeatureType();
         
-        ftBuilder = FeatureTypeBuilder.newInstance("testFeatureType");
-        ftBuilder.addType(AttributeTypeFactory.newAttributeType("testAttr", String.class));
-        stringFType = ftBuilder.getFeatureType();
+        ftb.setName("testFeatureType");
+        ftb.add("testAttr", String.class);
+        stringFType = ftb.buildFeatureType();
         
     }
     
@@ -78,7 +80,7 @@ public class FilterToSQLTest extends TestCase {
     public void testIntegerContext() throws Exception {
         
         Expression literal = filterFac.literal(5);
-        Expression prop = filterFac.property(integerFType.getAttributeTypes()[0].getLocalName());
+        Expression prop = filterFac.property(integerFType.getAttributes().get(0).getLocalName());
         PropertyIsEqualTo filter = filterFac.equals(prop, literal);
         
 
@@ -94,7 +96,7 @@ public class FilterToSQLTest extends TestCase {
     public void testStringContext() throws Exception {
         
         Expression literal = filterFac.literal(5);
-        Expression prop = filterFac.property(stringFType.getAttributeTypes()[0].getLocalName());
+        Expression prop = filterFac.property(stringFType.getAttributes().get(0).getLocalName());
         PropertyIsEqualTo filter = filterFac.equals(prop, literal);
         
 

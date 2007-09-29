@@ -35,9 +35,9 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -78,7 +78,7 @@ public class JDBCFeatureSource implements FeatureSource {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
     
     /** FeatureType being provided */
-    private FeatureType featureType;
+    private SimpleFeatureType featureType;
     
     /** JDBCDataStore based dataStore used to aquire content */
     private JDBC1DataStore dataStore;
@@ -95,7 +95,7 @@ public class JDBCFeatureSource implements FeatureSource {
      * @param featureType FeatureType being served
      */
     public JDBCFeatureSource(JDBC1DataStore jdbcDataStore,
-        FeatureType featureType) {
+        SimpleFeatureType featureType) {
         this.featureType = featureType;
         this.dataStore = jdbcDataStore;
     }
@@ -226,7 +226,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
         return getBounds(Query.ALL);
     }
 
@@ -249,11 +249,11 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         if (query.getFilter() == Filter.EXCLUDE) {
             if(featureType!=null)
-                return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCoordinateSystem());
-            return new Envelope();
+                return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCRS());
+            return new ReferencedEnvelope();
         }               
         return null; // too expensive right now :-)
     }
@@ -349,7 +349,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @see org.geotools.data.FeatureSource#getSchema()
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return featureType;
     }
 

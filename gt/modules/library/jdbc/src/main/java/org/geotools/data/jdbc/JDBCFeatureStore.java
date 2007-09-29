@@ -33,12 +33,11 @@ import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
 /**
@@ -68,7 +67,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
 /** Current Transaction this FeatureSource is opperating against */
     protected Transaction transaction = Transaction.AUTO_COMMIT;
 
-    public JDBCFeatureStore(JDBC1DataStore jdbcDataStore, FeatureType featureType) {
+    public JDBCFeatureStore(JDBC1DataStore jdbcDataStore, SimpleFeatureType featureType) {
         super(jdbcDataStore, featureType);
     }
 
@@ -159,7 +158,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      * Equivelent to:
      * </p>
      * <pre><code>
-     * modifyFeatures( new AttributeType[]{ type, }, new Object[]{ value, }, filter );
+     * modifyFeatures( new AttributeDescriptor[]{ type, }, new Object[]{ value, }, filter );
      * </code>
      * </pre>
      * 
@@ -174,9 +173,9 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      *
      * @throws IOException
      */
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
         throws IOException {
-        modifyFeatures( new AttributeType[]{type}, new Object[]{value}, filter );
+        modifyFeatures( new AttributeDescriptor[]{type}, new Object[]{value}, filter );
     }
 
     /**
@@ -211,7 +210,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      *
      * @throws IOException
      */
-    public void modifyFeatures(AttributeType[] type, Object[] value,
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
         Filter filter) throws IOException {
         String typeName = getSchema().getTypeName();
         
@@ -235,8 +234,8 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
             modifyFeatures( type, value, writer );            
         }
     }
-    protected void modifyFeatures( AttributeType[] type, Object[] value, FeatureWriter writer ) throws DataSourceException, IOException{
-        Feature feature;        
+    protected void modifyFeatures( AttributeDescriptor[] type, Object[] value, FeatureWriter writer ) throws DataSourceException, IOException{
+        SimpleFeature feature;        
         try {
         	while (writer.hasNext()) {
                 feature = writer.next();
@@ -302,7 +301,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
     public Set addFeatures(FeatureReader reader) throws IOException {
         Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
-        Feature feature = null;
+        SimpleFeature feature = null;
         SimpleFeature newFeature;
         FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
@@ -319,7 +318,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                 newFeature = (SimpleFeature)writer.next();
 
                 try {
-                    newFeature.setAttributes(feature.getAttributes(null));
+                    newFeature.setAttributes(feature.getAttributes());
                 } catch (IllegalAttributeException writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
@@ -339,7 +338,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
     public Set addFeatures(FeatureCollection collection) throws IOException {
         Set addedFids = new HashSet();
         String typeName = getSchema().getTypeName();
-        Feature feature = null;
+        SimpleFeature feature = null;
         SimpleFeature newFeature;
         FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
                 getTransaction());
@@ -348,7 +347,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         try {
             while (iterator.hasNext()) {
                 try {
-                    feature = (Feature) iterator.next();
+                    feature = (SimpleFeature) iterator.next();
                 } catch (Exception e) {
                     throw new DataSourceException("Could not add Features, problem with provided reader",
                         e);
@@ -361,10 +360,10 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                 	//match exactly the target feature type, so build attributes
                 	// based oin target
                     //newFeature.setAttributes(feature.getAttributes(null));
-                	Object[] attributes = new Object[ newFeature.getNumberOfAttributes() ];
+                	Object[] attributes = new Object[ newFeature.getAttributeCount() ];
                 	for ( int i = 0; i < attributes.length; i++) {
-                		AttributeType type = 
-                			newFeature.getFeatureType().getAttributeType( i );
+                		AttributeDescriptor type = 
+                			newFeature.getFeatureType().getAttribute( i );
                 		attributes[ i ] = feature.getAttribute( type.getLocalName() );
                 	}
                 	newFeature.setAttributes( attributes );
@@ -415,7 +414,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         String typeName = getSchema().getTypeName();
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 filter, getTransaction());
-        Feature feature;
+        SimpleFeature feature;
 
         try {        	
         	
@@ -465,7 +464,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         String typeName = getSchema().getTypeName();
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 getTransaction());
-        Feature feature;
+        SimpleFeature feature;
         SimpleFeature newFeature;
 
         try {
@@ -486,7 +485,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                 newFeature = (SimpleFeature)writer.next();
 
                 try {
-                    newFeature.setAttributes(feature.getAttributes(null));
+                    newFeature.setAttributes(feature.getAttributes());
                 } catch (IllegalAttributeException writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "

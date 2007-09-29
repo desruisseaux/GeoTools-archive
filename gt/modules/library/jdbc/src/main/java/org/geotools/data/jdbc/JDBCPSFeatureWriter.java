@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,9 +27,10 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.geotools.feature.GeometryAttributeType;
 
 
@@ -126,14 +128,14 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         int baseIndex = fillPrimaryKeyParameters(statement, feature, 1);
 
         Object[] attributes = feature.getAttributes(null);
-        AttributeType[] attributeTypes = feature.getFeatureType()
-                                                .getAttributeTypes();
+        List<AttributeDescriptor> attributeTypes = feature.getFeatureType()
+                                                .getAttributes();
         AttributeIO[] aios = queryData.getAttributeHandlers();
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
 
-        for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i] instanceof GeometryAttributeType ) {
-                String geomName = attributeTypes[i].getLocalName();
+        for (int i = 0; i < attributeTypes.size(); i++) {
+            if (attributeTypes.get(i) instanceof GeometryAttributeType ) {
+                String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
                 aios[i].write(statement, baseIndex + i, attributes[i]);
@@ -153,8 +155,8 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @throws SQLException
      */
     protected PreparedStatement createInsertStatement(Connection conn,
-        FeatureType featureType) throws SQLException {
-        AttributeType[] attributeTypes = featureType.getAttributeTypes();
+        SimpleFeatureType featureType) throws SQLException {
+        List<AttributeDescriptor> attributeTypes = featureType.getAttributes();
         String tableName = featureType.getTypeName();
 
         StringBuffer statementSQL = new StringBuffer("INSERT INTO " + tableName
@@ -168,8 +170,8 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
             }
         }
 
-        for (int i = 0; i < attributeTypes.length; i++) {
-            statementSQL.append(attributeTypes[i].getLocalName()).append(",");
+        for (int i = 0; i < attributeTypes.size(); i++) {
+            statementSQL.append(attributeTypes.get(i).getLocalName()).append(",");
         }
 
         statementSQL.setCharAt(statementSQL.length() - 1, ')');
@@ -184,11 +186,11 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         }
 
         // append attribute columns placeholders
-        for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i] instanceof GeometryAttributeType) {
+        for (int i = 0; i < attributeTypes.size(); i++) {
+            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
                 statementSQL.append("?");
             } else {
-                statementSQL.append(getGeometryPlaceHolder(attributeTypes[i]));
+                statementSQL.append(getGeometryPlaceHolder(attributeTypes.get(i)));
             }
 
             statementSQL.append(",");
@@ -210,7 +212,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @param type
      *
      */
-    protected abstract String getGeometryPlaceHolder(AttributeType type);
+    protected abstract String getGeometryPlaceHolder(AttributeDescriptor type);
 
     /**
      * Override that uses prepared statements to perform the operation.
@@ -265,7 +267,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @throws SQLException
      */
     private int fillPrimaryKeyParameters(PreparedStatement statement,
-        Feature feature, int baseIndex) throws IOException, SQLException {
+        SimpleFeature feature, int baseIndex) throws IOException, SQLException {
         if (!mapper.returnFIDColumnsAsAttributes()
                 && !mapper.hasAutoIncrementColumns()) {
             String FID = mapper.createID(queryData.getConnection(), feature,
@@ -292,8 +294,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @throws SQLException
      */
     protected PreparedStatement createDeleteStatement(Connection conn,
-        FeatureType featureType) throws SQLException {
-        AttributeType[] attributeTypes = featureType.getAttributeTypes();
+        SimpleFeatureType featureType) throws SQLException {
         String tableName = featureType.getTypeName();
 
         StringBuffer statementSQL = new StringBuffer("DELETE " + tableName
@@ -327,27 +328,26 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @throws SQLException
      */
     private void fillUpdateParameters(PreparedStatement statement,
-        Feature current, Feature live) throws IOException, SQLException {
-        Object[] attributes = current.getAttributes(null);
-        AttributeType[] attributeTypes = current.getFeatureType()
-                                                .getAttributeTypes();
+        SimpleFeature current, SimpleFeature live) throws IOException, SQLException {
+        List<Object> attributes = current.getAttributes();
+        List<AttributeDescriptor> attributeTypes = current.getFeatureType().getAttributes();
         AttributeIO[] aios = queryData.getAttributeHandlers();
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
 
         // set new vales for other fields
-        for (int i = 0; i < attributeTypes.length; i++) {
-            if (attributeTypes[i] instanceof GeometryAttributeType) {
-                String geomName = attributeTypes[i].getLocalName();
+        for (int i = 0; i < attributeTypes.size(); i++) {
+            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+                String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
-                aios[i].write(statement, i + 1, attributes[i]);
+                aios[i].write(statement, i + 1, attributes.get(i));
             } else {
-                aios[i].write(statement, i + 1, attributes[i]);
+                aios[i].write(statement, i + 1, attributes.get(i));
             }
         }
 
         // set new values for the primary key
-        int baseIndex = attributeTypes.length + 1;
+        int baseIndex = attributeTypes.size() + 1;
 
         if (!mapper.returnFIDColumnsAsAttributes()
                 && !mapper.hasAutoIncrementColumns()) {
@@ -368,8 +368,8 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @throws SQLException
      */
     protected PreparedStatement createUpdateStatement(Connection conn,
-        FeatureType featureType) throws SQLException {
-        AttributeType[] attributeTypes = featureType.getAttributeTypes();
+        SimpleFeatureType featureType) throws SQLException {
+        List<AttributeDescriptor> attributeTypes = featureType.getAttributes();
         String tableName = featureType.getTypeName();
 
         // create statement piecewise on a string buffer
@@ -378,13 +378,13 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
 
         // the "SET" part updating the fields, and the primary key too, if it's
         // not generated by the DBMS
-        for (int i = 0; i < attributeTypes.length; i++) {
-            statementSQL.append(attributeTypes[i].getLocalName()).append(" = ");
+        for (int i = 0; i < attributeTypes.size(); i++) {
+            statementSQL.append(attributeTypes.get(i).getLocalName()).append(" = ");
 
-            if (attributeTypes[i] instanceof GeometryAttributeType) {
+            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
                 statementSQL.append("?");
             } else {
-                statementSQL.append(getGeometryPlaceHolder(attributeTypes[i]));
+                statementSQL.append(getGeometryPlaceHolder(attributeTypes.get(i)));
             }
 
             statementSQL.append(",");
@@ -424,7 +424,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @see org.geotools.data.jdbc.JDBCFeatureWriter#doUpdate(org.geotools.feature.Feature,
      *      org.geotools.feature.Feature)
      */
-    protected void doUpdate(Feature live, Feature current)
+    protected void doUpdate(SimpleFeature live, SimpleFeature current)
         throws IOException, SQLException {
         LOGGER.fine("updating postgis feature " + current);
 

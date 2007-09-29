@@ -25,7 +25,6 @@ import javax.sql.DataSource;
 
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.AttributeType;
 
 /**
  * This JDBCDataStore is able to take advantage of additonal functionality

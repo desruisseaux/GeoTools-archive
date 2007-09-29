@@ -59,11 +59,12 @@ import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.view.DefaultView;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
@@ -87,8 +88,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * This should be overriden to construct an attribute type that represents any
  * column types not supported by the default implementation, such as geometry
  * columns. </li>
- * <li> {@link #getGeometryAttributeIO(AttributeType, QueryData)
- * getGeometryAttributeIO(AttributeType, QueryData)} - Should be overriden to
+ * <li> {@link #getGeometryAttributeIO(AttributeDescriptor, QueryData)
+ * getGeometryAttributeIO(AttributeDescriptor, QueryData)} - Should be overriden to
  * provide a way to read/write geometries into the format of the database </li>
  * </ul>
  * </p>
@@ -108,7 +109,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * table name should be exposed as a feature type. </li>
  * <li> {@link #determineSRID(String,String) determineSRID} - Used to determine
  * the SpatialReference ID of a geometry column in a table. </li>
- * <li> {@link #buildSQLQuery(String,AttributeType[],Filter,boolean)
+ * <li> {@link #buildSQLQuery(String,AttributeDescriptor[],Filter,boolean)
  * buildSQLQuery()} - Sub classes can override this to build a custom SQL query.
  * </li>
  * <li> {@link #getResultSetType(boolean) getResultSetType} if the standard
@@ -316,7 +317,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	/**
 	 * @see org.geotools.data.DataStore#getSchema(java.lang.String)
 	 */
-	public FeatureType getSchema(String typeName) throws IOException {
+	public SimpleFeatureType getSchema(String typeName) throws IOException {
 		return typeHandler.getSchema(typeName);
 	}
 
@@ -335,7 +336,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
 	 */
-	public void createSchema(FeatureType featureType) throws IOException {
+	public void createSchema(SimpleFeatureType featureType) throws IOException {
 		throw new UnsupportedOperationException(
 				"Table creation not implemented");
 	}
@@ -368,7 +369,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
 	 *      org.geotools.feature.FeatureType)
 	 */
-	public void updateSchema(String typeName, FeatureType featureType)
+	public void updateSchema(String typeName, SimpleFeatureType featureType)
 			throws IOException {
 		throw new UnsupportedOperationException(
 				"Table modification not supported");
@@ -439,11 +440,11 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * </p>
 	 * (non-Javadoc)
 	 */
-	public FeatureReader getFeatureReader(final FeatureType requestType,
+	public FeatureReader getFeatureReader(final SimpleFeatureType requestType,
 			final Filter filter, final Transaction transaction)
 			throws IOException {
 		String typeName = requestType.getTypeName();
-		FeatureType schemaType = getSchema(typeName);
+		SimpleFeatureType schemaType = getSchema(typeName);
 
 		int compare = DataUtilities.compare(requestType, schemaType);
 
@@ -491,10 +492,10 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws IOException
 	 *             If we can't get the schema.
 	 */
-	protected String[] attributeNames(FeatureType featureType, Filter filter)
+	protected String[] attributeNames(SimpleFeatureType featureType, Filter filter)
 			throws IOException {
 		String typeName = featureType.getTypeName();
-		FeatureType origional = getSchema(typeName);
+		SimpleFeatureType origional = getSchema(typeName);
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
 
 		if (featureType.getAttributeCount() == origional.getAttributeCount()) {
@@ -552,7 +553,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	public FeatureReader getFeatureReader(Query query, Transaction trans)
 			throws IOException {
 		String typeName = query.getTypeName();
-		FeatureType featureType = getSchema(typeName);
+		SimpleFeatureType featureType = getSchema(typeName);
 		FeatureTypeInfo typeInfo = typeHandler.getFeatureTypeInfo(typeName);
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
@@ -605,7 +606,7 @@ public abstract class JDBC1DataStore implements DataStore {
 					+ " does not contain requested properties:" + query);
 		}
 
-		AttributeType[] attrTypes = null;
+		AttributeDescriptor[] attrTypes = null;
 
 		try {
 			attrTypes = getAttributeTypes(typeName, propertyNames);
@@ -627,7 +628,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		QueryData queryData = executeQuery(typeInfo, typeName, sqlQuery, trans,
 				false, query.getHints());
 
-		FeatureType schema;
+		SimpleFeatureType schema;
 
 		try {
 			schema = FeatureTypeBuilder.newFeatureType(attrTypes, typeName,
@@ -649,7 +650,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			// (remove the attribtues only used for postFilter)
 			//
 			try {
-				FeatureType requestType = DataUtilities.createSubType(schema,
+				SimpleFeatureType requestType = DataUtilities.createSubType(schema,
 						requestedNames);
 				if ( !requestType.equals( reader.getFeatureType() ) ) {
                     reader = new ReTypeFeatureReader(reader, requestType, false);
@@ -678,7 +679,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws IOException
 	 * @throws DataSourceException
 	 */
-	private String constructQuery(Query query, AttributeType[] attrTypes)
+	private String constructQuery(Query query, AttributeDescriptor[] attrTypes)
 			throws IOException, DataSourceException {
 		String typeName = query.getTypeName();
 		SQLBuilder sqlBuilder = getSqlBuilder(query.getTypeName());
@@ -746,7 +747,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @throws IOException
 	 */
-	protected FeatureReader createFeatureReader(FeatureType schema,
+	protected FeatureReader createFeatureReader(SimpleFeatureType schema,
 			org.opengis.filter.Filter postFilter, QueryData queryData) throws IOException {
         
         // Thanks Shaun Forbes moving excludes check earlier
@@ -769,7 +770,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		return new JDBCFeatureReader(queryData);
 	}
 
-	// protected final AttributeReader createAttributeReader(AttributeType[]
+	// protected final AttributeReader createAttributeReader(AttributeDescriptor[]
 	// attrTypes, int fidColumnsCount, ResultSet rs) {
 	// AttributeIO[] attributeIO = new AttributeIO[attrTypes.length];
 	// for(int i = 0; i < attributeIO.length; i++) {
@@ -791,7 +792,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param type
 	 *
 	 */
-	protected AttributeIO getAttributeIO(AttributeType type) {
+	protected AttributeIO getAttributeIO(AttributeDescriptor type) {
 		if (basicAttributeIO == null) {
 			basicAttributeIO = new BasicAttributeIO();
 		}
@@ -804,7 +805,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * source.
 	 *
 	 * @param type
-	 *            The AttributeType to read.
+	 *            The AttributeDescriptor to read.
 	 * @param queryData
 	 *            The connection holder
 	 *
@@ -814,7 +815,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws IOException
 	 *             DOCUMENT ME!
 	 */
-	protected abstract AttributeIO getGeometryAttributeIO(AttributeType type,
+	protected abstract AttributeIO getGeometryAttributeIO(AttributeDescriptor type,
 			QueryData queryData) throws IOException;
 	
 	/**
@@ -964,7 +965,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *             if anything goes wrong.
 	 */
 	public SQLBuilder getSqlBuilder(String typeName) throws IOException {
-		FeatureType schema = getSchema( typeName );
+		SimpleFeatureType schema = getSchema( typeName );
 		SQLEncoder encoder = new SQLEncoder( );
 		encoder.setFeatureType( schema );
 		encoder.setFIDMapper(getFIDMapper(typeName));
@@ -1072,7 +1073,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param tablename
 	 *            A table name to check.
 	 *
-	 * @return True if the table should be exposed as a FeatureType, false if it
+	 * @return True if the table should be exposed as a FeaturSimpleFeatureTypee if it
 	 *         should be ignored.
 	 */
 	protected boolean allowTable(String tablename) {
@@ -1111,13 +1112,13 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * This works by retrieving the column information for the table from the
 	 * DatabaseMetaData object. It then iterates over the information for each
 	 * column, calling buildAttributeType(ResultSet) to construct an
-	 * AttributeType for each column. The list of attribute types is then turned
+	 * AttributeDescriptor for each column. The list of attribute types is then turned
 	 * into a FeatureType that defines the schema.
 	 * </p>
 	 *
 	 * <p>
 	 * It is not intended that this method is overriden. It should provide the
-	 * required functionality for most sub-classes. To add AttributeType
+	 * required functionality for most sub-classes. To add AttributeDescriptor
 	 * construction for vendor specific SQL types, such as geometries, override
 	 * the buildAttributeType(ResultSet) method.
 	 * </p>
@@ -1141,7 +1142,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @see JDBC1DataStore#buildAttributeType(ResultSet)
 	 */
-	protected FeatureType buildSchema(String typeName, FIDMapper mapper)
+	protected SimpleFeatureType buildSchema(String typeName, FIDMapper mapper)
 			throws IOException {
 		final int NAME_COLUMN = 4;
 		final int TYPE_NAME = 6;
@@ -1182,7 +1183,7 @@ public abstract class JDBC1DataStore implements DataStore {
 						}
 					}
 
-					AttributeType attributeType = buildAttributeType(tableInfo);
+					AttributeDescriptor attributeType = buildAttributeType(tableInfo);
 
 					if (attributeType != null) {
 						attributeTypes.add(attributeType);
@@ -1200,8 +1201,8 @@ public abstract class JDBC1DataStore implements DataStore {
 				throw new SchemaNotFoundException(typeName);
 			}
 
-			AttributeType[] types = (AttributeType[]) attributeTypes
-					.toArray(new AttributeType[0]);
+			AttributeDescriptor[] types = (AttributeDescriptor[]) attributeTypes
+					.toArray(new AttributeDescriptor[0]);
 
 			return FeatureTypeBuilder.newFeatureType(types, typeName,
 					getNameSpace());
@@ -1223,13 +1224,13 @@ public abstract class JDBC1DataStore implements DataStore {
 	}
 
 	/**
-	 * Constructs an AttributeType from a row in a ResultSet. The ResultSet
+	 * Constructs an AttributeDescriptor from a row in a ResultSet. The ResultSet
 	 * contains the information retrieved by a call to getColumns() on the
 	 * DatabaseMetaData object. This information can be used to construct an
 	 * Attribute Type.
 	 *
 	 * <p>
-	 * The default implementation constructs an AttributeType using the default
+	 * The default implementation constructs an AttributeDescriptor using the default
 	 * JDBC type mappings defined in JDBCDataStore. These type mappings only
 	 * handle native Java classes and SQL standard column types, so to handle
 	 * Geometry columns, sub classes should override this to check if a column
@@ -1247,13 +1248,13 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *            The ResultSet containing the result of a
 	 *            DatabaseMetaData.getColumns call.
 	 *
-	 * @return The AttributeType built from the ResultSet or null if the column
+	 * @return The AttributeDescriptor built from the ResultSet or null if the column
 	 *         should be excluded from the schema.
 	 *
 	 * @throws IOException
 	 *             If an error occurs processing the ResultSet.
 	 */
-	protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+	protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
 		try {
 			final int COLUMN_NAME = 4;
 			final int DATA_TYPE = 5;
@@ -1289,7 +1290,10 @@ public abstract class JDBC1DataStore implements DataStore {
 				// think of feature readers that have to copy content, so we always set it to true,
 				// perhaps with the new feature model things like this will be fished out
 				//return AttributeTypeFactory.newAttributeType(columnName, type, nillable, null, null, null, min, 1 );
-				return AttributeTypeFactory.newAttributeType(columnName, type, true, null, null, null, min, 1 );
+				AttributeTypeBuilder atb = new AttributeTypeBuilder();
+				atb.setName(columnName);
+				atb.setBinding(type);
+				return atb.buildDescriptor(columnName);
 			}
 		} catch (SQLException e) {
 			throw new IOException("SQL exception occurred: " + e.getMessage());
@@ -1522,7 +1526,7 @@ public abstract class JDBC1DataStore implements DataStore {
 							+ "did you mean Transaction.AUTO_COMMIT");
 		}
 
-		FeatureType featureType = getSchema(typeName);
+		SimpleFeatureType featureType = getSchema(typeName);
 		FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
 		LOGGER.fine("getting feature writer for " + typeName + ": " + info);
 
@@ -1592,12 +1596,12 @@ public abstract class JDBC1DataStore implements DataStore {
 
 		if ((names == null) || query.retrieveAllProperties()) {
 			String typeName = query.getTypeName();
-			FeatureType schema = getSchema(typeName);
+			SimpleFeatureType schema = getSchema(typeName);
 
 			names = new String[schema.getAttributeCount()];
 
 			for (int i = 0; i < schema.getAttributeCount(); i++) {
-				names[i] = schema.getAttributeType(i).getLocalName();
+				names[i] = schema.getAttribute(i).getLocalName();
 			}
 		}
 
@@ -1621,13 +1625,13 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *             if query contains a propertyName that is not a part of this
 	 *             type's schema.
 	 */
-	protected final AttributeType[] getAttributeTypes(String typeName,
+	protected final AttributeDescriptor[] getAttributeTypes(String typeName,
 			String[] propertyNames) throws IOException, SchemaException {
-		FeatureType schema = getSchema(typeName);
-		AttributeType[] types = new AttributeType[propertyNames.length];
+		SimpleFeatureType schema = getSchema(typeName);
+		AttributeDescriptor[] types = new AttributeDescriptor[propertyNames.length];
 
 		for (int i = 0; i < propertyNames.length; i++) {
-			types[i] = schema.getAttributeType(propertyNames[i]);
+			types[i] = schema.getAttribute(propertyNames[i]);
 
 			if (types[i] == null) {
 				throw new SchemaException(typeName
@@ -1696,11 +1700,11 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param requestedNames
 	 * @param ft
 	 */
-	public boolean allSameOrder(String[] requestedNames, FeatureType ft) {
+	public boolean allSameOrder(String[] requestedNames, SimpleFeatureType ft) {
 		if (requestedNames.length != ft.getAttributeCount())
 			return false; // incorrect # of attribute
 		for (int t = 0; t < requestedNames.length; t++) {
-			if (!(requestedNames[t].equals(ft.getAttributeType(t).getLocalName())))
+			if (!(requestedNames[t].equals(ft.getAttribute(t).getLocalName())))
 				return false; // name doesnt match
 		}
 		return true;

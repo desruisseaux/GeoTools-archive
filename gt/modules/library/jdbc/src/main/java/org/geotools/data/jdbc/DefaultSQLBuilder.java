@@ -16,9 +16,9 @@
 package org.geotools.data.jdbc;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.Filters;
@@ -57,7 +57,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
     // The instance of the encoder to be used to generate the WHERE clause
     protected SQLEncoder encoder;
 
-    protected FeatureType ft;
+    protected SimpleFeatureType ft;
     
     protected ClientTransactionAccessor accessor;
     
@@ -78,7 +78,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * subclass.
      * <p>
      * This constructor should not be used to obtain Pre/Post filters, as these
-     * methods require a FeatureType to function properly.
+     * methods require a SimpleFeatureType to function properly.
      *
      * @deprecated
      * @param encoder the specific encoder to be used.
@@ -96,7 +96,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * @param featureType
      * @param accessor client-side transaction handler; may be null.
      */
-    public DefaultSQLBuilder(SQLEncoder encoder, FeatureType featureType, ClientTransactionAccessor accessor) {
+    public DefaultSQLBuilder(SQLEncoder encoder, SimpleFeatureType featureType, ClientTransactionAccessor accessor) {
     	this.encoder = encoder;
     	this.ft = featureType;
     	this.accessor = accessor;
@@ -219,7 +219,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         by the encoder class
      */
     public String buildSQLQuery(String typeName, FIDMapper mapper,
-        AttributeType[] attrTypes, org.opengis.filter.Filter filter) throws SQLEncoderException {
+        AttributeDescriptor[] attrTypes, org.opengis.filter.Filter filter) throws SQLEncoderException {
         StringBuffer sqlBuffer = new StringBuffer();
 
         sqlBuffer.append("SELECT ");
@@ -244,13 +244,9 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * @param sql StringBuffer to be appended to
      * @param mapper FIDMapper to provide the name(s) of the FID columns
      * @param attributes Array of columns to be selected
-     *
-     * @see postgisDataStore.SQLBuilder#sqlColumns(java.lang.StringBuffer,
-     *      postgisDataStore.FIDMapper.FIDMapper,
-     *      org.geotools.feature.AttributeType[])
      */
     public void sqlColumns(StringBuffer sql, FIDMapper mapper,
-        AttributeType[] attributes) {
+        AttributeDescriptor[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
             sql.append(encoder.escapeName(mapper.getColumnName(i)) + ", ");
         }
@@ -278,9 +274,9 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *
      * @param sql A StringBuffer that the column specification can be appended
      *        to
-     * @param geomAttribute An AttributeType for a geometry attribute
+     * @param geomAttribute An AttributeDescriptor for a geometry attribute
      */
-    public void sqlGeometryColumn(StringBuffer sql, AttributeType geomAttribute) {
+    public void sqlGeometryColumn(StringBuffer sql, AttributeDescriptor geomAttribute) {
         sql.append(encoder.escapeName(geomAttribute.getLocalName()));
     }
     
@@ -297,7 +293,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
     	
     	sql.append( " ORDER BY ");
     	for ( int i = 0; i < sortBy.length; i++ ) {
-    		AttributeType type = (AttributeType) sortBy[i].getPropertyName().evaluate( ft );
+    		AttributeDescriptor type = (AttributeDescriptor) sortBy[i].getPropertyName().evaluate( ft );
     		if ( type != null ) {
     			sql.append( encoder.escapeName( type.getLocalName() ) );
     		}

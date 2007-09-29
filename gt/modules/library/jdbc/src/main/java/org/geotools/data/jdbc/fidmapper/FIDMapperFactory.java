@@ -15,9 +15,10 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
-import org.geotools.feature.FeatureType;
 import java.io.IOException;
 import java.sql.Connection;
+
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -50,5 +51,5 @@ public interface FIDMapperFactory {
      * @param featureType
      *
      */
-    FIDMapper getMapper(FeatureType featureType);
+    FIDMapper getMapper(SimpleFeatureType featureType);
 }

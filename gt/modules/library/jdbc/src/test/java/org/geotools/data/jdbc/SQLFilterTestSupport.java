@@ -19,13 +19,14 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -45,10 +46,10 @@ public abstract class SQLFilterTestSupport extends TestCase {
     protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
-    protected static FeatureType testSchema = null;
+    protected static SimpleFeatureType testSchema = null;
 
     /** Schema on which to preform tests */
-    protected static Feature testFeature = null;
+    protected static SimpleFeature testFeature = null;
     protected boolean setup = false;
 
     /**
@@ -76,39 +77,20 @@ public abstract class SQLFilterTestSupport extends TestCase {
         // Create the schema attributes
         LOGGER.finer("creating flat feature...");
 
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
-                LineString.class);
-        LOGGER.finer("created geometry attribute");
-
-        AttributeType booleanAttribute = AttributeTypeFactory.newAttributeType("testBoolean",
-                Boolean.class);
-        LOGGER.finer("created boolean attribute");
-
-        AttributeType charAttribute = AttributeTypeFactory.newAttributeType("testCharacter",
-                Character.class);
-        AttributeType byteAttribute = AttributeTypeFactory.newAttributeType("testByte",
-                Byte.class);
-        AttributeType shortAttribute = AttributeTypeFactory.newAttributeType("testShort",
-                Short.class);
-        AttributeType intAttribute = AttributeTypeFactory.newAttributeType("testInteger",
-                Integer.class);
-        AttributeType longAttribute = AttributeTypeFactory.newAttributeType("testLong",
-                Long.class);
-        AttributeType floatAttribute = AttributeTypeFactory.newAttributeType("testFloat",
-                Float.class);
-        AttributeType doubleAttribute = AttributeTypeFactory.newAttributeType("testDouble",
-                Double.class);
-        AttributeType stringAttribute = AttributeTypeFactory.newAttributeType("testString",
-                String.class);
-
-        AttributeType[] types = {
-            geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
-            shortAttribute, intAttribute, longAttribute, floatAttribute,
-            doubleAttribute, stringAttribute
-        };
-
-        // Builds the schema
-        testSchema = FeatureTypeBuilder.newFeatureType(types,"testSchema");
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+    	ftb.add("testGeometry", LineString.class);
+    	ftb.add("testBoolean", Boolean.class);
+    	ftb.add("testCharacter", Character.class);
+    	ftb.add("testByte", Byte.class);
+    	ftb.add("testShort", Short.class);
+    	ftb.add("testInteger", Integer.class);
+    	ftb.add("testLong", Long.class);
+    	ftb.add("testFloat", Float.class);
+    	ftb.add("testDouble", Double.class);
+    	ftb.add("testString", String.class);
+    	ftb.add("testZeroDouble", Double.class);
+    	ftb.setName("testSchema");
+        testSchema = ftb.buildFeatureType();
 
         GeometryFactory geomFac = new GeometryFactory();
 
@@ -132,7 +114,7 @@ public abstract class SQLFilterTestSupport extends TestCase {
         attributes[9] = "test string data";
 
         // Creates the feature itself
-        testFeature = testSchema.create(attributes);
+        testFeature = SimpleFeatureBuilder.build(testSchema, attributes, null);
         LOGGER.finer("...flat feature created");
 
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);

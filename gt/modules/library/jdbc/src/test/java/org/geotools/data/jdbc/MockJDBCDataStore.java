@@ -27,7 +27,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /** Provides a Mock JDBC DataStore for testing the abstract DataStore implementation.
  * 
@@ -51,7 +51,7 @@ public class MockJDBCDataStore extends JDBCDataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.jdbc.JDBCDataStore#createGeometryReader(org.geotools.feature.AttributeType, org.geotools.data.jdbc.JDBCDataStore.QueryData, int)
      */
-    protected AttributeReader createGeometryReader(AttributeType attrType, QueryData queryData, int index)
+    protected AttributeReader createGeometryReader(AttributeDescriptor attrType, QueryData queryData, int index)
         throws DataSourceException {
         return null;
     }
@@ -60,7 +60,7 @@ public class MockJDBCDataStore extends JDBCDataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.jdbc.JDBCDataStore#createGeometryWriter(org.geotools.feature.AttributeType, org.geotools.data.jdbc.JDBCDataStore.QueryData, int)
      */
-    protected AttributeWriter createGeometryWriter(AttributeType attrType, QueryData queryData, int index)
+    protected AttributeWriter createGeometryWriter(AttributeDescriptor attrType, QueryData queryData, int index)
         throws DataSourceException {     
         return null;
     }
@@ -70,7 +70,7 @@ public class MockJDBCDataStore extends JDBCDataStore {
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) {
         return null;
     }
 }
