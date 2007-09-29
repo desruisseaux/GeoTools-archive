@@ -5,16 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.units.NonSI;
 import javax.units.SI;
-import javax.units.Unit;
 
-import org.geotools.measure.Units;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.metadata.Identifier;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.util.CodeList;
 

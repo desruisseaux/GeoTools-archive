@@ -1,6 +1,5 @@
 package org.geotools.demo.example;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,16 +18,16 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.Intersects;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -85,13 +84,12 @@ public class WFSExample {
 		Query query = new DefaultQuery( typeName, filter, new String[]{ geomName } );
 		FeatureCollection features = source.getFeatures( query );
 
-		Envelope bounds = new Envelope();
+		ReferencedEnvelope bounds = new ReferencedEnvelope();
 		Iterator iterator = features.iterator();
 		try {
 			while( iterator.hasNext() ){
-				Feature feature = (Feature) iterator.next();
-				
-				bounds.expandToInclude( feature.getBounds() );
+				Feature feature = (Feature) iterator.next();				
+				bounds.include( feature.getBounds() );
 			}
 			System.out.println( "Calculated Bounds:"+ bounds );
 		}

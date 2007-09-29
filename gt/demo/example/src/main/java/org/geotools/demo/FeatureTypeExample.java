@@ -1,15 +1,6 @@
 package org.geotools.demo;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * You may of noticed that the use of DataUtilities.createType in the Csv2Shape
@@ -46,7 +37,7 @@ public class FeatureTypeExample {
 	 * The AttributeTypeFactory implementation is a bit messed up, you can
 	 * <b>only</b> use the static final methods to get anything done. This is
 	 * something we are fixing for GeoTools 2.5.
-	 */
+	 *
 	public FeatureType createUsingFactory() throws Exception {
 		final AttributeType LOCATION = AttributeTypeFactory.newAttributeType(
 				"Location",
@@ -69,7 +60,7 @@ public class FeatureTypeExample {
 		FeatureType schema = builder.getFeatureType();
 		
 		return schema;
-	}
+	}*/
 
 	/**
 	 * In GeoTools 2.5 we will switch to using the GeoAPI

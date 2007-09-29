@@ -26,19 +26,17 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.demo.postgis.PostGISDialog;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.gui.swing.ProgressWindow;
-import org.opengis.filter.Filter;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.Filter;
 
 public class PostGIS2Example {
 	
@@ -222,11 +220,11 @@ public class PostGIS2Example {
 			buf.append( schema.getTypeName() );
 			
 			buf.append(" namespace=");
-			buf.append( schema.getNamespace() );
+			buf.append( schema.getName().getNamespaceURI() );
 			buf.append("attributes = ([\n");
 			
 			for( PropertyDescriptor type : schema.getProperties() ){
-				buf.append( type.getLocalName() );
+				buf.append( type.getName().getLocalPart() );
 				buf.append(" [\n");					
 				
 				buf.append("\t binding=");
@@ -242,17 +240,17 @@ public class PostGIS2Example {
 				buf.append("\n");
 				
 				buf.append("\t restrictions=");
-				buf.append( type.getRestriction() );
+				buf.append( type.getType().getRestrictions() );
 				buf.append("\n");
 				
-				if( type instanceof GeometryAttributeType ){
-					GeometryAttributeType geomType = (GeometryAttributeType) type;
+				if( type instanceof GeometryDescriptor ){
+				    GeometryDescriptor geomType = (GeometryDescriptor) type;
 					buf.append("\t crs=");
-					if( geomType.getCoordinateSystem() == null ){
+					if( geomType.getCRS() == null ){
 						buf.append("null");						
 					}
 					else {
-						buf.append( geomType.getCoordinateSystem().getName() );	
+						buf.append( geomType.getCRS().getName() );	
 					}					
 					buf.append("\n");						
 				}
@@ -289,13 +287,10 @@ public class PostGIS2Example {
 						buf.append("\t");
 						buf.append( name );
 						buf.append( "=" );
-						buf.append( feature.getAttribute( name ) );
+						buf.append( feature.getProperty(name ).getValue() );
 					}
 					buf.append("]");					
 				}
-                public void visit(org.opengis.feature.Feature feature) {
-                    visit( (Feature) feature );
-                }
 			}, new ProgressWindow( this ));
 			
 			show.setText( buf.toString() );
