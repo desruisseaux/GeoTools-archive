@@ -182,14 +182,15 @@ public class AttributeTypeBuilder {
 		isNillable = true;
 	}
 	
-	public void setFactory(FeatureTypeFactory factory) {
+	public AttributeTypeBuilder setFactory(FeatureTypeFactory factory) {
 		this.factory = factory;
+		return this;
 	}
 	
 	/**
 	 * Initializes builder state from another attribute type.
 	 */
-	public void init( AttributeType type ) {
+	public AttributeTypeBuilder init( AttributeType type ) {
 		name = type.getName().getLocalPart();
 		namespaceURI = type.getName().getNamespaceURI();
 		isAbstract = type.isAbstract();
@@ -206,76 +207,90 @@ public class AttributeTypeBuilder {
 		if ( type instanceof GeometryType ) {
 			crs = ((GeometryType)type).getCRS();
 		}
+		return this;
 	}
 	
 	/**
 	 * Initializes builder state from another attribute descriptor.
 	 */
 
-	public void init( AttributeDescriptor descriptor ) {
+	public AttributeTypeBuilder init( AttributeDescriptor descriptor ) {
 		init( descriptor.getType() );
 		minOccurs = descriptor.getMinOccurs();
 		maxOccurs = descriptor.getMaxOccurs();
 		isNillable = descriptor.isNillable();
+		return this;
 	}
 	
 	// Type methods
 	//
 	
-	public void setBinding(Class binding) {
+	public AttributeTypeBuilder setBinding(Class binding) {
 		this.binding = binding;
+		return this;
 	}
 
-	public void setName(String name) {
+	public AttributeTypeBuilder setName(String name) {
 		this.name = name;
+		return this;
 	}
 
-	public void setNamespaceURI(String namespaceURI) {
+	public AttributeTypeBuilder setNamespaceURI(String namespaceURI) {
 		this.namespaceURI = namespaceURI;
+		return this;
 	}
 	
-	public void setCRS(CoordinateReferenceSystem crs) {
+	public AttributeTypeBuilder setCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
 		isCrsSet = true;
+		return this;
 	}
 
 	public boolean isCRSSet() {
         return isCrsSet;
     }
 	
-	public void setDescription(String description) {
+	public AttributeTypeBuilder setDescription(String description) {
 		this.description = description;
+		return this;
 	}
 
-	public void setAbstract(boolean isAbstract) {
+	public AttributeTypeBuilder setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
+		return this;
 	}
 
-	public void setIdentifiable(boolean isIdentifiable) {
+	public AttributeTypeBuilder setIdentifiable(boolean isIdentifiable) {
 		this.isIdentifiable = isIdentifiable;
+		return this;
 	}
 
-	public void addRestriction(Filter restriction) {
+	public AttributeTypeBuilder addRestriction(Filter restriction) {
 		restrictions().add(restriction);
+		return this;
 	}
 	
 	// Descriptor methods
 	//
 	
-	public void setNillable(boolean isNillable) {
+	public AttributeTypeBuilder setNillable(boolean isNillable) {
 		this.isNillable = isNillable;
+		return this;
 	}
 
-	public void setMaxOccurs(int maxOccurs) {
+	public AttributeTypeBuilder setMaxOccurs(int maxOccurs) {
 		this.maxOccurs = maxOccurs;
+		return this;
 	}
 
-	public void setMinOccurs(int minOccurs) {
+	public AttributeTypeBuilder setMinOccurs(int minOccurs) {
 		this.minOccurs = minOccurs;
+		return this;
 	}
 	
-	public void setDefaultValue(Object defaultValue) {
+	public AttributeTypeBuilder setDefaultValue(Object defaultValue) {
 		this.defaultValue = defaultValue;
+		return this;
 	}
 	
 	// construction methods
