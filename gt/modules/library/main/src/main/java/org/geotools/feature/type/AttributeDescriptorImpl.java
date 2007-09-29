@@ -44,5 +44,9 @@ public class AttributeDescriptorImpl extends PropertyDescriptorImpl
 	    return new StringBuffer(super.toString()).append(";defaultValue=")
 	        .append(defaultValue).toString();
 	}
+
+	public String getLocalName() {
+		return getName().getLocalPart();
+	}
 	
 }

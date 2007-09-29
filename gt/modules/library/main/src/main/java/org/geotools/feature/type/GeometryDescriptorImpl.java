@@ -1,9 +1,9 @@
 package org.geotools.feature.type;
 
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class GeometryDescriptorImpl extends AttributeDescriptorImpl 
     implements GeometryDescriptor {
@@ -17,4 +17,12 @@ public class GeometryDescriptorImpl extends AttributeDescriptorImpl
     public GeometryType getType() {
         return (GeometryType) super.getType();
     }
+
+	public CoordinateReferenceSystem getCRS() {
+		return getType().getCRS();
+	}
+
+	public String getLocalName() {
+		return getName().getLocalPart();
+	}
 }
