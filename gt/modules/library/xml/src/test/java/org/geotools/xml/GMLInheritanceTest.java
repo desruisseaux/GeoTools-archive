@@ -22,10 +22,11 @@ import java.util.logging.Level;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.TestData;
+
+import org.opengis.feature.simple.SimpleFeature;
 
 import junit.framework.TestCase;
 
@@ -97,7 +98,7 @@ public class GMLInheritanceTest extends TestCase {
         FeatureIterator i = doc.features();
         int j = 1;
         while(i.hasNext()){
-            Feature ft = i.next();
+            SimpleFeature ft = i.next();
             assertNotNull("Feature #"+j+" is null",ft);
 //            assertNotNull("Feature #"+j+" missing crs ",ft.getFeatureType().getDefaultGeometry().getCoordinateSystem());
 //            System.out.println("Feature "+j+" : "+ft);

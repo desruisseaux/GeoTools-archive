@@ -19,17 +19,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.XMLHandlerHints;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.SAXException;
 
 
@@ -56,7 +54,7 @@ public class FCBuffer extends Thread implements FeatureReader {
 
     /** DOCUMENT ME! */
     protected int state = 0;
-    private Feature[] features;
+    private SimpleFeature[] features;
 
     private int end;
     private int size;
@@ -77,9 +75,9 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @param timeout
      * @param ft Nullable
      */
-    protected FCBuffer(URI document, int capacity, int timeout, FeatureType ft) {
+    protected FCBuffer(URI document, int capacity, int timeout, SimpleFeatureType ft) {
     	super("Feature Collection Buffer");
-        features = new Feature[capacity];
+        features = new SimpleFeature[capacity];
         this.timeout = timeout;
         this.document = document;
         end = size = head = 0;
@@ -136,7 +134,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      *
      * @return false if unable to add the feature
      */
-    protected boolean addFeature(Feature f) {
+    protected boolean addFeature(SimpleFeature f) {
         if (ft == null) {
             ft = f.getFeatureType();
         }
@@ -178,7 +176,7 @@ public class FCBuffer extends Thread implements FeatureReader {
         return getFeatureReader(document,capacity,1000,null);
     }
     
-    public static FeatureReader getFeatureReader(URI document, int capacity, FeatureType ft)
+    public static FeatureReader getFeatureReader(URI document, int capacity, SimpleFeatureType ft)
     throws SAXException {
         return getFeatureReader(document,capacity,1000,ft);
 }
@@ -190,7 +188,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     }
 
     public static FeatureReader getFeatureReader(URI document, int capacity,
-        int timeout, FeatureType ft) throws SAXException {
+        int timeout, SimpleFeatureType ft) throws SAXException {
         FCBuffer fc = new FCBuffer(document, capacity, timeout,ft);
         fc.start(); // calls run
 
@@ -198,7 +196,7 @@ public class FCBuffer extends Thread implements FeatureReader {
             throw fc.exception;
         }
 
-        if(fc.getFeatureType()!=null && fc.getFeatureType().getDefaultGeometry()!=null && fc.getFeatureType().getDefaultGeometry().getCoordinateSystem() == null){
+        if(fc.getFeatureType()!=null && fc.getFeatureType().getDefaultGeometry()!=null && fc.getFeatureType().getDefaultGeometry().getCRS() == null){
                 // load crs
 //                Feature f = fc.peek();
                 // TODO set crs here.
@@ -206,7 +204,7 @@ public class FCBuffer extends Thread implements FeatureReader {
         return fc;
     }
 
-    protected FeatureType ft = null;
+    protected SimpleFeatureType ft = null;
 
 	private volatile Date lastUpdate;
     /**
@@ -216,7 +214,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      *
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         if(ft != null)
             return ft;
         Date d = new Date(Calendar.getInstance().getTimeInMillis() + timeout);
@@ -241,7 +239,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, NoSuchElementException {
         if (exception != null) {
             state = STOP;
@@ -250,7 +248,7 @@ public class FCBuffer extends Thread implements FeatureReader {
             throw e;
         }
 
-        Feature f = null;
+        SimpleFeature f = null;
         synchronized (this) {
 	        size--;
 	         f = features[head++];
@@ -267,7 +265,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature peek()
+    public SimpleFeature peek()
         throws IOException, NoSuchElementException {
         if (exception != null) {
             state = STOP;
@@ -276,7 +274,7 @@ public class FCBuffer extends Thread implements FeatureReader {
             throw e;
         }
 
-        Feature f = features[head];
+        SimpleFeature f = features[head];
         return f;
     }
 

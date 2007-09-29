@@ -23,9 +23,9 @@ import java.util.logging.Level;
 import junit.framework.TestCase;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
 import org.geotools.TestData;
 import org.geotools.xml.gml.FCBuffer;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -204,14 +204,14 @@ public class GMLStreamingParserStressTest extends TestCase {
             while(cont){
                 cont = false;
                 for(int i=0;i<10 && fr1.hasNext();i++){
-                    Feature ftr = fr1.next();
+                    SimpleFeature ftr = fr1.next();
                     assertTrue("Feature Null",ftr!=null);
 //                    System.out.println(ftr);
                     cont = true;
                     count1++;
                 }
                 for(int i=0;i<10 && fr2.hasNext();i++){
-                    Feature ftr = fr2.next();
+                    SimpleFeature ftr = fr2.next();
                     assertTrue("Feature Null",ftr!=null);
 //                    System.out.println(ftr);
                     cont = true;

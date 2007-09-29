@@ -26,12 +26,12 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.TestCase;
 
 import org.geotools.TestData;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.xml.gml.GMLFeatureCollection;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.schema.Schema;
+import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.SAXException;
 
 
@@ -212,7 +212,7 @@ public class GMLParserTest extends TestCase {
         FeatureIterator i = doc.features();
         int j = 1;
         while(i.hasNext()){
-            Feature ft = i.next();
+            SimpleFeature ft = i.next();
             assertNotNull("Feature #"+j+" is null",ft);
 //            assertNotNull("Feature #"+j+" missing crs ",ft.getFeatureType().getDefaultGeometry().getCoordinateSystem());
 //            System.out.println("Feature "+j+" : "+ft);
