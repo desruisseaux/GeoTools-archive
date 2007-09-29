@@ -23,8 +23,6 @@ import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
