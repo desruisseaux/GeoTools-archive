@@ -10,8 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.data.DataUtilities;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LengthFunction;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -22,6 +26,8 @@ import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Schema;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
@@ -147,6 +153,9 @@ public class SimpleFeatureTypeBuilder {
 	 */
 	protected AttributeTypeBuilder attributeBuilder;
 
+	/** Length for next filter */
+    private int length = -1;
+	
 	/**
 	 * Constructs the builder.
 	 */
@@ -446,7 +455,21 @@ public class SimpleFeatureTypeBuilder {
 		attributeBuilder.setNillable(isNillable);
 		return this;
 	}
+
 	/**
+     * Sets a restriction on the field length of the next attribute added to the feature type.
+     * <p>
+     * This method is the same as adding a restriction based on length( value ) < length
+     * This value is reset after a call to {@link #add(String, Class)}
+     * </p>
+     * @return length Used to limit the length of the next attribute created
+     */
+    public SimpleFeatureTypeBuilder length( int length) {
+        attributeBuilder.setLength(length);
+        return this;
+    }
+    
+    /**
 	 * Adds a restriction to the next attribute added to the feature type.
 	 * <p>
 	 * This value is reset after a call to {@link #add(String, Class)}
@@ -571,6 +594,7 @@ public class SimpleFeatureTypeBuilder {
 		//also check for jts geometry, if we ever actually get to a point where a
         // feature can be backed by another geometry model (like iso), we need 
         // to remove this check
+        //
         if ( ( defaultGeometry != null && defaultGeometry.equals( name ) ) 
             || Geometry.class.isAssignableFrom(binding) ) {
 		

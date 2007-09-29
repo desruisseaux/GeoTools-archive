@@ -34,8 +34,6 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.TestData;
 
 
@@ -45,97 +43,10 @@ import org.geotools.TestData;
  * @author Ian Schneider
  * @author James Macgill
  */
-public class ShapefileTest extends TestCaseSupport {
-    final String STATEPOP      = "shapes/statepop.shp";
-    final String STATEPOP_IDX  = "shapes/statepop.shx";
-    final String POINTTEST     = "shapes/pointtest.shp";
-    final String POLYGONTEST   = "shapes/polygontest.shp";
-    final String HOLETOUCHEDGE = "shapes/holeTouchEdge.shp";
-    final String EXTRAATEND    = "shapes/extraAtEnd.shp";
-
-    private final Lock lock = new Lock();
-
+public class ShapefileTest extends org.geotools.data.shapefile.ShapefileTest {
+    
     public ShapefileTest(String testName) throws IOException {
         super(testName);
-    }
-
-    public static void main(String[] args) {
-        verbose = true;
-        junit.textui.TestRunner.run(suite(ShapefileTest.class));
-    }
-
-    public void testLoadingStatePop() throws Exception {
-        loadShapes(STATEPOP, 49);
-        loadMemoryMapped(STATEPOP, 49);
-    }
-
-    public void testLoadingSamplePointFile() throws Exception {
-        loadShapes(POINTTEST, 10);
-        loadMemoryMapped(POINTTEST, 10);
-    }
-
-    public void testLoadingSamplePolygonFile() throws Exception {
-        loadShapes(POLYGONTEST, 2);
-        loadMemoryMapped(POLYGONTEST, 2);
-    }
-
-    public void testLoadingTwice() throws Exception {
-        loadShapes(POINTTEST, 10);
-        loadShapes(POINTTEST, 10);
-        loadShapes(STATEPOP, 49);
-        loadShapes(STATEPOP, 49);
-        loadShapes(POLYGONTEST, 2);
-        loadShapes(POLYGONTEST, 2);
-    }
-
-    /**
-     * It is posible for a point in a hole to touch the edge of its containing
-     * shell This test checks that such polygons can be loaded ok.
-     */
-    public void testPolygonHoleTouchAtEdge() throws Exception {
-        loadShapes(HOLETOUCHEDGE, 1);
-        loadMemoryMapped(HOLETOUCHEDGE, 1);
-    }
-
-    /**
-     * It is posible for a shapefile to have extra information past the end of
-     * the normal feature area, this tests checks that this situation is delt
-     * with ok.
-     */
-    public void testExtraAtEnd() throws Exception {
-        loadShapes(EXTRAATEND, 3);
-        loadMemoryMapped(EXTRAATEND, 3);
-    }
-
-    public void testIndexFile() throws Exception {
-        copyShapefiles(STATEPOP);
-        copyShapefiles(STATEPOP_IDX);
-        final ReadableByteChannel channel1 = TestData.openChannel(      STATEPOP); // Backed by InputStream
-        final ReadableByteChannel channel2 = TestData.openChannel(this, STATEPOP); // Backed by File
-        final ReadableByteChannel channel3 = TestData.openChannel(this, STATEPOP_IDX);
-        final ShapefileReader     reader1  = new ShapefileReader(channel1, lock);
-        final ShapefileReader     reader2  = new ShapefileReader(channel2, lock);
-        final IndexFile           index    = new IndexFile(channel3);
-        try{
-	        for (int i = 0; i < index.getRecordCount(); i++) {
-	            if (reader1.hasNext()) {
-	                Geometry g1 = (Geometry) reader1.nextRecord().shape();
-	                Geometry g2 = (Geometry) reader2.shapeAt(2 * (index.getOffset(i)));
-	                assertTrue(g1.equalsExact(g2));
-	
-	                g2 = (Geometry) reader2.shapeAt(index.getOffsetInBytes(i));
-	                assertTrue(g1.equalsExact(g2));
-	            } else {
-	                fail("uneven number of records");
-	            }
-
-            //assertEquals(reader1.nextRecord().offset(),index.getOffset(i));
-        }
-	    }finally{
-	    	reader1.close();
-	    	reader2.close();
-	    	index.close();
-	    }
     }
 
     public void testHolyPolygons() throws Exception {
@@ -145,7 +56,7 @@ public class ShapefileTest extends TestCaseSupport {
         factory.addType(AttributeTypeFactory.newAttributeType("a",
                 Geometry.class));
 
-        FeatureType type = factory.getFeatureType();
+        SimpleFeatureType type = factory.getFeatureType();
         FeatureCollection features = FeatureCollections.newCollection();
         features.add(type.create(new Object[] { g }));
 
@@ -212,22 +123,26 @@ public class ShapefileTest extends TestCaseSupport {
             reader.shapeAt(((Integer) offsets.get(i)).intValue());
         }
         reader.close();
+        
     }
 
-    private void loadShapes(String resource, int expected) throws Exception {
+    protected void loadShapes(String resource, int expected) throws Exception {
         final ReadableByteChannel c = TestData.openChannel(resource);
-        ShapefileReader reader = new ShapefileReader(c, lock);
+        ShapefileReader reader = new ShapefileReader(c, lock );
         int cnt = 0;
-
-        while (reader.hasNext()) {
-            reader.nextRecord().shape();
-            cnt++;
+        try {
+            while (reader.hasNext()) {
+                reader.nextRecord().shape();
+                cnt++;
+            }
         }
-        reader.close();
+        finally {
+            reader.close();
+        }
         assertEquals("Number of Geometries loaded incorect for : " + resource, expected, cnt);
     }
 
-    private void loadMemoryMapped(String resource, int expected) throws Exception {
+    protected void loadMemoryMapped(String resource, int expected) throws Exception {
         final ReadableByteChannel c = TestData.openChannel(resource);
         ShapefileReader reader = new ShapefileReader(c, lock);
         int cnt = 0;

@@ -3,7 +3,10 @@ package org.geotools.feature;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LengthFunction;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -12,7 +15,10 @@ import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 /**
  * Builder for attribute types and descriptors.
@@ -110,6 +116,7 @@ public class AttributeTypeBuilder {
 	//GeometryType
 	//
 	protected CoordinateReferenceSystem crs;
+	
 	protected boolean isCrsSet = false;
 	
 	//AttributeDescriptor
@@ -126,7 +133,10 @@ public class AttributeTypeBuilder {
 	 * nullable
 	 */
 	protected boolean isNillable = true;
+
+    private int length = -1;
 	
+    protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
 	
 	/**
 	 * Constructs the builder.
@@ -162,6 +172,7 @@ public class AttributeTypeBuilder {
 		binding = null;
 		superType = null;
 		crs = null;
+		length = -1;
 		isCrsSet = false;
 	}
 	
@@ -277,13 +288,22 @@ public class AttributeTypeBuilder {
 	 * </p>
 	 */
 	public AttributeType buildType() {
+	    if( length != -1){
+	        Filter lengthRestriction = length(name, length);
+	        restrictions().add( lengthRestriction );
+	    }
+	    
 		AttributeType type = factory.createAttributeType(
 			new org.geotools.feature.Name(namespaceURI,name), binding, isIdentifiable, isAbstract, 
-			restrictions, superType, description != null ? new SimpleInternationalString(description) : null);
+			restrictions, superType, description());
 		resetTypeState();
 		
 		return type;
 	}
+
+    private InternationalString description() {
+        return description != null ? new SimpleInternationalString(description) : null;
+    }
 	
 	/**
 	 * Builds the geometry attribute type.
@@ -294,7 +314,7 @@ public class AttributeTypeBuilder {
 	public GeometryType buildGeometryType() {
 		GeometryType type = factory.createGeometryType(
 			new org.geotools.feature.Name(namespaceURI,name), binding, crs, isIdentifiable, isAbstract, 
-			restrictions, superType, description != null ? new SimpleInternationalString(description) : null);
+			restrictions, superType, description());
 		
 		resetTypeState();
 		
@@ -377,5 +397,33 @@ public class AttributeTypeBuilder {
 		
 		return restrictions;
 	}
+
+    public void setLength(int length) {
+        this.length = length;
+    }
 	
+    /**
+     * Helper method to create a "length" filter.
+     * @param xpath
+     * @param length 
+     * @return Filter
+     */
+    public Filter length(String xpath, int length ){
+        if ( length < 0 ) {
+            return null;
+        }
+        LengthFunction lengthFunction = (LengthFunction)ff.function("LengthFunction", 
+                new Expression[]{ff.property(xpath)});
+        if( lengthFunction == null ) {
+            return null; // TODO: Help Richard! ff.createFunctionExpression cannot find Length!
+        }        
+        Filter cf = null;
+        try {
+            //cf = ff.equals(length, ff.literal(fieldLength));
+            cf = ff.lessOrEqual(lengthFunction, ff.literal(length));
+        } catch (IllegalFilterException e) {
+            // TODO something
+        }
+        return cf == null ? Filter.EXCLUDE : cf;
+    }
 }

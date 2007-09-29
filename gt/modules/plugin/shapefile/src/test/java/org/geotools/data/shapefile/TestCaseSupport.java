@@ -28,9 +28,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.TestData;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
@@ -149,7 +149,7 @@ public class TestCaseSupport extends TestCase {
     /**
      * Returns the first feature in the given feature collection.
      */
-    protected Feature firstFeature(FeatureCollection fc) {
+    protected SimpleFeature firstFeature(FeatureCollection fc) {
         return fc.features().next();
     }
 

@@ -170,7 +170,7 @@ public class ShapefileDataStoreFactory
      * @throws DataSourceException Thrown if the datastore which is created
      *         cannot be attached to the restore specified in params.
      */
-    public DataStore createDataStore(Map params) throws IOException {
+    public ShapefileDataStore createDataStore(Map params) throws IOException {
     	DataStore ds = null;
     	synchronized (liveStores) {
             if ( !liveStores.containsKey(params) ){	
@@ -186,7 +186,7 @@ public class ShapefileDataStoreFactory
         		ds=(DataStore) liveStores.get(params);
         	}
     	}
-        return ds;
+        return (ShapefileDataStore) ds;
     }
     /**
      * Creates a new DataStore - for a file that does not exist yet.

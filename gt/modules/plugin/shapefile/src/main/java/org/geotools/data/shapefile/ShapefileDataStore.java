@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.nio.charset.Charset;
@@ -71,23 +72,21 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
-import org.geotools.filter.CompareFilter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.Filters;
-import org.geotools.filter.LengthFunction;
-import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -132,7 +131,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected final URL xmlURL;
     protected Lock readWriteLock = new Lock();
     protected URI namespace = null; // namespace provided by the constructor's map
-    protected FeatureType schema; // read only
+    protected SimpleFeatureType schema; // read only
     protected boolean useMemoryMappedBuffer = true;
     protected Charset dbfCharset;
 
@@ -447,8 +446,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     protected Reader getAttributesReader(boolean readDbf)
         throws IOException {
-        AttributeType[] atts = (schema == null) ? readAttributes()
-                                                : schema.getAttributeTypes();
+            
+        List<AttributeDescriptor> atts =
+            (schema == null) ? readAttributes() : schema.getAttributes();
 
         if (!readDbf) {
             LOGGER.fine(
@@ -674,56 +674,46 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
 
     /**
-     * Create the AttributeTypes contained within this DataStore.
+     * Create the AttributeDescriptor contained within this DataStore.
      *
-     * @return An array of new AttributeTypes
-     *
+     * @return List of new AttributeDescriptor
      * @throws IOException If AttributeType reading fails
      */
-    protected AttributeType[] readAttributes() throws IOException {
+    protected List<AttributeDescriptor> readAttributes() throws IOException {
         ShapefileReader shp = openShapeReader();
         DbaseFileReader dbf = openDbfReader();
-        AbstractCRS cs = null;
+        CoordinateReferenceSystem crs = null;
 
 		PrjFileReader prj=null;
 		try {
 			prj = openPrjReader();
 
 			if (prj != null) {
-				cs = (AbstractCRS) prj.getCoodinateSystem();
+				crs = prj.getCoodinateSystem();
 			}
 		} catch (FactoryException fe) {
-			cs = null;
-		}finally{
+			crs = null;
+		} finally{
 			if( prj!=null)
 				prj.close();
 		}
-
-        try {
-            GeometryAttributeType geometryAttribute = (GeometryAttributeType) AttributeTypeFactory
-                .newAttributeType("the_geom",
-                    JTSUtilities.findBestGeometryClass(
-                        shp.getHeader().getShapeType()), true, 0, null, cs);
-
-            AttributeType[] atts;
-
+		SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+		try {
+            Class<?> geometryClass = JTSUtilities.findBestGeometryClass(shp.getHeader().getShapeType());            
+            build.nillable( true ).crs(crs).add("the_geom", geometryClass );
+            
             // take care of the case where no dbf and query wants all => geometry only
             if (dbf != null) {
                 DbaseFileHeader header = dbf.getHeader();
-                atts = new AttributeType[header.getNumFields() + 1];
-                atts[0] = geometryAttribute;
-
                 for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
-                    Class clazz = header.getFieldClass(i);
-                    atts[i + 1] = AttributeTypeFactory.newAttributeType(header
-                            .getFieldName(i), clazz, true,
-                            header.getFieldLength(i));
+                    Class attributeClass = header.getFieldClass(i);
+                    String name = header.getFieldName(i);
+                    int length = header.getFieldLength(i);
+                    
+                    build.nillable(true).length( length ).add( name, attributeClass );
                 }
-            } else {
-                atts = new AttributeType[] { geometryAttribute };
             }
-
-            return atts;
+            return build.;
         } finally {
             try {
                 shp.close();
@@ -889,7 +879,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
 	 */
-    protected Envelope getBounds() throws DataSourceException {
+    protected ReferencedEnvelope getBounds() throws DataSourceException {
         // This is way quick!!!
         ReadableByteChannel in = null;
 
@@ -902,15 +892,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             ShapefileHeader header = new ShapefileHeader();
             header.read(buffer, true);
 
+            ReferencedEnvelope bounds = new ReferencedEnvelope( schema.getCRS() );
+            bounds.include(header.minX(), header.minY() );
+            bounds.include(header.minX(), header.minY() );
+            
             Envelope env = new Envelope(header.minX(), header.maxX(),
                     header.minY(), header.maxY());
 
             if (schema != null) {
-                return new ReferencedEnvelope(env,
-                    schema.getDefaultGeometry().getCoordinateSystem());
+                return new ReferencedEnvelope(env,schema.getCRS());
             }
-
             return new ReferencedEnvelope(env, null);
+            
         } catch (IOException ioe) {
             // What now? This seems arbitrarily appropriate !
             throw new DataSourceException("Problem getting Bbox", ioe);
@@ -925,7 +918,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         }
     }
 
-    protected Envelope getBounds(Query query) throws IOException {
+    protected ReferencedEnvelope getBounds(Query query) throws IOException {
         if (query.getFilter().equals(Filter.INCLUDE)) {
             return getBounds();
         }
@@ -942,7 +935,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     public FeatureSource getFeatureSource(final String typeName)
         throws IOException {
-        final FeatureType featureType = getSchema(typeName);
+        final SimpleFeatureType featureType = getSchema(typeName);
         
         if (isWriteable) {
             if (getLockingManager() != null) {
@@ -960,11 +953,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                             listenerManager.removeFeatureListener(this, listener);
                         }
 
-                        public FeatureType getSchema() {
+                        public SimpleFeatureType getSchema() {
                             return featureType;
                         }
 
-                        public Envelope getBounds(Query query)
+                        public ReferencedEnvelope getBounds(Query query)
                             throws IOException {
                             return ShapefileDataStore.this.getBounds(query);
                         }
@@ -984,11 +977,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                         listenerManager.removeFeatureListener(this, listener);
                     }
 
-                    public FeatureType getSchema() {
+                    public SimpleFeatureType getSchema() {
                         return featureType;
                     }
 
-                    public Envelope getBounds(Query query)
+                    public ReferencedEnvelope getBounds(Query query)
                         throws IOException {
                         return ShapefileDataStore.this.getBounds(query);
                     }
@@ -1008,11 +1001,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     listenerManager.removeFeatureListener(this, listener);
                 }
 
-                public FeatureType getSchema() {
+                public SimpleFeatureType getSchema() {
                     return featureType;
                 }
 
-                public Envelope getBounds(Query query)
+                public ReferencedEnvelope getBounds(Query query)
                     throws IOException {
                     return ShapefileDataStore.this.getBounds(query);
                 }
@@ -1074,7 +1067,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 	 * @throws DbaseFileException
 	 *             DOCUMENT ME!
 	 */
-    protected static DbaseFileHeader createDbaseHeader(FeatureType featureType)
+    protected static DbaseFileHeader createDbaseHeader(SimpleFeatureType featureType)
         throws IOException, DbaseFileException {
         DbaseFileHeader header = new DbaseFileHeader();
 
@@ -1334,10 +1327,10 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         protected Reader attReader;
 
         // the current Feature
-        private Feature currentFeature;
+        private SimpleFeature currentFeature;
 
         // the FeatureType we are representing
-        private FeatureType featureType;
+        private SimpleFeatureType featureType;
 
         // an array for reuse in Feature creation
         private Object[] emptyAtts;

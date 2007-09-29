@@ -32,6 +32,8 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -98,17 +100,14 @@ public class ShapefileGeoResource extends AbstractGeoResource {
             synchronized (parent.getDataStore(monitor)) {
                 if (info == null) {
                     //calculate some meta data based on the feature type
-                    FeatureType type = getFeatureSource(monitor).getSchema();
-                    CoordinateReferenceSystem crs = type.getDefaultGeometry()
-                                                        .getCoordinateSystem();
-                    URI schema = type.getNamespace();
+                    SimpleFeatureType type = getFeatureSource(monitor).getSchema();
+                    CoordinateReferenceSystem crs = type.getCRS();
+                    String namespace = type.getName().getNamespaceURI();
                     String name = type.getTypeName();
                     String title = name;
                     String description = name;
                     String[] keywords = new String[] {
-                            ".shp", "Shapefile", name, schema
-                                .toString()
-                            };
+                            ".shp", "Shapefile", name, namespace};
 
                         //calculate bounds
                         ReferencedEnvelope bounds = null;
@@ -129,12 +128,12 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                                 FeatureIterator reader = getFeatureSource( monitor).getFeatures().features();
                                 try{
                                 while( reader.hasNext() ) {
-                                    Feature element = reader.next();
+                                    SimpleFeature element = reader.next();
                                 
                                     if (bounds.isNull()) {
                                         bounds.init((Envelope)element.getBounds());
                                     } else {
-                                        bounds.expandToInclude(element.getBounds());
+                                        bounds.include(element.getBounds());
                                     }
                                 }
                                 }
@@ -146,9 +145,15 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                             //something bad happend, return an i dont know
                             bounds = new ReferencedEnvelope(new Envelope(), crs);
                         }
-
+                        URI uri;
+                        try {
+                            uri = new URI(namespace);
+;
+                        } catch (URISyntaxException e) {
+                            uri = null;
+                        }              
                         info = new DefaultGeoResourceInfo(title, name,
-                                description, schema, bounds, crs, keywords, null);
+                                description, uri, bounds, crs, keywords, null);
                     }
                 }
             }
