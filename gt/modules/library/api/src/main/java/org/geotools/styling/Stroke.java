@@ -17,10 +17,11 @@
 package org.geotools.styling;
 
 import java.awt.Color;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTConstant;
-import org.geotools.feature.Feature;
 import org.geotools.filter.ConstantExpression;
 
 
@@ -91,7 +92,7 @@ public interface Stroke extends GTComponent {
                 return ConstantExpression.BLACK;
             }
 
-            public Color getColor(Feature f) {
+            public Color getColor(SimpleFeature f) {
                 return Color.BLACK;
             }
 
@@ -144,7 +145,7 @@ public interface Stroke extends GTComponent {
                 return ConstantExpression.NULL;
             }
 
-            public Color getColor(Feature f) {
+            public Color getColor(SimpleFeature f) {
                 return Color.BLACK;
             }
 
@@ -206,7 +207,7 @@ public interface Stroke extends GTComponent {
      *
      * @return The color of the stroke as a Color object
      **/
-    Color getColor(Feature f);
+    Color getColor(SimpleFeature f);
 
     /**
      * This parameter gives the solid color that will be used for a stroke.<br>

@@ -16,7 +16,7 @@
 package org.geotools.styling;
 
 import org.geotools.data.DataStore;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -52,11 +52,11 @@ public interface UserLayer extends StyledLayer {
 
     public DataStore getInlineFeatureDatastore();
 
-    public FeatureType getInlineFeatureType();
+    public SimpleFeatureType getInlineFeatureType();
 
     public void setInlineFeatureDatastore(DataStore store);
 
-    public void setInlineFeatureType(FeatureType ft);
+    public void setInlineFeatureType(SimpleFeatureType ft);
 
     public void setRemoteOWS(RemoteOWS service);
 

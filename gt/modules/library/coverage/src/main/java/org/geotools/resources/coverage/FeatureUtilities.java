@@ -22,18 +22,20 @@ import java.util.List;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -98,20 +100,14 @@ public final class FeatureUtilities {
         final CoordinateReferenceSystem sourceCRS =
                 CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
 
-        // create the feature type
-        final GeometricAttributeType geom = new GeometricAttributeType("geom",
-                        Polygon.class, true, 1, 1, null, sourceCRS, null);
-        final AttributeType grid = AttributeTypeFactory.newAttributeType(
-                        "grid", GridCoverage.class);
-
-        final AttributeType[] attTypes = { geom, grid };
-        // Fix the schema name
-        final String typeName = "GridCoverage";
-        final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-                        .newFeatureType(attTypes, typeName);
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName("GridCoverage");
+        ftb.add("geom", Polygon.class, sourceCRS);
+        ftb.add("grid", GridCoverage.class);
+        SimpleFeatureType schema = ftb.buildFeatureType();
 
         // create the feature
-        Feature feature = schema.create(new Object[] { bounds, coverage });
+        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, coverage }, null);
 
         final FeatureCollection collection = FeatureCollections.newCollection();
         collection.add(feature);
@@ -149,22 +145,15 @@ public final class FeatureUtilities {
 				// }
 				final LinearRing ring = gf.createLinearRing(coord);
 				final Polygon bounds = new Polygon(ring, null, gf);
+				
+				SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+		        ftb.setName("GridCoverage");
+		        ftb.add("geom", Polygon.class, sourceCrs);
+		        ftb.add("grid", AbstractGridCoverage2DReader.class);
+		        SimpleFeatureType schema = ftb.buildFeatureType();
 		
-				// create the feature type
-				final GeometricAttributeType geom = new GeometricAttributeType("geom",
-						Polygon.class, true, 1, 1, null, sourceCrs, null);
-				final AttributeType grid = AttributeTypeFactory.newAttributeType(
-						"grid", AbstractGridCoverage2DReader.class);
-		
-				final AttributeType[] attTypes = { geom, grid };
-				// Fix the schema name
-				final String typeName = "GridCoverage";
-				final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-						.newFeatureType(attTypes, typeName);
-		
-				// create the feature
-				Feature feature = schema.create(new Object[] { bounds,
-						gridCoverageReader });
+		        // create the feature
+		        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader }, null);
 		
 				final FeatureCollection collection = FeatureCollections.newCollection();
 				collection.add(feature);
@@ -203,24 +192,17 @@ public final class FeatureUtilities {
 		// }
 		final LinearRing ring = gf.createLinearRing(coord);
 		final Polygon bounds = new Polygon(ring, null, gf);
+		
+		SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName("GridCoverage");
+        ftb.add("geom", Polygon.class, sourceCrs);
+        ftb.add("grid", AbstractGridCoverage2DReader.class);
+        ftb.add("params", GeneralParameterValue[].class);
+        SimpleFeatureType schema = ftb.buildFeatureType();
 
-		// create the feature type
-		final GeometricAttributeType geom = new GeometricAttributeType("geom",
-				Polygon.class, true, 1, 1, null, sourceCrs, null);
-		final AttributeType grid = AttributeTypeFactory.newAttributeType(
-				"grid", AbstractGridCoverage2DReader.class);
-		final AttributeType paramsAttr = AttributeTypeFactory.newAttributeType(
-				"params", GeneralParameterValue[].class);
+        // create the feature
+        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader, params }, null);
 
-		final AttributeType[] attTypes = { geom, grid, paramsAttr };
-		// Fix the schema name
-		final String typeName = "GridCoverage";
-		final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-				.newFeatureType(attTypes, typeName);
-
-		// create the feature
-		Feature feature = schema.create(new Object[] { bounds,
-				gridCoverageReader,params });
 
 		final FeatureCollection collection = FeatureCollections.newCollection();
 		collection.add(feature);

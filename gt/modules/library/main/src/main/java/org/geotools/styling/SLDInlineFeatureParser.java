@@ -20,14 +20,16 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionDOMParser;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -42,7 +44,7 @@ public class SLDInlineFeatureParser
 	private static Hashtable SRSLookup = new Hashtable();
 	
 
-	public FeatureType  featureType=null;
+	public SimpleFeatureType  featureType=null;
 	public MemoryDataStore dataStore = null;
 	Node  rootNode = null;
 	ArrayList features= new ArrayList();
@@ -144,7 +146,7 @@ public class SLDInlineFeatureParser
 			if (child ==null)
 				throw new Exception("SLD inlineFeature Parser - couldnt extract a feature from the dom.");
 			
-			Feature f = parseFeature(child,featureType);
+			SimpleFeature f = parseFeature(child,featureType);
 			features.add(f);
 		}
 	}
@@ -182,10 +184,10 @@ public class SLDInlineFeatureParser
 	 * @param feature - points to the actual feature ie. "<Person>"
 	 * @param featureType
 	 */
-	private Feature parseFeature(Node feature, FeatureType featureType) throws Exception
+	private SimpleFeature parseFeature(Node feature, SimpleFeatureType featureType) throws Exception
 	{
 		Object[] nullAtts = new Object[featureType.getAttributeCount()];  // initialized to nulls
-		Feature f= featureType.create(nullAtts);
+		SimpleFeature f = SimpleFeatureBuilder.build(featureType, nullAtts, null);
 		
 		NodeList children = feature.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) 
@@ -372,7 +374,7 @@ public class SLDInlineFeatureParser
 	 */
 	private void buildStore() 
 	{
-		dataStore = new MemoryDataStore( (Feature[]) features.toArray(new Feature[features.size()]));		
+		dataStore = new MemoryDataStore( (SimpleFeature[]) features.toArray(new SimpleFeature[features.size()]));		
 	}
 
 	/**
@@ -401,7 +403,7 @@ public class SLDInlineFeatureParser
 	 * 
 	 * @param root
 	 */
-	private FeatureType makeFeatureType(Node root,boolean isCollection) throws Exception
+	private SimpleFeatureType makeFeatureType(Node root,boolean isCollection) throws Exception
 	{
 		Node feature = null;
 		//get a Feature node
@@ -447,9 +449,9 @@ public class SLDInlineFeatureParser
 		//DJB:I considered making each featuretype unique (thats the uniquenumber), but decided against
 		//    it so that the standard feature type filtering stuff would work ("<FeatureTypeStyle>" 
 		//    and <FeatureTypeConsraint>
-		  FeatureTypeBuilder build = FeatureTypeFactory.newInstance(featureName);  
+		  SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();  
 		  build.setName(featureName);  
-		  build.setNamespace(new URI("http://temp.inline.feature.sld.com"));  
+		  build.setNamespaceURI(new URI("http://temp.inline.feature.sld.com"));  
 
 		  
 		children = feature.getChildNodes();
@@ -464,21 +466,20 @@ public class SLDInlineFeatureParser
 			{
 				childName = child.getNodeName();
 			}	
-			AttributeType attType = null;
+			AttributeDescriptor attType = null;
 			//okay, have a tag, check to see if its a geometry
 			if (isGeometry(child))
 			{
 			    // force full geometry parsing so that we get to know the declared SRS
 			    getValue(child);
-				attType = AttributeTypeFactory.newAttributeType(childName,Geometry.class, true,  0, null, SRS);
+				build.add(childName, Geometry.class, SRS);
 			}
 			else
 			{
-				attType = AttributeTypeFactory.newAttributeType(childName,String.class);
+				build.add(childName,String.class);
 			}
-			build.addType(attType);	
 		}
-		return build.getFeatureType();
+		return build.buildFeatureType();
 	}
 	
 	

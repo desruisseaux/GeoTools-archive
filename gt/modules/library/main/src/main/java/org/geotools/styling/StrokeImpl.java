@@ -18,6 +18,7 @@ package org.geotools.styling;
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
@@ -394,7 +395,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         return out.toString();
     }
 
-    public java.awt.Color getColor(org.geotools.feature.Feature feature) {
+    public java.awt.Color getColor(SimpleFeature feature) {
         return java.awt.Color.decode((String) this.getColor().evaluate(feature));
     }
 

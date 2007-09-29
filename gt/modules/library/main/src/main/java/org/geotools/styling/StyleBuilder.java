@@ -21,10 +21,10 @@ import java.util.Iterator;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.SimpleFeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsGreaterThan;
@@ -1288,7 +1288,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler
+     * create a SimpleFeature type styler
      *
      * @param symbolizer - the symbolizer to use
      *
@@ -1368,7 +1368,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler see the SLD Spec for more details of scaleDenominators
+     * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
      * @param symbolizer - the symbolizer to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
@@ -1384,7 +1384,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler see the SLD Spec for more details of scaleDenominators
+     * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
      * @param symbolizers - an array of symbolizers to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
@@ -1400,7 +1400,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler
+     * create a SimpleFeature type styler
      *
      * @param featureTypeName - name of the feature type
      * @param symbolizer - the symbolizer to use
@@ -1414,7 +1414,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler
+     * create a SimpleFeature type styler
      *
      * @param featureTypeName - name of the feature type
      * @param symbolizers - an array of symbolizers to use
@@ -1428,7 +1428,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler see the SLD Spec for more details of scaleDenominators
+     * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
      * @param featureTypeName - name of the feature type
      * @param symbolizer - the symbolizer to use
@@ -1450,7 +1450,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler see the SLD Spec for more details of scaleDenominators
+     * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
      * @param featureTypeName - name of the feature type
      * @param symbolizers - an array of symbolizers to use
@@ -1478,7 +1478,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler
+     * create a SimpleFeature type styler
      *
      * @param featureTypeName - name of the feature type
      * @param r - the rule that driver this feature typ style
@@ -1498,7 +1498,7 @@ public class StyleBuilder {
     }
 
     /**
-     * create a Feature type styler see the SLD Spec for more details of scaleDenominators
+     * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
      * @param featureTypeName - name of the feature type
      * @param rules - the rules that make up the FeatureTypeStyle
@@ -1716,7 +1716,7 @@ public class StyleBuilder {
         FeatureCollection fc,
         String name,
         String[] colors,
-        FeatureType schema)
+        SimpleFeatureType schema)
         throws IllegalFilterException {
         //grab attribute col
         PropertyName value = ff.property(name);
@@ -1727,7 +1727,7 @@ public class StyleBuilder {
         int count = 0;
 
         while (it.hasNext()) {
-            Feature f = (Feature) it.next();
+            SimpleFeature f = (SimpleFeature) it.next();
             values[count++] = ((Number) f.getAttribute(name)).doubleValue();
         }
 

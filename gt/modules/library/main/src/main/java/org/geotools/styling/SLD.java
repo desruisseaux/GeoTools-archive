@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTRoot;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
@@ -1437,7 +1437,7 @@ public class SLD {
      * @return Teh FeatureTypeStyle object if it exists, otherwise false.
      */
     public static FeatureTypeStyle featureTypeStyle(Style style,
-        FeatureType type) {
+        SimpleFeatureType type) {
         if (style == null) {
             return null;
         }
@@ -1472,7 +1472,7 @@ public class SLD {
      * @return The first object to match the feature type, otherwise null if no
      *         match.
      */
-    public static Style matchingStyle(Style[] styles, FeatureType schema) {
+    public static Style matchingStyle(Style[] styles, SimpleFeatureType schema) {
         if ((styles == null) || (styles.length == 0)) {
             return null;
         }
@@ -1589,7 +1589,7 @@ SYMBOLIZER:
         return (FeatureTypeStyle[]) fts.toArray(new FeatureTypeStyle[fts.size()]);
     }
     
-    public static FeatureTypeStyle featureTypeStyle(StyledLayerDescriptor sld, FeatureType type) {
+    public static FeatureTypeStyle featureTypeStyle(StyledLayerDescriptor sld, SimpleFeatureType type) {
         //alternatively, we could use a StyleVisitor here
         Style[] styles = styles(sld);
         for (int i = 0; i < styles.length; i++) {

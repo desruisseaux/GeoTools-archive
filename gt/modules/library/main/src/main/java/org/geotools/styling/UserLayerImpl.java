@@ -23,8 +23,8 @@ import java.util.Arrays;
 
 import org.geotools.data.DataStore;
 import org.geotools.event.GTList;
-import org.geotools.feature.FeatureType;
 import org.geotools.resources.Utilities;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * DJB: on inlinefeature support:
@@ -77,7 +77,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
      *  You should ensure that you dont keep references to it around so it can be GCed.
      */
 	private DataStore   inlineFeatureDatastore = null;
-	private FeatureType inlineFeatureType = null;
+	private SimpleFeatureType inlineFeatureType = null;
 	
 	RemoteOWS remoteOWS;
     ArrayList styles = new GTList( this, "styles" );
@@ -92,7 +92,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     {
     	return inlineFeatureDatastore;    
     }
-	public FeatureType getInlineFeatureType()
+	public SimpleFeatureType getInlineFeatureType()
 	{
 		return inlineFeatureType;
 	}
@@ -102,7 +102,7 @@ public class UserLayerImpl extends StyledLayerImpl implements UserLayer
     	inlineFeatureDatastore = store;
     	fireChanged();
     }
-	public void setInlineFeatureType( FeatureType ft)
+	public void setInlineFeatureType(SimpleFeatureType ft)
 	{
 		inlineFeatureType = ft;
 		fireChanged();

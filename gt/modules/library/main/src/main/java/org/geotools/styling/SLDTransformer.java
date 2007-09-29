@@ -19,7 +19,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -584,7 +584,7 @@ public class SLDTransformer extends TransformerBase {
         }
 
         private void visitInlineFeatureType(DataStore dataStore,
-                FeatureType featureType) {
+                SimpleFeatureType featureType) {
             start("InlineFeature");
             try {
                 final String ftName = featureType.getTypeName();
@@ -596,7 +596,7 @@ public class SLDTransformer extends TransformerBase {
                 ftrax.setGmlPrefixing(true);
                 ftrax.setIndentation(2);
                 final CoordinateReferenceSystem crs = featureType
-                        .getDefaultGeometry().getCoordinateSystem();
+                        .getDefaultGeometry().getCRS();
                 String srsName = null;
                 if (crs == null) {
                     LOGGER.warning("Null CRS in feature type named [" + ftName
@@ -641,14 +641,13 @@ public class SLDTransformer extends TransformerBase {
                 final String defaultNS = this.getDefaultNamespace();
                 ftrax.getFeatureTypeNamespaces().declareDefaultNamespace("",
                         defaultNS);
-                final URI nsURI = featureType.getNamespace();
-                if (nsURI == null) {
+                final String ns = featureType.getName().getNamespaceURI();
+                if (ns == null) {
                     LOGGER.info("Null namespace URI in feature type named ["
                             + ftName + "]. Ignore namespace in features");
                 } else {
                     // find the URI's prefix mapping in this namespace support
                     // delegate and use it; otherwise ignore it
-                    final String ns = String.valueOf(nsURI);
                     final String prefix = this.nsSupport.getPrefix(ns);
                     if (prefix != null)
                         ftrax.getFeatureTypeNamespaces().declareNamespace(
