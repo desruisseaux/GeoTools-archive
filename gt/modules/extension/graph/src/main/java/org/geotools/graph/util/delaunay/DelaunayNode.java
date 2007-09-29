@@ -15,7 +15,7 @@
  */
 package org.geotools.graph.util.delaunay;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.graph.structure.line.BasicXYNode;
 
 /**
@@ -24,17 +24,17 @@ import org.geotools.graph.structure.line.BasicXYNode;
  */
 public class DelaunayNode extends BasicXYNode{    
     
-    private Feature feature;
+    private SimpleFeature feature;
     
     /** Creates a new instance of delaunayNode */
     public DelaunayNode() {    
     }
 
-    public void setFeature(Feature f){
+    public void setFeature(SimpleFeature f){
         feature = f;
     }
     
-    public Feature getFeature(){
+    public SimpleFeature getFeature(){
         return feature;
     }
     

@@ -9,10 +9,10 @@ package org.geotools.graph.util.delaunay;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
-import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.basic.BasicGraph;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  *
@@ -34,7 +34,7 @@ public class PoissonClusterer {
         System.out.println("x, y, actual, expected, probability");
         while (nodeIt.hasNext()){
             DelaunayNode next = (DelaunayNode) nodeIt.next();
-            Feature nextFeature = next.getFeature();
+            SimpleFeature nextFeature = next.getFeature();
             
             Object baseObj = base.getValue(nextFeature);
             if (!(baseObj instanceof Number)){
@@ -66,7 +66,7 @@ public class PoissonClusterer {
                         if (neighbor == null){
                             throw new RuntimeException("We have a problem.  " + next + " and " + neighbor + " should be neighbors via " + nextEdge + ", but aren't.");
                         }
-                        Feature neighborFeature = neighbor.getFeature();
+                        SimpleFeature neighborFeature = neighbor.getFeature();
                         newNodes.add(neighbor);
 
                         Object neighborsBaseObj = base.getValue(nextFeature);
@@ -116,7 +116,7 @@ public class PoissonClusterer {
                 Iterator newNodeIt = newNodes.iterator();
                 while (newNodeIt.hasNext()){
                     DelaunayNode nextNode = (DelaunayNode) newNodeIt.next();
-                    Feature nextFeature2 = nextNode.getFeature();
+                    SimpleFeature nextFeature2 = nextNode.getFeature();
                     Object neighborsBaseObj = base.getValue(nextFeature2);
                     if (!(baseObj instanceof Number)){
                         throw new RuntimeException("Expression " + base + " must evaluate to a number on feature " + nextFeature2);

@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.graph.structure.Edge;
@@ -107,8 +107,8 @@ public class AutoClustUtils {
         DelaunayNode[] nodes = new DelaunayNode[size];
         int index = 0;
         while (iter.hasNext()){
-            Feature next = iter.next();
-            Geometry geom = next.getDefaultGeometry();
+            SimpleFeature next = iter.next();
+            Geometry geom = (Geometry) next.getDefaultGeometry();
             Point centroid;
             if (geom instanceof Point){
                 centroid = (Point) geom;

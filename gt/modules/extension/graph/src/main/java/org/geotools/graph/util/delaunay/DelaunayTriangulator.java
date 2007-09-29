@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.graph.structure.Edge;
@@ -36,6 +35,7 @@ import org.geotools.graph.structure.basic.BasicGraph;
 import org.geotools.graph.structure.line.BasicXYNode;
 import org.geotools.graph.structure.line.XYNode;
 import org.geotools.math.Line;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  *
@@ -74,8 +74,8 @@ public class DelaunayTriangulator {
         DelaunayNode[] nodes = new DelaunayNode[size];
         int index = 0;
         while (iter.hasNext()){
-            Feature next = iter.next();
-            Geometry geom = next.getDefaultGeometry();
+            SimpleFeature next = iter.next();
+            Geometry geom = (Geometry) next.getDefaultGeometry();
             Point centroid;
             if (geom instanceof Point){
                 centroid = (Point) geom;
