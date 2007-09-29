@@ -16,9 +16,10 @@
 package org.geotools.filter;
 
 import java.util.Collection;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -43,7 +44,7 @@ public interface FidFilter extends Filter, Id {
      *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 
     /**
      * Adds a feature ID to the filter.

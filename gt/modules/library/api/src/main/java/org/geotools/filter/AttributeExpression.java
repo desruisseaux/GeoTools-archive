@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -55,7 +55,7 @@ public interface AttributeExpression extends Expression, PropertyName {
      *
      * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Feature)()}
      */
-    Object getValue(Feature feature);
+    Object getValue(SimpleFeature feature);
 
     /**
      * Gets the attribute path of this expression.

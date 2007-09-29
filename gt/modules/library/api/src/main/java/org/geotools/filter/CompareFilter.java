@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.BinaryComparisonOperator;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -93,5 +93,5 @@ public interface CompareFilter extends Filter, BinaryComparisonOperator {
      *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 }

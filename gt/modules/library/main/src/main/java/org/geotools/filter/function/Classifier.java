@@ -2,7 +2,6 @@ package org.geotools.filter.function;
 
 import java.util.List;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionImpl;
 import org.geotools.filter.LiteralExpression;

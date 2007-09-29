@@ -15,7 +15,7 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -38,7 +38,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
      *
      * @return True if the feature is filtered, otherwise false.
      */
-    boolean evaluate(Feature feature);
+    boolean evaluate(SimpleFeature feature);
 
     /**
      * Determines whether or not a given feature is 'contained by' this filter.
@@ -81,7 +81,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
      *
      * @deprecated use {@link #evaluate(Feature)}
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 
     /**
      * Implements a logical AND with this filter and returns the merged filter.

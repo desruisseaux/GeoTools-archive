@@ -22,12 +22,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -49,7 +49,7 @@ public class FilterAttributeExtractorTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** Schema on which to preform tests */
-    private static FeatureType testSchema = null;
+    private static SimpleFeatureType testSchema = null;
     private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
     boolean set = false;
     FilterAttributeExtractor fae;
@@ -103,61 +103,21 @@ public class FilterAttributeExtractorTest extends TestCase {
         fae = new FilterAttributeExtractor();
 
         fac = FilterFactoryFinder.createFilterFactory();
-
-        // Create the schema attributes
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
-                LineString.class);
-
-        AttributeType booleanAttribute = AttributeTypeFactory.newAttributeType("testBoolean",
-                Boolean.class);
-
-        AttributeType charAttribute = AttributeTypeFactory.newAttributeType("testCharacter",
-                Character.class);
-        AttributeType byteAttribute = AttributeTypeFactory.newAttributeType("testByte", Byte.class);
-        AttributeType shortAttribute = AttributeTypeFactory.newAttributeType("testShort",
-                Short.class);
-        AttributeType intAttribute = AttributeTypeFactory.newAttributeType("testInteger",
-                Integer.class);
-        AttributeType longAttribute = AttributeTypeFactory.newAttributeType("testLong", Long.class);
-        AttributeType floatAttribute = AttributeTypeFactory.newAttributeType("testFloat",
-                Float.class);
-        AttributeType doubleAttribute = AttributeTypeFactory.newAttributeType("testDouble",
-                Double.class);
-        AttributeType stringAttribute = AttributeTypeFactory.newAttributeType("testString",
-                String.class);
-        AttributeType stringAttribute2 = AttributeTypeFactory.newAttributeType("testString2",
-                String.class);
-
-        // Builds the schema
-        FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance("test");
-        feaTypeFactory.addType(geometryAttribute);
-
-        LOGGER.finest("created feature type and added geometry");
-        feaTypeFactory.addType(booleanAttribute);
-        LOGGER.finest("added boolean to feature type");
-        feaTypeFactory.addType(charAttribute);
-        LOGGER.finest("added character to feature type");
-        feaTypeFactory.addType(byteAttribute);
-        LOGGER.finest("added byte to feature type");
-        feaTypeFactory.addType(shortAttribute);
-
-        //LOGGER.finer("added short to feature type");
-        feaTypeFactory.addType(intAttribute);
-
-        //LOGGER.finer("added int to feature type");
-        feaTypeFactory.addType(longAttribute);
-
-        //LOGGER.finer("added long to feature type");
-        feaTypeFactory.addType(floatAttribute);
-
-        //LOGGER.finer("added float to feature type");
-        feaTypeFactory.addType(doubleAttribute);
-
-        //LOGGER.finer("added double to feature type");
-        feaTypeFactory.addType(stringAttribute);
-        feaTypeFactory.addType(stringAttribute2);
-
-        testSchema = feaTypeFactory.getFeatureType();
+        
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+    	ftb.add("testGeometry", LineString.class);
+    	ftb.add("testBoolean", Boolean.class);
+    	ftb.add("testCharacter", Character.class);
+    	ftb.add("testByte", Byte.class);
+    	ftb.add("testShort", Short.class);
+    	ftb.add("testInteger", Integer.class);
+    	ftb.add("testLong", Long.class);
+    	ftb.add("testFloat", Float.class);
+    	ftb.add("testDouble", Double.class);
+    	ftb.add("testString", String.class);
+    	ftb.add("testZeroDouble", Double.class);
+    	ftb.setName("testSchema");
+        testSchema = ftb.buildFeatureType();
     }
 
     /**

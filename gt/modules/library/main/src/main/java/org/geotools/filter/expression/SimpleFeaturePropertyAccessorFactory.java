@@ -3,9 +3,9 @@ package org.geotools.filter.expression;
 import java.util.regex.Pattern;
 
 import org.geotools.factory.Hints;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -17,8 +17,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * corresponding to the feature id.
  * </p>
  * <p>
- * THe property accessor may be run against {@link org.geotools.feature.Feature}, or 
- * against {@link org.geotools.feature.FeatureType}. In the former case the feature property 
+ * THe property accessor may be run against {@link SimpleFeature}, or 
+ * against {@link SimpleFeature}. In the former case the feature property 
  * value is returned, in the latter the feature property type is returned. 
  * </p>
  * 
@@ -41,7 +41,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
     	if ( xpath == null ) 
     		return null;
     	
-        if (!Feature.class.isAssignableFrom(type) && !FeatureType.class.isAssignableFrom(type))
+        if (!SimpleFeature.class.isAssignableFrom(type) && !SimpleFeatureType.class.isAssignableFrom(type))
             return null; // we only work with simple feature
 
         //if ("".equals(xpath) && target == Geometry.class)
@@ -80,17 +80,17 @@ public class SimpleFeaturePropertyAccessorFactory implements
     }
 
     /**
-     * Access to Feature Identifier.
+     * Access to SimpleFeature Identifier.
      * 
      * @author Jody Garnett, Refractions Research Inc.
      */
     static class FidSimpleFeaturePropertyAccessor implements PropertyAccessor {        
         public boolean canHandle(Object object, String xpath, Class target) {
         	//we only work against feature, not feature type
-            return object instanceof Feature && xpath.matches("@(\\w+:)?id");
+            return object instanceof SimpleFeature && xpath.matches("@(\\w+:)?id");
         }
         public Object get(Object object, String xpath, Class target) {
-            Feature feature = (Feature) object;
+            SimpleFeature feature = (SimpleFeature) object;
             return feature.getID();
         }
 
@@ -108,7 +108,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
 //        	if ( target != Geometry.class ) 
 //        		return false;
         	
-        	if ( !( object instanceof Feature || object instanceof FeatureType ) ) {
+        	if ( !( object instanceof SimpleFeature || object instanceof SimpleFeatureType ) ) {
         		return false;
         	}
         	
@@ -116,11 +116,11 @@ public class SimpleFeaturePropertyAccessorFactory implements
             
         }
         public Object get(Object object, String xpath, Class target) {
-        	if ( object instanceof Feature ) {
-        		return ((Feature) object).getDefaultGeometry();
+        	if ( object instanceof SimpleFeature ) {
+        		return ((SimpleFeature) object).getDefaultGeometry();
         	}
-        	if ( object instanceof FeatureType ) {
-        		return ((FeatureType)object).getDefaultGeometry();
+        	if ( object instanceof SimpleFeatureType ) {
+        		return ((SimpleFeatureType)object).getDefaultGeometry();
         	}
             
         	return null;
@@ -129,10 +129,10 @@ public class SimpleFeaturePropertyAccessorFactory implements
         public void set(Object object, String xpath, Object value, Class target)
                 throws IllegalAttributeException {
             
-        	if ( object instanceof Feature ) {
-        		((Feature) object).setDefaultGeometry( (Geometry) value );
+        	if ( object instanceof SimpleFeature ) {
+        		((SimpleFeature) object).setDefaultGeometry( (Geometry) value );
         	}
-        	if ( object instanceof FeatureType ) {
+        	if ( object instanceof SimpleFeatureType ) {
         		throw new IllegalAttributeException("feature type is immutable");
         	}
         	
@@ -143,12 +143,12 @@ public class SimpleFeaturePropertyAccessorFactory implements
         public boolean canHandle(Object object, String xpath, Class target) {
         	xpath = stripPrefix(xpath);
         	
-        	if ( object instanceof Feature ) {
-        		return ((Feature) object).getAttribute( xpath ) != null;
+        	if ( object instanceof SimpleFeature ) {
+        		return ((SimpleFeature) object).getAttribute( xpath ) != null;
         	}
         	
-        	if ( object instanceof FeatureType ) {
-        		return ((FeatureType) object).getAttributeType( xpath ) != null;
+        	if ( object instanceof SimpleFeatureType ) {
+        		return ((SimpleFeatureType) object).getAttribute( xpath ) != null;
         	}
         	
         	return false;
@@ -157,12 +157,12 @@ public class SimpleFeaturePropertyAccessorFactory implements
         public Object get(Object object, String xpath, Class target) {
         	xpath = stripPrefix(xpath);
         	
-        	if ( object instanceof Feature ) {
-        		return ((Feature) object).getAttribute( xpath );
+        	if ( object instanceof SimpleFeature ) {
+        		return ((SimpleFeature) object).getAttribute( xpath );
         	}
         	
-        	if ( object instanceof FeatureType ) {
-        		return ((FeatureType) object).getAttributeType( xpath );
+        	if ( object instanceof SimpleFeatureType ) {
+        		return ((SimpleFeatureType) object).getAttribute( xpath );
         	}
         	
         	return null;
@@ -172,11 +172,11 @@ public class SimpleFeaturePropertyAccessorFactory implements
                 throws IllegalAttributeException {
         	xpath = stripPrefix(xpath);
         	
-        	if ( object instanceof Feature ) {
-        		((Feature) object).setAttribute( xpath, value );
+        	if ( object instanceof SimpleFeature ) {
+        		((SimpleFeature) object).setAttribute( xpath, value );
         	}
         	
-        	if ( object instanceof FeatureType ) {
+        	if ( object instanceof SimpleFeatureType ) {
         		throw new IllegalAttributeException("feature type is immutable");    
         	}
         	

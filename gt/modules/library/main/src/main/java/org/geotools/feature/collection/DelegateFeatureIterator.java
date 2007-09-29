@@ -18,9 +18,9 @@ package org.geotools.feature.collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * A feature iterator that completely delegates to a normal
@@ -49,9 +49,9 @@ public class DelegateFeatureIterator implements FeatureIterator {
 	public boolean hasNext() {
 		return delegate != null && delegate.hasNext();
 	}
-	public Feature next() throws NoSuchElementException {
+	public SimpleFeature next() throws NoSuchElementException {
 		if( delegate == null ) throw new NoSuchElementException();
-		return (Feature) delegate.next();
+		return (SimpleFeature) delegate.next();
 	}
 	public void close() {
 		if( collection!=null && delegate!=null)

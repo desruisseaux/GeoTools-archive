@@ -15,8 +15,9 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.spatial.DistanceBufferOperator;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -84,7 +85,7 @@ public interface GeometryDistanceFilter extends GeometryFilter, DistanceBufferOp
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      *
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 
     /**
      * Gets the distance allowed by this filter.

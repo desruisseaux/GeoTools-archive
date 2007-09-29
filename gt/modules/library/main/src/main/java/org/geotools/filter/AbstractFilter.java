@@ -17,7 +17,7 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Implements Filter interface, with constants and default behaviors for
@@ -60,7 +60,7 @@ public abstract class AbstractFilter extends FilterAbstract implements Filter {
      * 
      * @deprecated use {@link Filter#evaluate(Feature)}
      */
-    public final boolean contains(Feature feature) {
+    public final boolean contains(SimpleFeature feature) {
     	return evaluate(feature);
     }
     

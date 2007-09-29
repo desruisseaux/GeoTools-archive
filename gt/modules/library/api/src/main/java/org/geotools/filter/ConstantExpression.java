@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.vividsolutions.jts.geom.Geometry;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -28,7 +30,6 @@ import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.NilExpression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -71,11 +72,11 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
     /**
      * @deprecated use {@link #evaluate(Feature)}
      */
-    public final Object getValue(Feature feature) {
+    public final Object getValue(SimpleFeature feature) {
         return evaluate(feature);
     }
 
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
         return getValue();
     }
 

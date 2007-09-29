@@ -23,11 +23,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -65,41 +66,38 @@ public class BetweenTest extends TestCase {
         //but we can start with a set of hard coded tests
         BetweenFilterImpl a = new BetweenFilterImpl();
 
-        AttributeType a1 = AttributeTypeFactory.newAttributeType("value", Integer.class);
-        AttributeType a2 = AttributeTypeFactory.newAttributeType("geometry",
-                Geometry.class);
-        FeatureType schema = FeatureTypeFactory.newFeatureType(new AttributeType[] {
-                    a1, a2
-                }, "testSchema");
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.add("value", Integer.class);
+        ftb.add("geometry", Geometry.class);
+        ftb.setName("testSchema");
+        SimpleFeatureType schema = ftb.buildFeatureType();
 
         a.addLeftValue(new LiteralExpressionImpl(new Double(5)));
         a.addRightValue(new LiteralExpressionImpl(new Double(15)));
         a.addMiddleValue(new AttributeExpressionImpl(schema, "value"));
 
-        LOGGER.fine("a1 official name is " + a1.getLocalName());
-
         //FlatFeatureFactory fFac = new FlatFeatureFactory(schema);
-        LOGGER.fine("geometry is " + schema.getAttributeType("geometry"));
-        LOGGER.fine("value is " + schema.getAttributeType("value"));
+        LOGGER.fine("geometry is " + schema.getAttribute("geometry"));
+        LOGGER.fine("value is " + schema.getAttribute("value"));
         LOGGER.fine("schema has value in it ? "
-            + schema.hasAttributeType("value"));
+            + (schema.getAttribute("value") != null));
 
         GeometryFactory gf = new GeometryFactory(new PrecisionModel());
-        Feature f1 = schema.create(new Object[] {
+        SimpleFeature f1 = SimpleFeatureBuilder.build(schema,new Object[] {
                     new Integer(12), gf.createPoint(new Coordinate(12,12))
-                });
-        Feature f2 = schema.create(new Object[] {
+                }, null);
+        SimpleFeature f2 = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(3), gf.createPoint(new Coordinate(3,3))
-                });
-        Feature f3 = schema.create(new Object[] {
+                }, null);
+        SimpleFeature f3 = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(15), gf.createPoint(new Coordinate(15,15))
-                });
-        Feature f4 = schema.create(new Object[] {
+                }, null);
+        SimpleFeature f4 = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(5), gf.createPoint(new Coordinate(5,5))
-                });
-        Feature f5 = schema.create(new Object[] {
+                }, null);
+        SimpleFeature f5 = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(30), gf.createPoint(new Coordinate(30,30))
-                });
+                }, null);
 
         assertEquals(true, a.contains(f1)); // in between
         assertEquals(false, a.contains(f2)); // too small

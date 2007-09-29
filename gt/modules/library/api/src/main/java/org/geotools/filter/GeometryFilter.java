@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -93,7 +93,7 @@ public interface GeometryFilter extends Filter, BinarySpatialOperator {
      * @return whether the feature meets the conditions of filtering imposed by
      *         this geometry filter.
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 
     /**
      * Retrieves the expression on the right side of the spatial comparison.

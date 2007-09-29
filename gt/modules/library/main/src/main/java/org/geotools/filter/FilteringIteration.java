@@ -20,6 +20,8 @@ import java.util.Iterator;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 
 
 /**
@@ -57,18 +59,18 @@ public class FilteringIteration extends FeatureCollectionIteration {
             this.filter = filter;
         }
 
-        public void endFeature(org.geotools.feature.Feature f) {
+        public void endFeature(SimpleFeature f) {
         }
 
         public void endFeatureCollection(
             org.geotools.feature.FeatureCollection fc) {
         }
 
-        public void handleAttribute(org.geotools.feature.AttributeType type,
+        public void handleAttribute(AttributeDescriptor type,
             Object value) {
         }
 
-        public void handleFeature(org.geotools.feature.Feature f) {
+        public void handleFeature(SimpleFeature f) {
             if (!filter.evaluate(f)) {
                 iterator.remove();
             }

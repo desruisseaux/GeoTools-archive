@@ -18,7 +18,7 @@ package org.geotools.filter;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.And;
 import org.opengis.filter.FilterVisitor;
 
@@ -37,7 +37,7 @@ public class AndImpl extends LogicFilterImpl implements And {
 	}
 	
 	//@Override
-	public boolean evaluate(Feature feature) {        
+	public boolean evaluate(SimpleFeature feature) {        
 		for (Iterator itr = children.iterator(); itr.hasNext();) {
             org.opengis.filter.Filter filter = (org.opengis.filter.Filter)itr.next();
 			if( !filter.evaluate( feature )) {

@@ -19,7 +19,6 @@ package org.geotools.filter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsLike;
 

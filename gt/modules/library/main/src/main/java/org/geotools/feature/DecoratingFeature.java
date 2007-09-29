@@ -12,6 +12,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 
 /**
  * Base class for feature decorators.
@@ -23,11 +25,11 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.5
  * 
  */
-public class DecoratingFeature implements Feature {
+public class DecoratingFeature implements SimpleFeature {
 
-    protected Feature delegate;
+    protected SimpleFeature delegate;
 
-    public DecoratingFeature(Feature delegate) {
+    public DecoratingFeature(SimpleFeature delegate) {
         this.delegate = delegate;
     }
 
@@ -51,15 +53,11 @@ public class DecoratingFeature implements Feature {
         return delegate.getAttributes();
     }
 
-    public Object[] getAttributes(Object[] attributes) {
-        return delegate.getAttributes(attributes);
-    }
-
-    public ReferencedEnvelope getBounds() {
+    public BoundingBox getBounds() {
         return delegate.getBounds();
     }
 
-    public Geometry getDefaultGeometry() {
+    public Object getDefaultGeometry() {
         return delegate.getDefaultGeometry();
     }
 
@@ -71,7 +69,7 @@ public class DecoratingFeature implements Feature {
         return delegate.getDescriptor();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return delegate.getFeatureType();
     }
 
@@ -83,9 +81,6 @@ public class DecoratingFeature implements Feature {
         return delegate.getName();
     }
 
-    public int getNumberOfAttributes() {
-        return delegate.getNumberOfAttributes();
-    }
 
     public Collection<Property> getProperties(Name arg0) {
         return delegate.getProperties(arg0);

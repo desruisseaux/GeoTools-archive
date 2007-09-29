@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.expression.AddImpl;
 import org.geotools.filter.expression.DivideImpl;
 import org.geotools.filter.expression.MultiplyImpl;
@@ -45,6 +43,8 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
@@ -490,7 +490,7 @@ public class FilterFactoryImpl implements FilterFactory {
      *
      * @return The new Attribute Expression.
      */
-    public AttributeExpression createAttributeExpression(FeatureType schema) {
+    public AttributeExpression createAttributeExpression(SimpleFeatureType schema) {
         return new AttributeExpressionImpl(schema);
     }
 
@@ -504,11 +504,11 @@ public class FilterFactoryImpl implements FilterFactory {
      *
      * @throws IllegalFilterException if there were creation problems.
      */
-    public AttributeExpression createAttributeExpression(FeatureType schema,
+    public AttributeExpression createAttributeExpression(SimpleFeatureType schema,
             String path) throws IllegalFilterException {
             return new AttributeExpressionImpl(schema, path);
         }
-    public AttributeExpression createAttributeExpression(AttributeType at) throws IllegalFilterException {
+    public AttributeExpression createAttributeExpression(AttributeDescriptor at) throws IllegalFilterException {
             return new AttributeExpressionImpl2(at);
         }
 

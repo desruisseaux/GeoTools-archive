@@ -16,6 +16,9 @@
 package org.geotools.filter;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
@@ -29,8 +32,6 @@ import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.geotools.factory.Factory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 
 
 /**
@@ -181,7 +182,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @deprecated use createAttributeExpression( xpath ), will be removed for
      *             GeoTools 2.3
      */
-    public AttributeExpression createAttributeExpression(FeatureType schema, String xpath)
+    public AttributeExpression createAttributeExpression(SimpleFeatureType schema, String xpath)
         throws IllegalFilterException;
 
     /**
@@ -196,7 +197,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @deprecated use createAttributeExpression( at ), will be removed for
      *             GeoTools 2.3
      */
-    public AttributeExpression createAttributeExpression(AttributeType at)
+    public AttributeExpression createAttributeExpression(AttributeDescriptor at)
         throws IllegalFilterException;
 
     /**
@@ -263,7 +264,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @return The new Attribute Expression.
      * @deprecated use {@link #createAttributeExpression(String)} instead.
      */
-    public AttributeExpression createAttributeExpression(FeatureType schema);
+    public AttributeExpression createAttributeExpression(SimpleFeatureType schema);
 
     /**
      * Creates a Math Expression of the given type.

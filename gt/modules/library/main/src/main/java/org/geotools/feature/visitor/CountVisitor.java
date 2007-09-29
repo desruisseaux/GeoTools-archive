@@ -15,9 +15,9 @@
  */
 package org.geotools.feature.visitor;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.SumVisitor.SumResult;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -34,7 +34,7 @@ public class CountVisitor implements FeatureCalc {
     public void init(FeatureCollection collection) {
     	//do nothing
     }
-    public void visit(Feature feature) {
+    public void visit(SimpleFeature feature) {
         visit((org.opengis.feature.Feature)feature);
     }
     

@@ -23,7 +23,6 @@ import java.util.Stack;
 import java.util.logging.Logger;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
@@ -39,6 +38,7 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.ExcludeFilter;
@@ -159,7 +159,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
          * The given filterCapabilities that we're splitting on.
          */
 	    private FilterCapabilities fcs = null;
-	    private FeatureType parent = null;
+	    private SimpleFeatureType parent = null;
 		private Filter original = null;
         
         /**
@@ -181,7 +181,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Expr
 	     * @param transactionAccessor If the transaction is handled on the client and not the server then different filters
 	     * must be sent to the server.  This class provides a generic way of obtaining the information from the transaction.
 	     */
-	    public PostPreProcessFilterSplittingVisitor(FilterCapabilities fcs, FeatureType parent, ClientTransactionAccessor transactionAccessor) {
+	    public PostPreProcessFilterSplittingVisitor(FilterCapabilities fcs, SimpleFeatureType parent, ClientTransactionAccessor transactionAccessor) {
 	        this.fcs = fcs;
 	        this.parent = parent;
 	        this.transactionAccessor = transactionAccessor;

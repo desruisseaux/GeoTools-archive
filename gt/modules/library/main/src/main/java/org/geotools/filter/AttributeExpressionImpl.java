@@ -19,12 +19,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.factory.Hints;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
 import org.geotools.filter.expression.PropertyAccessors;
 import org.geotools.filter.expression.Value;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 
@@ -46,7 +46,7 @@ public class AttributeExpressionImpl extends DefaultExpression
     protected String attPath;
 
     /** Holds all sub filters of this filter. */
-    protected FeatureType schema = null;
+    protected SimpleFeatureType schema = null;
     
     /** Holds hints for the property accessor factory */
     private Hints hints;
@@ -56,7 +56,7 @@ public class AttributeExpressionImpl extends DefaultExpression
      *
      * @param schema The schema for this attribute.
      */
-    protected AttributeExpressionImpl(FeatureType schema) {
+    protected AttributeExpressionImpl(SimpleFeatureType schema) {
         this.schema = schema;
         this.expressionType = ATTRIBUTE;
     }
@@ -94,7 +94,7 @@ public class AttributeExpressionImpl extends DefaultExpression
      * @throws IllegalFilterException If the attribute path is not in the
      *         schema.
      */
-    protected AttributeExpressionImpl(FeatureType schema, String attPath)
+    protected AttributeExpressionImpl(SimpleFeatureType schema, String attPath)
         throws IllegalFilterException {
         this.schema = schema;
         this.expressionType = ATTRIBUTE;
@@ -139,7 +139,7 @@ public class AttributeExpressionImpl extends DefaultExpression
 	       LOGGER.finest("schema: " + schema + "\n\nattribute: " + attPath);
 
        if (schema != null) {
-           if (schema.hasAttributeType(attPath)) {
+           if (schema.getAttribute(attPath) != null) {
                this.attPath = attPath;
            } else {
         	   
@@ -158,7 +158,7 @@ public class AttributeExpressionImpl extends DefaultExpression
       *
       * @param feature Feature from which to extract attribute value.
       */
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
     	PropertyAccessor accessor =
     		PropertyAccessors.findPropertyAccessor( feature, attPath, null, null );
     	if ( accessor == null ) {

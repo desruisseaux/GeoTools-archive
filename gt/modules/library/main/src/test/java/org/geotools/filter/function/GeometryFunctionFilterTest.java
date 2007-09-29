@@ -1,9 +1,9 @@
 package org.geotools.filter.function;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpression;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public class GeometryFunctionFilterTest extends FunctionTestSupport {
@@ -17,7 +17,7 @@ public class GeometryFunctionFilterTest extends FunctionTestSupport {
         exp.setArgs(new Expression[]{ fac.createAttributeExpression("geom") });
         FeatureIterator iter=featureCollection.features();
         while( iter.hasNext() ){
-            Feature feature = iter.next();
+            SimpleFeature feature = iter.next();
             assertEquals( "Point", exp.getValue(feature) );
         }
         
@@ -29,7 +29,7 @@ public class GeometryFunctionFilterTest extends FunctionTestSupport {
         exp.setArgs(new Expression[]{ fac.createAttributeExpression("geom") });
         FeatureIterator iter=featureCollection.features();
         while( iter.hasNext() ){
-            Feature feature = iter.next();
+        	SimpleFeature feature = iter.next();
             feature.setAttribute("geom",null);
             assertNull( exp.getValue(feature) );
         }

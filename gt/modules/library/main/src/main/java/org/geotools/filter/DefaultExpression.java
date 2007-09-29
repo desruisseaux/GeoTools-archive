@@ -15,9 +15,9 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.expression.ExpressionAbstract;
 import org.geotools.filter.expression.FilterVisitorExpressionWrapper;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -54,7 +54,7 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      * 
      * @deprecated use {@link #evaluate(Feature)}.
      */
-    public final Object getValue(Feature feature) {
+    public final Object getValue(SimpleFeature feature) {
         return evaluate((Object)feature);
     }
     
@@ -70,7 +70,7 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      *
      * @task REVISIT: make abstract?
      */
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
     	return evaluate((Object)feature);
     }
     

@@ -21,13 +21,14 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.feature.Feature;
 import junit.framework.TestCase;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory2;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -44,8 +45,8 @@ public class FunctionTestSupport extends TestCase {
     protected FilterFactory fac = FilterFactoryFinder.createFilterFactory();
     protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
     protected ExpressionBuilder builder = new ExpressionBuilder();
-    protected FeatureType dataType;
-    protected Feature[] testFeatures;
+    protected SimpleFeatureType dataType;
+    protected SimpleFeature[] testFeatures;
     
     /** Creates a new instance of FunctionTestSupport */
     public FunctionTestSupport(String testName) {
@@ -60,11 +61,11 @@ public class FunctionTestSupport extends TestCase {
         int iVal[] = new int[]{4,90,20,43,29,61,8,12};
         double dVal[] = new double[]{2.5,80.433,24.5,9.75,18,53,43.2,16};
         
-        testFeatures = new Feature[iVal.length];
+        testFeatures = new SimpleFeature[iVal.length];
         GeometryFactory fac=new GeometryFactory();
         
         for(int i=0; i< iVal.length; i++){
-            testFeatures[i] = dataType.create( new Object[] {
+            testFeatures[i] = SimpleFeatureBuilder.build(dataType, new Object[] {
                         new Integer(i+1),
                         new Integer(iVal[i]),
                         new Double(dVal[i]),

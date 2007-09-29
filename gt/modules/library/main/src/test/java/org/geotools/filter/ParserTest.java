@@ -23,10 +23,11 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.geotools.test.TestData;
@@ -88,11 +89,10 @@ public class ParserTest extends FilterTestSupport {
     public void setUp() throws SchemaException, IllegalAttributeException {
         super.setUp();
 
-        FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.createTemplate(testSchema);
-        AttributeType doubleAttribute2 = attFactory.newAttributeType("testZeroDouble",
-                Double.class);
-        feaTypeFactory.addType(doubleAttribute2);
-        testSchema = feaTypeFactory.getFeatureType();
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.init(testSchema);
+        ftb.add("testZeroDouble", Double.class);
+        testSchema = ftb.buildFeatureType();
 
         GeometryFactory geomFac = new GeometryFactory();
 
@@ -117,7 +117,7 @@ public class ParserTest extends FilterTestSupport {
         attributes[10] = new Double(0.0);
 
         // Creates the feature itself
-        testFeature = testSchema.create(attributes);
+        testFeature = SimpleFeatureBuilder.build(testSchema, attributes, null);
     }
 
     public void test1() throws Exception {

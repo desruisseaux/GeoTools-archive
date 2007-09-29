@@ -15,7 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Not;

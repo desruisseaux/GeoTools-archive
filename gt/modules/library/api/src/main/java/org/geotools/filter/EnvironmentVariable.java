@@ -15,7 +15,7 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -35,5 +35,5 @@ public interface EnvironmentVariable extends Expression {
      *
      * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Object)}
      */
-    Object getValue(Feature feature);
+    Object getValue(SimpleFeature feature);
 }

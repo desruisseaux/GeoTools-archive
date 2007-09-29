@@ -15,9 +15,9 @@
  */
 package org.geotools.filter.spatial;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilterImpl;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Within;
@@ -35,7 +35,7 @@ public class WithinImpl extends GeometryFilterImpl implements Within {
 	}
 	
 	public boolean evaluate(Object feature) {
-		if (feature instanceof Feature && !validate((Feature)feature))
+		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

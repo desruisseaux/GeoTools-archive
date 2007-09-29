@@ -16,10 +16,10 @@
 package org.geotools.feature.visitor;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -44,16 +44,16 @@ public class MaxVisitor implements FeatureCalc {
         expr = factory.property(attributeTypeName);
     }
     
-    public MaxVisitor(int attributeTypeIndex, FeatureType type)
+    public MaxVisitor(int attributeTypeIndex, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attributeTypeIndex).getLocalName());
+        expr = factory.property(type.getAttribute(attributeTypeIndex).getLocalName());
     }
 
-    public MaxVisitor(String attrName, FeatureType type)
+    public MaxVisitor(String attrName, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attrName).getLocalName());
+        expr = factory.property(type.getAttribute(attrName).getLocalName());
     }
 
     public MaxVisitor(Expression expr) throws IllegalFilterException {
@@ -69,7 +69,7 @@ public class MaxVisitor implements FeatureCalc {
      *
      * @param feature the feature to be visited
      */
-    public void visit(Feature feature) {
+    public void visit(SimpleFeature feature) {
         visit((org.opengis.feature.Feature)feature);
     }
     public void visit(org.opengis.feature.Feature feature) {

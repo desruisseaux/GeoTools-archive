@@ -17,7 +17,9 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -181,8 +183,8 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
 
              //LOGGER.finer("leftGeom = " + o.toString()); 
              return (Geometry) obj;
-         } else if (feature instanceof Feature) {
-             return ((Feature)feature).getDefaultGeometry();
+         } else if (feature instanceof SimpleFeature) {
+             return (Geometry) ((SimpleFeature)feature).getDefaultGeometry();
          }
     	 return null;
     }
@@ -196,8 +198,8 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     	
     	 if (rightGeometry != null) {
              return (Geometry) rightGeometry.evaluate(feature,Geometry.class);
-         } else if(feature instanceof Feature){
-             return ((Feature)feature).getDefaultGeometry();
+         } else if(feature instanceof SimpleFeature){
+             return (Geometry) ((SimpleFeature)feature).getDefaultGeometry();
          }
     	 return null;
     }
@@ -205,7 +207,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     /**
      * Subclass convenience method for validating the internals of the 
      */
-    protected boolean validate(Feature feature) {
+    protected boolean validate(SimpleFeature feature) {
     	
     	// Checks for error condition
         Geometry right = getRightGeometry(feature);
@@ -226,7 +228,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
      *
      * @return Flag confirming whether or not this feature is inside filter.
      */
-    public boolean evaluate(Feature feature) {
+    public boolean evaluate(SimpleFeature feature) {
 	    return evaluate((Object)feature);
 	}
 

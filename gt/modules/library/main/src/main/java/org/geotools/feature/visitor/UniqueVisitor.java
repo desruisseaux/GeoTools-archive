@@ -21,10 +21,11 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.SimpleFeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -46,16 +47,16 @@ public class UniqueVisitor implements FeatureCalc {
         expr = factory.property(attributeTypeName);
     }
 
-    public UniqueVisitor(int attributeTypeIndex, FeatureType type)
+    public UniqueVisitor(int attributeTypeIndex, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attributeTypeIndex).getLocalName());
+        expr = factory.property(type.getAttribute(attributeTypeIndex).getLocalName());
     }
 
-    public UniqueVisitor(String attrName, FeatureType type)
+    public UniqueVisitor(String attrName, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        expr = factory.property(type.getAttributeType(attrName).getLocalName());
+        expr = factory.property(type.getAttribute(attrName).getLocalName());
     }
 
     public UniqueVisitor(Expression expr) {
@@ -66,10 +67,10 @@ public class UniqueVisitor implements FeatureCalc {
     	//do nothing
     }
     
-    public void visit(Feature feature) {
-        visit((org.opengis.feature.Feature)feature);
+    public void visit(SimpleFeature feature) {
+        visit(feature);
     }
-    public void visit(org.opengis.feature.Feature feature) {
+    public void visit(Feature feature) {
         //we ignore null attributes
         Object value = expr.evaluate(feature);
         if (value != null) {

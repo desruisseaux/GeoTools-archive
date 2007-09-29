@@ -15,12 +15,12 @@
  */
 package org.geotools.filter.function;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
@@ -122,7 +122,7 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
         Classifier split = (Classifier) value;
         Function classify = ff.function("classify", ff.property("foo"), ff.literal(split));
         
-        Feature victim = testFeatures[2]; //foo = 20
+        SimpleFeature victim = testFeatures[2]; //foo = 20
         assertEquals("Feature was placed in wrong bin", new Integer(2), classify.evaluate(victim));
     }
 }

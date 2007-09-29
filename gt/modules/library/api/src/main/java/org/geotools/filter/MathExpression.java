@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.BinaryExpression;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -47,7 +47,7 @@ public interface MathExpression extends Expression, BinaryExpression {
      * @deprecated use {@link Expression#evaluate(Feature)}.
      *
      */
-    Object getValue(Feature feature);
+    Object getValue(SimpleFeature feature);
 
     /**
      * Adds the 'right' value to this expression.

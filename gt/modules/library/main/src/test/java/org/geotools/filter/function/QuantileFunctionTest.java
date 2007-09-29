@@ -20,9 +20,8 @@ import java.util.List;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
@@ -30,6 +29,8 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.parser.ParseException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * 
@@ -113,7 +114,7 @@ public class QuantileFunctionTest extends FunctionTestSupport {
     	QuantileFunction qf = (QuantileFunction) func;
  
     	//create a feature collection
-    	FeatureType ft = DataUtilities.createType("classification.nullnan",
+    	SimpleFeatureType ft = DataUtilities.createType("classification.nullnan",
         "id:0,foo:int,bar:double");
     	Integer iVal[] = new Integer[] {
     			new Integer(0),
@@ -136,10 +137,10 @@ public class QuantileFunctionTest extends FunctionTestSupport {
     			new Double(50.01),
     			null};
 
-    	Feature[] testFeatures = new Feature[iVal.length];
+    	SimpleFeature[] testFeatures = new SimpleFeature[iVal.length];
 
     	for(int i=0; i< iVal.length; i++){
-    		testFeatures[i] = ft.create(new Object[] {
+    		testFeatures[i] = SimpleFeatureBuilder.build(ft, new Object[] {
     				new Integer(i+1),
     				iVal[i],
     				dVal[i],

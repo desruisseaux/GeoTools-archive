@@ -1301,7 +1301,7 @@ public class DataUtilities {
         String typeName = (split == -1) ? identification
                                         : identification.substring(split + 1);
 
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName( typeName );
         tb.setNamespaceURI(namespace);
         

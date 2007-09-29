@@ -19,8 +19,8 @@ package org.geotools.filter;
 // Java Topology Suite dependencies
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureType;
 import org.geotools.gml.GMLHandlerJTS;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
@@ -58,7 +58,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
     private FilterHandler parent;
 
     /** The FeatureType to create attribute expressions against. */
-    private FeatureType schema;
+    private SimpleFeatureType schema;
 
     /** Whether we are currently processing a logic filter. */
     private boolean isLogicFilter = false;
@@ -87,7 +87,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
      * @param parent The parent of this filter, to recieve the filters created.
      * @param schema The schema that the filter will be used against.
      */
-    public FilterFilter(FilterHandler parent, FeatureType schema) {
+    public FilterFilter(FilterHandler parent, SimpleFeatureType schema) {
         super();
         this.parent = parent;
         this.schema = schema;
@@ -103,7 +103,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
      * @param parent The parent of this filter, to recieve the filters created.
      * @param schema The schema that the filter will be used against.
      */
-    public FilterFilter(FilterHandler parent, FeatureType schema,boolean convertLiteralToNumber ) {
+    public FilterFilter(FilterHandler parent, SimpleFeatureType schema,boolean convertLiteralToNumber ) {
         this(parent,schema);
         this.convertLiteralToNumber = convertLiteralToNumber;
        

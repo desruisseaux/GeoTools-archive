@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.PropertyIsLike;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -135,5 +135,5 @@ public interface LikeFilter extends Filter, PropertyIsLike {
      * @task REVISIT: could the pattern be null such that a null = null?
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 }

@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 
 
@@ -169,7 +169,7 @@ public abstract class CompareFilterImpl extends BinaryComparisonAbstract
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean evaluate(Feature feature){
+    public boolean evaluate(SimpleFeature feature){
     	return evaluate((Object)feature);
     }
   

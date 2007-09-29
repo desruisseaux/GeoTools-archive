@@ -15,9 +15,9 @@
  */
 package org.geotools.filter.spatial;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.CartesianDistanceFilter;
 import org.geotools.filter.FilterFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Beyond;
@@ -33,7 +33,7 @@ public class BeyondImpl extends CartesianDistanceFilter implements Beyond {
 		this.filterType = GEOMETRY_BEYOND;
 	}
 	
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(SimpleFeature feature) {
 		if (!validate(feature))
 			return false;
 		return evaluate((Object)feature);

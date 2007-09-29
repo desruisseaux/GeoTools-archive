@@ -15,17 +15,19 @@
  */
 package org.geotools.feature.visitor;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 
 /**
  * Determines the standard deviation. 
  *
+ * <pre>
  *            ----------------------------
  *            |  1   ---
  * Std dev =  | ___  \   ( x - mean ) ^ 2
  *           \|  N   /__
+ * </pre>
  *           
  * aka std dev = sqrt((sum((x-mean)^2))/N) where N is the number of samples
  * 
@@ -62,7 +64,7 @@ public class StandardDeviationVisitor implements FeatureCalc {
 		};
 	}
 
-	public void visit(Feature feature) {
+	public void visit(SimpleFeature feature) {
         visit((org.opengis.feature.Feature)feature);
     }
     public void visit(org.opengis.feature.Feature feature) {

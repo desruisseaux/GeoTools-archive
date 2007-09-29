@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -342,7 +342,7 @@ public final class ExpressionDOMParser {
             	String value = child.getFirstChild().getNodeValue();
             	value = value != null ? value.trim() : value;
                 AttributeExpression attribute = ff
-                    .createAttributeExpression((FeatureType) null, value);
+                    .createAttributeExpression((SimpleFeatureType) null, value);
 
                 //                attribute.setAttributePath(child.getFirstChild().getNodeValue());
                 return attribute;

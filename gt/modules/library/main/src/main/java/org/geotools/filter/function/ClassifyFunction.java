@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.function;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.opengis.filter.expression.Literal;

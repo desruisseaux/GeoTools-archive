@@ -2,34 +2,35 @@ package org.geotools.filter.expression;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class SimpleFeaturePropertyAccessorTest extends TestCase {
 
-	FeatureType type;
-	Feature feature;
+	SimpleFeatureType type;
+	SimpleFeature feature;
 	PropertyAccessor accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	
 	protected void setUp() throws Exception {
-		DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		
 		typeBuilder.setName( "test" );
 		typeBuilder.setNamespaceURI( "http://www.geotools.org/test" );
 		typeBuilder.add( "foo", Integer.class );
 		typeBuilder.add( "bar", Double.class );
 		
-		type = (FeatureType) typeBuilder.buildFeatureType();
+		type = (SimpleFeatureType) typeBuilder.buildFeatureType();
 		
-		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
 		builder.setType( type );
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 
-		feature = (Feature) builder.buildFeature( "fid" );
+		feature = (SimpleFeature) builder.buildFeature( "fid" );
 		accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	}
 	
@@ -58,8 +59,8 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 	}
 	
 	public void testGetType() {
-		assertEquals( type.getAttributeType( "foo" ), accessor.get( type, "foo", null ) );
-		assertEquals( type.getAttributeType( "bar" ), accessor.get( type, "bar", null ) );
+		assertEquals( type.getAttribute( "foo" ), accessor.get( type, "foo", null ) );
+		assertEquals( type.getAttribute( "bar" ), accessor.get( type, "bar", null ) );
 		assertNull( accessor.get( type, "illegal", null ) );
 	}
 	

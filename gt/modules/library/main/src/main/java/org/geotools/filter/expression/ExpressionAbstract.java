@@ -15,7 +15,7 @@
  */
 package org.geotools.filter.expression;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
 //
@@ -72,7 +72,7 @@ public abstract class ExpressionAbstract implements Expression {
      * @param feature
      * @return value or null
      */
-    protected Object eval( Expression expression, Feature feature ){
+    protected Object eval( Expression expression, SimpleFeature feature ){
         if( expression == null || feature == null ) return null;
         return expression.evaluate( feature );
     }
@@ -85,7 +85,7 @@ public abstract class ExpressionAbstract implements Expression {
      * @return value or null
      */
     protected Object eval(org.geotools.filter.Expression expression,
-            Feature feature) {
+    		SimpleFeature feature) {
         if (expression == null || feature == null)
             return null;
         return expression.evaluate(feature);

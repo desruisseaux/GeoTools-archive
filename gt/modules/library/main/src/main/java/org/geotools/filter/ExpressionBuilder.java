@@ -24,7 +24,6 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.parser.ExpressionException;
 import org.geotools.filter.parser.ExpressionParser;
 import org.geotools.filter.parser.ExpressionParserTreeConstants;
@@ -32,6 +31,7 @@ import org.geotools.filter.parser.Node;
 import org.geotools.filter.parser.ParseException;
 import org.geotools.filter.parser.Token;
 import org.geotools.filter.parser.TokenMgrError;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
 import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsBetween;
@@ -78,14 +78,14 @@ public class ExpressionBuilder {
      * @param input
      * @throws ParseException
      */
-    public static Object parse(FeatureType schema, String input) throws ParseException {
+    public static Object parse(SimpleFeatureType schema, String input) throws ParseException {
     	ExpressionBuilder builder = new ExpressionBuilder();
     	return builder.parser( schema, input );
     }
     /**
      * Parse the input string into either a Filter or an Expression.
      */
-    public Object parser(FeatureType schema, String input) throws ParseException {
+    public Object parser(SimpleFeatureType schema, String input) throws ParseException {
         ExpressionCompiler c = new ExpressionCompiler( schema,input);
         try {
             c.CompilationUnit();
@@ -141,9 +141,9 @@ public class ExpressionBuilder {
     	Stack stack = new Stack();
         ExpressionException exception = null;
         String input;
-        FeatureType schema;
+        SimpleFeatureType schema;
         WKTReader reader;
-        ExpressionCompiler(FeatureType schema, String input) {
+        ExpressionCompiler(SimpleFeatureType schema, String input) {
             super(new StringReader(input));
             this.input = input;
             this.schema = schema;
@@ -307,7 +307,7 @@ public class ExpressionBuilder {
                     try {
                         String attName = token();
                         if(schema != null){
-                            if(null == schema.getAttributeType(attName)){
+                            if(null == schema.getAttribute(attName)){
                                 throw new IllegalArgumentException(attName + " not found in schema");
                             }
                         }

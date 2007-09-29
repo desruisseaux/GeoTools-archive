@@ -17,7 +17,6 @@
  */
 package org.geotools.filter.function;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.MinVisitor;

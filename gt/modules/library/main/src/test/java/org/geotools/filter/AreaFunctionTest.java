@@ -10,7 +10,7 @@
  *    version 2.1 of the License, or (at your option) any later version.
  *
  *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    but WITHOUT AXNY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
@@ -22,13 +22,14 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -51,10 +52,10 @@ public class AreaFunctionTest extends TestCase {
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
     /** Feature on which to preform tests */
-    private static Feature testFeature = null;
+    private static SimpleFeature testFeature = null;
 
     /** Schema on which to preform tests */
-    private static FeatureType testSchema = null;
+    private static SimpleFeatureType testSchema = null;
     boolean setup = false;
     /** Test suite for this test case */
     TestSuite suite = null;
@@ -109,39 +110,23 @@ public class AreaFunctionTest extends TestCase {
         // Create the schema attributes
         LOGGER.finer("creating flat feature...");
 
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
-                Polygon.class);
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.add("testGeometry", Polygon.class);
         LOGGER.finer("created geometry attribute");
 
-        AttributeType booleanAttribute = AttributeTypeFactory.newAttributeType("testBoolean",
-                Boolean.class);
+        ftb.add("testBoolean", Boolean.class);
         LOGGER.finer("created boolean attribute");
 
-        AttributeType charAttribute = AttributeTypeFactory.newAttributeType("testCharacter",
-                Character.class);
-        AttributeType byteAttribute = AttributeTypeFactory.newAttributeType("testByte",
-                Byte.class);
-        AttributeType shortAttribute = AttributeTypeFactory.newAttributeType("testShort",
-                Short.class);
-        AttributeType intAttribute = AttributeTypeFactory.newAttributeType("testInteger",
-                Integer.class);
-        AttributeType longAttribute = AttributeTypeFactory.newAttributeType("testLong",
-                Long.class);
-        AttributeType floatAttribute = AttributeTypeFactory.newAttributeType("testFloat",
-                Float.class);
-        AttributeType doubleAttribute = AttributeTypeFactory.newAttributeType("testDouble",
-                Double.class);
-        AttributeType stringAttribute = AttributeTypeFactory.newAttributeType("testString",
-                String.class);
-
-        AttributeType[] types = {
-            geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
-            shortAttribute, intAttribute, longAttribute, floatAttribute,
-            doubleAttribute, stringAttribute
-        };
-
-        // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types,"testSchema");
+        ftb.add("testCharacter", Character.class);
+        ftb.add("testByte", Byte.class);
+        ftb.add("testShort", Short.class);
+        ftb.add("testInteger", Integer.class);
+        ftb.add("testLong", Long.class);
+        ftb.add("testFloat", Float.class);
+        ftb.add("testDouble", Double.class);
+        ftb.add("testString", String.class);
+        ftb.setName("testSchema");
+        testSchema = ftb.buildFeatureType();
 
         // Creates coordinates for the linestring
         Coordinate[] coords = new Coordinate[5];
@@ -167,7 +152,7 @@ public class AreaFunctionTest extends TestCase {
         attributes[9] = "test string data";
 
         // Creates the feature itself
-        testFeature = testSchema.create(attributes);
+        testFeature = SimpleFeatureBuilder.build(testSchema, attributes, null);
         LOGGER.finer("...flat feature created");
 
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);

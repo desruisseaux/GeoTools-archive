@@ -1,6 +1,5 @@
 package org.geotools.filter.identity;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.identity.GmlObjectId;
 
 /**

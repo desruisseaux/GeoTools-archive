@@ -15,9 +15,11 @@
  */
 package org.geotools.filter.spatial;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilterImpl;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Crosses;
@@ -35,7 +37,7 @@ public class CrossesImpl extends GeometryFilterImpl implements Crosses {
 	}
 	
 	public boolean evaluate(Object feature) {
-		if (feature instanceof Feature && !validate((Feature)feature))
+		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

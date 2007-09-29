@@ -15,7 +15,9 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+
+
 
 
 /**
@@ -47,7 +49,7 @@ public interface Expression extends ExpressionType, org.opengis.filter.expressio
      *
      * @return The result.
      */
-    Object evaluate(Feature feature);
+    Object evaluate(SimpleFeature feature);
 
     /**
      * Returns a value for this expression.  The feature argument is used if a
@@ -63,7 +65,7 @@ public interface Expression extends ExpressionType, org.opengis.filter.expressio
      *
      * @deprecated use {@link org.opengis.filter.expression.Expression#evaluate(Feature)}
      */
-    Object getValue(Feature feature);
+    Object getValue(SimpleFeature feature);
 
     /**
      * Used by FilterVisitors to perform some action on this filter instance.

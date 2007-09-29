@@ -17,7 +17,7 @@ package org.geotools.filter;
 
 import java.math.BigInteger;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -200,7 +200,7 @@ public class LiteralExpressionImpl extends DefaultExpression
      *
      * @throws IllegalArgumentException Feature does not match declared schema.
      */
-    public Object evaluate(Feature feature)
+    public Object evaluate(SimpleFeature feature)
     	throws IllegalArgumentException {
     	return evaluate((Object)feature);
     }

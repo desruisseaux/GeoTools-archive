@@ -17,9 +17,8 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 
@@ -41,14 +40,14 @@ public class AttributeExpressionImpl2 extends DefaultExpression
     protected String attPath;
 
     /** Holds all sub filters of this filter. */
-    protected AttributeType at = null;
+    protected AttributeDescriptor at = null;
 
     /**
      * Constructor with the schema for this attribute.
      *
-     * @param at the AttributeType schema for this attribute.
+     * @param at the AttributeDescriptor schema for this attribute.
      */
-    protected AttributeExpressionImpl2(AttributeType at) {
+    protected AttributeExpressionImpl2(AttributeDescriptor at) {
         this.at = at;
         this.expressionType = ATTRIBUTE;
     }
@@ -102,14 +101,14 @@ public class AttributeExpressionImpl2 extends DefaultExpression
       *
       * @param feature Feature from which to extract attribute value.
       */
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
     	return feature.getAttribute(attPath);
     }
     
     /* shouldn't this class dissapear as AttributeExpressionImpl does the job pretty well now?*/
 	public Object evaluate(Object object) {
-		if(object instanceof Feature){
-			return evaluate((Feature)object);
+		if(object instanceof SimpleFeature){
+			return evaluate((SimpleFeature)object);
 		}
 		return null;//just to respect old behavoir
 	}

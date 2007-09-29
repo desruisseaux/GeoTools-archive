@@ -112,5 +112,10 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	public int getAttributeCount() {
 		return properties.size();
 	}
+
+
+	public String getTypeName() {
+		return getName().getLocalPart();
+	}
 	
 }

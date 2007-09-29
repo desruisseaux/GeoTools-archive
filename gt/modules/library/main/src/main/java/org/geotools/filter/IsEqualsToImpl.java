@@ -15,7 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.expression.Value;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsEqualTo;

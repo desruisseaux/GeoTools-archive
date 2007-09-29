@@ -27,15 +27,16 @@ import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.PropertyIsEqualTo;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -57,11 +58,11 @@ public class FilterTest extends TestCase {
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
-    /** Feature on which to preform tests */
-    private static Feature testFeature = null;
+    /** SimpleFeature on which to preform tests */
+    private static SimpleFeature testFeature = null;
 
     /** Schema on which to preform tests */
-    private static FeatureType testSchema = null;
+    private static SimpleFeatureType testSchema = null;
     boolean set = false;
     
     FilterFactory fac;
@@ -122,77 +123,24 @@ public class FilterTest extends TestCase {
         set = true;
         
         fac = FilterFactoryFinder.createFilterFactory();
-
-        // Create the schema attributes
-        //LOGGER.debug("creating flat feature...");
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
-                LineString.class);
-
-        //LOGGER.debug("created geometry attribute");
-        AttributeType booleanAttribute = AttributeTypeFactory.newAttributeType("testBoolean",
-                Boolean.class);
-
-        //LOGGER.debug("created boolean attribute");
-        AttributeType charAttribute = AttributeTypeFactory.newAttributeType("testCharacter",
-                Character.class);
-        AttributeType byteAttribute = AttributeTypeFactory.newAttributeType("testByte",
-                Byte.class);
-        AttributeType shortAttribute = AttributeTypeFactory.newAttributeType("testShort",
-                Short.class);
-        AttributeType intAttribute = AttributeTypeFactory.newAttributeType("testInteger",
-                Integer.class);
-        AttributeType longAttribute = AttributeTypeFactory.newAttributeType("testLong",
-                Long.class);
-        AttributeType floatAttribute = AttributeTypeFactory.newAttributeType("testFloat",
-                Float.class);
-        AttributeType doubleAttribute = AttributeTypeFactory.newAttributeType("testDouble",
-                Double.class);
-        AttributeType stringAttribute = AttributeTypeFactory.newAttributeType("testString",
-                String.class);
-        AttributeType stringAttribute2 = AttributeTypeFactory.newAttributeType("testString2",
-                String.class);
-        AttributeType dateAttribute = AttributeTypeFactory.newAttributeType("date",
-                java.sql.Date.class);
-        AttributeType timeAttribute = AttributeTypeFactory.newAttributeType("time",
-                java.sql.Time.class);
-        AttributeType dateTimeAttribute1 = AttributeTypeFactory.newAttributeType("datetime1",
-                java.util.Date.class);
-        AttributeType dateTimeAttribute2 = AttributeTypeFactory.newAttributeType("datetime2",
-                java.sql.Timestamp.class);
-
-        // Builds the schema
-	FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.newInstance("test");
-	feaTypeFactory.addType(geometryAttribute);
-	 
-        LOGGER.finest("created feature type and added geometry");
-        feaTypeFactory.addType(booleanAttribute);
-        LOGGER.finest("added boolean to feature type");
-        feaTypeFactory.addType(charAttribute);
-        LOGGER.finest("added character to feature type");
-        feaTypeFactory.addType(byteAttribute);
-        LOGGER.finest("added byte to feature type");
-        feaTypeFactory.addType(shortAttribute);
-        //LOGGER.finer("added short to feature type");
-       feaTypeFactory.addType(intAttribute);
-
-        //LOGGER.finer("added int to feature type");
-       feaTypeFactory.addType(longAttribute);
-
-        //LOGGER.finer("added long to feature type");
-       feaTypeFactory.addType(floatAttribute);
-
-        //LOGGER.finer("added float to feature type");
-       feaTypeFactory.addType(doubleAttribute);
-
-        //LOGGER.finer("added double to feature type");
-       feaTypeFactory.addType(stringAttribute);
-       feaTypeFactory.addType(stringAttribute2);
-       feaTypeFactory.addType(dateAttribute);
-       feaTypeFactory.addType(timeAttribute);
-       feaTypeFactory.addType(dateTimeAttribute1);
-       feaTypeFactory.addType(dateTimeAttribute2);
-       
-       testSchema = feaTypeFactory.getFeatureType();
+        
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.add("testGeometry", LineString.class);
+        ftb.add("testBoolean", Boolean.class);
+        ftb.add("testCharacter", Character.class);
+        ftb.add("testByte", Byte.class);
+        ftb.add("testShort", Short.class);
+        ftb.add("testInteger", Integer.class);
+        ftb.add("testLong", Long.class);
+        ftb.add("testFloat", Float.class);
+        ftb.add("testDouble", Double.class);
+        ftb.add("testString", String.class);
+        ftb.add("testString2", String.class);
+        ftb.add("date", java.sql.Date.class);
+        ftb.add("time", java.sql.Time.class);
+        ftb.add("datetime1", java.util.Date.class);
+        ftb.add("datetime2", java.sql.Timestamp.class);
+        testSchema = ftb.buildFeatureType();
 
         //LOGGER.finer("added string to feature type");
         // Creates coordinates for the linestring
@@ -233,7 +181,7 @@ public class FilterTest extends TestCase {
 
         // Creates the feature itself
         //FlatFeatureFactory factory = new FlatFeatureFactory(testSchema);
-	testFeature = testSchema.create(attributes);
+        testFeature = SimpleFeatureBuilder.build(testSchema, attributes, null);
         //LOGGER.finer("...flat feature created");
     }
     
@@ -970,7 +918,7 @@ public class FilterTest extends TestCase {
 	/**
 	 * A {@link PropertyAccessorFactory} intended to be used on testing that the
 	 * Filter implementation works over Object as expected, and not only over
-	 * Feature
+	 * SimpleFeature
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
 	 */

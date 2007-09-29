@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.PropertyIsBetween;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -46,7 +46,7 @@ public interface BetweenFilter extends CompareFilter, PropertyIsBetween {
      *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 
     /**
      * @deprecated use {@link PropertyIsBetween#getLowerBoundary()}

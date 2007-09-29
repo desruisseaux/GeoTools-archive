@@ -15,8 +15,6 @@
  */
 package org.geotools.feature;
 
-import DefaultFeatureType;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;

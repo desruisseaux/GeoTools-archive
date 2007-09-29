@@ -16,13 +16,14 @@
 package org.geotools.feature.visitor;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.SimpleFeatureType;
 import org.geotools.feature.visitor.AverageVisitor.AverageResult;
 import org.geotools.feature.visitor.CountVisitor.CountResult;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -39,20 +40,20 @@ public class SumVisitor implements FeatureCalc {
     private Expression expr;
     SumStrategy strategy;
 
-    public SumVisitor(int attributeTypeIndex, FeatureType type)
+    public SumVisitor(int attributeTypeIndex, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
+        AttributeDescriptor attributeType = type.getAttribute(attributeTypeIndex);
         expr = factory.property(attributeType.getLocalName());
-        createStrategy(attributeType.getBinding());
+        createStrategy(attributeType.getType().getBinding());
     }
 
-    public SumVisitor(String attrName, FeatureType type)
+    public SumVisitor(String attrName, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        AttributeType attributeType = type.getAttributeType(attrName);
+        AttributeDescriptor attributeType = type.getAttribute(attrName);
         expr = factory.property(attributeType.getLocalName());
-        createStrategy(attributeType.getBinding());
+        createStrategy(attributeType.getType().getBinding());
     }
 
     public SumVisitor(Expression expr) throws IllegalFilterException {
@@ -84,10 +85,10 @@ public class SumVisitor implements FeatureCalc {
         return null;
     }
 
-    public void visit(Feature feature) {
-        visit((org.opengis.feature.Feature)feature);
+    public void visit(SimpleFeature feature) {
+        visit(feature);
     }
-    public void visit(org.opengis.feature.Feature feature) {
+    public void visit(Feature feature) {
         Object value = expr.evaluate(feature);
 
         if (strategy == null) {

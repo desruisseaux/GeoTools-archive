@@ -7,14 +7,15 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.test.TestData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,10 +40,10 @@ public class DOMParserTestSuite extends TestSuite {
     protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
-    protected static FeatureType testSchema = null;
+    protected static SimpleFeatureType testSchema = null;
 
     /** Schema on which to preform tests */
-    protected static Feature testFeature = null;
+    protected static SimpleFeature testFeature = null;
     
     protected boolean setup = false;
     
@@ -55,41 +56,20 @@ public class DOMParserTestSuite extends TestSuite {
     // Create the schema attributes
     LOGGER.finer("creating flat feature...");
 
-    AttributeType geometryAttribute = attFactory.newAttributeType("testGeometry",
-            LineString.class);
-    LOGGER.finer("created geometry attribute");
-
-    AttributeType booleanAttribute = attFactory.newAttributeType("testBoolean",
-            Boolean.class);
-    LOGGER.finer("created boolean attribute");
-
-    AttributeType charAttribute = attFactory.newAttributeType("testCharacter",
-            Character.class);
-    AttributeType byteAttribute = attFactory.newAttributeType("testByte",
-            Byte.class);
-    AttributeType shortAttribute = attFactory.newAttributeType("testShort",
-            Short.class);
-    AttributeType intAttribute = attFactory.newAttributeType("testInteger",
-            Integer.class);
-    AttributeType longAttribute = attFactory.newAttributeType("testLong",
-            Long.class);
-    AttributeType floatAttribute = attFactory.newAttributeType("testFloat",
-            Float.class);
-    AttributeType doubleAttribute = attFactory.newAttributeType("testDouble",
-            Double.class);
-    AttributeType stringAttribute = attFactory.newAttributeType("testString",
-            String.class);
-    AttributeType zeroDoubleAttribute = attFactory.newAttributeType("testZeroDouble",
-            Double.class);
-    AttributeType[] types = {
-        geometryAttribute, booleanAttribute, charAttribute, byteAttribute,
-        shortAttribute, intAttribute, longAttribute, floatAttribute,
-        doubleAttribute, stringAttribute, zeroDoubleAttribute 
-    };
-
-    // Builds the schema
-    testSchema = FeatureTypeFactory.newFeatureType(types,"testSchema");
-
+    SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+	ftb.add("testGeometry", LineString.class);
+	ftb.add("testBoolean", Boolean.class);
+	ftb.add("testCharacter", Character.class);
+	ftb.add("testByte", Byte.class);
+	ftb.add("testShort", Short.class);
+	ftb.add("testInteger", Integer.class);
+	ftb.add("testLong", Long.class);
+	ftb.add("testFloat", Float.class);
+	ftb.add("testDouble", Double.class);
+	ftb.add("testString", String.class);
+	ftb.add("testZeroDouble", Double.class);
+	ftb.setName("testSchema");
+    testSchema = ftb.buildFeatureType();
     GeometryFactory geomFac = new GeometryFactory();
 
     // Creates coordinates for the linestring
@@ -112,7 +92,7 @@ public class DOMParserTestSuite extends TestSuite {
     attributes[9] = "test string data";
     attributes[10] = new Double(0.0);
     // Creates the feature itself
-    testFeature = testSchema.create(attributes);
+    testFeature = SimpleFeatureBuilder.build(testSchema, attributes, null);
     LOGGER.finer("...flat feature created");
 
     //_log.getLoggerRepository().setThreshold(Level.DEBUG);

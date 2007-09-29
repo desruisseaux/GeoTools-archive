@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
@@ -31,6 +30,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 /**
@@ -71,7 +71,7 @@ public abstract class ClassificationFunction extends DefaultExpression implement
     }
     
     //overriding evaluate(feature) to point at evaluate(object)
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
         return evaluate((Object) feature);
     }
 

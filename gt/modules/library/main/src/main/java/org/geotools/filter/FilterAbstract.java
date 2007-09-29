@@ -16,8 +16,7 @@
 package org.geotools.filter;
 
 
-import org.geotools.feature.Feature;
-
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterVisitor;
 
 /**
@@ -43,7 +42,7 @@ public abstract class FilterAbstract implements org.opengis.filter.Filter
 	 * 
 	 * Default value is false
 	 */
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(SimpleFeature feature) {
 		return evaluate((Object)feature);
 	}
 	
@@ -61,7 +60,7 @@ public abstract class FilterAbstract implements org.opengis.filter.Filter
 	/**
 	 * Straight call throught to: evaulate( feature )
 	 */
-	public boolean accepts(Feature feature) {
+	public boolean accepts(SimpleFeature feature) {
 		return evaluate( feature );
 	}
 	
@@ -77,7 +76,7 @@ public abstract class FilterAbstract implements org.opengis.filter.Filter
 	 * @param feature
 	 * @return value or null
 	 */
-	protected Object eval( Expression expression, Feature feature ){
+	protected Object eval( Expression expression, SimpleFeature feature ){
 		if( expression == null || feature == null ) return null;
 		return expression.evaluate( feature );
 	}

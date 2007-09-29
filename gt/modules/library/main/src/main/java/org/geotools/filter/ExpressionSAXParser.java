@@ -20,7 +20,7 @@ package org.geotools.filter;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.Attributes;
 
@@ -70,7 +70,7 @@ public class ExpressionSAXParser {
      * A schema to read the attributes against.  Currently not really
      * impelmented.
      */
-    private FeatureType schema;
+    private SimpleFeatureType schema;
 
     /**
      * If the message from the SAX characters function should be read.   For
@@ -90,11 +90,11 @@ public class ExpressionSAXParser {
      * @param schema The schema for attributes (null is fine, as the code for
      *        this is not in place.
      */
-    public ExpressionSAXParser(FeatureType schema) {
+    public ExpressionSAXParser(SimpleFeatureType schema) {
         this( schema, FilterFactoryFinder.createFilterFactory() );    	
     }
     /** Constructor injection */
-    public ExpressionSAXParser( FeatureType schema, FilterFactory factory ){
+    public ExpressionSAXParser( SimpleFeatureType schema, FilterFactory factory ){
     	this.schema = schema;
         ff = factory;    	
     }

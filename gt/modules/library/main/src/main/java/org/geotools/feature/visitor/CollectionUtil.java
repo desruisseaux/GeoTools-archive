@@ -15,8 +15,8 @@
  */
 package org.geotools.feature.visitor;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.Iterator;
 
@@ -41,7 +41,7 @@ public class CollectionUtil {
         Iterator iterator;
 
         for (iterator = collection.iterator(); iterator.hasNext();) {
-            Feature feature = (Feature) iterator.next();
+            SimpleFeature feature = (SimpleFeature) iterator.next();
             visitor.visit(feature);
         }
 
@@ -52,7 +52,7 @@ public class CollectionUtil {
         Iterator iterator;
 
         for (iterator = collection.iterator(); iterator.hasNext();) {
-            Feature feature = (Feature) iterator.next();
+        	SimpleFeature feature = (SimpleFeature) iterator.next();
 
             for (int i = 0; i < visitors.length; i++) {
                 FeatureVisitor visitor = visitors[i];

@@ -21,11 +21,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -41,7 +42,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @source $URL$
  */
 public class MathTest extends TestCase {
-    FeatureType schema = null;
+    SimpleFeatureType schema = null;
 
     public MathTest(java.lang.String testName) {
         super(testName);
@@ -57,37 +58,36 @@ public class MathTest extends TestCase {
         return suite;
     }
 
-    public Feature[] sampleFeatures() throws Exception {
+    public SimpleFeature[] sampleFeatures() throws Exception {
         AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
-        AttributeType a1 = attFactory.newAttributeType("value", Integer.class);
-        AttributeType a2 = attFactory.newAttributeType("geometry",
-                Geometry.class);
-        AttributeType a3 = attFactory.newAttributeType("name", String.class);
-        schema = FeatureTypeFactory.newFeatureType(new AttributeType[] {
-                    a1, a2, a3
-                },"testSchema");
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.add("value", Integer.class);
+        ftb.add("geometry", Geometry.class);
+        ftb.add("name", String.class);
+        ftb.setName("testSchema");
+        schema = ftb.buildFeatureType();
 
-        Feature[] f = new Feature[3];
+        SimpleFeature[] f = new SimpleFeature[3];
         GeometryFactory gf = new GeometryFactory(new PrecisionModel());
-        f[0] = schema.create(new Object[] {
+        f[0] = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(12), gf.createGeometryCollection(null),
                     "first"
-                });
-        f[1] = schema.create(new Object[] {
+                }, null);
+        f[1] = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(3), gf.createGeometryCollection(null),
                     "second"
-                });
-        f[2] = schema.create(new Object[] {
+                }, null);
+        f[2] = SimpleFeatureBuilder.build(schema, new Object[] {
                     new Integer(15), gf.createGeometryCollection(null),
                     "third"
-                });
+                }, null);
 
         return f;
     }
 
     public void testTypeMissmatch() throws Exception {
-        Feature[] f = sampleFeatures();
+        SimpleFeature[] f = sampleFeatures();
 
         //the following are intentionaly backwards
         AttributeExpressionImpl e1 = new AttributeExpressionImpl(schema, "value");
@@ -115,7 +115,7 @@ public class MathTest extends TestCase {
     public void testSetupAndExtraction() throws Exception {
         //this should move out to a more configurable system run from scripts
         //but we can start with a set of hard coded tests
-        Feature[] f = sampleFeatures();
+        SimpleFeature[] f = sampleFeatures();
 
         AttributeExpressionImpl e1 = new AttributeExpressionImpl(schema, "value");
         AttributeExpressionImpl e2 = new AttributeExpressionImpl(schema, "name");

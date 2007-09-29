@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.PropertyIsNull;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -65,5 +65,5 @@ public interface NullFilter extends Filter, PropertyIsNull {
      *
      * @deprecated use {@link org.opengis.filter.Filter#evaluate(Feature)}
      */
-    boolean contains(Feature feature);
+    boolean contains(SimpleFeature feature);
 }

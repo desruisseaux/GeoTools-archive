@@ -17,12 +17,12 @@ package org.geotools.filter.function;
 
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.parser.ParseException;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  *
@@ -80,7 +80,7 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
         
         FeatureIterator list = featureCollection.features();
         //feature 1
-        Feature f = list.next();
+        SimpleFeature f = list.next();
         int slot = ((Number)func.getValue(f)).intValue();
         assertEquals(1, slot);
         //feature 2

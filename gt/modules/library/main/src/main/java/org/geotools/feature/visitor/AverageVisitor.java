@@ -16,11 +16,11 @@
 package org.geotools.feature.visitor;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -43,35 +43,35 @@ public class AverageVisitor implements FeatureCalc {
     AverageStrategy strategy;
 
     /**
-     * Constructor class for the AverageVisitor using AttributeType ID
+     * Constructor class for the AverageVisitor using AttributeDescriptor ID
      *
-     * @param attributeTypeIndex integer representing the AttributeType
+     * @param attributeTypeIndex integer representing the AttributeDescriptor
      * @param type FeatureType
      *
      * @throws IllegalFilterException
      */
-    public AverageVisitor(int attributeTypeIndex, FeatureType type)
+    public AverageVisitor(int attributeTypeIndex, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
+        AttributeDescriptor attributeType = type.getAttribute(attributeTypeIndex);
         expr = factory.property(attributeType.getLocalName());
-        createStrategy(attributeType.getBinding());
+        createStrategy(attributeType.getType().getBinding());
     }
 
     /**
-     * Constructor class for the AverageVisitor using AttributeType Name
+     * Constructor class for the AverageVisitor using AttributeDescriptor Name
      *
-     * @param attrName string respresenting the AttributeType
+     * @param attrName string respresenting the AttributeDescriptor
      * @param type FeatureType
      *
      * @throws IllegalFilterException
      */
-    public AverageVisitor(String attrName, FeatureType type)
+    public AverageVisitor(String attrName, SimpleFeatureType type)
         throws IllegalFilterException {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        AttributeType attributeType = type.getAttributeType(attrName);
+        AttributeDescriptor attributeType = type.getAttribute(attrName);
         expr = factory.property(attributeType.getLocalName());
-        createStrategy(attributeType.getBinding());
+        createStrategy(attributeType.getType().getBinding());
     }
 
     /**
@@ -113,8 +113,8 @@ public class AverageVisitor implements FeatureCalc {
         return null;
     }
 
-    public void visit(Feature feature) {
-        visit((org.opengis.feature.Feature)feature);
+    public void visit(SimpleFeature feature) {
+        visit(feature);
     }
     
     public void visit(org.opengis.feature.Feature feature) {

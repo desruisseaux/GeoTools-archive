@@ -15,8 +15,8 @@
  */
 package org.geotools.feature.visitor;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,7 +38,7 @@ public class BoundsVisitor implements FeatureCalc {
     }
     
     
-    public void visit(Feature feature) {
+    public void visit(SimpleFeature feature) {
        visit((org.opengis.feature.Feature)feature);
     }
     
