@@ -30,11 +30,13 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.TestData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -52,13 +54,10 @@ public class ShapefileTest extends org.geotools.data.shapefile.ShapefileTest {
     public void testHolyPolygons() throws Exception {
         Geometry g = readGeometry("holyPoly");
 
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance("junk");
-        factory.addType(AttributeTypeFactory.newAttributeType("a",
-                Geometry.class));
-
-        SimpleFeatureType type = factory.getFeatureType();
+        SimpleFeatureType type = DataUtilities.createType("junk","a:Geometry");
+        
         FeatureCollection features = FeatureCollections.newCollection();
-        features.add(type.create(new Object[] { g }));
+        SimpleFeature feature = SimpleFeatureBuilder.build(type,new Object[] { g },null);
 
         File tmpFile = getTempFile();
         tmpFile.delete();

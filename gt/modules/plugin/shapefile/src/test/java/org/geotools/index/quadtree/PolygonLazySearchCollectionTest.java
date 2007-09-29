@@ -34,7 +34,7 @@ public class PolygonLazySearchCollectionTest extends TestCaseSupport {
 		ds=new IndexedShapefileDataStore(file.toURL());
 		ds.buildQuadTree(0);
 		tree = openQuadTree();
-		crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
+		crs=ds.getSchema().getCRS();
 	}
 	
 	private QuadTree openQuadTree() throws StoreException{

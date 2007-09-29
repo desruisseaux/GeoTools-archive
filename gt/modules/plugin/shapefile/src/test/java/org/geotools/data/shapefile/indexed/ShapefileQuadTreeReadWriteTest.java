@@ -31,13 +31,14 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -98,7 +99,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
     	DataStore s1 = createDataStore(fac, TestData.url(this, "shapes/stream.shp"), true);
         String typeName = s1.getTypeNames()[0];
         FeatureSource source = s1.getFeatureSource(typeName);
-        FeatureType type = source.getSchema();
+        SimpleFeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
 
         IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
@@ -115,7 +116,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 		return createDataStore;
 	}
 
-	private void doubleWrite(FeatureType type, FeatureCollection one, File tmp,
+	private void doubleWrite(SimpleFeatureType type, FeatureCollection one, File tmp,
                              IndexedShapefileDataStoreFactory maker, boolean memorymapped)
             throws IOException, MalformedURLException {
 		DataStore s;
@@ -137,7 +138,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(),file.toURL(), true);
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
-        FeatureType type = source.getSchema();
+        SimpleFeatureType type = source.getSchema();
         FeatureCollection one = source.getFeatures();
 
         IndexedShapefileDataStoreFactory maker = new IndexedShapefileDataStoreFactory();
@@ -145,7 +146,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         test(type, one, getTempFile(), maker, true);
     }
 
-    private void test(FeatureType type, FeatureCollection one, File tmp,
+    private void test(SimpleFeatureType type, FeatureCollection one, File tmp,
         IndexedShapefileDataStoreFactory maker, boolean memorymapped)
         throws IOException, MalformedURLException, Exception {
         DataStore s;
@@ -176,8 +177,8 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         int i = 0;
 
         while (fs1.hasNext()) {
-            Feature f1 = fs1.next();
-            Feature f2 = fs2.next();
+            SimpleFeature f1 = fs1.next();
+            SimpleFeature f2 = fs2.next();
 
             if ((i++ % 50) == 0) {
                 if (verbose) {
@@ -189,12 +190,12 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         }
     }
 
-    static void compare(Feature f1, Feature f2) throws Exception {
-        if (f1.getNumberOfAttributes() != f2.getNumberOfAttributes()) {
+    static void compare(SimpleFeature f1, SimpleFeature f2) throws Exception {
+        if (f1.getAttributeCount() != f2.getAttributeCount()) {
             throw new Exception("Unequal number of attributes");
         }
 
-        for (int i = 0; i < f1.getNumberOfAttributes(); i++) {
+        for (int i = 0; i < f1.getAttributeCount(); i++) {
             Object att1 = f1.getAttribute(i);
             Object att2 = f2.getAttribute(i);
 
@@ -239,9 +240,9 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 
         FeatureCollection features = ds.getFeatureSource().getFeatures(ff.createFidFilter("streams.84"));
         FeatureIterator iter = features.features();
-        Envelope bounds;
+        ReferencedEnvelope bounds;
         try{
-            bounds = iter.next().getBounds();
+            bounds = new ReferencedEnvelope(iter.next().getBounds());
         }finally{
             iter.close();
         }
