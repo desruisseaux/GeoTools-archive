@@ -55,6 +55,4 @@ public abstract class AbstractAttributeIO {
         return metaData[position];
     }
     
-    
-    
 }

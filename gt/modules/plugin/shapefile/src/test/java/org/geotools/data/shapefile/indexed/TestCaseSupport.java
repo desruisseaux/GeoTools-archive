@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.TestData;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -145,8 +146,14 @@ public abstract class TestCaseSupport extends TestCase {
     /**
      * Returns the first feature in the given feature collection.
      */
-    protected SimpleFeature firstFeature(FeatureCollection fc) {
-        return fc.features().next();
+    protected SimpleFeature firstFeature( FeatureCollection featureCollection ){
+        FeatureIterator featureIterator = featureCollection.features();
+        try {
+            return featureIterator.next();
+        }
+        finally {
+            featureIterator.close();
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ import org.geotools.index.TreeException;
 
 
 /**
- * DOCUMENT ME!
+ *  RTree data structure.
  *
  * @author Tommaso Nolli
  * @source $URL$

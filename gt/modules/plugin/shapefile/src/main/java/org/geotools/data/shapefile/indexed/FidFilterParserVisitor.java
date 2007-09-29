@@ -18,6 +18,7 @@ package org.geotools.data.shapefile.indexed;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
@@ -40,7 +41,7 @@ import org.geotools.filter.NullFilter;
  */
 class FidFilterParserVisitor implements FilterVisitor{
 
-    Collection fids=new HashSet();
+    Set<String> fids=new HashSet<String>();
     
     public void visit(Filter filter) {
     }
@@ -64,7 +65,7 @@ class FidFilterParserVisitor implements FilterVisitor{
     }
 
     public void visit(FidFilter filter) {
-        fids.addAll(Arrays.asList(filter.getFids()));
+        fids.addAll( (Collection<? extends String>) filter.getIDs() );        
     }
 
     public void visit(AttributeExpression expression) {

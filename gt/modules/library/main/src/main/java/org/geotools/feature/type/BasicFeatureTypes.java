@@ -18,9 +18,10 @@ package org.geotools.feature.type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * Defines required attributes for Annotations.
@@ -53,17 +54,17 @@ public class BasicFeatureTypes
     /**
      * The FeatureType reference that should be used for Polygons
      */
-    public static final FeatureType POLYGON;
+    public static final SimpleFeatureType POLYGON;
     
     /**
      * The FeatureType reference that should be used for Points
      */
-    public static final FeatureType POINT;
+    public static final SimpleFeatureType POINT;
     
     /**
      * The FeatureType reference that should be used for Lines
      */
-    public static final FeatureType LINE;
+    public static final SimpleFeatureType LINE;
 
     /**
      * The attribute name used to store the geometry
@@ -73,15 +74,18 @@ public class BasicFeatureTypes
     
     // Static initializer for the tyoe variables
     static {
-        FeatureType tmpPoint = null;
-        FeatureType tmpPolygon = null;
-        FeatureType tmpLine = null;
+        SimpleFeatureType tmpPoint = null;
+        SimpleFeatureType tmpPolygon = null;
+        SimpleFeatureType tmpLine = null;
         try {
+            SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
             
-            AttributeType[] types =  new AttributeType[] {};
-            tmpPoint = FeatureTypeFactory.newFeatureType(types,"pointFeature");
-            tmpLine = FeatureTypeFactory.newFeatureType(types,"lineFeature");
-            tmpPolygon  = FeatureTypeFactory.newFeatureType(types,"polygonFeature");
+            //AttributeDescriptor[] types =  new AttributeDescriptor[] {};
+            
+            build.setName( "pointFeature" );
+            tmpPoint = build.name("pointFeature").buildFeatureType();            
+            tmpLine = build.name("lineFeature").buildFeatureType();
+            tmpPolygon  = build.name("polygonFeature").buildFeatureType();            
         } catch (Exception ex) {
             Logger.getLogger( "org.geotools.feature.type.BasicFeatureTypes" ).log(
                Level.SEVERE, "Error creating basic feature types", ex );

@@ -66,8 +66,6 @@ import org.geotools.factory.Hints;
  */
 public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory {
     
-            
-
     /** If the base types have been initialized */
     private static boolean initialized;
 

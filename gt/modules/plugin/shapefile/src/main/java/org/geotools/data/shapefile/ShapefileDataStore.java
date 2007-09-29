@@ -32,6 +32,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,6 +73,7 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.data.shapefile.shp.xml.ShpXmlFileReader;
 import org.geotools.factory.Hints;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
@@ -80,13 +82,22 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.filter.LengthFunction;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.capability.Function;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -416,7 +427,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 && propertyNames[0].equals(defaultGeomName) && 
                 (filterAttnames.length == 0 || (filterAttnames.length == 1 && filterAttnames[0].equals(defaultGeomName)))) {
             try {
-                FeatureType newSchema = DataUtilities.createSubType(schema,
+                SimpleFeatureType newSchema = DataUtilities.createSubType(schema,
                         propertyNames);
 
                 return createFeatureReader(typeName,
@@ -429,9 +440,10 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         return super.getFeatureReader(typeName, query);
     }
 
-    protected FeatureReader createFeatureReader(String typeName, Reader r,
-        FeatureType readerSchema) throws SchemaException {
-        return new org.geotools.data.FIDFeatureReader(r,
+    protected FeatureReader createFeatureReader(String typeName, Reader reader,
+        SimpleFeatureType readerSchema) throws SchemaException {
+        
+        return new org.geotools.data.FIDFeatureReader(reader,
             new DefaultFIDReader(typeName), readerSchema);
     }
 
@@ -451,10 +463,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             (schema == null) ? readAttributes() : schema.getAttributes();
 
         if (!readDbf) {
-            LOGGER.fine(
-                "The DBF file won't be opened since no attributes will be read from it");
-            atts = new AttributeType[] { schema.getDefaultGeometry() };
-
+            LOGGER.fine("The DBF file won't be opened since no attributes will be read from it");
+            atts = new ArrayList(1);
+            atts.add( schema.getDefaultGeometry() );
             return new Reader(atts, openShapeReader(), null);
         }
 
@@ -628,48 +639,44 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      *
      * @throws IOException If a type by the requested name is not present.
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         typeCheck(typeName);
-
         return getSchema();
     }
 
-    public FeatureType getSchema() throws IOException {
+    public SimpleFeatureType getSchema() throws IOException {
         if (schema == null) {
-            try {
-                AttributeType[] types = readAttributes();
-                FeatureType parent = null;
-                Class geomType = types[0].getBinding();
 
-                if ((geomType == Point.class) || (geomType == MultiPoint.class)) {
-                    parent = BasicFeatureTypes.POINT;
-                } else if ((geomType == Polygon.class)
-                        || (geomType == MultiPolygon.class)) {
-                    parent = BasicFeatureTypes.POLYGON;
-                } else if ((geomType == LineString.class)
-                        || (geomType == MultiLineString.class)) {
-                    parent = BasicFeatureTypes.LINE;
-                }
+            List<AttributeDescriptor> types = readAttributes();
+            
+            SimpleFeatureType parent = null;
+            Class<?> geomType = types.get(0).getType().getBinding();
 
-                if (parent != null) {
-                    schema = FeatureTypes.newFeatureType(readAttributes(),
-                            createFeatureTypeName(), namespace, false,
-                            new FeatureType[] { parent });
-                } else {
-                    if (namespace != null) {
-                        schema = FeatureTypes.newFeatureType(readAttributes(),
-                                createFeatureTypeName(), namespace, false);
-                    } else {
-                        schema = FeatureTypes.newFeatureType(readAttributes(),
-                                createFeatureTypeName(), FeatureTypes.DEFAULT_NAMESPACE,
-                                false);
-                    }
-                }
-            } catch (SchemaException se) {
-                throw new DataSourceException("Error creating FeatureType", se);
+            if ((geomType == Point.class) || (geomType == MultiPoint.class)) {
+                parent = BasicFeatureTypes.POINT;
+            } else if ((geomType == Polygon.class)
+                    || (geomType == MultiPolygon.class)) {
+                parent = BasicFeatureTypes.POLYGON;
+            } else if ((geomType == LineString.class)
+                    || (geomType == MultiLineString.class)) {
+                parent = BasicFeatureTypes.LINE;
             }
+            
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.addAll( types );
+            builder.setName( createFeatureTypeName() );
+            if (namespace != null) {
+                builder.setNamespaceURI( namespace );
+            }
+            else {
+                builder.setNamespaceURI( FeatureTypes.DEFAULT_NAMESPACE );                       
+            }
+            builder.setAbstract( false );
+            if (parent != null) {
+                builder.setSuperType( parent );
+            }
+            schema = builder.buildFeatureType();                                            
         }
-
         return schema;
     }
 
@@ -697,10 +704,16 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 			if( prj!=null)
 				prj.close();
 		}
-		SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+		AttributeTypeBuilder build = new AttributeTypeBuilder();
+		List<AttributeDescriptor> attributes = new ArrayList<AttributeDescriptor>();
 		try {
-            Class<?> geometryClass = JTSUtilities.findBestGeometryClass(shp.getHeader().getShapeType());            
-            build.nillable( true ).crs(crs).add("the_geom", geometryClass );
+            Class<?> geometryClass = JTSUtilities.findBestGeometryClass(shp.getHeader().getShapeType());
+            build.setNillable(true);
+            build.setCRS(crs);
+            build.setBinding(geometryClass);
+            
+            GeometryType geometryType = build.buildGeometryType();
+            attributes.add( build.buildDescriptor( "the_geom", geometryType ) );
             
             // take care of the case where no dbf and query wants all => geometry only
             if (dbf != null) {
@@ -710,10 +723,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     String name = header.getFieldName(i);
                     int length = header.getFieldLength(i);
                     
-                    build.nillable(true).length( length ).add( name, attributeClass );
+                    build.setNillable(true);
+                    build.setLength( length );
+                    attributes.add( build.buildDescriptor(name) );
                 }
             }
-            return build.;
+            return attributes;
         } finally {
             try {
                 shp.close();
@@ -766,7 +781,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      *
      * @throws IOException If the DataStore is remote.
      */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
         if (!isLocal()) {
             throw new IOException(
                 "Cannot create FeatureType on remote shapefile");
@@ -776,12 +791,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         schema = featureType;
 
         CoordinateReferenceSystem cs = featureType.getDefaultGeometry()
-                                                  .getCoordinateSystem();
+                                                  .getCRS();
 
         long temp = System.currentTimeMillis();
 
         if (isLocal()) {
-            Class geomType = featureType.getDefaultGeometry().getBinding();
+            Class geomType = featureType.getDefaultGeometry().getType().getBinding();
             ShapeType shapeType;
 
             if (Point.class.isAssignableFrom(geomType)) {
@@ -1069,45 +1084,16 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 	 */
     protected static DbaseFileHeader createDbaseHeader(SimpleFeatureType featureType)
         throws IOException, DbaseFileException {
+        
         DbaseFileHeader header = new DbaseFileHeader();
 
         for (int i = 0, ii = featureType.getAttributeCount(); i < ii; i++) {
-            AttributeType type = featureType.getAttributeType(i);
+            AttributeDescriptor type = featureType.getAttribute(i);
 
-            Class colType = type.getBinding();
+            Class<?> colType = type.getType().getBinding();
             String colName = type.getLocalName();
 
-            int fieldLen = -1;
-            Filter f = type.getRestriction();
-
-            if (f != null && f != Filter.EXCLUDE && f != Filter.INCLUDE &&
-                    ( (f instanceof PropertyIsLessThan )
-                      || (f instanceof PropertyIsLessThanOrEqualTo))) {
-                try {
-                    CompareFilter cf = (CompareFilter) f;
-
-                    if (cf.getLeftValue() instanceof LengthFunction) {
-                        fieldLen = Integer.parseInt(((LiteralExpression) cf.getRightValue()).getLiteral()
-                                                     .toString());
-                    } else {
-                        if (cf.getRightValue() instanceof LengthFunction) {
-                            fieldLen = Integer.parseInt(((LiteralExpression) cf
-                                                         .getLeftValue()).getLiteral()
-                                                         .toString());
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    fieldLen = 256;
-                }
-            } else {
-                fieldLen = 256;
-            }
-
-            if (fieldLen <= 0) {
-                fieldLen = 255;
-            }
-
-            // @todo respect field length
+            int fieldLen = FeatureTypes.getFieldLength( type );
             if ((colType == Integer.class) || (colType == Short.class)
                     || (colType == Byte.class)) {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 9), 0);
@@ -1227,12 +1213,16 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     protected static class Reader extends AbstractAttributeIO
         implements AttributeReader {
+        
         protected ShapefileReader shp;
         protected DbaseFileReader dbf;
         protected DbaseFileReader.Row row;
         protected ShapefileReader.Record record;
         int cnt;
 
+        public Reader(List<AttributeDescriptor> atts, ShapefileReader shp,DbaseFileReader dbf) {
+            this( (AttributeDescriptor[]) atts.toArray(new AttributeDescriptor[atts.size()]),shp, dbf);            
+        }
         /**
          * Create the shapefile reader
          *
@@ -1241,7 +1231,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
          * @param dbf - the dbf file reader. May be null, in this case no
          *        attributes will be read from the dbf file
          */
-        public Reader(AttributeType[] atts, ShapefileReader shp,
+        public Reader(AttributeDescriptor[] atts, ShapefileReader shp,
             DbaseFileReader dbf) {
             super(atts);
             this.shp = shp;
@@ -1386,7 +1376,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             for (int i = 0, ii = featureType.getAttributeCount(); i < ii;
                     i++) {
                 // if its a geometry, we don't want to write it to the dbf...
-                if (!(featureType.getAttributeType(i) instanceof GeometryAttributeType)) {
+                if (!(featureType.getAttribute(i) instanceof GeometryDescriptor)) {
                     cnt++;
                     writeFlags[i] = (byte) 1;
                 }
@@ -1424,10 +1414,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             // but if records > 0 and shapeType is null there's probably
             // another problem.
             if ((records <= 0) && (shapeType == null)) {
-                GeometryAttributeType geometryAttributeType = featureType
-                    .getDefaultGeometry();
+                GeometryDescriptor geometryAttributeType = featureType.getDefaultGeometry();
 
-                Class gat = geometryAttributeType.getBinding();
+                Class gat = geometryAttributeType.getType().getBinding();
                 shapeType = JTSUtilities.getShapeType(gat);
             }
 
@@ -1533,7 +1522,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
         }
 
-        public org.geotools.feature.FeatureType getFeatureType() {
+        public SimpleFeatureType getFeatureType() {
             return featureType;
         }
 
@@ -1545,7 +1534,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             return featureReader.hasNext();
         }
 
-        public org.geotools.feature.Feature next() throws IOException {
+        public SimpleFeature next() throws IOException {
             // closed already, error!
             if (featureReader == null) {
                 throw new IOException("Writer closed");
@@ -1600,7 +1589,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             }
 
             // writing of Geometry
-            Geometry g = currentFeature.getDefaultGeometry();
+            Geometry g = (Geometry) currentFeature.getDefaultGeometry();
 
             // if this is the first Geometry, find the shapeType and handler
             if (shapeType == null) {

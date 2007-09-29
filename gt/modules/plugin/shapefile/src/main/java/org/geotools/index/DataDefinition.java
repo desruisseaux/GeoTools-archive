@@ -20,17 +20,17 @@ import java.util.ArrayList;
 
 
 /**
- * DOCUMENT ME!
+ * Field definition
  *
  * @author Tommaso Nolli
  * @source $URL$
  */
 public class DataDefinition {
     private Charset charset;
-    private ArrayList fields;
+    private ArrayList<Field> fields;
 
     public DataDefinition(String charset) {
-        fields = new ArrayList();
+        fields = new ArrayList<Field>();
         this.charset = Charset.forName(charset);
     }
 
@@ -44,7 +44,7 @@ public class DataDefinition {
     }
 
     public Field getField(int i) {
-        return (Field) this.fields.get(i);
+        return this.fields.get(i);
     }
 
     /**
@@ -105,7 +105,7 @@ public class DataDefinition {
     }
 
     /**
-     * DOCUMENT ME!
+     * Character set values are encoded in.
      *
      */
     public Charset getCharset() {
@@ -114,7 +114,6 @@ public class DataDefinition {
 
     /**
      * Gets the max len of the data
-     *
      */
     public int getLen() {
         int len = 0;

@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 
 /**
- * DOCUMENT ME!
- *
+ * Holds values (with associated DataDefinition)
+ * 
  * @author Tommaso Nolli
  * @source $URL$
  */

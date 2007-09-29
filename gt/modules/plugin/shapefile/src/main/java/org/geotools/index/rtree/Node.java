@@ -145,8 +145,11 @@ public abstract class Node implements EntryBoundsChangeListener {
     }
 
     /**
-     * DOCUMENT ME!
-     *
+     * The bounds of this node.
+     * <p>
+     * You will need to look at the prj to produce a referneced envelope
+     * for wider use.
+     * 
      * @return The bounds
      */
     public Envelope getBounds() {

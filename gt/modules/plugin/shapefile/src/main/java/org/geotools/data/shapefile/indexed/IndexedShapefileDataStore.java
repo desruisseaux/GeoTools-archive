@@ -26,10 +26,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.logging.Level;
 
 import org.geotools.data.AbstractAttributeIO;
@@ -64,17 +66,14 @@ import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
-import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
@@ -86,7 +85,12 @@ import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.fs.FileSystemPageStore;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -305,7 +309,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	protected Filter getUnsupportedFilter(String typeName, Filter filter) {
 
-		if (filter instanceof FidFilter && fixURL!=null )
+		if (filter instanceof Id && fixURL!=null )
 			return Filter.INCLUDE;
 
 		return filter;
@@ -376,7 +380,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         Set attributes=new HashSet(Arrays.asList(propertyNames));
         attributes.addAll(fae.getAttributeNameSet());
         
-		FeatureType newSchema = schema;
+		SimpleFeatureType newSchema = schema;
 		boolean readDbf = true;
 		boolean readGeometry = true;
 
@@ -412,7 +416,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @throws IOException
 	 */
 	protected FeatureReader createFeatureReader(String typeName, Reader r,
-			FeatureType readerSchema) throws SchemaException, IOException {
+	        SimpleFeatureType readerSchema) throws SchemaException, IOException {
 
 		if (isLocal() && fixURL!=null ) {
 			if (!(new File(fixURL.getFile()).exists()))
@@ -449,10 +453,12 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			Filter filter) throws IOException {
 		Envelope bbox = null;
 
-		Collection goodRecs = null;
-		if (filter instanceof FidFilter && fixURL!=null ) {
-			FidFilter fidFilter = (FidFilter) filter;
-			goodRecs = queryFidIndex(fidFilter.getFids());
+		Collection<Data> goodRecs = null;
+		if (filter instanceof Id && fixURL!=null ) {
+			Id fidFilter = (Id) filter;
+			Set<?> fids = (Set<?>) fidFilter.getIDs();
+			
+			goodRecs = queryFidIndex( (Set<String>) fids );
 		} else {
 			if (filter != null) {
 				FilterConsumer fc = new FilterConsumer();
@@ -469,19 +475,19 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 				}
 			}
 		}
-
-		AttributeType[] atts = (schema == null) ? readAttributes() : schema
-				.getAttributeTypes();
+		List<AttributeDescriptor> atts = (schema == null) ? readAttributes() : schema
+				.getAttributes();
 
 		IndexedDbaseFileReader dbfR = null;
 
 		if (!readDbf) {
 			LOGGER.fine("The DBF file won't be opened since no attributes "
 					+ "will be read from it");
-			atts = new AttributeType[] { schema.getDefaultGeometry() };
+			atts = new ArrayList<AttributeDescriptor>(1);
+			atts.add( schema.getDefaultGeometry() );
 
 			if (!readGeometry) {
-				atts = new AttributeType[0];
+			    atts = new ArrayList<AttributeDescriptor>(1);
 			}
 		} else {
 			dbfR = (IndexedDbaseFileReader) openDbfReader();
@@ -500,8 +506,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @throws IOException
 	 * @throws TreeException
 	 */
-	private List queryFidIndex(String[] fids) throws IOException {
-		Arrays.sort(fids);
+	private List<Data> queryFidIndex(Set<String> idsSet) throws IOException {
+	    String fids[] = (String[]) idsSet.toArray(new String[idsSet.size()]);
+	    Arrays.sort(fids);
+	    
 		IndexedFidReader reader = null;
 		try {
 			File indexFile = new File(fixURL.getFile());
@@ -540,7 +548,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			return null;
 		}
 
-		List records = new ArrayList(fids.length);
+		List<Data> records = new ArrayList<Data>(fids.length);
 		try {
 			IndexFile shx = openIndexFile(shxURL);
 			try {
@@ -885,46 +893,46 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @throws IOException
 	 *             If a type by the requested name is not present.
 	 */
-	public FeatureType getSchema(String typeName) throws IOException {
+	public SimpleFeatureType getSchema(String typeName) throws IOException {
 		typeCheck(typeName);
 
 		return getSchema();
 	}
 
-	public FeatureType getSchema() throws IOException {
-		if (schema == null) {
-			try {
-				AttributeType[] types = readAttributes();
-				FeatureType parent = null;
-				Class geomType = types[0].getBinding();
+	/**
+	 * FIXME: Duplicate from ShapefileDataStore
+	 * @return SimpleFeatureType
+	 */
+	public SimpleFeatureType getSchema() throws IOException {
+		if (schema == null) {			
+			List<AttributeDescriptor> types = readAttributes();
+			SimpleFeatureType parent = null;
+			Class<?> geomType = types.get(0).getType().getBinding();
 
-				if ((geomType == Point.class) || (geomType == MultiPoint.class)) {
-					parent = BasicFeatureTypes.POINT;
-				} else if ((geomType == Polygon.class)
-						|| (geomType == MultiPolygon.class)) {
-					parent = BasicFeatureTypes.POLYGON;
-				} else if ((geomType == LineString.class)
-						|| (geomType == MultiLineString.class)) {
-					parent = BasicFeatureTypes.LINE;
-				}
-
-				if (parent != null) {
-					schema = FeatureTypes.newFeatureType(readAttributes(),
-							createFeatureTypeName(), namespace, false,
-							new FeatureType[] { parent });
-				} else {
-					if (namespace != null) {
-						schema = FeatureTypes.newFeatureType(readAttributes(),
-								createFeatureTypeName(), namespace, false);
-					} else {
-						schema = FeatureTypes.newFeatureType(readAttributes(),
-								createFeatureTypeName(), FeatureTypes.DEFAULT_NAMESPACE,
-								false);
-					}
-				}
-			} catch (SchemaException se) {
-				throw new DataSourceException("Error creating FeatureType", se);
+			if ((geomType == Point.class) || (geomType == MultiPoint.class)) {
+				parent = BasicFeatureTypes.POINT;
+			} else if ((geomType == Polygon.class)
+					|| (geomType == MultiPolygon.class)) {
+				parent = BasicFeatureTypes.POLYGON;
+			} else if ((geomType == LineString.class)
+					|| (geomType == MultiLineString.class)) {
+				parent = BasicFeatureTypes.LINE;
 			}
+
+			SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.addAll( types );
+            builder.setName( createFeatureTypeName() );
+            if (namespace != null) {
+                builder.setNamespaceURI( namespace );
+            }
+            else {
+                builder.setNamespaceURI( FeatureTypes.DEFAULT_NAMESPACE );                       
+            }
+            builder.setAbstract( false );
+            if (parent != null) {
+                builder.setSuperType( parent );
+            }
+            schema = builder.buildFeatureType(); 			
 		}
 
 		return schema;
@@ -933,8 +941,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	/**
      * @see org.geotools.data.AbstractDataStore#getBounds(org.geotools.data.Query)
      */
-    protected Envelope getBounds(Query query) throws IOException {
-        Envelope ret = null;
+    protected ReferencedEnvelope getBounds(Query query) throws IOException {
+        ReferencedEnvelope ret = null;
 
         Set records=new HashSet();
         if (query.getFilter() == Filter.INCLUDE || query==Query.ALL) {
@@ -948,7 +956,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         FidFilterParserVisitor visitor=new FidFilterParserVisitor();
         Filters.accept(query.getFilter(), visitor);
         if( !visitor.fids.isEmpty() ) {
-            List recordsFound = queryFidIndex((String[]) visitor.fids.toArray(new String[0]));
+            List<Data> recordsFound = queryFidIndex( visitor.fids );
             if( recordsFound!=null )
                 records.addAll(recordsFound);
         }
@@ -958,7 +966,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         
         ShapefileReader reader=new ShapefileReader(getReadChannel(shpURL), this.readWriteLock);
         try{
-            ret=new Envelope();
+            ret=new ReferencedEnvelope(getSchema().getCRS());
             for (Iterator iter = records.iterator(); iter.hasNext();) {
                 Data data = (Data) iter.next();
                 reader.goTo(((Long)data.getValue(1)).intValue());
@@ -971,14 +979,15 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         }
     }
 
-    private Envelope getBoundsRTree( Query query ) throws IOException {
-        Envelope ret=null;
+    private ReferencedEnvelope getBoundsRTree( Query query ) throws IOException {
+        ReferencedEnvelope ret=null;
         
         RTree rtree = this.openRTree();
 
         if (rtree != null) {
             try {
-                ret = rtree.getBounds(query.getFilter());
+                Envelope envelopeFromIndex = rtree.getBounds(query.getFilter());
+                ret = new ReferencedEnvelope( envelopeFromIndex, schema.getCRS() );
             } catch (TreeException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             } catch (UnsupportedFilterException e) {
@@ -998,7 +1007,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	public FeatureSource getFeatureSource(final String typeName)
 			throws IOException {
-		final FeatureType featureType = getSchema(typeName);
+		final SimpleFeatureType featureType = getSchema(typeName);
 
 		if (isWriteable) {
 			if (getLockingManager() != null) {
@@ -1015,11 +1024,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 						listenerManager.removeFeatureListener(this, listener);
 					}
 
-					public FeatureType getSchema() {
+					public SimpleFeatureType getSchema() {
 						return featureType;
 					}
 
-					public Envelope getBounds(Query query) throws IOException {
+					public ReferencedEnvelope getBounds(Query query) throws IOException {
 						return IndexedShapefileDataStore.this.getBounds(query);
 					}
 				};
@@ -1037,11 +1046,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 						listenerManager.removeFeatureListener(this, listener);
 					}
 
-					public FeatureType getSchema() {
+					public SimpleFeatureType getSchema() {
 						return featureType;
 					}
 
-					public Envelope getBounds(Query query) throws IOException {
+					public ReferencedEnvelope getBounds(Query query) throws IOException {
 						return IndexedShapefileDataStore.this.getBounds(query);
 					}
 				};
@@ -1060,11 +1069,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 					listenerManager.removeFeatureListener(this, listener);
 				}
 
-				public FeatureType getSchema() {
+				public SimpleFeatureType getSchema() {
 					return featureType;
 				}
 
-				public Envelope getBounds(Query query) throws IOException {
+				public ReferencedEnvelope getBounds(Query query) throws IOException {
 					return IndexedShapefileDataStore.this.getBounds(query);
 				}
 			};
@@ -1173,12 +1182,17 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		protected ShapefileReader.Record record;
 
-		protected Iterator goodRecs;
+		protected Iterator<Data> goodRecs;
 
 		private int recno;
 
 		private Data next;
 
+		public Reader(List<AttributeDescriptor> attributes, ShapefileReader shp,
+                IndexedDbaseFileReader dbf, Collection<Data> goodRecs) {
+		    this( (AttributeDescriptor[]) attributes.toArray(new AttributeDescriptor[attributes.size()]),
+		    shp, dbf, goodRecs);
+		}
 		/**
 		 * Create the shape reader
 		 *
@@ -1190,10 +1204,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		 *            the dbf file reader. May be null, in this case no
 		 *            attributes will be read from the dbf file
 		 * @param goodRecs
-		 *            DOCUMENT ME!
+		 *            Collection of good indexes that match the query.
 		 */
-		public Reader(AttributeType[] atts, ShapefileReader shp,
-				IndexedDbaseFileReader dbf, Collection goodRecs) {
+		public Reader(AttributeDescriptor[] atts, ShapefileReader shp,
+				IndexedDbaseFileReader dbf, Collection<Data> goodRecs) {
 			super(atts);
 			this.shp = shp;
 			this.dbf = dbf;
@@ -1314,10 +1328,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		protected Reader attReader;
 
 		// the current Feature
-		private Feature currentFeature;
+		private SimpleFeature currentFeature;
 
 		// the FeatureType we are representing
-		private FeatureType featureType;
+		private SimpleFeatureType featureType;
 
 		// an array for reuse in Feature creation
 		private Object[] emptyAtts;
@@ -1359,7 +1373,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 				attReader = getAttributesReader(true, true, null);
 				featureReader = createFeatureReader(typeName, attReader, schema);
 			} catch (Exception e) {
-				FeatureType schema = getSchema(typeName);
+				SimpleFeatureType schema = getSchema(typeName);
 
 				if (schema == null) {
 					throw new IOException(
@@ -1380,7 +1394,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 			for (int i = 0, ii = featureType.getAttributeCount(); i < ii; i++) {
 				// if its a geometry, we don't want to write it to the dbf...
-				if (!(featureType.getAttributeType(i) instanceof GeometryAttributeType)) {
+				if (!(featureType.getAttribute(i) instanceof GeometryDescriptor)) {
 					cnt++;
 					writeFlags[i] = (byte) 1;
 				}
@@ -1420,10 +1434,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		 */
 		protected void flush() throws IOException {
 			if ((records <= 0) && (shapeType == null)) {
-				GeometryAttributeType geometryAttributeType = featureType
+				GeometryDescriptor geometryDescriptor = featureType
 						.getDefaultGeometry();
 
-				Class gat = geometryAttributeType.getBinding();
+				Class<?> gat = geometryDescriptor.getType().getBinding();
 				shapeType = JTSUtilities.getShapeType(gat);
 			}
 
@@ -1450,9 +1464,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			DbaseFileHeader header = new DbaseFileHeader();
 
 			for (int i = 0, ii = featureType.getAttributeCount(); i < ii; i++) {
-				AttributeType type = featureType.getAttributeType(i);
+				AttributeDescriptor type = featureType.getAttribute(i);
 
-				Class colType = type.getBinding();
+				Class colType = type.getType().getBinding();
 				String colName = type.getLocalName();
 				int fieldLen = FeatureTypes.getFieldLength(type);
 
@@ -1643,7 +1657,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			}
 		}
 
-		public org.geotools.feature.FeatureType getFeatureType() {
+		public SimpleFeatureType getFeatureType() {
 			return featureType;
 		}
 
@@ -1655,7 +1669,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			return featureReader.hasNext();
 		}
 
-		public org.geotools.feature.Feature next() throws IOException {
+		public SimpleFeature next() throws IOException {
 			// closed already, error!
 			if (featureReader == null) {
 				throw new IOException("Writer closed");
@@ -1730,7 +1744,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 				indexedFidWriter.write();
 			}
 			// writing of Geometry
-			Geometry g = currentFeature.getDefaultGeometry();
+			Geometry g = (Geometry) currentFeature.getDefaultGeometry();
 
 			// if this is the first Geometry, find the shapeType and handler
 			if (shapeType == null) {

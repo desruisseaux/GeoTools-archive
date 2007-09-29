@@ -262,6 +262,16 @@ public class SimpleFeatureTypeBuilder {
 		return this;
 	}
 	/**
+	 * Set the name and continue chaining.
+	 * @param name
+	 * @return SimpleFeatureTypeBuilder with the indicated name
+	 */
+	public SimpleFeatureTypeBuilder name( String name ){
+	    setName( name );
+	    return this;
+	}
+	
+	/**
 	 * Sets the name of the built type.
 	 */
 	public void setName(String name) {
@@ -625,6 +635,17 @@ public class SimpleFeatureTypeBuilder {
 	    attributes().add(descriptor);
 	}
 
+    /**
+     * Adds a list of descriptors directly to the builder.
+     * <p>
+     * Use of this method is discouraged. Consider using {@link #add(String, Class)}.
+     * </p>
+     */
+    public void addAll( List<AttributeDescriptor>  descriptors ) {
+        for ( AttributeDescriptor ad : descriptors ) {
+            add( ad );
+        }
+    }
 	/**
      * Adds an array of descriptors directly to the builder.
      * <p>

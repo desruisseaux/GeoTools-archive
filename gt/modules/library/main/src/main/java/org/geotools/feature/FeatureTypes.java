@@ -128,28 +128,33 @@ public class FeatureTypes {
         String colName = descriptor.getLocalName();
 
         int fieldLen = -1;
-        for ( Filter f : type.getRestrictions()) {
-            if (f != null
-                && f != Filter.EXCLUDE
-                && f != Filter.INCLUDE
-                && (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)) {
-                try {
-                    BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
-                    if (cf.getExpression1() instanceof LengthFunction) {
-                        return Integer.parseInt(((Literal) cf.getExpression2()).getValue()
-                                .toString());
-                    } else if (cf.getExpression2() instanceof LengthFunction) {
-                        return Integer.parseInt(((Literal) cf.getExpression1()).getValue()
-                                .toString());
-                    } else {
+        while( type != null ){
+            // TODO: We should really go through all the restrictions and find
+            // the minimum of all the length restrictions; for now we assume an
+            // override behaviour.
+            for ( Filter f : type.getRestrictions()) {
+                if (f != null
+                    && f != Filter.EXCLUDE
+                    && f != Filter.INCLUDE
+                    && (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)) {
+                    try {
+                        BinaryComparisonOperator cf =  (BinaryComparisonOperator) f;
+                        if (cf.getExpression1() instanceof LengthFunction) {
+                            return Integer.parseInt(((Literal) cf.getExpression2()).getValue()
+                                    .toString());
+                        } else if (cf.getExpression2() instanceof LengthFunction) {
+                            return Integer.parseInt(((Literal) cf.getExpression1()).getValue()
+                                    .toString());
+                        } else {
+                            return ANY_LENGTH;
+                        }
+                    } catch (NumberFormatException e) {
                         return ANY_LENGTH;
                     }
-                } catch (NumberFormatException e) {
-                    return ANY_LENGTH;
                 }
             }
-        }
-            
+            type = type.getSuper();
+        }            
         return ANY_LENGTH;
     }
     

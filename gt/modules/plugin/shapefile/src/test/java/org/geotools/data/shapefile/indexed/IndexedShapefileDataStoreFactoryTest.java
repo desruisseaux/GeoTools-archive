@@ -80,11 +80,10 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
             TestData.url(ShapefileDataStoreTest.STATE_POP));
 
         DataStore store = factory.createDataStore(map);
-        assertEquals(namespace,
-            store.getSchema(ShapefileDataStoreTest.STATE_POP.substring(
-                    ShapefileDataStoreTest.STATE_POP.indexOf('/')+1,
-                    ShapefileDataStoreTest.STATE_POP.lastIndexOf('.')))
-                 .getNamespace());
+        String typeName = ShapefileDataStoreTest.STATE_POP.substring(
+                ShapefileDataStoreTest.STATE_POP.indexOf('/')+1,
+                ShapefileDataStoreTest.STATE_POP.lastIndexOf('.'));
+        assertEquals("http://jesse.com", store.getSchema(typeName).getName().getNamespaceURI());
     }
 
     private ShapefileDataStore testCreateDataStore(boolean newDS,boolean createIndex)

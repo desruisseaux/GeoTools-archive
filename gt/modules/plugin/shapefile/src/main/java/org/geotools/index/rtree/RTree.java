@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.apache.velocity.runtime.exception.NodeException;
 import org.opengis.filter.Filter;
 import org.geotools.filter.Filters;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.Lock;
@@ -35,7 +36,7 @@ import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * Relational index.
  *
  * @author Tommaso Nolli
  * @source $URL$

@@ -35,13 +35,15 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
 
 
 /**
- * DOCUMENT ME!
+ * Visit the feature collection calculating bounds.
  *
  * @author Tommaso Nolli
  * @source $URL$
@@ -49,7 +51,7 @@ import java.util.logging.Logger;
 public class FilterConsumer implements FilterVisitor {
     private static Logger LOGGER = Logger.getLogger("org.geotools.index.rtree");
     private Envelope bounds = null;
-
+    
     public Envelope getBounds() {
         return this.bounds;
     }
