@@ -28,8 +28,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.opengis.filter.Filter;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -123,7 +123,7 @@ public class StyleGenerator {
      */
     public static FeatureTypeStyle createFeatureTypeStyle(Classifier classifier,
         Expression expression, Color[] colors, String typeId,
-        GeometryAttributeType geometryAttrType, int elseMode, double opacity, Stroke defaultStroke)
+        GeometryDescriptor geometryAttrType, int elseMode, double opacity, Stroke defaultStroke)
         throws IllegalFilterException {
         //init nulls
         if (defaultStroke == null) {
@@ -210,7 +210,7 @@ public class StyleGenerator {
      * @param defaultStroke stroke used for borders
      *
      */
-    private static Symbolizer createSymbolizer(GeometryAttributeType geometryAttrType, Color color,
+    private static Symbolizer createSymbolizer(GeometryDescriptor geometryAttrType, Color color,
         double opacity, Stroke defaultStroke) {
         Symbolizer symb;
 
@@ -218,14 +218,14 @@ public class StyleGenerator {
             defaultStroke = sb.createStroke(Color.BLACK, 1, opacity);
         }
 
-        if ((geometryAttrType.getBinding() == MultiPolygon.class)
-                || (geometryAttrType.getBinding() == Polygon.class)) {
+        if ((geometryAttrType.getType().getBinding() == MultiPolygon.class)
+                || (geometryAttrType.getType().getBinding() == Polygon.class)) {
             Fill fill = sb.createFill(color, opacity);
             symb = sb.createPolygonSymbolizer(defaultStroke, fill);
-        } else if (geometryAttrType.getBinding() == LineString.class) {
+        } else if (geometryAttrType.getType().getBinding() == LineString.class) {
             symb = sb.createLineSymbolizer(color);
-        } else if ((geometryAttrType.getBinding() == MultiPoint.class)
-                || (geometryAttrType.getBinding() == Point.class)) {
+        } else if ((geometryAttrType.getType().getBinding() == MultiPoint.class)
+                || (geometryAttrType.getType().getBinding() == Point.class)) {
             Fill fill = sb.createFill(color, opacity);
             Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, fill, defaultStroke);
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
@@ -273,7 +273,7 @@ public class StyleGenerator {
     }
 
     private static Rule createRuleRanged(RangedClassifier classifier, Expression expression,
-        Object localMin, Object localMax, GeometryAttributeType geometryAttrType, int i,
+        Object localMin, Object localMax, GeometryDescriptor geometryAttrType, int i,
         int elseMode, Color[] colors, double opacity, Stroke defaultStroke)
         throws IllegalFilterException {
         // 1.0 --> 1
@@ -343,7 +343,7 @@ public class StyleGenerator {
     }
 
     private static Rule createRuleExplicit(ExplicitClassifier explicit, Expression expression,
-        Set value, GeometryAttributeType geometryAttrType, int i, int elseMode, Color[] colors,
+        Set value, GeometryDescriptor geometryAttrType, int i, int elseMode, Color[] colors,
         double opacity, Stroke defaultStroke) {
         // create a sub filter for each unique value, and merge them
         // into the logic filter
@@ -536,7 +536,7 @@ public class StyleGenerator {
      * @return an array with all the filters
      * @throws IllegalFilterException
      */
-    public static Filter[] toFilter(String[] styleExpression, FeatureType[] featureType,
+    public static Filter[] toFilter(String[] styleExpression, SimpleFeatureType[] featureType,
         String[] attributeTypeName) throws IllegalFilterException {
         Filter[] filter = new Filter[styleExpression.length];
 
@@ -603,7 +603,7 @@ public class StyleGenerator {
      * @return a filter
      * @throws IllegalFilterException
      */
-    public static Filter toRangedFilter(String styleExpression, FeatureType featureType,
+    public static Filter toRangedFilter(String styleExpression, SimpleFeatureType featureType,
         String attributeTypeName, boolean upperBoundClosed)
         throws IllegalFilterException {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
@@ -742,7 +742,7 @@ public class StyleGenerator {
      * @return a filter
      * @throws IllegalFilterException
      */
-    public static Filter toExplicitFilter(String styleExpression, FeatureType featureType,
+    public static Filter toExplicitFilter(String styleExpression, SimpleFeatureType featureType,
         String attributeTypeName) throws IllegalFilterException {
         // eliminate spaces after commas
         String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$

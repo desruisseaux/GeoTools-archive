@@ -19,7 +19,6 @@ package org.geotools.brewer.color;
 //import edu.psu.geovista.colorbrewer.OriginalColor;
 import java.awt.Color;
 import java.util.List;
-import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -27,6 +26,7 @@ import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.function.ClassificationFunction;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -109,7 +109,7 @@ public class PaletteFunction extends FunctionExpressionImpl implements FunctionE
         return prelim;
     }
 
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
         int classNum = classifier.getNumberOfClasses();
         ColorBrewer brewer = new ColorBrewer();
         int klass = ((Integer) classifier.evaluate(feature)).intValue();

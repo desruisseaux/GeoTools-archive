@@ -27,7 +27,6 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
@@ -37,6 +36,7 @@ import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.function.RangedClassifier;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -80,8 +80,8 @@ public class StyleGeneratorTest extends DataTestCase {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         MathExpression expr = null;
         MathExpression expr2 = null;
-        FeatureType type = roadType;
-        String attribName = type.getAttributeType(0).getLocalName();
+        SimpleFeatureType type = roadType;
+        String attribName = type.getAttribute(0).getLocalName();
         FeatureCollection fc = DataUtilities.collection(roadFeatures);
         FeatureSource fs = DataUtilities.source(fc);
 
