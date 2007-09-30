@@ -570,7 +570,7 @@ public class MemoryDataStore extends AbstractDataStore {
 
                 if (filter.evaluate(feature)) {
                     count++;
-                    envelope.expandToInclude(((Geometry) first.getDefaultGeometry()).getEnvelopeInternal());
+                    envelope.expandToInclude(((Geometry) feature.getDefaultGeometry()).getEnvelopeInternal());
                 }
             }
         }

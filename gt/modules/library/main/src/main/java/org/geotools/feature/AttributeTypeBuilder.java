@@ -161,6 +161,8 @@ public class AttributeTypeBuilder {
 	 */
 	public AttributeTypeBuilder() {
 		this( new FeatureTypeFactoryImpl() );
+		init();
+		
 	}
 	
 	/**
@@ -170,6 +172,14 @@ public class AttributeTypeBuilder {
 	 */
 	public AttributeTypeBuilder( FeatureTypeFactory factory ) {
 		this.factory = factory;
+	}
+	
+	/**
+	 * Resets all internal state.
+	 */
+	protected void init() {
+	    resetTypeState();
+	    resetDescriptorState();
 	}
 	
 	/**

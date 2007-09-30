@@ -78,13 +78,7 @@ public class AttributeImpl extends PropertyImpl implements Attribute {
 		newValue = parse(newValue);
 
 		//TODO: remove this validation
-		try {
-			Types.validate(getType(), this, newValue);
-		} catch (IllegalAttributeException e) {
-			throw (IllegalArgumentException) new IllegalArgumentException()
-					.initCause(e);
-		}
-
+		Types.validate(getType(), this, newValue);
 		super.setValue( newValue );
 	}
 

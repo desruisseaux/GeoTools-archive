@@ -58,6 +58,7 @@ import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.Utilities;
 import org.geotools.util.Converters;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.simple.SimpleFeature;
@@ -1163,11 +1164,17 @@ public class DataUtilities {
     public static SimpleFeatureType createSubType(SimpleFeatureType featureType,
             String[] properties, CoordinateReferenceSystem override)
             throws SchemaException {
-        try {
-            return createSubType( featureType, properties, override, featureType.getTypeName(), new URI(featureType.getName().getNamespaceURI()) );
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+        URI namespaceURI = null;
+        if ( featureType.getName().getNamespaceURI() != null ) {
+            try {
+                namespaceURI = new URI( featureType.getName().getNamespaceURI() );
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
+        
+        return createSubType( featureType, properties, override, featureType.getTypeName(), namespaceURI );
+
     }
 
     public static SimpleFeatureType createSubType(SimpleFeatureType featureType,
@@ -1185,9 +1192,11 @@ public class DataUtilities {
           }
         }
 
+        String namespaceURI = namespace != null ? namespace.toString() : null;
         boolean same = featureType.getAttributeCount() == properties.length &&
             featureType.getTypeName().equals( typeName ) &&
-            featureType.getName().getNamespaceURI().equals( namespace.toString() );
+            Utilities.equals(featureType.getName().getNamespaceURI(), namespaceURI );
+            
 
         for (int i = 0; (i < featureType.getAttributeCount()) && same; i++) {
             AttributeDescriptor type = featureType.getAttribute(i);

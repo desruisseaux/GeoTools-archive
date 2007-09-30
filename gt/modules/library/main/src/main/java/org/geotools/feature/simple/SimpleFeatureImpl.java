@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.feature.FeatureImpl;
+import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -61,7 +62,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
     public void setAttribute(String name, Object value) {
         Attribute attribute = (Attribute) getProperty(name);
         if ( attribute == null ) {
-            throw new IllegalArgumentException("No such attribute: " + name);
+            throw new IllegalAttributeException("No such attribute: " + name);
         }
         
         attribute.setValue( value );
@@ -121,7 +122,7 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
             getDefaultGeometryProperty().setValue(geometry);
         }
         else {
-            throw new IllegalStateException("Feature has no defaultGeometry property");    
+            throw new IllegalAttributeException("Feature has no defaultGeometry property");    
         }
         
     }

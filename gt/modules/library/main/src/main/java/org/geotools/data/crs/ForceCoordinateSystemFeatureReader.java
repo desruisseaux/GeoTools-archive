@@ -23,6 +23,7 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -63,7 +64,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class ForceCoordinateSystemFeatureReader implements FeatureReader {
     protected FeatureReader reader;
     protected SimpleFeatureType schema;
-
+    protected SimpleFeatureBuilder builder;
+    
     /**
      * Shortcut constructor that can be used if the new schema has already been computed
      * @param reader
@@ -110,6 +112,9 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
 
         if (!cs.equals(originalCs)) {
             schema = FeatureTypes.transform(type, cs, forceOnlyMissing);
+            
+            //create builder
+            builder = new SimpleFeatureBuilder(schema);
         }
 
         this.reader = reader;
@@ -141,7 +146,10 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         SimpleFeature next = reader.next();
         if( schema==null )
             return next;
-        return SimpleFeatureBuilder.copy(next);
+        
+        builder.init(next);
+        builder.setType( schema );
+        return builder.buildFeature(next.getID());
     }
 
     /**

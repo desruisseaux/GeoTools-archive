@@ -121,6 +121,7 @@ public class FilterTest extends TestCase {
         fac = FilterFactoryFinder.createFilterFactory();
         
         SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName( "testFeatureType");
         ftb.add("testGeometry", LineString.class);
         ftb.add("testBoolean", Boolean.class);
         ftb.add("testCharacter", Character.class);

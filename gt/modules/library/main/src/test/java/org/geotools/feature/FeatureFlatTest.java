@@ -101,8 +101,8 @@ public class FeatureFlatTest extends TestCase {
     public void testBogusCreation() throws Exception {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName( "test1" );
-        tb.add( "billy", String.class );
-        tb.add( "jimmy", String.class );
+        tb.nillable(false).add( "billy", String.class );
+        tb.nillable(false).add( "jimmy", String.class );
         
         SimpleFeatureType test = tb.buildFeatureType();
         try {
@@ -160,7 +160,7 @@ public class FeatureFlatTest extends TestCase {
         SimpleFeatureType type = SampleFeatureFixtures.createTestType();
         Object[] attributes = SampleFeatureFixtures.createAttributes();
         SimpleFeature feature = SimpleFeatureBuilder.build(type, attributes, "fid");
-        SimpleFeature clone = (SimpleFeature) ((Cloneable)feature).clone();
+        SimpleFeature clone = SimpleFeatureBuilder.deep(feature);
         assertTrue("Clone was not equal", feature.equals(clone));
     }
 
