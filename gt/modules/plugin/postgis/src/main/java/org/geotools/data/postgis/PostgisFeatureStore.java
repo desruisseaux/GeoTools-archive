@@ -42,13 +42,13 @@ import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FidFilter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -600,7 +600,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 String newValue;
 
                 //check her to make sure object matches attribute type.
-                if (curType  instanceof GeometryAttributeType) {
+                if (curType instanceof GeometryDescriptor) {
                     //create the text to add geometry
                     int srid = getSRID(curType.getLocalName());
                     String geoText = geometryWriter.write((Geometry) curValue);

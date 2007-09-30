@@ -8,8 +8,8 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Hits a PostGIS database with a feature reader.
@@ -69,13 +69,13 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
      */
     protected boolean addFeature(String table) throws Exception {
         FeatureWriter writer = ds.getFeatureWriter(table, Transaction.AUTO_COMMIT);
-        Feature feature;
+        SimpleFeature feature;
 
         while (writer.hasNext()) {
-            feature = (Feature) writer.next();
+            feature = (SimpleFeature) writer.next();
         }
 
-        feature = (Feature) writer.next();
+        feature = (SimpleFeature) writer.next();
         feature.setAttribute(0, "test");
         //feature.setAttribute(1, val);
         writer.write();
@@ -112,7 +112,7 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
         Query query = new DefaultQuery(table);
         FeatureReader fr = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(fr.hasNext());
-        Feature feature = fr.next();
+        SimpleFeature feature = fr.next();
         String id = feature.getID();
         fr.close();
         return id;
@@ -120,7 +120,7 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
     
     public void testGetSchema() throws Exception {
         //test that getSchema works when a entry does not exist in the geometry_columns table
-        FeatureType schema;
+        SimpleFeatureType schema;
         schema = ds.getSchema(table1);
         assertNotNull(schema);
         //test that getSchema works when geometry_columns f_table_schema = public

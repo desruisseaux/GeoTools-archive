@@ -23,15 +23,16 @@ import java.util.List;
 import org.geotools.data.FeatureReader;
 
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -62,13 +63,13 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 		List fids = new ArrayList();
 		FeatureCollection fc = data.getFeatureSource("road").getFeatures();
 		for (Iterator itr = fc.iterator(); itr.hasNext();) {
-			Feature f = (Feature)itr.next();
-			bbox.add(f.getDefaultGeometry().getEnvelopeInternal());
+			SimpleFeature f = (SimpleFeature)itr.next();
+			bbox.add(((Geometry) f.getDefaultGeometry()).getEnvelopeInternal());
 			fids.add(f.getID());
 		}
 		
 		//query each feature
-		FeatureType type = data.getSchema("road");
+		SimpleFeatureType type = data.getSchema("road");
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		
 		for (int i = 0; i < bbox.size(); i++) {
@@ -85,7 +86,7 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
                             ((PostgisDataStore) data).getFeatureReader(type,filter,Transaction.AUTO_COMMIT);
 			boolean found = false;
 			for (; reader.hasNext();) {
-				Feature f = reader.next();
+				SimpleFeature f = reader.next();
 				if (fid.equals(f.getID()))
 					found = true;
 			}

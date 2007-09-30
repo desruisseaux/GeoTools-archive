@@ -25,7 +25,6 @@ import org.geotools.data.jdbc.JDBCFeatureCollection;
 import org.geotools.data.jdbc.JDBCFeatureSource;
 import org.geotools.data.postgis.PostgisDataStore;
 import org.geotools.data.postgis.PostgisTests;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.visitor.AverageVisitor;
 import org.geotools.feature.visitor.CountVisitor;
 import org.geotools.feature.visitor.MaxVisitor;
@@ -40,6 +39,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -53,8 +53,8 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
     private PostgisDataStore dstore = null;
     private JDBCFeatureCollection fc = null;
     private JDBCFeatureCollection fc2 = null;
-    private FeatureType featureType = null;
-    private FeatureType featureType2 = null;
+    private SimpleFeatureType featureType = null;
+    private SimpleFeatureType featureType2 = null;
     private FilterFactory ff = FilterFactoryFinder.createFilterFactory();
     AttributeExpression att = null;
     AttributeExpression att2 = null;

@@ -5,10 +5,11 @@ import java.util.Set;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class PostgisFeatureStoreOnlineTest extends AbstractPostgisOnlineTestCase {
 
@@ -31,9 +32,9 @@ public class PostgisFeatureStoreOnlineTest extends AbstractPostgisOnlineTestCase
         Transaction transaction = new DefaultTransaction("attemptWriteFS");
         FeatureStore fs = (FeatureStore) ds.getFeatureSource(table);
         fs.setTransaction(transaction);
-        FeatureType ft = fs.getSchema();
+        SimpleFeatureType ft = fs.getSchema();
         FeatureCollection fc = FeatureCollections.newCollection();
-        Feature feature = ft.create(new Object[] {"test"});
+        SimpleFeature feature = SimpleFeatureBuilder.build(ft, new Object[] {"test"}, null);
         fc.add(feature);
         Set set = fs.addFeatures(fc);
         String id = (String) set.toArray()[0];

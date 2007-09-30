@@ -32,7 +32,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -176,7 +176,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".road add name varchar;");
 
             for (int i = 0; i < roadFeatures.length; i++) {
-                Feature feature = roadFeatures[i];
+                SimpleFeature feature = roadFeatures[i];
 
                 //strip out the road. 
                 String fid = feature.getID().substring("road.".length());
@@ -221,7 +221,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".lake add name varchar;");
             
             for (int i = 0; i < lakeFeatures.length; i++) {
-                Feature feature = lakeFeatures[i];
+                SimpleFeature feature = lakeFeatures[i];
 
                 //strip out the lake. 
                 String ql = "INSERT INTO " + f.schema + ".lake (id,geom,name) VALUES ("
@@ -304,7 +304,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".river add flow float8");
             
             for (int i = 0; i < riverFeatures.length; i++) {
-                Feature feature = riverFeatures[i];
+                SimpleFeature feature = riverFeatures[i];
                 String fid = feature.getID().substring("river.".length());
                 s.execute(
                     "INSERT INTO " + f.schema + ".river (fid, id, geom, river, flow) VALUES ("

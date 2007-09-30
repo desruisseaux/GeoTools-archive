@@ -72,10 +72,10 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.CompareFilter;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
@@ -1271,14 +1271,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             //to get it back in exactly the order they wanted.  So for now 
             //let's leave things as is, and maybe talk about it in an irc. -ch 
             for (int i = 0; i < attributeType.length; i++) {
-                if (!(attributeType[i] instanceof GeometryAttributeType)) {
+                if (!(attributeType[i] instanceof GeometryDescriptor)) {
                     continue;
                 }
-                GeometryAttributeType geomAttribute = (GeometryAttributeType) attributeType[i];
+                GeometryDescriptor geomAttribute = (GeometryDescriptor) attributeType[i];
                 String columnName = attributeType[i].getLocalName();
                 
-                CoordinateReferenceSystem refSys = geomAttribute
-                    .getCoordinateSystem();
+                CoordinateReferenceSystem refSys = geomAttribute.getCRS();
                 int SRID;
 
                 if (refSys != null) {
@@ -1309,9 +1308,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                 //this construct seems unnecessary, since we already would
                 //pass over if this wasn't a geometry...
-                Class type = geomAttribute.getBinding();
+                Class type = geomAttribute.getType().getBinding();
 
-                if (geomAttribute instanceof GeometryAttributeType) {
+                if (geomAttribute instanceof GeometryDescriptor) {
                     typeName = getGeometrySQLTypeName(type);
                 } else {
                     typeName = (String) CLASS_MAPPINGS.get(type);
@@ -1493,7 +1492,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             	typeName = (String) GEOM_CLASS_MAPPINGS.get(attributeType[i].getType().getBinding());
             	
             if (typeName != null) {
-                if (attributeType[i] instanceof GeometryAttributeType) {
+                if (attributeType[i] instanceof GeometryDescriptor) {
                     typeName = "GEOMETRY";
                 } else if (typeName.equals("VARCHAR")) {
                 	int length = FeatureTypes.getFieldLength(attributeType[i]);
