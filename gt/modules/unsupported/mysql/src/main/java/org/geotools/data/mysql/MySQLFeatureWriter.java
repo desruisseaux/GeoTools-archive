@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,11 +16,6 @@
 package org.geotools.data.mysql;
 
 import java.io.IOException;
-
-import org.geotools.data.FeatureReader;
-import org.geotools.data.jdbc.JDBCTextFeatureWriter;
-import org.geotools.data.jdbc.QueryData;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
@@ -30,6 +25,9 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTWriter;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.jdbc.JDBCTextFeatureWriter;
+import org.geotools.data.jdbc.QueryData;
 
 
 /**
@@ -42,7 +40,6 @@ import com.vividsolutions.jts.io.WKTWriter;
  * bug in the MySQL bug database, so I will add a new bug there.  In the meantime,
  * this package should work fine for writing non-geometric data.
  * @author Gary Sheppard garysheppard@psu.edu
-
  *
  * @author wolf
  * @author Gary Sheppard garysheppard@psu.edu

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -20,9 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.sql.DataSource;
-
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -32,7 +30,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
 /**
  * Creates a MySQLDataStoreFactory based on the correct params.
- * 
+ *
  * <p>
  * This factory should be registered in the META-INF/ folder, under services/
  * in the DataStoreFactorySpi file.
@@ -41,55 +39,43 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  * @author Andrea Aime, University of Modena and Reggio Emilia
  * @source $URL$
  */
-public class MySQLDataStoreFactory
-    extends AbstractDataStoreFactory {
-
+public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
     private static final Logger LOGGER = Logger.getLogger(MySQLDataStoreFactory.class.getName());
-        
+
     /** Creates MySQL JDBC driver class. */
     private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
     /** Param, package visibiity for JUnit tests */
-    static final Param DBTYPE = new Param("dbtype", String.class,
-            "must be 'mysql'", true, "mysql");
+    static final Param DBTYPE = new Param("dbtype", String.class, "must be 'mysql'", true, "mysql");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param HOST = new Param("host", String.class,
-            "mysql host machine", true, "localhost");
+    static final Param HOST = new Param("host", String.class, "mysql host machine", true,
+            "localhost");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PORT = new Param("port", Integer.class,
-            "mysql connection port", true, "3306");
+    static final Param PORT = new Param("port", Integer.class, "mysql connection port", true, "3306");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param DATABASE = new Param("database", String.class,
-            "msyql database");
+    static final Param DATABASE = new Param("database", String.class, "msyql database");
 
     /** Param, package visibiity for JUnit tests */
-    static final Param USER = new Param("user", String.class,
-            "user name to login as", false);
+    static final Param USER = new Param("user", String.class, "user name to login as", false);
 
     /** Param, package visibiity for JUnit tests */
-    static final Param PASSWD = new Param("passwd", String.class,
-            "password used to login", false);
-    
+    static final Param PASSWD = new Param("passwd", String.class, "password used to login", false);
     static final Param MAXCONN = new Param("max connections", Integer.class,
             "maximum number of open connections", false, new Integer(10));
-    
     static final Param MINCONN = new Param("min connections", Integer.class,
             "minimum number of pooled connection", false, new Integer(4));
-    
-    static final Param VALIDATECONN = new Param("validate connections", Boolean .class,
+    static final Param VALIDATECONN = new Param("validate connections", Boolean.class,
             "check connection is alive before using it", false, Boolean.FALSE);
 
     /** Param, package visibiity for JUnit tests */
-    static final Param NAMESPACE = new Param("namespace", String.class,
-            "namespace prefix used", false);
+    static final Param NAMESPACE = new Param("namespace", String.class, "namespace prefix used",
+            false);
 
     /** Array with all of the params */
-    static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE
-    };
+    static final Param[] arrayParameters = { DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, NAMESPACE };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
@@ -99,11 +85,11 @@ public class MySQLDataStoreFactory
 
     /**
      * Checks to see if all the postgis params are there.
-     * 
+     *
      * <p>
      * Should have:
      * </p>
-     * 
+     *
      * <ul>
      * <li>
      * dbtype: equal to postgis
@@ -121,7 +107,7 @@ public class MySQLDataStoreFactory
      * database
      * </li>
      * </ul>
-     * 
+     *
      *
      * @param params Set of parameters needed for a postgis data store.
      *
@@ -129,8 +115,9 @@ public class MySQLDataStoreFactory
      *         for host, user, passwd, and database.
      */
     public boolean canProcess(Map params) {
-        if(!super.canProcess(params))
+        if (!super.canProcess(params)) {
             return false;
+        }
 
         return ((String) params.get("dbtype")).equalsIgnoreCase("mysql");
     }
@@ -168,12 +155,13 @@ public class MySQLDataStoreFactory
             LOGGER.warning("Can not process : " + params);
             throw new IOException("The parameteres map isn't correct!!");
         }
-        
-        boolean validate = validateConn != null && validateConn.booleanValue();
-        int maxActive = maxConn != null ? maxConn.intValue() : 10;
-        int maxIdle = minConn != null ? minConn.intValue() : 4;
-        DataSource ds = getDefaultDataSource(host, user, passwd, port, database, maxActive, maxIdle, validate);
-        
+
+        boolean validate = (validateConn != null) && validateConn.booleanValue();
+        int maxActive = (maxConn != null) ? maxConn.intValue() : 10;
+        int maxIdle = (minConn != null) ? minConn.intValue() : 4;
+        DataSource ds = getDefaultDataSource(host, user, passwd, port, database, maxActive,
+                maxIdle, validate);
+
         if (namespace != null) {
             return new MySQLDataStore(ds, namespace);
         } else {
@@ -181,10 +169,14 @@ public class MySQLDataStoreFactory
         }
     }
 
-    public static ManageableDataSource getDefaultDataSource(String host, String user, String passwd, int port, String database, int maxActive, int minIdle, boolean validate) throws DataSourceException {
+    public static ManageableDataSource getDefaultDataSource(String host, String user,
+        String passwd, int port, String database, int maxActive, int minIdle, boolean validate)
+        throws DataSourceException {
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
         String driver = "com.mysql.jdbc.Driver";
-        return DataSourceUtil.buildDefaultDataSource(url, driver, user, passwd, maxActive, minIdle, validate ? "select version()" : null, false, 0);
+
+        return DataSourceUtil.buildDefaultDataSource(url, driver, user, passwd, maxActive, minIdle,
+            validate ? "select version()" : null, false, 0);
     }
 
     /**
@@ -197,8 +189,7 @@ public class MySQLDataStoreFactory
      * @throws UnsupportedOperationException Cannot create new database
      */
     public DataStore createNewDataStore(Map params) throws IOException {
-        throw new UnsupportedOperationException(
-            "MySQL cannot create a new Database");
+        throw new UnsupportedOperationException("MySQL cannot create a new Database");
     }
 
     /**
@@ -207,7 +198,7 @@ public class MySQLDataStoreFactory
     public String getDisplayName() {
         return "MySQL";
     }
-    
+
     /**
      * Describe the nature of the datasource constructed by this factory.
      *
@@ -218,16 +209,16 @@ public class MySQLDataStoreFactory
         return "MySQL Database";
     }
 
-//    /**
-//     *
-//     */
-//    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-//        String host = (String) HOST.lookUp(params);
-//        String user = (String) USER.lookUp(params);
-//        String port = (String) PORT.lookUp(params);
-//        String database = (String) DATABASE.lookUp(params);
-//        return new DataSourceMetadataEnity( host+"port", database, "MySQL connection to "+host+" as "+user );
-//    }
+    //    /**
+    //     *
+    //     */
+    //    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+    //        String host = (String) HOST.lookUp(params);
+    //        String user = (String) USER.lookUp(params);
+    //        String port = (String) PORT.lookUp(params);
+    //        String database = (String) DATABASE.lookUp(params);
+    //        return new DataSourceMetadataEnity( host+"port", database, "MySQL connection to "+host+" as "+user );
+    //    }
 
     /**
      * Test to see if this datastore is available, if it has all the
@@ -243,8 +234,10 @@ public class MySQLDataStoreFactory
             Class.forName(DRIVER_CLASS);
         } catch (ClassNotFoundException cnfe) {
             LOGGER.warning("MySQL data sources are not available: " + cnfe.getMessage());
+
             return false;
         }
+
         return true;
     }
 

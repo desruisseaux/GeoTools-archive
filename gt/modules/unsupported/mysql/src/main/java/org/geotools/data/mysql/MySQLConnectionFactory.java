@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,6 +15,7 @@
  */
 package org.geotools.data.mysql;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,15 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
-
 import javax.sql.DataSource;
-
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.datasource.DataSourceFinder;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 /**
  * Creates ConnectionPool objects for a certain MySQL database instance.
@@ -39,7 +37,6 @@ import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class MySQLConnectionFactory {
-
     /** Standard logging instance */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
 
@@ -95,40 +92,44 @@ public class MySQLConnectionFactory {
      * @return a MySQL ConnectionPool object
      * @throws SQLException if an error occurs connecting to the MySQL database
      */
-    public ConnectionPool getConnectionPool(String username, String password) throws SQLException {
+    public ConnectionPool getConnectionPool(String username, String password)
+        throws SQLException {
         setLogin(username, password);
+
         return getConnectionPool();
     }
 
     /**
-         * Creates a database connection method to initialize a given database for
-         * feature extraction with the user and password params.
-         *
-         * @param user the name of the user connect to connect to the pgsql db.
-         * @param password the password for the user.
-         *
-         * @return the sql Connection object to the database.
-         *
-         * @throws SQLException if the postgis sql driver could not be found
-         */
-    public Connection getConnection(String user, String password) throws SQLException {
+     * Creates a database connection method to initialize a given database for
+     * feature extraction with the user and password params.
+     *
+     * @param user the name of the user connect to connect to the pgsql db.
+     * @param password the password for the user.
+     *
+     * @return the sql Connection object to the database.
+     *
+     * @throws SQLException if the postgis sql driver could not be found
+     */
+    public Connection getConnection(String user, String password)
+        throws SQLException {
         Properties props = new Properties();
         props.put("user", user);
         props.put("password", password);
+
         return getConnection(props);
     }
 
     /**
-         * Creates a database connection method to initialize a given database for
-         * feature extraction with the given Properties.
-         *
-         * @param props Should contain at a minimum the user and password.
-         *        Additional properties, such as charSet, can also be added.
-         *
-         * @return the sql Connection object to the database.
-         *
-         * @throws SQLException if the postgis sql driver could not be found
-         */
+     * Creates a database connection method to initialize a given database for
+     * feature extraction with the given Properties.
+     *
+     * @param props Should contain at a minimum the user and password.
+     *        Additional properties, such as charSet, can also be added.
+     *
+     * @return the sql Connection object to the database.
+     *
+     * @throws SQLException if the postgis sql driver could not be found
+     */
     public Connection getConnection(Properties props) throws SQLException {
         // makes a new feature type bean to deal with incoming
         Connection dbConnection = null;
@@ -155,8 +156,8 @@ public class MySQLConnectionFactory {
      */
     public ConnectionPool getConnectionPool() throws SQLException {
         String poolKey = _dbURL + _username + _password;
-        MysqlConnectionPoolDataSource poolDataSource =
-            (MysqlConnectionPoolDataSource) _dataSources.get(poolKey);
+        MysqlConnectionPoolDataSource poolDataSource = (MysqlConnectionPoolDataSource) _dataSources
+            .get(poolKey);
 
         if (poolDataSource == null) {
             poolDataSource = new MysqlConnectionPoolDataSource();
@@ -188,7 +189,7 @@ public class MySQLConnectionFactory {
         if (!connectionPool.isClosed()) {
             connectionPool.close();
         }
+
         ConnectionPoolManager.getInstance().free(connectionPool);
     }
-
 }

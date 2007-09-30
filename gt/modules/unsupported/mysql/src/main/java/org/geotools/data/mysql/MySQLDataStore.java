@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -20,9 +20,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.logging.Logger;
-
 import javax.sql.DataSource;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -38,16 +45,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderMySQL;
-import org.opengis.feature.type.AttributeDescriptor;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * An implementation of the GeoTools Data Store API for the MySQL database platform.
@@ -63,13 +61,12 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Debasish Sahu debasish.sahu@rmsi.com
  * @source $URL$
  */
-
 public class MySQLDataStore extends JDBCDataStore {
     /** The logger for the mysql module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
 
     /**
-     * Basic constructor for MySQLDataStore.  
+     * Basic constructor for MySQLDataStore.
      * be done similar to the following:<br>
      * @param dataSource A source of connections for this datastore
      * @throws IOException if the database cannot be properly accessed
@@ -98,13 +95,9 @@ public class MySQLDataStore extends JDBCDataStore {
      * @param namespace the namespace for this data store.  Can be null, in which case the namespace will simply be the schema name.
      * @throws IOException if the database cannot be properly accessed
      */
-    public MySQLDataStore(
-        DataSource dataSource,
-        String databaseSchemaName,
-        String namespace)
+    public MySQLDataStore(DataSource dataSource, String databaseSchemaName, String namespace)
         throws IOException {
-        super(
-            dataSource,
+        super(dataSource,
             JDBCDataStoreConfig.createWithNameSpaceAndSchemaName(namespace, databaseSchemaName));
     }
 
@@ -117,12 +110,8 @@ public class MySQLDataStore extends JDBCDataStore {
      * @param password the password corresponding to <code>username</code>
      * @return a MySQLDataStore for the specified parameters
      */
-    public static MySQLDataStore getInstance(
-        String host,
-        String schema,
-        String username,
-        String password)
-        throws IOException, SQLException {
+    public static MySQLDataStore getInstance(String host, String schema, String username,
+        String password) throws IOException, SQLException {
         return getInstance(host, 3306, schema, username, password);
     }
 
@@ -136,17 +125,13 @@ public class MySQLDataStore extends JDBCDataStore {
      * @throws IOException if the MySQLDataStore cannot be created because the database cannot be properly accessed
      * @throws SQLException if a MySQL connection pool cannot be established
      */
-    public static MySQLDataStore getInstance(
-        String host,
-        int port,
-        String schema,
-        String username,
-        String password)
-        throws IOException, SQLException {
+    public static MySQLDataStore getInstance(String host, int port, String schema, String username,
+        String password) throws IOException, SQLException {
         String url = "jdbc:mysql://" + host + ":" + port + "/" + schema;
         String driver = "com.mysql.jdbc.Driver";
-        return new MySQLDataStore(DataSourceUtil.buildDefaultDataSource(url, driver, username, password, 
-                "select version()"));
+
+        return new MySQLDataStore(DataSourceUtil.buildDefaultDataSource(url, driver, username,
+                password, "select version()"));
     }
 
     /**
@@ -157,7 +142,8 @@ public class MySQLDataStore extends JDBCDataStore {
      * @return a FeatureWriter for modifying existing features
      * @throws IOException if the database cannot be properly accessed
      */
-    public FeatureWriter getFeatureWriter(String typeName) throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName)
+        throws IOException {
         return getFeatureWriter(typeName, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
 
@@ -168,7 +154,8 @@ public class MySQLDataStore extends JDBCDataStore {
      * @return a FeatureWriter for adding new features
      * @throws IOException if the database cannot be properly accessed
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName) throws IOException {
+    public FeatureWriter getFeatureWriterAppend(String typeName)
+        throws IOException {
         return getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT);
     }
 
@@ -177,7 +164,7 @@ public class MySQLDataStore extends JDBCDataStore {
      * contains the information retrieved by a call to  getColumns() on the
      * DatabaseMetaData object.  This information  can be used to construct an
      * Attribute Type.
-     * 
+     *
      * <p>
      * In addition to standard SQL types, this method identifies MySQL 4.1's geometric
      * datatypes and creates attribute types accordingly.  This happens when the
@@ -186,7 +173,7 @@ public class MySQLDataStore extends JDBCDataStore {
      * method simply calls the parent class's buildAttributeType method to do something
      * with it.
      * </p>
-     * 
+     *
      * <p>
      * Note: Overriding methods must never move the current row pointer in the
      * result set.
@@ -204,51 +191,62 @@ public class MySQLDataStore extends JDBCDataStore {
      *         default implementation if a type is present that is not present
      *         in the TYPE_MAPPINGS.
      */
-    protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeDescriptor buildAttributeType(ResultSet rs)
+        throws IOException {
         final int COLUMN_NAME = 4;
         final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
 
         try {
             int dataType = rs.getInt(DATA_TYPE);
+
             if (dataType == Types.OTHER) {
                 //this is MySQL-specific; handle it
                 String typeName = rs.getString(TYPE_NAME);
                 String typeNameLower = typeName.toLowerCase();
                 AttributeTypeBuilder builder = new AttributeTypeBuilder();
+
                 //TODO: Get at CRS info, put geometry stuff in its own method
                 if ("geometry".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(Geometry.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(Geometry.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("point".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(Point.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(Point.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("linestring".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(LineString.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(LineString.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("polygon".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(Polygon.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(Polygon.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multipoint".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(MultiPoint.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(MultiPoint.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multilinestring".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(MultiLineString.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(MultiLineString.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multipolygon".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(MultiPolygon.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(MultiPolygon.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("geometrycollection".equals(typeNameLower)) {
-                	builder.setNillable(true);
-                	builder.setBinding(GeometryCollection.class);
-                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
+                    builder.setNillable(true);
+                    builder.setBinding(GeometryCollection.class);
+
+                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else {
                     //nothing else we can do
                     return super.buildAttributeType(rs);
@@ -261,16 +259,17 @@ public class MySQLDataStore extends JDBCDataStore {
         }
     }
 
-	 /**
+    /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getSqlBuilder(java.lang.String)
      */
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
         //SQLEncoder encoder = new SQLEncoderMySQL(); replace with this once
-	//it is fully tested, the test cases work, but I don't have a live
+        //it is fully tested, the test cases work, but I don't have a live
         //mysql database. -ch
         //SQLEncoder encoder = new SQLEncoder();
-		SQLEncoderMySQL encoder = new SQLEncoderMySQL(); 
+        SQLEncoderMySQL encoder = new SQLEncoderMySQL();
         encoder.setFIDMapper(getFIDMapper(typeName));
+
         return new MySQLSQLBuilder(encoder, getSchema(typeName));
     }
 
@@ -287,6 +286,4 @@ public class MySQLDataStore extends JDBCDataStore {
 
         return new MySQLFeatureWriter(reader, queryData);
     }
-    
-
 }

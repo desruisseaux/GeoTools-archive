@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -23,18 +23,16 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SchemaException;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
 
 
 /**
@@ -89,8 +87,7 @@ public class MysqlGeomColumn {
     private static Map gidMap = new HashMap();
 
     /** factory for attribute types. */
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .defaultInstance();
+    private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     static {
         sqlTypeMap.put("TINY", Byte.class);
@@ -170,8 +167,7 @@ public class MysqlGeomColumn {
      *        refers to the MysqlGeomColumn.
      * @param geomTabName The name of the table holding the geometry data.
      */
-    public MysqlGeomColumn(String feaTabName, String feaGeomColumn,
-        String geomTabName) {
+    public MysqlGeomColumn(String feaTabName, String feaGeomColumn, String geomTabName) {
         this.feaTabName = feaTabName;
         this.feaGeomColumn = feaGeomColumn;
         this.geomTabName = geomTabName;
@@ -224,8 +220,8 @@ public class MysqlGeomColumn {
                 spacRefID = result.getInt(12);
             }
 
-            LOGGER.finer("creating new geometry column with values: "
-                + feaTabName + " " + feaGeomColumn + " " + geomTabName);
+            LOGGER.finer("creating new geometry column with values: " + feaTabName + " "
+                + feaGeomColumn + " " + geomTabName);
             result = statement.executeQuery("SELECT * FROM " + geomTabName);
 
             //currently selects all, should be more elegant as we get complex
@@ -242,8 +238,7 @@ public class MysqlGeomColumn {
             result.close();
             statement.close();
         } catch (SQLException e) {
-            LOGGER.warning("Some sort of database connection error: "
-                + e.getMessage());
+            LOGGER.warning("Some sort of database connection error: " + e.getMessage());
         }
     }
 
@@ -256,8 +251,8 @@ public class MysqlGeomColumn {
      * @return The SQL statement to get the geometry data.
      */
     private String makeGeomSql(String feaTableName) {
-        return "SELECT * FROM " + GEOMETRY_META_NAME
-        + " WHERE F_TABLE_NAME = '" + feaTableName + "';";
+        return "SELECT * FROM " + GEOMETRY_META_NAME + " WHERE F_TABLE_NAME = '" + feaTableName
+        + "';";
     }
 
     /**
@@ -311,8 +306,7 @@ public class MysqlGeomColumn {
             try {
                 returnGeometry = geometryReader.read(wellKnownText);
             } catch (ParseException e) {
-                LOGGER.finer("Failed to parse the geometry from Mysql: "
-                    + e.getMessage());
+                LOGGER.finer("Failed to parse the geometry from Mysql: " + e.getMessage());
             }
 
             return returnGeometry;
@@ -517,8 +511,8 @@ public class MysqlGeomColumn {
      * @todo Fix FeatureType name - IanS tasks TODO: put this method
      *       MysqlGeomColumn or a SchemaFactory.
      */
-    public static FeatureType makeSchema(ResultSetMetaData metaData,
-        String geoColumn) throws SQLException, SchemaException {
+    public static FeatureType makeSchema(ResultSetMetaData metaData, String geoColumn)
+        throws SQLException, SchemaException {
         String columnName = null;
         Class colClass = null;
         int numCols = metaData.getColumnCount();

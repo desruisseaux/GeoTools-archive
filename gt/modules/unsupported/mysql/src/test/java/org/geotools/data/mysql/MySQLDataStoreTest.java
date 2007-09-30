@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,6 +15,9 @@
  */
 package org.geotools.data.mysql;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,11 +29,14 @@ import java.util.NoSuchElementException;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
@@ -59,14 +65,6 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * Test for mysql.  Must use a locally available instance of mysql.
@@ -106,13 +104,13 @@ public class MySQLDataStoreTest extends TestCase {
 
         return suite;
     }
-    
+
     protected void setUp() throws Exception {
         super.setUp();
 
         PropertyResourceBundle resource;
-        resource =
-            new PropertyResourceBundle(this.getClass().getResourceAsStream("fixture.properties"));
+        resource = new PropertyResourceBundle(this.getClass()
+                                                  .getResourceAsStream("fixture.properties"));
 
         String namespace = resource.getString("namespace");
         String host = resource.getString("host");
@@ -126,14 +124,14 @@ public class MySQLDataStoreTest extends TestCase {
             throw new IllegalStateException(
                 "The fixture.properties file needs to be configured for your own database");
         }
-        
-        connPool = MySQLDataStoreFactory.getDefaultDataSource(host, user, password, port, database, 10, 2, false);
+
+        connPool = MySQLDataStoreFactory.getDefaultDataSource(host, user, password, port, database,
+                10, 2, false);
         setupTestTable(connPool.getConnection());
 
         dstore = new MySQLDataStore(connPool, namespace);
-        dstore.setFIDMapper(
-                "testset",
-                new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
+        dstore.setFIDMapper("testset",
+            new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
         schema = dstore.getSchema(FEATURE_TABLE);
     }
 
@@ -150,27 +148,27 @@ public class MySQLDataStoreTest extends TestCase {
         //        pcedflag;int4;4;0;;YES;;
         //        dbdflag;int4;4;0;;YES;;
         //        the_geom;geometry;-1;0;;YES;;
-
         Statement st = conn.createStatement();
+
         try {
             st.execute("DROP TABLE testset");
         } catch (Exception e) {
         }
+
         st.execute(
             "CREATE TABLE testset ( gid integer, area double, perimeter double, testb_ integer, "
-                + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, the_geom multipolygon)");
+            + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, the_geom multipolygon)");
         st.close();
-        PreparedStatement ps =
-            conn.prepareStatement(
+
+        PreparedStatement ps = conn.prepareStatement(
                 "INSERT into testset values(?, ?, ?, ?, ?, ?, ?, ?, GeomFromText(?))");
-        BufferedReader reader =
-            new BufferedReader(
-                new InputStreamReader(this.getClass().getResourceAsStream("testdata.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    this.getClass().getResourceAsStream("testdata.txt")));
 
         try {
-
             String line = null;
-            while((line = reader.readLine()) != null) {
+
+            while ((line = reader.readLine()) != null) {
                 String[] values = line.split(";");
                 ps.setInt(1, Integer.parseInt(values[0]));
                 ps.setDouble(2, Double.parseDouble(values[1]));
@@ -182,7 +180,7 @@ public class MySQLDataStoreTest extends TestCase {
                 ps.setInt(8, Integer.parseInt(values[7]));
                 ps.setString(9, values[8]);
                 ps.execute();
-            } 
+            }
         } finally {
             reader.close();
             ps.close();
@@ -192,7 +190,7 @@ public class MySQLDataStoreTest extends TestCase {
     protected void tearDown() {
         try {
             dropTestTable(connPool.getConnection());
-        } catch(SQLException e) { 
+        } catch (SQLException e) {
         } finally {
             ConnectionPoolManager.getInstance().closeAll();
         }
@@ -228,8 +226,8 @@ public class MySQLDataStoreTest extends TestCase {
         String testTable = FEATURE_TABLE;
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
-        FeatureReader reader =
-            dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE,
+                Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
     }
@@ -254,8 +252,7 @@ public class MySQLDataStoreTest extends TestCase {
     }
 
     public void testGeomFilter() throws Exception {
-        org.geotools.filter.GeometryFilter gf =
-            filterFac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+        org.geotools.filter.GeometryFilter gf = filterFac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
         Envelope env = new Envelope(428500, 430000, 428500, 440000);
         LiteralExpression right = filterFac.createBBoxExpression(env);
         gf.addRightGeometry(right);
@@ -323,8 +320,8 @@ public class MySQLDataStoreTest extends TestCase {
     public void testBadTypeName() throws Exception {
         try {
             String badType = "badType43";
-            FeatureWriter writer =
-                dstore.getFeatureWriter(badType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+            FeatureWriter writer = dstore.getFeatureWriter(badType, Filter.INCLUDE,
+                    Transaction.AUTO_COMMIT);
             fail("should not have type " + badType);
         } catch (SchemaNotFoundException e) {
             LOGGER.fine("succesfully caught exception: " + e);
@@ -404,18 +401,14 @@ public class MySQLDataStoreTest extends TestCase {
         state.rollback();
     }
 
-    public void testGetFeaturesWriterModifyGeometry()
-        throws IOException, IllegalAttributeException {
-        FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    public void testGetFeaturesWriterModifyGeometry() throws IOException, IllegalAttributeException {
+        FeatureWriter writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
+                Transaction.AUTO_COMMIT);
         Feature feature;
-        Coordinate[] points =
-            {
-                new Coordinate(59, 59),
-                new Coordinate(17, 17),
-                new Coordinate(49, 39),
-                new Coordinate(57, 67),
-                new Coordinate(79, 79)};
+        Coordinate[] points = {
+                new Coordinate(59, 59), new Coordinate(17, 17), new Coordinate(49, 39),
+                new Coordinate(57, 67), new Coordinate(79, 79)
+            };
         LineString geom = geomFac.createLineString(points);
 
         while (writer.hasNext()) {
@@ -436,16 +429,13 @@ public class MySQLDataStoreTest extends TestCase {
 
     public void testGetFeaturesWriterModifyMultipleAtts()
         throws IOException, IllegalAttributeException {
-        FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        FeatureWriter writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
+                Transaction.AUTO_COMMIT);
         Feature feature;
-        Coordinate[] points =
-            {
-                new Coordinate(32, 44),
-                new Coordinate(62, 51),
-                new Coordinate(45, 35),
-                new Coordinate(55, 65),
-                new Coordinate(73, 75)};
+        Coordinate[] points = {
+                new Coordinate(32, 44), new Coordinate(62, 51), new Coordinate(45, 35),
+                new Coordinate(55, 65), new Coordinate(73, 75)
+            };
         LineString geom = geomFac.createLineString(points);
 
         while (writer.hasNext()) {
@@ -481,7 +471,7 @@ public class MySQLDataStoreTest extends TestCase {
         assertEquals("Checking num features before add", 6, count);
         assertFalse(writer.hasNext());
 
-        SimpleFeature feature = (SimpleFeature)writer.next();
+        SimpleFeature feature = (SimpleFeature) writer.next();
         Object[] atts = getTestAtts("testAdd");
         feature.setAttributes(atts);
         writer.write();
@@ -497,16 +487,13 @@ public class MySQLDataStoreTest extends TestCase {
     }
 
     private Object[] getTestAtts(String name) {
-        Coordinate[] points =
-            {
-                new Coordinate(45, 45),
-                new Coordinate(45, 55),
-                new Coordinate(55, 55),
-                new Coordinate(55, 45),
-                new Coordinate(45, 45)};
+        Coordinate[] points = {
+                new Coordinate(45, 45), new Coordinate(45, 55), new Coordinate(55, 55),
+                new Coordinate(55, 45), new Coordinate(45, 45)
+            };
         PrecisionModel precModel = new PrecisionModel();
         LinearRing shell = new LinearRing(points, precModel, srid);
-        Polygon[] testPolys = { new Polygon(shell, precModel, srid)};
+        Polygon[] testPolys = { new Polygon(shell, precModel, srid) };
         MultiPolygon the_geom = new MultiPolygon(testPolys, precModel, srid);
         Integer gID = new Integer(addId);
         Double area = new Double(100.0);
@@ -515,8 +502,7 @@ public class MySQLDataStoreTest extends TestCase {
         Integer testb_id = new Integer(4833);
         Integer code = new Integer(0);
 
-        Object[] attributes =
-            { gID, area, perimeter, testb_, testb_id, name, code, code, the_geom };
+        Object[] attributes = { gID, area, perimeter, testb_, testb_id, name, code, code, the_geom };
 
         return attributes;
     }

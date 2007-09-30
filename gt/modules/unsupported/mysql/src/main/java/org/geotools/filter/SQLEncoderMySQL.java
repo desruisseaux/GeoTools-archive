@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,8 +17,6 @@ package org.geotools.filter;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
@@ -30,16 +28,21 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @author Chris Holmes, TOPP
  * @author Debasish Sahu, debasish.sahu@rmsi.com
- * 
+ *
  * @source $URL$
  */
-public class SQLEncoderMySQL extends SQLEncoder
-    implements org.geotools.filter.FilterVisitor {
+public class SQLEncoderMySQL extends SQLEncoder implements org.geotools.filter.FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
     /** To write geometry so postgis can read it. */
     private static WKTWriter wkt = new WKTWriter();
+
+    /** The standard SQL multicharacter wild card. */
+    private static final String SQL_WILD_MULTI = "%";
+
+    /** The standard SQL single character wild card. */
+    private static final String SQL_WILD_SINGLE = "_";
 
     /**
      * The srid of the schema, so the bbox conforms.  Could be better to have
@@ -50,18 +53,13 @@ public class SQLEncoderMySQL extends SQLEncoder
     /** The geometry attribute to use if none is specified. */
     private String defaultGeom;
 
-/** The standard SQL multicharacter wild card. */
-	private static final String SQL_WILD_MULTI = "%";
+    /** The escaped version of the multiple wildcard for the REGEXP pattern. */
+    private String escapedWildcardMulti = "\\.\\*";
 
-	/** The standard SQL single character wild card. */
-	private static final String SQL_WILD_SINGLE = "_";
-	/** The escaped version of the multiple wildcard for the REGEXP pattern. */
-	private String escapedWildcardMulti = "\\.\\*";
+    /** The escaped version of the single wildcard for the REGEXP pattern. */
+    private String escapedWildcardSingle = "\\.\\?";
 
-	/** The escaped version of the single wildcard for the REGEXP pattern. */
-	private String escapedWildcardSingle = "\\.\\?";
-
-		/**
+    /**
      * Empty constructor TODO: rethink empty constructor, as BBOXes _need_ an
      * SRID, must make client set it somehow.  Maybe detect when encode is
      * called?
@@ -98,6 +96,7 @@ public class SQLEncoderMySQL extends SQLEncoder
         capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
         capabilities.addType(FilterCapabilities.FID);
         capabilities.addType(FilterCapabilities.LIKE);
+
         return capabilities;
     }
 
@@ -141,23 +140,26 @@ public class SQLEncoderMySQL extends SQLEncoder
 
         if (filter.getFilterType() == AbstractFilter.GEOMETRY_BBOX) {
             DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
-            DefaultExpression right = (DefaultExpression) filter
-                .getRightGeometry();
+            DefaultExpression right = (DefaultExpression) filter.getRightGeometry();
 
             // left and right have to be valid expressions
             try {
-		    out.write("MBRIntersects(");
+                out.write("MBRIntersects(");
+
                 if (left == null) {
-                        out.write(defaultGeom);
-                      } else {
-                          left.accept(this);
-                     }
+                    out.write(defaultGeom);
+                } else {
+                    left.accept(this);
+                }
+
                 out.write(", ");
+
                 if (right == null) {
                     out.write(defaultGeom);
                 } else {
                     right.accept(this);
                 }
+
                 out.write(")");
             } catch (java.io.IOException ioe) {
                 LOGGER.warning("Unable to export filter" + ioe);
@@ -180,7 +182,7 @@ public class SQLEncoderMySQL extends SQLEncoder
         throws IOException {
         Geometry bbox = (Geometry) expression.getLiteral();
         String geomText = wkt.write(bbox);
-        out.write("GeometryFromText('" + geomText + "', " + srid + ")");        
+        out.write("GeometryFromText('" + geomText + "', " + srid + ")");
     }
 
     public void visit(LikeFilter filter) {
@@ -204,9 +206,8 @@ public class SQLEncoderMySQL extends SQLEncoder
 
             //TODO figure out when to add ESCAPE clause, probably just for the
             // '_' char.
-         } catch (java.io.IOException ioe) {
+        } catch (java.io.IOException ioe) {
             LOGGER.warning("Unable to export filter" + ioe);
         }
-
     }
 }

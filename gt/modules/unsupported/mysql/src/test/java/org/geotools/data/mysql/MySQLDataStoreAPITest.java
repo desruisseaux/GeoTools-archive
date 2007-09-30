@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,6 +15,10 @@
  */
 package org.geotools.data.mysql;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSourceFactory;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -25,11 +29,9 @@ import java.sql.Statement;
 import java.util.NoSuchElementException;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.filter.Filter;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -60,35 +62,31 @@ import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSourceFactory;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * This class tests the MySQLDataStore API against the same tests as
  * MemoryDataStore.
- * 
+ *
  * <p>
  * The test fixture is available in the shared DataTestCase, really the common
  * elements should move to a shared DataStoreAPITestCase.
  * </p>
- * 
+ *
  * <p>
  * This class does require your own DataStore, it will create a table populated
  * with the Features from the test fixture, and run a test, and then remove
  * the table.
  * </p>
- * 
+ *
  * <p>
  * Because of the nature of this testing process you cannot run these tests in
  * conjunction with another user, so they cannot be implemented against the
  * public server.
  * </p>
- * 
+ *
  * <p>
  * A simple properties file has been constructed,
  * <code>fixture.properties</code>, which you may direct to your own potgis
@@ -99,7 +97,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  */
 public class MySQLDataStoreAPITest extends DataTestCase {
-    private static final int LOCK_DURATION = 3600 * 1000;  // one hour
+    private static final int LOCK_DURATION = 3600 * 1000; // one hour
+
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
     static boolean CHECK_TYPE = false;
@@ -122,11 +121,11 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             throw new AssertionError("test supressed " + test);
         }
     }
-    
+
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
+
     public static Test suite() {
         LOGGER.info("starting suite...");
 
@@ -134,7 +133,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         LOGGER.info("made suite...");
 
         return suite;
-    }    
+    }
 
     /**
      * @see TestCase#setUp()
@@ -143,8 +142,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         super.setUp();
 
         PropertyResourceBundle resource;
-        resource =
-            new PropertyResourceBundle(this.getClass().getResourceAsStream("fixture.properties"));
+        resource = new PropertyResourceBundle(this.getClass()
+                                                  .getResourceAsStream("fixture.properties"));
 
         String namespace = resource.getString("namespace");
         String host = resource.getString("host");
@@ -159,9 +158,9 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             throw new IllegalStateException(
                 "The fixture.properties file needs to be configured for your own database");
         }
-        
-        pool = MySQLDataStoreFactory.getDefaultDataSource(host, user, password, port, database, 10, 2, false);
 
+        pool = MySQLDataStoreFactory.getDefaultDataSource(host, user, password, port, database, 10,
+                2, false);
 
         setUpRoadTable();
         setUpRiverTable();
@@ -173,8 +172,10 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         data = new MySQLDataStore(pool, null, getName());
         data.setFIDMapper("road", new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "road"));
-        data.setFIDMapper("river", new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "river"));
-        data.setFIDMapper("testset", new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
+        data.setFIDMapper("river",
+            new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "river"));
+        data.setFIDMapper("testset",
+            new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
 
         //
         // Update Fixture to reflect the actual data in the database
@@ -186,7 +187,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     /**
      * This is a quick hack to have our fixture reflect the FIDs in the
      * database.
-     * 
+     *
      * <p>
      * When the dataStore learns how to preserve our FeatureIds this won't be
      * required.
@@ -196,8 +197,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      */
     protected void updateRoadFeaturesFixture() throws Exception {
         Connection conn = pool.getConnection();
-        FeatureReader reader =
-            data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        FeatureReader reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
 
         Envelope bounds = new Envelope();
 
@@ -205,7 +206,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             SimpleFeature f;
 
             while (reader.hasNext()) {
-                f = (SimpleFeature)reader.next();
+                f = (SimpleFeature) reader.next();
 
                 int index = ((Integer) f.getAttribute("id")).intValue() - 1;
                 roadFeatures[index] = f;
@@ -250,13 +251,13 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         tFilter.addLeftValue(rd2Literal);
         tFilter.addRightValue(rdNameAtt);
         rd2Filter = tFilter;
-        rd12Filter = ff.or( rd2Filter, rd1Filter);
+        rd12Filter = ff.or(rd2Filter, rd1Filter);
     }
 
     /**
      * This is a quick hack to have our fixture reflect the FIDs in the
      * database.
-     * 
+     *
      * <p>
      * When the dataStore learns how to preserve our FeatureIds this won't be
      * required.
@@ -266,8 +267,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      */
     protected void updateRiverFeaturesFixture() throws Exception {
         Connection conn = pool.getConnection();
-        FeatureReader reader =
-            data.getFeatureReader(new DefaultQuery("river", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        FeatureReader reader = data.getFeatureReader(new DefaultQuery("river", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
 
         Envelope bounds = new Envelope();
 
@@ -309,9 +310,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         try {
             DatabaseMetaData md = conn.getMetaData();
-            ResultSet rs =
-                //md.getTables( catalog, null, null, null );
-    md.getTables(null, "public", "%", new String[] { "TABLE", });
+            ResultSet rs =  //md.getTables( catalog, null, null, null );
+                md.getTables(null, "public", "%", new String[] { "TABLE", });
             ResultSetMetaData rsmd = rs.getMetaData();
             int NUM = rsmd.getColumnCount();
             System.out.print(" ");
@@ -371,26 +371,18 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         try {
             Statement s = conn.createStatement();
 
-            s.execute("CREATE TABLE road (fid varchar(255) PRIMARY KEY, id int, geom LINESTRING, name varchar(255) )");
+            s.execute(
+                "CREATE TABLE road (fid varchar(255) PRIMARY KEY, id int, geom LINESTRING, name varchar(255) )");
 
             for (int i = 0; i < roadFeatures.length; i++) {
                 Feature f = roadFeatures[i];
 
                 //strip out the road. 
                 String fid = f.getID().substring("road.".length());
-                String ql =
-                    "INSERT INTO road (fid,id,geom,name) VALUES ("
-                        + "'"
-                        + fid
-                        + "',"
-                        + f.getAttribute("id")
-                        + ","
-                        + "GeometryFromText('"
-                        + ((Geometry) f.getAttribute("geom")).toText()
-                        + "', 0 ),"
-                        + "'"
-                        + f.getAttribute("name")
-                        + "')";
+                String ql = "INSERT INTO road (fid,id,geom,name) VALUES (" + "'" + fid + "',"
+                    + f.getAttribute("id") + "," + "GeometryFromText('"
+                    + ((Geometry) f.getAttribute("geom")).toText() + "', 0 )," + "'"
+                    + f.getAttribute("name") + "')";
 
                 s.execute(ql);
             }
@@ -432,26 +424,16 @@ public class MySQLDataStoreAPITest extends DataTestCase {
             Statement s = conn.createStatement();
 
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE river(fid varchar(255) PRIMARY KEY, id int, geom MULTILINESTRING, river varchar(255), flow double)");
+            s.execute(
+                "CREATE TABLE river(fid varchar(255) PRIMARY KEY, id int, geom MULTILINESTRING, river varchar(255), flow double)");
 
             for (int i = 0; i < riverFeatures.length; i++) {
                 Feature f = riverFeatures[i];
                 String fid = f.getID().substring("river.".length());
-                s.execute(
-                    "INSERT INTO river (fid, id, geom, river, flow) VALUES ("
-                        + "'"
-                        + fid
-                        + "',"
-                        + f.getAttribute("id")
-                        + ","
-                        + "GeometryFromText('"
-                        + f.getAttribute("geom").toString()
-                        + "', 0 ),"
-                        + "'"
-                        + f.getAttribute("river")
-                        + "',"
-                        + f.getAttribute("flow")
-                        + ")");
+                s.execute("INSERT INTO river (fid, id, geom, river, flow) VALUES (" + "'" + fid
+                    + "'," + f.getAttribute("id") + "," + "GeometryFromText('"
+                    + f.getAttribute("geom").toString() + "', 0 )," + "'" + f.getAttribute("river")
+                    + "'," + f.getAttribute("flow") + ")");
             }
         } finally {
             conn.close();
@@ -577,9 +559,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         for (int i = 0; i < expected.getAttributeCount(); i++) {
             AttributeType expectedAttribute = expected.getAttributeType(i);
             AttributeType actualAttribute = actual.getAttributeType(i);
-            assertEquals(
-                "attribute " + expectedAttribute.getLocalName(),
-                expectedAttribute,
+            assertEquals("attribute " + expectedAttribute.getLocalName(), expectedAttribute,
                 actualAttribute);
         }
 
@@ -598,9 +578,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         for (int i = 0; i < expected.getAttributeCount(); i++) {
             AttributeType expectedAttribute = expected.getAttributeType(i);
             AttributeType actualAttribute = actual.getAttributeType(i);
-            assertEquals(
-                "attribute " + expectedAttribute.getLocalName(),
-                expectedAttribute,
+            assertEquals("attribute " + expectedAttribute.getLocalName(), expectedAttribute,
                 actualAttribute);
         }
 
@@ -763,56 +741,56 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertEquals(1, count(reader));
     }
 
-// TODO: uncomment when and if MySQLDataStore gets transaction capabilities
-//    public void testGetFeatureReaderFilterTransaction()
-//        throws NoSuchElementException, IOException, IllegalAttributeException {
-//        Transaction t = new DefaultTransaction();
-//        FeatureType type = data.getSchema("road");
-//        FeatureReader reader;
-//
-//        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
-//        assertTrue(reader instanceof EmptyFeatureReader);
-//        assertEquals(type, reader.getFeatureType());
-//        assertEquals(0, count(reader));
-//
-//        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
-//        assertEquals(type, reader.getFeatureType());
-//        assertEquals(roadFeatures.length, count(reader));
-//
-//        reader = data.getFeatureReader(type, rd1Filter, t);
-//        assertEquals(type, reader.getFeatureType());
-//        assertEquals(1, count(reader));
-//
-//        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
-//        Feature feature;
-//
-//        while (writer.hasNext()) {
-//            feature = writer.next();
-//
-//            if (feature.getID().equals(roadFeatures[0].getID())) {
-//                writer.remove();
-//            }
-//        }
-//
-//        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
-//        assertEquals(0, count(reader));
-//
-//        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
-//        assertEquals(roadFeatures.length - 1, count(reader));
-//
-//        reader = data.getFeatureReader(type, rd1Filter, t);
-//        assertEquals(0, count(reader));
-//
-//        t.rollback();
-//        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
-//        assertEquals(0, count(reader));
-//
-//        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
-//        assertEquals(roadFeatures.length, count(reader));
-//
-//        reader = data.getFeatureReader(type, rd1Filter, t);
-//        assertEquals(1, count(reader));
-//    }
+    // TODO: uncomment when and if MySQLDataStore gets transaction capabilities
+    //    public void testGetFeatureReaderFilterTransaction()
+    //        throws NoSuchElementException, IOException, IllegalAttributeException {
+    //        Transaction t = new DefaultTransaction();
+    //        FeatureType type = data.getSchema("road");
+    //        FeatureReader reader;
+    //
+    //        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
+    //        assertTrue(reader instanceof EmptyFeatureReader);
+    //        assertEquals(type, reader.getFeatureType());
+    //        assertEquals(0, count(reader));
+    //
+    //        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
+    //        assertEquals(type, reader.getFeatureType());
+    //        assertEquals(roadFeatures.length, count(reader));
+    //
+    //        reader = data.getFeatureReader(type, rd1Filter, t);
+    //        assertEquals(type, reader.getFeatureType());
+    //        assertEquals(1, count(reader));
+    //
+    //        FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
+    //        Feature feature;
+    //
+    //        while (writer.hasNext()) {
+    //            feature = writer.next();
+    //
+    //            if (feature.getID().equals(roadFeatures[0].getID())) {
+    //                writer.remove();
+    //            }
+    //        }
+    //
+    //        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
+    //        assertEquals(0, count(reader));
+    //
+    //        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
+    //        assertEquals(roadFeatures.length - 1, count(reader));
+    //
+    //        reader = data.getFeatureReader(type, rd1Filter, t);
+    //        assertEquals(0, count(reader));
+    //
+    //        t.rollback();
+    //        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
+    //        assertEquals(0, count(reader));
+    //
+    //        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
+    //        assertEquals(roadFeatures.length, count(reader));
+    //
+    //        reader = data.getFeatureReader(type, rd1Filter, t);
+    //        assertEquals(1, count(reader));
+    //    }
 
     /**
      * Ensure readers contents equal those in the feature array
@@ -842,7 +820,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     /**
      * Ensure readers contents match those in the feature array
-     * 
+     *
      * <p>
      * Implemented using match on attribute types, not feature id
      * </p>
@@ -852,7 +830,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
      *
      * @throws Exception DOCUMENT ME!
      */
-    void assertMatched(Feature[] array, FeatureReader reader) throws Exception {
+    void assertMatched(Feature[] array, FeatureReader reader)
+        throws Exception {
         Feature feature;
         int count = 0;
 
@@ -924,27 +903,28 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         return count == array.length;
     }
+
     boolean covers(FeatureIterator reader, Feature[] array)
-    throws NoSuchElementException, IOException, IllegalAttributeException {
-    Feature feature;
-    int count = 0;
+        throws NoSuchElementException, IOException, IllegalAttributeException {
+        Feature feature;
+        int count = 0;
 
-    try {
-        while (reader.hasNext()) {
-            feature = reader.next();
+        try {
+            while (reader.hasNext()) {
+                feature = reader.next();
 
-            if (!contains(array, feature)) {
-                return false;
+                if (!contains(array, feature)) {
+                    return false;
+                }
+
+                count++;
             }
-
-            count++;
+        } finally {
+            reader.close();
         }
-    } finally {
-        reader.close();
-    }
 
-    return count == array.length;
-}
+        return count == array.length;
+    }
 
     boolean coversLax(FeatureReader reader, Feature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
@@ -1042,6 +1022,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         assertEquals(roadFeatures.length - 1, count("road"));
     }
+
     public void testGetFeatureWriterRemoveAll() throws IOException, IllegalAttributeException {
         FeatureWriter writer = writer("road");
         Feature feature;
@@ -1054,6 +1035,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         } finally {
             writer.close();
         }
+
         assertEquals(0, count("road"));
     }
 
@@ -1070,12 +1052,12 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         LOGGER.info("about to call has next on writer " + writer);
 
         while (writer.hasNext()) {
-            feature = (SimpleFeature)writer.next();
+            feature = (SimpleFeature) writer.next();
         }
 
         assertFalse(writer.hasNext());
 
-        feature = (SimpleFeature)writer.next();
+        feature = (SimpleFeature) writer.next();
         feature.setAttributes(newRoad.getAttributes(null));
         writer.write();
 
@@ -1085,11 +1067,11 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
     /**
      * Seach for feature based on AttributeType.
-     * 
+     *
      * <p>
      * If attributeName is null, we will search by feature.getID()
      * </p>
-     * 
+     *
      * <p>
      * The provided reader will be closed by this opperations.
      * </p>
@@ -1181,7 +1163,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         //writer.close(); called by count.
     }
 
-    public void testGetFeatureWriterAppendTypeNameTransaction() throws Exception {
+    public void testGetFeatureWriterAppendTypeNameTransaction()
+        throws Exception {
         FeatureWriter writer;
 
         writer = data.getFeatureWriterAppend("road", Transaction.AUTO_COMMIT);
@@ -1225,142 +1208,142 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertEquals(1, count(writer));
     }
 
-// Uncomment when and if MySQLDataStore will support transaction
-//    /**
-//     * Test two transactions one removing feature, and one adding a feature.
-//     *
-//     * @throws Exception DOCUMENT ME!
-//     */
-//    public void testGetFeatureWriterTransaction() throws Exception {
-//        Transaction t1 = new DefaultTransaction();
-//        Transaction t2 = new DefaultTransaction();
-//        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
-//        FeatureWriter writer2 = data.getFeatureWriterAppend("road", t2);
-//
-//        FeatureType road = data.getSchema("road");
-//        FeatureReader reader;
-//        Feature feature;
-//        Feature[] ORIGIONAL = roadFeatures;
-//        Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
-//        Feature[] ADD = new Feature[ORIGIONAL.length + 1];
-//        Feature[] FINAL = new Feature[ORIGIONAL.length];
-//        int i;
-//        int index;
-//        index = 0;
-//
-//        for (i = 0; i < ORIGIONAL.length; i++) {
-//            feature = ORIGIONAL[i];
-//
-//            if (!feature.getID().equals(roadFeatures[0].getID())) {
-//                REMOVE[index++] = feature;
-//            }
-//        }
-//
-//        for (i = 0; i < ORIGIONAL.length; i++) {
-//            ADD[i] = ORIGIONAL[i];
-//        }
-//
-//        ADD[i] = newRoad; // will need to update with Fid from database
-//
-//        for (i = 0; i < REMOVE.length; i++) {
-//            FINAL[i] = REMOVE[i];
-//        }
-//
-//        FINAL[i] = newRoad; // will need to update with Fid from database
-//
-//        // start of with ORIGINAL                        
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(covers(reader, ORIGIONAL));
-//
-//        // writer 1 removes road.rd1 on t1
-//        // -------------------------------
-//        // - tests transaction independence from DataStore
-//        while (writer1.hasNext()) {
-//            feature = writer1.next();
-//            assertEquals(roadFeatures[0].getID(), feature.getID());
-//            writer1.remove();
-//        }
-//
-//        // still have ORIGIONAL and t1 has REMOVE
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(covers(reader, ORIGIONAL));
-//
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
-//        assertTrue(covers(reader, REMOVE));
-//
-//        // close writer1
-//        // --------------
-//        // ensure that modification is left up to transaction commmit
-//        writer1.close();
-//
-//        // We still have ORIGIONAL and t1 has REMOVE
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(covers(reader, ORIGIONAL));
-//
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
-//        assertTrue(covers(reader, REMOVE));
-//
-//        // writer 2 adds road.rd4 on t2
-//        // ----------------------------
-//        // - tests transaction independence from each other
-//        feature = writer2.next();
-//        feature.setAttributes(newRoad.getAttributes(null));
-//        writer2.write();
-//
-//        // HACK: ?!? update ADD and FINAL with new FID from database
-//        //
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
-//        newRoad = findFeature(reader, "id", new Integer(4));
-//        System.out.println("newRoad:" + newRoad);
-//        ADD[ADD.length - 1] = newRoad;
-//        FINAL[FINAL.length - 1] = newRoad;
-//
-//        // We still have ORIGIONAL and t2 has ADD
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(covers(reader, ORIGIONAL));
-//
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
-//        assertMatched(ADD, reader); // broken due to FID problem
-//
-//        writer2.close();
-//
-//        // Still have ORIGIONAL and t2 has ADD
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(covers(reader, ORIGIONAL));
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
-//        assertTrue(coversLax(reader, ADD));
-//
-//        // commit t1
-//        // ---------
-//        // -ensure that delayed writing of transactions takes place
-//        //
-//        t1.commit();
-//
-//        // We now have REMOVE, as does t1 (which has not additional diffs)
-//        // t2 will have FINAL
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(covers(reader, REMOVE));
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
-//        assertTrue(covers(reader, REMOVE));
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
-//        assertTrue(coversLax(reader, FINAL));
-//
-//        // commit t2
-//        // ---------
-//        // -ensure that everyone is FINAL at the end of the day
-//        t2.commit();
-//
-//        // We now have Number( remove one and add one)
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-//        assertTrue(coversLax(reader, FINAL));
-//
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
-//        assertTrue(coversLax(reader, FINAL));
-//
-//        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
-//        assertTrue(coversLax(reader, FINAL));
-//    }
+    // Uncomment when and if MySQLDataStore will support transaction
+    //    /**
+    //     * Test two transactions one removing feature, and one adding a feature.
+    //     *
+    //     * @throws Exception DOCUMENT ME!
+    //     */
+    //    public void testGetFeatureWriterTransaction() throws Exception {
+    //        Transaction t1 = new DefaultTransaction();
+    //        Transaction t2 = new DefaultTransaction();
+    //        FeatureWriter writer1 = data.getFeatureWriter("road", rd1Filter, t1);
+    //        FeatureWriter writer2 = data.getFeatureWriterAppend("road", t2);
+    //
+    //        FeatureType road = data.getSchema("road");
+    //        FeatureReader reader;
+    //        Feature feature;
+    //        Feature[] ORIGIONAL = roadFeatures;
+    //        Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
+    //        Feature[] ADD = new Feature[ORIGIONAL.length + 1];
+    //        Feature[] FINAL = new Feature[ORIGIONAL.length];
+    //        int i;
+    //        int index;
+    //        index = 0;
+    //
+    //        for (i = 0; i < ORIGIONAL.length; i++) {
+    //            feature = ORIGIONAL[i];
+    //
+    //            if (!feature.getID().equals(roadFeatures[0].getID())) {
+    //                REMOVE[index++] = feature;
+    //            }
+    //        }
+    //
+    //        for (i = 0; i < ORIGIONAL.length; i++) {
+    //            ADD[i] = ORIGIONAL[i];
+    //        }
+    //
+    //        ADD[i] = newRoad; // will need to update with Fid from database
+    //
+    //        for (i = 0; i < REMOVE.length; i++) {
+    //            FINAL[i] = REMOVE[i];
+    //        }
+    //
+    //        FINAL[i] = newRoad; // will need to update with Fid from database
+    //
+    //        // start of with ORIGINAL                        
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(covers(reader, ORIGIONAL));
+    //
+    //        // writer 1 removes road.rd1 on t1
+    //        // -------------------------------
+    //        // - tests transaction independence from DataStore
+    //        while (writer1.hasNext()) {
+    //            feature = writer1.next();
+    //            assertEquals(roadFeatures[0].getID(), feature.getID());
+    //            writer1.remove();
+    //        }
+    //
+    //        // still have ORIGIONAL and t1 has REMOVE
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(covers(reader, ORIGIONAL));
+    //
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+    //        assertTrue(covers(reader, REMOVE));
+    //
+    //        // close writer1
+    //        // --------------
+    //        // ensure that modification is left up to transaction commmit
+    //        writer1.close();
+    //
+    //        // We still have ORIGIONAL and t1 has REMOVE
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(covers(reader, ORIGIONAL));
+    //
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+    //        assertTrue(covers(reader, REMOVE));
+    //
+    //        // writer 2 adds road.rd4 on t2
+    //        // ----------------------------
+    //        // - tests transaction independence from each other
+    //        feature = writer2.next();
+    //        feature.setAttributes(newRoad.getAttributes(null));
+    //        writer2.write();
+    //
+    //        // HACK: ?!? update ADD and FINAL with new FID from database
+    //        //
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+    //        newRoad = findFeature(reader, "id", new Integer(4));
+    //        System.out.println("newRoad:" + newRoad);
+    //        ADD[ADD.length - 1] = newRoad;
+    //        FINAL[FINAL.length - 1] = newRoad;
+    //
+    //        // We still have ORIGIONAL and t2 has ADD
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(covers(reader, ORIGIONAL));
+    //
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+    //        assertMatched(ADD, reader); // broken due to FID problem
+    //
+    //        writer2.close();
+    //
+    //        // Still have ORIGIONAL and t2 has ADD
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(covers(reader, ORIGIONAL));
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+    //        assertTrue(coversLax(reader, ADD));
+    //
+    //        // commit t1
+    //        // ---------
+    //        // -ensure that delayed writing of transactions takes place
+    //        //
+    //        t1.commit();
+    //
+    //        // We now have REMOVE, as does t1 (which has not additional diffs)
+    //        // t2 will have FINAL
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(covers(reader, REMOVE));
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+    //        assertTrue(covers(reader, REMOVE));
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+    //        assertTrue(coversLax(reader, FINAL));
+    //
+    //        // commit t2
+    //        // ---------
+    //        // -ensure that everyone is FINAL at the end of the day
+    //        t2.commit();
+    //
+    //        // We now have Number( remove one and add one)
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+    //        assertTrue(coversLax(reader, FINAL));
+    //
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+    //        assertTrue(coversLax(reader, FINAL));
+    //
+    //        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+    //        assertTrue(coversLax(reader, FINAL));
+    //    }
 
     // Feature Source Testing
     public void testGetFeatureSourceRoad() throws IOException {
@@ -1418,7 +1401,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();
-        assertEquals(roadBounds , b);
+        assertEquals(roadBounds, b);
     }
 
     public void testGetFeatureSourceRiver()
@@ -1478,7 +1461,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     public void testGetFeatureStoreAddFeatures() throws IOException {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
-        road.addFeatures(DataUtilities.collection( newRoad ));
+        road.addFeatures(DataUtilities.collection(newRoad));
         assertEquals(roadFeatures.length + 1, count("road"));
     }
 
@@ -1495,94 +1478,93 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertEquals(1, count("road"));
     }
 
-//  Uncomment when and if MySQLDataStore will support transaction
-//    public void testGetFeatureStoreTransactionSupport() throws Exception {
-//        Transaction t1 = new DefaultTransaction();
-//        Transaction t2 = new DefaultTransaction();
-//
-//        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
-//        FeatureStore road1 = (FeatureStore) data.getFeatureSource("road");
-//        FeatureStore road2 = (FeatureStore) data.getFeatureSource("road");
-//
-//        road1.setTransaction(t1);
-//        road2.setTransaction(t2);
-//
-//        Feature feature;
-//        Feature[] ORIGIONAL = roadFeatures;
-//        Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
-//        Feature[] ADD = new Feature[ORIGIONAL.length + 1];
-//        Feature[] FINAL = new Feature[ORIGIONAL.length];
-//        int i;
-//        int index;
-//        index = 0;
-//
-//        for (i = 0; i < ORIGIONAL.length; i++) {
-//            feature = ORIGIONAL[i];
-//            LOGGER.info("id is " + feature.getID());
-//
-//            if (!feature.getID().equals("road.rd1")) {
-//                REMOVE[index++] = feature;
-//            }
-//        }
-//
-//        for (i = 0; i < ORIGIONAL.length; i++) {
-//            ADD[i] = ORIGIONAL[i];
-//        }
-//
-//        ADD[i] = newRoad;
-//
-//        for (i = 0; i < REMOVE.length; i++) {
-//            FINAL[i] = REMOVE[i];
-//        }
-//
-//        FINAL[i] = newRoad;
-//
-//        // start of with ORIGINAL
-//        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
-//
-//        // road1 removes road.rd1 on t1
-//        // -------------------------------
-//        // - tests transaction independence from DataStore
-//        road1.removeFeatures(rd1Filter);
-//
-//        // still have ORIGIONAL and t1 has REMOVE
-//        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
-//        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
-//
-//        // road2 adds road.rd4 on t2
-//        // ----------------------------
-//        // - tests transaction independence from each other
-//        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
-//        road2.addFeatures(reader);
-//
-//        // We still have ORIGIONAL, t1 has REMOVE, and t2 has ADD
-//        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
-//        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
-//        assertTrue(coversLax(road2.getFeatures().reader(), ADD));
-//
-//        // commit t1
-//        // ---------
-//        // -ensure that delayed writing of transactions takes place
-//        //
-//        t1.commit();
-//
-//        // We now have REMOVE, as does t1 (which has not additional diffs)
-//        // t2 will have FINAL
-//        assertTrue(covers(road.getFeatures().reader(), REMOVE));
-//        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
-//        assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
-//
-//        // commit t2
-//        // ---------
-//        // -ensure that everyone is FINAL at the end of the day
-//        t2.commit();
-//
-//        // We now have Number( remove one and add one)
-//        assertTrue(coversLax(road.getFeatures().reader(), FINAL));
-//        assertTrue(coversLax(road1.getFeatures().reader(), FINAL));
-//        assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
-//    }
-
+    //  Uncomment when and if MySQLDataStore will support transaction
+    //    public void testGetFeatureStoreTransactionSupport() throws Exception {
+    //        Transaction t1 = new DefaultTransaction();
+    //        Transaction t2 = new DefaultTransaction();
+    //
+    //        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+    //        FeatureStore road1 = (FeatureStore) data.getFeatureSource("road");
+    //        FeatureStore road2 = (FeatureStore) data.getFeatureSource("road");
+    //
+    //        road1.setTransaction(t1);
+    //        road2.setTransaction(t2);
+    //
+    //        Feature feature;
+    //        Feature[] ORIGIONAL = roadFeatures;
+    //        Feature[] REMOVE = new Feature[ORIGIONAL.length - 1];
+    //        Feature[] ADD = new Feature[ORIGIONAL.length + 1];
+    //        Feature[] FINAL = new Feature[ORIGIONAL.length];
+    //        int i;
+    //        int index;
+    //        index = 0;
+    //
+    //        for (i = 0; i < ORIGIONAL.length; i++) {
+    //            feature = ORIGIONAL[i];
+    //            LOGGER.info("id is " + feature.getID());
+    //
+    //            if (!feature.getID().equals("road.rd1")) {
+    //                REMOVE[index++] = feature;
+    //            }
+    //        }
+    //
+    //        for (i = 0; i < ORIGIONAL.length; i++) {
+    //            ADD[i] = ORIGIONAL[i];
+    //        }
+    //
+    //        ADD[i] = newRoad;
+    //
+    //        for (i = 0; i < REMOVE.length; i++) {
+    //            FINAL[i] = REMOVE[i];
+    //        }
+    //
+    //        FINAL[i] = newRoad;
+    //
+    //        // start of with ORIGINAL
+    //        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
+    //
+    //        // road1 removes road.rd1 on t1
+    //        // -------------------------------
+    //        // - tests transaction independence from DataStore
+    //        road1.removeFeatures(rd1Filter);
+    //
+    //        // still have ORIGIONAL and t1 has REMOVE
+    //        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
+    //        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
+    //
+    //        // road2 adds road.rd4 on t2
+    //        // ----------------------------
+    //        // - tests transaction independence from each other
+    //        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
+    //        road2.addFeatures(reader);
+    //
+    //        // We still have ORIGIONAL, t1 has REMOVE, and t2 has ADD
+    //        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
+    //        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
+    //        assertTrue(coversLax(road2.getFeatures().reader(), ADD));
+    //
+    //        // commit t1
+    //        // ---------
+    //        // -ensure that delayed writing of transactions takes place
+    //        //
+    //        t1.commit();
+    //
+    //        // We now have REMOVE, as does t1 (which has not additional diffs)
+    //        // t2 will have FINAL
+    //        assertTrue(covers(road.getFeatures().reader(), REMOVE));
+    //        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
+    //        assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
+    //
+    //        // commit t2
+    //        // ---------
+    //        // -ensure that everyone is FINAL at the end of the day
+    //        t2.commit();
+    //
+    //        // We now have Number( remove one and add one)
+    //        assertTrue(coversLax(road.getFeatures().reader(), FINAL));
+    //        assertTrue(coversLax(road1.getFeatures().reader(), FINAL));
+    //        assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
+    //    }
     boolean isLocked(String typeName, String fid) {
         InProcessLockingManager lockingManager = (InProcessLockingManager) data.getLockingManager();
 
@@ -1692,10 +1674,13 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         road.lockFeatures(rd1Filter);
         assertTrue(isLocked("road", "road.rd1"));
+
         long then = System.currentTimeMillis();
+
         do {
-            Thread.sleep( 200 );
-        } while ( System.currentTimeMillis() - then < 200 ); 
+            Thread.sleep(200);
+        } while ((System.currentTimeMillis() - then) < 200);
+
         assertFalse(isLocked("road", "road.rd1"));
     }
 }
