@@ -23,7 +23,6 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -48,8 +47,6 @@ public class SQLEncoderPostgisTest extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .defaultInstance();
 
     /** Schema on which to preform tests */
     protected static SimpleFeatureType testSchema = null;
