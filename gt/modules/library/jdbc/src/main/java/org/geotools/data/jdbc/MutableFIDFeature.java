@@ -17,9 +17,11 @@
  */
 package org.geotools.data.jdbc;
 
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.DefaultFeatureType;
+import java.util.List;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureImpl;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * @author Sean Geoghegan, Defence Science and Technology Organisation
@@ -28,13 +30,13 @@ import org.geotools.feature.IllegalAttributeException;
  * @version $Id$
  * Last Modified: $Date: 2004/04/09 15:30:52 $ 
  */
-public class MutableFIDFeature extends DefaultFeature {
+public class MutableFIDFeature extends SimpleFeatureImpl {
 
 	String featureId;
 	
-  public MutableFIDFeature(DefaultFeatureType ft, Object[] attributes, String fid)
+  public MutableFIDFeature(List properties, SimpleFeatureType ft, String fid)
     throws IllegalAttributeException {
-    super(ft, attributes, fid);
+    super(properties, ft, fid);
 
   }
 

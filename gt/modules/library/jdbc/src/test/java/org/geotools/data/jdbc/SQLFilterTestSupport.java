@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;

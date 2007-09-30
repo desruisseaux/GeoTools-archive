@@ -65,8 +65,8 @@ public class DataTestCase extends TestCase {
     protected SimpleFeatureType roadType; // road: id,geom,name
     protected SimpleFeatureType subRoadType; // road: id,geom    
     protected SimpleFeature[] roadFeatures;
-    protected Envelope roadBounds;
-    protected Envelope rd12Bounds;    
+    protected ReferencedEnvelope roadBounds;
+    protected ReferencedEnvelope rd12Bounds;    
     protected Filter rd1Filter;
     protected Filter rd2Filter;
     protected Filter rd12Filter;
@@ -148,7 +148,7 @@ public class DataTestCase extends TestCase {
             },
             "road.rd3"
         );
-        roadBounds = new Envelope();
+        roadBounds = new ReferencedEnvelope();
         roadBounds.expandToInclude( new ReferencedEnvelope(roadFeatures[0].getBounds()) );
         roadBounds.expandToInclude( new ReferencedEnvelope(roadFeatures[1].getBounds()) );
         roadBounds.expandToInclude( new ReferencedEnvelope(roadFeatures[2].getBounds()) );
@@ -162,7 +162,7 @@ public class DataTestCase extends TestCase {
         
         rd12Filter = create;
         
-        rd12Bounds = new Envelope();
+        rd12Bounds = new ReferencedEnvelope();
         rd12Bounds.expandToInclude(new ReferencedEnvelope(roadFeatures[0].getBounds()));
         rd12Bounds.expandToInclude(new ReferencedEnvelope(roadFeatures[1].getBounds()));        
         //   + 2,3

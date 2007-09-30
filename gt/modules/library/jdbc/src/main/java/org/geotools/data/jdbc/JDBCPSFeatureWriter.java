@@ -126,7 +126,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         MutableFIDFeature feature) throws IOException, SQLException {
         int baseIndex = fillPrimaryKeyParameters(statement, feature, 1);
 
-        Object[] attributes = feature.getAttributes(null);
+        Object[] attributes = feature.getAttributes().toArray();
         List<AttributeDescriptor> attributeTypes = feature.getFeatureType()
                                                 .getAttributes();
         AttributeIO[] aios = queryData.getAttributeHandlers();

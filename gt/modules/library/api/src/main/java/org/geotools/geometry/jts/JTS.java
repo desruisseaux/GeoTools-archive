@@ -31,7 +31,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Polygon;
-
 import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
@@ -574,7 +573,7 @@ public final class JTS {
                     new Coordinate(e.getMinX(), e.getMinY())
                 }), null);
     }
-    
+
     /**
      * Converts a {@link BoundingBox} to a polygon.
      * <p>

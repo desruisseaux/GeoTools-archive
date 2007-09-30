@@ -20,6 +20,8 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * Builder for attribute types and descriptors.
  * <p>
@@ -124,7 +126,7 @@ public class AttributeTypeBuilder {
 	/**
 	 * min occurs
 	 */
-	protected int minOccurs = 1;
+	protected int minOccurs = 0;
 	/**
 	 * max occurs
 	 */
@@ -346,6 +348,7 @@ public class AttributeTypeBuilder {
 		return this;
 	}
 	
+	
 	// construction methods
 	//
 	
@@ -405,7 +408,7 @@ public class AttributeTypeBuilder {
 	 * @see #buildDescriptor(String, AttributeType) 
 	 */
 	public AttributeDescriptor buildDescriptor( String name ) {
-		if ( crs != null ) {
+		if ( crs != null || Geometry.class.isAssignableFrom(binding)) {
 			return buildDescriptor(name, buildGeometryType());
 		}
 		else {

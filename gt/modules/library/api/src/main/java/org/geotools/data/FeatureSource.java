@@ -15,7 +15,6 @@
  */
 package org.geotools.data;
 
-
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.Set;

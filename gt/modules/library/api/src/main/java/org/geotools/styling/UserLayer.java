@@ -15,8 +15,8 @@
  */
 package org.geotools.styling;
 
-import org.geotools.data.DataStore;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.data.DataStore;
 
 
 /**

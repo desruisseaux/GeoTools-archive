@@ -60,14 +60,13 @@ import org.geotools.data.view.DefaultView;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeTypeBuilder;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.SQLEncoder;
+import org.geotools.filter.SQLEncoderException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -631,15 +630,15 @@ public abstract class JDBC1DataStore implements DataStore {
 		SimpleFeatureType schema;
 
 		try {
-			schema = FeatureTypeBuilder.newFeatureType(attrTypes, typeName,
-					getNameSpace());
+			SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+			ftb.setName(typeName);
+			ftb.addAll(attrTypes);
+			ftb.setNamespaceURI(getNameSpace());
+			schema = ftb.buildFeatureType();
 		} catch (FactoryRegistryException e) {
 			throw new DataSourceException(
 					"Schema Factory Error when creating schema for FeatureReader",
 					e);
-		} catch (SchemaException e) {
-			throw new DataSourceException(
-					"Schema Error when creating schema for FeatureReader", e);
 		}
 
 		FeatureReader reader;
@@ -1204,8 +1203,11 @@ public abstract class JDBC1DataStore implements DataStore {
 			AttributeDescriptor[] types = (AttributeDescriptor[]) attributeTypes
 					.toArray(new AttributeDescriptor[0]);
 
-			return FeatureTypeBuilder.newFeatureType(types, typeName,
-					getNameSpace());
+			SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+			ftb.name(typeName);
+			ftb.addAll(types);
+			ftb.setNamespaceURI(getNameSpace());
+			return ftb.buildFeatureType();
 		} catch (SQLException sqlException) {
 			JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
 			conn = null; // prevent finally block from reclosing
@@ -1213,9 +1215,6 @@ public abstract class JDBC1DataStore implements DataStore {
 					+ typeName + " " + sqlException.getMessage(), sqlException);
 		} catch (FactoryRegistryException e) {
 			throw new DataSourceException("Error creating FeatureType "
-					+ typeName, e);
-		} catch (SchemaException e) {
-			throw new DataSourceException("Error creating FeatureType for "
 					+ typeName, e);
 		} finally {
 			JDBCUtils.close(tableInfo);

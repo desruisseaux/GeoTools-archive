@@ -17,12 +17,12 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortBy;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
@@ -333,7 +333,7 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      * @param order
      */
     public FeatureCollection sort(SortBy order);
-    
+
     /**
      * Get the total bounds of this collection which is calculated by doing a
      * union of the bounds of each feature inside of it
@@ -341,5 +341,4 @@ public interface FeatureCollection extends ResourceCollection, SimpleFeature {
      * @return An Envelope containing the total bounds of this collection.
      */
     ReferencedEnvelope getBounds();
-
 }

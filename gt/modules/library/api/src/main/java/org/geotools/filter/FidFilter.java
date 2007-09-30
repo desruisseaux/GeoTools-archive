@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import java.util.Collection;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;

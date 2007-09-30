@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import com.vividsolutions.jts.geom.Envelope;
-
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.expression.Expression;

@@ -21,6 +21,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.IllegalAttributeException;
 
+
 /**
  * The low-level interface for reading Features. Will use the underlying
  * AttributeReader and the given FeatureType to create new Features.

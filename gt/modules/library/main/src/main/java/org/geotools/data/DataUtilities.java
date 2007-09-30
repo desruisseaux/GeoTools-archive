@@ -1663,10 +1663,10 @@ public class DataUtilities {
             Class clazz = type(type);
             if(Geometry.class.isAssignableFrom(clazz)) {
             	GeometryType at = new GeometryTypeImpl(new Name( name ), clazz , crs, false, false, Collections.EMPTY_LIST, null, null );
-	            return new GeometryDescriptorImpl( at, new Name(name), 1,1, nillable, null );
+	            return new GeometryDescriptorImpl( at, new Name(name), 0,1, nillable, null );
             } else {
 	            AttributeType at = new AttributeTypeImpl( new Name( name ), clazz , false, false, Collections.EMPTY_LIST, null, null );
-	            return new AttributeDescriptorImpl( at, new Name(name), 1,1, nillable, null );
+	            return new AttributeDescriptorImpl( at, new Name(name), 0,1, nillable, null );
             }
         } catch (ClassNotFoundException e) {
             throw new SchemaException("Could not type " + name + " as:" + type);

@@ -30,6 +30,10 @@ public class ComplexAttributeImpl extends AttributeImpl implements ComplexAttrib
        return FeatureImplUtils.unmodifiable((Collection) super.getValue());
     }
     
+    public Collection<Property> getProperties() {
+    	return FeatureImplUtils.unmodifiable((Collection) super.getValue());
+    }
+    
     /**
      * Internal helper method for getting at the properties without wrapping
      * in unmodifiable collection.

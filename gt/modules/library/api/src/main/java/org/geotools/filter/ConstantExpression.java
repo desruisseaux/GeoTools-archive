@@ -19,7 +19,6 @@ import java.awt.Color;
 import java.math.BigDecimal;
 import java.util.Date;
 import com.vividsolutions.jts.geom.Geometry;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;

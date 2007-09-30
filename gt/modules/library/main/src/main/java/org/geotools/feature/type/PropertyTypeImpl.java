@@ -59,7 +59,8 @@ public class PropertyTypeImpl implements PropertyType {
 	}
 
 	public List<Filter> getRestrictions() {
-		return restrictions;
+		List<Filter> empty = Collections.emptyList();
+		return restrictions == null ? empty : restrictions;
 	}
 
     public PropertyType getSuper() {
@@ -95,7 +96,7 @@ public class PropertyTypeImpl implements PropertyType {
 			return false;
 		}
 
-		if (!Utilities.equals(restrictions, prop.getRestrictions())) {
+		if (!equals(getRestrictions(), prop.getRestrictions())) {
 			return false;
 		}
 		
@@ -109,6 +110,20 @@ public class PropertyTypeImpl implements PropertyType {
 
 		return true;
 	}
+	
+	/**
+     * Convenience method for testing two lists for equality. One or both objects may be null,
+     * and considers null and emtpy list as equal
+     */
+    private boolean equals(final List object1, final List object2) {
+        if((object1==object2) || (object1!=null && object1.equals(object2)))
+        	return true;
+        if(object1 == null && object2.size() == 0)
+        	return true;
+        if(object2 == null && object1.size() == 0)
+        	return true;
+        return false;
+    }
 
 	public Map<Object,Object> getUserData() {
 	    return userData;

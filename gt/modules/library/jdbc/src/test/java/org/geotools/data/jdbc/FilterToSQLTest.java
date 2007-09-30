@@ -23,8 +23,6 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;

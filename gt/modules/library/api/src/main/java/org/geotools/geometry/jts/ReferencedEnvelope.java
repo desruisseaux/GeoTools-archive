@@ -68,9 +68,9 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * Creates a null envelope with a null coordinate reference system.
      */
     public ReferencedEnvelope() {
-        this( (CoordinateReferenceSystem) null );
+        this((CoordinateReferenceSystem) null);
     }
-    
+
     /**
      * Creates a null envelope with the specified coordinate reference system.
      *
@@ -567,13 +567,9 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * @return A ReferencedEnvelope using the specified envelope, or null if the envelope was null.
      */
     public static ReferencedEnvelope reference(Envelope e) {
-
-        if ( e == null )
-        {
+        if (e == null) {
             return null;
-        }
-        else
-        {
+        } else {
             if (e instanceof ReferencedEnvelope) {
                 return (ReferencedEnvelope) e;
             }
@@ -581,7 +577,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
             return new ReferencedEnvelope(e, null);
         }
     }
-    
+
     /**
      * Utility method to ensure that an BoundingBox in a ReferencedEnvelope.
      * <p>
@@ -593,9 +589,10 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * @return
      */
     public static ReferencedEnvelope reference(BoundingBox e) {
-    	if(e == null)
-    		return null; 
-    	
+        if (e == null) {
+            return null;
+        }
+
         if (e instanceof ReferencedEnvelope) {
             return (ReferencedEnvelope) e;
         }

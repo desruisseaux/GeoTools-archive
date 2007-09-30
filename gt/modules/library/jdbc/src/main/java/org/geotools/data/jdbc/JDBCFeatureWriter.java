@@ -19,25 +19,23 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -93,7 +91,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
             live = null;
 
             try {
-                SimpleFeature temp = DataUtilities.template(featureType);
+                SimpleFeature temp = SimpleFeatureBuilder.template(featureType, null);
 
                 /* Here we create a Feature with a Mutable FID.
                  * We use data utilities to create a default set of attributes
@@ -106,8 +104,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                  * of Feature in MutableFIDFeature at a later date.
                  *
                  */
-                current = new MutableFIDFeature((DefaultFeatureType) featureType,
-                        temp.getAttributes().toArray(), null);
+                current = new MutableFIDFeature((List) temp.getProperties(), featureType, null);
 
                 if (useQueryDataForInsert()) {
                     queryData.startInsert();
