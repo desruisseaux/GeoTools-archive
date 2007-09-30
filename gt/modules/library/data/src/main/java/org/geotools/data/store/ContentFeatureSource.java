@@ -16,6 +16,8 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
@@ -24,8 +26,9 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -74,13 +77,13 @@ public abstract class ContentFeatureSource implements FeatureSource {
         return transaction;
     }
 
-    public final DataStore getDataStore() {
+    public DataStore getDataStore() {
         return entry.getDataStore();
     }
 
-    public final FeatureType getSchema() {
+    public final SimpleFeatureType getSchema() {
         ContentState state = entry.getState(transaction);
-        FeatureType featureType = state.getMemberType();
+        SimpleFeatureType featureType = state.getFeatureType();
 
         if (featureType == null) {
             //build and cache it
@@ -91,18 +94,18 @@ public abstract class ContentFeatureSource implements FeatureSource {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    state.setMemberType( featureType);
+                    state.setFeatureType( featureType);
                 }
             }
         }
         return featureType;
     }
 
-    public final Envelope getBounds() throws IOException {
+    public final ReferencedEnvelope getBounds() throws IOException {
         return all(entry.getState(transaction)).getBounds();
     }
 
-    public final Envelope getBounds(Query query) throws IOException {
+    public final ReferencedEnvelope getBounds(Query query) throws IOException {
         return filtered(entry.getState(transaction), query.getFilter()).getBounds();
     }
 
@@ -159,16 +162,16 @@ public abstract class ContentFeatureSource implements FeatureSource {
         entry.getState(transaction).removeListener(listener);
     }
 
+    /**
+     * Returns an empty set, subclasses should override if need be.
+     */
+    public Set getSupportedHints() {
+        return Collections.EMPTY_SET;
+    }
+    
     //
     // Internal API
     //
-    /**
-     * Returns the data store logger.
-     */
-    public Logger getLogger() {
-    	return ((ContentDataStore) getDataStore() ).getLogger();
-    }
-    
     /**
      * Creates a feature type for the entry.
      * <p>
@@ -182,7 +185,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      *   </code>
      * </pre>
      */
-    protected abstract FeatureType buildFeatureType() throws IOException;
+    protected abstract SimpleFeatureType buildFeatureType() throws IOException;
 
     /**
      * FeatureCollection representing the entire contents.

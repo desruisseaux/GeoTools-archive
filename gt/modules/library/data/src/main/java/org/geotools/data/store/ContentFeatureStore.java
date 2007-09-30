@@ -17,12 +17,12 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.Set;
+
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
-
 
 public abstract class ContentFeatureStore extends ContentFeatureSource implements FeatureStore {
     public ContentFeatureStore(ContentEntry entry) {
@@ -35,12 +35,12 @@ public abstract class ContentFeatureStore extends ContentFeatureSource implement
         return null;
     }
 
-    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
         throws IOException {
         // TODO Auto-generated method stub
     }
 
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
         throws IOException {
         // TODO Auto-generated method stub
     }

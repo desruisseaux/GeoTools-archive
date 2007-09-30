@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
@@ -31,9 +30,10 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -57,14 +57,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public abstract class ContentDataStore implements DataStore {
 	/**
-	 * logging instance
-	 */
-	static final Logger LOGGER = Logger.getLogger( "org.geotools.data" );
-	
-	/**
      * Map<TypeName,ContentEntry> one for each kind of content served up.
      */
-    final Map entries;
+    final protected Map entries;
 
     /**
      * Factory used to create feature types
@@ -164,7 +159,7 @@ public abstract class ContentDataStore implements DataStore {
      *
      * @see DataStore#getSchema(String)
      */
-    public final FeatureType getSchema(String typeName)
+    public final SimpleFeatureType getSchema(String typeName)
         throws IOException {
         return getFeatureSource(typeName).getSchema();
     }
@@ -223,7 +218,7 @@ public abstract class ContentDataStore implements DataStore {
      *
      * @see DataStore#createSchema(FeatureType)
      */
-    public void createSchema(FeatureType featureType)
+    public void createSchema(SimpleFeatureType featureType)
         throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -246,7 +241,7 @@ public abstract class ContentDataStore implements DataStore {
         return null;
     }
 
-    public final void updateSchema(String typeName, FeatureType featureType)
+    public final void updateSchema(String typeName, SimpleFeatureType featureType)
         throws IOException {
     }
 
@@ -258,17 +253,6 @@ public abstract class ContentDataStore implements DataStore {
     //
     // Internal API
     //
-    /**
-     * Returns the logger for the datastore.
-     * <p>
-     * Subclasses should override to provide a differnt logging instance. This
-     * implementation uses the logger "org.geotools.data".
-     * </p>
-     */
-    public Logger getLogger() {
-    	return LOGGER;
-    }
-    
     /**
      * Creates a set of qualified names corresponding to the types that the
      * datastore provides.

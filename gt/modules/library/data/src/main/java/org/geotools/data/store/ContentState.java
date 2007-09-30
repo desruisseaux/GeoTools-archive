@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.data.FeatureListener;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -46,11 +46,7 @@ public class ContentState {
 	/**
 	 * cached feature type
 	 */
-	protected FeatureType memberType;
-	/**
-	 * cached feature collection type
-	 */
-	protected FeatureType collectionType;
+	protected SimpleFeatureType featureType;
 	/**
 	 * cached number of features
 	 */
@@ -83,26 +79,17 @@ public class ContentState {
     protected ContentState(ContentState state) {
 		this( state.getEntry() );
 		
-        memberType = state.memberType;
-        collectionType = state.collectionType;
+        featureType = state.featureType;
         count = state.count;
         bounds = state.bounds == null ? null : new Envelope( state.bounds );
 	}
 
-	public FeatureType getMemberType(){
-    	return memberType;
+	public SimpleFeatureType getFeatureType(){
+    	return featureType;
     }
     
-    public void setMemberType( FeatureType memberType ){
-    	this.memberType = memberType;    	
-    }
-    
-    public FeatureType getCollectionType(){
-    	return collectionType; 
-    }
-    
-    public void setCollectionType( FeatureType featureType ){
-    	collectionType = featureType;    	
+    public void setFeatureType( SimpleFeatureType featureType ){
+    	this.featureType = featureType;
     }
     
     public int getCount(){
@@ -125,8 +112,7 @@ public class ContentState {
      * Flushes the cache.
      */
     public void flush() {
-        memberType = null;
-        collectionType = null;
+        featureType = null;
         count = -1;
         bounds = null;
     }
@@ -142,8 +128,7 @@ public class ContentState {
      * Cleans up the state object by clearing cache and listeners.
      */
     public void close() {
-    	memberType = null;
-    	collectionType = null;
+    	featureType = null;
     	if( listeners != null ){
     		listeners.clear();
     		listeners = null;
