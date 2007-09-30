@@ -1,21 +1,21 @@
 package org.geotools.xml.gml;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 
 /**
+ * A temporary measure representing a choice between several bindings.
+ * <p> 
  * Created for GML generated FeatureTypes.  Represents a Choice type.  This is a
- * pale, weak imitation of the real thing and as soon as the new FeatureModel comes around
- * it will be thrown away.
- *
+ * pale, weak imitation of the real thing and as soon as the new FeatureModel
+ * comes around it will be thrown away.
  * 
  * This is temporary and only for use by the parser.  It should never be public or in common use.
  * 
  * @author Jesse
- *
- * @deprecated Will be removed in geotools 2.6.
  */
-interface ChoiceAttributeType extends AttributeType{
+interface ChoiceAttributeType extends AttributeDescriptor, AttributeType {
+    
 	/**
 	 * Gets the choices
 	 * @return the potential types
@@ -35,6 +35,4 @@ interface ChoiceAttributeType extends AttributeType{
 	 *  </p>
 	 */
 	public Object convert(Object obj);
-	interface Geometry extends ChoiceAttributeType, GeometryAttributeType{
-	}
 }

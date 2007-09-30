@@ -9,6 +9,9 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
+/**
+ * AttributeType for hold geometry implementations, maintains CRS information.
+ */
 public class GeometryTypeImpl extends AttributeTypeImpl implements GeometryType {
 
 	protected CoordinateReferenceSystem CRS;

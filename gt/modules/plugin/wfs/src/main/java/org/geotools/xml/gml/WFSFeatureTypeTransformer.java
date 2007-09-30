@@ -32,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class WFSFeatureTypeTransformer {
 
-    public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
+    public static SimpleFeatureType transform( SimpleFeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
         FeatureTypeBuilder factory = FeatureTypeBuilder.newInstance(schema.getTypeName());
 
         factory.setNamespace(schema.getNamespace());

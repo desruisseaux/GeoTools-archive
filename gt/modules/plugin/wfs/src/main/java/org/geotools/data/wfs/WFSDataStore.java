@@ -859,7 +859,7 @@ public class WFSDataStore extends AbstractDataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getBounds(org.geotools.data.Query)
      */
-    protected Envelope getBounds(Query query) throws IOException {
+    protected ReferencedEnvelope getBounds(Query query) throws IOException {
         if ((query == null) || (query.getTypeName() == null)) {
             return super.getBounds(query);
         }

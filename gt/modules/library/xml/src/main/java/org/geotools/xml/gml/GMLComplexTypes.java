@@ -28,12 +28,17 @@ import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.DataUtilities;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XMLHandlerHints;
@@ -4178,7 +4183,7 @@ public class GMLComplexTypes {
             }
 
             String nm = (String) hints.get(STREAM_FEATURE_NAME_HINT);
-            Feature f;
+            SimpleFeature f;
             if ((nm != null) && nm.equals(element.getName())) {
                 f = getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(XMLHandlerHints.STREAM_HINT)).ft);
                 stream(f, (FCBuffer) hints.get(XMLHandlerHints.STREAM_HINT));
@@ -4189,10 +4194,10 @@ public class GMLComplexTypes {
             return f;
         }
 
-        public Feature getFeature(Element element, ElementValue[] value,
-            Attributes attrs, Map hints, FeatureType ft) throws SAXException {
+        public SimpleFeature getFeature(Element element, ElementValue[] value,
+            Attributes attrs, Map hints, SimpleFeatureType ft) throws SAXException {
             if(ft == null)
-                ft = (FeatureType) featureTypeMappings.get(element.getType()
+                ft = (SimpleFeatureType) featureTypeMappings.get(element.getType()
                     .getNamespace() + "#" + element.getName());
 
             if (ft == null) {
@@ -4215,7 +4220,7 @@ public class GMLComplexTypes {
                 fid = attrs.getValue(GMLSchema.NAMESPACE.toString(), "fid");
             }
 
-            Feature rt = null;
+            SimpleFeature rt = null;
             if ((fid != null) || !"".equals(fid)) {
                 try {
                     rt =  ft.create(values, fid);
@@ -4226,8 +4231,9 @@ public class GMLComplexTypes {
             }
 
             try {
-                if(rt == null)
-                rt = ft.create(values);
+                if(rt == null){
+                    rt = SimpleFeatureBuilder.build( ft, values, null );
+                }
             } catch (IllegalAttributeException e1) {
                 logger.warning(e1.toString());
                 throw new SAXException(e1);
@@ -4236,10 +4242,10 @@ public class GMLComplexTypes {
             return rt;
         }
 
-		private void setAttribute(ElementValue[] value, FeatureType ft, Object[] values, int i, int j) {
+		private void setAttribute(ElementValue[] value, SimpleFeatureType ft, Object[] values, int i, int j) {
 			j = searchByName(value, ft, i, j);
 			if(j!=-1){
-                assignValue(value, values, ft.getAttributeType(j), i, j);
+                assignValue(value, values, ft.getAttribute(j), i, j);
 			}else{
 			    searchByType(value, ft, values, i);
 			}
@@ -4252,18 +4258,18 @@ public class GMLComplexTypes {
 		 * (ie ... is this part of the consequences of GT's featureType model)?
 		 * 
 		 */
-		private void searchByType(ElementValue[] value, FeatureType ft, Object[] values, int i) {
+		private void searchByType(ElementValue[] value, SimpleFeatureType ft, Object[] values, int i) {
 			
 			if(value[i].getValue()!=null){
 				// first check same index since it is supposed to be the same...
 				if( isMatch(value, ft, i, i) ){
-					assignValue(value, values, ft.getAttributeType(i), i, i);
+					assignValue(value, values, ft.getAttribute(i), i, i);
 					return;
 				}
 				for(int k=0;k<ft.getAttributeCount();k++){
 				    if(isMatch(value, ft, i, k)){
 				    	if( values[i]==null)
-				    		assignValue(value, values, ft.getAttributeType(k), i, k);
+				    		assignValue(value, values, ft.getAttribute(k), i, k);
 				    }
 				}
 			}
@@ -4278,7 +4284,7 @@ public class GMLComplexTypes {
 		}
 
 		private boolean isMatch(ElementValue[] value, SimpleFeatureType ft, int i, int k) {
-			AttributeDescriptor AttributeDescriptor = ft.getAttributeDescriptor(k);
+			AttributeDescriptor AttributeDescriptor = ft.getAttribute(k);
 			String typeName = ft.getTypeName();
 			
 			if( !AttributeDescriptor.getLocalName().equals(typeName) )
@@ -4294,20 +4300,20 @@ public class GMLComplexTypes {
 						return true;
 				}
 			}
-			return AttributeDescriptor.getBinding().isAssignableFrom(instanceClass);
+			return AttributeDescriptor.getType().getBinding().isAssignableFrom(instanceClass);
 		}
 
-		private int searchByName(ElementValue[] value, FeatureType ft, int i, int j) {
+		private int searchByName(ElementValue[] value, SimpleFeatureType ft, int i, int j) {
 			for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
 			    // TODO use equals
-			    if((ft.getAttributeDescriptor(k).getLocalName()==null && value[i].getElement().getName()==null) ||
-			            ft.getAttributeDescriptor(k).getLocalName().equals(value[i].getElement().getName()))
+			    if((ft.getAttribute(k).getLocalName()==null && value[i].getElement().getName()==null) ||
+			            ft.getAttribute(k).getLocalName().equals(value[i].getElement().getName()))
 			        j = k;
 			}
 			return j;
 		}
 
-        private void stream(Feature feature, FCBuffer featureCollectionBuffer)
+        private void stream(SimpleFeature feature, FCBuffer featureCollectionBuffer)
             throws SAXNotSupportedException, SAXException {
             if (!featureCollectionBuffer.addFeature(feature)) {
                 throw new SAXException("Buffer overflow");
@@ -4353,16 +4359,16 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.xsi.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Feature.class;
+            return SimpleFeature.class;
         }
 
         /*
          * Creates a FT from the information provided
          */
-        private FeatureType loadFeatureType(Element element,
+        private SimpleFeatureType loadFeatureType(Element element,
             ElementValue[] value, Attributes attrs) throws SAXException {
 
-            FeatureType ft = createFeatureType(element);
+            SimpleFeatureType ft = createFeatureType(element);
                 featureTypeMappings.put(element.getType().getNamespace() + "#"
                     + element.getName(), ft);
                 return ft;
@@ -4390,7 +4396,7 @@ public class GMLComplexTypes {
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             if ((value == null) || (element == null)
-                    || value instanceof FeatureCollection || !(value instanceof Feature)) {
+                    || value instanceof FeatureCollection || !(value instanceof SimpleFeature)) {
                 return false;
             }
 
@@ -4411,7 +4417,7 @@ public class GMLComplexTypes {
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
             if (canEncode(element, value, hints)) {
-                Feature f = (Feature) value;
+                SimpleFeature f = (SimpleFeature) value;
                 if (element == null) {
                     print(f, output, hints);
                 } else {
@@ -4420,7 +4426,7 @@ public class GMLComplexTypes {
             }
         }
 
-        private void print(Element e, Feature f, PrintHandler ph, Map hints)
+        private void print(Element e, SimpleFeature f, PrintHandler ph, Map hints)
             throws OperationNotSupportedException, IOException {
             AttributesImpl ai = new AttributesImpl();
 
@@ -4432,12 +4438,11 @@ public class GMLComplexTypes {
 
             ph.startElement(e.getNamespace(), e.getName(), ai);
 
-            FeatureType ft = f.getFeatureType();
-            AttributeDescriptor[] ats = ft.getAttributeDescriptors();
-
+            SimpleFeatureType ft = f.getFeatureType();
+            List<AttributeDescriptor> ats = ft.getAttributes();
             if (ats != null) {
-                for (int i = 0; i < ats.length; i++) {
-                    Element e2 = e.findChildElement(ats[i].getLocalName());
+                for (int i = 0; i < ats.size(); i++) {
+                    Element e2 = e.findChildElement(ats.get(i).getLocalName());
                     e2.getType().encode(e2, f.getAttribute(i), ph, hints);
                 }
             }
@@ -4445,7 +4450,7 @@ public class GMLComplexTypes {
             ph.endElement(e.getNamespace(), e.getName());
         }
 
-        private void print(Feature f, PrintHandler ph, Map hints)
+        private void print(SimpleFeature f, PrintHandler ph, Map hints)
             throws OperationNotSupportedException, IOException {
             AttributesImpl ai = new AttributesImpl();
 
@@ -4457,16 +4462,15 @@ public class GMLComplexTypes {
 
             ph.startElement(GMLSchema.NAMESPACE, "_Feature", ai);
 
-            FeatureType ft = f.getFeatureType();
-            AttributeDescriptor[] ats = ft.getAttributeDescriptors();
+            SimpleFeatureType ft = f.getFeatureType();
+            List<AttributeDescriptor> ats = ft.getAttributes();
 
             if (ats != null) {
-                for (int i = 0; i < ats.length; i++) {
-                    Type t = XSISimpleTypes.find(ats[i].getBinding());
+                for (int i = 0; i < ats.size(); i++) {
+                    Type t = XSISimpleTypes.find(ats.get(i).getType().getBinding());
                     t.encode(null, f.getAttribute(i), ph, hints);
                 }
             }
-
             ph.endElement(GMLSchema.NAMESPACE, "_Feature");
         }
     }
@@ -4776,7 +4780,7 @@ public class GMLComplexTypes {
             Element e = null;
 
             while (i.hasNext()) {
-                Feature f = i.next();
+                SimpleFeature f = i.next();
                 output.startElement(GMLSchema.NAMESPACE, "featureMember", null);
 
                 if (e == null) { // first time
@@ -5092,7 +5096,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.Type#getValue(java.util.List)
          */
-        public Object getValue(Element element, ElementValue[] value,
+        public SimpleFeature getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException {
             if ((value == null) || (value.length != 1)) {
                 throw new SAXException("must be one feature " + value.length);
@@ -5103,14 +5107,14 @@ public class GMLComplexTypes {
                                                                   .getClass()
                                                                   .getName());
 
-            return (Feature) value[0].getValue();
+            return (SimpleFeature) value[0].getValue();
         }
 
         /**
          * @see org.geotools.xml.xsi.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Feature.class;
+            return SimpleFeature.class;
         }
 
         /**
@@ -5134,7 +5138,7 @@ public class GMLComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            if (!(value instanceof Feature)) {
+            if (!(value instanceof SimpleFeature)) {
                 return false;
             }
 
@@ -5155,7 +5159,7 @@ public class GMLComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            if (!(value instanceof Feature)) {
+            if (!(value instanceof SimpleFeature)) {
                 return;
             }
 
@@ -5168,7 +5172,7 @@ public class GMLComplexTypes {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
                 AbstractFeatureType.getInstance().encode(element
-                    .findChildElement(((Feature) value).getFeatureType()
+                    .findChildElement(((SimpleFeature) value).getFeatureType()
                                        .getTypeName()), value, output, hints);
                 output.endElement(element.getNamespace(), element.getName());
             }
@@ -6503,16 +6507,16 @@ public class GMLComplexTypes {
     /*
      * Creates a FT from the information provided
      */
-    public static FeatureType createFeatureType(Element element) throws SAXException {
+    public static SimpleFeatureType createFeatureType(Element element) throws SAXException {
         String ftName = element.getName();
         URI ftNS = element.getType().getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
-        FeatureTypeBuilder typeFactory = FeatureTypeBuilder.newInstance(ftName);
-        typeFactory.setNamespace(ftNS);
-        typeFactory.setName(ftName);
-
-        GeometryAttributeDescriptor geometryAttribute = null;
+        SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+        build.setName(ftName);
+        build.setNamespaceURI( ftNS );
+        
+        GeometryDescriptor geometryAttribute = null;
 
         ElementGrouping child = ((ComplexType)element.getType()).getChild();
 //        FeatureType parent = null;
@@ -6529,31 +6533,31 @@ public class GMLComplexTypes {
         AttributeDescriptor[] attrs = (AttributeDescriptor[])getAttributes(element.getName(),child).toArray(new AttributeDescriptor[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
-        		typeFactory.addType(attrs[i]);
+        	    build.add(attrs[i]);
 
         if ((geometryAttribute == null)
-                && attrs[i] instanceof GeometryAttributeDescriptor) {
+                && attrs[i] instanceof GeometryDescriptor) {
             if (!attrs[i].getLocalName()
 //                    .equalsIgnoreCase(BoxType.getInstance().getName())) {
                 .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
-                geometryAttribute = (GeometryAttributeDescriptor) attrs[i];
+                geometryAttribute = (GeometryDescriptor) attrs[i];
             }
         }}
         }
 
         if (geometryAttribute != null) {
-            typeFactory.setDefaultGeometry(geometryAttribute);
+            build.setDefaultGeometry( geometryAttribute.getLocalName() );
         }
 
         try {
-            FeatureType ft = typeFactory.getFeatureType();
+            SimpleFeatureType ft = build.buildFeatureType();
             return ft;
-        } catch (SchemaException e) {
+        } catch (IllegalArgumentException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
     }
-    public static FeatureType createFeatureType(ComplexType element) throws SAXException {
+    public static SimpleFeatureType createFeatureType(ComplexType element) throws SAXException {
         String ftName = element.getName();
         URI ftNS = element.getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
@@ -6593,46 +6597,46 @@ public class GMLComplexTypes {
         }
     }
 
-    private static List getAttributes(String name, ElementGrouping eg){
-        List l = new LinkedList();
+    private static List<AttributeDescriptor> getAttributes(String name, ElementGrouping eg){
+        List<AttributeDescriptor> attributes = new LinkedList<AttributeDescriptor>();
         AttributeDescriptor t = null;
         switch(eg.getGrouping()){
 
         case ElementGrouping.CHOICE:
             t = getAttribute(name, (Choice)eg);
             if(t!=null)
-                l.add(t);
+                attributes.add(t);
             break;
         case ElementGrouping.GROUP:
-            l.addAll(getAttributes(name,((Group)eg).getChild()));
+            attributes.addAll(getAttributes(name,((Group)eg).getChild()));
             break;
         case ElementGrouping.ELEMENT:
             t = getAttribute((Element)eg);
             if(t!=null)
-                l.add(t);
-        	return l;
+                attributes.add(t);
+        	return attributes;
 
         case ElementGrouping.ALL:
             Element[] elems = ((All)eg).getElements();
             if(elems!=null)
                 for(int i=0;i<elems.length;i++)
-                    l.add(getAttribute(elems[i]));
+                    attributes.add(getAttribute(elems[i]));
         	break;
         case ElementGrouping.SEQUENCE:
             ElementGrouping[] children = ((Sequence)eg).getChildren();
             if(children!=null)
                 for(int i=0;i<children.length;i++)
-                    l.addAll(getAttributes(name, children[i]));
+                    attributes.addAll(getAttributes(name, children[i]));
     	break;
         }
-        return l;
+        return attributes;
     }
 
     private static AttributeDescriptor getAttribute(Element eg){
     	if(eg.getNamespace() == GMLSchema.NAMESPACE && (AbstractFeatureType.getInstance().getChildElements()[0] == eg || AbstractFeatureType.getInstance().getChildElements()[1] == eg || AbstractFeatureType.getInstance().getChildElements()[2] == eg))
     		return null;
 
-        Class type = Object.class;
+        Class<?> type = Object.class;
     	if(eg.getType() != null){
 	        if(eg.getType() instanceof SimpleType){
 	            type = eg.getType().getInstanceType();
@@ -6665,12 +6669,27 @@ public class GMLComplexTypes {
         if(type == null)
             type = Object.class;
         
-        // nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
+        // nillable should really be nillable, but in gt2.X nillable
+        // in an attribute is equivalent to minOccurs == 0 as well
 		boolean nillable = eg.isNillable()||eg.getMinOccurs() == 0;
         if( !nillable ){
             try{
                 Object defaultValue = DataUtilities.defaultValue(type);
-                return AttributeDescriptorFactory.newAttributeDescriptor( eg.getName(), type, nillable, Filter.INCLUDE, defaultValue, null);
+                AttributeTypeBuilder build = new AttributeTypeBuilder();
+                build.setName( eg.getName() );
+                build.setBinding( type );
+                build.setNillable( nillable );
+                build.setDefaultValue( defaultValue );
+
+                return build.buildDescriptor(eg.getName());
+                               
+//                return AttributeTypeFactory.newAttributeDescriptor(
+//                        eg.getName(),
+//                        type,
+//                        nillable,
+//                        Filter.INCLUDE,
+//                        defaultValue,
+//                        null);
             } catch( IllegalArgumentException e ){
                 // can happen if the type is not supported by the method.  
                 // in this case I'm taking the easy way out and just not 
@@ -6678,10 +6697,23 @@ public class GMLComplexTypes {
                 logger.warning("Don't know how to make a default value for: "+type
                         +". Consider making it nillable.");
                 
-                return AttributeDescriptorFactory.newAttributeDescriptor(eg.getName(),type,(nillable));
+                AttributeTypeBuilder build = new AttributeTypeBuilder();
+                build.setName( eg.getName() );
+                build.setBinding( type );
+                build.setNillable( nillable );
+                return build.buildDescriptor(eg.getName());
+//                return AttributeTypeFactory.newAttributeType(
+//                        eg.getName(),
+//                        type,
+//                        nillable);
             }
         }
-        return AttributeDescriptorFactory.newAttributeDescriptor(eg.getName(),type,(nillable));
+        AttributeTypeBuilder build = new AttributeTypeBuilder();
+        build.setName( eg.getName() );
+        build.setBinding( type );
+        build.setNillable( nillable );
+        return build.buildDescriptor(eg.getName());
+        //return AttributeTypeFactory.newAttributeType(eg.getName(),type,(nillable));
     }
 
     private static AttributeDescriptor getAttribute(String name, Choice eg){
@@ -6724,7 +6756,7 @@ public class GMLComplexTypes {
     	int i=0;
     	for (Iterator iter = l.iterator(); iter.hasNext(); i++) {
 			AttributeDescriptor type = (AttributeDescriptor) iter.next();
-			choices[i]=type.getBinding();
+			choices[i]=type.getType().getBinding();
 		}
     	return choices;
 	}
@@ -6743,10 +6775,10 @@ public class GMLComplexTypes {
             at = (AttributeDescriptor)i.next();
             if(at!= null){
                 if(common == null){
-                    common = at.getBinding();
+                    common = at.getType().getBinding();
                 }else{
                     // merge two types
-                    Class t = at.getBinding();
+                    Class t = at.getType().getBinding();
                     if(t!=null){
                         if(!common.isAssignableFrom(t)){
                             // either t is super class .. or they share one

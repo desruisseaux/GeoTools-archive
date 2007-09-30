@@ -1,9 +1,19 @@
 package org.geotools.xml.gml;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.geotools.data.DataUtilities;
 import org.geotools.feature.DefaultAttributeType;
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.AttributeTypeImpl;
 import org.geotools.feature.type.GeometricAttributeType;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -22,14 +32,22 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author Jesse
  */
-class ChoiceAttributeTypeImpl extends DefaultAttributeType implements ChoiceAttributeType {
+class ChoiceAttributeTypeImpl extends AttributeTypeImpl implements ChoiceAttributeType {
 
-    private Class[] types;
-
-	public ChoiceAttributeTypeImpl(String name, Class[] types, Class defaultType, boolean nillable, int min, int max,
-            Object defaultValue, Filter f) {
-           super(name,defaultType,nillable,min,max,defaultValue, f);
-           this.types=types;
+    protected Class[] types;
+    private boolean isNillable;
+    private int maxOccurs;
+    private int minOccurs;
+    Object defaultValue;
+    
+	public ChoiceAttributeTypeImpl(Name name, Class<?>[] types, Class<?> defaultType, boolean nillable, int min, int max,
+            Object defaultValue, Filter filter) {
+	    super( name, defaultType, false, false, toRestrictions(filter), null, toDescription(types) );
+	    if( defaultValue == null && !isNillable ){
+	        defaultValue = DataUtilities.defaultValue( defaultType );
+	    }
+	    this.minOccurs = min;
+	    this.maxOccurs = max;
     }
 
 	public Class[] getChoices() {
@@ -38,41 +56,46 @@ class ChoiceAttributeTypeImpl extends DefaultAttributeType implements ChoiceAttr
 	public Object convert(Object obj) {
 		return obj;
 	}
-	
-	static class Geometry extends GeometricAttributeType implements ChoiceAttributeType.Geometry{
 
-		private Class[] types;
+    public Object getDefaultValue() {
+        return defaultValue;
+    }
 
-		public Geometry(String name, Class[] types, Class defaultType, boolean nillable, 
-				int min, int max, Object defaultValue, 
-				CoordinateReferenceSystem cs, Filter filter) {
-			super(name, defaultType, nillable, min, max, defaultValue, cs, filter);
-			this.types=types;
-		}
+    public String getLocalName() {
+        return getName().getLocalPart();
+    }
 
-		public Class[] getChoices() {
-			return types;
-		}
-		
-		public Object convert(Object obj) {
-			GeometryFactory fac=new GeometryFactory();
-			if (getBinding()==MultiPolygon.class && obj instanceof Polygon ){
-				return fac.createMultiPolygon(new Polygon[]{(Polygon) obj});
-			}
-			if (getBinding()==MultiPoint.class && obj instanceof Point ){
-				return fac.createMultiPoint(new Point[]{(Point) obj});
-			}
-			if (getBinding()==MultiLineString.class && obj instanceof LineString ){
-				return fac.createMultiLineString(new LineString[]{(LineString) obj});
-			}
-			if (getBinding()==GeometryCollection.class && obj instanceof Geometry ){
-				return fac.createGeometryCollection(new com.vividsolutions.jts.geom.Geometry[]{(com.vividsolutions.jts.geom.Geometry) obj});
-			}
-			
-			return obj;
-		}
-		
-	}
+    public AttributeType getType() {
+        return this;
+    }
 
+    public int getMaxOccurs() {
+        return minOccurs;
+    }
 
+    public int getMinOccurs() {
+        return maxOccurs;
+    }
+
+    public boolean isNillable() {
+        return isNillable;
+    }
+
+    static List<Filter> toRestrictions( Filter filter ){
+        if( filter == null ){
+            return (List<Filter>)Collections.EMPTY_LIST;
+        }
+        else {
+            return Collections.singletonList( filter );
+        }
+    }
+    static InternationalString toDescription( Class[] bindings ){
+        StringBuffer buf = new StringBuffer();
+        buf.append("Choice betwee ");
+        for( Class bind : bindings ){
+            buf.append( bind.getName() );
+            buf.append( "," );
+        }
+        return new SimpleInternationalString( buf.toString() );
+    }
 }

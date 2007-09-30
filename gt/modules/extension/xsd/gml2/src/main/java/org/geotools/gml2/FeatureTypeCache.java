@@ -37,8 +37,7 @@ public class FeatureTypeCache {
         synchronized (this) {
             if (map.get(type.getTypeName()) != null) {
                 SimpleFeatureType other = map.get(type.getTypeName());
-                SimpleFeatureType other = (SimpleFeatureType) map.get(type.getTypeName());
-
+                
                 if (!other.equals(type)) {
                     String msg = "Type with same name already exists in cache.";
                     throw new IllegalArgumentException(msg);

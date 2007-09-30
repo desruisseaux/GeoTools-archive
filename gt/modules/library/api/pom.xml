@@ -100,8 +100,7 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-    <plugins>
-      <!-- ====    Code Formatting  ============================== -->
+    <!--plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jalopy-maven-plugin</artifactId>
@@ -113,7 +112,7 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>
+    </plugins-->
   </build>
   
   
