@@ -284,6 +284,10 @@ public class AttributeTypeBuilder {
 	public void setIdentifiable(boolean isIdentifiable) {
 		this.isIdentifiable = isIdentifiable;
 	}
+	
+	public void setLength(int length) {
+        this.length = length;
+    }
 
 	public void addRestriction(Filter restriction) {
 		restrictions().add(restriction);
@@ -346,6 +350,11 @@ public class AttributeTypeBuilder {
 		return this;
 	}
 
+	public AttributeTypeBuilder length( int length ) {
+	    this.length = length;
+	    return this;
+	}
+	
 	public AttributeTypeBuilder restriction(Filter restriction) {
 		restrictions().add(restriction);
 		return this;
@@ -523,17 +532,12 @@ public class AttributeTypeBuilder {
 		return restrictions;
 	}
 
-    public void setLength(int length) {
-        this.length = length;
-    }
+	
 	
     /**
      * Helper method to create a "length" filter.
-     * @param xpath
-     * @param length 
-     * @return Filter
      */
-    public Filter length(String xpath, int length ){
+    protected Filter length(String xpath, int length ){
         if ( length < 0 ) {
             return null;
         }
