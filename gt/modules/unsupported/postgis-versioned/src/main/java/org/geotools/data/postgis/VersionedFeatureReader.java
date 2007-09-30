@@ -20,9 +20,10 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * A feature reader for versioned features. It assumes the internal reader has
@@ -48,7 +49,7 @@ class VersionedFeatureReader implements FeatureReader {
         wrapped.close();
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return wrapped.getFeatureType();
     }
 
@@ -56,13 +57,13 @@ class VersionedFeatureReader implements FeatureReader {
         return wrapped.hasNext();
     }
 
-    public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
-        Feature feature = wrapped.next();
-        FeatureType featureType = wrapped.getFeatureType();
+    public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+        SimpleFeature feature = wrapped.next();
+        SimpleFeatureType featureType = wrapped.getFeatureType();
         String id = feature.getID();
 
-        return featureType.create(feature
-                .getAttributes(new Object[featureType.getAttributeCount()]), fidMapper
+        return SimpleFeatureBuilder.build(featureType, feature
+                .getAttributes(), fidMapper
                 .getUnversionedFid(id));
     }
 }

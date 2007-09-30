@@ -21,8 +21,8 @@ import java.util.Set;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 
 /**
@@ -52,12 +52,12 @@ class WrappingPostgisFeatureStore extends WrappingPostgisFeatureSource
         return wrappedStore.getTransaction();
     }
 
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
             throws IOException {
         wrappedStore.modifyFeatures(type, value, filter);
     }
 
-    public void modifyFeatures(AttributeType[] type, Object[] value,
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
             Filter filter) throws IOException {
         wrappedStore.modifyFeatures(type, value, filter);
     }

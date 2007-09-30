@@ -22,8 +22,8 @@ import java.sql.Statement;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Covers both the basic and multicolumn fid mappers
@@ -64,7 +64,7 @@ class VersionedMulticolumnFIDMapper extends MultiColumnFIDMapper implements Vers
         return unversioned;
     }
 
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
             throws IOException {
         if (colNames.length == 2 && feature.getAttribute(colNames[1]) == null) {
             try {

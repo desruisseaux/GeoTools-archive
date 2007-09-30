@@ -23,11 +23,12 @@ import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
@@ -39,14 +40,14 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
     PostgisConnectionFactory pcFactory;
 
-    protected FeatureType railType;
-    protected FeatureType treeType;
+    protected SimpleFeatureType railType;
+    protected SimpleFeatureType treeType;
 
-    protected Feature[] railFeatures;
-    protected Feature[] treeFeatures;
+    protected SimpleFeature[] railFeatures;
+    protected SimpleFeature[] treeFeatures;
 
-    protected Envelope railBounds;
-    protected Envelope treeBounds;
+    protected ReferencedEnvelope railBounds;
+    protected ReferencedEnvelope treeBounds;
 
     public AbstractVersionedPostgisDataTestCase(String name) {
         super(name);
@@ -82,24 +83,24 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         railType = DataUtilities.createType(getName() + ".rail",
                 "geom:LineString:nillable");
-        railFeatures = new Feature[1];
+        railFeatures = new SimpleFeature[1];
         // 0,0 +-----------+ 10,10
-        railFeatures[0] = railType.create(new Object[] { line(new int[] { 0,0, 10, 10}) },
+        railFeatures[0] = SimpleFeatureBuilder.build(railType, new Object[] { line(new int[] { 0,0, 10, 10}) },
                 "rail.1");
-        railBounds = new Envelope();
-        railBounds.expandToInclude(railFeatures[0].getBounds());
+        railBounds = new ReferencedEnvelope();
+        railBounds.include(railFeatures[0].getBounds());
         
         treeType = DataUtilities.createType(getName() +".tree",
           "geom:Point:nillable,name:String");
-        treeFeatures = new Feature[1];
-        treeFeatures[0] = treeType.create( new Object[]{
+        treeFeatures = new SimpleFeature[1];
+        treeFeatures[0] = SimpleFeatureBuilder.build(treeType, new Object[]{
             gf.createPoint(new Coordinate(5,5)),
             "BigPine"
         },
         "tree.tr1"
         );
-        treeBounds = new Envelope();
-        treeBounds.expandToInclude(treeFeatures[0].getBounds());      
+        treeBounds = new ReferencedEnvelope();
+        treeBounds.include(treeFeatures[0].getBounds());      
     }
 
     protected VersionedPostgisDataStore getDataStore() throws IOException {
@@ -154,7 +155,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".tree add name varchar;");
 
             for (int i = 0; i < treeFeatures.length; i++) {
-                Feature feature = treeFeatures[i];
+                SimpleFeature feature = treeFeatures[i];
 
                 // strip out the lake.
                 String ql = "INSERT INTO " + f.schema + ".tree (geom,name) VALUES ("
@@ -196,7 +197,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".road add name varchar;");
 
             for (int i = 0; i < roadFeatures.length; i++) {
-                Feature feature = roadFeatures[i];
+                SimpleFeature feature = roadFeatures[i];
 
                 // strip out the road.
                 String fid = feature.getID().substring("road.".length());
@@ -238,7 +239,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".lake add name varchar;");
 
             for (int i = 0; i < lakeFeatures.length; i++) {
-                Feature feature = lakeFeatures[i];
+                SimpleFeature feature = lakeFeatures[i];
 
                 // strip out the lake.
                 String ql = "INSERT INTO " + f.schema + ".lake (id,geom,name) VALUES ("
@@ -278,7 +279,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
                     + "', 'rail', 'geom', 0, 'LINESTRING', 2);");
 
             for (int i = 0; i < railFeatures.length; i++) {
-                Feature feature = railFeatures[i];
+                SimpleFeature feature = railFeatures[i];
 
                 // strip out the lake.
                 String ql = "INSERT INTO " + f.schema + ".rail (geom) VALUES ("
@@ -399,7 +400,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             s.execute("ALTER TABLE " + f.schema + ".river add flow float8");
 
             for (int i = 0; i < riverFeatures.length; i++) {
-                Feature feature = riverFeatures[i];
+                SimpleFeature feature = riverFeatures[i];
                 String fid = feature.getID().substring("river.".length());
                 s
                         .execute("INSERT INTO " + f.schema

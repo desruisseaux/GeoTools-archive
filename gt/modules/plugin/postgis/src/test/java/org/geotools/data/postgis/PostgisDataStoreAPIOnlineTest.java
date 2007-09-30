@@ -1467,7 +1467,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         ReferencedEnvelope b = half.getBounds();
         ReferencedEnvelope expectedBounds = isEnvelopeComputingEnabled() ? roadBounds : new ReferencedEnvelope();
-        assertEquals(expectedBounds, b); // empty envelope is expected
+        assertEquals(expectedBounds, b); 
     }
 
     /**

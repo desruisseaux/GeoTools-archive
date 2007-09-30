@@ -61,15 +61,16 @@ import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterVisitorFilterWrapper;
 import org.geotools.geometry.jts.JTS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
@@ -174,8 +175,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         return (String[]) names.toArray(new String[names.size()]);
     }
 
-    public FeatureType getSchema(String typeName) throws IOException {
-        FeatureType ft = wrapped.getSchema(typeName);
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
+        SimpleFeatureType ft = wrapped.getSchema(typeName);
         
         if(!isVersioned(typeName)) {
             return ft;
@@ -188,30 +189,32 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         Set names = new HashSet(Arrays.asList(filterPropertyNames(new DefaultQuery(typeName))));
         List filtered = new ArrayList();
         for (int i = 0; i < ft.getAttributeCount(); i++) {
-            AttributeType cat = ft.getAttributeType(i);
+            AttributeDescriptor cat = ft.getAttribute(i);
             String name = cat.getLocalName().toLowerCase();
             if (names.contains(name)) {
                 filtered.add(cat);
             }
         }
-        AttributeType[] ats = (AttributeType[]) filtered
-                .toArray(new AttributeType[filtered.size()]);
+        AttributeDescriptor[] ats = (AttributeDescriptor[]) filtered
+                .toArray(new AttributeDescriptor[filtered.size()]);
 
         try {
-            return FeatureTypeBuilder.newFeatureType(ats, ft.getTypeName(), ft.getNamespace(), ft
-                    .isAbstract(), ft.getAncestors(), ft.getDefaultGeometry());
-        } catch (SchemaException e) {
+        	SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        	ftb.init(ft);
+        	ftb.setAttributes(Arrays.asList(ats));
+            return ftb.buildFeatureType();
+        } catch (IllegalArgumentException e) {
             throw new DataSourceException(
                     "Error converting FeatureType from versioned (internal) schema "
                             + "to unversioned (external) schema " + typeName, e);
         }
     }
 
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
         wrapped.createSchema(featureType);
     }
 
-    public void updateSchema(String typeName, FeatureType featureType) throws IOException {
+    public void updateSchema(String typeName, SimpleFeatureType featureType) throws IOException {
         throw new IOException("VersionedPostgisDataStore.updateSchema not yet implemented");
         // TODO: implement updateSchema when the postgis data store does it
     }
@@ -621,7 +624,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         // part of the internal type fid) and everything to run the post filter against
         Set columns = new HashSet();
         SQLBuilder builder = wrapped.getSqlBuilder(typeName);
-        FeatureType internalType = wrapped.getSchema(typeName);
+        SimpleFeatureType internalType = wrapped.getSchema(typeName);
         Filter preFilter = builder.getPreQueryFilter(filter);
         Filter postFilter = builder.getPostQueryFilter(filter);
         columns.addAll(Arrays.asList(DataUtilities.attributeNames(postFilter, internalType)));
@@ -680,7 +683,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             DefaultQuery q = new DefaultQuery(typeName, newFilter, colArray);
             fr = wrapped.getFeatureReader(q, transaction);
             while (fr.hasNext()) {
-                Feature f = fr.next();
+                SimpleFeature f = fr.next();
                 long revision = ((Long) f.getAttribute("revision")).longValue();
                 long expired = ((Long) f.getAttribute("expired")).longValue();
 
@@ -779,7 +782,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         try  {
             fr = wrapped.getFeatureReader(query, transaction);
             while(fr.hasNext()) {
-                Feature f = fr.next();
+                SimpleFeature f = fr.next();
                 revisions.add(f.getAttribute("revision"));
             }
         } catch(IllegalAttributeException e) {
@@ -1008,7 +1011,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
                 CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
-                        .getCoordinateSystem();
+                        .getCRS();
                 if (crs != null)
                     envelope = JTS.toGeographic(envelope, crs);
                 state.expandDirtyBounds(envelope);
@@ -1135,7 +1138,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             Envelope envelope = wrapped.getFeatureSource(typeName).getBounds();
             if (envelope != null) {
                 CoordinateReferenceSystem crs = wrapped.getSchema(typeName).getDefaultGeometry()
-                        .getCoordinateSystem();
+                        .getCRS();
                 if (crs != null)
                     envelope = JTS.toGeographic(envelope, crs);
                 state.expandDirtyBounds(envelope);
@@ -1347,7 +1350,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      */
     protected Filter transformFidFilter(String featureTypeName, Filter filter) throws IOException,
             FactoryConfigurationError {
-        FeatureType featureType = wrapped.getSchema(featureTypeName);
+        SimpleFeatureType featureType = wrapped.getSchema(featureTypeName);
         VersionedFIDMapper mapper = (VersionedFIDMapper) wrapped.getFIDMapper(featureTypeName);
         FidTransformeVisitor transformer = new FidTransformeVisitor(FilterFactoryFinder
                 .createFilterFactory(), featureType, mapper);

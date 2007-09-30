@@ -22,12 +22,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Takes a filter that eventually contains a fid filter and builds a new filter that does not have
@@ -48,7 +48,7 @@ class FidTransformeVisitor extends DuplicatorFilterVisitor {
 
     private Object featureType;
 
-    public FidTransformeVisitor(FilterFactory factory, FeatureType featureType,
+    public FidTransformeVisitor(FilterFactory factory, SimpleFeatureType featureType,
             VersionedFIDMapper mapper) {
         super(factory);
         this.mapper = mapper;

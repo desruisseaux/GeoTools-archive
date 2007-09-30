@@ -17,24 +17,21 @@ package org.geotools.data.postgis;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
@@ -69,14 +66,14 @@ public class FeatureDiffReader {
 
     private FeatureReader createdReader;
 
-    private FeatureType externalFeatureType;
+    private SimpleFeatureType externalFeatureType;
 
     private FeatureDiff lastDiff;
 
     private ModifiedFeatureIds modifiedIds;
 
     public FeatureDiffReader(VersionedPostgisDataStore store, Transaction transaction,
-            FeatureType externalFeatureType, RevisionInfo fromVersion, RevisionInfo toVersion,
+            SimpleFeatureType externalFeatureType, RevisionInfo fromVersion, RevisionInfo toVersion,
             VersionedFIDMapper mapper, ModifiedFeatureIds modifiedIds) throws IOException {
         this.store = store;
         this.transaction = transaction;
@@ -175,7 +172,7 @@ public class FeatureDiffReader {
      * 
      * @return
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return externalFeatureType;
     }
 
@@ -214,15 +211,15 @@ public class FeatureDiffReader {
      * @return
      * @throws IllegalAttributeException
      */
-    private Feature gatherNextUnversionedFeature(final FeatureReader fr) throws IOException {
+    private SimpleFeature gatherNextUnversionedFeature(final FeatureReader fr) throws IOException {
         try {
-            final Feature f = fr.next();
+            final SimpleFeature f = fr.next();
             final Object[] attributes = new Object[externalFeatureType.getAttributeCount()];
             for (int i = 0; i < externalFeatureType.getAttributeCount(); i++) {
-                attributes[i] = f.getAttribute(externalFeatureType.getAttributeType(i).getLocalName());
+                attributes[i] = f.getAttribute(externalFeatureType.getAttribute(i).getLocalName());
             }
             String id = mapper.getUnversionedFid(f.getID());
-            return externalFeatureType.create(attributes, id);
+            return SimpleFeatureBuilder.build(externalFeatureType, attributes, id);
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Could not properly load the fetures to diff: " + e);
         }
@@ -271,8 +268,8 @@ public class FeatureDiffReader {
                     return false;
                 }
                 // compute field by field difference
-                Feature from = gatherNextUnversionedFeature(fvReader);
-                Feature to = gatherNextUnversionedFeature(tvReader);
+                SimpleFeature from = gatherNextUnversionedFeature(fvReader);
+                SimpleFeature to = gatherNextUnversionedFeature(tvReader);
                 FeatureDiff diff = new FeatureDiff(from, to);
                 if (diff.getChangedAttributes().size() != 0) {
                     lastDiff = diff;

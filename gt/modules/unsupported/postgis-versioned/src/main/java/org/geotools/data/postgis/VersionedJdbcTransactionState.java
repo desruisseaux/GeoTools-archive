@@ -33,11 +33,10 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.operation.TransformException;
@@ -166,7 +165,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
         // first, check we touched at least one versioned table
         if (!dirtyTypes.isEmpty()) {
             // first write down modified envelope
-            Feature f = null;
+            SimpleFeature f = null;
             FeatureWriter writer = null;
             try {
                 // build filter to extract the appropriate changeset record
@@ -284,7 +283,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
      * @throws IOException
      */
     protected long writeRevision(Transaction t, ReferencedEnvelope bbox) throws IOException {
-        Feature f = null;
+        SimpleFeature f = null;
         FeatureWriter writer = null;
         String author = (String) t.getProperty(VersionedPostgisDataStore.AUTHOR);
         String message = (String) t.getProperty(VersionedPostgisDataStore.MESSAGE);

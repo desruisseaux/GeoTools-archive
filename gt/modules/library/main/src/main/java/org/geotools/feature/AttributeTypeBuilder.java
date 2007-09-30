@@ -385,7 +385,7 @@ public class AttributeTypeBuilder {
 	 * </p>
 	 */
 	public AttributeType buildType() {
-	    if( length != -1){
+	    if(length != null){
 	        Filter lengthRestriction = length(name, length);
 	        restrictions().add( lengthRestriction );
 	    }

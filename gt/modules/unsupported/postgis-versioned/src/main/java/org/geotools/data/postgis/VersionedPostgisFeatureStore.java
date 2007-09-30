@@ -43,17 +43,16 @@ import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * A cheap implementation of a feature locking.
@@ -62,7 +61,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * locking. If an optimization is possible (mass updates come to mind), we try to use the feature
  * locking, otherwiser we fall back on the implementation inherited from AbstractFeatureSource.
  * <p>
- * {@link #modifyFeatures(AttributeType[], Object[], Filter)} is an example of things that cannot be
+ * {@link #modifyFeatures(AttributeDescriptor[], Object[], Filter)} is an example of things that cannot be
  * optimized. Theoretically, one could mass expire current feature, but he should have first read
  * into memory all of them to rewrite them as new (which may not be possible).
  * 
@@ -76,9 +75,9 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     private FeatureLocking locking;
 
-    private FeatureType schema;
+    private SimpleFeatureType schema;
 
-    public VersionedPostgisFeatureStore(FeatureType schema, VersionedPostgisDataStore store)
+    public VersionedPostgisFeatureStore(SimpleFeatureType schema, VersionedPostgisDataStore store)
             throws IOException {
         this.store = store;
         this.schema = schema;
@@ -149,11 +148,11 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         locking.setTransaction(transaction);
     }
 
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
         return getBounds(Query.ALL);
     }
 
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         RevisionInfo ri = new RevisionInfo(query.getVersion());
         DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
                 ri);
@@ -174,7 +173,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         store.listenerManager.addFeatureListener(this, listener);
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return schema;
     }
 
@@ -182,11 +181,11 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         store.listenerManager.removeFeatureListener(this, listener);
     }
 
-    public void modifyFeatures(AttributeType type, Object value, Filter filter) throws IOException {
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter) throws IOException {
         super.modifyFeatures(type, value, filter);
     }
 
-    public void modifyFeatures(AttributeType[] type, Object[] value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value, Filter filter)
             throws IOException {
         super.modifyFeatures(type, value, filter);
     }
@@ -196,7 +195,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // revisions (and before that, we have to compute the modified envelope)
         Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
                 new RevisionInfo());
-        Envelope bounds = locking
+        ReferencedEnvelope bounds = locking
                 .getBounds(new DefaultQuery(schema.getTypeName(), versionedFilter));
         Transaction t = getTransaction();
         boolean autoCommit = false;
@@ -205,7 +204,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
             autoCommit = true;
         }
         VersionedJdbcTransactionState state = store.wrapped.getVersionedJdbcTransactionState(t);
-        locking.modifyFeatures(locking.getSchema().getAttributeType("expired"), new Long(state
+        locking.modifyFeatures(locking.getSchema().getAttribute("expired"), new Long(state
                 .getRevision()), versionedFilter);
         if (autoCommit) {
             t.commit();
@@ -277,8 +276,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
                 fr = store.wrapped.getFeatureReader(q, getTransaction());
                 fw = store.wrapped.getFeatureWriterAppend(schema.getTypeName(), getTransaction());
                 while (fr.hasNext()) {
-                    Feature original = fr.next();
-                    Feature restored = fw.next();
+                    SimpleFeature original = fr.next();
+                    SimpleFeature restored = fw.next();
                     for (int i = 0; i < original.getFeatureType().getAttributeCount(); i++) {
                         restored.setAttribute(i, original.getAttribute(i));
                     }
@@ -312,7 +311,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
             try {
                 fw = store.getFeatureWriter(schema.getTypeName(), mifCurrent, getTransaction());
                 while (fw.hasNext()) {
-                    Feature current = fw.next();
+                    SimpleFeature current = fw.next();
                     Filter currIdFilter = ff.id(Collections
                             .singleton(ff.featureId(current.getID())));
                     Filter cidToVersion = store.buildVersionedFilter(schema.getTypeName(),
@@ -320,7 +319,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
                     DefaultQuery q = new DefaultQuery(schema.getTypeName(), cidToVersion);
                     q.setVersion(toVersion);
                     fr = store.getFeatureReader(q, getTransaction());
-                    Feature original = fr.next();
+                    SimpleFeature original = fr.next();
                     for (int i = 0; i < original.getFeatureType().getAttributeCount(); i++) {
                         current.setAttribute(i, original.getAttribute(i));
                     }
@@ -391,7 +390,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         try {
             fr = store.wrapped.getFeatureReader(q, getTransaction());
             while (fr.hasNext()) {
-                Feature f = fr.next();
+                SimpleFeature f = fr.next();
                 Long revision = (Long) f.getAttribute(0);
                 if (revision.longValue() > r1.revision)
                     revisions.add(revision);

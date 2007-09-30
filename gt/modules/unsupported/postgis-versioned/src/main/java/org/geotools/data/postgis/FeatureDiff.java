@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Represents the difference between two states of the same feature.
@@ -52,9 +52,9 @@ public class FeatureDiff {
 
     List changedAttributes;
 
-    Feature feature;
+    SimpleFeature feature;
 
-    Feature oldFeature;
+    SimpleFeature oldFeature;
 
     /**
      * Creates a new feature difference for a modified feature
@@ -64,7 +64,7 @@ public class FeatureDiff {
      * @param newFeature
      * @param changes
      */
-    FeatureDiff(Feature oldFeature, Feature newFeature) {
+    FeatureDiff(SimpleFeature oldFeature, SimpleFeature newFeature) {
         super();
         if(oldFeature == null && newFeature == null)
             throw new IllegalArgumentException("Both features are null, that's not a diff!");
@@ -80,8 +80,8 @@ public class FeatureDiff {
         } else {
             this.state = UPDATED;
             List changedAttributes = new ArrayList();
-            for (int i = 0; i < oldFeature.getNumberOfAttributes(); i++) {
-                String attName = oldFeature.getFeatureType().getAttributeType(i).getLocalName();
+            for (int i = 0; i < oldFeature.getAttributeCount(); i++) {
+                String attName = oldFeature.getFeatureType().getAttribute(i).getLocalName();
                 Object toAttribute = newFeature.getAttribute(attName);
                 Object fromAttribute = oldFeature.getAttribute(attName);
                 if (!DataUtilities.attributesEqual(fromAttribute, toAttribute)) {
@@ -131,7 +131,7 @@ public class FeatureDiff {
      * 
      * @return
      */
-    public Feature getFeature() {
+    public SimpleFeature getFeature() {
         return feature;
     }
 
@@ -140,7 +140,7 @@ public class FeatureDiff {
      * 
      * @return
      */
-    public Feature getOldFeature() {
+    public SimpleFeature getOldFeature() {
         return oldFeature;
     }
 

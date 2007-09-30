@@ -22,7 +22,7 @@ import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Covers both the basic and multicolumn fid mappers
@@ -66,7 +66,7 @@ class VersionedAutoincrementFIDMapper extends MultiColumnFIDMapper implements Ve
         return unversioned;
     }
 
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
             throws IOException {
         if (feature.getAttribute(colNames[1]) == null) {
             try {

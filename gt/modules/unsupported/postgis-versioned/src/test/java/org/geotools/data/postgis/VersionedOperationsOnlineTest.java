@@ -37,17 +37,19 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataTestCase {
     FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
@@ -76,14 +78,14 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
      */
     public void testChangesetFeatureType() throws IOException {
         VersionedPostgisDataStore ds = getDataStore();
-        FeatureType ft = ds.getSchema(VersionedPostgisDataStore.TBL_CHANGESETS);
-        assertNotNull(ft.getAttributeType("revision"));
+        SimpleFeatureType ft = ds.getSchema(VersionedPostgisDataStore.TBL_CHANGESETS);
+        assertNotNull(ft.getAttribute("revision"));
         assertFalse(ds.getFeatureSource(VersionedPostgisDataStore.TBL_CHANGESETS) instanceof FeatureStore);
     }
 
     public void testVersionEnableDisableFeatureType() throws IOException {
         VersionedPostgisDataStore ds = getDataStore();
-        FeatureType ft = ds.getSchema("road");
+        SimpleFeatureType ft = ds.getSchema("road");
         assertFalse(ds.isVersioned("road"));
 
         // version
@@ -91,15 +93,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertTrue(ds.isVersioned("road"));
         assertEquals(ft, ds.getSchema("road"));
         if (ds.getFIDMapper("road").returnFIDColumnsAsAttributes())
-            assertNotNull(ds.wrapped.getSchema("road").getAttributeType("revision"));
-        assertNotNull(ds.wrapped.getSchema("road").getAttributeType("expired"));
+            assertNotNull(ds.wrapped.getSchema("road").getAttribute("revision"));
+        assertNotNull(ds.wrapped.getSchema("road").getAttribute("expired"));
 
         // un-version
         ds.setVersioned("road", false, "gimbo", "Versioning no more needed");
         assertFalse(ds.isVersioned("road"));
         assertEquals(ft, ds.getSchema("road"));
-        assertNull(ds.wrapped.getSchema("road").getAttributeType("revision"));
-        assertNull(ds.wrapped.getSchema("road").getAttributeType("expired"));
+        assertNull(ds.wrapped.getSchema("road").getAttribute("revision"));
+        assertNull(ds.wrapped.getSchema("road").getAttribute("expired"));
     }
 
     public void testVersionEnableChangeSets() throws IOException {
@@ -119,12 +121,12 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     public void testGetFeatureReader() throws IOException, NoSuchElementException, Exception {
         VersionedPostgisDataStore ds = getDataStore();
 
-        FeatureType originalFt = ds.getSchema("road");
+        SimpleFeatureType originalFt = ds.getSchema("road");
         ds.setVersioned("road", true, "gimbo", "version enabling stuff");
         DefaultQuery q = new DefaultQuery("road");
         FeatureReader fr = ds.wrapped.getFeatureReader(q, Transaction.AUTO_COMMIT);
         while (fr.hasNext()) {
-            Feature f = fr.next();
+            SimpleFeature f = fr.next();
             assertEquals(new Long(1), (Long) f.getAttribute("revision"));
             assertEquals(new Long(Long.MAX_VALUE), (Long) f.getAttribute("expired"));
         }
@@ -154,7 +156,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // versioned datastore
         assertEquals(originalFt, fr.getFeatureType());
         assertTrue(fr.hasNext());
-        Feature f = fr.next();
+        SimpleFeature f = fr.next();
         assertEquals("road.rd1", f.getID());
         assertEquals("r1 rev 3", f.getAttribute("name"));
         assertFalse(fr.hasNext());
@@ -244,10 +246,10 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
     public void testGetFeatureWriter() throws IOException, NoSuchElementException, Exception {
         VersionedPostgisDataStore ds = getDataStore();
-        Envelope originalBounds = ds.wrapped.getFeatureSource("road").getBounds();
+        ReferencedEnvelope originalBounds = ds.wrapped.getFeatureSource("road").getBounds();
 
         // version enable road
-        FeatureType originalFt = ds.getSchema("road");
+        SimpleFeatureType originalFt = ds.getSchema("road");
         ds.setVersioned("road", true, "gimbo", "version enabling stuff");
 
         // build a filter to extract just road 1
@@ -257,7 +259,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         Transaction t = createTransaction("gimbo", "first change");
         FeatureWriter fw = ds.getFeatureWriter("road", filter, t);
         assertTrue(fw.hasNext());
-        Feature f = fw.next();
+        SimpleFeature f = fw.next();
         f.setAttribute("name", "r1 rev 2");
         fw.write();
         fw.close();
@@ -288,20 +290,20 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(new Long(1), f.getAttribute("revision"));
         // TODO : get revision back among the attributes
         // assertEquals(new Long(1), f.getAttribute("revision"));
-        assertEquals(originalBounds, f.getDefaultGeometry().getEnvelopeInternal());
+        assertEquals(originalBounds, ((Geometry) f.getDefaultGeometry()).getEnvelopeInternal());
         // ... first change
         assertTrue(fr.hasNext());
         f = fr.next();
         assertEquals(new Long(2), f.getAttribute("revision"));
         assertEquals("first change", f.getAttribute("message"));
-        assertEquals(roadFeatures[0].getDefaultGeometry().getEnvelope(), f.getDefaultGeometry()
+        assertEquals(((Geometry) roadFeatures[0].getDefaultGeometry()).getEnvelope(), ((Geometry) f.getDefaultGeometry())
                 .getEnvelope());
         // ... second change
         assertTrue(fr.hasNext());
         f = fr.next();
         assertEquals(new Long(3), f.getAttribute("revision"));
         assertEquals("second change", f.getAttribute("message"));
-        assertEquals(roadFeatures[0].getDefaultGeometry().getEnvelope(), f.getDefaultGeometry()
+        assertEquals(((Geometry) roadFeatures[0].getDefaultGeometry()).getEnvelope(), ((Geometry) f.getDefaultGeometry())
                 .getEnvelope());
         // finish
         assertFalse(fr.hasNext());
@@ -353,7 +355,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         Transaction t = createTransaction("mambo", "Today I feel like adding fetures, yeah");
         FeatureWriter fw = ds.getFeatureWriterAppend("road", t);
         // ... new road
-        Feature f = fw.next();
+        SimpleFeature f = fw.next();
         f.setAttribute(0, new Integer(4));
         f.setAttribute(1, line(new int[] { 3, 3, 4, 4, 5, 10 }));
         f.setAttribute(2, "r4");
@@ -413,7 +415,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // now create one feature
         FeatureWriter fw = ds.getFeatureWriterAppend("tree", Transaction.AUTO_COMMIT);
         assertFalse(fw.hasNext());
-        Feature f = fw.next();
+        SimpleFeature f = fw.next();
         f.setAttribute(0, gf.createPoint(new Coordinate(50, 50)));
         f.setAttribute(1, "NewTreeOnTheBlock");
         fw.write();
@@ -436,8 +438,8 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // now create one feature
         FeatureWriter fw = ds.getFeatureWriter("tree", Transaction.AUTO_COMMIT);
         assertTrue(fw.hasNext());
-        Feature f = fw.next();
-        Envelope oldBounds = f.getBounds();
+        SimpleFeature f = fw.next();
+        ReferencedEnvelope oldBounds = ReferencedEnvelope.reference(f.getBounds());
         f.setAttribute(0, gf.createPoint(new Coordinate(50, 50)));
         fw.write();
         fw.close();
@@ -446,7 +448,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // ones
         DefaultQuery q = new DefaultQuery();
         q.setVersion("1");
-        Envelope e = ds.getFeatureSource("tree").getBounds(q);
+        ReferencedEnvelope e = ds.getFeatureSource("tree").getBounds(q);
         assertEquals(oldBounds, e);
     }
 
@@ -498,18 +500,18 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // setup a transaction
         Transaction t = createTransaction("gimbo", "double update");
         FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
-        FeatureType treeSchema = ds.getSchema("tree");
+        SimpleFeatureType treeSchema = ds.getSchema("tree");
         store.setTransaction(t);
         assertEquals(1, store.getFeatures(filter).size());
-        store.modifyFeatures(treeSchema.getAttributeType("name"), "update1", filter);
-        store.modifyFeatures(treeSchema.getAttributeType("name"), "update2", filter);
+        store.modifyFeatures(treeSchema.getAttribute("name"), "update1", filter);
+        store.modifyFeatures(treeSchema.getAttribute("name"), "update2", filter);
         t.commit();
 
         // make sure the second update is the one that went in
         FeatureCollection fc = store.getFeatures(filter);
         FeatureIterator fi = fc.features();
         assertTrue(fi.hasNext());
-        Feature f = fi.next();
+        SimpleFeature f = fi.next();
         assertEquals("update2", f.getAttribute("name"));
         assertFalse(fi.hasNext());
         fi.close();
@@ -529,7 +531,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         ds.setVersioned("tree", true, "gimbo", "What do you want, I'm undecided...");
 
         // create a new feature
-        Feature tree = treeType.create(new Object[] { gf.createPoint(new Coordinate(7, 7)),
+        SimpleFeature tree = SimpleFeatureBuilder.build(treeType, new Object[] { gf.createPoint(new Coordinate(7, 7)),
                 "SmallPine" }, "tree.tr2");
 
         // setup a transaction
@@ -559,18 +561,18 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         ds.setVersioned("tree", true, "gimbo", "What do you want, I'm undecided...");
 
         // create a new feature
-        Feature tree = treeType.create(new Object[] { gf.createPoint(new Coordinate(7, 7)),
+        SimpleFeature tree = SimpleFeatureBuilder.build(treeType, new Object[] { gf.createPoint(new Coordinate(7, 7)),
                 "SmallPine" }, "tree.tr2");
 
         // setup a transaction
         Transaction t = createTransaction("gimbo", "double update");
-        FeatureType treeSchema = ds.getSchema("tree");
+        SimpleFeatureType treeSchema = ds.getSchema("tree");
         FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
         store.setTransaction(t);
         Set ids = store.addFeatures(DataUtilities.collection(tree));
         Filter filter = ff.id(Collections.singleton(ff.featureId((String) ids.iterator().next())));
         assertEquals(1, store.getFeatures(filter).size());
-        store.modifyFeatures(treeSchema.getAttributeType("name"), "update1", filter);
+        store.modifyFeatures(treeSchema.getAttribute("name"), "update1", filter);
         t.commit();
         t.close();
     }
@@ -583,7 +585,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         Transaction t = createTransaction("serial", "Feature modification");
         FeatureWriter fw = ds.getFeatureWriter("rail", Filter.INCLUDE, t);
         assertTrue(fw.hasNext());
-        Feature f = fw.next();
+        SimpleFeature f = fw.next();
         f.setDefaultGeometry(line(new int[] { 0, 0, -10, -10 }));
         fw.write();
         fw.close();
@@ -840,7 +842,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertTrue(fc.contains(riverFeatures[1]));
         FeatureIterator fi = fc.features();
         while (fi.hasNext()) {
-            Feature f = fi.next();
+            SimpleFeature f = fi.next();
             if (f.getID().equals("river.rv1"))
                 assertFalse(f.equals(riverFeatures[1]));
             else if (f.getID().equals("river.rv2"))
@@ -880,7 +882,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         FeatureCollection fc = fs.getLog("1", "5", newIdFilter, null);
         assertEquals(1, fc.size());
         FeatureIterator it = fc.features();
-        Feature f = it.next();
+        SimpleFeature f = it.next();
         assertEquals("changesets.4", f.getID());
         assertEquals("lamb", f.getAttribute("author"));
         assertEquals("third change", f.getAttribute("message"));
@@ -1030,7 +1032,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         Transaction t = createTransaction("lamb", "first change");
         FeatureWriter fw = ds.getFeatureWriter("river", Filter.INCLUDE, t);
         while (fw.hasNext()) {
-            Feature f = fw.next();
+            SimpleFeature f = fw.next();
             if (f.getID().equals("river.rv1")) {
                 f.setAttribute("river", "rv1 v2");
                 f.setAttribute("flow", new Double(9.6));
@@ -1048,7 +1050,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t = createTransaction("trout", "second change");
         fw = ds.getFeatureWriter("river", Filter.INCLUDE, t);
         while (fw.hasNext()) {
-            Feature f = fw.next();
+            SimpleFeature f = fw.next();
             if (f.getID().equals("river.rv2")) {
                 f.setAttribute("river", "rv2 v3");
                 f.setAttribute("geom", lines(new int[][] { { 200, 200, 120, 120 } }));
@@ -1062,7 +1064,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // revision 4) create a new feature, rv3
         t = createTransaction("lamb", "third change");
         fw = ds.getFeatureWriterAppend("river", t);
-        Feature f = fw.next();
+        SimpleFeature f = fw.next();
         f.setAttribute("id", new Integer(3));
         f.setAttribute("geom", lines(new int[][] { { 300, 300, 301, 301 } }));
         f.setAttribute("river", "rv2 v3");

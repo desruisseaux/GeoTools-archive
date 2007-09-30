@@ -927,7 +927,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 			 // at this point, the query should have a geometry in it. 
 			 // BUT, if there's no geometry in the table, then the query will not (obviously) have a geometry in it.
 			 
-			 attributeTypes = (AttributeDescriptor[]) schema.getAttributes().toArray(new AttributeDescriptor[schema.getAttributes().size()]);
+			 attributeTypes = (AttributeDescriptor[]) schemaNew.getAttributes().toArray(new AttributeDescriptor[schema.getAttributes().size()]);
 				 
             for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
                 if (Geometry.class.isAssignableFrom(attributeTypes[j].getType().getBinding())) // same as .isgeometry() - see new featuretype javadoc

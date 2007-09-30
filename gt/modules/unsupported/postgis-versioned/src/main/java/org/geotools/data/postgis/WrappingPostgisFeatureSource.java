@@ -8,10 +8,9 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Really delegates everything to a wrapped feature source, but allows to
@@ -44,11 +43,11 @@ public class WrappingPostgisFeatureSource implements FeatureSource {
         wrapped.removeFeatureListener(listener);
     }
 
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
         return wrapped.getBounds();
     }
 
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         return wrapped.getBounds(query);
     }
 
@@ -68,7 +67,7 @@ public class WrappingPostgisFeatureSource implements FeatureSource {
         return wrapped.getFeatures(query);
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return wrapped.getSchema();
     }
     

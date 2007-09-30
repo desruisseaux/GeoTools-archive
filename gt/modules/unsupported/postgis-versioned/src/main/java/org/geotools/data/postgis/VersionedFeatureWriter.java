@@ -18,6 +18,7 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
@@ -27,13 +28,13 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.MutableFIDFeature;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -56,13 +57,13 @@ class VersionedFeatureWriter implements FeatureWriter {
 
     private FeatureWriter appendWriter;
 
-    private FeatureType featureType;
+    private SimpleFeatureType featureType;
 
-    private Feature oldFeature;
+    private SimpleFeature oldFeature;
 
-    private Feature newFeature;
+    private SimpleFeature newFeature;
 
-    private Feature liveFeature;
+    private SimpleFeature liveFeature;
 
     private VersionedJdbcTransactionState state;
 
@@ -84,7 +85,7 @@ class VersionedFeatureWriter implements FeatureWriter {
      *            if true, the transaction need to be committed once the writer is closed
      */
     public VersionedFeatureWriter(FeatureWriter updateWriter, FeatureWriter appendWriter,
-            FeatureType featureType, VersionedJdbcTransactionState state,
+            SimpleFeatureType featureType, VersionedJdbcTransactionState state,
             VersionedFIDMapper mapper, boolean autoCommit) {
         this.updateWriter = updateWriter;
         this.appendWriter = appendWriter;
@@ -111,7 +112,7 @@ class VersionedFeatureWriter implements FeatureWriter {
         }
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 
@@ -123,8 +124,8 @@ class VersionedFeatureWriter implements FeatureWriter {
             return false;
     }
 
-    public Feature next() throws IOException {
-        Feature original = null;
+    public SimpleFeature next() throws IOException {
+        SimpleFeature original = null;
         if (updateWriter != null && updateWriter.hasNext()) {
             oldFeature = updateWriter.next();
             newFeature = appendWriter.next();
@@ -144,8 +145,8 @@ class VersionedFeatureWriter implements FeatureWriter {
             String unversionedId = liveFeature.getID();
             if (oldFeature != null)
                 unversionedId = mapper.getUnversionedFid(liveFeature.getID());
-            liveFeature = new MutableFIDFeature((DefaultFeatureType) featureType, liveFeature
-                    .getAttributes(new Object[featureType.getAttributeCount()]), unversionedId);
+            liveFeature = new MutableFIDFeature((List) liveFeature
+                    .getProperties(), featureType, unversionedId);
             return liveFeature;
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Error casting versioned feature to external one. "
@@ -160,15 +161,15 @@ class VersionedFeatureWriter implements FeatureWriter {
      * @return
      * @throws TransformException
      */
-    public Envelope getLatLonFeatureEnvelope(Feature feature) throws IOException {
+    public Envelope getLatLonFeatureEnvelope(SimpleFeature feature) throws IOException {
         try {
             Envelope result = new Envelope();
-            FeatureType ft = feature.getFeatureType();
+            SimpleFeatureType ft = feature.getFeatureType();
             for (int i = 0; i < ft.getAttributeCount(); i++) {
-                AttributeType at = ft.getAttributeType(i);
-                if (at instanceof GeometryAttributeType) {
-                    GeometryAttributeType gat = (GeometryAttributeType) at;
-                    CoordinateReferenceSystem crs = gat.getCoordinateSystem();
+                AttributeDescriptor at = ft.getAttribute(i);
+                if (at instanceof GeometryDescriptor) {
+                	GeometryDescriptor gat = (GeometryDescriptor) at;
+                    CoordinateReferenceSystem crs = gat.getCRS();
 
                     Geometry geom = (Geometry) feature.getAttribute(i);
                     if (geom != null) {
@@ -194,7 +195,7 @@ class VersionedFeatureWriter implements FeatureWriter {
         }
 
         listenerManager.fireFeaturesRemoved(getFeatureType().getTypeName(), state.getTransaction(),
-                oldFeature.getBounds(), false);
+                ReferencedEnvelope.reference(oldFeature.getBounds()), false);
         writeOldFeature(true);
     }
 
@@ -235,8 +236,8 @@ class VersionedFeatureWriter implements FeatureWriter {
                 // if there is an old feature, make sure to write a new revision only if the
                 // feauture was modified
                 boolean dirty = false;
-                for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
-                    AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
+                for (int i = 0; i < liveFeature.getAttributeCount(); i++) {
+                    AttributeDescriptor at = liveFeature.getFeatureType().getAttribute(i);
                     Object newValue = liveFeature.getAttribute(at.getLocalName());
                     Object oldValue = oldFeature.getAttribute(at.getLocalName());
                     newFeature.setAttribute(at.getLocalName(), newValue);
@@ -253,7 +254,7 @@ class VersionedFeatureWriter implements FeatureWriter {
                 dirtyFeature = state.isFidDirty(typeName, fid);
             }
             
-            Feature writtenFeature = null;
+            SimpleFeature writtenFeature = null;
             if(dirtyFeature) {
                 // we're updating again a feature we already touched, so we have to move
                 // attributes from the live to the old, and make sure the old is not expired
@@ -261,8 +262,8 @@ class VersionedFeatureWriter implements FeatureWriter {
                 // assigned kind we can get into troubles with duplicated primary keys)
                 
                 // copy attributes from live to new
-                for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
-                    AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
+                for (int i = 0; i < liveFeature.getAttributeCount(); i++) {
+                    AttributeDescriptor at = liveFeature.getFeatureType().getAttribute(i);
                     oldFeature.setAttribute(at.getLocalName(), liveFeature.getAttribute(at.getLocalName()));
                 }
                 
@@ -276,8 +277,8 @@ class VersionedFeatureWriter implements FeatureWriter {
                     writeOldFeature(true);
                 
                 // copy attributes from live to new
-                for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
-                    AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
+                for (int i = 0; i < liveFeature.getAttributeCount(); i++) {
+                    AttributeDescriptor at = liveFeature.getFeatureType().getAttribute(i);
                     newFeature.setAttribute(at.getLocalName(), liveFeature.getAttribute(at.getLocalName()));
                 }
     
@@ -328,13 +329,13 @@ class VersionedFeatureWriter implements FeatureWriter {
 
             // and finally notify the user
             if (oldFeature != null) {
-                Envelope bounds = oldFeature.getBounds();
-                bounds.expandToInclude(liveFeature.getBounds());
+                ReferencedEnvelope bounds = ReferencedEnvelope.reference(oldFeature.getBounds());
+                bounds.include(liveFeature.getBounds());
                 listenerManager.fireFeaturesChanged(getFeatureType().getTypeName(), state
                         .getTransaction(), bounds, false);
             } else {
                 listenerManager.fireFeaturesAdded(getFeatureType().getTypeName(), state
-                        .getTransaction(), liveFeature.getBounds(), false);
+                        .getTransaction(), ReferencedEnvelope.reference(liveFeature.getBounds()), false);
             }
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Error writing expiration tag on old feature. "

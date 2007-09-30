@@ -37,7 +37,7 @@ public class MutableFIDFeature extends SimpleFeatureImpl {
   public MutableFIDFeature(List properties, SimpleFeatureType ft, String fid)
     throws IllegalAttributeException {
     super(properties, ft, fid);
-
+    this.featureId = fid;
   }
 
   /**
