@@ -16,7 +16,7 @@
 package org.geotools.kml.bindings;
 
 import java.util.Collection;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.kml.KML;
 import org.geotools.kml.KMLTestSupport;
 import org.geotools.xml.Binding;
@@ -24,7 +24,7 @@ import org.geotools.xml.Binding;
 
 public class FolderTypeBindingTest extends KMLTestSupport {
     public void testType() throws Exception {
-        assertEquals(Feature.class, binding(KML.FolderType).getType());
+        assertEquals(SimpleFeature.class, binding(KML.FolderType).getType());
     }
 
     public void testExecutionMode() throws Exception {
@@ -36,7 +36,7 @@ public class FolderTypeBindingTest extends KMLTestSupport {
             + "<coordinates>0,0</coordinates>" + "</Point>" + "</Placemark>" + "</Folder>";
         buildDocument(xml);
 
-        Feature document = (Feature) parse();
+        SimpleFeature document = (SimpleFeature) parse();
         assertEquals("folder", document.getAttribute("name"));
 
         Collection features = (Collection) document.getAttribute("Feature");

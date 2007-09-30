@@ -17,7 +17,7 @@ package org.geotools.xml.impl.jxpath;
 
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -35,7 +35,7 @@ public class FeatureTypeAttributeIterator implements NodeIterator {
     /**
      * The feature type
      */
-    FeatureType featureType;
+    SimpleFeatureType featureType;
 
     /**
      * current position
@@ -44,7 +44,7 @@ public class FeatureTypeAttributeIterator implements NodeIterator {
 
     public FeatureTypeAttributeIterator(FeatureTypePointer pointer) {
         this.pointer = pointer;
-        featureType = (FeatureType) pointer.getImmediateNode();
+        featureType = (SimpleFeatureType) pointer.getImmediateNode();
         position = 1;
     }
 

@@ -17,7 +17,7 @@ package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Element;
 import java.util.Iterator;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.gml3.GML;
 import org.geotools.gml3.GML3TestSupport;
@@ -54,10 +54,10 @@ public class AbstractFeatureCollectionTypeBindingTest extends GML3TestSupport {
         assertEquals(2, fc.size());
 
         Iterator i = fc.iterator();
-        Feature f = (Feature) i.next();
+        SimpleFeature f = (SimpleFeature) i.next();
         assertEquals("fid.1", f.getID());
 
-        f = (Feature) i.next();
+        f = (SimpleFeature) i.next();
         assertEquals("fid.2", f.getID());
     }
 
@@ -79,10 +79,10 @@ public class AbstractFeatureCollectionTypeBindingTest extends GML3TestSupport {
         assertEquals(2, fc.size());
 
         Iterator i = fc.iterator();
-        Feature f = (Feature) i.next();
+        SimpleFeature f = (SimpleFeature) i.next();
         assertEquals("fid.1", f.getID());
 
-        f = (Feature) i.next();
+        f = (SimpleFeature) i.next();
         assertEquals("fid.2", f.getID());
     }
 }

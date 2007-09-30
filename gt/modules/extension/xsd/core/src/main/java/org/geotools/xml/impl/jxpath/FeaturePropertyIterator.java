@@ -17,7 +17,7 @@ package org.geotools.xml.impl.jxpath;
 
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 public class FeaturePropertyIterator implements NodeIterator {
@@ -29,7 +29,7 @@ public class FeaturePropertyIterator implements NodeIterator {
     /**
      * The feature.
      */
-    Feature feature;
+    SimpleFeature feature;
 
     /**
      * current position
@@ -38,7 +38,7 @@ public class FeaturePropertyIterator implements NodeIterator {
 
     public FeaturePropertyIterator(FeaturePointer pointer) {
         this.pointer = pointer;
-        feature = (Feature) pointer.getImmediateNode();
+        feature = (SimpleFeature) pointer.getImmediateNode();
         position = 1;
     }
 
@@ -49,7 +49,7 @@ public class FeaturePropertyIterator implements NodeIterator {
     public boolean setPosition(int position) {
         this.position = position;
 
-        return position <= feature.getNumberOfAttributes();
+        return position <= feature.getAttributeCount();
     }
 
     public NodePointer getNodePointer() {

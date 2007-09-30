@@ -22,7 +22,7 @@ import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -40,9 +40,9 @@ public class FeatureTypePointer extends NodePointer {
     /**
      * The underlying feature type
      */
-    FeatureType featureType;
+    SimpleFeatureType featureType;
 
-    protected FeatureTypePointer(NodePointer parent, FeatureType featureType, QName name) {
+    protected FeatureTypePointer(NodePointer parent, SimpleFeatureType featureType, QName name) {
         super(parent);
         this.name = name;
         this.featureType = featureType;
@@ -73,7 +73,7 @@ public class FeatureTypePointer extends NodePointer {
     }
 
     public void setValue(Object value) {
-        featureType = (FeatureType) value;
+        featureType = (SimpleFeatureType) value;
     }
 
     public int compareChildNodePointers(NodePointer pointer1, NodePointer pointer2) {
@@ -85,7 +85,7 @@ public class FeatureTypePointer extends NodePointer {
             NodeNameTest nodeNameTest = (NodeNameTest) test;
 
             if (!nodeNameTest.isWildcard()) {
-                int index = featureType.find(nodeNameTest.getNodeName().getName());
+                int index = featureType.indexOf(nodeNameTest.getNodeName().getName());
 
                 if (index > -1) {
                     return new SingleFeatureTypeAttributeIterator(this, index);

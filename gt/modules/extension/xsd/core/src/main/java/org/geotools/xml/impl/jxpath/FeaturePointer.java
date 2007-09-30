@@ -22,7 +22,7 @@ import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -40,9 +40,9 @@ public class FeaturePointer extends NodePointer {
     /**
      * The underlying feature
      */
-    Feature feature;
+    SimpleFeature feature;
 
-    protected FeaturePointer(NodePointer parent, Feature feature, QName name) {
+    protected FeaturePointer(NodePointer parent, SimpleFeature feature, QName name) {
         super(parent);
         this.name = name;
         this.feature = feature;
@@ -57,7 +57,7 @@ public class FeaturePointer extends NodePointer {
     }
 
     public int getLength() {
-        return feature.getNumberOfAttributes();
+        return feature.getAttributeCount();
     }
 
     public QName getName() {
@@ -73,7 +73,7 @@ public class FeaturePointer extends NodePointer {
     }
 
     public void setValue(Object value) {
-        feature = (Feature) value;
+        feature = (SimpleFeature) value;
     }
 
     public int compareChildNodePointers(NodePointer pointer1, NodePointer pointer2) {
@@ -85,7 +85,7 @@ public class FeaturePointer extends NodePointer {
             NodeNameTest nodeNameTest = (NodeNameTest) test;
 
             if (!nodeNameTest.isWildcard()) {
-                int index = feature.getFeatureType().find(nodeNameTest.getNodeName().getName());
+                int index = feature.getFeatureType().indexOf(nodeNameTest.getNodeName().getName());
 
                 if (index > -1) {
                     return new SingleFeaturePropertyIterator(this, index);

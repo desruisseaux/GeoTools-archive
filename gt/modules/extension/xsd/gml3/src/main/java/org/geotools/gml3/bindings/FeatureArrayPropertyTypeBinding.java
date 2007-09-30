@@ -17,7 +17,7 @@ package org.geotools.gml3.bindings;
 
 import java.util.List;
 import javax.xml.namespace.QName;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.gml3.GML;
 import org.geotools.xml.*;
 
@@ -58,7 +58,7 @@ public class FeatureArrayPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature[].class;
+        return SimpleFeature[].class;
     }
 
     /**
@@ -69,9 +69,9 @@ public class FeatureArrayPropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        List features = node.getChildValues(Feature.class);
+        List features = node.getChildValues(SimpleFeature.class);
 
-        return features.toArray(new Feature[features.size()]);
+        return features.toArray(new SimpleFeature[features.size()]);
     }
 
     public Object getProperty(Object object, QName name) {

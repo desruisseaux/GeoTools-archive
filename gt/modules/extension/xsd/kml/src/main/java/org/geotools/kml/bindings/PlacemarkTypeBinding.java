@@ -17,10 +17,10 @@ package org.geotools.kml.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.kml.KML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.Binding;
@@ -51,10 +51,10 @@ import org.geotools.xml.Node;
  * @generated
  */
 public class PlacemarkTypeBinding extends AbstractComplexBinding {
-    static final FeatureType featureType;
+    static final SimpleFeatureType featureType;
 
     static {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
 
         //TODO: use inheiretance when our feature model works
         tb.init(FeatureTypeBinding.featureType);
@@ -80,7 +80,7 @@ public class PlacemarkTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     public int getExecutionMode() {
@@ -95,9 +95,9 @@ public class PlacemarkTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        DefaultFeatureBuilder b = new DefaultFeatureBuilder();
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder();
 
-        Feature feature = (Feature) value;
+        SimpleFeature feature = (SimpleFeature) value;
         b.init(feature);
         b.setType(featureType);
 

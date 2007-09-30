@@ -19,9 +19,9 @@ import java.net.URI;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.kml.KML;
 import org.geotools.styling.FeatureTypeStyle;
@@ -68,7 +68,7 @@ public class FeatureTypeBinding extends AbstractComplexBinding {
     /**
      * base feature type for kml features
      */
-    protected static final FeatureType featureType;
+    protected static final SimpleFeatureType featureType;
 
     static {
         DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
@@ -123,7 +123,7 @@ public class FeatureTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     /**

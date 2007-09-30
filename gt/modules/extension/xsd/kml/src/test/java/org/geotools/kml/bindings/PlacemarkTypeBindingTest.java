@@ -15,18 +15,16 @@
  */
 package org.geotools.kml.bindings;
 
-import java.util.Map;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.kml.KML;
 import org.geotools.kml.KMLTestSupport;
-import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.xml.Binding;
 
 
 public class PlacemarkTypeBindingTest extends KMLTestSupport {
     public void testType() throws Exception {
-        assertEquals(Feature.class, binding(KML.PlacemarkType).getType());
+        assertEquals(SimpleFeature.class, binding(KML.PlacemarkType).getType());
     }
 
     public void testExecutionMode() throws Exception {
@@ -38,7 +36,7 @@ public class PlacemarkTypeBindingTest extends KMLTestSupport {
             + "<Point>" + "<coordinates>1,2</coordinates>" + "</Point>" + "</Placemark>";
         buildDocument(xml);
 
-        Feature placemark = (Feature) parse();
+        SimpleFeature placemark = (SimpleFeature) parse();
         assertEquals("name", placemark.getAttribute("name"));
         assertEquals("description", placemark.getAttribute("description"));
         assertNotNull(placemark.getAttribute("Geometry"));

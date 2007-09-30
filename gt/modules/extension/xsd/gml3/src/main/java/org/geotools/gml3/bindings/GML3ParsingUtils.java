@@ -16,7 +16,6 @@
 package org.geotools.gml3.bindings;
 
 import org.eclipse.xsd.XSDElementDeclaration;
-import java.net.URI;
 import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -25,13 +24,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.bindings.GML2ParsingUtils;
-import org.geotools.referencing.CRS;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -56,7 +54,7 @@ public class GML3ParsingUtils {
      *
      * @return A feature.
      */
-    public static Feature parseFeature(ElementInstance instance, Node node, Object value,
+    public static SimpleFeature parseFeature(ElementInstance instance, Node node, Object value,
         FeatureTypeCache ftCache, BindingWalkerFactory bwFactory)
         throws Exception {
         return GML2ParsingUtils.parseFeature(instance, node, value, ftCache, bwFactory);
@@ -68,7 +66,7 @@ public class GML3ParsingUtils {
      *
      * @return The corresponding geotools feature type.
      */
-    public static FeatureType featureType(XSDElementDeclaration element,
+    public static SimpleFeatureType featureType(XSDElementDeclaration element,
         BindingWalkerFactory bwFactory) throws Exception {
         return GML2ParsingUtils.featureType(element, bwFactory);
     }
@@ -76,7 +74,7 @@ public class GML3ParsingUtils {
     /**
      * Turns a parse node + feature type + fid info a feature.
      */
-    static Feature feature(FeatureType fType, String fid, Node node)
+    static SimpleFeature feature(SimpleFeatureType fType, String fid, Node node)
         throws Exception {
         return GML2ParsingUtils.feature(fType, fid, node);
     }

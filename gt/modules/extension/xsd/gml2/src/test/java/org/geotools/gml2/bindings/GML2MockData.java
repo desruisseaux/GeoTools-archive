@@ -31,9 +31,9 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
@@ -271,7 +271,7 @@ public class GML2MockData {
         return feature;
     }
 
-    static Feature feature() throws Exception {
+    static SimpleFeature feature() throws Exception {
         DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
         typeBuilder.setName(TEST.TestFeature.getLocalPart());
         typeBuilder.setNamespaceURI(TEST.TestFeature.getNamespaceURI());
@@ -282,7 +282,7 @@ public class GML2MockData {
         typeBuilder.add("count", Integer.class);
         typeBuilder.add("date", Date.class);
 
-        FeatureType type = (FeatureType) typeBuilder.buildFeatureType();
+        SimpleFeatureType type = (SimpleFeatureType) typeBuilder.buildFeatureType();
 
         DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
         builder.setType(type);
@@ -292,7 +292,7 @@ public class GML2MockData {
         builder.add(new Integer(1));
         builder.add(new Date());
 
-        return (Feature) builder.buildFeature("fid.1");
+        return (SimpleFeature) builder.buildFeature("fid.1");
     }
 
     static Element featureMember(Document document, Node parent) {

@@ -16,7 +16,7 @@
 package org.geotools.gml2.bindings;
 
 import javax.xml.namespace.QName;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -69,7 +69,7 @@ public class GMLFeatureAssociationTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     /**
@@ -80,7 +80,7 @@ public class GMLFeatureAssociationTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return node.getChildValue(Feature.class);
+        return node.getChildValue(SimpleFeature.class);
 
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
     }

@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -43,14 +43,14 @@ public class FeaturePropertyExtractor implements PropertyExtractor {
     }
 
     public boolean canHandle(Object object) {
-        return object instanceof Feature && !(object instanceof FeatureCollection);
+        return object instanceof SimpleFeature && !(object instanceof FeatureCollection);
     }
 
     public List properties(Object object, XSDElementDeclaration element) {
-        Feature feature = (Feature) object;
-        FeatureType featureType = feature.getFeatureType();
+        SimpleFeature feature = (SimpleFeature) object;
+        SimpleFeatureType featureType = feature.getFeatureType();
 
-        String namespace = featureType.getNamespace().toString();
+        String namespace = featureType.getName().getNamespaceURI();
         String typeName = featureType.getTypeName();
 
         //find the type in the schema
@@ -73,7 +73,7 @@ public class FeaturePropertyExtractor implements PropertyExtractor {
             }
 
             //make sure the feature type has an element
-            if (featureType.getAttributeType(attribute.getName()) == null) {
+            if (featureType.getAttribute(attribute.getName()) == null) {
                 continue;
             }
 

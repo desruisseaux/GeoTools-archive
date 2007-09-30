@@ -16,9 +16,8 @@
 package org.geotools.xml.impl.jxpath;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
-import java.util.HashSet;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.IllegalAttributeException;
 
 
@@ -32,21 +31,21 @@ import org.geotools.feature.IllegalAttributeException;
  */
 public class FeaturePropertyHandler implements DynamicPropertyHandler {
     public String[] getPropertyNames(Object object) {
-        Feature feature = (Feature) object;
-        FeatureType featureType = feature.getFeatureType();
+        SimpleFeature feature = (SimpleFeature) object;
+        SimpleFeatureType featureType = feature.getFeatureType();
 
         //set is ok because jxpath ignores order
         String[] propertyNames = new String[featureType.getAttributeCount()];
 
         for (int i = 0; i < propertyNames.length; i++) {
-            propertyNames[i] = featureType.getAttributeType(i).getLocalName();
+            propertyNames[i] = featureType.getAttribute(i).getLocalName();
         }
 
         return propertyNames;
     }
 
     public Object getProperty(Object object, String property) {
-        Feature feature = (Feature) object;
+        SimpleFeature feature = (SimpleFeature) object;
         Object value = feature.getAttribute(property(property));
 
         if (value != null) {
@@ -62,7 +61,7 @@ public class FeaturePropertyHandler implements DynamicPropertyHandler {
     }
 
     public void setProperty(Object object, String property, Object value) {
-        Feature feature = (Feature) object;
+        SimpleFeature feature = (SimpleFeature) object;
 
         try {
             feature.setAttribute(property(property), value);

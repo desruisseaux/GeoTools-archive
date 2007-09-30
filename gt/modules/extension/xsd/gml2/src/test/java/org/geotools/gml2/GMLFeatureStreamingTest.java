@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import java.io.InputStream;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.xml.StreamingParser;
 
 
@@ -46,7 +46,7 @@ public class GMLFeatureStreamingTest extends TestCase {
 
     private void makeAssertions(StreamingParser parser) {
         for (int i = 0; i < 3; i++) {
-            Feature f = (Feature) parser.parse();
+            SimpleFeature f = (SimpleFeature) parser.parse();
             assertNotNull(f);
 
             assertEquals(i + "", f.getID());

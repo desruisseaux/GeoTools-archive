@@ -19,9 +19,9 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.xml.sax.helpers.NamespaceSupport;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.factory.Hints;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
@@ -49,11 +49,11 @@ public class XPathPropertyAccessorFactory implements PropertyAccessorFactory {
 
     public PropertyAccessor createPropertyAccessor(Class type, String xpath, Class target,
         Hints hints) {
-        if (Feature.class.isAssignableFrom(type)) {
+        if (SimpleFeature.class.isAssignableFrom(type)) {
             return new XPathPropertyAcessor();
         }
 
-        if (FeatureType.class.isAssignableFrom(type)) {
+        if (SimpleFeatureType.class.isAssignableFrom(type)) {
             return new XPathPropertyAcessor();
         }
 

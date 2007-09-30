@@ -17,7 +17,7 @@ package org.geotools.kml;
 
 import junit.framework.TestCase;
 import java.util.Collection;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Symbolizer;
 import org.geotools.xml.Parser;
@@ -27,7 +27,7 @@ import org.geotools.xml.StreamingParser;
 public class KMLParsingTest extends TestCase {
     public void testParse() throws Exception {
         Parser parser = new Parser(new KMLConfiguration());
-        Feature f = (Feature) parser.parse(getClass().getResourceAsStream("states.kml"));
+        SimpleFeature f = (SimpleFeature) parser.parse(getClass().getResourceAsStream("states.kml"));
         assertNotNull(f);
 
         assertEquals("topp:states", f.getAttribute("name"));
@@ -40,9 +40,9 @@ public class KMLParsingTest extends TestCase {
         StreamingParser parser = new StreamingParser(new KMLConfiguration(),
                 getClass().getResourceAsStream("states.kml"), KML.Placemark);
         int count = 0;
-        Feature f = null;
+        SimpleFeature f = null;
 
-        while ((f = (Feature) parser.parse()) != null) {
+        while ((f = (SimpleFeature) parser.parse()) != null) {
             FeatureTypeStyle style = (FeatureTypeStyle) f.getAttribute("Style");
             assertNotNull(style);
 

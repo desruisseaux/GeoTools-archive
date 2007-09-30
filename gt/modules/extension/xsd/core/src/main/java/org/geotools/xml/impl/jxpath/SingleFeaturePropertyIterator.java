@@ -17,7 +17,7 @@ package org.geotools.xml.impl.jxpath;
 
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -38,7 +38,7 @@ public class SingleFeaturePropertyIterator implements NodeIterator {
     /**
      * The feature.
      */
-    Feature feature;
+    SimpleFeature feature;
 
     /**
      * indedx of property
@@ -54,7 +54,7 @@ public class SingleFeaturePropertyIterator implements NodeIterator {
     public SingleFeaturePropertyIterator(FeaturePointer pointer, int index) {
         this.pointer = pointer;
         this.index = index;
-        feature = (Feature) pointer.getImmediateNode();
+        feature = (SimpleFeature) pointer.getImmediateNode();
     }
 
     /**

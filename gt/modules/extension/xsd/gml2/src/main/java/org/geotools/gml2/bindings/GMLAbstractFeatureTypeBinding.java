@@ -15,13 +15,8 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.eclipse.xsd.XSDElementDeclaration;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
@@ -86,7 +81,7 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     /**
@@ -102,7 +97,7 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        Feature feature = (Feature) object;
+        SimpleFeature feature = (SimpleFeature) object;
 
         if (GML.name.equals(name)) {
             return feature.getAttribute("name");
@@ -113,19 +108,10 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
         }
 
         if (GML.boundedBy.equals(name)) {
-            Envelope bounds = feature.getBounds();
-
-            if (bounds instanceof ReferencedEnvelope) {
-                return bounds;
-            }
-
-            CoordinateReferenceSystem crs = (feature.getFeatureType().getDefaultGeometry() != null)
-                ? feature.getFeatureType().getDefaultGeometry().getCoordinateSystem() : null;
-
-            return new ReferencedEnvelope(bounds, crs);
+            return feature.getBounds();
         }
 
-        if (feature.getFeatureType().getAttributeType(name.getLocalPart()) != null) {
+        if (feature.getFeatureType().getAttribute(name.getLocalPart()) != null) {
             return feature.getAttribute(name.getLocalPart());
         }
 

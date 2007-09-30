@@ -18,7 +18,7 @@ package org.geotools.gml2.bindings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.gml2.GML;
 import org.geotools.gml2.TEST;
 import org.geotools.gml2.TestConfiguration;
@@ -37,7 +37,7 @@ public class GMLAbstractFeatureTypeBindingTest extends GMLTestSupport {
     }
 
     public void testType() {
-        assertEquals(Feature.class, binding(GML.AbstractFeatureType).getType());
+        assertEquals(SimpleFeature.class, binding(GML.AbstractFeatureType).getType());
     }
 
     public void testExectionMode() {
@@ -48,7 +48,7 @@ public class GMLAbstractFeatureTypeBindingTest extends GMLTestSupport {
         Element feature = GML2MockData.feature(document, document);
         feature.setAttributeNS(GML.NAMESPACE, "fid", "fid.1");
 
-        Feature f = (Feature) parse();
+        SimpleFeature f = (SimpleFeature) parse();
         assertNotNull(feature);
 
         assertEquals("fid.1", f.getID());

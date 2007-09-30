@@ -16,7 +16,7 @@
 package org.geotools.kml.bindings;
 
 import javax.xml.namespace.QName;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.kml.KML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.Binding;
@@ -57,7 +57,7 @@ public class ContainerTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     public int getExecutionMode() {

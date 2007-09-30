@@ -18,7 +18,7 @@ package org.geotools.gml3.bindings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.gml3.GML;
 import org.geotools.gml3.GML3TestSupport;
 import org.geotools.xml.Configuration;
@@ -38,7 +38,7 @@ public class AbstractFeatureTypeBindingTest extends GML3TestSupport {
         Element feature = GML3MockData.feature(document, document);
         feature.setAttributeNS(GML.NAMESPACE, "id", "fid.1");
 
-        Feature f = (Feature) parse();
+        SimpleFeature f = (SimpleFeature) parse();
         assertNotNull(feature);
 
         assertEquals("fid.1", f.getID());

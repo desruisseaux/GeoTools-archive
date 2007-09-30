@@ -16,7 +16,7 @@
 package org.geotools.gml2.bindings;
 
 import javax.xml.namespace.QName;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.gml2.GML;
 import org.geotools.xml.AbstractComplexBinding;
@@ -90,7 +90,7 @@ public class GMLAbstractFeatureCollectionTypeBinding extends AbstractComplexBind
         FeatureCollection fc = (FeatureCollection) value;
 
         //add all feature member children
-        fc.addAll(node.getChildValues(Feature.class));
+        fc.addAll(node.getChildValues(SimpleFeature.class));
 
         return fc;
     }

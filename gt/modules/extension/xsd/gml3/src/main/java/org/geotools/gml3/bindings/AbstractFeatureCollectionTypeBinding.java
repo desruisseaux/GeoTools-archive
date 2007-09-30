@@ -16,8 +16,8 @@
 package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.feature.DefaultFeatureCollections;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.gml3.GML;
 import org.geotools.xml.*;
@@ -78,10 +78,10 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
         FeatureCollection featureCollection = DefaultFeatureCollections.newCollection();
 
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="gml:featureMember"/&gt;
-        featureCollection.addAll(node.getChildValues(Feature.class));
+        featureCollection.addAll(node.getChildValues(SimpleFeature.class));
 
         //&lt;element minOccurs="0" ref="gml:featureMembers"/&gt;
-        Feature[] featureMembers = (Feature[]) node.getChildValue(Feature[].class);
+        SimpleFeature[] featureMembers = (SimpleFeature[]) node.getChildValue(SimpleFeature[].class);
 
         if (featureMembers != null) {
             for (int i = 0; i < featureMembers.length; i++) {

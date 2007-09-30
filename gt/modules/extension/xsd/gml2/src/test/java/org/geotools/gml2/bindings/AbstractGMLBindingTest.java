@@ -32,12 +32,14 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml2.GMLConfiguration;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
@@ -53,8 +55,7 @@ import org.geotools.xml.impl.NodeImpl;
 public class AbstractGMLBindingTest extends TestCase {
     XSDSchema schema;
     MutablePicoContainer container;
-    FeatureTypeBuilder ftBuilder;
-    AttributeTypeFactory attFactory;
+    SimpleFeatureTypeBuilder ftBuilder;
 
     protected void setUp() throws Exception {
         String loc = GMLConfiguration.class.getResource("feature.xsd").toString();
@@ -65,8 +66,7 @@ public class AbstractGMLBindingTest extends TestCase {
 
         configuration.registerBindings(container);
 
-        ftBuilder = new DefaultFeatureTypeFactory();
-        attFactory = new DefaultAttributeTypeFactory();
+        ftBuilder = new SimpleFeatureTypeBuilder();
     }
 
     protected void tearDown() throws Exception {
@@ -135,17 +135,17 @@ public class AbstractGMLBindingTest extends TestCase {
         return csFactory.create(c);
     }
 
-    public Feature createFeature(String[] names, Class[] types, Object[] values) {
+    public SimpleFeature createFeature(String[] names, Class[] types, Object[] values) {
         ftBuilder.setName("test");
 
         for (int i = 0; i < names.length; i++) {
-            ftBuilder.addType(attFactory.newAttributeType(names[i], values[i].getClass()));
+            ftBuilder.add(names[i], values[i].getClass());
         }
 
         try {
-            FeatureType fType = ftBuilder.getFeatureType();
+            SimpleFeatureType fType = ftBuilder.buildFeatureType();
 
-            return fType.create(values);
+            return SimpleFeatureBuilder.build(fType, values, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

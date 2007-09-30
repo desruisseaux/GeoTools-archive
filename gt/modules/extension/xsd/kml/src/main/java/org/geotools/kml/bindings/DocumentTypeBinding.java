@@ -17,9 +17,9 @@ package org.geotools.kml.bindings;
 
 import java.util.Collection;
 import javax.xml.namespace.QName;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 import org.geotools.kml.KML;
 import org.geotools.xml.AbstractComplexBinding;
@@ -51,7 +51,7 @@ import org.geotools.xml.Node;
  * @generated
  */
 public class DocumentTypeBinding extends AbstractComplexBinding {
-    static final FeatureType featureType;
+    static final SimpleFeatureType featureType;
 
     static {
         DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
@@ -78,7 +78,7 @@ public class DocumentTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     public int getExecutionMode() {
@@ -95,12 +95,12 @@ public class DocumentTypeBinding extends AbstractComplexBinding {
         throws Exception {
         DefaultFeatureBuilder b = new DefaultFeatureBuilder();
 
-        Feature feature = (Feature) value;
+        SimpleFeature feature = (SimpleFeature) value;
         b.init(feature);
         b.setType(featureType);
 
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:Feature"/&gt;
-        b.set("Feature", node.getChildValues(Feature.class));
+        b.set("Feature", node.getChildValues(SimpleFeature.class));
 
         return b.buildFeature(feature.getID());
     }

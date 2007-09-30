@@ -24,15 +24,19 @@ import java.util.Iterator;
 import java.util.List;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
@@ -63,7 +67,7 @@ public class GML2ParsingUtils {
      *
      * @return A feature type.
      */
-    public static Feature parseFeature(ElementInstance instance, Node node, Object value,
+    public static SimpleFeature parseFeature(ElementInstance instance, Node node, Object value,
         FeatureTypeCache ftCache, BindingWalkerFactory bwFactory)
         throws Exception {
         //get the definition of the element
@@ -73,7 +77,7 @@ public class GML2ParsingUtils {
         // which means we are parsing an elemetn which could not be found in the 
         // schema, so instaed of using the element declaration to build the 
         // type, just use the node given to us
-        FeatureType fType = null;
+        SimpleFeatureType fType = null;
 
         if (!decl.isAbstract()) {
             //first look in cache
@@ -123,22 +127,23 @@ public class GML2ParsingUtils {
      *
      * @return A geotools feature type
      */
-    public static FeatureType featureType(Node node) throws Exception {
-        FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
+    public static SimpleFeatureType featureType(Node node)
+        throws Exception {
+        SimpleFeatureTypeBuilder ftBuilder = new SimpleFeatureTypeBuilder();
         ftBuilder.setName(node.getComponent().getName());
-        ftBuilder.setNamespace(new URI(node.getComponent().getNamespace()));
+        ftBuilder.setNamespaceURI(node.getComponent().getNamespace());
 
         //mandatory gml attributes
         if (!node.hasChild("description")) {
-            ftBuilder.addType(AttributeTypeFactory.newAttributeType("description", String.class));
+            ftBuilder.add("description", String.class);
         }
 
         if (!node.hasChild("name")) {
-            ftBuilder.addType(AttributeTypeFactory.newAttributeType("name", String.class));
+            ftBuilder.add("name", String.class);
         }
 
         if (!node.hasChild("boundedBy")) {
-            ftBuilder.addType(AttributeTypeFactory.newAttributeType("boundedBy", Envelope.class));
+            ftBuilder.add("boundedBy", ReferencedEnvelope.class);
         }
 
         //application schema defined attributes
@@ -147,11 +152,10 @@ public class GML2ParsingUtils {
             String name = child.getComponent().getName();
             Object valu = child.getValue();
 
-            ftBuilder.addType(AttributeTypeFactory.newAttributeType(name,
-                    (valu != null) ? valu.getClass() : Object.class));
+            ftBuilder.add(name, (valu != null) ? valu.getClass() : Object.class);
         }
 
-        return ftBuilder.getFeatureType();
+        return ftBuilder.buildFeatureType();
     }
 
     /**
@@ -162,11 +166,11 @@ public class GML2ParsingUtils {
      *
      * @return The corresponding geotools feature type.
      */
-    public static FeatureType featureType(XSDElementDeclaration element,
+    public static SimpleFeatureType featureType(XSDElementDeclaration element,
         BindingWalkerFactory bwFactory) throws Exception {
-        FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
+        SimpleFeatureTypeBuilder ftBuilder = new SimpleFeatureTypeBuilder();
         ftBuilder.setName(element.getName());
-        ftBuilder.setNamespace(new URI(element.getTargetNamespace()));
+        ftBuilder.setNamespaceURI(element.getTargetNamespace());
 
         // build the feaure type by walking through the elements of the
         // actual xml schema type
@@ -206,7 +210,7 @@ public class GML2ParsingUtils {
             int min = particle.getMinOccurs();
             int max = particle.getMaxOccurs();
 
-            //check for uniitialized values
+            //check for uninitialized values
             if (min == -1) {
                 min = 0;
             }
@@ -216,21 +220,23 @@ public class GML2ParsingUtils {
             }
 
             // create the type
-            AttributeType type = AttributeTypeFactory.newAttributeType(property.getName(),
-                    theClass, true, null, null, null, min, max);
-            ftBuilder.addType(type);
+            ftBuilder.minOccurs(min).maxOccurs(max).add(property.getName(), theClass);
         }
 
-        return ftBuilder.getFeatureType();
+        return ftBuilder.buildFeatureType();
     }
 
-    public static Feature feature(FeatureType fType, String fid, Node node)
+    public static SimpleFeature feature(SimpleFeatureType fType, String fid, Node node)
         throws Exception {
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder();
+        b.setType(fType);
+
         Object[] attributes = new Object[fType.getAttributeCount()];
 
         for (int i = 0; i < fType.getAttributeCount(); i++) {
-            AttributeType attType = fType.getAttributeType(i);
-            Object attValue = node.getChildValue(attType.getLocalName());
+            AttributeDescriptor att = fType.getAttribute(i);
+            AttributeType attType = att.getType();
+            Object attValue = node.getChildValue(att.getLocalName());
 
             if ((attValue != null) && !attType.getBinding().isAssignableFrom(attValue.getClass())) {
                 //type mismatch, to try convert
@@ -241,11 +247,11 @@ public class GML2ParsingUtils {
                 }
             }
 
-            attributes[i] = attValue;
+            b.add(attValue);
         }
 
         //create the feature
-        return fType.create(attributes, fid);
+        return b.buildFeature(fid);
     }
 
     public static CoordinateReferenceSystem crs(Node node) {

@@ -17,8 +17,7 @@ package org.geotools.xml.impl.jxpath;
 
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -31,7 +30,7 @@ public class FeatureTypeAttributePointer extends NodePointer {
     /**
      * the feature type
      */
-    FeatureType featureType;
+    SimpleFeatureType featureType;
 
     /**
      * The parent pointer
@@ -52,7 +51,7 @@ public class FeatureTypeAttributePointer extends NodePointer {
     public FeatureTypeAttributePointer(FeatureTypePointer parent, int index) {
         super(parent);
         this.index = index;
-        this.featureType = (FeatureType) parent.getImmediateNode();
+        this.featureType = (SimpleFeatureType) parent.getImmediateNode();
     }
 
     /**
@@ -81,7 +80,7 @@ public class FeatureTypeAttributePointer extends NodePointer {
      * feature attribute.
      */
     public QName getName() {
-        return new QName(null, featureType.getAttributeType(index).getLocalName());
+        return new QName(null, featureType.getAttribute(index).getLocalName());
     }
 
     public Object getBaseValue() {
@@ -89,7 +88,7 @@ public class FeatureTypeAttributePointer extends NodePointer {
     }
 
     public Object getImmediateNode() {
-        return featureType.getAttributeType(index);
+        return featureType.getAttribute(index);
     }
 
     public void setValue(Object value) {

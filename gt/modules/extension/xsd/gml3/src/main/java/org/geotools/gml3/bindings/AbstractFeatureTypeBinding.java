@@ -19,9 +19,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml3.GML;
@@ -86,7 +86,7 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Feature.class;
+        return SimpleFeature.class;
     }
 
     /**
@@ -119,10 +119,10 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Element encode(Object object, Document document, Element value)
         throws Exception {
-        Feature feature = (Feature) object;
-        FeatureType featureType = feature.getFeatureType();
+        SimpleFeature feature = (SimpleFeature) object;
+        SimpleFeatureType featureType = feature.getFeatureType();
 
-        String namespace = featureType.getNamespace().toString();
+        String namespace = featureType.getName().getNamespaceURI();
         String typeName = featureType.getTypeName();
 
         Element encoding = document.createElementNS(namespace, typeName);
@@ -133,7 +133,7 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        Feature feature = (Feature) object;
+        SimpleFeature feature = (SimpleFeature) object;
 
         if (GML.name.equals(name)) {
             return feature.getAttribute("name");
@@ -144,16 +144,7 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         }
 
         if (GML.boundedBy.equals(name)) {
-            Envelope bounds = feature.getBounds();
-
-            if (bounds instanceof ReferencedEnvelope) {
-                return bounds;
-            }
-
-            CoordinateReferenceSystem crs = (feature.getFeatureType().getDefaultGeometry() != null)
-                ? feature.getFeatureType().getDefaultGeometry().getCoordinateSystem() : null;
-
-            return new ReferencedEnvelope(bounds, crs);
+            return feature.getBounds();
         }
 
         return null;

@@ -27,7 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.geotools.xml.Parser;
 import org.geotools.xml.StreamingParser;
 
@@ -62,7 +62,7 @@ public class GMLApplicationSchemaParsingTest extends TestCase {
         StreamingParser parser = new StreamingParser(configuration, in, "//TestFeature");
 
         for (int i = 0; i < 3; i++) {
-            Feature f = (Feature) parser.parse();
+            SimpleFeature f = (SimpleFeature) parser.parse();
 
             assertNotNull(f);
         }
@@ -146,7 +146,7 @@ public class GMLApplicationSchemaParsingTest extends TestCase {
         StreamingParser parser = new StreamingParser(new GMLConfiguration(), in, "//TestFeature");
 
         for (int i = 0; i < 3; i++) {
-            Feature f = (Feature) parser.parse();
+            SimpleFeature f = (SimpleFeature) parser.parse();
             assertNotNull(f);
 
             assertEquals(i + "", f.getID());
