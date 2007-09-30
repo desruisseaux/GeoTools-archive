@@ -29,7 +29,6 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
@@ -185,7 +184,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			// It is not clear that this cast will always be safe, but it seems
 			// to
 			// be a safe approach for the default implementation provided.
-			DefaultFeatureType featureType = (DefaultFeatureType) getFeatureType();
+			SimpleFeatureType featureType = (SimpleFeatureType) getFeatureType();
 			Object[] attributes = new Object[featureType.getAttributeCount()];
 
 			try {

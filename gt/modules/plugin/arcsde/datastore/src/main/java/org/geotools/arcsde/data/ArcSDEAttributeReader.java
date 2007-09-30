@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.type.GeometricAttributeType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -202,7 +201,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 			ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);
         
-        if (schema.getAttribute(index) instanceof GeometricAttributeType) {
+        if (schema.getAttribute(index) instanceof GeometryDescriptor) {
             try{
                 SeShape shape = (SeShape) value;
                 /**
