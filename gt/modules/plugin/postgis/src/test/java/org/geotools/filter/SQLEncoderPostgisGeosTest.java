@@ -19,9 +19,12 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -33,10 +36,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  *  DJB added this because there were NO testcases for SQLEncoderGeos!!!
