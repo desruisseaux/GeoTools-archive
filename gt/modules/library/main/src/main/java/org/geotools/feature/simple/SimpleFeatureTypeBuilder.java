@@ -698,6 +698,17 @@ public class SimpleFeatureTypeBuilder {
 	    add(name,binding,decode(srs));
 	}
 	
+	/**
+	 * Directly sets the list of attributes. 
+	 * @param attributes the new list of attributes, or null to reset the list
+	 */
+	public void setAttributes(List<AttributeDescriptor> attributes) {
+		List atts = attributes();
+		atts.clear();
+		if(attributes != null)
+		atts.addAll(attributes);
+	}
+	
 	
 	/**
 	 * Builds a feature type from compiled state.
