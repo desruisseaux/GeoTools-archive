@@ -36,10 +36,9 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.opengis.filter.Filter;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -132,7 +131,7 @@ public class DirectoryDataStore implements DataStore, LockingManager {
     /**
      * @see org.geotools.data.DataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         AbstractFileDataStore afds = (AbstractFileDataStore) dataStores.get(typeName);
 
         if (afds != null) {
