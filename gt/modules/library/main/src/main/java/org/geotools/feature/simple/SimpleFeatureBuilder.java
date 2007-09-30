@@ -2,14 +2,11 @@ package org.geotools.feature.simple;
 
 import java.rmi.server.UID;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.FeatureFactoryImpl;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.type.SetAttributeType;
 import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.FeatureFactory;
