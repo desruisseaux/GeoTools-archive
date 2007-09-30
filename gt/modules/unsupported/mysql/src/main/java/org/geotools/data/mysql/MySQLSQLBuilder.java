@@ -17,10 +17,11 @@ package org.geotools.data.mysql;
 
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.SQLEncoder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 /**
  * A MySQL-specific instance of DefaultSQLBuilder, which supports MySQL 4.1's geometric
@@ -39,7 +40,7 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
         super(encoder);
     }
 
-    public MySQLSQLBuilder(SQLEncoder encoder, FeatureType ft) {
+    public MySQLSQLBuilder(SQLEncoder encoder, SimpleFeatureType ft) {
         super(encoder, ft, null);
     }
 
@@ -63,7 +64,7 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
      * @param mapper     
      * @param attributes
      */
-    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeType[] attributes) {
+    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeDescriptor[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
             sql.append(mapper.getColumnName(i));
             if (attributes.length > 0 || i < (mapper.getColumnCount() - 1)) {
@@ -74,7 +75,7 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
         for (int i = 0; i < attributes.length; i++) {
             String colName = attributes[i].getLocalName();
 
-            if (attributes[i] instanceof GeometryAttributeType) {
+            if (attributes[i] instanceof GeometryDescriptor) {
                 sql.append("AsText(" + attributes[i].getLocalName() + ") AS " + attributes[i].getLocalName());
             } else {
                 sql.append(colName);

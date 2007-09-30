@@ -35,10 +35,10 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderMySQL;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -204,7 +204,7 @@ public class MySQLDataStore extends JDBCDataStore {
      *         default implementation if a type is present that is not present
      *         in the TYPE_MAPPINGS.
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
         final int COLUMN_NAME = 4;
         final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
@@ -215,39 +215,40 @@ public class MySQLDataStore extends JDBCDataStore {
                 //this is MySQL-specific; handle it
                 String typeName = rs.getString(TYPE_NAME);
                 String typeNameLower = typeName.toLowerCase();
-
+                AttributeTypeBuilder builder = new AttributeTypeBuilder();
+                //TODO: Get at CRS info, put geometry stuff in its own method
                 if ("geometry".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        Geometry.class);
+                	builder.setNillable(true);
+                	builder.setBinding(Geometry.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("point".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        Point.class);
+                	builder.setNillable(true);
+                	builder.setBinding(Point.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("linestring".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        LineString.class);
+                	builder.setNillable(true);
+                	builder.setBinding(LineString.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("polygon".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        Polygon.class);
+                	builder.setNillable(true);
+                	builder.setBinding(Polygon.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multipoint".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        MultiPoint.class);
+                	builder.setNillable(true);
+                	builder.setBinding(MultiPoint.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multilinestring".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        MultiLineString.class);
+                	builder.setNillable(true);
+                	builder.setBinding(MultiLineString.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multipolygon".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        MultiPolygon.class);
+                	builder.setNillable(true);
+                	builder.setBinding(MultiPolygon.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("geometrycollection".equals(typeNameLower)) {
-                    return AttributeTypeFactory.newAttributeType(
-                        rs.getString(COLUMN_NAME),
-                        GeometryCollection.class);
+                	builder.setNillable(true);
+                	builder.setBinding(GeometryCollection.class);
+                	return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else {
                     //nothing else we can do
                     return super.buildAttributeType(rs);
@@ -276,7 +277,7 @@ public class MySQLDataStore extends JDBCDataStore {
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) {
         return new WKTAttributeIO();
     }
 
@@ -286,5 +287,6 @@ public class MySQLDataStore extends JDBCDataStore {
 
         return new MySQLFeatureWriter(reader, queryData);
     }
+    
 
 }
