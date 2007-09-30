@@ -2,6 +2,7 @@ package org.geotools.feature.simple;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -706,7 +707,18 @@ public class SimpleFeatureTypeBuilder {
 		List atts = attributes();
 		atts.clear();
 		if(attributes != null)
-		atts.addAll(attributes);
+			atts.addAll(attributes);
+	}
+	
+	/**
+	 * Directly sets the list of attributes. 
+	 * @param attributes the new list of attributes, or null to reset the list
+	 */
+	public void setAttributes(AttributeDescriptor[] attributes) {
+		List atts = attributes();
+		atts.clear();
+		if(attributes != null)
+			atts.addAll(Arrays.asList(attributes));
 	}
 	
 	
