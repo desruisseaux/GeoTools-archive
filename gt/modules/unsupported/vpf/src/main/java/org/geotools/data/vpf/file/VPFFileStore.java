@@ -28,8 +28,8 @@ import java.util.StringTokenizer;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -76,11 +76,11 @@ public class VPFFileStore extends AbstractDataStore {
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String pathName) throws IOException {
-        FeatureType result = null;
+    public SimpleFeatureType getSchema(String pathName) throws IOException {
+        SimpleFeatureType result = null;
 
         if (files.containsKey(pathName)) {
-            result = (FeatureType) files.get(pathName);
+            result = (SimpleFeatureType) files.get(pathName);
         } else {
             try {
                 result = findFile(pathName);

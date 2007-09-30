@@ -27,8 +27,8 @@ import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.io.TripletId;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -48,7 +48,7 @@ public class AreaGeometryFactory extends VPFGeometryFactory
     /* (non-Javadoc)
      * @see com.ionicsoft.wfs.jdbc.geojdbc.module.vpf.VPFGeometryFactory#createGeometry(java.lang.String, int, int)
      */
-    public void createGeometry(VPFFeatureType featureType, Feature values)
+    public void createGeometry(VPFFeatureType featureType, SimpleFeature values)
         throws SQLException, IOException, IllegalAttributeException {
         
         int tempEdgeId;
@@ -96,7 +96,7 @@ public class AreaGeometryFactory extends VPFGeometryFactory
         VPFFile ringFile = VPFFileFactory.getInstance().getFile(ringTableName);
         ringFile.reset();
 
-        Feature faceFeature = faceFile.readFeature();
+        SimpleFeature faceFeature = faceFile.readFeature();
 
         while (faceFeature != null) {
             if (faceFeature.getAttribute("id").equals(new Integer(faceId))) {
@@ -113,7 +113,7 @@ public class AreaGeometryFactory extends VPFGeometryFactory
                 int prevNodeId = -1;
 
                 while (nextEdgeId > 0) {
-                    Feature edgeRow = edgeFile.getRowFromId("id", nextEdgeId);
+                    SimpleFeature edgeRow = edgeFile.getRowFromId("id", nextEdgeId);
 
                     // Read all the important stuff from the edge row data
                     int leftFace  = ((TripletId) edgeRow.getAttribute("left_face")).getId();

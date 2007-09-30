@@ -30,8 +30,8 @@ import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FCode;
 import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.ifc.VPFCoverageIfc;
-import org.geotools.feature.Feature;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * A VPF coverage. This class constructs and contains both feature
@@ -76,7 +76,7 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
      * @throws IOException if the directory does not contain a valid FCS file
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */
-    public VPFCoverage(VPFLibrary cLibrary, Feature feature, String cDirectoryName)
+    public VPFCoverage(VPFLibrary cLibrary, SimpleFeature feature, String cDirectoryName)
         throws IOException, SchemaException {
 	this(cLibrary, feature, cDirectoryName, null);
     }
@@ -92,7 +92,7 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
      * @throws IOException if the directory does not contain a valid FCS file
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */
-    public VPFCoverage(VPFLibrary cLibrary, Feature feature, 
+    public VPFCoverage(VPFLibrary cLibrary, SimpleFeature feature, 
                        String cDirectoryName, URI namespace)
         throws IOException, SchemaException {
         topologyLevel = Short.parseShort(feature.getAttribute(FIELD_LEVEL).toString());
@@ -124,7 +124,7 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
         // constructor just to save time.
         Iterator iter = file.readAllRows().iterator();
         while (iter.hasNext()) {
-            Feature row = (Feature) iter.next();
+            SimpleFeature row = (SimpleFeature) iter.next();
             featureClassName = row.getAttribute("feature_class").toString().trim();
             featureClass = new VPFFeatureClass(this, featureClassName,
                     pathName, namespace);
@@ -158,7 +158,7 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
 
             while (charVDTIter.hasNext()) {
                 // Figure out which featureClass owns it
-                Feature row = (Feature) charVDTIter.next();
+                SimpleFeature row = (SimpleFeature) charVDTIter.next();
                 String attr = row.getAttribute("attribute").toString().trim().toLowerCase();
 
                 if (!ALLOWED_FCODE_ATTRIBUTES_LIST.contains(attr))

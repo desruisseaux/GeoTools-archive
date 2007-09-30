@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -29,11 +30,13 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FCode;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.type.AnnotationFeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  *
@@ -45,7 +48,7 @@ public class VPFFeatureReader
     implements FeatureReader, FCode {
     private boolean hasNext = true;
     private boolean nextCalled = true;
-    private Feature currentFeature = null;
+    private SimpleFeature currentFeature = null;
     private final VPFFeatureType featureType;
 
     /** Creates a new instance of VPFFeatureReader */
@@ -67,7 +70,7 @@ public class VPFFeatureReader
      * @param file
      * @param row
      */
-    private Map generateFileRowMap(VPFFile file, Feature row)
+    private Map generateFileRowMap(VPFFile file, SimpleFeature row)
             throws IOException{
         String tileFileName = null;
         Map rows = new HashMap();
@@ -80,7 +83,7 @@ public class VPFFeatureReader
             joinFile = getVPFFile(columnPair.column2);
     
             if (!rows.containsKey(joinFile) && rows.containsKey(primaryFile)) {
-                Feature joinRow = (Feature) rows.get(primaryFile);
+                SimpleFeature joinRow = (SimpleFeature) rows.get(primaryFile);
     
                 try {
                     int joinID = Integer.parseInt(joinRow.getAttribute(columnPair.column1.getLocalName()).toString());
@@ -102,7 +105,7 @@ public class VPFFeatureReader
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 
@@ -120,7 +123,7 @@ public class VPFFeatureReader
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next() throws IOException, IllegalAttributeException, 
+    public SimpleFeature next() throws IOException, IllegalAttributeException, 
                                  NoSuchElementException {
         nextCalled = true;
         return currentFeature;
@@ -137,7 +140,7 @@ public class VPFFeatureReader
         boolean result = true;
         VPFFile file = (VPFFile) featureType.getFeatureClass().getFileList().get(0);
         hasNext = false;
-        Feature row = null;
+        SimpleFeature row = null;
         try {
             if(file.hasNext()){
                 row = file.readFeature();
@@ -187,21 +190,20 @@ public class VPFFeatureReader
      * @param row the row
      *
      */ 
-    private void retrieveObject(VPFFile file, Feature row) throws IOException{
+    private void retrieveObject(VPFFile file, SimpleFeature row) throws IOException{
         VPFFile secondFile = null;
         VPFColumn column = null;
         Map rows = generateFileRowMap(file, row);
-        AttributeType[] attributes = featureType.getFeatureClass()
-                .getAttributeTypes();
+        List<AttributeDescriptor> attributes = featureType.getFeatureClass().getAttributes();
         Object[] values = new Object[featureType.getAttributeCount()];
         Object value = null;
         String featureId = null;
         // Pass 1 - identify the feature identifier
-        for(int inx = 0; inx < attributes.length; inx++){
+        for(int inx = 0; inx < attributes.size(); inx++){
             // I am thinking it is probably safer to look this up 
             // by column name than by position, but if it breaks,
             // it is easy enough to change
-            if (attributes[inx].getLocalName().equals("id")) {
+            if (attributes.get(inx).getLocalName().equals("id")) {
                 value = row.getAttribute(inx);
                 if(value != null) {
                     featureId = value.toString(); 
@@ -210,16 +212,16 @@ public class VPFFeatureReader
             }
         }
         try {
-            currentFeature = featureType.create(values, featureId);
+            currentFeature = SimpleFeatureBuilder.build(featureType,values, featureId);
         } catch (IllegalAttributeException exc) {
             // This shouldn't happen since everything should be nillable
             exc.printStackTrace();
         }
         
         // Pass 2 - get the attributes, including the geometry
-        for(int inx = 0; inx < attributes.length; inx++){
+        for(int inx = 0; inx < attributes.size(); inx++){
             try {
-                if (attributes[inx].getLocalName().equals(AnnotationFeatureType.ANNOTATION_ATTRIBUTE_NAME)) {
+                if (attributes.get(inx).getLocalName().equals(AnnotationFeatureType.ANNOTATION_ATTRIBUTE_NAME)) {
                     try{
                         //TODO: are we sure this is the intended action? Hard-coding an attribute to "nam"?
                         currentFeature.setAttribute(inx, "nam");
@@ -228,10 +230,10 @@ public class VPFFeatureReader
                     }
                     continue;
                 }
-                column = (VPFColumn) attributes[inx];
+                column = (VPFColumn) attributes.get(inx);
                 value = null;
                 secondFile = getVPFFile(column); 
-                Feature tempRow = (Feature) rows.get(secondFile);
+                SimpleFeature tempRow = (SimpleFeature) rows.get(secondFile);
                 if(tempRow != null){
                     value = tempRow.getAttribute(column.getLocalName());
                     if (column.isAttemptLookup()){
@@ -242,7 +244,7 @@ public class VPFFeatureReader
                             VPFFile intVdtFile = VPFFileFactory.getInstance().getFile(intVdtFileName);
                             Iterator intVdtIter = intVdtFile.readAllRows().iterator();
                             while(intVdtIter.hasNext()){
-                                Feature intVdtRow = (Feature)intVdtIter.next();
+                                SimpleFeature intVdtRow = (SimpleFeature)intVdtIter.next();
                                 if(intVdtRow.getAttribute("table").toString().trim().equals(featureClassName) && 
                                         (Short.parseShort(intVdtRow.getAttribute("value").toString()) == Short.parseShort(value.toString()) &&
                                         (intVdtRow.getAttribute("attribute").toString().trim().equals(column.getLocalName())))){
@@ -287,13 +289,13 @@ public class VPFFeatureReader
      * @param column the column to search for 
      * @return the VPFFile that owns this column
      */
-    private VPFFile getVPFFile(AttributeType column){
+    private VPFFile getVPFFile(AttributeDescriptor column){
         VPFFile result = null;
         VPFFile temp;
         Iterator iter = featureType.getFeatureClass().getFileList().iterator();
         while(iter.hasNext()){
             temp = (VPFFile)iter.next();
-            if((temp != null) && (temp.find(column) >= 0)){
+            if((temp != null) && (temp.indexOf(column.getName()) >= 0)){
                 result = temp;
                 break;
             }

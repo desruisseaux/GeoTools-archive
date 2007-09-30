@@ -21,17 +21,11 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -47,7 +41,7 @@ import org.opengis.util.InternationalString;
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  * @source $URL$
  */
-public class VPFFeatureType implements FeatureType {
+public class VPFFeatureType implements SimpleFeatureType {
     /**
      * The feature class that this feature type belongs to
      */
@@ -67,7 +61,7 @@ public class VPFFeatureType implements FeatureType {
      * @param cFeature A <code>Feature</code> from the char.vdt file 
      * with more detailed information for this feature type
      */
-    public VPFFeatureType(VPFFeatureClass cFeatureClass, Feature cFeature){
+    public VPFFeatureType(VPFFeatureClass cFeatureClass, SimpleFeature cFeature){
         featureClass = cFeatureClass;
         faccCode = cFeature.getAttribute("value").toString().trim();
         String mainTableFileName = cFeature.getAttribute("table").toString().trim();
@@ -116,68 +110,12 @@ public class VPFFeatureType implements FeatureType {
     }
 
     /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureFactory#create(java.lang.Object[])
-     */
-    public Feature create(Object[] attributes) throws IllegalAttributeException {
-        return featureClass.create(attributes);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureFactory#create(java.lang.Object[], java.lang.String)
-     */
-    public Feature create(Object[] attributes, String featureID)
-        throws IllegalAttributeException {
-        return featureClass.create(attributes, featureID);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#duplicate(org.geotools.feature.Feature)
-     */
-    public Feature duplicate(Feature feature) throws IllegalAttributeException {
-        return featureClass.duplicate(feature);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#find(org.geotools.feature.AttributeType)
-     */
-    public int find(AttributeType type) {
-        return featureClass.find(type);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAncestors()
-     */
-    public FeatureType[] getAncestors() {
-        return featureClass.getAncestors();
-    }
-
-    /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getAttributeCount()
      */
     public int getAttributeCount() {
         return featureClass.getAttributeCount();
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAttributeType(int)
-     */
-    public AttributeType getAttributeType(int position) {
-        return featureClass.getAttributeType(position);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAttributeType(java.lang.String)
-     */
-    public AttributeType getAttributeType(String xPath) {
-        return featureClass.getAttributeType(xPath);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAttributeTypes()
-     */
-    public AttributeType[] getAttributeTypes() {
-        return featureClass.getAttributeTypes();
-    }
     /**
      * @return The <code>VPFCoverage</code> that this <code>FeatureType</code> 
      *         belongs to.
@@ -217,18 +155,6 @@ public class VPFFeatureType implements FeatureType {
     public List getJoinList() {
         return featureClass.getJoinList();
     }
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getNamespace()
-     */
-    public URI getNamespace() {
-        return featureClass.getNamespace();
-    }
-//    /* (non-Javadoc)
-//     * @see org.geotools.feature.FeatureType#getNamespace()
-//     */
-//    public URI getNamespaceURI() {
-//        return featureClass.getNamespaceURI();
-//    }
 
     /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getTypeName()
@@ -238,32 +164,12 @@ public class VPFFeatureType implements FeatureType {
     }
 
     /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#hasAttributeType(java.lang.String)
-     */
-    public boolean hasAttributeType(String xPath) {
-        return featureClass.hasAttributeType(xPath);
-    }
-
-    /* (non-Javadoc)
      * @see org.geotools.feature.FeatureType#isAbstract()
      */
     public boolean isAbstract() {
         return featureClass.isAbstract();
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#isDescendedFrom(org.geotools.feature.FeatureType)
-     */
-    public boolean isDescendedFrom(FeatureType type) {
-        return featureClass.isDescendedFrom(type);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#isDescendedFrom(java.lang.String, java.lang.String)
-     */
-    public boolean isDescendedFrom(URI nsURI, String typeName) {
-        return featureClass.isDescendedFrom(nsURI, typeName);
-    }
     /**
      * The FACC code, a two-letter, 3-number code
      * identifying the feature type
@@ -272,13 +178,7 @@ public class VPFFeatureType implements FeatureType {
     public String getFaccCode() {
         return faccCode;
     }
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
-	 */
-    public int find(String attName) {
-        return featureClass.find(attName);
-    }
-
+	
     public boolean equals(Object obj) {
         return featureClass.equals(obj);
     }
@@ -332,10 +232,10 @@ public class VPFFeatureType implements FeatureType {
 		return featureClass.getCRS();
 	}
 
-	public GeometryAttributeType getDefaultGeometry() {
+	public GeometryDescriptor getDefaultGeometry() {
 	    return featureClass.getDefaultGeometry();
 	}
-
+	
 	public Class getBinding() {
 		return featureClass.getBinding();
 	}

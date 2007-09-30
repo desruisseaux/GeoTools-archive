@@ -18,7 +18,7 @@ package org.geotools.data.vpf.util;
 import java.util.HashMap;
 
 import org.geotools.data.vpf.io.TableRow;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /*
  * PrimitiveDataFactory.java
@@ -49,13 +49,13 @@ public class PrimitiveDataFactory {
         return ed;
     }
 
-    protected HashMap readFeature(TableRow line, FeatureType type) {
+    protected HashMap readFeature(TableRow line, SimpleFeatureType type) {
         HashMap tmp = new HashMap();
 
         String name = null;
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
-            name = type.getAttributeType(i).getLocalName();
+            name = type.getAttribute(i).getLocalName();
             tmp.put(name, line.get(name));
         }
 

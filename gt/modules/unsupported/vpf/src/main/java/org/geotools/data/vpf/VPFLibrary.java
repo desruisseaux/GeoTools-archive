@@ -19,12 +19,12 @@ package org.geotools.data.vpf;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.net.URI;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
@@ -32,11 +32,11 @@ import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.ifc.VPFLibraryIfc;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /*
@@ -133,7 +133,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      * @throws IOException
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */
-    public VPFLibrary(Feature libraryFeature, File dir) throws IOException, SchemaException {
+    public VPFLibrary(SimpleFeature libraryFeature, File dir) throws IOException, SchemaException {
         xmin = ((Number)libraryFeature.getAttribute(FIELD_XMIN)).doubleValue();
         ymin = ((Number)libraryFeature.getAttribute(FIELD_YMIN)).doubleValue();
         xmax = ((Number)libraryFeature.getAttribute(FIELD_XMAX)).doubleValue();
@@ -194,7 +194,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      */
     private void setCoverages() throws IOException, SchemaException {
         VPFCoverage coverage;
-        Feature feature;
+        SimpleFeature feature;
         String directoryName;
 
         // I'd like to know why this if is here...
@@ -204,7 +204,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
             //            TableInputStream vpfTable = new TableInputStream(vpfTableName);
             Iterator iter = vpfFile.readAllRows().iterator();
             while (iter.hasNext()){
-                feature = (Feature)iter.next();
+                feature = (SimpleFeature)iter.next();
                 directoryName = directory.getPath();
                 coverage = new VPFCoverage(this, feature, directoryName, namespace);
                 coverages.add(coverage);
@@ -288,7 +288,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
         Iterator rowsIter = tileFile.readAllRows().iterator();
         while (rowsIter.hasNext())
         {
-            Feature row = (Feature)rowsIter.next();
+            SimpleFeature row = (SimpleFeature)rowsIter.next();
             Short rowId = new Short(Short.parseShort(row.getAttribute("id").toString()));
             String value = row.getAttribute(FIELD_TILE_NAME).toString();
 
@@ -353,7 +353,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
         result = new String[featureTypesCount];
         for(int inx = 0; inx < coveragesCount; inx++){
             for(int jnx = 0; jnx < coverageTypes[inx].size(); jnx++){
-                result[index] = ((FeatureType)coverageTypes[inx].get(jnx)).getTypeName();
+                result[index] = ((SimpleFeatureType)coverageTypes[inx].get(jnx)).getTypeName();
                 index++;
             }
         }
@@ -363,17 +363,17 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
     /* (non-Javadoc)
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String typeName){
+    public SimpleFeatureType getSchema(String typeName){
         // Look through all of the coverages to find a matching feature type
-        FeatureType result = null;
+        SimpleFeatureType result = null;
         Iterator coverageIter = coverages.iterator();
         Iterator featureTypesIter;
-        FeatureType temp;
+        SimpleFeatureType temp;
         boolean breakOut = false;
         while(coverageIter.hasNext() && !breakOut){
             featureTypesIter = ((VPFCoverage)coverageIter.next()).getFeatureTypes().iterator();
             while(featureTypesIter.hasNext()){
-                temp = (FeatureType)featureTypesIter.next();
+                temp = (SimpleFeatureType)featureTypesIter.next();
                 if(temp.getTypeName().equals(typeName)){
                     result = temp;
                     breakOut = true;
@@ -409,7 +409,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
                 // WGS84 data ("EPSG:4326").
                 String vpfTableName = new File(directory, GEOGRAPHIC_REFERENCE_TABLE).toString();
                 VPFFile grtFile = VPFFileFactory.getInstance().getFile(vpfTableName);
-                Feature grt = grtFile.getRowFromId("id", 1);
+                SimpleFeature grt = grtFile.getRowFromId("id", 1);
                 String dataType = String.valueOf(grt.getAttribute("data_type"));
 
                 if("GEO".equalsIgnoreCase(dataType)){

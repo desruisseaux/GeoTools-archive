@@ -24,8 +24,9 @@ import java.util.Vector;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -52,7 +53,7 @@ public class VPFDataBase implements FileConstants {
     public VPFDataBase(File directory) throws IOException, SchemaException {
         VPFFile vpfTable;
         String vpfTableName;
-        Feature feature;
+        SimpleFeature feature;
         VPFLibrary library;
 
         // read libraries info
@@ -62,7 +63,7 @@ public class VPFDataBase implements FileConstants {
         Iterator iter = vpfTable.readAllRows().iterator();
 
         while (iter.hasNext()) {
-            feature = (Feature) iter.next();
+            feature = (SimpleFeature) iter.next();
 
             try {
               library = new VPFLibrary(feature, directory);

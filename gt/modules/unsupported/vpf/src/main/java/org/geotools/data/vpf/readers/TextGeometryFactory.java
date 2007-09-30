@@ -25,8 +25,8 @@ import org.geotools.data.vpf.VPFFeatureType;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class TextGeometryFactory extends VPFGeometryFactory implements FileConstants {
     
-    public void createGeometry(VPFFeatureType featureType, Feature values)
+    public void createGeometry(VPFFeatureType featureType, SimpleFeature values)
         throws SQLException, IOException, IllegalAttributeException{
         
         Geometry result = null;
@@ -58,7 +58,7 @@ public class TextGeometryFactory extends VPFGeometryFactory implements FileConst
 
         String textTableName = tileDirectory.concat(File.separator).concat(TEXT_PRIMITIVE);
         VPFFile textFile = VPFFileFactory.getInstance().getFile(textTableName);
-        Feature row = textFile.getRowFromId("id", textId);
+        SimpleFeature row = textFile.getRowFromId("id", textId);
         result = (Geometry)row.getAttribute("shape_line");
         
         values.setDefaultGeometry(result);

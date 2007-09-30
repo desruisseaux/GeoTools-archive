@@ -25,8 +25,9 @@ import org.geotools.data.vpf.VPFFeatureType;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -40,7 +41,7 @@ public class ConnectedNodeGeometryFactory extends VPFGeometryFactory implements 
     /* (non-Javadoc)
      * @see com.ionicsoft.wfs.jdbc.geojdbc.module.vpf.VPFGeometryFactory#createGeometry(com.ionicsoft.wfs.jdbc.geojdbc.module.vpf.VPFIterator)
      */
-    public void createGeometry(VPFFeatureType featureType, Feature values) throws SQLException, IOException, IllegalAttributeException{
+    public void createGeometry(VPFFeatureType featureType, SimpleFeature values) throws SQLException, IOException, IllegalAttributeException{
         Geometry result = null;
         int nodeId = Integer.parseInt(values.getAttribute("cnd_id").toString());
 //        VPFFeatureType featureType = (VPFFeatureType)values.getFeatureType();
@@ -57,7 +58,7 @@ public class ConnectedNodeGeometryFactory extends VPFGeometryFactory implements 
 
         String nodeTableName = tileDirectory.concat(File.separator).concat(CONNECTED_NODE_PRIMITIVE);
         VPFFile nodeFile = VPFFileFactory.getInstance().getFile(nodeTableName);
-        Feature row = nodeFile.getRowFromId("id", nodeId);
+        SimpleFeature row = nodeFile.getRowFromId("id", nodeId);
         result = (Geometry)row.getAttribute("coordinate");
         values.setDefaultGeometry(result);
     }

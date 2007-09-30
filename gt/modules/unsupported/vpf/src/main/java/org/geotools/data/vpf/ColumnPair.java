@@ -15,7 +15,7 @@
  */
 package org.geotools.data.vpf;
 
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * This class encapsulates a join between two columns. It was originally intended to
@@ -29,17 +29,17 @@ class ColumnPair {
     /**
      * The first column to join
      */
-    public AttributeType column1;
+    public AttributeDescriptor column1;
     /**
      * The second column to join
      */
-    public AttributeType column2;
+    public AttributeDescriptor column2;
     /**
      * The only constructor
      * @param c1 the first column
      * @param c2 the second column
      */
-    public ColumnPair(AttributeType c1, AttributeType c2) {
+    public ColumnPair(AttributeDescriptor c1, AttributeDescriptor c2) {
         column1 = c1;
         column2 = c2;
     }

@@ -22,13 +22,11 @@ import java.util.Map;
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.io.TripletId;
 import org.geotools.data.vpf.util.DataUtils;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyType;
-import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -39,7 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  * @source $URL$
  */
-public class VPFColumn implements AttributeType, DataTypesDefinition {
+public class VPFColumn implements AttributeDescriptor, DataTypesDefinition {
     /**
      * If the value is a short integer, that often means it has
      * an accompanying value in a string lookup table.
@@ -49,7 +47,7 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
      * The contained attribute type. 
      * AttributeType operations are delegated to this object.
      */
-    private final AttributeType attribute;
+    private final AttributeDescriptor attribute;
 
     /** Describe variable <code>elementsNumber</code> here. */
     private final int elementsNumber;
@@ -92,9 +90,10 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         this.valDescTableName = valDescTableName;
         this.thematicIdx = thematicIdx;
         this.narrTable = narrTable;
-        attribute = AttributeTypeFactory.newAttributeType(name,
-                getColumnClass(), true, getColumnSize());
+        attribute = new AttributeTypeBuilder().length(getColumnSize())
+            .binding( getColumnClass() ).nillable( true ).buildDescriptor(name);
     }
+    
     /**
      * Retrieves the class for the column,
      * based on a char value.
@@ -151,20 +150,6 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         return columnClass;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#createDefaultValue()
-     */
-    public Object createDefaultValue() {
-        return attribute.createDefaultValue();
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#duplicate(java.lang.Object)
-     */
-    public Object duplicate(Object src) throws IllegalAttributeException {
-        return attribute.duplicate(src);
-    }
-
     /**
      * Gets the size of the column in bytes
      * @return the size
@@ -207,13 +192,6 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public Class getBinding() {
-    	return attribute.getBinding();
-    }
-
-    /**
      * Gets the value of valDescTableName
      *
      * @return the value of valDescTableName
@@ -244,20 +222,6 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
         return attribute.isNillable();
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#parse(java.lang.Object)
-     */
-    public Object parse(Object value) throws IllegalArgumentException {
-        return attribute.parse(value);
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.feature.AttributeType#validate(java.lang.Object)
-     */
-    public void validate(Object obj) throws IllegalArgumentException {
-        attribute.validate(obj);
-    }
-
     /**
      * Returns the typeChar field
      *
@@ -280,11 +244,11 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
      * or null if none exists.
      * @return The <code>GeometryAttributeType</code> value
      */
-    public GeometryAttributeType getGeometryAttributeType() {
-        GeometryAttributeType result = null;
+    public GeometryDescriptor getGeometryAttributeType() {
+        GeometryDescriptor result = null;
 
         if (isGeometry()) {
-            result = (GeometryAttributeType) attribute;
+            result = (GeometryDescriptor) attribute;
         }
 
         return result;
@@ -295,12 +259,7 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
     public boolean isAttemptLookup() {
         return attemptLookup;
     }
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.AttributeType#getRestriction()
-	 */
-	public Filter getRestriction() {
-		return attribute.getRestriction();
-	}
+	
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.AttributeType#getMinOccurs()
 	 */

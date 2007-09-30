@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -34,7 +34,7 @@ import org.geotools.feature.IllegalAttributeException;
  */
 public class VPFFileFeatureReader implements FeatureReader {
     private final VPFFile featureType;
-    private Feature currentFeature;
+    private SimpleFeature currentFeature;
 
     public VPFFileFeatureReader(VPFFile type) {
         featureType = type;
@@ -46,14 +46,14 @@ public class VPFFileFeatureReader implements FeatureReader {
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         if (!hasNext()) {
             throw new NoSuchElementException();

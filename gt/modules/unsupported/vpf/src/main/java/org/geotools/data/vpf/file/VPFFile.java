@@ -38,19 +38,20 @@ import org.geotools.data.vpf.io.VPFInputStream;
 import org.geotools.data.vpf.io.VariableIndexInputStream;
 import org.geotools.data.vpf.io.VariableIndexRow;
 import org.geotools.data.vpf.util.DataUtils;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.AnnotationFeatureType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
@@ -72,7 +73,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  * @source $URL$
  */
-public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition {
+public class VPFFile implements SimpleFeatureType, FileConstants, DataTypesDefinition {
     //    private final TableInputStream stream;
     private static String ACCESS_MODE = "r";
 
@@ -103,7 +104,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     /**
      * The contained Feature Type
      */
-    private final FeatureType featureType;
+    private final SimpleFeatureType featureType;
 
     /**
      * Keeps value of length of ASCII header
@@ -141,7 +142,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         inputStream = new RandomAccessFile(cPathName, ACCESS_MODE);
         readHeader();
 
-        GeometryAttributeType gat = null;
+        GeometryDescriptor gat = null;
         VPFColumn geometryColumn = null;
 
         Iterator iter = columns.iterator();
@@ -155,53 +156,19 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             }
         }
 
-        Vector superTypes = new Vector();
+        SimpleFeatureType superType = null;
         // if it's a text geometry feature type add annotation as a super type
         if (pathName.endsWith(TEXT_PRIMITIVE)) {
-            superTypes.add( AnnotationFeatureType.ANNOTATION );
+            superType =  AnnotationFeatureType.ANNOTATION;
         }
-          
-        featureType = new DefaultFeatureType(cPathName, "VPF", columns,
-                superTypes, gat);
-    }
-
-    /**
-     * Create a new feature from the provided attributes It is unclear why one
-     * would want to use this method.
-     *
-     * @param attributes the attributes to used
-     *
-     * @return the created feature
-     *
-     * @throws IllegalAttributeException if any of the attributes is invalid
-     */
-    public Feature create(Object[] attributes) throws IllegalAttributeException {
-        return featureType.create(attributes);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureFactory#create(java.lang.Object[], java.lang.String)
-     */
-    public Feature create(Object[] attributes, String featureID)
-        throws IllegalAttributeException {
-        return featureType.create(attributes, featureID);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#duplicate(org.geotools.feature.Feature)
-     */
-    public Feature duplicate(Feature feature) throws IllegalAttributeException {
-        return featureType.duplicate(feature);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#find(org.geotools.feature.AttributeType)
-     */
-    public int find(AttributeType type) {
-        return featureType.find(type);
+         
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName( cPathName );
+        b.setNamespaceURI("VPF");
+        b.setSuperType(superType);
+        b.addAll( columns );
+        b.setDefaultGeometry(gat.getLocalName());
+        featureType = b.buildFeatureType();
     }
 
     /**
@@ -216,42 +183,10 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 
     /*
      *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAncestors()
-     */
-    public FeatureType[] getAncestors() {
-        return featureType.getAncestors();
-    }
-
-    /*
-     *  (non-Javadoc)
      * @see org.geotools.feature.FeatureType#getAttributeCount()
      */
     public int getAttributeCount() {
         return featureType.getAttributeCount();
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAttributeType(int)
-     */
-    public AttributeType getAttributeType(int position) {
-        return featureType.getAttributeType(position);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAttributeType(java.lang.String)
-     */
-    public AttributeType getAttributeType(String xPath) {
-        return featureType.getAttributeType(xPath);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getAttributeTypes()
-     */
-    public AttributeType[] getAttributeTypes() {
-        return featureType.getAttributeTypes();
     }
 
     /**
@@ -313,22 +248,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         return result;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#getNamespace()
-     */
-    public URI getNamespace() {
-        return featureType.getNamespace();
-    }
-
-//    /*
-//     *  (non-Javadoc)
-//     * @see org.geotools.feature.FeatureType#getNamespace()
-//     */
-//    public URI getNamespaceURI() {
-//        return featureType.getNamespaceURI();
-//    }
-
     /**
      * Gets the value of narrativeTable variable file name.
      *
@@ -356,30 +275,15 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected int getRecordSize() {
         int size = 0;
-//        int currentSize;
 
         Iterator iter = columns.iterator();
 
+        
         while (iter.hasNext()) {
             VPFColumn column = (VPFColumn) iter.next();
-//            currentSize = column.getFieldLength();
-            if (column.getRestriction() == Filter.INCLUDE || column.getRestriction() == null) {
-//            if (currentSize < 0) {
-                return -1;
-            } else {
-            	int currentSize = 0;
-            	if(column.getRestriction() instanceof CompareFilter){
-            		try{
-            		CompareFilter cf = (CompareFilter)column.getRestriction();
-            		if(cf.getLeftValue() instanceof LengthFunction){
-            			currentSize = Integer.parseInt(((LiteralExpression)cf.getRightValue()).getLiteral().toString());
-            		}else{
-                		if(cf.getRightValue() instanceof LengthFunction)
-                			currentSize = Integer.parseInt(((LiteralExpression)cf.getLeftValue()).getLiteral().toString());
-            		}
-            		}catch(Throwable t){}
-            	}
-                size += currentSize;
+            int length = FeatureTypes.getFieldLength(column);
+            if ( length > -1 ) {
+                size += length;    
             }
         }
 
@@ -397,9 +301,9 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      * @throws IllegalAttributeException The feature can not be created due to
      *         illegal attributes in the source file
      */
-    public Feature getRowFromId(String idName, int id)
+    public SimpleFeature getRowFromId(String idName, int id)
         throws IllegalAttributeException {
-        Feature result = null;
+        SimpleFeature result = null;
 
         try {
             // This speeds things up mightily
@@ -438,13 +342,13 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      *
      * @return a TableRow that matches the other parameters
      */
-    private Feature getRowFromIterator(Iterator iter, String idName, int id) {
-        Feature result = null;
-        Feature currentFeature;
+    private SimpleFeature getRowFromIterator(Iterator iter, String idName, int id) {
+        SimpleFeature result = null;
+        SimpleFeature currentFeature;
         int value = -1;
 
         while (iter.hasNext()) {
-            currentFeature = (Feature) iter.next();
+            currentFeature = (SimpleFeature) iter.next();
             try {
                 value = Integer.parseInt(currentFeature.getAttribute(idName).toString());
 
@@ -468,14 +372,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     public String getTypeName() {
         return featureType.getTypeName();
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#hasAttributeType(java.lang.String)
-     */
-    public boolean hasAttributeType(String xPath) {
-        return featureType.hasAttributeType(xPath);
     }
 
     /**
@@ -511,22 +407,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         return featureType.isAbstract();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#isDescendedFrom(org.geotools.feature.FeatureType)
-     */
-    public boolean isDescendedFrom(FeatureType type) {
-        return featureType.isDescendedFrom(type);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.feature.FeatureType#isDescendedFrom(java.lang.String, java.lang.String)
-     */
-    public boolean isDescendedFrom(URI nsURI, String typeName) {
-        return featureType.isDescendedFrom(nsURI, typeName);
-    }
-
     /**
      * Generates a list containing all of the features in the file
      *
@@ -545,7 +425,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         }
 
         try {
-            Feature row = readFeature();
+            SimpleFeature row = readFeature();
 
             while (row != null) {
                 list.add(row);
@@ -705,8 +585,8 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      * @throws IllegalAttributeException if any of the attributes retrieved are
      *         illegal
      */
-    public Feature readFeature() throws IOException, IllegalAttributeException {
-        Feature result = null;
+    public SimpleFeature readFeature() throws IOException, IllegalAttributeException {
+        SimpleFeature result = null;
         Iterator iter = columns.iterator();
         VPFColumn column;
         boolean textPrimitive = pathName.endsWith(TEXT_PRIMITIVE);
@@ -718,10 +598,11 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             for (int inx = 0; inx < columns.size(); inx++) {
                 column = (VPFColumn) columns.get(inx);
 
-                if (column.getRestriction() == Filter.INCLUDE || column.getRestriction() == null) {
-//                    if (column.getFieldLength() < 0) {
+                if ( column.getType().getRestrictions().isEmpty() || 
+                        column.getType().getRestrictions().contains( org.opengis.filter.Filter.INCLUDE )) {
                     values[inx] = readVariableSizeData(column.getTypeChar());
-                } else {
+                }
+                else {
                     values[inx] = readFixedSizeData(column.getTypeChar(),
                             column.getElementsNumber());
                 }
@@ -730,7 +611,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
                 values[size-1] = "nam";
             }
 
-            result = featureType.create(values);
+            result = SimpleFeatureBuilder.build( featureType, values, null);
         } catch (EOFException exp) {
             // Should we be throwing an exception instead of eating it?
             exp.printStackTrace();
@@ -1078,13 +959,6 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         return result;
     }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
-	 */
-	public int find(String attName) {
-        return featureType.find(attName);
-	}
-
 	public List<AttributeDescriptor> getAttributes() {
 	    return featureType.getAttributes();
 	}
@@ -1130,7 +1004,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 		return featureType.getCRS();
 	}
 
-	public GeometryAttributeType getDefaultGeometry() {
+	public GeometryDescriptor getDefaultGeometry() {
 		return featureType.getDefaultGeometry();
 	}
 

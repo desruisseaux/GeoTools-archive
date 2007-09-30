@@ -25,8 +25,9 @@ import org.geotools.data.vpf.VPFFeatureType;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -40,7 +41,7 @@ public class LineGeometryFactory extends VPFGeometryFactory implements FileConst
     /* (non-Javadoc)
      * @see com.ionicsoft.wfs.jdbc.geojdbc.module.vpf.VPFGeometryFactory#createGeometry(com.ionicsoft.wfs.jdbc.geojdbc.module.vpf.VPFIterator)
      */
-    public void createGeometry(VPFFeatureType featureType, Feature values) throws SQLException, IOException, IllegalAttributeException{
+    public void createGeometry(VPFFeatureType featureType, SimpleFeature values) throws SQLException, IOException, IllegalAttributeException{
         Geometry result = null;
         int edgeId = Integer.parseInt(values.getAttribute("edg_id").toString());
 //        VPFFeatureType featureType = (VPFFeatureType) values.getFeatureType();
@@ -57,7 +58,7 @@ public class LineGeometryFactory extends VPFGeometryFactory implements FileConst
 
         String edgeTableName = tileDirectory.concat(File.separator).concat(EDGE_PRIMITIVE);
         VPFFile edgeFile = VPFFileFactory.getInstance().getFile(edgeTableName);
-        Feature row = edgeFile.getRowFromId("id", edgeId);
+        SimpleFeature row = edgeFile.getRowFromId("id", edgeId);
         result = (Geometry)row.getAttribute("coordinates");
         values.setDefaultGeometry(result);
     }
