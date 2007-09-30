@@ -44,11 +44,12 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
 //import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.PropertyIsEqualTo;
 
 import org.opengis.filter.expression.Expression;
@@ -84,7 +85,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
     //private FeatureCollection collection = FeatureCollections.newCollection();
-    private FeatureType schema;
+    private SimpleFeatureType schema;
     //private int srid = -1;
     private JDBCConnectionFactory connFactory;
     private LocationsXYDataStore dstore;
@@ -247,7 +248,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     //todo assert on schema.
     public void testFeatureTypes() throws Exception {
         String[] types = dstore.getTypeNames();
-        FeatureType schema1 = dstore.getSchema(types[0]);
+        SimpleFeatureType schema1 = dstore.getSchema(types[0]);
 
         //FeatureType schema2 = dstore.getSchema(types[1]);
         //need to figure out spatial_ref_system and geometry_columns
@@ -304,7 +305,7 @@ public class LocationsXYDataStoreTest extends TestCase {
 
         FeatureReader reader =
             dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-	Feature feature = reader.next();
+	SimpleFeature feature = reader.next();
     reader.close();
     
 	LOGGER.info("feature is: " + feature);

@@ -19,13 +19,11 @@ package org.geotools.data.geometryless;
 import java.util.logging.Logger;
 
 import org.geotools.data.geometryless.filter.SQLEncoderLocationsXY;
-// import org.geotools.data.jdbc.DefaultSQLBuilder;
-import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.sql.BypassSqlFeatureTypeHandler;
 import org.geotools.data.sql.BypassSqlSQLBuilder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 
 // import org.geotools.filter.SQLEncoder;
@@ -78,7 +76,7 @@ public class LocationsXYSQLBuilder extends BypassSqlSQLBuilder {
      * @param mapper
      * @param attributes
      */
-    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeType[] attributes) {
+    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeDescriptor[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
             LOGGER.finest(mapper.getColumnName(i));
             sql.append(mapper.getColumnName(i));
@@ -92,10 +90,10 @@ public class LocationsXYSQLBuilder extends BypassSqlSQLBuilder {
             Name colName = attributes[i].getName();
 
             LOGGER.finest(attributes[i].getName() + " isGeom: "
-                    + (attributes[i] instanceof GeometryAttributeType));
+                    + (attributes[i] instanceof GeometryDescriptor));
 
             // Here we want the x and y columns to be requested.
-            if (attributes[i] instanceof GeometryAttributeType) {
+            if (attributes[i] instanceof GeometryDescriptor) {
 
                 sql.append(xCoordColumnName + ", " + yCoordColumnName);
 
@@ -111,7 +109,7 @@ public class LocationsXYSQLBuilder extends BypassSqlSQLBuilder {
         }
     }
 
-    public void sqlGeometryColumn(StringBuffer sql, AttributeType geomAttribute) {
+    public void sqlGeometryColumn(StringBuffer sql, AttributeDescriptor geomAttribute) {
         if (null == super.fieldAliases) {
             sql.append(xCoordColumnName + ", " + yCoordColumnName);
         } else {

@@ -49,10 +49,11 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.UnaliasSQLEncoder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 // import org.geotools.filter.SQLEncoder;
 // import org.geotools.data.geometryless.filter.GeometrylessSQLEncoder;
@@ -253,7 +254,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      *             if a type is present that is not present in the
      *             TYPE_MAPPINGS.
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
         final int COLUMN_NAME = 4;
         final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
@@ -279,7 +280,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) {
         return new WKTAttributeIO();
     }
 
@@ -308,7 +309,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
         BypassSqlFeatureTypeHandler ftHandler = (BypassSqlFeatureTypeHandler) super.typeHandler;
         FilterToSQL encoder = new UnaliasSQLEncoder();
-        FeatureType schema = getSchema( typeName );
+        SimpleFeatureType schema = getSchema( typeName );
 		encoder.setFeatureType( schema );
         encoder.setFIDMapper(getFIDMapper(typeName));
         SQLBuilder sqlBuilder;
@@ -389,7 +390,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
 
             // TODO: set a more appropiate fid mapper
             FIDMapper fidMapper = new NullFIDMapper();
-            FeatureType viewType = buildSchema(typeName, rsmd);
+            SimpleFeatureType viewType = buildSchema(typeName, rsmd);
             BypassSqlFeatureTypeHandler th = (BypassSqlFeatureTypeHandler) typeHandler;
             th.registerView(viewType, sqlQuery, fidMapper);
         } catch (SQLException e) {
@@ -415,9 +416,9 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
      * @throws IOException
      * @throws SQLException
      */
-    private FeatureType buildSchema(String typeName, ResultSetMetaData rsmd) throws IOException,
+    private SimpleFeatureType buildSchema(String typeName, ResultSetMetaData rsmd) throws IOException,
             SQLException {
-        FeatureType viewType;
+        SimpleFeatureType viewType;
 
         final int NAME_COLUMN = 4;
         final int TYPE_NAME = 6;
@@ -454,7 +455,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
 
                     // AttributeDescriptor attribute =
                     // buildAttributeDescriptor(tableInfo);
-                    AttributeType attribute = buildAttributeType(tableInfo);
+                    AttributeDescriptor attribute = buildAttributeType(tableInfo);
 
                     if (attribute != null) {
                         attributeDescriptors.add(attribute);
@@ -483,11 +484,15 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implemen
             // viewType = (FeatureType)tf.createFeatureType(ftName, schema,
             // null);
 
-            AttributeType[] types = (AttributeType[]) attributeDescriptors
-                    .toArray(new AttributeType[0]);
-            viewType = FeatureTypeFactory.newFeatureType(types, typeName, namespace, false, null,
-                    null);
-
+            AttributeDescriptor[] types = (AttributeDescriptor[]) attributeDescriptors
+                    .toArray(new AttributeDescriptor[0]);
+            
+            SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+            tb.setName( typeName );
+            tb.setNamespaceURI( namespace );
+            tb.addAll( types );
+            
+            viewType = tb.buildFeatureType();
             return viewType;
 
         } catch (Exception sqlException) {

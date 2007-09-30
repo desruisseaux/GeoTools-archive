@@ -29,20 +29,16 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.geometryless.attributeio.PointXYAttributeIO;
-import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.geometryless.filter.SQLEncoderLocationsXY;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.sql.BypassSqlFeatureTypeHandler;
 import org.geotools.data.sql.BypassSqlSQLBuilder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.filter.UnaliasSQLEncoder;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
-// import org.geotools.data.jdbc.FilterToSQL;
-// import org.geotools.filter.SQLEncoder;
-import org.geotools.data.geometryless.filter.SQLEncoderLocationsXY;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -162,7 +158,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
      *             if a type is present that is not present in the
      *             TYPE_MAPPINGS.
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
         final int COLUMN_NAME = 4;
         final int DATA_TYPE = 5;
         final int TYPE_NAME = 6;
@@ -183,7 +179,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
             if (colName.equals(XCoordColumnName)) {
                 // do type checking here, during config, not during reading.
                 if (Number.class.isAssignableFrom(type)) {
-                    return AttributeTypeFactory.newAttributeType(geomName, Point.class);
+                    return new AttributeTypeBuilder().binding(Point.class).buildDescriptor(geomName);
                 } else {
                     String excMesg = "Specified X column of " + colName + " of type: " + type
                             + ", can not be used as x point";
@@ -237,7 +233,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) {
         return new PointXYAttributeIO();
     }
 

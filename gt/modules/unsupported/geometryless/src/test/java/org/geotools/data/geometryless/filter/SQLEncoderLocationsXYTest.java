@@ -24,16 +24,15 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 //import com.vividsolutions.jts.geom.Envelope;
@@ -52,18 +51,16 @@ public class SQLEncoderLocationsXYTest extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .newInstance();
 
  //  private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
    private FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
    
  
     /** Schema on which to preform tests */
-    protected static FeatureType testSchema = null;
+    protected static SimpleFeatureType testSchema = null;
 
     /** Schema on which to preform tests */
-    protected static Feature testFeature = null;
+    protected static SimpleFeature testFeature = null;
 
     /** Test suite for this test case */
     TestSuite suite = null;
@@ -101,38 +98,22 @@ public class SQLEncoderLocationsXYTest extends TestCase {
         // Create the schema attributes
         System.out.println("creating flat feature...");
 
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
-                LineString.class);
-        System.out.println("created geometry attribute");
-
-        AttributeType booleanAttribute = AttributeTypeFactory.newAttributeType("testBoolean",
-                Boolean.class);
-
-        AttributeType charAttribute = AttributeTypeFactory.newAttributeType("testCharacter",
-                Character.class);
-        AttributeType byteAttribute = AttributeTypeFactory.newAttributeType("testByte",
-                Byte.class);
-        AttributeType shortAttribute = AttributeTypeFactory.newAttributeType("testShort",
-                Short.class);
-        AttributeType intAttribute = AttributeTypeFactory.newAttributeType("testInteger",
-                Integer.class);
-        AttributeType longAttribute = AttributeTypeFactory.newAttributeType("testLong",
-                Long.class);
-        AttributeType floatAttribute = AttributeTypeFactory.newAttributeType("testFloat",
-                Float.class);
-        AttributeType doubleAttribute = AttributeTypeFactory.newAttributeType("testDouble",
-                Double.class);
-        AttributeType stringAttribute = AttributeTypeFactory.newAttributeType("testString",
-                String.class);
-
-        AttributeType[] types = {
-                geometryAttribute, booleanAttribute, charAttribute,
-                byteAttribute, shortAttribute, intAttribute, longAttribute,
-                floatAttribute, doubleAttribute, stringAttribute
-            };
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( "testSchema" );
+        
+        tb.add("testGeometry", LineString.class);
+        tb.add("testBoolean", Boolean.class);
+        tb.add("testCharacter", Character.class);
+        tb.add("testByte", Byte.class);
+        tb.add("testShort", Short.class);
+        tb.add("testInteger", Integer.class);
+        tb.add("testLong", Long.class);
+        tb.add("testFloat", Float.class);
+        tb.add("testDouble", Double.class);
+        tb.add("testString", String.class);
 
         // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types, "testSchema");
+        testSchema = tb.buildFeatureType();
 
         GeometryFactory geomFac = new GeometryFactory();
 
@@ -156,7 +137,7 @@ public class SQLEncoderLocationsXYTest extends TestCase {
         attributes[9] = "test string data";
 
         // Creates the feature itself
-        testFeature = testSchema.create(attributes);
+        testFeature = SimpleFeatureBuilder.build(testSchema, attributes, null);
         System.out.println("...flat feature created");
 
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);

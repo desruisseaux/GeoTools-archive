@@ -29,11 +29,11 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.DataStoreFactorySpi.Param;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -158,9 +158,9 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         assertTrue(ds instanceof LocationsXYDataStore);
         FeatureSource fs = ds.getFeatureSource("ViewType1");
         assertNotNull(fs);
-        FeatureType schema = fs.getSchema();
+        SimpleFeatureType schema = fs.getSchema();
         assertNotNull(schema);
-        GeometryAttributeType defaultGeometry = (GeometryAttributeType) schema.getDefaultGeometry();
+        GeometryDescriptor defaultGeometry = (GeometryDescriptor) schema.getDefaultGeometry();
         assertNotNull("No default geometry: " + schema.toString(), defaultGeometry);
         assertEquals("location", defaultGeometry.getName().getLocalPart());
         
@@ -168,7 +168,7 @@ public class JDBCDataStoreFactoryTest extends TestCase {
         assertNotNull(features);
         FeatureIterator iterator = features.features();
         while(iterator.hasNext()){
-            Feature next = iterator.next();
+            SimpleFeature next = iterator.next();
             assertNotNull(next);
             Object location = next.getAttribute("location");
             assertNotNull(location);
@@ -242,8 +242,8 @@ public class JDBCDataStoreFactoryTest extends TestCase {
 
         DataStore dstore = dsFactory.createDataStore(params);
 
-        FeatureType ft1 = dstore.getSchema(typeName1);
-        FeatureType ft2 = dstore.getSchema(typeName2);
+        SimpleFeatureType ft1 = dstore.getSchema(typeName1);
+        SimpleFeatureType ft2 = dstore.getSchema(typeName2);
         assertNotNull(ft1);
         assertNotNull(ft2);
 

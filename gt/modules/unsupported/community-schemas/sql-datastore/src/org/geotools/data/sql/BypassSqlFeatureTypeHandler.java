@@ -14,8 +14,7 @@ import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class BypassSqlFeatureTypeHandler extends FeatureTypeHandler {
 
@@ -30,7 +29,7 @@ public class BypassSqlFeatureTypeHandler extends FeatureTypeHandler {
 		this.bypassSqlTypes = new HashMap();
 	}
 	
-	public void registerView(FeatureType viewType, String sqlQuery, FIDMapper fidMapper){
+	public void registerView(SimpleFeatureType viewType, String sqlQuery, FIDMapper fidMapper){
 		String typeName = viewType.getTypeName();
 		sqlQuery = sqlQuery.replaceAll("\n|\r", "");
 		sqlQuery = sqlQuery.replaceAll("\t", " ");

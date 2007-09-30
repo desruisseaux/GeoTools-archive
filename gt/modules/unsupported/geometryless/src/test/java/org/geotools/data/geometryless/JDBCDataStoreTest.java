@@ -44,9 +44,10 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
 //import org.geotools.filter.CompareFilter;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.Filter;
@@ -76,7 +77,7 @@ public class JDBCDataStoreTest extends TestCase {
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
     //private FeatureCollection collection = FeatureCollections.newCollection();
-    private FeatureType schema;
+    private SimpleFeatureType schema;
     //private int srid = -1;
     private JDBCConnectionFactory connFactory;
     private JDBCDataStore dstore;
@@ -245,7 +246,7 @@ public class JDBCDataStoreTest extends TestCase {
     //todo assert on schema.
     public void testFeatureTypes() throws Exception {
         String[] types = dstore.getTypeNames();
-        FeatureType schema1 = dstore.getSchema(types[0]);
+        SimpleFeatureType schema1 = dstore.getSchema(types[0]);
 
         //FeatureType schema2 = dstore.getSchema(types[1]);
         //need to figure out spatial_ref_system and geometry_columns

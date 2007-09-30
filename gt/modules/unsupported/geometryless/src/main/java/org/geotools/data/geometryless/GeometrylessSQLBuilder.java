@@ -18,13 +18,11 @@ package org.geotools.data.geometryless;
 
 import java.util.logging.Logger;
 
-// import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.GeometryAttributeType;
-// import org.geotools.filter.SQLEncoder;
-import org.geotools.data.jdbc.FilterToSQL;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 
 /**
@@ -66,7 +64,7 @@ public class GeometrylessSQLBuilder extends GeoAPISQLBuilder {
      * @param fidColumnName
      * @param attributes
      */
-    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeType[] attributes) {
+    public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeDescriptor[] attributes) {
    
     	
     	
@@ -82,9 +80,9 @@ public class GeometrylessSQLBuilder extends GeoAPISQLBuilder {
             Name colName = attributes[i].getName();
 
             LOGGER.finest(attributes[i].getName() + " isGeom: "
-                + (attributes[i] instanceof GeometryAttributeType) );
+                + (attributes[i] instanceof GeometryDescriptor) );
 
-            if (attributes[i] instanceof GeometryAttributeType) {
+            if (attributes[i] instanceof GeometryDescriptor) {
                 sql.append("AsText(" + attributes[i].getName() + ") AS " + attributes[i].getName());
             } else {
                 sql.append(colName.getLocalPart());

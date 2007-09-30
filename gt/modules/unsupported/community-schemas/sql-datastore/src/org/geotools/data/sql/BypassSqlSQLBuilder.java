@@ -9,11 +9,12 @@ import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
+
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.UnaliasSQLEncoder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 
@@ -59,7 +60,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 	 *             class
 	 */
 	public String buildSQLQuery(String typeName, FIDMapper mapper,
-			AttributeType[] attrTypes, org.opengis.filter.Filter filter)
+			AttributeDescriptor[] attrTypes, org.opengis.filter.Filter filter)
 			throws SQLEncoderException {
 		String sqlStmt;
 
@@ -71,7 +72,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 			UnaliasSQLEncoder encoder = (UnaliasSQLEncoder) super.encoder;
 			encoder.setAliases(fieldAliases);
 			
-			FeatureType fType;
+			SimpleFeatureType fType;
 			try {
 				fType = ftHandler.getFeatureTypeInfo(typeName).getSchema();
 			} catch (Exception e) {
@@ -110,7 +111,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 	}
 
 	public void sqlColumns(final StringBuffer sql, final FIDMapper mapper,
-			final AttributeType[] attributes, final Map aliases) {
+			final AttributeDescriptor[] attributes, final Map aliases) {
 
 		String sqlExpression;
 		String alias;
@@ -129,7 +130,7 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 			if(!alias.equals(sqlExpression)){
 				fieldName += " AS " + alias;
 			}
-			if (attributes[i] instanceof GeometryAttributeType) {
+			if (attributes[i] instanceof GeometryDescriptor) {
 				sqlGeometryColumn(sql, attributes[i]);
 			} else {
 				sql.append(encoder.escapeName(fieldName));
@@ -185,9 +186,9 @@ public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 	 * @return
 	 * @throws SQLEncoderException
 	 */
-	private String getSelect(String sqlQueryDefinition, FeatureType fType)
+	private String getSelect(String sqlQueryDefinition, SimpleFeatureType fType)
 			throws SQLEncoderException {
-		AttributeType firstAtt = fType.getAttributeTypes()[0];
+		AttributeDescriptor firstAtt = fType.getAttribute(0);
 		String firstAttName = firstAtt.getLocalName().toLowerCase();
 
 		int index = sqlQueryDefinition.indexOf(firstAttName);
