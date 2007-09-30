@@ -434,6 +434,10 @@ public class TransactionStateDiff implements State {
             return null;
         }
 
+        public Collection<Property> getProperties() {
+            return null;
+        }
+        
         public Collection<Property> getProperties(String name) {
             return null;
         }

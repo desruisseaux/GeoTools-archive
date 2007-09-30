@@ -138,7 +138,7 @@ public class FeatureCollectionIteration {
             if (FeatureCollection.class.isAssignableFrom(type.getType().getBinding())) {
                 walker((FeatureCollection) feature.getAttribute(i));
 //            } else if (type instanceof FeatureType) {
-            } else if (type instanceof FeatureAttributeType ) {
+            } else if (SimpleFeature.class.isAssignableFrom(type.getType().getBinding())) {
                 // recurse if attribute type is another feature
                 walker((SimpleFeature) feature.getAttribute(i));
             } else {

@@ -217,6 +217,10 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
     public void setDefaultGeometryProperty(GeometryAttribute geometryAttribute) {
     }
 
+    public Collection<Property> getProperties() {
+        return null;
+    }
+    
     public Collection<Property> getProperties(Name name) {
         return null;
     }

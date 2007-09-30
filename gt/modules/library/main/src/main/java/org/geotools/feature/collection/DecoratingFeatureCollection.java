@@ -138,6 +138,10 @@ public class DecoratingFeatureCollection implements FeatureCollection {
     public Name getName() {
         return delegate.getName();
     }
+    
+    public Collection<Property> getProperties() {
+        return delegate.getProperties();
+    }
 
     public Collection<Property> getProperties(Name name) {
         return delegate.getProperties(name);

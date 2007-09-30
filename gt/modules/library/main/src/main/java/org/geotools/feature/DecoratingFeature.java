@@ -81,6 +81,9 @@ public class DecoratingFeature implements SimpleFeature {
         return delegate.getName();
     }
 
+    public Collection<Property> getProperties() {
+        return delegate.getProperties();
+    }
 
     public Collection<Property> getProperties(Name arg0) {
         return delegate.getProperties(arg0);
