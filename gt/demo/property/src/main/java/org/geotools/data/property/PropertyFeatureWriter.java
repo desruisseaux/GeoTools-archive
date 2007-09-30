@@ -19,19 +19,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class PropertyFeatureWriter implements FeatureWriter {
     PropertyDataStore store;
@@ -42,8 +40,8 @@ public class PropertyFeatureWriter implements FeatureWriter {
     File write;
     PropertyAttributeWriter writer;
     
-    Feature origional = null;
-    Feature live = null;    
+    SimpleFeature origional = null;
+    SimpleFeature live = null;    
     public PropertyFeatureWriter( PropertyDataStore dataStore, String typeName ) throws IOException {
         store = dataStore;
         File dir = store.directory;        
@@ -53,7 +51,7 @@ public class PropertyFeatureWriter implements FeatureWriter {
         reader = new PropertyAttributeReader( read );
         writer = new PropertyAttributeWriter( write, reader.type );
     }    
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return reader.type;
     }
     public boolean hasNext() throws IOException {
@@ -70,19 +68,19 @@ public class PropertyFeatureWriter implements FeatureWriter {
         }
         return reader.hasNext();
     }
-    private void writeImplementation( Feature f ) throws IOException{
+    private void writeImplementation( SimpleFeature f ) throws IOException{
         writer.next();
         writer.writeFeatureID( f.getID() );        
-        for( int i=0; i<f.getNumberOfAttributes(); i++){
+        for( int i=0; i<f.getAttributeCount(); i++){
             writer.write( i, f.getAttribute( i ));
         }   
     }
-    public Feature next() throws IOException {
+    public SimpleFeature next() throws IOException {
         if( writer == null ) {
             throw new IOException( "Writer has been closed" );
         }
         String fid = null;
-        FeatureType type = reader.type;                                
+        SimpleFeatureType type = reader.type;                                
         try {
             if( hasNext() ){
                 reader.next(); // grab next line
@@ -93,8 +91,8 @@ public class PropertyFeatureWriter implements FeatureWriter {
                     values[i]=reader.read( i );
                 }
                             
-                origional = type.create( values, fid );
-                live = type.duplicate( origional );
+                origional = SimpleFeatureBuilder.build(type, values, fid );
+                live = SimpleFeatureBuilder.copy(origional);
                 return live;
             }
             else {
@@ -102,7 +100,7 @@ public class PropertyFeatureWriter implements FeatureWriter {
                 Object values[] = DataUtilities.defaultValues( type );
 
                 origional = null;                                            
-                live = type.create( values, fid );
+                live = SimpleFeatureBuilder.build(type, values, fid);
                 return live;    
             }                    
         } catch (IllegalAttributeException e) {
@@ -120,15 +118,15 @@ public class PropertyFeatureWriter implements FeatureWriter {
         else {
             writeImplementation( live );
             if( origional != null){
-            	Envelope bounds = new Envelope();
-                bounds.expandToInclude(live.getBounds());
-                bounds.expandToInclude(origional.getBounds());
+            	ReferencedEnvelope bounds = new ReferencedEnvelope();
+                bounds.include(live.getBounds());
+                bounds.include(origional.getBounds());
                 store.listenerManager.fireFeaturesChanged(live.getFeatureType().getTypeName(), Transaction.AUTO_COMMIT,
                     bounds, false);                               
             }
             else {
                 store.listenerManager.fireFeaturesAdded(live.getFeatureType().getTypeName(), Transaction.AUTO_COMMIT,
-                    live.getBounds(), false);
+                    ReferencedEnvelope.reference(live.getBounds()), false);
             }            
         }
         origional = null;
@@ -140,7 +138,7 @@ public class PropertyFeatureWriter implements FeatureWriter {
         }
         if( origional != null ){
             store.listenerManager.fireFeaturesRemoved(live.getFeatureType().getTypeName(), Transaction.AUTO_COMMIT,
-                    origional.getBounds(), false);
+                    ReferencedEnvelope.reference(origional.getBounds()), false);
         }                     
         origional = null; 
         live = null; // prevent live and remove from being written out       

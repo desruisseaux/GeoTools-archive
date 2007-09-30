@@ -22,8 +22,8 @@ import java.io.IOException;
 
 import org.geotools.data.AttributeWriter;
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 /**
@@ -49,8 +49,8 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class PropertyAttributeWriter implements AttributeWriter {
     BufferedWriter writer;    
-    FeatureType type;    
-    public PropertyAttributeWriter( File file, FeatureType featureType ) throws IOException {
+    SimpleFeatureType type;    
+    public PropertyAttributeWriter( File file, SimpleFeatureType featureType ) throws IOException {
         writer = new BufferedWriter( new FileWriter( file ) );
         type = featureType;                
         writer.write( "_=" );
@@ -59,8 +59,8 @@ public class PropertyAttributeWriter implements AttributeWriter {
     public int getAttributeCount() {
         return type.getAttributeCount();
     }
-    public AttributeType getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
-        return type.getAttributeType(index);
+    public AttributeDescriptor getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
+        return type.getAttribute(index);
     }
     public boolean hasNext() throws IOException {
         return false;

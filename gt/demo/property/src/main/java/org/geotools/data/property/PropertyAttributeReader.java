@@ -24,13 +24,11 @@ import java.util.NoSuchElementException;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
@@ -256,7 +254,7 @@ public class PropertyAttributeReader implements AttributeReader {
                 "No content available - did you remeber to call next?");
         }
 
-        AttributeType attType = type.getAttributeType(index);
+        AttributeDescriptor attType = type.getAttribute(index);
 
         String stringValue = null;
 		try {
@@ -277,7 +275,7 @@ public class PropertyAttributeReader implements AttributeReader {
 		//parse the value
         Object value = null;
 
-        if (attType instanceof GeometryAttributeType) {
+        if (attType instanceof GeometryDescriptor) {
             try {
                 value = wktReader.read(stringValue);
             } catch (ParseException e) {
@@ -285,7 +283,7 @@ public class PropertyAttributeReader implements AttributeReader {
                     e);
             }
         } else {
-        	value = Converters.convert( stringValue, attType.getBinding() );
+        	value = Converters.convert( stringValue, attType.getType().getBinding() );
         }
 
         return value;

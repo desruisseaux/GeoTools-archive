@@ -15,14 +15,16 @@
  */
 package org.geotools.data.property;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -56,7 +58,7 @@ public class PropertyFeatureReader implements FeatureReader {
      *
      * @return DOCUMENT ME!
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return reader.type;
     }
 
@@ -69,11 +71,11 @@ public class PropertyFeatureReader implements FeatureReader {
      * @throws IllegalAttributeException DOCUMENT ME!
      * @throws NoSuchElementException DOCUMENT ME!
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         reader.next();
 
-        FeatureType type = reader.type;
+        SimpleFeatureType type = reader.type;
         String fid = reader.getFeatureID();
         Object[] values = new Object[reader.getAttributeCount()];
 
@@ -87,7 +89,7 @@ public class PropertyFeatureReader implements FeatureReader {
 			}
         }
 
-        return type.create(values, fid);
+        return SimpleFeatureBuilder.build(type, values, fid);
     }
 
     /**

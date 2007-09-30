@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;

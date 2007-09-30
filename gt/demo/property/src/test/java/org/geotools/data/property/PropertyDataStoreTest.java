@@ -35,12 +35,13 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
@@ -97,23 +98,23 @@ public class PropertyDataStoreTest extends TestCase {
     }
 
     public void testGetSchema() throws IOException {
-        FeatureType type = store.getSchema( "road" );
+        SimpleFeatureType type = store.getSchema( "road" );
         assertNotNull( type );
         assertEquals( "road", type.getTypeName() );
-        assertEquals( "propertyTestData", type.getNamespace().toString() );
+        assertEquals( "propertyTestData", type.getName().getNamespaceURI().toString() );
         assertEquals( 2, type.getAttributeCount() );
         
-        AttributeType id = type.getAttributeType(0);        
-        AttributeType name = type.getAttributeType(1);
+        AttributeDescriptor id = type.getAttribute(0);        
+        AttributeDescriptor name = type.getAttribute(1);
         
         assertEquals( "id", id.getLocalName() );
-        assertEquals( "class java.lang.Integer", id.getBinding().toString() );
+        assertEquals( "class java.lang.Integer", id.getType().getBinding().toString() );
                 
         assertEquals( "name", name.getLocalName() );
-        assertEquals( "class java.lang.String", name.getBinding().toString() );                        
+        assertEquals( "class java.lang.String", name.getType().getBinding().toString() );                        
     }
     public void testGetFeaturesFeatureTypeFilterTransaction1() throws Exception {
-        FeatureType type = store.getSchema( "road" );
+        SimpleFeatureType type = store.getSchema( "road" );
         Query roadQuery = new DefaultQuery("road");
         FeatureReader reader = store.getFeatureReader( roadQuery, Transaction.AUTO_COMMIT );
         int count = 0;
@@ -210,7 +211,7 @@ public class PropertyDataStoreTest extends TestCase {
             
         int count = 0;
         while( writer.hasNext() ){
-            Feature f = writer.next();
+            SimpleFeature f = writer.next();
             f.setAttribute(1,"name "+(count+1));
             writer.write();
             count++;
@@ -222,7 +223,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeFirstName() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        SimpleFeature f;
         f = writer.next();
         f.setAttribute(1,"changed");
         writer.write();
@@ -232,7 +233,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeLastName() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        SimpleFeature f;
         writer.next();
         writer.next();
         writer.next();        
@@ -245,7 +246,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeAppend() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        SimpleFeature f;
         writer.next();
         writer.next();
         writer.next();
@@ -282,7 +283,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeRemoveAppend() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        SimpleFeature f;
         writer.next();
         writer.next();
         writer.next();
@@ -300,7 +301,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeIgnoreAppend() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        SimpleFeature f;
         writer.next();
         writer.next();
         writer.next();
@@ -351,9 +352,9 @@ public class PropertyDataStoreTest extends TestCase {
     }
 
     public void testTransactionIndependence() throws Exception {
-        FeatureType ROAD = store.getSchema( "road" );
-        Feature chrisFeature =
-            ROAD.create( new Object[]{ new Integer(5), "chris"}, "fid5" );
+        SimpleFeatureType ROAD = store.getSchema( "road" );
+        SimpleFeature chrisFeature =
+            SimpleFeatureBuilder.build(ROAD, new Object[]{ new Integer(5), "chris"}, "fid5" );
         
         FeatureStore roadAuto = (FeatureStore) store.getFeatureSource("road");
         
