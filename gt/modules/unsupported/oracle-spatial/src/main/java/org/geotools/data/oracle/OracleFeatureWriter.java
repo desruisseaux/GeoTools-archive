@@ -35,11 +35,11 @@ import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.datasource.DataSourceFinder;
 import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.oracle.sdo.GeometryConverter;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.filter.SQLEncoderOracle;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -91,7 +91,7 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
      * @see org.geotools.data.jdbc.JDBCFeatureWriter#doUpdate(org.geotools.feature.Feature,
      *      org.geotools.feature.Feature)
      */
-    protected void doUpdate(Feature live, Feature current)
+    protected void doUpdate(SimpleFeature live, SimpleFeature current)
         throws IOException, SQLException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("updating postgis feature " + current);
@@ -106,13 +106,13 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
             String sql = makeUpdateSql(live, current);
             statement = conn.prepareStatement(sql);
 
-            FeatureType schema = current.getFeatureType();
+            SimpleFeatureType schema = current.getFeatureType();
             int position = 1;
 
-            for (int i = 0; i < current.getNumberOfAttributes(); i++) {
-                AttributeType type = schema.getAttributeType(i);
+            for (int i = 0; i < current.getAttributeCount(); i++) {
+                AttributeDescriptor type = schema.getAttribute(i);
 
-                if (type instanceof GeometricAttributeType && !DataUtilities.attributesEqual(current.getAttribute(i), live.getAttribute(i))) {
+                if (type instanceof GeometryDescriptor && !DataUtilities.attributesEqual(current.getAttribute(i), live.getAttribute(i))) {
                     Geometry geometry = (Geometry) current.getAttribute(i);
 
                     LOGGER.fine("ORACLE SPATIAL: geometry to be written:"
@@ -171,10 +171,10 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
             statement = conn.prepareStatement( sql );
             
             int position = 1;
-            FeatureType schema = current.getFeatureType();
+            SimpleFeatureType schema = current.getFeatureType();
             for( int i=0; i<current.getNumberOfAttributes();i++){
-            	AttributeType type = schema.getAttributeType( i );
-            	if( type instanceof GeometricAttributeType ){
+            	AttributeDescriptor type = schema.getAttribute( i );
+            	if( type instanceof GeometryDescriptor ){
             		Geometry geometry = (Geometry) current.getAttribute( i );
                     
                     // set the proper SRID, otherwise insertion will fail due to issues
