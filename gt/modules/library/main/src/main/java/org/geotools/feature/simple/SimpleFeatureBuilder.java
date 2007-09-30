@@ -6,15 +6,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.type.SetAttributeType;
 import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.Name;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A builder for features.
@@ -262,6 +269,25 @@ public class SimpleFeatureBuilder {
      * @throws IllegalArgumentException If no such attribute with teh specified
      * name exists.
      */
+    public void set(Name name, Object value) {
+        int index = featureType.indexOf(name);
+        if (index == -1 ) {
+            throw new IllegalArgumentException("No such attribute:" + name);
+        }
+        set(index,value);
+    }
+    
+    /**
+     * Adds an attribute value by name.
+     * <p>
+     * This method can be used to add attribute values out of order.
+     * </p>
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     * 
+     * @throws IllegalArgumentException If no such attribute with teh specified
+     * name exists.
+     */
     public void set(String name, Object value) {
         int index = featureType.indexOf(name);
         if (index == -1 ) {
@@ -391,7 +417,7 @@ public class SimpleFeatureBuilder {
 	}
 	
 	/**
-     * Static method to copy an existing feature.
+     * Copy an existing feature (the values are reused so be careful with mutable values).
      * <p>
      * If multiple features need to be copied, this method should not be used
      * and instead an instance should be instantiated directly.
@@ -402,11 +428,43 @@ public class SimpleFeatureBuilder {
      * </p>
      */
 	public static SimpleFeature copy( SimpleFeature original ) {
+	    if( original == null ) return null;
+	    
 	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder(original.getFeatureType());
 	    builder.init(original); // this is a shallow copy
 	    return builder.buildFeature(original.getID());
 	}
 	
+	/**
+     * Deep copy an existing feature.
+     * <p>
+     * This method is scary, expensive and will result in a deep copy of
+     * Geometry which will be.
+     * </p>
+     * @param original Content
+     * @return copy
+     */
+    public static SimpleFeature deep( SimpleFeature original ) {
+        if( original == null ) return null;
+        
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(original.getFeatureType());
+        try {
+            for( Property property : original.getProperties() ){
+                Object value = property.getValue();
+                Object copy = value;
+                if( value instanceof Geometry ){
+                    Geometry geometry = (Geometry) value;
+                    copy = geometry.clone();
+                }
+                builder.set( property.getName(), copy );
+            }
+            return builder.buildFeature(original.getID());    
+        }
+        catch( Exception e ) {
+            throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
+        }
+    }
+    
 	/**
 	 * Builds a new feature whose attribute values are the default ones
 	 * @param featureType

@@ -30,12 +30,11 @@ import java.util.NoSuchElementException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer;
+import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.SAXException;
 
 
@@ -50,7 +49,7 @@ import org.xml.sax.SAXException;
 public class WFSFeatureReader extends FCBuffer {
     private InputStream is = null;
     private WFSTransactionState ts = null;
-    private Feature next = null;
+    private SimpleFeature next = null;
     private int insertSearchIndex = -1;
 
     private WFSFeatureReader(InputStream is, int capacity, int timeout,
@@ -180,8 +179,9 @@ public class WFSFeatureReader extends FCBuffer {
     private boolean loadElement()
         throws NoSuchElementException, IOException {
         if (ts == null) {
-            while ((next == null) && super.hasNext())
+            while ((next == null) && super.hasNext()){
                 next = super.next();
+            }
         } else {
             List l = ts.getActions(ft.getTypeName());
 
@@ -229,7 +229,7 @@ public class WFSFeatureReader extends FCBuffer {
         return next != null;
     }
 
-    private Feature updateFeature( Action a, Feature feature ) {
+    private SimpleFeature updateFeature( Action a, SimpleFeature feature ) {
         if ((a.getType() == Action.DELETE)
                 && a.getFilter().evaluate(feature)) {
             return null;
@@ -247,7 +247,7 @@ public class WFSFeatureReader extends FCBuffer {
     /**
      * @see org.geotools.data.FeatureReader#next()
      */
-    public Feature next()
+    public SimpleFeature next()
         throws IOException, NoSuchElementException {
         if (next == null) {
             loadElement(); // load it
@@ -256,8 +256,7 @@ public class WFSFeatureReader extends FCBuffer {
                 throw new NoSuchElementException();
             }
         }
-
-        Feature r = next;
+        SimpleFeature r = next;
         next = null;
 
         return r;

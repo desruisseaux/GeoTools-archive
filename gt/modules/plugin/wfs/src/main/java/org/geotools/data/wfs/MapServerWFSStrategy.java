@@ -24,8 +24,8 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.spatial.BBOX;
@@ -62,7 +62,7 @@ public class MapServerWFSStrategy extends StrictWFSStrategy implements WFSStrate
             if( filter == Filter.INCLUDE ){
                 FilterFactory fac=CommonFactoryFinder.getFilterFactory(null);
                 try {
-                    FeatureType schema = store.getSchema(query.getTypeName());
+                    SimpleFeatureType schema = store.getSchema(query.getTypeName());
                     String attName = schema.getDefaultGeometry().getLocalName();
                     
                     List fts = store.capabilities.getFeatureTypes(); // FeatureSetDescription

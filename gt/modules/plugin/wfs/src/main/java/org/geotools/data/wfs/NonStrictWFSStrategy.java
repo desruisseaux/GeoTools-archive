@@ -156,7 +156,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
     protected FeatureReader applyReprojectionDecorator(FeatureReader reader, Query query, CoordinateReferenceSystem dataCRS) {
         FeatureReader tmp = reader;
         if (query.getCoordinateSystem() !=null &&
-            !query.getCoordinateSystem().equals( reader.getFeatureType().getDefaultGeometry().getCoordinateSystem())){
+            !query.getCoordinateSystem().equals( reader.getFeatureType().getCRS())){
             try {
                 reader = new ForceCoordinateSystemFeatureReader(reader,query.getCoordinateSystem());
             } catch (SchemaException e) {
@@ -165,7 +165,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
             }
         }else{
             if(reader.getFeatureType().getDefaultGeometry()!= null && dataCRS!=null &&
-                    reader.getFeatureType().getDefaultGeometry().getCoordinateSystem()== null){
+                    reader.getFeatureType().getCRS()== null){
                 // set up crs
                 try {
                     reader = new ForceCoordinateSystemFeatureReader(reader,dataCRS);

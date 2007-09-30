@@ -26,11 +26,11 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.FidFilter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
 import org.geotools.xml.XMLHandlerHints;
@@ -83,7 +83,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
         private Query query;
         private Transaction transaction;
         private Set foundFids=new HashSet();
-        private Feature next;
+        private SimpleFeature next;
 
         public StrictFeatureReader(Transaction transaction, Query query, Integer level) throws IOException {
             init(transaction, query, level);
@@ -107,9 +107,9 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
             this.filter=visitor.getFilter();
 
             DefaultQuery nonFidQuery=new DefaultQuery(query);
-            FidFilter fidFilter = visitor.getFidFilter();
+            Id fidFilter = visitor.getFidFilter();
             nonFidQuery.setFilter(fidFilter);
-            if( fidFilter.getFids().length>0 ){
+            if( fidFilter.getIDs().size()>0 ){
                 delegate = StrictWFSStrategy.super.createFeatureReader(transaction, nonFidQuery);
             }else{
                 delegate=nextReader();
@@ -121,7 +121,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
                 delegate.close();
         }
 
-        public FeatureType getFeatureType() {
+        public SimpleFeatureType getFeatureType() {
             return delegate.getFeatureType();
         }
 
@@ -170,11 +170,11 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
         }
 
 
-        public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+        public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
             if( !hasNext() )
                 throw new NoSuchElementException();
             
-            Feature tmp = next;
+            SimpleFeature tmp = next;
             foundFids.add(tmp.getID());
             next=null;
             return tmp;

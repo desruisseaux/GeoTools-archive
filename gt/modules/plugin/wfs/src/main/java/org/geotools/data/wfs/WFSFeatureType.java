@@ -24,21 +24,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultFeature;
 import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryType;
-import org.opengis.feature.type.Name;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -52,19 +47,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jesse
  * @since 1.1.0
  */
-class WFSFeatureType implements FeatureType {
-    FeatureType delegate;
+class WFSFeatureType implements SimpleFeatureType {
+    SimpleFeatureType delegate;
     private URI schemaURI;
     /**
      * If lenient then it will not throw exceptions on create() if the attributes aren't legal.
      */
     private boolean lenient;
 
-    public WFSFeatureType( FeatureType delegate, URI schemaURI ) {
+    public WFSFeatureType( SimpleFeatureType delegate, URI schemaURI ) {
         this( delegate, schemaURI, false);
     }
 
-    public WFSFeatureType( FeatureType delegate, URI schemaURI, boolean lenient2 ) {
+    public WFSFeatureType( SimpleFeatureType delegate, URI schemaURI, boolean lenient2 ) {
         this.delegate = delegate;
         this.schemaURI=schemaURI;
         lenient=lenient2;

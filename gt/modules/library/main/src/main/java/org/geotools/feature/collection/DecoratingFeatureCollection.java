@@ -115,6 +115,10 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.getAttributes();
     }
 
+//    public Object[] getAttributes(Object[] attributes) {
+//        return delegate.getAttributes(attributes);
+//    }
+
     public ReferencedEnvelope getBounds() {
         return delegate.getBounds();
     }
@@ -141,6 +145,10 @@ public class DecoratingFeatureCollection implements FeatureCollection {
     
     public Collection<Property> getProperties() {
         return delegate.getProperties();
+    }
+
+    public int getNumberOfAttributes() {
+        return delegate.getAttributeCount();
     }
 
     public Collection<Property> getProperties(Name name) {

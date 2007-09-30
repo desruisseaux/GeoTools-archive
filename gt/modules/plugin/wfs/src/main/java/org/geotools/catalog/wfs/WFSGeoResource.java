@@ -29,10 +29,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.wfs.WFSDataStore;
-import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.net.URI;
@@ -171,7 +171,7 @@ public class WFSGeoResource extends AbstractGeoResource {
         CoordinateReferenceSystem crs = null;
 
         IGeoResourceWFSInfo() throws IOException {
-            FeatureType ft = parent.getDS().getSchema(typename);
+            SimpleFeatureType ft = parent.getDS().getSchema(typename);
 
             List fts = parent.getDS().getCapabilities().getFeatureTypes();
             FeatureSetDescription fsd = null;
@@ -193,19 +193,24 @@ public class WFSGeoResource extends AbstractGeoResource {
             description = fsd.getAbstract();
 
             try {
-                crs = ft.getDefaultGeometry().getCoordinateSystem();
+                crs = ft.getDefaultGeometry().getCRS();
             } catch (Exception e) {
                 crs = DefaultGeographicCRS.WGS84;
             }
 
             name = typename;
-            schema = ft.getNamespace();
+            try {
+                schema = new URI( ft.getName().getNamespaceURI());
+            } catch (URISyntaxException e) {
+                schema = null;
+            }
             title = fsd.getTitle();
 
             keywords = new String[] {
-                    "wfs", //$NON-NLS-1$
-                    typename, ft.getNamespace().toString()
-                };
+                "wfs", //$NON-NLS-1$
+                typename,
+                ft.getName().getNamespaceURI()
+            };
         }
 
         /*

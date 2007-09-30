@@ -28,16 +28,12 @@ import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XMLHandlerHints;
@@ -4273,7 +4269,7 @@ public class GMLComplexTypes {
 			}
 		}
 
-		private void assignValue(ElementValue[] value, Object[] values, AttributeType at, int i, int k) {
+		private void assignValue(ElementValue[] value, Object[] values, AttributeDescriptor at, int i, int k) {
 			if( at instanceof ChoiceAttributeType ){
 				ChoiceAttributeType choiceAT = (ChoiceAttributeType) at;
 				values[k]=choiceAT.convert(value[i].getValue());
@@ -4281,31 +4277,31 @@ public class GMLComplexTypes {
 				values[k] = value[i].getValue();
 		}
 
-		private boolean isMatch(ElementValue[] value, FeatureType ft, int i, int k) {
-			AttributeType attributeType = ft.getAttributeType(k);
+		private boolean isMatch(ElementValue[] value, SimpleFeatureType ft, int i, int k) {
+			AttributeDescriptor AttributeDescriptor = ft.getAttributeDescriptor(k);
 			String typeName = ft.getTypeName();
 			
-			if( !attributeType.getLocalName().equals(typeName) )
+			if( !AttributeDescriptor.getLocalName().equals(typeName) )
 				return false;
 			
 			Class instanceClass = value[i].getValue().getClass();
 			
-			if( attributeType instanceof ChoiceAttributeType ){
-				ChoiceAttributeType choiceAT=(ChoiceAttributeType) attributeType;
+			if( AttributeDescriptor instanceof ChoiceAttributeDescriptor ){
+				ChoiceAttributeDescriptor choiceAT=(ChoiceAttributeDescriptor) AttributeDescriptor;
 				Class[] choices = choiceAT.getChoices();
 				for (int j = 0; j < choices.length; j++) {
 					if( choices[j].isAssignableFrom(instanceClass))
 						return true;
 				}
 			}
-			return attributeType.getBinding().isAssignableFrom(instanceClass);
+			return AttributeDescriptor.getBinding().isAssignableFrom(instanceClass);
 		}
 
 		private int searchByName(ElementValue[] value, FeatureType ft, int i, int j) {
 			for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
 			    // TODO use equals
-			    if((ft.getAttributeType(k).getLocalName()==null && value[i].getElement().getName()==null) ||
-			            ft.getAttributeType(k).getLocalName().equals(value[i].getElement().getName()))
+			    if((ft.getAttributeDescriptor(k).getLocalName()==null && value[i].getElement().getName()==null) ||
+			            ft.getAttributeDescriptor(k).getLocalName().equals(value[i].getElement().getName()))
 			        j = k;
 			}
 			return j;
@@ -4437,7 +4433,7 @@ public class GMLComplexTypes {
             ph.startElement(e.getNamespace(), e.getName(), ai);
 
             FeatureType ft = f.getFeatureType();
-            AttributeType[] ats = ft.getAttributeTypes();
+            AttributeDescriptor[] ats = ft.getAttributeDescriptors();
 
             if (ats != null) {
                 for (int i = 0; i < ats.length; i++) {
@@ -4462,7 +4458,7 @@ public class GMLComplexTypes {
             ph.startElement(GMLSchema.NAMESPACE, "_Feature", ai);
 
             FeatureType ft = f.getFeatureType();
-            AttributeType[] ats = ft.getAttributeTypes();
+            AttributeDescriptor[] ats = ft.getAttributeDescriptors();
 
             if (ats != null) {
                 for (int i = 0; i < ats.length; i++) {
@@ -6516,31 +6512,31 @@ public class GMLComplexTypes {
         typeFactory.setNamespace(ftNS);
         typeFactory.setName(ftName);
 
-        GeometryAttributeType geometryAttribute = null;
+        GeometryAttributeDescriptor geometryAttribute = null;
 
         ElementGrouping child = ((ComplexType)element.getType()).getChild();
 //        FeatureType parent = null;
 //        if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
 //            parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
 
-//        if(parent != null && parent.getAttributeTypes()!=null){
-//            typeFactory.addTypes(parent.getAttributeTypes());
+//        if(parent != null && parent.getAttributeDescriptors()!=null){
+//            typeFactory.addTypes(parent.getAttributeDescriptors());
 //            if(parent.getDefaultGeometry()!=null){
 //                geometryAttribute = parent.getDefaultGeometry();
 //            }
 //        }
 
-        AttributeType[] attrs = (AttributeType[])getAttributes(element.getName(),child).toArray(new AttributeType[]{,});
+        AttributeDescriptor[] attrs = (AttributeDescriptor[])getAttributes(element.getName(),child).toArray(new AttributeDescriptor[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
         		typeFactory.addType(attrs[i]);
 
         if ((geometryAttribute == null)
-                && attrs[i] instanceof GeometryAttributeType) {
+                && attrs[i] instanceof GeometryAttributeDescriptor) {
             if (!attrs[i].getLocalName()
 //                    .equalsIgnoreCase(BoxType.getInstance().getName())) {
                 .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
-                geometryAttribute = (GeometryAttributeType) attrs[i];
+                geometryAttribute = (GeometryAttributeDescriptor) attrs[i];
             }
         }}
         }
@@ -6566,20 +6562,20 @@ public class GMLComplexTypes {
         typeFactory.setNamespace(ftNS);
         typeFactory.setName(ftName);
 
-        GeometryAttributeType geometryAttribute = null;
+        GeometryAttributeDescriptor geometryAttribute = null;
 
         ElementGrouping child = (element).getChild();
 
-        AttributeType[] attrs = (AttributeType[])getAttributes(element.getName(),child).toArray(new AttributeType[]{,});
+        AttributeDescriptor[] attrs = (AttributeDescriptor[])getAttributes(element.getName(),child).toArray(new AttributeDescriptor[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
             typeFactory.addType(attrs[i]);
 
             if ((geometryAttribute == null)
-                && attrs[i] instanceof GeometryAttributeType) {
+                && attrs[i] instanceof GeometryAttributeDescriptor) {
                 if (!attrs[i].getLocalName()
                     .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
-                    geometryAttribute = (GeometryAttributeType) attrs[i];
+                    geometryAttribute = (GeometryAttributeDescriptor) attrs[i];
                 }
             }}
         }
@@ -6599,7 +6595,7 @@ public class GMLComplexTypes {
 
     private static List getAttributes(String name, ElementGrouping eg){
         List l = new LinkedList();
-        AttributeType t = null;
+        AttributeDescriptor t = null;
         switch(eg.getGrouping()){
 
         case ElementGrouping.CHOICE:
@@ -6632,7 +6628,7 @@ public class GMLComplexTypes {
         return l;
     }
 
-    private static AttributeType getAttribute(Element eg){
+    private static AttributeDescriptor getAttribute(Element eg){
     	if(eg.getNamespace() == GMLSchema.NAMESPACE && (AbstractFeatureType.getInstance().getChildElements()[0] == eg || AbstractFeatureType.getInstance().getChildElements()[1] == eg || AbstractFeatureType.getInstance().getChildElements()[2] == eg))
     		return null;
 
@@ -6651,7 +6647,7 @@ public class GMLComplexTypes {
 	                        type = eg.getType().getInstanceType();
 	                    }else{
 	                        if(l.size() == 1){
-	                            return (AttributeType)l.iterator().next();
+	                            return (AttributeDescriptor)l.iterator().next();
 	                        }
 	                        // Do some magic to find the type
 	                        type = getCommonType(l);
@@ -6674,21 +6670,21 @@ public class GMLComplexTypes {
         if( !nillable ){
             try{
                 Object defaultValue = DataUtilities.defaultValue(type);
-                return AttributeTypeFactory.newAttributeType( eg.getName(), type, nillable, Filter.INCLUDE, defaultValue, null);
-            }catch( IllegalArgumentException e ){
+                return AttributeDescriptorFactory.newAttributeDescriptor( eg.getName(), type, nillable, Filter.INCLUDE, defaultValue, null);
+            } catch( IllegalArgumentException e ){
                 // can happen if the type is not supported by the method.  
                 // in this case I'm taking the easy way out and just not 
                 // having a default value.
                 logger.warning("Don't know how to make a default value for: "+type
                         +". Consider making it nillable.");
                 
-                return AttributeTypeFactory.newAttributeType(eg.getName(),type,(nillable));
+                return AttributeDescriptorFactory.newAttributeDescriptor(eg.getName(),type,(nillable));
             }
         }
-        return AttributeTypeFactory.newAttributeType(eg.getName(),type,(nillable));
+        return AttributeDescriptorFactory.newAttributeDescriptor(eg.getName(),type,(nillable));
     }
 
-    private static AttributeType getAttribute(String name, Choice eg){
+    private static AttributeDescriptor getAttribute(String name, Choice eg){
         
         List l = new LinkedList();
         ElementGrouping[] children = eg.getChildren();
@@ -6702,7 +6698,7 @@ public class GMLComplexTypes {
             return null;
         }
         if(l.size() == 1){
-            return (AttributeType)l.iterator().next();
+            return (AttributeDescriptor)l.iterator().next();
         }
             // Do some magic to find the type
             Class type = getCommonType(l);
@@ -6719,32 +6715,32 @@ public class GMLComplexTypes {
             }
             Class[] choices=collectionChoices(l);
             if( Geometry.class.isAssignableFrom(type))
-            	return new ChoiceAttributeTypeImpl.Geometry(name,choices,type,nillable,1,1,null, null, Filter.INCLUDE);
-            return new ChoiceAttributeTypeImpl(name,choices,type,nillable,1,1,null, Filter.INCLUDE);
+            	return new ChoiceAttributeDescriptorImpl.Geometry(name,choices,type,nillable,1,1,null, null, Filter.INCLUDE);
+            return new ChoiceAttributeDescriptorImpl(name,choices,type,nillable,1,1,null, Filter.INCLUDE);
     }
     
     private static Class[] collectionChoices(List l) {
     	Class[] choices=new Class[l.size()];
     	int i=0;
     	for (Iterator iter = l.iterator(); iter.hasNext(); i++) {
-			AttributeType type = (AttributeType) iter.next();
+			AttributeDescriptor type = (AttributeDescriptor) iter.next();
 			choices[i]=type.getBinding();
 		}
     	return choices;
 	}
 
-	// takes List<AttributeType>
-    private static Class getCommonType(List attributeTypes){
-        if(attributeTypes == null || attributeTypes.isEmpty())
+	// takes List<AttributeDescriptor>
+    private static Class getCommonType(List AttributeDescriptors){
+        if(AttributeDescriptors == null || AttributeDescriptors.isEmpty())
             return null;
-        if(attributeTypes.size() == 1)
-            return attributeTypes.iterator().next().getClass();
+        if(AttributeDescriptors.size() == 1)
+            return AttributeDescriptors.iterator().next().getClass();
         
         Class common = null;
-        AttributeType at = null;
-        Iterator i = attributeTypes.iterator();
+        AttributeDescriptor at = null;
+        Iterator i = AttributeDescriptors.iterator();
         while(i.hasNext()){
-            at = (AttributeType)i.next();
+            at = (AttributeDescriptor)i.next();
             if(at!= null){
                 if(common == null){
                     common = at.getBinding();

@@ -94,11 +94,13 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor implements Fi
     		pages.push(org.geotools.filter.Filter.ALL);
     		return;
     	}
-    	if( strict )
-        // Should not happen?
-    	throw new RuntimeException("visit(Filter) unsupported");
-    	else
+    	if( strict ){
+    	    // Should not happen?
+    	    throw new RuntimeException("visit(Filter) unsupported");
+    	}
+    	else {
     		pages.push(filter);
+    	}
     }
 
     public void visit(BetweenFilter filter) {

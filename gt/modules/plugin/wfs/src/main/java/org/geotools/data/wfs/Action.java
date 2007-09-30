@@ -22,11 +22,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.Filters;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 
 
@@ -84,6 +87,8 @@ public interface Action {
          * update and Object is the new Value.
          */
         public UpdateAction(String typeName, Filter f, Map properties) {
+            DuplicatingFilterVisitor duplicator = new DuplicatingFilterVisitor();
+            
         	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(), false);
         	Filters.accept( f, visitor);
             filter = (Filter) visitor.getCopy();
@@ -141,7 +146,7 @@ public interface Action {
             return typeName;
         }
 
-		public void update(Feature feature) {
+		public void update(SimpleFeature feature) {
 			if( !filter.evaluate(feature) )
 				throw new IllegalArgumentException(feature+"is not affected by this update, only call update on features that" +
 						"the Action applies to!");
@@ -220,7 +225,7 @@ public interface Action {
      * @author dzwiers
      */
     public static class InsertAction implements Action {
-        private final Feature feature;
+        private final SimpleFeature feature;
 
         /**
          * Creates an insert action for the Feature specified.  The feature is copied to
@@ -228,10 +233,11 @@ public interface Action {
          * 
          * @param f Feature to add
          */
-        public InsertAction(Feature f) {
-        	Feature feature;
+        public InsertAction(SimpleFeature f) {
+        	SimpleFeature feature;
             try {
-				feature = f.getFeatureType().duplicate(f);
+                // WARNNING: deep copy
+                feature = SimpleFeatureBuilder.copy( f );
 			} catch (IllegalAttributeException e) {
 				Logger.getLogger("org.geotools.data.wfs").warning("Failed to duplicate feature:"+f);
 				feature=f;
@@ -249,7 +255,7 @@ public interface Action {
         /**
          * @return The Feature to add
          */
-        public Feature getFeature() {
+        public SimpleFeature getFeature() {
             return feature;
         }
 
@@ -258,7 +264,7 @@ public interface Action {
          */
         public String getTypeName() {
             return (feature == null) ? null
-                                     : feature.getFeatureType().getTypeName();
+                                     : feature.getName().getLocalPart();
         }
 
         /**

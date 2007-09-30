@@ -259,8 +259,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
     	catch( Exception e ) {
     		throw (IllegalAttributeException) new IllegalAttributeException("illegal attribute").initCause(e);
     	}
-    	
-        
+    	        
 //        String id = original.getID();
 //        int numAtts = featureType.getAttributeCount();
 //        Object attributes[] = new Object[numAtts];

@@ -54,14 +54,12 @@ import org.geotools.data.Transaction;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.Filters;
@@ -300,7 +298,8 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     private String[] typeNames = null;
-    private Map featureTypeCache = new HashMap();
+    
+    private Map<String,SimpleFeatureType> featureTypeCache = new HashMap<String,SimpleFeatureType>();
 
 	private Map fidMap=new HashMap();
 
@@ -332,14 +331,14 @@ public class WFSDataStore extends AbstractDataStore {
      *
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         if (featureTypeCache.containsKey(typeName)) {
-            return (FeatureType) featureTypeCache.get(typeName);
+            return featureTypeCache.get(typeName);
         }
         
         // TODO sanity check for request with capabilities obj
 
-        FeatureType t=null;
+        SimpleFeatureType t=null;
         SAXException sax = null;
         IOException io = null;
         if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
@@ -395,8 +394,19 @@ public class WFSDataStore extends AbstractDataStore {
         
         if(ftName!=null){
             try {
-            	t = FeatureTypeBuilder.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+                SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+                build.init( t );
+                build.setName( ftName==null?typeName:ftName );
                 
+                t = build.buildFeatureType();
+                
+//            	t = FeatureTypeBuilder.newFeatureType(
+//            	        t.getAttributeTypes(),
+//            	        ftName==null?typeName:ftName,
+//    	                t.getNamespace(),
+//    	                t.isAbstract(),
+//    	                t.getAncestors(),
+//    	                t.getDefaultGeometry());                
             } catch (SchemaException e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());
             }
@@ -417,7 +427,7 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     //  protected for testing
-    protected FeatureType getSchemaGet(String typeName)
+    protected SimpleFeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
         URL getUrl = getDescribeFeatureTypeURLGet(typeName);
         Logger.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
@@ -473,7 +483,7 @@ public class WFSDataStore extends AbstractDataStore {
         return getUrl;
     }
 
-    static FeatureType parseDescribeFeatureTypeResponse( String typeName, Schema schema ) throws SAXException {
+    static SimpleFeatureType parseDescribeFeatureTypeResponse( String typeName, Schema schema ) throws SAXException {
         Element[] elements = schema.getElements();
 
         if (elements == null) {
@@ -496,14 +506,14 @@ public class WFSDataStore extends AbstractDataStore {
             return null;
         }
 
-        FeatureType ft = GMLComplexTypes.createFeatureType(element);
+        SimpleFeatureType ft = GMLComplexTypes.createFeatureType(element);
 
 
         return ft;
     }
 
     // protected for testing
-    protected FeatureType getSchemaPost(String typeName)
+    protected SimpleFeatureType getSchemaPost(String typeName)
         throws IOException, SAXException {
         URL postUrl = capabilities.getDescribeFeatureType().getPost();
 
@@ -638,7 +648,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         WFSFeatureType schema = (WFSFeatureType)getSchema(request.getTypeName());
         
-        FeatureType featureType;
+        SimpleFeatureType featureType;
         try {
             featureType = DataUtilities.createSubType( schema.delegate, request.getPropertyNames(), 
                     request.getCoordinateSystem() );
@@ -802,7 +812,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
         WFSFeatureType schema = (WFSFeatureType)getSchema(query.getTypeName());
         
-        FeatureType featureType;
+        SimpleFeatureType featureType;
         try {
             featureType = DataUtilities.createSubType( schema.delegate, query.getPropertyNames(), 
                     query.getCoordinateSystem() );
@@ -894,7 +904,7 @@ public class WFSDataStore extends AbstractDataStore {
     	if(q.getTypeName() == null || t == null)
     		return new Filter[]{Filter.INCLUDE,q.getFilter()};
     	
-    	FeatureType ft = getSchema(q.getTypeName());
+    	SimpleFeatureType ft = getSchema(q.getTypeName());
     	
     	List fts = capabilities.getFeatureTypes(); //FeatureSetDescription
         boolean found = false;

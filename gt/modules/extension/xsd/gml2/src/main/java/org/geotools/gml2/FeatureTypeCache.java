@@ -20,7 +20,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 
 public class FeatureTypeCache {
-    HashMap map = new HashMap();
+    HashMap<String,SimpleFeatureType> map =
+        new HashMap<String,SimpleFeatureType>();
 
     public SimpleFeatureType get(String name) {
         synchronized (this) {
@@ -35,6 +36,7 @@ public class FeatureTypeCache {
 
         synchronized (this) {
             if (map.get(type.getTypeName()) != null) {
+                SimpleFeatureType other = map.get(type.getTypeName());
                 SimpleFeatureType other = (SimpleFeatureType) map.get(type.getTypeName());
 
                 if (!other.equals(type)) {
