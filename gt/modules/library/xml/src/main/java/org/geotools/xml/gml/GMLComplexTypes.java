@@ -32,6 +32,7 @@ import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.Name;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -4223,7 +4224,7 @@ public class GMLComplexTypes {
             SimpleFeature rt = null;
             if ((fid != null) || !"".equals(fid)) {
                 try {
-                    rt =  ft.create(values, fid);
+                    rt = SimpleFeatureBuilder.build(ft, values, fid );                   
                 } catch (IllegalAttributeException e) {
                     logger.warning(e.toString());
                     throw new SAXException(e);
@@ -4292,8 +4293,8 @@ public class GMLComplexTypes {
 			
 			Class instanceClass = value[i].getValue().getClass();
 			
-			if( AttributeDescriptor instanceof ChoiceAttributeDescriptor ){
-				ChoiceAttributeDescriptor choiceAT=(ChoiceAttributeDescriptor) AttributeDescriptor;
+			if( AttributeDescriptor instanceof ChoiceAttributeType ){
+			    ChoiceAttributeType choiceAT=(ChoiceAttributeType) AttributeDescriptor;
 				Class[] choices = choiceAT.getChoices();
 				for (int j = 0; j < choices.length; j++) {
 					if( choices[j].isAssignableFrom(instanceClass))
@@ -6562,36 +6563,37 @@ public class GMLComplexTypes {
         URI ftNS = element.getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
-        FeatureTypeBuilder typeFactory = FeatureTypeBuilder.newInstance(ftName);
-        typeFactory.setNamespace(ftNS);
-        typeFactory.setName(ftName);
+        SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+        build.setNamespaceURI(ftNS);
+        build.setName(ftName);
 
-        GeometryAttributeDescriptor geometryAttribute = null;
+        GeometryDescriptor geometryAttribute = null;
 
         ElementGrouping child = (element).getChild();
 
-        AttributeDescriptor[] attrs = (AttributeDescriptor[])getAttributes(element.getName(),child).toArray(new AttributeDescriptor[]{,});
-        for(int i=0;i<attrs.length;i++){
-        	if(attrs[i]!=null){
-            typeFactory.addType(attrs[i]);
+        List<AttributeDescriptor> attrs = getAttributes(element.getName(),child);
+        for( AttributeDescriptor attributeDescriptor : attrs ){
+            if(attributeDescriptor==null) continue;
+            
+            build.add(attributeDescriptor);
 
             if ((geometryAttribute == null)
-                && attrs[i] instanceof GeometryAttributeDescriptor) {
-                if (!attrs[i].getLocalName()
+                && attributeDescriptor instanceof GeometryDescriptor) {
+                if (!attributeDescriptor.getLocalName()
                     .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
-                    geometryAttribute = (GeometryAttributeDescriptor) attrs[i];
+                    geometryAttribute = (GeometryDescriptor) attributeDescriptor;
                 }
-            }}
+            }            
         }
 
         if (geometryAttribute != null) {
-            typeFactory.setDefaultGeometry(geometryAttribute);
+            build.setDefaultGeometry(geometryAttribute.getLocalName());
         }
 
         try {
-            FeatureType ft = typeFactory.getFeatureType();
+            SimpleFeatureType ft = build.buildFeatureType();
             return ft;
-        } catch (SchemaException e) {
+        } catch (IllegalArgumentException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
@@ -6733,7 +6735,7 @@ public class GMLComplexTypes {
             return (AttributeDescriptor)l.iterator().next();
         }
             // Do some magic to find the type
-            Class type = getCommonType(l);
+            Class<?> type = getCommonType(l);
             if(type == null)
                 type = Object.class;
             // Take the first name ... cause we need one anyways
@@ -6746,9 +6748,13 @@ public class GMLComplexTypes {
                 }
             }
             Class[] choices=collectionChoices(l);
-            if( Geometry.class.isAssignableFrom(type))
-            	return new ChoiceAttributeDescriptorImpl.Geometry(name,choices,type,nillable,1,1,null, null, Filter.INCLUDE);
-            return new ChoiceAttributeDescriptorImpl(name,choices,type,nillable,1,1,null, Filter.INCLUDE);
+            Name typeName = new Name(name);
+            if( Geometry.class.isAssignableFrom(type)) {
+            	return new ChoiceGeometryTypeImpl(typeName,choices,type,nillable,1,1,null, null, Filter.INCLUDE);
+            }
+            else {
+                return new ChoiceAttributeTypeImpl(typeName,choices,type,nillable,1,1,null, Filter.INCLUDE);
+            }
     }
     
     private static Class[] collectionChoices(List l) {
