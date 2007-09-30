@@ -24,11 +24,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -142,19 +142,19 @@ final class SqlStatementEncoder {
      * @param schema
      * @return SQL used to create the table
      */
-    String makeCreateTableSQL(FeatureType schema ){
+    String makeCreateTableSQL(SimpleFeatureType schema ){
     	StringBuffer sql = new StringBuffer("CREATE TABLE ");
         sql.append(tableName);
         sql.append("(");
         sql.append(fidColumn);
         sql.append(" NUMBER,");
 
-        AttributeType[] attributeTypes = schema.getAttributeTypes();
+        AttributeDescriptor[] attributeTypes = schema.getAttributes().toArray(new AttributeDescriptor[schema.getAttributes().size()]);
 
         for (int i = 0; i < attributeTypes.length; i++) {
             sql.append(attributeTypes[i].getLocalName());
             sql.append(" ");
-            sql.append( makeType( attributeTypes[i].getBinding() ));
+            sql.append( makeType( attributeTypes[i].getType().getBinding() ));
             if (i < (attributeTypes.length - 1)) {
                 sql.append(",");
             } else { 
@@ -176,7 +176,7 @@ final class SqlStatementEncoder {
 
         return sql.toString();
     }
-    public String makeCreateGeomIndex( FeatureType schema ){
+    public String makeCreateGeomIndex( SimpleFeatureType schema ){
     	StringBuffer sql = new StringBuffer();
     	
         // SPATIAL INDEX (On default geometry)
@@ -206,7 +206,7 @@ final class SqlStatementEncoder {
      *         feature attribute.  The VALUES section will contain ?'s for each attribute of the
      *         feature type.
      */
-    String makeInsertSQL(FeatureType featureType) {
+    String makeInsertSQL(SimpleFeatureType featureType) {
         StringBuffer sql = new StringBuffer("INSERT INTO ");
 
         sql.append(tableName);
@@ -214,7 +214,7 @@ final class SqlStatementEncoder {
         sql.append(fidColumn);
         sql.append(",");
 
-        AttributeType[] attributeTypes = featureType.getAttributeTypes();
+        AttributeDescriptor[] attributeTypes = featureType.getAttributes().toArray(new AttributeDescriptor[featureType.getAttributes().size()]);
 
         for (int i = 0; i < attributeTypes.length; i++) {
             sql.append(attributeTypes[i].getLocalName());
@@ -252,7 +252,7 @@ final class SqlStatementEncoder {
      *
      * @throws SQLEncoderException If an error occurs encoding the SQL
      */
-    String makeSelectSQL(AttributeType[] attrTypes, Filter filter, int maxFeatures, boolean useMax)
+    String makeSelectSQL(AttributeDescriptor[] attrTypes, Filter filter, int maxFeatures, boolean useMax)
         throws SQLEncoderException {
         LOGGER.finer("Creating sql for Query: mf=" + maxFeatures + " filter=" + filter 
             +  " useMax=" + useMax);
@@ -300,7 +300,7 @@ final class SqlStatementEncoder {
      *
      * @return An SQL template.
      */
-    String makeModifyTemplate(AttributeType[] attributeTypes) {
+    String makeModifyTemplate(AttributeDescriptor[] attributeTypes) {
         StringBuffer buffer = new StringBuffer("UPDATE ");
 
         buffer.append(tableName);
@@ -319,7 +319,7 @@ final class SqlStatementEncoder {
         return buffer.toString();
     }
 
-    String makeModifyTemplate(AttributeType[] attributeTypes, Filter filter)
+    String makeModifyTemplate(AttributeDescriptor[] attributeTypes, Filter filter)
         throws SQLEncoderException {
         String whereClause = whereEncoder.encode(filter);
 
@@ -330,7 +330,7 @@ final class SqlStatementEncoder {
         return "DELETE FROM " + tableName + " " + whereEncoder.encode(filter);
     }
 
-	public String makeAddGeomMetadata(FeatureType featureType, Envelope bounds, int srid) {
+	public String makeAddGeomMetadata(SimpleFeatureType featureType, Envelope bounds, int srid) {
     	StringBuffer sql = new StringBuffer();
     	
         // SPATIAL INDEX (On default geometry)

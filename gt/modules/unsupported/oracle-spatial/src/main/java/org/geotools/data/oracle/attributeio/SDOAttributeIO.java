@@ -32,7 +32,7 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.datasource.DataSourceFinder;
 import org.geotools.data.jdbc.datasource.UnWrapper;
 import org.geotools.data.oracle.sdo.GeometryConverter;
-import org.geotools.feature.AttributeType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -66,7 +66,7 @@ public class SDOAttributeIO implements AttributeIO {
 	private Class targetClazz;
 	private GeometryFactory geometryFactory; 
 
-	public SDOAttributeIO(AttributeType attributeType, QueryData queryData)
+	public SDOAttributeIO(AttributeDescriptor attributeType, QueryData queryData)
 			throws DataSourceException {
 		this.queryData = queryData;
 		geometryFactory = null;
@@ -74,7 +74,7 @@ public class SDOAttributeIO implements AttributeIO {
 			String tableName = queryData.getFeatureTypeInfo()
 					.getFeatureTypeName();
 			String columnName = attributeType.getLocalName();
-			targetClazz = attributeType.getBinding();
+			targetClazz = attributeType.getType().getBinding();
 			LOGGER.fine("About to create Geometry convertor for " + tableName
 					+ "." + columnName);
 

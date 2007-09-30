@@ -21,17 +21,17 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.data.jdbc.JDBCFeatureSource;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 public class OracleFeatureSource extends JDBCFeatureSource {
 
-    OracleFeatureSource(JDBC1DataStore jdbcDataStore, FeatureType featureType) {
+    OracleFeatureSource(JDBC1DataStore jdbcDataStore, SimpleFeatureType featureType) {
         super(jdbcDataStore, featureType);
     }
 
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
         return getBounds(Query.ALL);
     }
 
@@ -54,7 +54,7 @@ public class OracleFeatureSource extends JDBCFeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         if(query.getTypeName() == null) {
             query = new DefaultQuery(query);
             ((DefaultQuery) query).setTypeName(getSchema().getTypeName());

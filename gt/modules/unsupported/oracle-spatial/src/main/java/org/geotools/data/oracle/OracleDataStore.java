@@ -31,9 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
+
 import oracle.jdbc.OracleConnection;
-import oracle.sql.ARRAY;
-import oracle.sql.Datum;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.DataSourceException;
@@ -59,16 +58,16 @@ import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.data.oracle.referencing.OracleAuthorityFactory;
 import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.data.oracle.sdo.TT;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderOracle;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -176,7 +175,7 @@ public class OracleDataStore extends JDBCDataStore {
      * 
      *  TODO: Determine the specific type of the geometry.
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
     	final int TABLE_NAME = 3;
         final int COLUMN_NAME = 4;
         final int TYPE_NAME = 6;
@@ -203,20 +202,26 @@ public class OracleDataStore extends JDBCDataStore {
      * @param columnName
      * @param isNillable 
      */
-    private AttributeType getSDOGeometryAttribute(String tableName, String columnName, boolean isNullable ) {
+    private AttributeDescriptor getSDOGeometryAttribute(String tableName, String columnName, boolean isNullable ) {
     	int srid = 0; // aka NULL
+    	AttributeTypeBuilder build = new AttributeTypeBuilder();
+        build.setNillable(isNullable);
+        try {
+            Class geomClass = determineGeometryClass(tableName, columnName);
+            build.setBinding(geomClass); 
+        } catch (Exception e) {
+            LOGGER.warning("could not determin Geometry class");
+        }
 		try {
 			srid = determineSRID( tableName, columnName );
 //			CoordinateReferenceSystem crs = determineCRS( srid );
             CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
-            Class geomClass = determineGeometryClass(tableName, columnName);
-			if( crs != null ){
-				return AttributeTypeFactory.newAttributeType(columnName, geomClass,isNullable, 0, null, crs );
-			}
+            build.setCRS(crs);
+    
 		} catch (Exception e) {
 			LOGGER.warning( "Could not map SRID "+srid+" to CRS:"+e );
 		}
-    	return AttributeTypeFactory.newAttributeType(columnName, Geometry.class,isNullable);		
+		return build.buildDescriptor(columnName);		
 	}
     private Class determineGeometryClass(String tableName, String columnName) throws IOException {
         Connection conn = null;
@@ -320,7 +325,7 @@ public class OracleDataStore extends JDBCDataStore {
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType, org.geotools.data.jdbc.QueryData)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) throws IOException {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) throws IOException {
 	return new SDOAttributeIO(type, queryData);
     }
     
@@ -365,7 +370,7 @@ public class OracleDataStore extends JDBCDataStore {
     	return st.execute( sql );    	
     }
     
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
     	String tableName = featureType.getTypeName();
     	Transaction t = new DefaultTransaction("createSchema");
     	
@@ -446,7 +451,7 @@ public class OracleDataStore extends JDBCDataStore {
             return new ReferencedEnvelope(new Envelope(), query.getCoordinateSystem());
         }
 
-        FeatureType schema = getSchema(query.getTypeName());
+        SimpleFeatureType schema = getSchema(query.getTypeName());
         SQLBuilder sqlBuilder = getSqlBuilder(schema.getTypeName());
 
         Filter postQueryFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
@@ -462,8 +467,8 @@ public class OracleDataStore extends JDBCDataStore {
 
             Envelope retEnv = new Envelope();
             Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
-            AttributeType[] attributeTypes = schema.getAttributeTypes();
-            FeatureType schemaNew = schema;
+            //AttributeType[] attributeTypes = schema.getAttributeTypes();
+            SimpleFeatureType schemaNew = schema;
             if (!query.retrieveAllProperties()) {
                 try {
                     schemaNew = DataUtilities.createSubType(schema, query.getPropertyNames());
@@ -489,16 +494,16 @@ public class OracleDataStore extends JDBCDataStore {
             // BUT, if there's no geometry in the table, then the query will not (obviously) have a
             // geometry in it.
 
-            attributeTypes = schemaNew.getAttributeTypes();
+            List<AttributeDescriptor> attributeTypes = schemaNew.getAttributes();
 
             for (int j = 0, n = schemaNew.getAttributeCount(); j < n; j++) {
-                if (Geometry.class.isAssignableFrom(attributeTypes[j].getBinding())) // same as
+                if (Geometry.class.isAssignableFrom(attributeTypes.get(j).getType().getBinding())) // same as
                                                                                     // .isgeometry()
                                                                                     // - see new
                                                                                     // featuretype
                                                                                     // javadoc
                 {
-                    String attName = attributeTypes[j].getLocalName();
+                    String attName = attributeTypes.get(j).getLocalName();
                     Envelope curEnv = getEnvelope(conn, schemaNew, attName, sqlBuilder, filter);
 
                     if (curEnv == null) {
@@ -513,7 +518,7 @@ public class OracleDataStore extends JDBCDataStore {
 
             if ((schemaNew != null) && (schemaNew.getDefaultGeometry() != null))
                 return new ReferencedEnvelope(retEnv, schemaNew.getDefaultGeometry()
-                        .getCoordinateSystem());
+                        .getCRS());
             if (query.getCoordinateSystem() != null)
                 return new ReferencedEnvelope(retEnv, query.getCoordinateSystem());
             return new ReferencedEnvelope(retEnv, null);
@@ -536,14 +541,14 @@ public class OracleDataStore extends JDBCDataStore {
     
     protected Envelope getEnvelope(
         Connection conn,
-        FeatureType schema,
+        SimpleFeatureType schema,
         String geomName,
         SQLBuilder sqlBuilder,
         Filter filter)
         throws SQLException, SQLEncoderException, IOException, ParseException {
         
         StringBuffer sql = new StringBuffer();
-        GeometryAttributeType gat = (GeometryAttributeType) schema.getAttributeType(geomName);
+        GeometryDescriptor gat = (GeometryDescriptor) schema.getAttribute(geomName);
         // from the Oracle docs: "The SDO_TUNE.EXTENT_OF function has better performance than the
         // SDO_AGGR_MBR function if the data is non-geodetic and if a spatial index is defined
         // on the geometry column; however, the SDO_TUNE.EXTENT_OF function is limited to
@@ -554,7 +559,7 @@ public class OracleDataStore extends JDBCDataStore {
         // Long story short: under restrictive conditions SDO_TUNE.EXTENT_OF works, but we have
         // to be prepared to fall back on SDO_AGGR_MBR.
         List queries = new ArrayList();
-        if(Filter.INCLUDE.equals(filter) && !(gat.getCoordinateSystem() instanceof GeodeticCRS)) {
+        if(Filter.INCLUDE.equals(filter) && !(gat.getCRS() instanceof GeodeticCRS)) {
             sql.append("SELECT SDO_TUNE.EXTENT_OF('").append(schema.getTypeName()).append("', '");
             sql.append(geomName).append("') from dual");
             queries.add(sql.toString());
