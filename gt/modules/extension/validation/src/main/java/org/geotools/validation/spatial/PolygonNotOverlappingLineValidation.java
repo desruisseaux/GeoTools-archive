@@ -20,8 +20,8 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -72,26 +72,26 @@ public class PolygonNotOverlappingLineValidation
         Object[] poly2 = polySource2.getFeatures().toArray();
 
         if (!envelope.contains(polySource1.getBounds())) {
-            results.error((Feature) poly1[0],
+            results.error((SimpleFeature) poly1[0],
                 "Polygon Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         if (!envelope.contains(polySource2.getBounds())) {
-            results.error((Feature) poly1[0],
+            results.error((SimpleFeature) poly1[0],
                 "Restricted Polygon Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         for (int i = 0; i < poly1.length; i++) {
-            Feature tmp = (Feature) poly1[i];
-            Geometry gt = tmp.getDefaultGeometry();
+            SimpleFeature tmp = (SimpleFeature) poly1[i];
+            Geometry gt = (Geometry) tmp.getDefaultGeometry();
 
             for (int j = 0; j < poly2.length; j++) {
-                Feature tmp2 = (Feature) poly2[j];
-                Geometry gt2 = tmp2.getDefaultGeometry();
+                SimpleFeature tmp2 = (SimpleFeature) poly2[j];
+                Geometry gt2 = (Geometry) tmp2.getDefaultGeometry();
 
                 if (gt2.touches(gt)) {
                     return false;

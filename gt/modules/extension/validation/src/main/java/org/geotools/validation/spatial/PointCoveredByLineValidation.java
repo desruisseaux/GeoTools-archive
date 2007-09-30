@@ -20,8 +20,8 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -80,30 +80,30 @@ public class PointCoveredByLineValidation extends PointLineAbstractValidation {
         Object[] lines = lineSource.getFeatures().toArray();
 
         if (!envelope.contains(pointSource.getBounds())) {
-            results.error((Feature) points[0],
+            results.error((SimpleFeature) points[0],
                 "Point Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         if (!envelope.contains(lineSource.getBounds())) {
-            results.error((Feature) lines[0],
+            results.error((SimpleFeature) lines[0],
                 "Line Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         for (int i = 0; i < lines.length; i++) {
-            Feature tmp = (Feature) lines[i];
-            Geometry gt = tmp.getDefaultGeometry();
+            SimpleFeature tmp = (SimpleFeature) lines[i];
+            Geometry gt = (Geometry) tmp.getDefaultGeometry();
 
             if (gt instanceof LineString) {
                 LineString ls = (LineString) gt;
 
                 boolean r = false;
                 for (int j = 0; j < points.length && !r; j++) {
-                    Feature tmp2 = (Feature) points[j];
-                    Geometry gt2 = tmp2.getDefaultGeometry();
+                    SimpleFeature tmp2 = (SimpleFeature) points[j];
+                    Geometry gt2 = (Geometry) tmp2.getDefaultGeometry();
 
                     if (gt2 instanceof Point) {
                         Point pt = (Point) gt2;

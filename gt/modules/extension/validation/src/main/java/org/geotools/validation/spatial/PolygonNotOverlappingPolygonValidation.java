@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -108,14 +108,14 @@ public class PolygonNotOverlappingPolygonValidation
         }*/
         boolean success = true;
         for (int i = 0; i < poly1.length; i++) {
-        	Feature tmp = (Feature) poly1[i];
+        	SimpleFeature tmp = (SimpleFeature) poly1[i];
         	LOGGER.finest("Polgon overlap test for:"+tmp.getID() );
-            Geometry gt = tmp.getDefaultGeometry();
+            Geometry gt = (Geometry) tmp.getDefaultGeometry();
 
             for (int j = 0; j < poly2.length; j++) {
-                Feature tmp2 = (Feature) poly2[j];
+                SimpleFeature tmp2 = (SimpleFeature) poly2[j];
                 LOGGER.finest("Polgon overlap test against:"+tmp2.getID() );                
-                Geometry gt2 = tmp2.getDefaultGeometry();
+                Geometry gt2 = (Geometry) tmp2.getDefaultGeometry();
 
                 if (gt2.overlaps(gt) != expected) {
                 	results.error( tmp, "Polygon "+typeRef1+" overlapped Polygon "+typeRef2+"("+tmp2.getID()+") was not "+expected );

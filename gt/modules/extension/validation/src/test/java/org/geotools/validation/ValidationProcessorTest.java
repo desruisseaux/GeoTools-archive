@@ -21,10 +21,11 @@ import java.util.HashMap;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.validation.spatial.IsValidGeometryValidation;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * ValidationProcessorTest purpose.
@@ -96,12 +97,12 @@ public class ValidationProcessorTest extends DataTestCase {
 		// test the broken road
 		// make an incorrect line
 		try {
-			this.newRoad = this.roadType.create(new Object[] {
+			this.newRoad = SimpleFeatureBuilder.build(this.roadType, new Object[] {
 				new Integer(2), line(new int[] { 1, 2, 1, 2}), "r4"
 			}, "road.rd4");
 		} catch (IllegalAttributeException e) {}
 		
-		Feature[] singleRoad = new Feature[1];
+		SimpleFeature[] singleRoad = new SimpleFeature[1];
 		singleRoad[0] = this.newRoad;
 		FeatureCollection features = DataUtilities.collection(singleRoad);
 		processor.runFeatureTests( "dataStoreId", features, results);

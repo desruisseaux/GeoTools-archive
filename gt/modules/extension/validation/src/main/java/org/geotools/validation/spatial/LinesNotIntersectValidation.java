@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -85,8 +85,8 @@ public class LinesNotIntersectValidation extends LineLineAbstractValidation {
                 while (features.hasNext()) // for each feature
                  {
                     // check if it intersects any of the previous features
-                    Feature feature = features.next();
-                    Geometry geom = feature.getDefaultGeometry();
+                    SimpleFeature feature = features.next();
+                    Geometry geom = (Geometry) feature.getDefaultGeometry();
 
                     for (int i = 0; i < geoms.size(); i++) // for each existing geometry
                      {

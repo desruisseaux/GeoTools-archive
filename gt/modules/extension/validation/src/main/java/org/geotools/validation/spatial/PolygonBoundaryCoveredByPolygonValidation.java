@@ -20,8 +20,8 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -82,30 +82,30 @@ public class PolygonBoundaryCoveredByPolygonValidation
         Object[] polyRs = polySource.getFeatures().toArray();
 
         if (!envelope.contains(polySource.getBounds())) {
-            results.error((Feature) polys[0],
+            results.error((SimpleFeature) polys[0],
                 "Poly Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         if (!envelope.contains(polyrSource.getBounds())) {
-            results.error((Feature) polyRs[0],
+            results.error((SimpleFeature) polyRs[0],
                 "Poly Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         for (int i = 0; i < polys.length; i++) {
-            Feature tmp = (Feature) polys[i];
-            Geometry gt = tmp.getDefaultGeometry();
+            SimpleFeature tmp = (SimpleFeature) polys[i];
+            Geometry gt = (Geometry) tmp.getDefaultGeometry();
 
             if (gt instanceof Polygon) {
             	Polygon ls = (Polygon) gt;
 
                 boolean r = false;
                 for (int j = 0; j < polyRs.length && !r; j++) {
-                    Feature tmp2 = (Feature) polyRs[j];
-                    Geometry gt2 = tmp2.getDefaultGeometry();
+                    SimpleFeature tmp2 = (SimpleFeature) polyRs[j];
+                    Geometry gt2 = (Geometry) tmp2.getDefaultGeometry();
 
                     if (gt2 instanceof Polygon) {
                     	Polygon pt = (Polygon) gt2;

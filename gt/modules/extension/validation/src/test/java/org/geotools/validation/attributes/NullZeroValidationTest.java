@@ -19,10 +19,11 @@ package org.geotools.validation.attributes;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.validation.RoadValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -49,7 +50,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class NullZeroValidationTest extends TestCase {
 	private GeometryFactory gf;
 	private RoadValidationResults results;
-	private FeatureType type;	
+	private SimpleFeatureType type;	
 	NullZeroValidation test;	
 	/**
 	 * Constructor for NullZeroValidationTest.
@@ -78,9 +79,9 @@ public class NullZeroValidationTest extends TestCase {
 		results = new RoadValidationResults();
 	}
 
-	private Feature road( String road, int id, String name ) throws IllegalAttributeException{
+	private SimpleFeature road( String road, int id, String name ) throws IllegalAttributeException{
 		Coordinate[] coords = new Coordinate[]{ new Coordinate(1, 1), new Coordinate( 2, 2), new Coordinate (4, 2), new Coordinate (5, 1)};		
-		return type.create(new Object[] {
+		return SimpleFeatureBuilder.build(type, new Object[] {
 				new Integer(id),
 				gf.createLineString(coords),
 				name,

@@ -20,8 +20,8 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -78,14 +78,14 @@ public class LinesNotOverlapValidation extends LineLineAbstractValidation {
         Object[] lines2 = lineSource2.getFeatures().toArray();
 
         if (!envelope.contains(lineSource1.getBounds())) {
-            results.error((Feature) lines1[0],
+            results.error((SimpleFeature) lines1[0],
                 "Point Feature Source is not contained within the Envelope provided.");
 
             return false;
         }
 
         if (!envelope.contains(lineSource2.getBounds())) {
-            results.error((Feature) lines2[0],
+            results.error((SimpleFeature) lines2[0],
                 "Line Feature Source is not contained within the Envelope provided.");
 
             return false;
@@ -94,12 +94,12 @@ public class LinesNotOverlapValidation extends LineLineAbstractValidation {
         boolean r = true;
 
         for (int i = 0; i < lines2.length; i++) {
-            Feature tmp = (Feature) lines2[i];
-            Geometry gt = tmp.getDefaultGeometry();
+            SimpleFeature tmp = (SimpleFeature) lines2[i];
+            Geometry gt = (Geometry) tmp.getDefaultGeometry();
 
             for (int j = 0; j < lines1.length; j++) {
-                Feature tmp2 = (Feature) lines1[j];
-                Geometry gt2 = tmp2.getDefaultGeometry();
+                SimpleFeature tmp2 = (SimpleFeature) lines1[j];
+                Geometry gt2 = (Geometry) tmp2.getDefaultGeometry();
 
                 if (gt.overlaps(gt2)) {
                     results.error(tmp,

@@ -20,10 +20,10 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -83,15 +83,15 @@ public class LineNotTouchingPolygonInteriorValidation
         FeatureCollection fcPoly = fsPoly.getFeatures();
                 
         while(fLine.hasNext()){
-        	Feature line = fLine.next();
+        	SimpleFeature line = fLine.next();
         	FeatureIterator fPoly = fcPoly.features();
-        	Geometry lineGeom = line.getDefaultGeometry();
+        	Geometry lineGeom = (Geometry) line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){
         			while(fPoly.hasNext()){
-        				Feature poly = fPoly.next();
-        				Geometry polyGeom = poly.getDefaultGeometry(); 
+        				SimpleFeature poly = fPoly.next();
+        				Geometry polyGeom = (Geometry) poly.getDefaultGeometry(); 
         				if(envelope.contains(polyGeom.getEnvelopeInternal())){
         					if(Polygon.class.isAssignableFrom(polyGeom.getClass())){
         						Polygon p = (Polygon)polyGeom;

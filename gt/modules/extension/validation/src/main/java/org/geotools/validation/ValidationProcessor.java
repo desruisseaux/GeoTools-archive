@@ -28,14 +28,14 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.resources.TestData;
 import org.geotools.validation.dto.ArgumentDTO;
 import org.geotools.validation.dto.PlugInDTO;
 import org.geotools.validation.dto.TestDTO;
 import org.geotools.validation.dto.TestSuiteDTO;
 import org.geotools.validation.xml.XMLReader;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -314,7 +314,7 @@ public class ValidationProcessor {
      */
     public void runFeatureTests(String dsID, FeatureCollection collection, ValidationResults results)
         throws Exception {
-    	FeatureType type = collection.getSchema();
+    	SimpleFeatureType type = collection.getSchema();
         
         // check for any tests that are to be performed on ALL features
         ArrayList tests = (ArrayList) featureLookup.get(ANYTYPENAME);
@@ -341,7 +341,7 @@ public class ValidationProcessor {
              try {
             	 while (features.hasNext()) // iterate through each feature and run the test on it
                  {
-            	 	Feature feature = (Feature) features.next();
+            	 	SimpleFeature feature = (SimpleFeature) features.next();
             	 	
             	 	// for each test that is to be performed on this feature
             	 	for (int i = 0; i < tests.size(); i++) {

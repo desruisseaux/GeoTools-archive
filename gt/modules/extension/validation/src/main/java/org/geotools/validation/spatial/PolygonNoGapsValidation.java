@@ -17,10 +17,10 @@
  */
 package org.geotools.validation.spatial;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
@@ -68,12 +68,12 @@ public class PolygonNoGapsValidation extends DefaultFeatureValidation {
      *      com.vividsolutions.jts.geom.Envelope,
      *      org.geotools.validation.ValidationResults)
      */
-    public boolean validate(Feature feature, 
-                            FeatureType type,
+    public boolean validate(SimpleFeature feature, 
+                            SimpleFeatureType type,
 	                          ValidationResults results){
 		
         if(feature != null){
-        	Geometry layer = feature.getDefaultGeometry();
+        	Geometry layer = (Geometry) feature.getDefaultGeometry();
         	if(layer instanceof Polygon){
         		Polygon p = (Polygon)layer;
         		if(p.getNumInteriorRing()!=0){

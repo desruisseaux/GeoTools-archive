@@ -16,16 +16,18 @@
 package org.geotools.kml.bindings;
 
 import java.util.Collection;
+
 import javax.xml.namespace.QName;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.kml.KML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -54,7 +56,7 @@ public class FolderTypeBinding extends AbstractComplexBinding {
     static final SimpleFeatureType featureType;
 
     static {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.init(FeatureTypeBinding.featureType);
         tb.setName("folder");
 
@@ -93,12 +95,11 @@ public class FolderTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        DefaultFeatureBuilder b = new DefaultFeatureBuilder();
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureType);
 
         SimpleFeature feature = (SimpleFeature) value;
         b.init(feature);
-        b.setType(featureType);
-
+        
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:Feature"/&gt;
         b.set("Feature", node.getChildValues(SimpleFeature.class));
 

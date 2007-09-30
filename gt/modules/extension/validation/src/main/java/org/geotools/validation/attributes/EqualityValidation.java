@@ -18,11 +18,11 @@ package org.geotools.validation.attributes;
 
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.opengis.filter.Filter;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -102,7 +102,7 @@ public class EqualityValidation extends DefaultFeatureValidation {
      *
      * @see org.geotools.validation.FeatureValidation#validate
      */
-    public boolean validate(Feature feature, FeatureType type,
+    public boolean validate(SimpleFeature feature, SimpleFeatureType type,
         ValidationResults results) {
         if (!filter.evaluate(feature)) {
             return true;

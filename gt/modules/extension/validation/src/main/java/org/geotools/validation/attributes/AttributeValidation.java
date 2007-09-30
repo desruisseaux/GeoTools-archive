@@ -17,10 +17,10 @@
  */
 package org.geotools.validation.attributes;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -66,7 +66,7 @@ public class AttributeValidation extends DefaultFeatureValidation {
      *      org.geotools.feature.FeatureType,
      *      org.geotools.validation.ValidationResults)
      */
-    public boolean validate(Feature feature, FeatureType type,
+    public boolean validate(SimpleFeature feature, SimpleFeatureType type,
         ValidationResults results) {
     	int surface = ((Integer) feature.getAttribute("surface")).intValue();
     	int speed = ((Integer) feature.getAttribute("speed")).intValue();

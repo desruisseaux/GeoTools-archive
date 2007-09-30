@@ -33,13 +33,13 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultRepository;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.validation.dto.ArgumentDTO;
 import org.geotools.validation.dto.PlugInDTO;
 import org.geotools.validation.dto.TestDTO;
 import org.geotools.validation.dto.TestSuiteDTO;
 import org.geotools.validation.xml.ValidationException;
 import org.geotools.validation.xml.XMLReader;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -616,11 +616,11 @@ public class BatchValidator {
         Map errors = new HashMap();
         Validation v;
 
-        public void error(Feature feature, String message) {
+        public void error(SimpleFeature feature, String message) {
             errors.put(feature, message);
         }
 
-        public void warning(Feature feature, String message) {
+        public void warning(SimpleFeature feature, String message) {
             errors.put(feature, message);
         }
 
@@ -637,7 +637,7 @@ public class BatchValidator {
             Iterator i = errors.keySet().iterator();
             if(i.hasNext()){
             	while (i.hasNext()) {
-                	Feature f = (Feature) i.next();
+                	SimpleFeature f = (SimpleFeature) i.next();
                 	String msg = (String) errors.get(f);
                 	r += (f.getID() + " " + msg + "\n");
             	}

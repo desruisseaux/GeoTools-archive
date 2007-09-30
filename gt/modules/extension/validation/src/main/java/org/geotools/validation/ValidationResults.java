@@ -16,7 +16,7 @@
  */
 package org.geotools.validation;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -68,7 +68,7 @@ public interface ValidationResults {
      * @param message Optional error message. Use a non null message to provide
      *        specific failure information.
      */
-    public void error(Feature feature, String message);
+    public void error(SimpleFeature feature, String message);
 
     /**
      * Returns a validation warning against the provided feature. An optional
@@ -93,5 +93,5 @@ public interface ValidationResults {
      * @param message Optional warning message. Use a non null message to
      *        provide specific warning information.
      */
-    public void warning(Feature feature, String message);
+    public void warning(SimpleFeature feature, String message);
 }

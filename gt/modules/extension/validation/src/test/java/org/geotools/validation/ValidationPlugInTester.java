@@ -22,12 +22,13 @@ import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.validation.spatial.LineNoSelfIntersectValidation;
 import org.geotools.validation.spatial.LineNoSelfOverlappingValidation;
 import org.geotools.validation.spatial.LinesNotIntersectValidation;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * ValidationPlugInTester purpose.
@@ -144,15 +145,15 @@ public class ValidationPlugInTester extends DataTestCase {
 	
 		// produce a broken road (newRoad)
 		try {
-			this.newRoad = this.roadType.create(new Object[] {
+			this.newRoad = SimpleFeatureBuilder.build(this.roadType, new Object[] {
 				new Integer(2), line(new int[] { 3, 6, 3, 8, 5, 8, 5, 7, 2, 7}), "r4"
 			}, "road.rd4");
 		} catch (IllegalAttributeException e) {}
 		
 		try {
-            FeatureReader reader = DataUtilities.reader(new Feature[] {this.newRoad});
+            FeatureReader reader = DataUtilities.reader(new SimpleFeature[] {this.newRoad});
             String typeName = reader.getFeatureType().getTypeName();            
-			FeatureCollection collection = DataUtilities.collection(new Feature[] {this.newRoad});
+			FeatureCollection collection = DataUtilities.collection(new SimpleFeature[] {this.newRoad});
             processor.runFeatureTests("road", collection, roadValidationResults);
 			}
 		catch (Exception e1) {
@@ -220,13 +221,13 @@ public class ValidationPlugInTester extends DataTestCase {
 
 		// produce a broken road (newRoad)
 		try {
-			this.newRoad = this.roadType.create(new Object[] {
+			this.newRoad = SimpleFeatureBuilder.build(this.roadType, (new Object[] {
 				new Integer(2), line(new int[] { 7, 7, 8, 7, 9, 7, 9, 6, 8, 6, 8, 7, 7, 7}), "r4"
-			}, "road.rd4");
+			}), "road.rd4");
 		} catch (IllegalAttributeException e) {}
 	
 		try {
-			processor.runFeatureTests( "datastoreId", DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests( "datastoreId", DataUtilities.collection(new SimpleFeature[] {this.newRoad}), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
@@ -259,7 +260,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}*/
 	
 		try {
-			processor.runFeatureTests("dataStoreId", DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests("dataStoreId", DataUtilities.collection(new SimpleFeature[] {this.newRoad}), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -345,7 +346,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		
 		HashMap layers = new HashMap();
 		try {
-			layers.put("dataStoreId:road", DataUtilities.source(new Feature[] {newRoad}));
+			layers.put("dataStoreId:road", DataUtilities.source(new SimpleFeature[] {newRoad}));
 			layers.put("dataStoreId:river", DataUtilities.source(riverFeatures));
 		}
 		catch (Exception e) {

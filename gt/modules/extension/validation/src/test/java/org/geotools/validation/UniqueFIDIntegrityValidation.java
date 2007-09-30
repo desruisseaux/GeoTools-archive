@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -193,7 +193,7 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 				 
 				while (features.hasNext())	// for each feature
 				{
-					Feature feature = features.next();
+					SimpleFeature feature = features.next();
 					String fid = feature.getID();
 					if(FIDs.containsKey(fid))	// if a FID like this one already exists
 					{

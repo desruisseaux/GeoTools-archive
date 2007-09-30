@@ -25,13 +25,14 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.Filter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -87,17 +88,17 @@ public class ValidatorTest extends TestCase {
     		
     	assertEquals( "lakes test", 0, results.error.size() );
     }
-    public Feature createInvalidLake() throws Exception {
+    public SimpleFeature createInvalidLake() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
     	
     	FeatureIterator features = lakes.getFeatures( new DefaultQuery("lakes", Filter.INCLUDE, 1, null, null) ).features();
-    	Feature feature = features.next();
+    	SimpleFeature feature = features.next();
     	features.close();
     	
-    	FeatureType LAKE = lakes.getSchema();
+    	SimpleFeatureType LAKE = lakes.getSchema();
     	Object array[] = new Object[ LAKE.getAttributeCount() ];
     	for( int i=0; i<LAKE.getAttributeCount(); i++){
-    		AttributeType attr = LAKE.getAttributeType( i );
+    		AttributeDescriptor attr = LAKE.getAttribute( i );
     		// System.out.println( i+" "+attr.getType()+":"+attr.getName()+"="+feature.getAttribute( i )  );
     		if( LAKE.getDefaultGeometry() == attr ){
     			GeometryFactory factory = new GeometryFactory();
@@ -114,13 +115,13 @@ public class ValidatorTest extends TestCase {
     			array[i] = feature.getAttribute( i );
     		}
     	}
-    	return LAKE.create( array, "splash" );
+    	return SimpleFeatureBuilder.build(LAKE, array, "splash");
     }
     public void testFeatureValidation2() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	Feature newFeature = createInvalidLake();
+    	SimpleFeature newFeature = createInvalidLake();
     	    	
-    	FeatureCollection add = DataUtilities.collection( new Feature[]{ newFeature, } );
+    	FeatureCollection add = DataUtilities.collection( new SimpleFeature[]{ newFeature, } );
     	
     	DefaultFeatureResults results = new DefaultFeatureResults();    	
     	fixture.processor.runFeatureTests( "LAKES", add, results );
@@ -154,9 +155,9 @@ public class ValidatorTest extends TestCase {
     	Validator validator = new Validator( fixture.repository, fixture.processor );
     	
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	Feature newFeature = createInvalidLake();
+    	SimpleFeature newFeature = createInvalidLake();
         
-    	FeatureCollection add = DataUtilities.collection( new Feature[]{ newFeature, } );
+    	FeatureCollection add = DataUtilities.collection( new SimpleFeature[]{ newFeature, } );
     	DefaultFeatureResults results = new DefaultFeatureResults();
     	fixture.processor.runFeatureTests( "LAKES", add, results );
     	

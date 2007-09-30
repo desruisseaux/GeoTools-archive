@@ -19,10 +19,10 @@ package org.geotools.validation.spatial;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -100,7 +100,7 @@ public class LineNoSelfOverlappingValidation extends DefaultFeatureValidation {
     *      org.geotools.feature.FeatureTypeInfo,
     *      org.geotools.validation.ValidationResults)
     */
-   public boolean validate(Feature feature, FeatureType type,
+   public boolean validate(SimpleFeature feature, SimpleFeatureType type,
        ValidationResults results) {
        //BUG: refer to comments above.
        LOGGER.setLevel(Level.ALL);

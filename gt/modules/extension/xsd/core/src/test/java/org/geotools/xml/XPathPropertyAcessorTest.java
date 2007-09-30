@@ -22,8 +22,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.expression.PropertyAccessor;
 
 
@@ -32,7 +33,7 @@ public class XPathPropertyAcessorTest extends TestCase {
     SimpleFeature target;
 
     protected void setUp() throws Exception {
-        DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
         typeBuilder.setName("test");
         typeBuilder.setNamespaceURI("http://www.geotools.org/test");
         typeBuilder.add("name", String.class);
@@ -40,8 +41,7 @@ public class XPathPropertyAcessorTest extends TestCase {
         typeBuilder.add("geometry", Geometry.class);
         type = (SimpleFeatureType) typeBuilder.buildFeatureType();
 
-        DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-        builder.setType(type);
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
         builder.add("theName");
         builder.add("theDescription");
         builder.add(new GeometryFactory().createPoint(new Coordinate(0, 0)));

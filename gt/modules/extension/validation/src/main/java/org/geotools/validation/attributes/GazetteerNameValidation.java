@@ -27,10 +27,10 @@ import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -103,7 +103,7 @@ public class GazetteerNameValidation extends DefaultFeatureValidation {
      *      org.geotools.feature.FeatureType,
      *      org.geotools.validation.ValidationResults)
      */
-    public boolean validate(Feature feature, FeatureType type,
+    public boolean validate(SimpleFeature feature, SimpleFeatureType type,
         ValidationResults results) { // throws Exception {
 
         String place = (String) feature.getAttribute(attributeName);

@@ -22,14 +22,15 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -58,9 +59,9 @@ import com.vividsolutions.jts.geom.LineString;
 public class SpatialTestCase extends TestCase
 {
 	protected GeometryFactory gf;
-	protected FeatureType lineType;
-	protected Feature[] lineFeatures;
-	protected Envelope lineBounds;
+	protected SimpleFeatureType lineType;
+	protected SimpleFeature[] lineFeatures;
+	protected ReferencedEnvelope lineBounds;
 	protected LineString ls0, ls1, ls2, ls3;
 	protected String namespace;
 	protected FilterFactory filterFactory;
@@ -108,7 +109,7 @@ public class SpatialTestCase extends TestCase
 		namespace = getName();
 		vr = new TempFeatureResults();
 
-		lineFeatures = new Feature[4];
+		lineFeatures = new SimpleFeature[4];
 		ls0 = gf.createLineString(new Coordinate[]{	new Coordinate(0,0),
 													new Coordinate(2,0.1),
 													new Coordinate(3,0),
@@ -126,31 +127,31 @@ public class SpatialTestCase extends TestCase
 
 		lineType = DataUtilities.createType("my.line",
 											"id:0,geom:LineString,name:String");
-		lineFeatures[0] = lineType.create(new Object[] {
+		lineFeatures[0] = SimpleFeatureBuilder.build(lineType, new Object[] {
 										new Integer(0),
 										ls0,
 										"line0"},
 									"line.line0");
-		lineFeatures[1] = lineType.create(new Object[] {
+		lineFeatures[1] = SimpleFeatureBuilder.build(lineType, new Object[] {
 										new Integer(1),
 										ls1,
 										"line1"},
 									"line.line1");
-		lineFeatures[2] = lineType.create(new Object[] {
+		lineFeatures[2] = SimpleFeatureBuilder.build(lineType, new Object[] {
 										new Integer(2),
 										ls2,
 										"line2"},
 									"line.line2");
-		lineFeatures[3] = lineType.create(new Object[] {
+		lineFeatures[3] = SimpleFeatureBuilder.build(lineType, new Object[] {
 										new Integer(3),
 										ls3,
 										"line3"},
 									"line.line3");
-		lineBounds = new Envelope();
-		lineBounds.expandToInclude( lineFeatures[0].getBounds() );
-		lineBounds.expandToInclude( lineFeatures[1].getBounds() );
-		lineBounds.expandToInclude( lineFeatures[2].getBounds() );
-		lineBounds.expandToInclude( lineFeatures[3].getBounds() );
+		lineBounds = new ReferencedEnvelope();
+		lineBounds.include( lineFeatures[0].getBounds() );
+		lineBounds.include( lineFeatures[1].getBounds() );
+		lineBounds.include( lineFeatures[2].getBounds() );
+		lineBounds.include( lineFeatures[3].getBounds() );
 
 //		filterFactory = FilterFactoryFinder.createFilterFactory();
 //		BBoxExpression bbex = filterFactory.createBBoxExpression(lineBounds);

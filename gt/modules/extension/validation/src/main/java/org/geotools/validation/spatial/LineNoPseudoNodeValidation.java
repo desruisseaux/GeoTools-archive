@@ -20,10 +20,10 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -86,8 +86,8 @@ public class LineNoPseudoNodeValidation extends LineAbstractValidation {
         FeatureIterator fLine = fcLine.features();
                 
         while(fLine.hasNext()){
-        	Feature line = fLine.next();
-        	Geometry lineGeom = line.getDefaultGeometry();
+        	SimpleFeature line = fLine.next();
+        	Geometry lineGeom = (Geometry) line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){

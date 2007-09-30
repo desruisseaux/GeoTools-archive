@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -90,15 +90,15 @@ public class LineIntersectsLineWithNodeValidation
         FeatureCollection fcRLine = fsRLine.getFeatures();
                 
         while(fLine.hasNext()){
-        	Feature line = fLine.next();
+        	SimpleFeature line = fLine.next();
         	FeatureIterator fRLine = fcRLine.features();
-        	Geometry lineGeom = line.getDefaultGeometry();
+        	Geometry lineGeom = (Geometry) line.getDefaultGeometry();
         	if(envelope.contains(lineGeom.getEnvelopeInternal())){
         		// 	check for valid comparison
         		if(LineString.class.isAssignableFrom(lineGeom.getClass())){
         			while(fRLine.hasNext()){
-        				Feature rLine = fRLine.next();
-        				Geometry rLineGeom = rLine.getDefaultGeometry(); 
+        				SimpleFeature rLine = fRLine.next();
+        				Geometry rLineGeom = (Geometry) rLine.getDefaultGeometry(); 
         				if(envelope.contains(rLineGeom.getEnvelopeInternal())){
         					if(LineString.class.isAssignableFrom(rLineGeom.getClass())){
     							if(lineGeom.intersects(rLineGeom)){

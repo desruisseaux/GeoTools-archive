@@ -18,7 +18,7 @@ package org.geotools.validation;
 
 import java.util.ArrayList;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * RoadNetworkValidationResults purpose.
@@ -87,7 +87,7 @@ public class RoadNetworkValidationResults implements ValidationResults {
 	 * @param feature
 	 * @param message
 	 */
-	public void error(Feature feature, String message) {
+	public void error(SimpleFeature feature, String message) {
 		failedFeatures.add(feature);
 		failureMessages.add(feature.getID() + ": " + message);
 	}
@@ -102,7 +102,7 @@ public class RoadNetworkValidationResults implements ValidationResults {
 	 * @param feature
 	 * @param message
 	 */
-	public void warning(Feature feature, String message) {
+	public void warning(SimpleFeature feature, String message) {
 		warningFeatures.add(feature);
 		warningMessages.add(feature.getID() + ": " + message);
 	}

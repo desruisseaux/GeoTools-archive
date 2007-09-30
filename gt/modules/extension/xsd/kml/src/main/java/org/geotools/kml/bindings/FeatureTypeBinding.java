@@ -16,18 +16,21 @@
 package org.geotools.kml.bindings;
 
 import java.net.URI;
+
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.kml.KML;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -71,7 +74,7 @@ public class FeatureTypeBinding extends AbstractComplexBinding {
     protected static final SimpleFeatureType featureType;
 
     static {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setNamespaceURI(KML.NAMESPACE);
         tb.setName("feature");
 
@@ -134,8 +137,7 @@ public class FeatureTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        DefaultFeatureBuilder b = new DefaultFeatureBuilder();
-        b.setType(featureType);
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureType);
 
         //&lt;element minOccurs="0" name="name" type="string"/&gt;
         b.set("name", node.getChildValue("name"));

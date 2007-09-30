@@ -28,12 +28,11 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Repository;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -121,7 +120,7 @@ public class Validator
 			return;
 		}
 		
-		FeatureType type = features.getFeatureType();
+		SimpleFeatureType type = features.getFeatureType();
 		
 		final Map failed = new TreeMap();
 		
@@ -161,13 +160,13 @@ public class Validator
 					name = validation.getName();
 					description = validation.getDescription();
 				}                
-				public void error(Feature feature, String message) {
+				public void error(SimpleFeature feature, String message) {
 					LOGGER.warning(name + ": " + message + " (" + description
 						+ ")");
 					failed.put(feature.getID(),
 						name + ": " + message + " " + "(" + description + ")");
 				}
-				public void warning(Feature feature, String message) {
+				public void warning(SimpleFeature feature, String message) {
 					LOGGER.warning(name + ": " + message + " (" + description
 						+ ")");
 				}
@@ -324,7 +323,7 @@ public class Validator
 					description = validation.getDescription();
 				}
 		
-				public void error(Feature feature, String message) {
+				public void error(SimpleFeature feature, String message) {
 					LOGGER.warning(name + ": " + message + " (" + description
 						+ ")");
 					if (feature == null) {
@@ -336,7 +335,7 @@ public class Validator
 					}
 				}
 		
-				public void warning(Feature feature, String message) {
+				public void warning(SimpleFeature feature, String message) {
 					LOGGER.warning(name + ": " + message + " (" + description
 						+ ")");
 				}

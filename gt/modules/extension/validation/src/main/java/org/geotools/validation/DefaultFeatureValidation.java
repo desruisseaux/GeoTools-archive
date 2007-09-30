@@ -18,8 +18,8 @@ package org.geotools.validation;
 
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -182,7 +182,7 @@ public class DefaultFeatureValidation implements FeatureValidation {
      *
      * @see org.geotools.validation.FeatureValidation#validate
      */
-    public boolean validate(Feature feature, FeatureType type,
+    public boolean validate(SimpleFeature feature, SimpleFeatureType type,
         ValidationResults results) {
         LOGGER.warning(getName() + " not implemented");
         results.warning(feature, " test not implemented");
@@ -213,8 +213,8 @@ public class DefaultFeatureValidation implements FeatureValidation {
      * @return feature.getDefaultGeomertry as a LineString, or <code>null</code>
      * @throws ClassCastException If feature.getDefaultGeometry is the wrong type
      */
-    protected LineString getDefaultLineString( Feature feature ) throws ClassCastException {
-        Geometry geom = feature.getDefaultGeometry();
+    protected LineString getDefaultLineString( SimpleFeature feature ) throws ClassCastException {
+        Geometry geom = (Geometry)feature.getDefaultGeometry();
         if (geom == null) {
             // Ignore null value, user can use NullZero check
             return null;

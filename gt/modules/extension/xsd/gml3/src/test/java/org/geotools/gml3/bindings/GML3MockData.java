@@ -15,11 +15,22 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.Date;
+
+import javax.xml.namespace.QName;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.gml3.GML;
+import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import java.util.Date;
-import javax.xml.namespace.QName;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -30,14 +41,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.gml3.GML;
-import org.geotools.referencing.CRS;
 
 
 /**
@@ -225,7 +228,7 @@ public class GML3MockData {
     }
 
     static SimpleFeature feature() throws Exception {
-        DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
+        SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
         typeBuilder.setName(TEST.TestFeature.getLocalPart());
         typeBuilder.setNamespaceURI(TEST.TestFeature.getNamespaceURI());
 
@@ -237,9 +240,7 @@ public class GML3MockData {
 
         SimpleFeatureType type = (SimpleFeatureType) typeBuilder.buildFeatureType();
 
-        DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-
-        builder.setType(type);
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
         builder.add("theName");
         builder.add("theDescription");
         builder.add(point());

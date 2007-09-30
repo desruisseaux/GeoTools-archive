@@ -20,15 +20,14 @@ package org.geotools.validation.network;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.graph.build.line.LineStringGraphGenerator;
 import org.geotools.graph.structure.Graph;
 import org.geotools.validation.DefaultIntegrityValidation;
 import org.geotools.validation.ValidationResults;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.feature.simple.SimpleFeature;
 
 
 /**
@@ -83,7 +82,7 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
      *
      * @throws Exception DOCUMENT ME!
      */
-    public boolean validate(Map layers, Envelope envelope,
+    public boolean validate(Map layers, ReferencedEnvelope envelope,
         final ValidationResults results) throws Exception {
     	
       LineStringGraphGenerator lgb = new LineStringGraphGenerator();
@@ -93,7 +92,7 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
       FeatureIterator f = fc.features();
 
       while (f.hasNext()) {
-          Feature ft = f.next();
+          SimpleFeature ft = f.next();
 
           if (envelope.contains(ft.getBounds())) {
               //lgb.add(ft);

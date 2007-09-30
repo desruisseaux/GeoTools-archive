@@ -16,18 +16,14 @@
  */
 package org.geotools.validation.relate;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
@@ -35,7 +31,10 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -101,7 +100,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	/* (non-Javadoc)
 	 * @see org.geotools.validation.IntegrityValidation#validate(java.util.Map, com.vividsolutions.jts.geom.Envelope, org.geotools.validation.ValidationResults)
 	 */
-	public boolean validate(Map layers, Envelope envelope,
+	public boolean validate(Map layers, ReferencedEnvelope envelope,
 			ValidationResults results) throws Exception 
 	{
 		LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
@@ -183,19 +182,19 @@ public class CrossesIntegrity extends RelationIntegrity
 						
 			while (fr1.hasNext())
 			{
-				Feature f1 = fr1.next();
-				Geometry g1 = f1.getDefaultGeometry();
+				SimpleFeature f1 = fr1.next();
+				Geometry g1 = (Geometry)f1.getDefaultGeometry();
 				fr2 = featureResultsB.features();
 				
 				while (fr2 != null && fr2.hasNext())
 				{
-					Feature f2 = fr2.next();
-					Geometry g2 = f2.getDefaultGeometry();
+					SimpleFeature f2 = fr2.next();
+					Geometry g2 = (Geometry)f2.getDefaultGeometry();
 					//System.out.println("Do the two overlap?->" + g1.overlaps(g2));
 					//System.out.println("Does the one contain the other?->" + g1.contains(g2));
 					if(g1.overlaps(g2) != expected || g1.contains(g2) != expected)
 					{
-						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" overlapped "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
+						results.error( f1, ((Geometry)f1.getDefaultGeometry()).getGeometryType()+" "+getGeomTypeRefA()+" overlapped "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
 						success = false;
 					}
 				}		
@@ -241,12 +240,12 @@ public class CrossesIntegrity extends RelationIntegrity
 	private boolean validateSingleLayer(FeatureSource featureSourceA, 
 										boolean expected, 
 										ValidationResults results, 
-										Envelope bBox) 
+										ReferencedEnvelope bBox) 
 	throws Exception
 	{
 		boolean success = true;
 		
-		FeatureType ft = featureSourceA.getSchema();
+		SimpleFeatureType ft = featureSourceA.getSchema();
 		
 		Filter filter = filterBBox(bBox, ft);
 
@@ -265,24 +264,24 @@ public class CrossesIntegrity extends RelationIntegrity
 			while (fr1.hasNext())
 			{
 				//System.out.println("Single layer Outer loop count: " + loopCt1);
-				Feature f1 = fr1.next();
+				SimpleFeature f1 = fr1.next();
 //				System.out.println("overlapFilter " + overlapsFilter.contains(f1));
 //				System.out.println("containsFilter " + containsFilter.contains(f1));
 				//System.out.println("Filter " + filter.contains(f1));
 //				System.out.println("f1 = " + f1.getDefaultGeometry().getEnvelope());
 //				System.out.println("env1 = " + bBox);
 				
-				Geometry g1 = f1.getDefaultGeometry();
-				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
+				Geometry g1 = (Geometry)f1.getDefaultGeometry();
+				Filter filter2 = filterBBox(ReferencedEnvelope.reference(g1.getEnvelope().getEnvelopeInternal()), ft);
 
 				//FeatureResults featureResults2 = featureSourceA.getFeatures(filter2);
 				FeatureCollection featureResults2 = featureSourceA.getFeatures();
 				fr2 = featureResults2.features();	
 				while (fr2 != null && fr2.hasNext())
 				{			
-					Feature f2 = fr2.next();
+					SimpleFeature f2 = fr2.next();
 					//System.out.println("Filter2 " + filter2.contains(f2));
-					Geometry g2 = f2.getDefaultGeometry();
+					Geometry g2 = (Geometry)f2.getDefaultGeometry();
 					//System.out.println("Do the two overlap?->" + g1.overlaps(g2));
 					//System.out.println("Does the one contain the other?->" + g1.contains(g2));
 					if (!usedIDs.contains(f2.getID()))
@@ -294,7 +293,7 @@ public class CrossesIntegrity extends RelationIntegrity
 							{
 								//results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
 								results.error( f1, getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+")");
-								System.out.println(f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
+								System.out.println(((Geometry)f1.getDefaultGeometry()).getGeometryType()+" "+getGeomTypeRefA()+"("+f1.getID()+")"+" crossed "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected);
 								success = false;
 							}
 						}
@@ -314,7 +313,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	
 	
 	
-	private Filter filterBBox(Envelope bBox, FeatureType ft)
+	private Filter filterBBox(ReferencedEnvelope bBox, SimpleFeatureType ft)
 		throws FactoryConfigurationError, IllegalFilterException
 	{
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();

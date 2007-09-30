@@ -16,8 +16,8 @@
  */
 package org.geotools.validation;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -99,6 +99,6 @@ public interface FeatureValidation extends Validation {
      *
      * @return True if feature passes this test.
      */
-    public boolean validate(Feature feature, FeatureType type,
+    public boolean validate(SimpleFeature feature, SimpleFeatureType type,
         ValidationResults results) throws Exception;
 }

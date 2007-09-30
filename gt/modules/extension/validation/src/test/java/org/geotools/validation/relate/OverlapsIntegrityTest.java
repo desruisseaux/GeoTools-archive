@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -85,7 +85,7 @@ public class OverlapsIntegrityTest extends SpatialTestCase
         FeatureIterator r=line.getFeatures().features();
 		for( ; r.hasNext(); ){
 			System.out.println("Loop counter: " +  ++counter);
-			Feature victim = r.next();
+			SimpleFeature victim = r.next();
 			System.out.println("Found line number: " + victim.getID());
 			assertTrue( "feature "+victim.getID(), filter.evaluate( victim ));
 		}

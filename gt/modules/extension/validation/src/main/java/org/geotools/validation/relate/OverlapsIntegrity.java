@@ -16,27 +16,27 @@
  */
 package org.geotools.validation.relate;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -103,7 +103,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 	/* (non-Javadoc)
 	 * @see org.geotools.validation.IntegrityValidation#validate(java.util.Map, com.vividsolutions.jts.geom.Envelope, org.geotools.validation.ValidationResults)
 	 */
-	public boolean validate(Map layers, Envelope envelope,
+	public boolean validate(Map layers, ReferencedEnvelope envelope,
 			ValidationResults results) throws Exception 
 	{
 		LOGGER.finer("Starting test "+getName()+" ("+getClass().getName()+")" );
@@ -161,14 +161,14 @@ public class OverlapsIntegrity extends RelationIntegrity
 											FeatureSource featureSourceB, 
 											boolean expected, 
 											ValidationResults results, 
-											Envelope bBox) 
+											ReferencedEnvelope bBox) 
 	throws Exception
 	{
 		boolean success = true;
 		int errors = 0;
 		int countInterval = 100;
 		int counter = 0;
-		FeatureType ft = featureSourceA.getSchema();
+		SimpleFeatureType ft = featureSourceA.getSchema();
 		
 		Filter filter = filterBBox(bBox, ft);
 
@@ -187,10 +187,10 @@ public class OverlapsIntegrity extends RelationIntegrity
 			while (fr1.hasNext())
 			{
 				counter++;
-				Feature f1 = fr1.next();
+				SimpleFeature f1 = fr1.next();
 				
-				Geometry g1 = f1.getDefaultGeometry();
-				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
+				Geometry g1 = (Geometry)f1.getDefaultGeometry();
+				Filter filter2 = filterBBox(ReferencedEnvelope.reference(g1.getEnvelope().getEnvelopeInternal()), ft);
 
 				FeatureCollection collectionB = featureSourceB.getFeatures(filter2);
 				
@@ -199,8 +199,8 @@ public class OverlapsIntegrity extends RelationIntegrity
 				{
 					while (fr2 != null && fr2.hasNext())
 					{
-						Feature f2 = fr2.next();
-						Geometry g2 = f2.getDefaultGeometry();
+						SimpleFeature f2 = fr2.next();
+						Geometry g2 = (Geometry)f2.getDefaultGeometry();
 						if (!usedIDs.contains(f2.getID()))
 						{
 							
@@ -269,7 +269,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 	private boolean validateSingleLayer(FeatureSource featureSourceA, 
 										boolean expected, 
 										ValidationResults results, 
-										Envelope bBox) 
+										ReferencedEnvelope bBox) 
 	throws Exception
 	{
 		boolean success = true;
@@ -277,7 +277,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 		Date date1 = new Date();
 		int countInterval = 100;
 		int counter = 0;
-		FeatureType ft = featureSourceA.getSchema();
+		SimpleFeatureType ft = featureSourceA.getSchema();
 		
 		
 		System.out.println("---------------- In Overlaps Integrity ----------------");
@@ -303,10 +303,10 @@ public class OverlapsIntegrity extends RelationIntegrity
 			while (fr1.hasNext())
 			{
 				counter++;
-				Feature f1 = fr1.next();
+				SimpleFeature f1 = fr1.next();
 				
-				Geometry g1 = f1.getDefaultGeometry();
-				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
+				Geometry g1 = (Geometry) f1.getDefaultGeometry();
+				Filter filter2 = filterBBox(ReferencedEnvelope.reference(g1.getEnvelope().getEnvelopeInternal()), ft);
 
 				FeatureCollection collectionB = featureSourceA.getFeatures(filter2);
 				
@@ -315,8 +315,8 @@ public class OverlapsIntegrity extends RelationIntegrity
 				{
 					while (fr2 != null && fr2.hasNext())
 					{
-						Feature f2 = fr2.next();
-						Geometry g2 = f2.getDefaultGeometry();
+						SimpleFeature f2 = fr2.next();
+						Geometry g2 = (Geometry) f2.getDefaultGeometry();
 						if (!usedIDs.contains(f2.getID()))
 						{
 							
@@ -367,7 +367,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 	
 	
 	/** Try and Filter by the provided bbox, will default to Filter.EXCLUDE if null */
-	static public Filter filterBBox(Envelope bBox, FeatureType ft)
+	static public Filter filterBBox(Envelope bBox, SimpleFeatureType ft)
 		throws FactoryConfigurationError, IllegalFilterException
 	{
 		if( bBox == null ){

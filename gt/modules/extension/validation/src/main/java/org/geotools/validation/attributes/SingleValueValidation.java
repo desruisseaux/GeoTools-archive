@@ -17,10 +17,10 @@
  */
 package org.geotools.validation.attributes;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -62,7 +62,7 @@ public class SingleValueValidation extends DefaultFeatureValidation {
      *
      * @see org.geotools.validation.FeatureValidation#validate
      */
-    public boolean validate(Feature feature, FeatureType type,
+    public boolean validate(SimpleFeature feature, SimpleFeatureType type,
         ValidationResults results) {
         return false;
     }

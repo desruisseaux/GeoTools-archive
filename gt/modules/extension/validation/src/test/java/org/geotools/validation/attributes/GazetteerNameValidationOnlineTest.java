@@ -33,16 +33,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -52,7 +50,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 /**
  * GazetteerNameValidationTest purpose.
@@ -71,11 +68,11 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 	public GazetteerNameValidationOnlineTest(String s){super(s);}
 	
 	public void XtestValidate() {
-		class TestFeature implements Feature {
+		class TestFeature implements SimpleFeature {
 			Map attrs = new HashMap();
 			public FeatureCollection getParent(){return null;}
 			public void setParent(FeatureCollection collection){}
-			public FeatureType getFeatureType(){return null;}
+			public SimpleFeatureType getFeatureType(){return null;}
 			public String getID(){return "";}
 			public Object[] getAttributes(Object[] attributes){return attrs.entrySet().toArray();}
 			//	used
@@ -255,7 +252,7 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
                 return false;
             }
 		}
-		Feature f = new TestFeature();
+		SimpleFeature f = new TestFeature();
 		try{f.setAttribute("CityName","Vancouver");}catch(Exception e){}
 		GazetteerNameValidation gnv = new GazetteerNameValidation();
 		gnv.setAttributeName("CityName");

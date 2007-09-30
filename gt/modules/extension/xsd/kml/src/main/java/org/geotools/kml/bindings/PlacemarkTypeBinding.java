@@ -95,7 +95,7 @@ public class PlacemarkTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        SimpleFeatureBuilder b = new SimpleFeatureBuilder();
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(featureType);
 
         SimpleFeature feature = (SimpleFeature) value;
         b.init(feature);
