@@ -22,7 +22,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * Indicates client class has attempted to create an invalid feature.
  * @source $URL$
  */
-public class IllegalAttributeException extends RuntimeException {
+public class IllegalAttributeException extends IllegalArgumentException {
     private static final long serialVersionUID = -4964013824521988182L;
 
     /** The expected attribute type. */

@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.IllegalAttributeException;
-
 
 /**
  * The low-level interface for reading Features. Will use the underlying
@@ -103,7 +101,7 @@ public interface FeatureReader {
      */
 
     //Feature next() throws IOException, IllegalAttributeException, NoSuchElementException;
-    SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException;
+    SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException;
 
     /**
      * Query whether this FeatureReader has another Feature.
