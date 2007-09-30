@@ -3,6 +3,7 @@ package org.geotools.feature;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.IllegalFilterException;
@@ -93,7 +94,7 @@ public class AttributeTypeBuilder {
 	/**
 	 * restrictions
 	 */
-	protected List/*<Filter>*/ restrictions;
+	protected List<Filter> restrictions;
 	/**
 	 * string description
 	 */
@@ -124,19 +125,33 @@ public class AttributeTypeBuilder {
 	//AttributeDescriptor
 	//
 	/**
-	 * min occurs
+	 * Minimum number of occurrences allowed.
+	 * See minOccurs() function for the default value
+	 * based on nillable if not explicitly set.
 	 */
-	protected int minOccurs = 0;
+	protected Integer minOccurs = null;
+	
+    /**
+     * Maximum number of occurrences allowed.
+     * See maxOccurs() function for the default value (of 1).
+     */
+	protected Integer maxOccurs = null;
+	
 	/**
-	 * max occurs
-	 */
-	protected int maxOccurs = 1;
-	/**
-	 * nullable
+	 * True if value is allowed to be null.
+	 * <p>
+	 * Depending on this value minOccurs, maxOccurs and defaultValue()
+	 * will return different results.
+	 * <p>
+	 * The default value is <code>true</code>.
 	 */
 	protected boolean isNillable = true;
 
-    private int length = -1;
+	/**
+	 * If this value is set an additional restriction
+	 * will be added based on the length function.
+	 */
+    private Integer length = null;
 	
     protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
 	
@@ -172,15 +187,16 @@ public class AttributeTypeBuilder {
 		description = null;
 		isIdentifiable = false;
 		binding = Object.class;
+		defaultValue = null;
 		superType = null;
 		crs = null;
-		length = -1;
+		length = null;
 		isCrsSet = false;
 	}
 	
 	protected void resetDescriptorState() {
-		minOccurs = 1;
-		maxOccurs = 1;
+		minOccurs = null;
+		maxOccurs = null;
 		isNillable = true;
 	}
 	
@@ -444,7 +460,7 @@ public class AttributeTypeBuilder {
 	
 	public AttributeDescriptor buildDescriptor(Name name, AttributeType type ) {
 		AttributeDescriptor descriptor = factory.createAttributeDescriptor(
-			type, name, minOccurs, maxOccurs, isNillable, defaultValue);
+			type, name, minOccurs(), maxOccurs(), isNillable, defaultValue());
 	
 		resetDescriptorState();
 		return descriptor;
@@ -452,16 +468,44 @@ public class AttributeTypeBuilder {
 	
 	public GeometryDescriptor buildDescriptor(Name name, GeometryType type ) {
 	    GeometryDescriptor descriptor = factory.createGeometryDescriptor(
-            type, name, minOccurs, maxOccurs, isNillable, defaultValue);
+            type, name, minOccurs(), maxOccurs(), isNillable, defaultValue());
     
         resetDescriptorState();
         return descriptor;
     }
 	
+	/**
+	 * This is not actually right but we do it for backwards compatibility.
+	 * @return minOccurs if set or a default based on isNillable.
+	 */
+	private int minOccurs(){
+	    if( minOccurs == null ){
+	        return isNillable ? 0 : 1;
+	    }
+	    return minOccurs;
+	}
+    /**
+     * This is not actually right but we do it for backwards compatibility.
+     * @return minOccurs if set or a default based on isNillable.
+     */
+    private int maxOccurs(){
+        if( maxOccurs == null ){
+            return 1;
+        }
+        return maxOccurs;
+    }
+	
+	private Object defaultValue(){
+	    if( defaultValue == null && !isNillable){
+	        defaultValue = DataUtilities.defaultValue( binding );
+	    }
+	    return defaultValue;
+	}
+	
 	// internal / subclass api
 	//
 	
-	protected List restrictions() {
+	protected List<Filter> restrictions() {
 		if (restrictions == null ) {
 			restrictions = new ArrayList();		
 		}
