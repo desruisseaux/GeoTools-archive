@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 import junit.framework.TestCase;
 
 import org.geotools.data.DataStoreFinder;
@@ -42,15 +40,12 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
-import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -60,6 +55,8 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -239,14 +236,14 @@ public class OracleDataStoreOnlineTest extends TestCase {
 
     public void testGetSchema() throws Exception {
     	if( conn == null ) return;    	
-            FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
+            SimpleFeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
             assertNotNull(ft);
             System.out.println(ft);
     }
 
     public void testGetFeatureReader() throws Exception {
     	if( conn == null ) return;    	
-            FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
+            SimpleFeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
             Query q = new DefaultQuery( "ORA_TEST_POINTS" );
             FeatureReader fr = dstore.getFeatureReader( q, Transaction.AUTO_COMMIT);
             assertEquals( ft, fr.getFeatureType() );
@@ -266,7 +263,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         FeatureWriter writer = dstore.getFeatureWriter("ORA_TEST_POINTS", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         assertNotNull(writer);
 
-        Feature feature = writer.next();
+        SimpleFeature feature = writer.next();
         System.out.println(feature);
         feature.setAttribute(0, "Changed Feature");
         System.out.println(feature);
@@ -275,7 +272,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
 
         Query q = new DefaultQuery( "ORA_TEST_POINTS" );
         FeatureReader reader = dstore.getFeatureReader( q, Transaction.AUTO_COMMIT);
-        Feature readF = reader.next();
+        SimpleFeature readF = reader.next();
         
         assertEquals("Changed Feature", feature.getAttribute(0));
         assertEquals(feature.getID(), readF.getID());
@@ -328,7 +325,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         
         FeatureCollection fc = fr;
         assertEquals(1, fc.size());
-        Feature f = fc.features().next();
+        SimpleFeature f = fc.features().next();
         assertEquals("point 1", f.getAttribute("NAME"));        
     }
     
@@ -403,8 +400,8 @@ public class OracleDataStoreOnlineTest extends TestCase {
         FeatureCollection fr = fs.getFeatures(filter);        
         assertEquals(1, fr.size());
         
-        Feature feature = (Feature) fr.iterator().next();
-        Geometry geom = feature.getDefaultGeometry();
+        SimpleFeature feature = (SimpleFeature) fr.iterator().next();
+        Geometry geom = (Geometry) feature.getDefaultGeometry();
         assertEquals(Point.class.getName(), geom.getClass().getName());
         Point point = (Point) geom;
         assertEquals(10.0, point.getX(), 0.001);
@@ -420,7 +417,12 @@ public class OracleDataStoreOnlineTest extends TestCase {
         String name = "add_name";
         BigDecimal intval = new BigDecimal(70);
         Point point = jtsFactory.createPoint(new Coordinate(-15.0, -25));
-        Feature feature = dstore.getSchema("ORA_TEST_POINTS").create(new Object[] { name, intval, point });
+        SimpleFeatureType type = dstore.getSchema("ORA_TEST_POINTS");
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
+        builder.add(name);
+        builder.add(intval);
+        builder.add(point);
+        SimpleFeature feature = builder.buildFeature("fid.1");
          
         FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
         fs.addFeatures(DataUtilities.collection(feature));
@@ -451,10 +453,10 @@ public class OracleDataStoreOnlineTest extends TestCase {
         DefaultQuery q = new DefaultQuery("ORA_TEST_POINTS",Filter.INCLUDE);
         q.setPropertyNames(new String[]{"NAME"});
         FeatureReader fr = dstore.getFeatureReader(q, Transaction.AUTO_COMMIT);
-        Feature f = fr.next();
-        FeatureType ft = f.getFeatureType();
+        SimpleFeature f = fr.next();
+        SimpleFeatureType ft = f.getFeatureType();
         assertEquals(1, ft.getAttributeCount());
-        assertEquals("NAME", ft.getAttributeType(0).getLocalName());        
+        assertEquals("NAME", ft.getAttribute(0).getLocalName());        
     }
     
     public void testBoundsWgs84() throws IOException {
@@ -516,14 +518,14 @@ public class OracleDataStoreOnlineTest extends TestCase {
     
     public void testGeometryType() throws IOException {
         if( conn == null ) return; 
-        FeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
-        assertEquals(Point.class, ft.getDefaultGeometry().getBinding());
+        SimpleFeatureType ft = dstore.getSchema("ORA_TEST_POINTS");
+        assertEquals(Point.class, ft.getDefaultGeometry().getType().getBinding());
     }
     
     public void testGeometryType2() throws IOException {
         if( conn == null ) return; 
         // here we did not declare a type
-        FeatureType ft = dstore.getSchema("ORA_TEST_LINES");
-        assertEquals(Geometry.class, ft.getDefaultGeometry().getBinding());
+        SimpleFeatureType ft = dstore.getSchema("ORA_TEST_LINES");
+        assertEquals(Geometry.class, ft.getDefaultGeometry().getType().getBinding());
     }
 }

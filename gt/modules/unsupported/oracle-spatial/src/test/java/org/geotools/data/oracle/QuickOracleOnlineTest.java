@@ -15,14 +15,12 @@
  */
 package org.geotools.data.oracle;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
 
 import oracle.sql.ARRAY;
@@ -33,11 +31,10 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
-import org.geotools.data.jdbc.JDBCDataStoreConfig;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -224,9 +221,9 @@ public class QuickOracleOnlineTest extends DataTestCase {
     public void testGeometryCRS() throws Exception {
     	if( conn == null ) return;
     	FeatureType schema = data.getSchema("ORA_TEST_LINES");
-    	GeometryAttributeType geom = schema.getDefaultGeometry();
+    	GeometryDescriptor geom = schema.getDefaultGeometry();
     	
-    	assertNotNull( geom.getCoordinateSystem() );
+    	assertNotNull( geom.getCRS() );
     	assertEquals( "SHAPE", geom.getLocalName() );
     }    
 }

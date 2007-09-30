@@ -18,9 +18,9 @@ package org.geotools.data.oracle;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.SQLEncoderOracle;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class SqlStatementEncoderTest extends TestCase {
 	private SQLEncoderOracle encoder;
@@ -38,7 +38,7 @@ public class SqlStatementEncoderTest extends TestCase {
 	 * 'org.geotools.data.oracle.SqlStatementEncoder.makeCreateTableSQL(FeatureType)'
 	 */
 	public void testMakeCreateTableSQL() throws Exception {
-		FeatureType schema = DataUtilities.createType("ignore",
+		SimpleFeatureType schema = DataUtilities.createType("ignore",
 				"name:String, line:MultiLineString, measure:Integer");
 		String create = sql.makeCreateTableSQL(schema);
 //		System.out.println(create);
@@ -61,7 +61,7 @@ public class SqlStatementEncoderTest extends TestCase {
 	 * 'org.geotools.data.oracle.SqlStatementEncoder.makeCreateGeomIndex()'
 	 */
 	public void testMakeCreateIndexSQL() throws SchemaException {
-		FeatureType schema = DataUtilities.createType("ignore",
+		SimpleFeatureType schema = DataUtilities.createType("ignore",
 				"name:String, line:MultiLineString, measure:Integer");
 		String create = sql.makeCreateGeomIndex(schema);
 		String expected = "CREATE INDEX table_sidx ON table( line) INDEXTYPE IS mdsys.spatial_index";
