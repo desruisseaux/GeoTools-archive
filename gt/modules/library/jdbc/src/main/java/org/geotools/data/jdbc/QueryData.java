@@ -33,10 +33,10 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.factory.Hints;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 /**
  * QueryData holds the ResultSet obtained from the sql query and has the following responsibilities:
@@ -130,7 +130,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
         this.attributeHandlers = new AttributeIO[attributeTypes.size()];
 
         for (int i = 0; i < attributeHandlers.length; i++) {
-            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+            if (attributeTypes.get(i) instanceof GeometryDescriptor) {
                 attributeHandlers[i] = parentDataStore.getGeometryAttributeIO(attributeTypes.get(i),
                         this);
             } else {

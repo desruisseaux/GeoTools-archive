@@ -30,10 +30,8 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.GeometryAttributeType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryDescriptor;
 
 

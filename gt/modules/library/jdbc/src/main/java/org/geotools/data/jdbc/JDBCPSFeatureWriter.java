@@ -27,11 +27,10 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.GeometryAttributeType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
 
 
 /**
@@ -134,7 +133,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
 
         for (int i = 0; i < attributeTypes.size(); i++) {
-            if (attributeTypes.get(i) instanceof GeometryAttributeType ) {
+            if (attributeTypes.get(i) instanceof GeometryDescriptor ) {
                 String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
@@ -187,7 +186,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
 
         // append attribute columns placeholders
         for (int i = 0; i < attributeTypes.size(); i++) {
-            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+            if (attributeTypes.get(i) instanceof GeometryDescriptor) {
                 statementSQL.append("?");
             } else {
                 statementSQL.append(getGeometryPlaceHolder(attributeTypes.get(i)));
@@ -336,7 +335,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
 
         // set new vales for other fields
         for (int i = 0; i < attributeTypes.size(); i++) {
-            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+            if (attributeTypes.get(i) instanceof GeometryDescriptor) {
                 String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
@@ -381,7 +380,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
         for (int i = 0; i < attributeTypes.size(); i++) {
             statementSQL.append(attributeTypes.get(i).getLocalName()).append(" = ");
 
-            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+            if (attributeTypes.get(i) instanceof GeometryDescriptor) {
                 statementSQL.append("?");
             } else {
                 statementSQL.append(getGeometryPlaceHolder(attributeTypes.get(i)));

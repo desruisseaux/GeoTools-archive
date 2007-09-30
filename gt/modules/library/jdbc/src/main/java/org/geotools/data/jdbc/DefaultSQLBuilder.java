@@ -16,7 +16,7 @@
 package org.geotools.data.jdbc;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -252,7 +252,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
         }
 
         for (int i = 0; i < attributes.length; i++) {
-            if (attributes[i] instanceof GeometryAttributeType) {
+            if (attributes[i] instanceof GeometryDescriptor) {
                 sqlGeometryColumn(sql, attributes[i]);
             } else {
                 sql.append(encoder.escapeName(attributes[i].getLocalName()));

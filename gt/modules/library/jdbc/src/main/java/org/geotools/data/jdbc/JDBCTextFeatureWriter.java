@@ -33,11 +33,11 @@ import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -216,7 +216,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
         for (int i = 0; i < attributeTypes.size(); i++) {
             attrValue = null;
-            if (attributeTypes.get(i) instanceof GeometryAttributeType) {
+            if (attributeTypes.get(i) instanceof GeometryDescriptor) {
                 String geomName = attributeTypes.get(i).getLocalName();
                 int srid = ftInfo.getSRID(geomName);
                 Geometry geometry = (Geometry) attributes[i];
@@ -479,7 +479,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 }
 
 				String attrValue = null;
-				if (attributes[i] instanceof GeometryAttributeType) {
+				if (attributes[i] instanceof GeometryDescriptor) {
 				    String geomName = attributes[i].getLocalName();
 				    int srid = ftInfo.getSRID(geomName);
 				    Geometry geometry = (Geometry) currAtt;

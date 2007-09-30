@@ -22,11 +22,11 @@ import java.sql.SQLException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -110,13 +110,13 @@ public class JDBCFeatureReader implements FeatureReader {
         	//JD: check for a coordinate system, if present on the type, set on the geometry
         	// I know this is pretty loose, but its better then nothing
         	if ( attribute instanceof Geometry && 
-        			queryData.getFeatureType().getAttribute( i ) instanceof GeometryAttributeType ) {
+        			queryData.getFeatureType().getAttribute( i ) instanceof GeometryDescriptor ) {
         		Geometry geometry = (Geometry) attribute;
-        		GeometryAttributeType geometryType = 
-        			(GeometryAttributeType) queryData.getFeatureType().getAttribute( i );
+        		GeometryDescriptor geometryType = 
+        			(GeometryDescriptor) queryData.getFeatureType().getAttribute( i );
         		
-        		if ( geometryType.getCoordinateSystem() != null ) {
-        			geometry.setUserData( geometryType.getCoordinateSystem() );
+        		if ( geometryType.getCRS() != null ) {
+        			geometry.setUserData( geometryType.getCRS() );
         		}
         	}
         	
