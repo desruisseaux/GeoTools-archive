@@ -29,11 +29,12 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.FilterFactory;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -149,7 +150,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @throws RuntimeException
 	 *             DOCUMENT ME!
 	 */
-	public FeatureType getFeatureType() {
+	public SimpleFeatureType getFeatureType() {
 		try {
 			return ArcSDEAdapter.fetchSchema(
 					this.dataStore.getConnectionPool(), this.layer
@@ -175,8 +176,8 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * 
 	 * @throws IOException
 	 */
-	public synchronized Feature next() throws IOException {
-		Feature feature;
+	public synchronized SimpleFeature next() throws IOException {
+		SimpleFeature feature;
 
 		if (!hasNext()) {
 			// In this case we must instantiate a new feature and add it
@@ -188,7 +189,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			Object[] attributes = new Object[featureType.getAttributeCount()];
 
 			try {
-				feature = featureType.create(attributes);
+				feature = SimpleFeatureBuilder.build(featureType, attributes, null);
 			} catch (IllegalAttributeException iae) {
 				LOGGER.log(Level.WARNING, iae.getMessage(), iae);
 				throw new IOException(iae.getMessage());
@@ -199,7 +200,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			this.notInserted = true;
 		} else {
 			// Simply return the next feature in the list...
-			feature = (Feature) this.features.get(++this.currentIndex);
+			feature = (SimpleFeature) this.features.get(++this.currentIndex);
 		}
 
 		return feature;
@@ -222,7 +223,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			this.features.remove(this.currentIndex--);
 			this.notInserted = false;
 		} else {
-			Feature feature = (Feature) this.features.get(this.currentIndex);
+			SimpleFeature feature = (SimpleFeature) this.features.get(this.currentIndex);
 			ArcSDEPooledConnection connection = null;
 
 			try {
@@ -261,9 +262,9 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 		ArcSDEPooledConnection connection = null;
 
 		try {
-			Feature feature = (Feature) this.features.get(this.currentIndex);
-			FeatureType featureType = feature.getFeatureType();
-			AttributeType[] attributeTypes = featureType.getAttributeTypes();
+			SimpleFeature feature = (SimpleFeature) this.features.get(this.currentIndex);
+			SimpleFeatureType featureType = feature.getFeatureType();
+			List<AttributeDescriptor> attributeTypes = featureType.getAttributes();
 			connection = getConnection();
 
 			if (this.notInserted) {
@@ -365,7 +366,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @throws SeException
 	 *             DOCUMENT ME!
 	 */
-	private synchronized String[] getColumns(AttributeType[] attributeTypes,
+	private synchronized String[] getColumns(List<AttributeDescriptor> attributeTypes,
 			SeConnection connection) throws SeException {
 		if (this.columnDefinitions == null) {
 			SeTable table = new SeTable(connection, this.layer
@@ -378,8 +379,8 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			ArrayList columnList = new ArrayList();
 			ArrayList indexes = new ArrayList();
 
-			for (int i = 0; i < attributeTypes.length; i++) {
-                if (attributeTypes[i].getLocalName().equals(this.layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID))) {
+			for (int i = 0; i < attributeTypes.size(); i++) {
+                if (attributeTypes.get(i).getLocalName().equals(this.layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID))) {
                     //this is an attribute added to the featuretype
                     //solely to support FIDs.  It isn't an actual attribute
                     //on the underlying SDE table, and as such it can't
@@ -395,7 +396,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 				// their
 				// documentation. 1 indicates an ArcSDE managed field.
 				if (this.columnDefinitions[i].getRowIdType() != 1) {
-					columnList.add(attributeTypes[i].getLocalName().toUpperCase());
+					columnList.add(attributeTypes.get(i).getLocalName().toUpperCase());
 					indexes.add(new Integer(i));
 				}
 			}

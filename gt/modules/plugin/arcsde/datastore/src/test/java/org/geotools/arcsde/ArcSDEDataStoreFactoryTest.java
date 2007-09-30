@@ -30,7 +30,7 @@ import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.esri.sde.sdk.client.SeException;
 
@@ -179,7 +179,7 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
         DataStore store = dsFactory.createDataStore(workingParamsWithSqlView);
         assertNotNull(store);
 
-        FeatureType viewType = store.getSchema(InProcessViewSupportTestData.typeName);
+        SimpleFeatureType viewType = store.getSchema(InProcessViewSupportTestData.typeName);
         assertNotNull(viewType);
         assertEquals(InProcessViewSupportTestData.typeName, viewType.getTypeName());
     }

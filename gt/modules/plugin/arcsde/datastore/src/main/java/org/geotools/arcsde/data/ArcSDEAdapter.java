@@ -17,8 +17,6 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,17 +31,12 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.SchemaException;
-
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.FactoryException;
@@ -145,12 +138,12 @@ public class ArcSDEAdapter {
      * @throws IllegalArgumentException
      *             DOCUMENT ME!
      */
-    public static int guessShapeTypes(GeometryAttributeType attribute) {
+    public static int guessShapeTypes(GeometryDescriptor attribute) {
         if (attribute == null) {
             throw new NullPointerException("a GeometryAttributeType must be provided, got null");
         }
 
-        Class geometryClass = attribute.getBinding();
+        Class geometryClass = attribute.getType().getBinding();
 
         int shapeTypes = 0;
 
@@ -202,12 +195,12 @@ public class ArcSDEAdapter {
      *             if the SeColumnDefinition constructor throws it due to some
      *             invalid parameter
      */
-    public static SeColumnDefinition createSeColumnDefinition(AttributeType type) throws SeException {
+    public static SeColumnDefinition createSeColumnDefinition(AttributeDescriptor type) throws SeException {
         SeColumnDefinition colDef = null;
         String colName = type.getLocalName();
         boolean nillable = type.isNillable();
 
-        SdeTypeDef def = getSdeType(type.getBinding());
+        SdeTypeDef def = getSdeType(type.getType().getBinding());
 
         int sdeColType = def.colDefType;
         int fieldLength = def.size;
@@ -254,20 +247,20 @@ public class ArcSDEAdapter {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace) throws IOException {
+    public static SimpleFeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace) throws IOException {
         SeLayer sdeLayer = connPool.getSdeLayer(typeName);
         SeTable sdeTable = connPool.getSdeTable(typeName);
         // List/*<AttributeDescriptor>*/properties =
         // createAttributeDescriptors(connPool, sdeLayer, sdeTable, namespace);
         List/* <AttributeType> */properties = createAttributeDescriptors(connPool, sdeLayer, sdeTable, namespace);
-        FeatureType type = createSchema(typeName, namespace, properties);
+        SimpleFeatureType type = createSchema(typeName, namespace, properties);
         return type;
     }
 
     /**
      * Fetchs the schema for the "SQL SELECT" like view definition
      */
-    public static FeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace, SeQueryInfo queryInfo) throws IOException {
+    public static SimpleFeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName, String namespace, SeQueryInfo queryInfo) throws IOException {
 
         List attributeDescriptors;
 
@@ -308,7 +301,7 @@ public class ArcSDEAdapter {
             }
             conn.close();
         }
-        FeatureType type = createSchema(typeName, namespace, attributeDescriptors);
+        SimpleFeatureType type = createSchema(typeName, namespace, attributeDescriptors);
         return type;
     }
 
@@ -344,12 +337,12 @@ public class ArcSDEAdapter {
         boolean isNilable;
         int fieldLen;
         Object defValue;
-        Object metadata = null;
+        CoordinateReferenceSystem metadata = null;
 
         int nCols = seColumns.length;
         List attDescriptors = new ArrayList(nCols);
 
-        AttributeType attributeType = null;
+        AttributeDescriptor attributeType = null;
         Class typeClass = null;
 
         for (int i = 0; i < nCols; i++) {
@@ -384,39 +377,34 @@ public class ArcSDEAdapter {
                 // Set restrictions = Restrictions.createLength(name, typeClass,
                 // fieldLen);
             }
-            attributeType = AttributeTypeFactory.newAttributeType(attName, typeClass, isNilable, fieldLen, defValue, metadata);
-            attDescriptors.add(attributeType);
+
+            AttributeTypeBuilder b = new AttributeTypeBuilder();
+            b.setBinding(typeClass);
+            b.setName(attName);
+            b.setNillable(isNilable);
+            b.setDefaultValue(defValue);
+            b.setLength(fieldLen);
+            b.setCRS(metadata);
+            
+            attDescriptors.add(b.buildDescriptor(attName));
         }
 
         return attDescriptors;
     }
 
-    private static FeatureType createSchema(String typeName, String namespace, List properties) {
+    private static SimpleFeatureType createSchema(String typeName, String namespace, List properties) {
         // TODO: use factory lookup mechanism once its in place
-        FeatureTypeBuilder builder = CommonFactoryFinder.getFeatureTypeFactory(null);
+    	SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         
         builder.setName(typeName);
-        try {
-            builder.setNamespace(new URI(namespace));
-        } 
-        catch (URISyntaxException e) {
-            LOGGER.warning("Illegal namespace uri: " + namespace );
-        }
+        builder.setNamespaceURI(namespace);
         
         for (Iterator it = properties.iterator(); it.hasNext();) {
-            AttributeType attType = (AttributeType) it.next();
-            builder.addType(attType);
+            AttributeDescriptor attType = (AttributeDescriptor) it.next();
+            builder.add(attType);
         }
 
-        FeatureType type;
-        try {
-            type = builder.getFeatureType();
-        } 
-        catch (SchemaException e) {
-            throw new RuntimeException(e);
-        }
-
-        return type;
+        return builder.buildFeatureType();
     }
 
     /**

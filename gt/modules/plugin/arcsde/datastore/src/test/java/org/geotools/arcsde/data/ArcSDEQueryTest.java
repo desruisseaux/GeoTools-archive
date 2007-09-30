@@ -27,7 +27,8 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 
@@ -64,7 +65,7 @@ public class ArcSDEQueryTest extends TestCase {
     
     private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
-    private FeatureType ftype;
+    private SimpleFeatureType ftype;
     
     private static final int FILTERING_COUNT = 3;
 	/**
@@ -202,9 +203,9 @@ public class ArcSDEQueryTest extends TestCase {
      */
     public void testCalculateQueryExtent()throws Exception {
     	FeatureReader reader = dstore.getFeatureReader(typeName);
-    	Envelope real = new Envelope();
+    	ReferencedEnvelope real = new ReferencedEnvelope();
     	while(reader.hasNext()){
-    		real.expandToInclude(reader.next().getBounds());
+    		real.include(reader.next().getBounds());
     	}
     	
     	Envelope e = getQueryAll().calculateQueryExtent();
@@ -214,9 +215,9 @@ public class ArcSDEQueryTest extends TestCase {
     	reader.close();
     
     	reader = dstore.getFeatureReader(typeName, filteringQuery);
-    	real = new Envelope();
+    	real = new ReferencedEnvelope();
     	while(reader.hasNext()){
-    		real.expandToInclude(reader.next().getBounds());
+    		real.include(reader.next().getBounds());
     	}
     	
     	e = getQueryFiltered().calculateQueryExtent();

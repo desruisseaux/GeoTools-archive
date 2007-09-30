@@ -42,15 +42,15 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FilterFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -58,15 +58,12 @@ import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.helpers.ParserAdapter;
 
 import com.esri.sde.sdk.pe.PeFactory;
 import com.esri.sde.sdk.pe.PeProjectedCS;
 import com.esri.sde.sdk.pe.PeProjectionException;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -194,7 +191,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void _testAutoFillSRS() throws Throwable {
         
         ArcSDEDataStore ds = testData.getDataStore();
-        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem sdeCRS = ds.getSchema("GISDATA.TOWNS_POLY").getDefaultGeometry().getCRS();
         
         LOGGER.info(sdeCRS.toWKT().replaceAll(" ","").replaceAll("\n", "").replaceAll("\"", "\\\""));
         
@@ -633,7 +630,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         List propNames = new ArrayList(type.getAttributeCount() - 1);
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
-            if (type.getAttribute(i) instanceof GeometryAttributeType) {
+            if (type.getAttribute(i) instanceof GeometryDescriptor) {
                 continue;
             }
 

@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
@@ -96,16 +95,16 @@ public abstract class FIDReader {
      *             if the SeLayer can't be obtained (only if the geomety
      *             attribute was not included in the request).
      */
-    public String[] getPropertiesToFetch(FeatureType schema) throws IOException {
+    public String[] getPropertiesToFetch(SimpleFeatureType schema) throws IOException {
 
         List attNames = new ArrayList(schema.getAttributeCount() + 1);
 
         // /List attDescriptors = Descriptors.nodes(schema.getDescriptor());
-        List attDescriptors = Arrays.asList(schema.getAttributeTypes());
+        List attDescriptors = Arrays.asList(schema.getAttributes());
 
         int i = 0;
         for (Iterator it = attDescriptors.iterator(); it.hasNext(); i++) {
-            AttributeType property = (AttributeType) it.next();
+            AttributeDescriptor property = (AttributeDescriptor) it.next();
             // /attNames.add( property.getName().getLocalPart() );
             attNames.add(property.getLocalName());
         }
@@ -209,15 +208,15 @@ public abstract class FIDReader {
             }
         }
 
-        public String[] getPropertiesToFetch(FeatureType schema) throws IOException {
+        public String[] getPropertiesToFetch(SimpleFeatureType schema) throws IOException {
             List attNames = new ArrayList(schema.getAttributeCount() + 1);
 
             // /List attDescriptors = Descriptors.nodes(schema.getDescriptor());
-            List attDescriptors = Arrays.asList(schema.getAttributeTypes());
+            List attDescriptors = Arrays.asList(schema.getAttributes());
 
             int i = 0;
             for (Iterator it = attDescriptors.iterator(); it.hasNext(); i++) {
-                AttributeType property = (AttributeType) it.next();
+                AttributeDescriptor property = (AttributeDescriptor) it.next();
                 attNames.add(property.getLocalName());
             }
 

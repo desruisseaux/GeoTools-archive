@@ -33,11 +33,11 @@ import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.text.cql2.CQL;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -323,28 +323,28 @@ public class SDEJavaApiJoinTest extends TestCase {
         SelectBody select = ViewRegisteringFactoryHelper.parseSqlQuery(plainSQL);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
-        FeatureType type = store.getSchema(InProcessViewSupportTestData.typeName);
+        SimpleFeatureType type = store.getSchema(InProcessViewSupportTestData.typeName);
         assertNotNull(type);
 
         assertEquals(InProcessViewSupportTestData.typeName, type.getTypeName());
 
         assertEquals(4, type.getAttributeCount());
-        List atts = Arrays.asList(type.getAttributeTypes());
+        List atts = type.getAttributes();
         assertEquals(4, atts.size());
-        AttributeType att1 = (AttributeType) atts.get(0);
-        AttributeType att2 = (AttributeType) atts.get(1);
-        AttributeType att3 = (AttributeType) atts.get(2);
-        AttributeType att4 = (AttributeType) atts.get(3);
+        AttributeDescriptor att1 = (AttributeDescriptor) atts.get(0);
+        AttributeDescriptor att2 = (AttributeDescriptor) atts.get(1);
+        AttributeDescriptor att3 = (AttributeDescriptor) atts.get(2);
+        AttributeDescriptor att4 = (AttributeDescriptor) atts.get(3);
 
         assertEquals("ID", att1.getLocalName());
         assertEquals("NAME", att2.getLocalName());
         assertEquals("SHAPE", att3.getLocalName());
         assertEquals("DESCRIPTION", att4.getLocalName());
 
-        assertEquals(Integer.class, att1.getBinding());
-        assertEquals(String.class, att2.getBinding());
-        assertEquals(Point.class, att3.getBinding());
-        assertEquals(String.class, att4.getBinding());
+        assertEquals(Integer.class, att1.getType().getBinding());
+        assertEquals(String.class, att2.getType().getBinding());
+        assertEquals(Point.class, att3.getType().getBinding());
+        assertEquals(String.class, att4.getType().getBinding());
     }
 
     public void testViewBounds() throws IOException {
@@ -427,7 +427,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         final int expectedCount = 7;
         Iterator it = fc.iterator();
         while (it.hasNext()) {
-            Feature f = (Feature) it.next();
+            SimpleFeature f = (SimpleFeature) it.next();
             assertNotNull(f);
             itCount++;
         }
@@ -452,7 +452,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         final int expectedCount = 3;
         Iterator it = fc.iterator();
         while (it.hasNext()) {
-            Feature f = (Feature) it.next();
+            SimpleFeature f = (SimpleFeature) it.next();
             assertNotNull(f);
             itCount++;
         }

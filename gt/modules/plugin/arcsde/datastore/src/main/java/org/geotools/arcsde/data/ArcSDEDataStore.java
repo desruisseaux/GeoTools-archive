@@ -25,11 +25,18 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import java.beans.FeatureDescriptor;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -171,12 +178,12 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public synchronized FeatureType getSchema(String typeName) throws java.io.IOException {
+    public synchronized SimpleFeatureType getSchema(String typeName) throws java.io.IOException {
         if (typeName == null) {
             throw new NullPointerException("typeName is null");
         }
 
-        FeatureType schema = (FeatureType) viewSchemasCache.get(typeName);
+        SimpleFeatureType schema = (SimpleFeatureType) viewSchemasCache.get(typeName);
 
         if (schema == null) {
             // connection used to retrieve the user name if a non qualified type
@@ -208,7 +215,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 }
             }
 
-            schema = (FeatureType) schemasCache.get(typeName);
+            schema = (SimpleFeatureType) schemasCache.get(typeName);
 
             if (schema == null) {
                 schema = ArcSDEAdapter.fetchSchema(getConnectionPool(), typeName, this.namespace);
@@ -224,7 +231,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * method calls createSchema(schema, null);
      * 
      */
-    public void createSchema(FeatureType schema) throws IOException, IllegalArgumentException {
+    public void createSchema(SimpleFeatureType schema) throws IOException, IllegalArgumentException {
         createSchema(schema, null);
     }
 
@@ -316,7 +323,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      *             type at the ArcSDE instance (e.g. a table with that name
      *             already exists).
      */
-    public void createSchema(FeatureType featureType, Map hints) throws IOException,
+    public void createSchema(SimpleFeatureType featureType, Map hints) throws IOException,
             IllegalArgumentException {
         if (featureType == null) {
             throw new NullPointerException("You have to provide a FeatureType instance");
@@ -401,14 +408,14 @@ public class ArcSDEDataStore extends AbstractDataStore {
             table = createSeTable(connection, qualifiedName, HACK_COL_NAME, configKeyword);
             tableCreated = true;
 
-            List atts = Arrays.asList(featureType.getAttributeTypes());
-            AttributeType currAtt;
+            List atts = Arrays.asList(featureType.getAttributes());
+            AttributeDescriptor currAtt;
 
             for (Iterator it = atts.iterator(); it.hasNext();) {
-                currAtt = (AttributeType) it.next();
+                currAtt = (AttributeDescriptor) it.next();
 
-                if (currAtt instanceof GeometryAttributeType) {
-                    GeometryAttributeType geometryAtt = (GeometryAttributeType) currAtt;
+                if (currAtt instanceof GeometryDescriptor) {
+                    GeometryDescriptor geometryAtt = (GeometryDescriptor) currAtt;
                     createSeLayer(layer, qualifiedName, geometryAtt);
                 } else {
                     LOGGER.fine("Creating column definition for " + currAtt);
@@ -510,7 +517,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * @throws SeException
      */
     private void createSeLayer(SeLayer layer, String qualifiedName,
-            GeometryAttributeType geometryAtt) throws SeException {
+            GeometryDescriptor geometryAtt) throws SeException {
         String spatialColName = geometryAtt.getLocalName();
         LOGGER.info("setting spatial column name: " + spatialColName);
         layer.setSpatialColumnName(spatialColName);
@@ -522,7 +529,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
         layer.setDescription("Created with GeoTools");
 
         // Define the layer's Coordinate Reference
-        CoordinateReferenceSystem crs = geometryAtt.getCoordinateSystem();
+        CoordinateReferenceSystem crs = geometryAtt.getCRS();
         SeCoordinateReference coordref = getGenericCoordRef();
         String WKT = null;
 
@@ -639,15 +646,15 @@ public class ArcSDEDataStore extends AbstractDataStore {
         FeatureReader reader = null;
 
         try {
-            FeatureType schema = getSchema(typeName);
+            SimpleFeatureType schema = getSchema(typeName);
             sdeQuery = ArcSDEQuery.createQuery(this, schema, query);
 
             sdeQuery.execute();
 
             AttributeReader attReader = new ArcSDEAttributeReader(sdeQuery);
-            final FeatureType resultingSchema = sdeQuery.getSchema();
+            final SimpleFeatureType resultingSchema = sdeQuery.getSchema();
             reader = new DefaultFeatureReader(attReader, resultingSchema) {
-                protected Feature readFeature(AttributeReader atts)
+                protected org.opengis.feature.simple.SimpleFeature readFeature(AttributeReader atts)
                         throws IllegalAttributeException, IOException {
                     ArcSDEAttributeReader sdeAtts = (ArcSDEAttributeReader) atts;
                     Object[] currAtts = sdeAtts.readAll();
@@ -657,7 +664,8 @@ public class ArcSDEDataStore extends AbstractDataStore {
                      * for (int i = 0, ii = atts.getAttributeCount(); i < ii;
                      * i++) { attributes[i] = atts.read(i); }
                      */
-                    return resultingSchema.create(this.attributes, sdeAtts.readFID());
+                    
+                    return SimpleFeatureBuilder.build(resultingSchema, this.attributes, sdeAtts.readFID());
                 }
             };
         } catch (SchemaException ex) {
@@ -737,7 +745,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 if (conn != null) conn.close();
             }
 
-            FeatureType schema = getSchema(typeName);
+            SimpleFeatureType schema = getSchema(typeName);
             ArcSDEQuery.FilterSet filters = ArcSDEQuery.createFilters(layer, schema, filter, qInfo,
                     getViewSelectStatement(typeName), fidReader);
 
@@ -819,13 +827,13 @@ public class ArcSDEDataStore extends AbstractDataStore {
     public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
             throws IOException {
 
-        FeatureType featureType = getSchema(typeName);
-        AttributeType[] attributes = featureType.getAttributeTypes();
-        String[] names = new String[attributes.length];
+        SimpleFeatureType featureType = getSchema(typeName);
+        List<AttributeDescriptor> attributes = featureType.getAttributes();
+        String[] names = new String[attributes.size()];
 
         // Extract the attribute names for the query, we want them all...
         for (int i = 0; i < names.length; i++) {
-            names[i] = attributes[i].getLocalName();
+            names[i] = attributes.get(i).getLocalName();
         }
 
         DefaultQuery query = new DefaultQuery(typeName, filter, 100, names, "handle");
@@ -1134,7 +1142,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
             conn.close();
         }
 
-        FeatureType viewSchema = ArcSDEAdapter.fetchSchema(connectionPool, typeName, namespace,
+        SimpleFeatureType viewSchema = ArcSDEAdapter.fetchSchema(connectionPool, typeName, namespace,
                 queryInfo);
         LOGGER.fine("view schema: " + viewSchema);
 

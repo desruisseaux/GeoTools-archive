@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
 import org.geotools.arcsde.data.ArcSDEGeometryBuildingException;
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterCapabilities;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -108,7 +108,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
     /** DOCUMENT ME! */
     private SeLayer sdeLayer;
     
-    private FeatureType featureType;
+    private SimpleFeatureType featureType;
 
     /**
      */
@@ -118,7 +118,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
 
     /**
      */
-    public GeometryEncoderSDE(SeLayer layer, FeatureType featureType) {
+    public GeometryEncoderSDE(SeLayer layer, SimpleFeatureType featureType) {
         this.sdeLayer = layer;
         this.featureType = featureType;
     }

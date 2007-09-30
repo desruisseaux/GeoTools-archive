@@ -21,10 +21,10 @@ import java.util.logging.Logger;
 
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.type.GeometricAttributeType;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeShape;
@@ -45,7 +45,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 	private ArcSDEQuery query;
 
 	/** schema of the features this attribute reader iterates over */
-	private FeatureType schema;
+	private SimpleFeatureType schema;
 
     /** current sde java api row being read */
     private SdeRow currentRow;
@@ -105,10 +105,10 @@ class ArcSDEAttributeReader implements AttributeReader {
         this.fidPrefix = new StringBuffer(typeName).append('.');
         this.fidPrefixLen = this.fidPrefix.length();
 
-        final GeometryAttributeType geomType = schema.getDefaultGeometry();
+        final GeometryDescriptor geomType = schema.getDefaultGeometry();
 
         if (geomType != null) {
-            Class geometryClass = geomType.getBinding();
+            Class geometryClass = geomType.getType().getBinding();
             this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
         }
 	}
@@ -123,9 +123,9 @@ class ArcSDEAttributeReader implements AttributeReader {
 	/**
 	 * 
 	 */
-	public AttributeType getAttributeType(int index)
+	public AttributeDescriptor getAttributeType(int index)
 			throws ArrayIndexOutOfBoundsException {
-		return this.schema.getAttributeType(index);
+		return this.schema.getAttribute(index);
 	}
 
 	/**
@@ -202,7 +202,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 			ArrayIndexOutOfBoundsException {
         Object value = currentRow.getObject(index);
         
-        if (schema.getAttributeType(index) instanceof GeometricAttributeType) {
+        if (schema.getAttribute(index) instanceof GeometricAttributeType) {
             try{
                 SeShape shape = (SeShape) value;
                 /**

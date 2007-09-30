@@ -32,8 +32,8 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import org.geotools.arcsde.data.ArcSDEAdapter;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterCapabilities;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
@@ -88,7 +88,7 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @param ft
      * @param definitionQuery
      */
-    public FilterToSQLSDE(String layerQName, String layerFidColName, FeatureType ft, PlainSelect definitionQuery) {
+    public FilterToSQLSDE(String layerQName, String layerFidColName, SimpleFeatureType ft, PlainSelect definitionQuery) {
         this.layerQualifiedName = layerQName;
         this.layerFidFieldName = layerFidColName;
         this.featureType = ft;

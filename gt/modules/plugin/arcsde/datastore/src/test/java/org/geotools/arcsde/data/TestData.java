@@ -28,11 +28,13 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -780,7 +782,7 @@ public class TestData {
     public FeatureCollection createTestFeatures(Class jtsGeomType, int numFeatures)
             throws IOException, IllegalAttributeException {
         FeatureCollection col = FeatureCollections.newCollection();
-        FeatureType type = getDataStore().getSchema(getTemp_table());
+        SimpleFeatureType type = getDataStore().getSchema(getTemp_table());
         Object[] values = new Object[type.getAttributeCount()];
 
         for (int i = 0; i < numFeatures; i++) {
@@ -797,7 +799,7 @@ public class TestData {
             values[5] = cal.getTime();
             values[6] = createTestGeometry(jtsGeomType, i);
 
-            Feature f = type.create(values);
+            SimpleFeature f = SimpleFeatureBuilder.build(type, values, null);
             col.add(f);
         }
 

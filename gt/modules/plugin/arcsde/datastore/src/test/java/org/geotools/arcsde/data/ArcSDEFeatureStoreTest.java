@@ -7,6 +7,7 @@ import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.data.*;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.*;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -17,8 +18,10 @@ import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsEqualTo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -174,23 +177,23 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * @throws SchemaException DOCUMENT ME!
      */
     public void testCreateSchema() throws IOException, SchemaException {
-        FeatureType type;
-        AttributeType[] atts = new AttributeType[4];
+        SimpleFeatureType type;
+        
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
         	LOGGER.fine("Unqualifying type name to create schema.");
         	typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
         }
-
-        atts[0] = AttributeTypeFactory.newAttributeType("FST_COL",
-                String.class, false);
-        atts[1] = AttributeTypeFactory.newAttributeType("SECOND_COL",
-                Double.class, false);
-        atts[2] = AttributeTypeFactory.newAttributeType("GEOM", Point.class,
-                false);
-        atts[3] = AttributeTypeFactory.newAttributeType("FOURTH_COL",
-                Integer.class, false);
-        type = FeatureTypeBuilder.newFeatureType(atts, typeName);
+        
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName( typeName );
+        
+        b.add("FST_COL", String.class);
+		b.add("SECOND_COL", String.class);
+		b.add("GEOM", Point.class);
+		b.add("FOURTH_COL", Integer.class);
+        
+        type = b.buildFeatureType();
 
         DataStore ds = this.testData.getDataStore();
 
@@ -333,19 +336,23 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
     
     public void testCreateNillableShapeSchema() throws IOException, SchemaException {
-        FeatureType type;
-        AttributeType[] atts = new AttributeType[2];
+        SimpleFeatureType type;
+        AttributeDescriptor[] atts = new AttributeDescriptor[2];
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
             LOGGER.fine("Unqualifying type name to create schema.");
             typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
         }
         
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName( typeName );
         
-        atts[0] = AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false);
-        atts[1] = AttributeTypeFactory.newAttributeType("SHAPE", MultiLineString.class, true);
+        b.add("OBJECTID", Integer.class);
+		b.add("SHAPE", MultiLineString.class);
+
+		type = b.buildFeatureType();
+
         
-        type = FeatureTypeBuilder.newFeatureType(atts, typeName);
         
         ArcSDEDataStore ds = this.testData.getDataStore();
         
@@ -357,19 +364,21 @@ public class ArcSDEFeatureStoreTest extends TestCase {
     }
     
     public void testWriteAndUpdateNullShapes() throws IOException, SchemaException {
-        FeatureType type;
-        AttributeType[] atts = new AttributeType[2];
+        SimpleFeatureType type;
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
             LOGGER.fine("Unqualifying type name to create schema.");
             typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
         }
+
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName( typeName );
+        
+        b.add("OBJECTID", Integer.class);
+		b.add("SHAPE", MultiLineString.class);
+        
+        type = b.buildFeatureType();
                 
-        atts[0] = AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false);
-        atts[1] = new GeometricAttributeType("SHAPE", MultiLineString.class, true, null, null, null);
-        
-        type = FeatureTypeBuilder.newFeatureType(atts, typeName);
-        
         DataStore ds = this.testData.getDataStore();
         
         this.testData.deleteTempTable(((ArcSDEDataStore)ds).getConnectionPool());

@@ -17,11 +17,16 @@
 package org.geotools.arcsde.data;
 
 import com.vividsolutions.jts.geom.*;
+
 import junit.framework.TestCase;
 import org.geotools.data.*;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.*;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -29,6 +34,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Or;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 
@@ -88,8 +94,8 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         reader.close();
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        Filter fidFilter = ff.createFidFilter(fid);
-
+        Filter fidFilter = ff.id(Collections.singleton(ff.featureId(fid)));
+        	
         FeatureWriter writer = ds.getFeatureWriter(typeName, fidFilter,
                 Transaction.AUTO_COMMIT);
 
@@ -152,7 +158,7 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         writer.close();
 
         //was it really removed?
-        FeatureReader read = ds.getFeatureReader(new DefaultQuery(typeName, or),
+        FeatureReader read = ds.getFeatureReader(new DefaultQuery(typeName, filter),
                 Transaction.AUTO_COMMIT);
         assertFalse(read.hasNext());
         read.close();
@@ -176,24 +182,26 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      * @throws SchemaException DOCUMENT ME!
      */
-    public void testCreateSchema() throws IOException, SchemaException {
-        FeatureType type;
-        AttributeType[] atts = new AttributeType[4];
+    public void testCreateSchema() throws IOException {
+        SimpleFeatureType type;
+
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
             LOGGER.fine("Unqualifying type name to create schema.");
             typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
         }
 
-        atts[0] = AttributeTypeFactory.newAttributeType("FST_COL",
-                String.class, false);
-        atts[1] = AttributeTypeFactory.newAttributeType("SECOND_COL",
-                Double.class, false);
-        atts[2] = AttributeTypeFactory.newAttributeType("GEOM", Point.class,
-                false);
-        atts[3] = AttributeTypeFactory.newAttributeType("FOURTH_COL",
-                Integer.class, false);
-        type = FeatureTypeFactory.newFeatureType(atts, typeName);
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName( typeName );
+        
+        b.add("FST_COL", String.class);
+		b.add("SECOND_COL", String.class);
+		b.add("GEOM", Point.class);
+		b.add("FOURTH_COL", Integer.class);
+        
+        type = b.buildFeatureType();
+
+        
 
         DataStore ds = this.testData.getDataStore();
 
@@ -312,13 +320,13 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         FeatureWriter writer = ds.getFeatureWriterAppend(typeName,
                 Transaction.AUTO_COMMIT);
 
-        Feature source;
+        SimpleFeature source;
         SimpleFeature dest;
 
         for (FeatureIterator fi = features.features(); fi.hasNext();) {
             source = fi.next();
             dest = (SimpleFeature)writer.next();
-            dest.setAttributes(source.getAttributes((Object[]) null));
+            dest.setAttributes(source.getAttributes());
             writer.write();
         }
 
@@ -363,7 +371,7 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.INCLUDE,
                 transaction);
 
-        Feature source;
+        SimpleFeature source;
         SimpleFeature dest;
 
         int count = 0;
@@ -376,7 +384,7 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
 
             source = fi.next();
             dest = (SimpleFeature)writer.next();
-            dest.setAttributes(source.getAttributes((Object[]) null));
+            dest.setAttributes(source.getAttributes());
             writer.write();
         }
 
@@ -415,14 +423,14 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
         FeatureWriter writer = ds.getFeatureWriterAppend(typeName,
                 Transaction.AUTO_COMMIT);
         
-        Feature source;
+        SimpleFeature source;
         SimpleFeature dest;
 
         for (FeatureIterator fi = features.features(); fi.hasNext();) {
             assertFalse(writer.hasNext());
             source = fi.next();
             dest = (SimpleFeature)writer.next();
-            dest.setAttributes(source.getAttributes((Object[]) null));
+            dest.setAttributes(source.getAttributes());
             writer.write();
         }
 

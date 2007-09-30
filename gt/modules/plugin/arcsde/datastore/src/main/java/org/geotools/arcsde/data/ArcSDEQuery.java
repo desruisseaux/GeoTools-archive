@@ -41,11 +41,12 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.FilterToSQLException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 
@@ -89,7 +90,7 @@ class ArcSDEQuery {
      * server. It could have less attributes than the ones of the actual table
      * schema, in which case only those attributes will be requested.
      */
-    private FeatureType schema;
+    private SimpleFeatureType schema;
 
     /**
      * The query built using the constraints given by the geotools Query. It
@@ -124,7 +125,7 @@ class ArcSDEQuery {
      *
      * @see prepareQuery
      */
-    private ArcSDEQuery(ArcSDEPooledConnection connection, FeatureType schema,
+    private ArcSDEQuery(ArcSDEPooledConnection connection, SimpleFeatureType schema,
         FilterSet filterSet, FIDReader fidReader) throws DataSourceException {
         this.connection = connection;
         this.schema = schema;
@@ -145,7 +146,7 @@ class ArcSDEQuery {
     public static ArcSDEQuery createQuery(ArcSDEDataStore store, Query query)
         throws IOException {
         String typeName = query.getTypeName();
-        FeatureType schema = store.getSchema(typeName);
+        SimpleFeatureType schema = store.getSchema(typeName);
         return createQuery(store, schema, query);
     }
 
@@ -164,7 +165,7 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      */
     public static ArcSDEQuery createQuery(ArcSDEDataStore store,
-        FeatureType schema, Query query) throws IOException {
+        SimpleFeatureType schema, Query query) throws IOException {
         if ((store == null) || (schema == null) || (query == null)) {
             throw new NullPointerException("store=" + store + ", schema="
                 + schema + ", query=" + query);
@@ -216,7 +217,7 @@ class ArcSDEQuery {
             //guess which properties needs actually be retrieved.
             List queryColumns = getQueryColumns(query, schema);
     
-            /*Simple*/FeatureType querySchema = null;
+            SimpleFeatureType querySchema = null;
     
             //TODO: create attributes with namespace when switching to GeoAPI FM
     //        String ns = store.getNamespace() == null? null : store.getNamespace().toString();
@@ -276,18 +277,18 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      */
     private static List /*<String>*/ getQueryColumns(Query query,
-        final FeatureType schema) throws DataSourceException {
+        final SimpleFeatureType schema) throws DataSourceException {
         final HashSet columnNames;
         
         String[] queryColumns = query.getPropertyNames();
 
         if ((queryColumns == null) || (queryColumns.length == 0)) {
-            List attNames = Arrays.asList(schema.getAttributeTypes());
+            List attNames = schema.getAttributes();
 
             columnNames = new HashSet(attNames.size());
 
             for (Iterator it = attNames.iterator(); it.hasNext();) {
-                AttributeType att = (AttributeType) it.next();
+                AttributeDescriptor att = (AttributeDescriptor) it.next();
                 String attName = att.getLocalName();
                 //de namespace-ify the names
                 if (attName.indexOf(":") != -1) {
@@ -332,7 +333,7 @@ class ArcSDEQuery {
      * @throws NoSuchElementException DOCUMENT ME!
      * @throws IOException DOCUMENT ME!
      */
-    public static ArcSDEQuery.FilterSet createFilters(SeLayer layer, FeatureType schema,
+    public static ArcSDEQuery.FilterSet createFilters(SeLayer layer, SimpleFeatureType schema,
         Filter filter, SeQueryInfo qInfo, PlainSelect viewSelect, FIDReader fidReader)
         throws NoSuchElementException, IOException {
         
@@ -511,7 +512,7 @@ class ArcSDEQuery {
      *
      * @return the schema of the originating Query
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return this.schema;
     }
 
@@ -558,7 +559,7 @@ class ArcSDEQuery {
      */
     public static Envelope calculateQueryExtent(ArcSDEDataStore ds, Query query)
         throws IOException {
-        FeatureType queryFt = ds.getSchema(query.getTypeName());
+        SimpleFeatureType queryFt = ds.getSchema(query.getTypeName());
         HashSet pnames = new HashSet();
         pnames.addAll(Arrays.asList(query.getPropertyNames()));
         if (!pnames.contains(queryFt.getDefaultGeometry().getLocalName())) {
@@ -1013,7 +1014,7 @@ class ArcSDEQuery {
          */
         private SeSqlConstruct sdeSqlConstruct;
         
-        private FeatureType featureType;
+        private SimpleFeatureType featureType;
 
         /**
          * Creates a new FilterSet object.
@@ -1021,7 +1022,7 @@ class ArcSDEQuery {
          * @param sdeLayer DOCUMENT ME!
          * @param sourceFilter DOCUMENT ME!
          */
-        public FilterSet(SeLayer sdeLayer, Filter sourceFilter, FeatureType ft,
+        public FilterSet(SeLayer sdeLayer, Filter sourceFilter, SimpleFeatureType ft,
                 SeQueryInfo definitionQuery, PlainSelect layerSelectStatement, FIDReader fidReader) {
             assert sdeLayer != null;
             assert sourceFilter != null;
