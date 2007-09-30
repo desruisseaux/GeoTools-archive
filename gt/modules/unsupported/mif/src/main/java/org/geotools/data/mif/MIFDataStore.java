@@ -15,14 +15,16 @@
  */
 package org.geotools.data.mif;
 
-import org.geotools.data.AbstractDataStore;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureWriter;
-import org.geotools.feature.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import org.geotools.data.AbstractDataStore;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -152,7 +154,7 @@ public class MIFDataStore extends AbstractDataStore {
      * @throws IOException if init path is not a directory or a MIFFile object
      *         cannot be created
      */
-    public void createSchema(FeatureType featureType) throws IOException {
+    public void createSchema(SimpleFeatureType featureType) throws IOException {
         if (!filePath.isDirectory()) {
             throw new IOException(
                 "Can't create schema on a MIF DataStore instantiated from a single MIF file");
@@ -202,7 +204,7 @@ public class MIFDataStore extends AbstractDataStore {
      *
      * @throws IOException
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         return getMIFFile(typeName).getSchema();
     }
 
@@ -245,7 +247,7 @@ public class MIFDataStore extends AbstractDataStore {
     private void registerMIF(String path) throws IOException {
         MIFFile mf = new MIFFile(path, params);
         MIFFileHolder mfh = new MIFFileHolder(mf);
-        FeatureType ft = mf.getSchema();
+        SimpleFeatureType ft = mf.getSchema();
         mifFileHolders.put(ft.getTypeName(), mfh);
     }
 

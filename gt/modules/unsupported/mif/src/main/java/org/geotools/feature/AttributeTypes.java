@@ -15,16 +15,18 @@
  */
 package org.geotools.feature;
 
-import org.geotools.feature.AttributeType;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import org.geotools.filter.CompareFilter;
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.Filters;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
-
-import java.util.Iterator;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -67,8 +69,8 @@ public class AttributeTypes {
      * @return The defined field length, or defaultLength if no maximum length
      *         has been defined.
      */
-    public static int getFieldLength(AttributeType attr, int defaultLength) {
-        int length = getFieldLengthFromFilter(attr.getRestriction());
+    public static int getFieldLength(AttributeDescriptor attr, int defaultLength) {
+        int length = getFieldLengthFromFilter(attr.getType().getRestrictions());
 
         if (length == FIELD_LENGTH_UNDEFINED) {
             length = defaultLength;
@@ -88,7 +90,7 @@ public class AttributeTypes {
      * @return the defined field length, or FIELD_LENGTH_UNDEFINED if no
      *         maximum length has been defined.
      */
-    public static int getFieldLength(AttributeType attr) {
+    public static int getFieldLength(AttributeDescriptor attr) {
         return getFieldLength(attr, FIELD_LENGTH_UNDEFINED);
     }
 
@@ -103,51 +105,54 @@ public class AttributeTypes {
      * @return The maximum field length found in the filter, or
      *         FIELD_LENGTH_UNDEFINED if none was found;
      */
-    public static int getFieldLengthFromFilter(Filter filter) {
-        int length = FIELD_LENGTH_UNDEFINED;
+    public static int getFieldLengthFromFilter(List<Filter> filterList) {
+		int length = FIELD_LENGTH_UNDEFINED;
 
-        if ((filter != null) && (filter != Filter.EXCLUDE)
-                && (filter != Filter.INCLUDE)) {
-            short filterType = Filters.getFilterType( filter );
+		for (Filter filter : filterList) {
+			if ((filter != null) && (filter != Filter.EXCLUDE)
+					&& (filter != Filter.INCLUDE)) {
+				short filterType = Filters.getFilterType(filter);
 
-            if ((filterType == FilterType.COMPARE_LESS_THAN)
-                    || (filterType == FilterType.COMPARE_LESS_THAN_EQUAL)
-                    || (filterType == FilterType.COMPARE_EQUALS)) {
-                try {
-                    CompareFilter cf = (CompareFilter) filter;
+				if ((filterType == FilterType.COMPARE_LESS_THAN)
+						|| (filterType == FilterType.COMPARE_LESS_THAN_EQUAL)
+						|| (filterType == FilterType.COMPARE_EQUALS)) {
+					try {
+						CompareFilter cf = (CompareFilter) filter;
 
-                    if (cf.getLeftValue() instanceof LengthFunction) {
-                        length = Integer.parseInt(((LiteralExpression) cf.getRightValue()).getLiteral()
-                                                   .toString());
-                    } else {
-                        if (cf.getRightValue() instanceof LengthFunction) {
-                            length = Integer.parseInt(((LiteralExpression) cf
-                                                       .getLeftValue()).getLiteral()
-                                                       .toString());
-                        }
-                    }
+						if (cf.getLeftValue() instanceof LengthFunction) {
+							length = Integer.parseInt(((LiteralExpression) cf
+									.getRightValue()).getLiteral().toString());
+						} else {
+							if (cf.getRightValue() instanceof LengthFunction) {
+								length = Integer
+										.parseInt(((LiteralExpression) cf
+												.getLeftValue()).getLiteral()
+												.toString());
+							}
+						}
 
-                    if (filterType == FilterType.COMPARE_LESS_THAN) {
-                        length--;
-                    }
-                } catch (NumberFormatException e) {
-                }
+						if (filterType == FilterType.COMPARE_LESS_THAN) {
+							length--;
+						}
+					} catch (NumberFormatException e) {
+						continue; // try the next thing
+					}
 
-                // In case of a complex filter, looks for the maximum defined length in filter
-            } else if ((filterType == FilterType.LOGIC_AND)
-                    || (filterType == FilterType.LOGIC_OR)) {
-                for (Iterator it = ((LogicFilter) filter).getFilterIterator();
-                        it.hasNext();) {
-                    Filter subFilter = (Filter) it.next();
-                    int subLength = getFieldLengthFromFilter(subFilter);
+					// In case of a complex filter, looks for the maximum defined length in filter
+				} else if ((filterType == FilterType.LOGIC_AND)
+						|| (filterType == FilterType.LOGIC_OR)) {
+					for (Iterator it = ((LogicFilter) filter)
+							.getFilterIterator(); it.hasNext();) {
+						Filter subFilter = (Filter) it.next();
+						int subLength = getFieldLengthFromFilter(Arrays.asList(new Filter[]{subFilter}));
 
-                    if (subLength > length) {
-                        length = subLength;
-                    }
-                }
-            }
-        }
-
-        return length;
-    }
+						if (subLength > length) {
+							length = subLength;
+						}
+					}
+				}
+			}
+		}
+		return length;
+	}
 }

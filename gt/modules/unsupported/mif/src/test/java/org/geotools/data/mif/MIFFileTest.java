@@ -15,21 +15,21 @@
  */
 package org.geotools.data.mif;
 
+import java.util.HashMap;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureWriter;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -78,18 +78,18 @@ public class MIFFileTest extends TestCase {
             assertEquals("450",
                 mif.getHeaderClause(MIFDataStore.HCLAUSE_VERSION));
 
-            FeatureType schema = mif.getSchema();
+            SimpleFeatureType schema = mif.getSchema();
             assertNotNull(schema);
             assertEquals(11, schema.getAttributeCount());
-            assertEquals("DESCRIPTION", schema.getAttributeType(1).getLocalName());
+            assertEquals("DESCRIPTION", schema.getAttribute(1).getLocalName());
             assertEquals(Double.class,
-                schema.getAttributeType("LENGTH").getBinding());
+                schema.getAttribute("LENGTH").getType().getBinding());
 
             FeatureReader fr = mif.getFeatureReader();
             int tot = 0;
 
             while (fr.hasNext()) {
-                Feature f = fr.next();
+                SimpleFeature f = fr.next();
 
                 if (++tot == 4) {
                     assertEquals("POLYGON", (String) f.getAttribute("GEOMTYPE"));
@@ -123,7 +123,7 @@ public class MIFFileTest extends TestCase {
             // Input file
             in = new MIFFile(MIFTestUtils.fileName("grafo"), null); // .mif
 
-            FeatureType ft = in.getSchema();
+            SimpleFeatureType ft = in.getSchema();
 
             maxAttr = ft.getAttributeCount() - 1;
 
@@ -153,15 +153,15 @@ public class MIFFileTest extends TestCase {
             inFR = in.getFeatureReader();
             outFW = out.getFeatureWriter();
 
-            Feature inF;
-            Feature outF;
+            SimpleFeature inF;
+            SimpleFeature outF;
             int counter = 0;
 
             while (inFR.hasNext()) {
                 inF = inFR.next();
                 outF = outFW.next();
 
-                for (int i = 0; i < outF.getNumberOfAttributes(); i++) {
+                for (int i = 0; i < outF.getAttributeCount(); i++) {
                     outF.setAttribute(i, inF.getAttribute(i));
                 }
 
@@ -183,8 +183,8 @@ public class MIFFileTest extends TestCase {
             int n = 0;
 
             while (inFR.hasNext()) {
-                Feature fin = inFR.next();
-                Feature fout = outFR.next();
+                SimpleFeature fin = inFR.next();
+                SimpleFeature fout = outFR.next();
 
                 // Cycling attribute sampling
                 assertEquals(fin.getAttribute(n).toString(),
@@ -213,7 +213,7 @@ public class MIFFileTest extends TestCase {
                     MIFTestUtils.getParams("", "", null));
             FeatureWriter fw = in.getFeatureWriter();
 
-            Feature f;
+            SimpleFeature f;
             int counter = 0;
 
             while (fw.hasNext()) {
@@ -231,7 +231,7 @@ public class MIFFileTest extends TestCase {
             }
 
             // Appends a line
-            Feature newf = fw.next();
+            SimpleFeature newf = fw.next();
             newf.setAttribute("DESCRIPTION", "newline");
             fw.write();
 
@@ -290,15 +290,15 @@ public class MIFFileTest extends TestCase {
 
             fr1.next();
 
-            Feature f1 = fr1.next();
+            SimpleFeature f1 = fr1.next();
 
             FeatureReader fr2 = mif2.getFeatureReader();
 
             fr2.next();
 
-            Feature f2 = fr2.next();
+            SimpleFeature f2 = fr2.next();
 
-            for (int i = 0; i < f1.getNumberOfAttributes(); i++) {
+            for (int i = 0; i < f1.getAttributeCount(); i++) {
                 assertEquals("Features are different",
                     f1.getAttribute(i).toString(), f2.getAttribute(i).toString());
             }
@@ -318,14 +318,14 @@ public class MIFFileTest extends TestCase {
             mif = new MIFFile(MIFTestUtils.fileName("mixed"), // .mif
                     MIFTestUtils.getParams("mif", "", null, "untyped"));
 
-            FeatureType ft = mif.getSchema();
+            SimpleFeatureType ft = mif.getSchema();
 
-            assertEquals(ft.getDefaultGeometry().getBinding(), Geometry.class);
+            assertEquals(ft.getDefaultGeometry().getType().getBinding(), Geometry.class);
 
             FeatureReader fr = mif.getFeatureReader();
 
             while (fr.hasNext()) {
-                Feature f = fr.next();
+                SimpleFeature f = fr.next();
                 String geomtype = (String) f.getAttribute("GEOMTYPE");
 
                 if (geomtype.equals("LINE")) {
@@ -430,14 +430,14 @@ public class MIFFileTest extends TestCase {
             mif = new MIFFile(MIFTestUtils.fileName(typeName), // .mif
                     MIFTestUtils.getParams("mif", "", null, geomType));
 
-            FeatureType ft = mif.getSchema();
+            SimpleFeatureType ft = mif.getSchema();
 
-            assertEquals(geomClass, ft.getDefaultGeometry().getBinding());
+            assertEquals(geomClass, ft.getDefaultGeometry().getType().getBinding());
 
             FeatureReader fr = mif.getFeatureReader();
 
             try {
-                Feature f = fr.next();
+                SimpleFeature f = fr.next();
                 Geometry geom = (Geometry) f.getAttribute("the_geom");
 
                 if (errorExpected) {

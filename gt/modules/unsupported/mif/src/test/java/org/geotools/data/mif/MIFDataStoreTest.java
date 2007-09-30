@@ -15,9 +15,13 @@
  */
 package org.geotools.data.mif;
 
-import com.vividsolutions.jts.geom.LineString;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.HashMap;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
@@ -25,16 +29,14 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.Filter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Date;
-import java.util.HashMap;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -110,36 +112,67 @@ public class MIFDataStoreTest extends TestCase {
             fail(e.getMessage());
         }
     }
-
+    
     /**
      */
     public void testCreateSchema() {
         initDS("");
 
         try {
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
-                    "newschema");
-            builder.addType(AttributeTypeFactory.newAttributeType("obj",
-                    LineString.class, true));
-            builder.addType(AttributeTypeFactory.newAttributeType("charfield",
-                    String.class, false, 25, ""));
-            builder.addType(AttributeTypeFactory.newAttributeType("intfield",
-                    Integer.class, false, 0, new Integer(0)));
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.setName("newschema");
+            
+            AttributeTypeBuilder atb = new AttributeTypeBuilder();
+            atb.setName("obj");
+            atb.setBinding(LineString.class);
+            atb.setNillable(true);
+            
+            builder.add(atb.buildDescriptor("obj"));
+            
+            atb.setName("charfield");
+            atb.setBinding(String.class);
+            atb.setNillable(false);
+            atb.setLength(25);
+            atb.setDefaultValue("");
+            
+            builder.add(atb.buildDescriptor("charfield"));
+            
+            atb.setName("intfield");
+            atb.setBinding(Integer.class);
+            atb.setLength(0);
+            atb.setDefaultValue(0);
+            
+            builder.add(atb.buildDescriptor("intfield"));
 
-            builder.addType(AttributeTypeFactory.newAttributeType("datefield",
-                    Date.class, true));
-            builder.addType(AttributeTypeFactory.newAttributeType(
-                    "doublefield", Double.class, false, 0, new Double(0)));
-            builder.addType(AttributeTypeFactory.newAttributeType(
-                    "floatfield", Float.class, false, 0, new Float(0)));
-            builder.addType(AttributeTypeFactory.newAttributeType("boolfield",
-                    Boolean.class, false, 0, new Boolean(false)));
+            atb.setName("datefield");
+            atb.setBinding(Date.class);
+            atb.setDefaultValue(null);
+            
+            builder.add(atb.buildDescriptor("datefield"));
 
-            FeatureType newFT = builder.getFeatureType();
+            atb.setName("doublefield");
+            atb.setBinding(Double.class);
+            atb.setDefaultValue(0d);
+            
+            builder.add(atb.buildDescriptor("doublefield"));
+
+            atb.setName("floatfield");
+            atb.setBinding(Float.class);
+            atb.setDefaultValue(0f);
+            
+            builder.add(atb.buildDescriptor("floatfield"));
+            
+            atb.setName("boolfield");
+            atb.setBinding(Boolean.class);
+            atb.setDefaultValue(false);
+            
+            builder.add(atb.buildDescriptor("boolfield"));
+
+            SimpleFeatureType newFT = builder.buildFeatureType();
 
             ds.createSchema(newFT);
 
-            FeatureType builtFT = ds.getSchema("newschema");
+            SimpleFeatureType builtFT = ds.getSchema("newschema");
 
             assertEquals(builtFT, newFT);
         } catch (Exception e) {
@@ -153,16 +186,32 @@ public class MIFDataStoreTest extends TestCase {
         initDS("");
 
         try {
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
-                    "newschema");
-            builder.addType(AttributeTypeFactory.newAttributeType("charfield",
-                    String.class, false, 25, ""));
-            builder.addType(AttributeTypeFactory.newAttributeType("intfield",
-                    Integer.class, false, 0, new Integer(0)));
-            builder.addType(AttributeTypeFactory.newAttributeType("obj",
-                    LineString.class, true));
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.setName("newschema");
+            
+            AttributeTypeBuilder atb = new AttributeTypeBuilder();
+            atb.setName("charfield");
+            atb.setBinding(String.class);
+            atb.setNillable(false);
+            atb.setLength(25);
+            atb.setDefaultValue("");
+            
+            builder.add(atb.buildDescriptor("charfield"));
+            
+            atb.setName("intfield");
+            atb.setBinding(Integer.class);
+            atb.setLength(0);
+            atb.setDefaultValue(0);
+            
+            builder.add(atb.buildDescriptor("intfield"));
+            
+            atb.setName("obj");
+            atb.setBinding(LineString.class);
+            atb.setNillable(true);
+            
+            builder.add(atb.buildDescriptor("obj"));
 
-            FeatureType newFT = builder.getFeatureType();
+            SimpleFeatureType newFT = builder.buildFeatureType();
 
             ds.createSchema(newFT);
             fail("SchemaException expected"); // Geometry must be the first field
@@ -176,18 +225,40 @@ public class MIFDataStoreTest extends TestCase {
         initDS("");
 
         try {
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
-                    "newschema");
-            builder.addType(AttributeTypeFactory.newAttributeType("obj",
-                    LineString.class, true));
-            builder.addType(AttributeTypeFactory.newAttributeType("charfield",
-                    String.class, false, 25, ""));
-            builder.addType(AttributeTypeFactory.newAttributeType("obj2",
-                    LineString.class, true));
-            builder.addType(AttributeTypeFactory.newAttributeType("intfield",
-                    Integer.class, false, 0, new Integer(0)));
-
-            FeatureType newFT = builder.getFeatureType();
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.setName("newschema");
+            
+            AttributeTypeBuilder atb = new AttributeTypeBuilder();
+            
+            atb.setName("obj");
+            atb.setBinding(LineString.class);
+            atb.setNillable(true);
+            
+            builder.add(atb.buildDescriptor("obj"));
+            
+            atb.setName("charfield");
+            atb.setBinding(String.class);
+            atb.setNillable(false);
+            atb.setLength(25);
+            atb.setDefaultValue("");
+            
+            builder.add(atb.buildDescriptor("charfield"));
+            
+            atb.setName("obj2");
+            atb.setBinding(LineString.class);
+            atb.setNillable(false);
+            atb.setDefaultValue(null);
+            
+            builder.add(atb.buildDescriptor("obj2"));
+            
+            atb.setName("intfield");
+            atb.setBinding(Integer.class);
+            atb.setLength(0);
+            atb.setDefaultValue(0);
+            
+            builder.add(atb.buildDescriptor("intfield"));
+            
+            SimpleFeatureType newFT = builder.buildFeatureType();
 
             ds.createSchema(newFT);
             fail("SchemaException expected"); // Only one geometry
@@ -202,7 +273,7 @@ public class MIFDataStoreTest extends TestCase {
 
         try {
             FeatureReader fr = getFeatureReader("grafo", "ID = 33755");
-            Feature arc = null;
+            SimpleFeature arc = null;
             Integer id = new Integer(0);
 
             if (fr.hasNext()) {
@@ -227,7 +298,7 @@ public class MIFDataStoreTest extends TestCase {
         String outmif = "grafo_new";
 
         try {
-            FeatureType newFT = MIFTestUtils.duplicateSchema(ds.getSchema(
+            SimpleFeatureType newFT = MIFTestUtils.duplicateSchema(ds.getSchema(
                         "grafo"), outmif);
             ds.createSchema(newFT);
 
@@ -235,7 +306,7 @@ public class MIFDataStoreTest extends TestCase {
 
             FeatureWriter fw = ds.getFeatureWriterAppend(outmif,
                     Transaction.AUTO_COMMIT);
-            Feature f;
+            SimpleFeature f;
             FeatureReader fr = getFeatureReader("grafo",
                     "ID == 73690 || ID == 71045");
 
@@ -244,7 +315,7 @@ public class MIFDataStoreTest extends TestCase {
             while (fr.hasNext()) {
                 ++counter;
 
-                Feature fin = fr.next();
+                SimpleFeature fin = fr.next();
                 f = fw.next();
 
                 for (int i = 0; i <= maxAttr; i++) {
@@ -303,7 +374,7 @@ public class MIFDataStoreTest extends TestCase {
             MIFTestUtils.copyMif("grafo", outmif);
             initDS(outmif);
 
-            Feature f;
+            SimpleFeature f;
             Transaction transaction = new DefaultTransaction("mif");
 
             try {
@@ -365,7 +436,7 @@ public class MIFDataStoreTest extends TestCase {
         initDS(outmif);
 
         FeatureSource fs = null;
-        FeatureType featureType = null;
+        SimpleFeatureType featureType = null;
 
         try {
             featureType = ds.getSchema(outmif);
@@ -382,7 +453,7 @@ public class MIFDataStoreTest extends TestCase {
         }
 
         try {
-            ((FeatureStore) fs).modifyFeatures(featureType.getAttributeType(
+            ((FeatureStore) fs).modifyFeatures(featureType.getAttribute(
                     "DESCRIPTION"), "FOO", Filter.INCLUDE);
         } catch (Exception e) {
             fail("Cannot update Features: " + e.getMessage());
@@ -400,7 +471,7 @@ public class MIFDataStoreTest extends TestCase {
 
             assertEquals(true, fr.hasNext());
 
-            Feature f = fr.next();
+            SimpleFeature f = fr.next();
             assertEquals("FOO", f.getAttribute("DESCRIPTION"));
             assertEquals(false, fr.hasNext());
 
@@ -421,8 +492,8 @@ public class MIFDataStoreTest extends TestCase {
         try {
             fr = getFeatureReader("grafo");
 
-            Feature f = fr.next();
-            assertEquals(f.getDefaultGeometry().getFactory().getSRID(),
+            SimpleFeature f = fr.next();
+            assertEquals(((Geometry) f.getDefaultGeometry()).getFactory().getSRID(),
                 MIFTestUtils.SRID);
 
             fr.close();

@@ -15,18 +15,6 @@
  */
 package org.geotools.data.mif;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypes;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.ExpressionBuilder;
-import org.opengis.filter.Filter;
-import org.geotools.filter.parser.ParseException;
-import org.geotools.test.TestData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,7 +23,22 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
+
+import org.geotools.feature.AttributeTypes;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.filter.ExpressionBuilder;
+import org.geotools.filter.parser.ParseException;
+import org.geotools.test.TestData;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -140,7 +143,7 @@ public class MIFTestUtils {
      * @param f DOCUMENT ME!
      * @param logger DOCUMENT ME!
      */
-    public static void printFeature(Feature f, Logger logger) {
+    public static void printFeature(SimpleFeature f, Logger logger) {
         print(f.toString(), logger);
     }
 
@@ -160,15 +163,15 @@ public class MIFTestUtils {
      * @param ft DOCUMENT ME!
      * @param logger DOCUMENT ME!
      */
-    public static void printSchema(FeatureType ft, Logger logger) {
+    public static void printSchema(SimpleFeatureType ft, Logger logger) {
         print(ft.getTypeName(), logger);
 
-        AttributeType[] attrs = ft.getAttributeTypes();
+        List<AttributeDescriptor> attrs = ft.getAttributes();
 
-        for (int i = 0; i < attrs.length; i++) {
-            print("   " + attrs[i].getLocalName() + " - "
-                + attrs[i].getBinding().toString() + "("
-                + AttributeTypes.getFieldLength(attrs[i], 0) + ")", logger);
+        for (int i = 0; i < attrs.size(); i++) {
+            print("   " + attrs.get(i).getLocalName() + " - "
+                + attrs.get(i).getType().getBinding().toString() + "("
+                + AttributeTypes.getFieldLength(attrs.get(i), 0) + ")", logger);
         }
     }
 
@@ -227,15 +230,16 @@ public class MIFTestUtils {
      *
      * @throws SchemaException
      */
-    protected static FeatureType duplicateSchema(FeatureType inFeatureType,
+    protected static SimpleFeatureType duplicateSchema(SimpleFeatureType inFeatureType,
         String typeName) throws SchemaException {
-        FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(typeName);
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.setName(typeName);
 
         for (int i = 0; i < inFeatureType.getAttributeCount(); i++) {
-            builder.addType(inFeatureType.getAttributeType(i));
+            builder.add(inFeatureType.getAttribute(i));
         }
 
-        return builder.getFeatureType();
+        return builder.buildFeatureType();
     }
 
     /**

@@ -15,6 +15,36 @@
  */
 package org.geotools.data.mif;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URI;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureWriter;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.AttributeTypes;
+import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -27,33 +57,6 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.io.ParseException;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureWriter;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.AttributeTypes;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.SchemaException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URI;
-import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
-import java.util.Date; // TODO use java.sql.Date?
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Vector;
-import java.util.logging.Logger;
 
 
 /**
@@ -143,7 +146,7 @@ public class MIFFile {
     private char chDelimiter = '\t'; // TAB is the default delimiter if not specified in header
 
     // Schema variables
-    private FeatureType featureType = null;
+    private SimpleFeatureType featureType = null;
     private int numAttribs = 0;
     private int geomFieldIndex = -1;
     private URI namespace = null;
@@ -293,7 +296,7 @@ public class MIFFile {
      * @throws SchemaException Error setting the given FeatureType as the MIF
      *         schema
      */
-    public MIFFile(String path, FeatureType featureType, HashMap params)
+    public MIFFile(String path, SimpleFeatureType featureType, HashMap params)
         throws IOException, SchemaException {
         // TODO use url instead of String
         super();
@@ -565,7 +568,7 @@ public class MIFFile {
         header += ("Columns " + (numAttribs - 1) + "\n");
 
         for (int i = 1; i < numAttribs; i++) {
-            AttributeType at = featureType.getAttributeType(i);
+            AttributeDescriptor at = featureType.getAttribute(i);
             header += ("  " + at.getLocalName() + " " + getMapInfoAttrType(at)
             + "\n");
         }
@@ -602,8 +605,9 @@ public class MIFFile {
      *
      * @return the String description of the MapInfo Type
      */
-    private String getMapInfoAttrType(AttributeType at) {
-        if (at.getBinding() == String.class) {
+    private String getMapInfoAttrType(AttributeDescriptor at) {
+        if (at.getType().getBinding() == String.class) {
+        	
             int l = AttributeTypes.getFieldLength(at, MAX_STRING_LEN);
 
             if (l <= 0) {
@@ -611,14 +615,14 @@ public class MIFFile {
             }
 
             return "Char(" + l + ")";
-        } else if (at.getBinding() == Integer.class) {
+        } else if (at.getType().getBinding() == Integer.class) {
             return "Integer";
-        } else if ((at.getBinding() == Double.class)
-                || (at.getBinding() == Float.class)) {
+        } else if ((at.getType().getBinding() == Double.class)
+                || (at.getType().getBinding() == Float.class)) {
             return "Float";
-        } else if (at.getBinding() == Boolean.class) {
+        } else if (at.getType().getBinding() == Boolean.class) {
             return "Logical";
-        } else if (at.getBinding() == Date.class) {
+        } else if (at.getType().getBinding() == Date.class) {
             return "Date";
         } else {
             return "Char(" + MAX_STRING_LEN + ")"; // TODO Should it raise an exception here (UnsupportedSchema) ?
@@ -723,7 +727,7 @@ public class MIFFile {
         try {
             String tok;
             boolean hasMifText = false;
-            AttributeType[] columns = null;
+            AttributeDescriptor[] columns = null;
 
             while (mif.readLine()) {
                 tok = mif.getToken().toLowerCase();
@@ -806,7 +810,7 @@ public class MIFFile {
                     }
 
                     // Columns <n> does not take into account the geometry column, so we increment
-                    columns = new AttributeType[++cols];
+                    columns = new AttributeDescriptor[++cols];
 
                     String name;
                     String type;
@@ -864,9 +868,16 @@ public class MIFFile {
                             defa = "";
                         }
 
+                        
+                        AttributeTypeBuilder b = new AttributeTypeBuilder();
+                        b.setName(name);
+                        b.setBinding(typeClass);
+                        b.setNillable(defa == null);
+                        b.setDefaultValue(defa);
+                        
+                        
                         // Apart from Geometry, MapInfo table fields cannot be null, so Nillable is always false and default value must always be provided!
-                        columns[i] = AttributeTypeFactory.newAttributeType(name,
-                                typeClass, (defa == null), size, defa);
+                        columns[i] = b.buildDescriptor(name);
                     }
                 }
             }
@@ -937,26 +948,36 @@ public class MIFFile {
                         "Unable to determine geometry type from mif file");
                 }
 
-                columns[0] = AttributeTypeFactory.newAttributeType(geometryName,
-                        geomType, true);
+                AttributeTypeBuilder b = new AttributeTypeBuilder();
+                b.setName(geometryName);
+                b.setBinding(geomType);
+                b.setNillable(true);
+                
+                
+                columns[0] = b.buildDescriptor(geometryName);
 
                 try {
                     String typeName = mifFile.getName();
                     typeName = typeName.substring(0, typeName.indexOf("."));
 
-                    FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(typeName);
+                    SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+                    builder.setName(typeName);
 
-                    builder.setNamespace(namespace);
+                    builder.setNamespaceURI(namespace);
 
                     for (int i = 0; i < columns.length; i++)
-                        builder.addType(columns[i]);
+                        builder.add(columns[i]);
 
                     if (hasMifText) {
-                        builder.addType(AttributeTypeFactory.newAttributeType(
-                                "MIF_TEXT", String.class, true));
+                    	b = new AttributeTypeBuilder();
+                    	b.setName("MIF_TEXT");
+                    	b.setBinding(String.class);
+                    	b.setNillable(true);
+                    	
+                        builder.add(b.buildDescriptor("MIF_TEXT"));
                     }
 
-                    setSchema(builder.getFeatureType());
+                    setSchema(builder.buildFeatureType());
                 } catch (SchemaException schexp) {
                     throw new SchemaException(
                         "Exception creating feature type from MIF header: "
@@ -974,7 +995,7 @@ public class MIFFile {
      *
      * @return the current FeatureType associated with the MIF file
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return featureType;
     }
 
@@ -987,7 +1008,7 @@ public class MIFFile {
      * @throws SchemaException The given FeatureType is not compatible with
      *         MapInfo format
      */
-    private void setSchema(FeatureType ft) throws SchemaException {
+    private void setSchema(SimpleFeatureType ft) throws SchemaException {
         featureType = ft;
 
         numAttribs = featureType.getAttributeCount();
@@ -997,9 +1018,9 @@ public class MIFFile {
         featureDefaults = new Object[numAttribs];
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
-            AttributeType at = featureType.getAttributeType(i);
+            AttributeDescriptor at = featureType.getAttribute(i);
 
-            Class atc = at.getBinding();
+            Class atc = at.getType().getBinding();
 
             if (Geometry.class.isAssignableFrom(atc)) {
                 if (geomFieldIndex >= 0) {
@@ -1037,8 +1058,8 @@ public class MIFFile {
         MIFValueSetter[] fieldValueSetters = new MIFValueSetter[numAttribs];
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
-            AttributeType at = featureType.getAttributeType(i);
-            Class atc = at.getBinding();
+            AttributeDescriptor at = featureType.getAttribute(i);
+            Class atc = at.getType().getBinding();
 
             if (i == geomFieldIndex) {
                 fieldValueSetters[i] = null;
@@ -1176,7 +1197,7 @@ public class MIFFile {
         private MIFFileTokenizer mid = null;
         private boolean mifEOF = false;
         private String mifText = ""; // caption for text objects 
-        private Feature inputFeature = null;
+        private SimpleFeature inputFeature = null;
         private Object[] inputBuffer = null;
         private MIFValueSetter[] fieldValueSetters;
 
@@ -1204,12 +1225,12 @@ public class MIFFile {
         }
 
         // Reads the next feature and returns the last one
-        public Feature next() throws NoSuchElementException {
+        public SimpleFeature next() throws NoSuchElementException {
             if (inputFeature == null) {
                 throw new NoSuchElementException("Reached the end of MIF file");
             }
 
-            Feature temp = inputFeature;
+            SimpleFeature temp = inputFeature;
 
             try {
                 inputFeature = readFeature();
@@ -1221,7 +1242,7 @@ public class MIFFile {
             return temp;
         }
 
-        public FeatureType getFeatureType() {
+        public SimpleFeatureType getFeatureType() {
             return featureType;
         }
 
@@ -1252,8 +1273,8 @@ public class MIFFile {
          *
          * @throws IOException
          */
-        private Feature readFeature() throws IOException {
-            Feature feature = null;
+        private SimpleFeature readFeature() throws IOException {
+            SimpleFeature feature = null;
             Geometry geom = readGeometry();
 
             if (mifEOF) {
@@ -1308,7 +1329,7 @@ public class MIFFile {
             // Now add geometry and build the feature
             try {
                 inputBuffer[0] = geom;
-                feature = featureType.create(inputBuffer);
+                feature = SimpleFeatureBuilder.build(featureType, inputBuffer, null);
             } catch (Exception e) {
                 throw new IOException("Exception building feature: "
                     + e.getMessage());
@@ -1619,8 +1640,8 @@ public class MIFFile {
         private PrintStream outMid = null;
         private FeatureReader innerReader = null;
         private MIFValueSetter[] fieldValueSetters;
-        private Feature editFeature = null;
-        private Feature originalFeature = null;
+        private SimpleFeature editFeature = null;
+        private SimpleFeature originalFeature = null;
 
         private Writer(PrintStream mif, PrintStream mid, boolean append)
             throws IOException {
@@ -1646,11 +1667,11 @@ public class MIFFile {
             }
         }
 
-        public FeatureType getFeatureType() {
+        public SimpleFeatureType getFeatureType() {
             return featureType;
         }
 
-        public Feature next() throws IOException {
+        public SimpleFeature next() throws IOException {
             try {
                 if (originalFeature != null) {
                     writeFeature(originalFeature); // keep the original
@@ -1658,10 +1679,10 @@ public class MIFFile {
 
                 if (innerReader.hasNext()) {
                     originalFeature = innerReader.next(); // ;
-                    editFeature = featureType.duplicate(originalFeature);
-                } else {
+                    editFeature = SimpleFeatureBuilder.copy(originalFeature);
+                    } else {
                     originalFeature = null;
-                    editFeature = featureType.create(featureDefaults);
+                    editFeature = SimpleFeatureBuilder.build(featureType, featureDefaults, null); 
                 }
 
                 return editFeature;
@@ -1745,7 +1766,7 @@ public class MIFFile {
          * @throws SchemaException if given Feature is not compatible with
          *         MIFFile FeatureType. TODO: private
          */
-        public void writeFeature(Feature f) throws IOException, SchemaException {
+        public void writeFeature(SimpleFeature f) throws IOException, SchemaException {
             if ((outMif == null) || (outMid == null)) {
                 throw new IOException(
                     "Output stream has not been opened for writing.");

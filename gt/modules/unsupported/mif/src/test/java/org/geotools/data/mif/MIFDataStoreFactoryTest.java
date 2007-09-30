@@ -15,14 +15,16 @@
  */
 package org.geotools.data.mif;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi.Param;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.feature.FeatureType;
 import java.io.IOException;
 import java.net.URI;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DataStoreFactorySpi.Param;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -93,8 +95,8 @@ public class MIFDataStoreFactoryTest extends TestCase {
             ds = dsFactory.createDataStore(MIFTestUtils.getParams("mif",
                         MIFTestUtils.fileName(""), uri));
 
-            FeatureType ft = ds.getSchema("grafo");
-            assertEquals("Bad URI", new URI(strURI), ft.getNamespace());
+            SimpleFeatureType ft = ds.getSchema("grafo");
+            assertEquals("Bad URI", new URI(strURI), ft.getName().getNamespaceURI());
         } catch (Exception e) {
             fail(e.getMessage());
         }
