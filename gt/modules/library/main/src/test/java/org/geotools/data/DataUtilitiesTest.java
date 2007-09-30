@@ -23,13 +23,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -335,12 +337,12 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals(1, DataUtilities.compare(subRoadType, roadType));
 
         // different order
-        FeatureType road2 = DataUtilities.createType("namespace.road",
+        SimpleFeatureType road2 = DataUtilities.createType("namespace.road",
                 "geom:LineString,name:String,id:0");
         assertEquals(1, DataUtilities.compare(road2, roadType));
 
         // different namespace        
-        FeatureType road3 = DataUtilities.createType("test.road",
+        SimpleFeatureType road3 = DataUtilities.createType("test.road",
                 "id:0,geom:LineString,name:String");
         assertEquals(0, DataUtilities.compare(road3, roadType));
     }
@@ -349,46 +351,46 @@ public class DataUtilitiesTest extends DataTestCase {
     }
 
     public void testReType() throws Exception {
-        Feature rd1 = roadFeatures[0];
+        SimpleFeature rd1 = roadFeatures[0];
         assertEquals(rd1, rd1);
 
-        Feature rdDuplicate = roadType.duplicate(rd1);
+        SimpleFeature rdDuplicate = SimpleFeatureBuilder.copy(rd1);
 
         assertEquals(rd1, rdDuplicate);
         assertNotSame(rd1, rdDuplicate);
 
-        Feature rd2 = DataUtilities.reType(roadType, rd1);
+        SimpleFeature rd2 = DataUtilities.reType(roadType, rd1);
 
         assertEquals(rd1, rd2);
         assertNotSame(rd1, rd2);
 
-        Feature rd3 = DataUtilities.reType(subRoadType, rd1);
+        SimpleFeature rd3 = DataUtilities.reType(subRoadType, rd1);
 
         assertFalse(rd1.equals(rd3));
-        assertEquals(2, rd3.getNumberOfAttributes());
+        assertEquals(2, rd3.getAttributeCount());
         assertEquals(rd1.getID(), rd3.getID());
         assertEquals(rd1.getAttribute("id"), rd3.getAttribute("id"));
         assertEquals((Geometry) rd1.getAttribute("geom"),
             (Geometry) rd3.getAttribute("geom"));
         assertNotNull(rd3.getDefaultGeometry());
 
-        Feature rv1 = riverFeatures[0];
+        SimpleFeature rv1 = riverFeatures[0];
         assertEquals(rv1, rv1);
 
-        Feature rvDuplicate = riverType.duplicate(rv1);
+        SimpleFeature rvDuplicate = SimpleFeatureBuilder.copy(rv1);
 
         assertEquals(rv1, rvDuplicate);
         assertNotSame(rv1, rvDuplicate);
 
-        Feature rv2 = DataUtilities.reType(riverType, rv1);
+        SimpleFeature rv2 = DataUtilities.reType(riverType, rv1);
 
         assertEquals(rv1, rv2);
         assertNotSame(rv1, rv2);
 
-        Feature rv3 = DataUtilities.reType(subRiverType, rv1);
+        SimpleFeature rv3 = DataUtilities.reType(subRiverType, rv1);
 
         assertFalse(rv1.equals(rv3));
-        assertEquals(2, rv3.getNumberOfAttributes());
+        assertEquals(2, rv3.getAttributeCount());
         assertEquals(rv1.getID(), rv3.getID());
         assertEquals(rv1.getAttribute("name"), rv3.getAttribute("name"));
         assertEquals(rv1.getAttribute("flow"), rv3.getAttribute("flow"));
@@ -399,9 +401,9 @@ public class DataUtilitiesTest extends DataTestCase {
      * Test for Feature template(FeatureType)
      */
     public void testTemplateFeatureType() throws IllegalAttributeException {
-        Feature feature = DataUtilities.template(roadType);
+        SimpleFeature feature = DataUtilities.template(roadType);
         assertNotNull(feature);
-        assertEquals(roadType.getAttributeCount(), feature.getNumberOfAttributes());
+        assertEquals(roadType.getAttributeCount(), feature.getAttributeCount());
     }
 
     /*
@@ -409,9 +411,9 @@ public class DataUtilitiesTest extends DataTestCase {
      */
     public void testTemplateFeatureTypeString()
         throws IllegalAttributeException {
-        Feature feature = DataUtilities.template(roadType, "Foo");
+        SimpleFeature feature = DataUtilities.template(roadType, "Foo");
         assertNotNull(feature);
-        assertEquals(roadType.getAttributeCount(), feature.getNumberOfAttributes());
+        assertEquals(roadType.getAttributeCount(), feature.getAttributeCount());
         assertEquals("Foo", feature.getID());
         assertNull(feature.getAttribute("name"));
         assertNull(feature.getAttribute("id"));
@@ -425,9 +427,9 @@ public class DataUtilitiesTest extends DataTestCase {
     }
 
     public void testDefaultValue() throws IllegalAttributeException {
-        assertNull(DataUtilities.defaultValue(roadType.getAttributeType("name")));
-        assertNull(DataUtilities.defaultValue(roadType.getAttributeType("id")));
-        assertNull(DataUtilities.defaultValue(roadType.getAttributeType("geom")));
+        assertNull(DataUtilities.defaultValue(roadType.getAttribute("name")));
+        assertNull(DataUtilities.defaultValue(roadType.getAttribute("id")));
+        assertNull(DataUtilities.defaultValue(roadType.getAttribute("geom")));
     }
 
     
@@ -497,7 +499,7 @@ public class DataUtilitiesTest extends DataTestCase {
     	FilterFactory ffac = CommonFactoryFinder.getFilterFactory(null);
 
     	String typeSpec = "geom:Point,att1:String,att2:String,att3:String,att4:String";
-    	FeatureType testType = DataUtilities.createType("testType", typeSpec);
+    	SimpleFeatureType testType = DataUtilities.createType("testType", typeSpec);
     	//System.err.println("created test type: " + testType);
     	
     	filter1 = ffac.equals(ffac.property("att1"), ffac.literal("val1"));

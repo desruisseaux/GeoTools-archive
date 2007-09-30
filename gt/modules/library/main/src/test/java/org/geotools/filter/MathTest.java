@@ -21,15 +21,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -59,8 +56,6 @@ public class MathTest extends TestCase {
     }
 
     public SimpleFeature[] sampleFeatures() throws Exception {
-        AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
-
         SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
         ftb.add("value", Integer.class);
         ftb.add("geometry", Geometry.class);

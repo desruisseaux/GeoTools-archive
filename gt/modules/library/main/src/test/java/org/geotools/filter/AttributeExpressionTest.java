@@ -2,15 +2,15 @@ package org.geotools.filter;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.DefaultFeatureBuilder;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 public class AttributeExpressionTest extends TestCase {
 
 	public void testFeature() {
-		DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		
 		typeBuilder.setName( "test" );
 		typeBuilder.setNamespaceURI( "http://www.geotools.org/test" );
@@ -19,7 +19,7 @@ public class AttributeExpressionTest extends TestCase {
 		
 		SimpleFeatureType type = typeBuilder.buildFeatureType();
 		
-		DefaultFeatureBuilder builder = new DefaultFeatureBuilder(type);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
 		builder.add( new Integer( 1 ) );
 		builder.add( new Double( 2.0 ) );
 

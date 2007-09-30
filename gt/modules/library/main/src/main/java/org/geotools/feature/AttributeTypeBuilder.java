@@ -169,7 +169,7 @@ public class AttributeTypeBuilder {
 		restrictions = null;
 		description = null;
 		isIdentifiable = false;
-		binding = null;
+		binding = Object.class;
 		superType = null;
 		crs = null;
 		length = -1;

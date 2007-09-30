@@ -15,12 +15,18 @@
  */
 package org.geotools.feature;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.util.Cloneable;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -38,7 +44,7 @@ public class FeatureFlatTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.defaultcore");
 
     /** Feature on which to preform tests */
-    private Feature testFeature = null;
+    private SimpleFeature testFeature = null;
 
     TestSuite suite = null;
 
@@ -93,18 +99,20 @@ public class FeatureFlatTest extends TestCase {
     }
 
     public void testBogusCreation() throws Exception {
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance("test1");
-        factory.addType(newAtt("billy", String.class, false));
-        factory.addType(newAtt("jimmy", String.class, false));
-        FeatureType test = factory.getFeatureType();
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( "test1" );
+        tb.add( "billy", String.class );
+        tb.add( "jimmy", String.class );
+        
+        SimpleFeatureType test = tb.buildFeatureType();
         try {
-            test.create(null);
+            SimpleFeatureBuilder.build(test, (Object[])null, null);
             fail("no error");
         } catch (IllegalAttributeException iae) {
         }
 
         try {
-            test.create(new Object[32]);
+            SimpleFeatureBuilder.build(test, new Object[32],null);
             fail("no error");
         } catch (IllegalAttributeException iae) {
         }
@@ -120,13 +128,16 @@ public class FeatureFlatTest extends TestCase {
         g[3] = gf.createPoint(new Coordinate(10, 10));
 
         GeometryCollection gc = gf.createGeometryCollection(g);
-        FeatureTypeFactory factory = FeatureTypeFactory.newInstance("bounds");
-        factory.addType(newAtt("p1", Point.class));
-        factory.addType(newAtt("p2", Point.class));
-        factory.addType(newAtt("p3", Point.class));
-        factory.addType(newAtt("p4", Point.class));
-        FeatureType t = factory.createFeatureType();
-        Feature f = t.create(g);
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( "bounds" );
+        
+        tb.add("p1", Point.class);
+        tb.add("p2", Point.class);
+        tb.add("p3", Point.class);
+        tb.add("p4", Point.class);
+        SimpleFeatureType t = tb.buildFeatureType();
+        
+        SimpleFeature f = SimpleFeatureBuilder.build(t, g, null);
         assertEquals(gc.getEnvelopeInternal(), f.getBounds());
 
         g[1].getCoordinate().y = 20;
@@ -138,33 +149,38 @@ public class FeatureFlatTest extends TestCase {
     }
 
     public void testClone() {
-        DefaultFeature f = (DefaultFeature) SampleFeatureFixtures.createFeature();
-        Feature c = (Feature) f.clone();
-        for (int i = 0, ii = c.getNumberOfAttributes(); i < ii; i++) {
+        SimpleFeature f = SampleFeatureFixtures.createFeature();
+        SimpleFeature c = SimpleFeatureBuilder.copy( f );
+        for (int i = 0, ii = c.getAttributeCount(); i < ii; i++) {
             assertEquals(c.getAttribute(i), f.getAttribute(i));
         }
     }
 
     public void testClone2() throws Exception {
-        FeatureType type = SampleFeatureFixtures.createTestType();
+        SimpleFeatureType type = SampleFeatureFixtures.createTestType();
         Object[] attributes = SampleFeatureFixtures.createAttributes();
-        DefaultFeature feature = (DefaultFeature) type.create(attributes, "fid");
-        Feature clone = (Feature) ((Cloneable)feature).clone();
+        SimpleFeature feature = SimpleFeatureBuilder.build(type, attributes, "fid");
+        SimpleFeature clone = (SimpleFeature) ((Cloneable)feature).clone();
         assertTrue("Clone was not equal", feature.equals(clone));
     }
 
     public void testToStringWontThrow() throws IllegalAttributeException {
         SimpleFeature f = (SimpleFeature)SampleFeatureFixtures.createFeature();
-        f.setAttributes(new Object[f.getNumberOfAttributes()]);
+        f.setAttributes(new Object[f.getAttributeCount()]);
         String s = f.toString();
     }
 
-    static AttributeType newAtt(String name, Class c) {
-        return AttributeTypeFactory.newAttributeType(name, c, true);
+    static AttributeDescriptor newAtt(String name, Class c) {
+        AttributeTypeBuilder ab = new AttributeTypeBuilder();
+        ab.setBinding(c);
+        return ab.buildDescriptor( name );
     }
 
-    static AttributeType newAtt(String name, Class c, boolean nillable) {
-        return AttributeTypeFactory.newAttributeType(name, c, nillable);
+    static AttributeDescriptor newAtt(String name, Class c, boolean nillable) {
+        AttributeTypeBuilder ab = new AttributeTypeBuilder();
+        ab.setNillable(nillable);
+        ab.setBinding( c );
+        return ab.buildDescriptor(name);
     }
 
     public void testModify() throws IllegalAttributeException {
@@ -182,33 +198,21 @@ public class FeatureFlatTest extends TestCase {
 
     }
 
-//    public void testFindAttribute() {
-//        DefaultFeature f = (DefaultFeature) SampleFeatureFixtures.createFeature();
-//        FeatureType t = f.getFeatureType();
-//        for (int i = 0, ii = t.getAttributeCount(); i < ii; i++) {
-//            AttributeType a = t.getAttributeType(i);
-//            assertEquals(i, f.findAttributeByName(a.getName()));
-//        }
-//        assertEquals(-1, f.findAttributeByName("bilbo baggins"));
-//        assertEquals(null, f.getAttribute("jimmy hoffa"));
-//    }
-
     public void testAttributeAccess() throws Exception {
         // this ones kinda silly
     	SimpleFeature f = (SimpleFeature)SampleFeatureFixtures.createFeature();
-        Object[] atts = null;
-        atts = f.getAttributes(atts);
-        for (int i = 0, ii = atts.length; i < ii; i++) {
-            assertEquals(atts[i], f.getAttribute(i));
+        List atts = f.getAttributes();
+        for (int i = 0, ii = atts.size(); i < ii; i++) {
+            assertEquals(atts.get(i), f.getAttribute(i));
         }
-        Object[] attsAgain = f.getAttributes(null);
+        List attsAgain = f.getAttributes();
         assertTrue(atts != attsAgain);
         f.setAttributes(atts);
-        attsAgain = f.getAttributes(attsAgain);
+        attsAgain = f.getAttributes();
         assertTrue(atts != attsAgain);
-        for (int i = 0, ii = atts.length; i < ii; i++) {
-            assertEquals(atts[i], f.getAttribute(i));
-            assertEquals(attsAgain[i], f.getAttribute(i));
+        for (int i = 0, ii = atts.size(); i < ii; i++) {
+            assertEquals(atts.get(i), f.getAttribute(i));
+            assertEquals(attsAgain.get(i), f.getAttribute(i));
         }
         try {
             f.setAttribute(1244, "x");
@@ -252,15 +256,19 @@ public class FeatureFlatTest extends TestCase {
 //    }
 
     public void testEquals() throws Exception {
-        Feature f1 = SampleFeatureFixtures.createFeature();
-        Feature f2 = SampleFeatureFixtures.createFeature();
+        SimpleFeature f1 = SampleFeatureFixtures.createFeature();
+        SimpleFeature f2 = SampleFeatureFixtures.createFeature();
         assertTrue(f1.equals(f1));
         assertTrue(f2.equals(f2));
         assertTrue(!f1.equals(f2));
         assertTrue(!f1.equals(null));
-        FeatureType another =
-            FeatureTypeFactory.newFeatureType(new AttributeType[] { newAtt("name", String.class)}, "different");
-        assertTrue(!f1.equals(another.create(new Object[1])));
+        
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( "different" );
+        tb.add( "name", String.class );
+        SimpleFeatureType type = tb.buildFeatureType();
+        
+        assertTrue(!f1.equals(SimpleFeatureBuilder.build(type, new Object[1], null)));
     }
 
     /*
@@ -271,14 +279,18 @@ public class FeatureFlatTest extends TestCase {
      * as we now allow 
      */
     public void testDefaultGeometry() throws Exception {
-        FeatureType testType = testFeature.getFeatureType();
-        AttributeType geometry = testType.getAttributeType("testGeometry");
+        SimpleFeatureType testType = testFeature.getFeatureType();
+        AttributeDescriptor geometry = testType.getAttribute("testGeometry");
         assertTrue(geometry == testType.getDefaultGeometry());
-        assertTrue(testFeature.getDefaultGeometry().getEnvelopeInternal().equals(testFeature.getBounds()));
+        assertTrue(((Geometry)testFeature.getDefaultGeometry()).getEnvelopeInternal().equals(testFeature.getBounds()));
 
-        FeatureType another =
-            FeatureTypeFactory.newFeatureType(new AttributeType[] { newAtt("name", String.class)}, "different");
-        DefaultFeature f1 = (DefaultFeature) another.create(new Object[1]);
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( "different" );
+        tb.add( "name", String.class );
+        
+        SimpleFeatureType another = tb.buildFeatureType(); 
+        SimpleFeature f1 = SimpleFeatureBuilder.build(another, new Object[1], null);
+            
         assertEquals(null, f1.getDefaultGeometry());
         try {
             f1.setDefaultGeometry(null);

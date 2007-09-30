@@ -25,6 +25,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 
@@ -39,18 +41,18 @@ public class ArrayFeatureReaderTest extends TestCase {
     private CollectionFeatureReader collectionReader;
     private CollectionFeatureReader featureCollectionReader;
     private SimpleFeatureType type;
-    private Feature[] features;
+    private SimpleFeature[] features;
 
     protected void setUp() throws Exception {
         type = DataUtilities.createType("TestType", "geom:Geometry");
-        features = new Feature[] {
-                type.create(new Object[] { null }, "f1"),
-                type.create(new Object[] { null }, "f2"),
-                type.create(new Object[] { null }, "f3"),
-                type.create(new Object[] { null }, "f4"),
-                type.create(new Object[] { null }, "f5"),
-                type.create(new Object[] { null }, "f6")
-            };
+        features = new SimpleFeature[] {
+            SimpleFeatureBuilder.build( type, new Object[] { null }, "f1" ), 
+            SimpleFeatureBuilder.build( type, new Object[] { null }, "f2" ),
+            SimpleFeatureBuilder.build( type, new Object[] { null }, "f3" ),
+            SimpleFeatureBuilder.build( type, new Object[] { null }, "f4" ),
+            SimpleFeatureBuilder.build( type, new Object[] { null }, "f5" ),
+            SimpleFeatureBuilder.build( type, new Object[] { null }, "f6" )
+        };
 
         FeatureCollection collection = FeatureCollections.newCollection();
         List list = Arrays.asList(features);

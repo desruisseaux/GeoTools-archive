@@ -24,6 +24,8 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.util.Cloneable;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +45,7 @@ public class FeatureWrappedComplexTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.feature");
 
     /** Feature on which to preform tests */
-    private Feature testFeature = null;
+    private SimpleFeature testFeature = null;
     TestSuite suite = null;
 
     public FeatureWrappedComplexTest( String testName ) {
@@ -74,7 +76,7 @@ public class FeatureWrappedComplexTest extends TestCase {
 
     public void testAttributeAccess() throws Exception {
         // this ones kinda silly
-        Feature f = testFeature;
+        SimpleFeature f = testFeature;
 
         try {
             f.setAttribute(1244, Collections.singletonList("x"));
@@ -98,8 +100,8 @@ public class FeatureWrappedComplexTest extends TestCase {
 
     public void testWrappedAccessIndex() {
         int attrIndex = 5;
-        Feature simple = SampleFeatureFixtures.createFeature();
-        Feature wrapped = testFeature;
+        SimpleFeature simple = SampleFeatureFixtures.createFeature();
+        SimpleFeature wrapped = testFeature;
         Object intAtt = wrapped.getAttribute(attrIndex);
         LOGGER.info("simple is: " + simple + ", and wrapped is: " + wrapped);
         LOGGER.info("intAtt is: " + intAtt);
@@ -111,8 +113,8 @@ public class FeatureWrappedComplexTest extends TestCase {
 
     public void testWrappedAccessName() {
         String attName = "testCharacter";
-        Feature simple = SampleFeatureFixtures.createFeature();
-        Feature wrapped = testFeature;
+        SimpleFeature simple = SampleFeatureFixtures.createFeature();
+        SimpleFeature wrapped = testFeature;
         Object intAtt = wrapped.getAttribute(attName);
         assertTrue(intAtt instanceof List);
 
@@ -121,19 +123,19 @@ public class FeatureWrappedComplexTest extends TestCase {
     }
 
     public void testWrappedAccessAll() {
-        Feature simple = SampleFeatureFixtures.createFeature();
-        Feature wrapped = testFeature;
-        Object[] simpleAtts = simple.getAttributes(null);
-        Object[] complexAtts = wrapped.getAttributes(null);
+        SimpleFeature simple = SampleFeatureFixtures.createFeature();
+        SimpleFeature wrapped = testFeature;
+        List simpleAtts = simple.getAttributes();
+        List complexAtts = wrapped.getAttributes();
         List curAttList = null;
 
         // we're starting at 1 because of the annoying equals with geometries,
         // and I don't want to figure out where the util method is...
-        for( int i = 1; i < complexAtts.length; i++ ) {
-            assertTrue(complexAtts[i] instanceof List);
-            curAttList = (List) complexAtts[i];
+        for( int i = 1; i < complexAtts.size(); i++ ) {
+            assertTrue(complexAtts.get(i) instanceof List);
+            curAttList = (List) complexAtts.get(i);
             assertEquals(1, curAttList.size());
-            assertEquals(curAttList.get(0), (simpleAtts[i]));
+            assertEquals(curAttList.get(0), (simpleAtts.get(i)));
         }
     }
 

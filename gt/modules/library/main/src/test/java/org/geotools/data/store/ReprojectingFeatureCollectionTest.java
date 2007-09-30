@@ -2,11 +2,10 @@ package org.geotools.data.store;
 
 import java.util.Iterator;
 
-
-import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 
@@ -38,8 +37,8 @@ public class ReprojectingFeatureCollectionTest extends
 		Iterator reader = delegate.iterator();
 		
 		while( reader.hasNext() ) {
-			Feature normal = (Feature) reader.next();
-			Feature reprojected = (Feature) reproject.next();
+			SimpleFeature normal = (SimpleFeature) reader.next();
+			SimpleFeature reprojected = (SimpleFeature) reproject.next();
 			
 			Point p1 = (Point) normal.getAttribute( "defaultGeom" );
 			p1 = (Point) transformer.transform( p1 );

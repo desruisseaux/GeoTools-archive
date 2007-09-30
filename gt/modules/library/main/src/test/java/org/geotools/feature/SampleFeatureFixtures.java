@@ -21,8 +21,14 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
-import org.geotools.feature.type.ChoiceAttributeType;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 
 
 /**
@@ -44,12 +50,12 @@ public class SampleFeatureFixtures {
     public SampleFeatureFixtures() {
     }
 
-    public static Feature createFeature() {
+    public static SimpleFeature createFeature() {
         try {
-            FeatureType testType = createTestType();
+            SimpleFeatureType testType = createTestType();
             Object[] attributes = createAttributes();
 
-            return testType.create(attributes);
+            return SimpleFeatureBuilder.build( testType,attributes,null);
         } catch (Exception e) {
             Error ae = new AssertionError(
                     "Sample Feature for tests has been misscoded");
@@ -58,7 +64,7 @@ public class SampleFeatureFixtures {
         }
     }
 
-    public static Feature createAddressFeature() {
+    public static SimpleFeature createAddressFeature() {
         try {
             return createFeature();
 
@@ -96,62 +102,76 @@ public class SampleFeatureFixtures {
 
     //If we go to factories/protected constructors this won't work, will need
     //to move to a types directory, or use the factory
-    public static AttributeType getChoiceAttrType1() {
+    public static AttributeDescriptor getChoiceAttrType1() {
         return createChoiceAttrType("choiceTest1", createType1Choices());
     }
 
-    public static AttributeType[] createType1Choices() {
-        AttributeType[] choices = new AttributeType[3];
-        choices[0] = AttributeTypeFactory.newAttributeType("testByte",
-                Byte.class);
-        choices[1] = AttributeTypeFactory.newAttributeType("testDouble",
-                Double.class);
-        choices[2] = AttributeTypeFactory.newAttributeType("testString",
-                String.class);
-
+    public static AttributeDescriptor[] createType1Choices() {
+        AttributeTypeBuilder ab = new AttributeTypeBuilder();
+        AttributeDescriptor[] choices = new AttributeDescriptor[3];
+        
+        ab.setBinding(Byte.class);
+        choices[0] = ab.buildDescriptor( "testByte" );
+        
+        ab.setBinding(Double.class);
+        choices[1] = ab.buildDescriptor( "testDouble");
+        
+        ab.setBinding(String.class);
+        choices[2] = ab.buildDescriptor( "testString");
+        
         return choices;
     }
 
-    public static AttributeType getChoiceAttrType2() {
-        AttributeType[] choices = new AttributeType[2];
-        choices[0] = AttributeTypeFactory.newAttributeType("testString",
-                String.class, false);
-        choices[1] = AttributeTypeFactory.newAttributeType("testInt",
-                Integer.class, false);
-
+    public static AttributeDescriptor getChoiceAttrType2() {
+        AttributeTypeBuilder ab = new AttributeTypeBuilder();
+        AttributeDescriptor[] choices = new AttributeDescriptor[2];
+        
+        ab.setBinding(String.class);
+        choices[0] = ab.buildDescriptor( "testString" );
+        
+        ab.setBinding(Integer.class);
+        choices[1] = ab.buildDescriptor( "testInt" );
+        
         return createChoiceAttrType("choiceTest2", choices);
     }
 
-    public static AttributeType createChoiceAttrType(String name,
-        AttributeType[] choices) {
-        return new ChoiceAttributeType(name, choices);
-    }
-
-    public static AttributeType createGeomChoiceAttrType(String name,
-        GeometryAttributeType[] choices) {
-        return new ChoiceAttributeType.Geometric(name, choices);
-    }
-
-    public static AttributeType getChoiceGeomType() {
-        GeometryAttributeType[] choices = new GeometryAttributeType[2];
-        choices[0] = (GeometryAttributeType) AttributeTypeFactory
-            .newAttributeType("testLine", LineString.class);
-        choices[1] = (GeometryAttributeType) AttributeTypeFactory
-            .newAttributeType("testMultiLine", MultiLineString.class);
-
-        return createGeomChoiceAttrType("choiceGeom", choices);
-    }
-
-    public static FeatureType createChoiceFeatureType() {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
-        tb.setName( "test" );
+    public static AttributeDescriptor createChoiceAttrType(String name,
+        AttributeDescriptor[] choices) {
         
-        tb.add(getChoiceAttrType1());
-        tb.add(getChoiceAttrType2());
-        tb.add(getChoiceGeomType());
-        tb.setDefaultGeometry(getChoiceGeomType());
+        throw new RuntimeException("Figure out how to handle choice");
+        //return new ChoiceAttributeType(name, choices);
+    }
+
+    public static AttributeDescriptor createGeomChoiceAttrType(String name,
+        GeometryDescriptor[] choices) {
+        throw new RuntimeException("Figure out how to handle choice");
+        //return new ChoiceAttributeType.Geometric(name, choices);
+    }
+
+    public static AttributeDescriptor getChoiceGeomType() {
+        throw new RuntimeException("Figure out how to handle choice");
         
-        return tb.buildFeatureType();
+//        GeometryAttributeType[] choices = new GeometryAttributeType[2];
+//        choices[0] = (GeometryAttributeType) AttributeTypeFactory
+//            .newAttributeType("testLine", LineString.class);
+//        choices[1] = (GeometryAttributeType) AttributeTypeFactory
+//            .newAttributeType("testMultiLine", MultiLineString.class);
+//
+//        return createGeomChoiceAttrType("choiceGeom", choices);
+    }
+
+    public static SimpleFeatureType createChoiceFeatureType() {
+        throw new RuntimeException("Figure out how to handle choice");
+        
+//        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+//        tb.setName( "test" );
+//        
+//        tb.add(getChoiceAttrType1());
+//        tb.add(getChoiceAttrType2());
+//        tb.add(getChoiceGeomType());
+//        tb.setDefaultGeometry(getChoiceGeomType());
+//        
+//        return tb.buildFeatureType();
     }
 
     /**
@@ -160,8 +180,8 @@ public class SampleFeatureFixtures {
      *
      * @throws SchemaException
      */
-    public static FeatureType createTestType() throws SchemaException {
-        DefaultFeatureTypeBuilder tb = new DefaultFeatureTypeBuilder();
+    public static SimpleFeatureType createTestType() throws SchemaException {
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName("test");
         
         tb.add("testGeometry", Point.class);
@@ -178,32 +198,5 @@ public class SampleFeatureFixtures {
         tb.setDefaultGeometry("testGeometry");
         return tb.buildFeatureType();
         
-//        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance("test");
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-//                "testGeometry", Point.class));
-//
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-//                "testBoolean", Boolean.class));
-//
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-//                "testCharacter", Character.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testByte",
-//                Byte.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testShort",
-//                Short.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-//                "testInteger", Integer.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testLong",
-//                Long.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType("testFloat",
-//                Float.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-//                "testDouble", Double.class));
-//        typeFactory.addType(AttributeTypeFactory.newAttributeType(
-//                "testString", String.class));
-//        typeFactory.setDefaultGeometry((GeometryAttributeType) typeFactory.get(
-//                0));
-//
-//        return typeFactory.getFeatureType();
     }
 }

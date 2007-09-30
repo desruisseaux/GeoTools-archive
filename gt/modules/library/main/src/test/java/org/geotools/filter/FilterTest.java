@@ -27,8 +27,6 @@ import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -66,8 +64,6 @@ public class FilterTest extends TestCase {
     boolean set = false;
     
     FilterFactory fac;
-
-      private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Test suite for this test case */
     TestSuite suite = null;

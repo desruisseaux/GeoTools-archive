@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureFactoryImpl;
-import org.geotools.feature.type.SetAttributeType;
 import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.FeatureFactory;

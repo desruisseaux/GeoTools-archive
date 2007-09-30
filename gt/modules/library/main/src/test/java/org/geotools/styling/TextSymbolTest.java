@@ -23,9 +23,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
@@ -50,9 +48,6 @@ import com.vividsolutions.jts.geom.Point;
 public class TextSymbolTest extends TestCase {
     private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
 
-    /** factory for attributes */
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .defaultInstance();
     String dataFolder;
 
     public TextSymbolTest(java.lang.String testName) {

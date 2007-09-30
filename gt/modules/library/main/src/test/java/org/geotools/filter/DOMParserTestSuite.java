@@ -7,8 +7,12 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
+import junit.framework.Assert;
+import junit.framework.Protectable;
+import junit.framework.Test;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -25,19 +29,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-import junit.framework.Assert;
-import junit.framework.Protectable;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-
 public class DOMParserTestSuite extends TestSuite {
     
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
     protected static SimpleFeatureType testSchema = null;

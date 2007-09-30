@@ -21,8 +21,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -60,9 +58,6 @@ public class ExpressionTest extends TestCase {
 
 	/** Schema on which to preform tests */
 	private static SimpleFeatureType testSchema = null;
-
-	private static AttributeTypeFactory attFactory = AttributeTypeFactory
-			.defaultInstance();
 
 	static FilterFactory filterFactory = FilterFactoryFinder
 			.createFilterFactory();

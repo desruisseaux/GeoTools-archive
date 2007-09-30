@@ -2,12 +2,12 @@ package org.geotools.data.store;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.DefaultFeatureBuilder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.type.DefaultFeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -24,7 +24,7 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 		crs = CRS.parseWKT( 
 			"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]" 
 		);
-		DefaultFeatureTypeBuilder typeBuilder = new DefaultFeatureTypeBuilder();
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		
 		typeBuilder.setName( "test" );
 		typeBuilder.setNamespaceURI( "test" );
@@ -34,10 +34,9 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 		typeBuilder.add( "otherGeom", LineString.class );
 		typeBuilder.setDefaultGeometry( "defaultGeom" );
 		
-		FeatureType featureType = (FeatureType) typeBuilder.buildFeatureType();
+		SimpleFeatureType featureType = (SimpleFeatureType) typeBuilder.buildFeatureType();
 		
-		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-		builder.setType( featureType );
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(featureType);
 		
 		GeometryFactory gf = new GeometryFactory();
 		delegate = new DefaultFeatureCollection( "test", featureType ){};

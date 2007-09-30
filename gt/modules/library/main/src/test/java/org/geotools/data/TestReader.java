@@ -18,9 +18,9 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * 
@@ -31,19 +31,19 @@ class TestReader implements FeatureReader{
     /**
 	 * 
 	 */
-	private FeatureType type;
-	private Feature feature;
+	private SimpleFeatureType type;
+	private SimpleFeature feature;
 
-    public TestReader(FeatureType type, Feature f) {
+    public TestReader(SimpleFeatureType type, SimpleFeature f) {
         this.type = type;
 		this.feature=f;
     }
     
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return type;
     }
 
-    public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+    public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
         next=false;
         return feature;
     }

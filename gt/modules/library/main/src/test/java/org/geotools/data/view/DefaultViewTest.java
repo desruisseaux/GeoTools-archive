@@ -9,13 +9,15 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
+
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
@@ -29,7 +31,7 @@ public class DefaultViewTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        FeatureType ft=DataUtilities.createType(typeName, "geom:Point,name:String,id:int");
+        SimpleFeatureType ft=DataUtilities.createType(typeName, "geom:Point,name:String,id:int");
         ds=new MemoryDataStore();
         ds.addFeature(createFeatures(ft,1));
         ds.addFeature(createFeatures(ft,2));
@@ -37,14 +39,13 @@ public class DefaultViewTest extends TestCase {
         ds.addFeature(createFeatures(ft,4));
     }
 
-    private Feature createFeatures(FeatureType ft, int i) throws IllegalAttributeException {
+    private SimpleFeature createFeatures(SimpleFeatureType ft, int i) throws IllegalAttributeException {
         GeometryFactory fac=new GeometryFactory();
-        return ft.create(new Object[]{
-                fac.createPoint(new Coordinate(i,i)),
-                "name"+i, 
-                new Integer(i)
-            }
-        );
+        return SimpleFeatureBuilder.build(ft,new Object[]{
+            fac.createPoint(new Coordinate(i,i)),
+            "name"+i, 
+            new Integer(i)
+        }, null);
     }
 
     public void testGetFeatures() throws Exception {

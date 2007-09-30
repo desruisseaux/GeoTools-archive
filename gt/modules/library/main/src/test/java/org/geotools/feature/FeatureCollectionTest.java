@@ -23,6 +23,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -58,9 +63,13 @@ public class FeatureCollectionTest extends TestCase {
   
   protected void setUp() throws Exception {
     features = FeatureCollections.newCollection();
-    FeatureType dumby = FeatureTypeFactory.newFeatureType(null,"Dumby");
+    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+    tb.setName( "Dummy" );
+    
+    SimpleFeatureBuilder b = new SimpleFeatureBuilder(tb.buildFeatureType());
+    
     for (int i = 0; i < 100; i++) {
-      features.add(dumby.create(null)); 
+      features.add(b.buildFeature(null)); 
     }
   }
   
@@ -88,12 +97,19 @@ public class FeatureCollectionTest extends TestCase {
     g[3] = gf.createPoint( new Coordinate(10,10));
 
     GeometryCollection gc = gf.createGeometryCollection( g );
-    FeatureTypeFactory factory = FeatureTypeFactory.newInstance("bounds");
-    factory.addType(AttributeTypeFactory.newAttributeType("p1", Point.class));
-    FeatureType t = factory.createFeatureType();
+    
+    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+    tb.setName("bounds");
+    tb.add( "p1", Point.class );
+    
+    SimpleFeatureType t = tb.buildFeatureType();
+    
     FeatureCollection fc = FeatureCollections.newCollection();
+    SimpleFeatureBuilder b = new SimpleFeatureBuilder(t);
+    
     for (int i = 0; i < g.length; i++) {
-      fc.add(t.create(new Geometry[] {g[i]}));
+        b.add( new Geometry[] {g[i]});
+        fc.add( b.buildFeature(null) );
     } 
     assertEquals(gc.getEnvelopeInternal(),fc.getBounds());
   }
@@ -127,7 +143,12 @@ public class FeatureCollectionTest extends TestCase {
       i.remove();
     }
     assertEquals(features.size(),0);
-    assertTrue(! features.remove(FeatureTypeFactory.newFeatureType(null,"XXX").create(null)));
+    
+    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+    tb.setName( "XXX" );
+    SimpleFeatureBuilder b = new SimpleFeatureBuilder(tb.buildFeatureType());
+    
+    assertTrue(! features.remove(b.buildFeature(null)));
   }
   
   public void testAssorted() {
@@ -138,8 +159,8 @@ public class FeatureCollectionTest extends TestCase {
     copy.addAll(features);
     assertTrue(!copy.isEmpty());
     ArrayList list = new ArrayList(features);
-    Feature[] f1 = (Feature[]) list.toArray(new Feature[list.size()]);
-    Feature[] f2 = (Feature[]) features.toArray(new Feature[list.size()]);
+    SimpleFeature[] f1 = (SimpleFeature[]) list.toArray(new SimpleFeature[list.size()]);
+    SimpleFeature[] f2 = (SimpleFeature[]) features.toArray(new SimpleFeature[list.size()]);
     assertEquals(f1.length,f2.length);
     for (int i = 0; i < f1.length; i++) {
       assertSame(f1[i], f2[i]);

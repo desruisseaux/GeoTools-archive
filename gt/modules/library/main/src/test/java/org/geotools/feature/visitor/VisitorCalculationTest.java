@@ -25,13 +25,14 @@ import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.SimpleFeature;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.geotools.feature.visitor.MedianVisitor.MedianResult;
 import org.geotools.feature.visitor.MinVisitor.MinResult;
 import org.geotools.feature.visitor.UniqueVisitor.UniqueResult;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 
@@ -43,11 +44,11 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class VisitorCalculationTest extends DataTestCase {
     FeatureCollection fc;
-    FeatureType ft;
+    SimpleFeatureType ft;
     FeatureCollection fc2;
-    FeatureType ft2;
+    SimpleFeatureType ft2;
     FeatureCollection fc3;
-    FeatureType ft3;
+    SimpleFeatureType ft3;
 
     public VisitorCalculationTest(String arg0) {
         super(arg0);
@@ -61,10 +62,10 @@ public class VisitorCalculationTest extends DataTestCase {
         ft2 = riverType;
 
         //create our own fc3
-        FeatureType boringType = DataUtilities.createType("fc3.boring","id:0");
+        SimpleFeatureType boringType = DataUtilities.createType("fc3.boring","id:0");
         SimpleFeature[] boringFeatures = new SimpleFeature[100];
         for (int i = 1; i <= 100; i++) {
-        	boringFeatures[i-1] = (SimpleFeature) boringType.create(new Object[] {new Integer(i)});
+        	boringFeatures[i-1] = SimpleFeatureBuilder.build( boringType,new Object[] {new Integer(i)},null);
         }
 
         ft3 = boringType;
@@ -334,7 +335,7 @@ public class VisitorCalculationTest extends DataTestCase {
     
     public void testQuantileList() throws Exception {
         FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-        Expression expr = factory.property(ft.getAttributeType(0).getLocalName());
+        Expression expr = factory.property(ft.getAttribute(0).getLocalName());
         QuantileListVisitor visitor = new QuantileListVisitor(expr, 2);
         fc.accepts(visitor, null);
         List[] qResult = (List[]) visitor.getResult().getValue();
@@ -345,7 +346,7 @@ public class VisitorCalculationTest extends DataTestCase {
 
     public void testStandardDeviation() throws Exception {
     	FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
-    	Expression expr = factory.property(ft3.getAttributeType(0).getLocalName());
+    	Expression expr = factory.property(ft3.getAttribute(0).getLocalName());
     	AverageVisitor visit1 = new AverageVisitor(expr);
     	fc3.accepts(visit1, null);
     	double average = visit1.getResult().toDouble();

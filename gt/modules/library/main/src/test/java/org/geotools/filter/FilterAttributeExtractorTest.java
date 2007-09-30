@@ -22,8 +22,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -32,8 +30,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 
@@ -50,7 +46,7 @@ public class FilterAttributeExtractorTest extends TestCase {
 
     /** Schema on which to preform tests */
     private static SimpleFeatureType testSchema = null;
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
+    
     boolean set = false;
     FilterAttributeExtractor fae;
     FilterFactory fac;

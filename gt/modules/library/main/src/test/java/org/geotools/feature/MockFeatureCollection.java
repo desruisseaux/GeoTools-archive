@@ -69,7 +69,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
         return null;
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return null;
     }
 
@@ -159,7 +159,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
         return null;
     }
 
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return null;
     }
 

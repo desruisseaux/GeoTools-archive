@@ -20,7 +20,6 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.FilterFactoryFinder;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;

@@ -115,16 +115,8 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.getAttributes();
     }
 
-    public Object[] getAttributes(Object[] attributes) {
-        return delegate.getAttributes(attributes);
-    }
-
     public ReferencedEnvelope getBounds() {
         return delegate.getBounds();
-    }
-
-    public Geometry getDefaultGeometry() {
-        return delegate.getDefaultGeometry();
     }
 
     public GeometryAttribute getDefaultGeometryProperty() {
@@ -145,10 +137,6 @@ public class DecoratingFeatureCollection implements FeatureCollection {
 
     public Name getName() {
         return delegate.getName();
-    }
-
-    public int getNumberOfAttributes() {
-        return delegate.getNumberOfAttributes();
     }
 
     public Collection<Property> getProperties(Name name) {
@@ -281,6 +269,7 @@ public class DecoratingFeatureCollection implements FeatureCollection {
         return delegate.toArray(a);
     }
 	
-	
-	
+	public Object getDefaultGeometry() {
+	    return delegate.getDefaultGeometry();
+	}
 }

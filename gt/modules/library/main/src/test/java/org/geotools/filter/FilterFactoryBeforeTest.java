@@ -3,11 +3,9 @@ package org.geotools.filter;
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.LogicFilter;
-import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
 import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.expression.Expression;
 
 public class FilterFactoryBeforeTest extends TestCase {
 

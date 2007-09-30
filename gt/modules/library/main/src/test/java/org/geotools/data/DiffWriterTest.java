@@ -17,10 +17,12 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import junit.framework.TestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -31,7 +33,7 @@ public class DiffWriterTest extends TestCase {
 
 	DiffFeatureWriter writer;
 	private Point geom;
-	private FeatureType type;
+	private SimpleFeatureType type;
 	
 	protected void setUp() throws Exception {
         type = DataUtilities.createType("default", "name:String,*geom:Geometry");
@@ -39,21 +41,20 @@ public class DiffWriterTest extends TestCase {
         geom = fac.createPoint(new Coordinate(10,10));
 
         Diff diff=new Diff();
-		diff.add("1", type.create(new Object[]{ "diff1", geom }, "1"));
-		diff.modify("original", type.create(new Object[]{ "diff2", geom }, "original"));
-		FeatureReader reader=new TestReader(type,type.create(new Object[]{ "original", geom }, "original") );
+		diff.add("1", SimpleFeatureBuilder.build(type, new Object[]{ "diff1", geom }, "1"));
+		diff.modify("original", SimpleFeatureBuilder.build(type, new Object[]{ "diff2", geom }, "original"));
+		FeatureReader reader=new TestReader(type,SimpleFeatureBuilder.build(type,new Object[]{ "original", geom }, "original") );
 		writer=new DiffFeatureWriter(reader, diff){
-
-			protected void fireNotification(int eventType, Envelope bounds) {
-				// 
-			}
+            protected void fireNotification(int eventType,
+                    ReferencedEnvelope bounds) {
+            }
 			
 		};
 	}
 
 	public void testRemove() throws Exception {
 		writer.next();
-		Feature feature=writer.next();
+		SimpleFeature feature=writer.next();
 		writer.remove();
 		assertNull(writer.diff.added.get(feature.getID()));
 	}
@@ -74,7 +75,7 @@ public class DiffWriterTest extends TestCase {
 			writer.next();
 		}
 		
-		Feature feature=writer.next();
+		SimpleFeature feature=writer.next();
 		feature.setAttribute("name", "new1");
 		
 		writer.write();

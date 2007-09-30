@@ -23,10 +23,11 @@ import junit.framework.TestCase;
 
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
@@ -41,7 +42,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class TransactionTest extends TestCase {
     MemoryDataStore ds;
-    FeatureType type;
+    SimpleFeatureType type;
     Geometry geom;
     
     protected void setUp() throws Exception {
@@ -49,8 +50,8 @@ public class TransactionTest extends TestCase {
         type=DataUtilities.createType("default", "name:String,*geom:Geometry");
         GeometryFactory fac=new GeometryFactory();
         geom=fac.createPoint(new Coordinate(10,10));
-        Feature f1=type.create(new Object[]{ "original", geom });
-        ds=new MemoryDataStore(new Feature[]{f1});
+        SimpleFeature f1=SimpleFeatureBuilder.build(type,new Object[]{ "original", geom },null);
+        ds=new MemoryDataStore(new SimpleFeature[]{f1});
     }
 
     protected void tearDown() throws Exception {
@@ -58,8 +59,8 @@ public class TransactionTest extends TestCase {
     }
     
     public void testAddFeature() throws Exception{
-        Feature f1=type.create(new Object[]{ "one",geom });
-        Feature f2=type.create(new Object[]{ "two", geom });
+        SimpleFeature f1=SimpleFeatureBuilder.build(type,new Object[]{ "one",geom },null);
+        SimpleFeature f2=SimpleFeatureBuilder.build(type,new Object[]{ "two", geom },null);
         
         FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());
@@ -71,7 +72,7 @@ public class TransactionTest extends TestCase {
     }
 
     public void testRemoveFeature() throws Exception{
-        Feature f1=type.create(new Object[]{ "one",geom });
+        SimpleFeature f1=SimpleFeatureBuilder.build(type,new Object[]{ "one",geom },null);
         
         FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());

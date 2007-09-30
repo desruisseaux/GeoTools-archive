@@ -21,10 +21,7 @@ import java.util.Set;
 
 import org.geotools.data.FeatureLockFactory;
 import org.geotools.data.FileDataStoreFactorySpi;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionImpl;
 import org.geotools.resources.LazySet;
@@ -80,9 +77,7 @@ public final class CommonFactoryFinder {
                     FunctionImpl.class,
                     FunctionExpression.class,//TODO: remove
                     Function.class,
-                    AttributeTypeFactory.class,
-                    FeatureCollections.class,
-                    FeatureTypeFactory.class}));
+                    FeatureCollections.class}));
         }
         return registry;
     }
@@ -197,74 +192,6 @@ public final class CommonFactoryFinder {
         hints = addDefaultHints(hints);
         return new LazySet(getServiceRegistry().getServiceProviders(
                 FileDataStoreFactorySpi.class, null, hints));
-    }
-
-    /**
-     * Returns the first implementation of {@link AttributeTypeFactory} matching the specified hints.
-     * If no implementation matches, a new one is created if possible or an exception is thrown
-     * otherwise.
-     * <p>
-     * If no hints are provided, this method typically returns an instance of
-     * {@link org.geotools.feature.DefaultAttributeTypeFactory}.
-     *
-     * @param  hints An optional map of hints, or {@code null} if none.
-     * @return The first attribute type factory that matches the supplied hints.
-     * @throws FactoryRegistryException if no implementation was found or can be created for the
-     *         {@link AttributeTypeFactory} interface.
-     *
-     * @see Hints#ATTRIBUTE_TYPE_FACTORY
-     * @see org.geotools.feature.DefaultAttributeTypeFactory
-     */
-    public static synchronized AttributeTypeFactory getAttributeTypeFactory(Hints hints) {
-        hints = addDefaultHints(hints);
-        return (AttributeTypeFactory) getServiceRegistry().getServiceProvider(
-                AttributeTypeFactory.class, null, hints, Hints.ATTRIBUTE_TYPE_FACTORY);
-    }
-
-    /**
-     * Returns a set of all available implementations for the {@link AttributeTypeFactory} interface.
-     *
-     * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set of available attribute type factory implementations.
-     */
-    public static synchronized Set getAttributeTypeFactories(Hints hints) {
-        hints = addDefaultHints(hints);
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                AttributeTypeFactory.class, null, hints));
-    }
-
-    /**
-     * Returns a set of all available implementations for the {@link FeatureTypeFactory} interface.
-     *
-     * @param  hints An optional map of hints, or {@code null} if none.
-     * @return Set of available feature type factory implementations.
-     */
-    public static synchronized Set getAttributeFeatureFactories(Hints hints) {
-        hints = addDefaultHints(hints);
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                FeatureTypeFactory.class, null, hints));
-    }
-
-    /**
-     * The default AttributeTypeFactory.
-     * <p>
-     * You can use the following Hints:
-     * <ul>
-     * <li>FEATURE_TYPE_FACTORY - to control or reuse an implementation
-     * <li>FEATURE_TYPE_FACTORY_NAME - to supply a name for the returned factory
-     * </ul>
-     * GeoTools ships with a DefaultAttributeTypeFactory, although you can hook up
-     * your own implementation as needed.
-     * @return FeatureTypeFactory using Hints.FEATURE_TYPE_FACTORY_NAME
-     */
-    public static synchronized FeatureTypeFactory getFeatureTypeFactory(Hints hints) {
-        hints = addDefaultHints(hints);
-        FeatureTypeFactory factory = new DefaultFeatureTypeFactory();        
-        factory.setName((String) hints.get(Hints.FEATURE_TYPE_FACTORY_NAME));
-        return factory;
-
-        //return (FeatureTypeFactory) getServiceRegistry().getServiceProvider(
-        //        FeatureTypeFactory.class, null, hints, Hints.FEATURE_TYPE_FACTORY );
     }
 
     /**

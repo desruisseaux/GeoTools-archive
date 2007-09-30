@@ -31,11 +31,11 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.TransactionStateDiff;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -103,12 +103,12 @@ public class CollectionDataStoreTest extends DataTestCase {
      *
      * @return DOCUMENT ME!
      */
-    boolean containsLax(Feature[] array, Feature expected) {
+    boolean containsLax(SimpleFeature[] array, SimpleFeature expected) {
         if ((array == null) || (array.length == 0)) {
             return false;
         }
 
-        FeatureType type = expected.getFeatureType();
+        SimpleFeatureType type = expected.getFeatureType();
 
         for (int i = 0; i < array.length; i++) {
             if (match(array[i], expected)) {
@@ -127,8 +127,8 @@ public class CollectionDataStoreTest extends DataTestCase {
      *
      * @return DOCUMENT ME!
      */
-    boolean match(Feature expected, Feature actual) {
-        FeatureType type = expected.getFeatureType();
+    boolean match(SimpleFeature expected, SimpleFeature actual) {
+        SimpleFeatureType type = expected.getFeatureType();
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
             Object av = actual.getAttribute(i);
@@ -166,7 +166,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertNotNull(msg, c2);
         assertEquals(msg + " size", c1.size(), c2.size());
 
-        Feature f;
+        SimpleFeature f;
 
         for (FeatureIterator i = c1.features(); i.hasNext();) {
             f = i.next();
@@ -212,8 +212,8 @@ public class CollectionDataStoreTest extends DataTestCase {
         FeatureReader reader1 = data.getFeatureReader("road");
         FeatureReader reader2 = data.getFeatureReader("road");
 
-        Feature feature1;
-        Feature feature2;
+        SimpleFeature feature1;
+        SimpleFeature feature2;
 
         while (reader1.hasNext() || reader2.hasNext()) {
             assertTrue(contains(roadFeatures, reader1.next()));
@@ -238,7 +238,7 @@ public class CollectionDataStoreTest extends DataTestCase {
 
     public void testGetFeatureReaderFilterAutoCommit()
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        FeatureType type = data.getSchema("road");
+        SimpleFeatureType type = data.getSchema("road");
         FeatureReader reader;
 
         reader = data.getFeatureReader(new DefaultQuery("road"), Transaction.AUTO_COMMIT);
@@ -261,7 +261,7 @@ public class CollectionDataStoreTest extends DataTestCase {
     public void testGetFeatureReaderFilterTransaction()
         throws NoSuchElementException, IOException, IllegalAttributeException {
         Transaction t = new DefaultTransaction();
-        FeatureType type = data.getSchema("road");
+        SimpleFeatureType type = data.getSchema("road");
         FeatureReader reader;
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
@@ -281,7 +281,7 @@ public class CollectionDataStoreTest extends DataTestCase {
 
         TransactionStateDiff state = (TransactionStateDiff) t.getState(data);
         FeatureWriter writer = state.writer("road", Filter.INCLUDE);
-        Feature feature;
+        SimpleFeature feature;
 
         while (writer.hasNext()) {
             feature = writer.next();
@@ -311,7 +311,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(1, count(reader));
     }
 
-    void assertCovered(Feature[] features, FeatureReader reader)
+    void assertCovered(SimpleFeature[] features, FeatureReader reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         int count = 0;
 
@@ -339,9 +339,9 @@ public class CollectionDataStoreTest extends DataTestCase {
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
-    boolean covers(FeatureReader reader, Feature[] array)
+    boolean covers(FeatureReader reader, SimpleFeature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
 
         try {
@@ -361,9 +361,9 @@ public class CollectionDataStoreTest extends DataTestCase {
         return count == array.length;
     }
 
-    boolean coversLax(FeatureReader reader, Feature[] array)
+    boolean coversLax(FeatureReader reader, SimpleFeature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
 
         try {
@@ -385,7 +385,7 @@ public class CollectionDataStoreTest extends DataTestCase {
 
     void dump(FeatureReader reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
 
         try {
@@ -405,7 +405,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         }
     }
 
-    // Feature Source Testing
+    // SimpleFeature Source Testing
     public void testGetFeatureSourceRoad() throws IOException {
         FeatureSource road = data.getFeatureSource("road");
 
@@ -435,17 +435,17 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(1, half.getSchema().getAttributeCount());
 
         FeatureIterator reader = half.features();
-        FeatureType type = half.getSchema();
+        SimpleFeatureType type = half.getSchema();
         reader.close();
 
-        FeatureType actual = half.getSchema();
+        SimpleFeatureType actual = half.getSchema();
         String name = type.getTypeName();
         assertEquals(name, actual.getTypeName());
-        assertEquals(type.getNamespace(), actual.getNamespace());
+        assertEquals(type.getName().getNamespaceURI(), actual.getName().getNamespaceURI());
         assertEquals(type.getAttributeCount(), actual.getAttributeCount());
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
-            assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
+            assertEquals(type.getAttribute(i), actual.getAttribute(i));
         }
 
         assertNull(type.getDefaultGeometry());

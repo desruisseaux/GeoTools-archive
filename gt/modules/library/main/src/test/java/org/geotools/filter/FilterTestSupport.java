@@ -19,8 +19,6 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -43,8 +41,6 @@ public abstract class FilterTestSupport extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
-
     /** Schema on which to preform tests */
     protected static SimpleFeatureType testSchema = null;
 

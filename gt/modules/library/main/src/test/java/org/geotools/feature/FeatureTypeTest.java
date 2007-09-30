@@ -30,6 +30,12 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.geotools.data.DataTestCase;
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -62,30 +68,27 @@ public class FeatureTypeTest extends DataTestCase {
   
   public void XtestAbstractType() throws Exception {
     
-    FeatureTypeFactory factory = FeatureTypeFactory.newInstance("AbstractThing");
-    factory.setAbstract(true);
-    factory.setNamespace( new URI("http://www.nowhereinparticular.net"));
+    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+    tb.setName("AbstractThing");
+    tb.setAbstract(true);
+    tb.setNamespaceURI( new URI("http://www.nowhereinparticular.net"));
     
-    FeatureType abstractType = factory.getFeatureType();
-    factory.addType(AttributeTypeFactory.newAttributeType("X",String.class));
-    
-    Set bases = new HashSet();
-    bases.add(abstractType);
-    factory.setSuperTypes(bases);
-    
-    factory.setName( "AbstractType2" );
-    FeatureType abstractType2 = factory.getFeatureType();
+    SimpleFeatureType abstractType = tb.buildFeatureType();
+    tb.setName( "AbstractType2" );
+    tb.setSuperType(abstractType);
+    tb.add( "X", String.class );
+    SimpleFeatureType abstractType2 = tb.buildFeatureType();
     
     assertTrue(abstractType.isAbstract());
     assertTrue(abstractType2.isAbstract());
     
-    assertTrue(abstractType.isDescendedFrom(new URI("http://www.opengis.net/gml"),"Feature"));
-    assertTrue(abstractType2.isDescendedFrom(new URI("http://www.opengis.net/gml"),"Feature"));
-    assertTrue(abstractType2.isDescendedFrom(abstractType));
-    assertTrue(!abstractType.isDescendedFrom(abstractType2));
+    assertTrue(FeatureTypes.isDecendedFrom(abstractType, new URI("http://www.opengis.net/gml"),"Feature"));
+    assertTrue(FeatureTypes.isDecendedFrom(abstractType2, new URI("http://www.opengis.net/gml"),"Feature"));
+    assertTrue(FeatureTypes.isDecendedFrom(abstractType2, abstractType));
+    assertFalse(FeatureTypes.isDecendedFrom(abstractType,abstractType2));
     
     try {
-      abstractType.create(new Object[0]);
+      SimpleFeatureBuilder.build(abstractType, new Object[0], null);
       fail("abstract type allowed create");
     } catch (IllegalAttributeException iae) {
       
@@ -93,7 +96,7 @@ public class FeatureTypeTest extends DataTestCase {
       
     }
     try {
-      abstractType2.create(new Object[0]);
+      SimpleFeatureBuilder.build(abstractType2, new Object[0], null);
       fail("abstract type allowed create");
     } catch (IllegalAttributeException iae) {
       
@@ -101,52 +104,53 @@ public class FeatureTypeTest extends DataTestCase {
       
     }
     
-    // with non-abstract super
-    try {
-      FeatureType[] supers = new FeatureType[1];
-      supers[0] = FeatureTypeFactory.newFeatureType(null,"SillyThing",null,false);
-      FeatureTypeFactory.newFeatureType(null,"BadFeature",null,true,supers);
-      //JD: removing the restriction which prevents a super type from being non-abstract
-      //fail("allowed bad super");
-    } catch (SchemaException se) {
-      
-    }
   }
   
   public void testEquals() throws Exception {
-    FeatureTypeBuilder at = FeatureTypeFactory.newInstance("Thing");
-    at.setNamespace(new URI("http://www.nowhereinparticular.net"));
-    at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
-    final FeatureType ft = at.getFeatureType();
-    at = FeatureTypeFactory.newInstance("Thing");
-    at.setNamespace( new URI("http://www.nowhereinparticular.net"));
-    at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
-    FeatureType ft2 = at.getFeatureType();
-    assertEquals(ft,ft2);
-    at.setName("Thingee");
-    assertTrue(! ft.equals(at.getFeatureType()));
-    at = FeatureTypeFactory.createTemplate(ft);
-    at.setNamespace( new URI("http://www.somewhereelse.net"));
-    assertTrue(! ft.equals(at.getFeatureType()));
-    assertTrue(! ft.equals(null));
+      SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+      tb.setName("Thing");
+      tb.setNamespaceURI("http://www.nowhereinparticular.net");
+      tb.add( "X", String.class );
+      final SimpleFeatureType ft = tb.buildFeatureType();
+      
+      tb = new SimpleFeatureTypeBuilder();
+      tb.setName( "Thing" );
+      tb.setNamespaceURI("http://www.nowhereinparticular.net");
+      tb.add( "X", String.class );
+      
+      SimpleFeatureType ft2 = tb.buildFeatureType();
+      assertEquals(ft,ft2);
+      
+      tb.setName("Thingee");
+      assertTrue(! ft.equals(tb.buildFeatureType()));
+      
+      tb.init(ft);
+      tb.setNamespaceURI("http://www.somewhereelse.net");
+      
+      assertTrue(! ft.equals(tb.buildFeatureType()));
+      assertTrue(! ft.equals(null));
   }
 
      public void testCopyFeature() throws Exception {
-        Feature feature = lakeFeatures[0];
-        assertDuplicate( "feature", feature, feature.getFeatureType().duplicate( feature  ) );        
-    }
+        SimpleFeature feature = lakeFeatures[0];
+        assertDuplicate( "feature", feature, SimpleFeatureBuilder.copy( feature  ) );        
+     }
+     
     public void testDeepCopy() throws Exception {
         // primative        
         String str = "FooBar";
         Integer i = new Integer(3);
         Float f = new Float( 3.14);
         Double d = new Double( 3.14159 );
-        AttributeType testType = AttributeTypeFactory.newAttributeType("test",
-								       Object.class);
-        assertSame( "String", str, testType.duplicate( str ) );
-        assertSame( "Integer", i, testType.duplicate( i ) );
-        assertSame( "Float", f, testType.duplicate( f ) );
-        assertSame( "Double", d, testType.duplicate( d ) );
+        
+        AttributeTypeBuilder ab = new AttributeTypeBuilder();
+        
+        AttributeDescriptor testType = ab.buildDescriptor( "test" );
+        
+        assertSame( "String", str, DataUtilities.duplicate( str ) );
+        assertSame( "Integer", i, DataUtilities.duplicate( i ) );
+        assertSame( "Float", f, DataUtilities.duplicate( f ) );
+        assertSame( "Double", d, DataUtilities.duplicate( d ) );
         
         // collections
         Object objs[] = new Object[]{ str, i, f, d, };
@@ -161,13 +165,13 @@ public class FeatureTypeTest extends DataTestCase {
         map.put("b", i );
         map.put("c", f );
         map.put("d", d );
-        assertDuplicate( "objs", objs, testType.duplicate( objs ) );        
-        assertDuplicate( "ints", ints, testType.duplicate( ints ) );
-        assertDuplicate( "list", list, testType.duplicate( list ) );
-        assertDuplicate( "map", map, testType.duplicate( map ) );
+        assertDuplicate( "objs", objs, DataUtilities.duplicate( objs ) );        
+        assertDuplicate( "ints", ints, DataUtilities.duplicate( ints ) );
+        assertDuplicate( "list", list, DataUtilities.duplicate( list ) );
+        assertDuplicate( "map", map, DataUtilities.duplicate( map ) );
         
         // complex type
-        Feature feature = lakeFeatures[0];
+        SimpleFeature feature = lakeFeatures[0];
         
         Coordinate coords = new Coordinate(1, 3); 
         Coordinate coords2 = new Coordinate(1, 3);
@@ -181,8 +185,8 @@ public class FeatureTypeTest extends DataTestCase {
         assertTrue( "jts equals", !point.equals( (Object) point2 ) );
         
         assertDuplicate( "jts duplicate", point, point2 );        
-        assertDuplicate( "feature", feature, testType.duplicate( feature ) );
-        assertDuplicate( "point", point, testType.duplicate( point ) );
+        assertDuplicate( "feature", feature, DataUtilities.duplicate( feature ) );
+        assertDuplicate( "point", point, DataUtilities.duplicate( point ) );
     }
     static Set immutable;
     static {
@@ -216,9 +220,9 @@ public class FeatureTypeTest extends DataTestCase {
             Geometry expectedGeom = (Geometry) expected;
             Geometry actualGeom = (Geometry) value;
             assertTrue( message, expectedGeom.equals( actualGeom ) );
-        } else if (expected instanceof Feature) {
-	    assertDuplicate(message, ((Feature)expected).getAttributes(null), 
-			    ((Feature)value).getAttributes(null));
+        } else if (expected instanceof SimpleFeature) {
+	    assertDuplicate(message, ((SimpleFeature)expected).getAttributes(), 
+			    ((SimpleFeature)value).getAttributes());
         } else {
             assertEquals( message, expected, value );
         }

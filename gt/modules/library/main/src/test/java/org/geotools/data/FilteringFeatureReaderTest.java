@@ -18,8 +18,8 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
 /**
@@ -73,7 +73,7 @@ public class FilteringFeatureReaderTest extends DataTestCase {
         assertEquals( 0, count( reader ));
         
         reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.EXCLUDE );
-        assertContents( new Feature[0], reader );                                                           
+        assertContents( new SimpleFeature[0], reader );                                                           
     }
     public void testFilteringFeatureReaderNONE() throws IOException {
         FeatureReader reader;        
@@ -93,10 +93,10 @@ public class FilteringFeatureReaderTest extends DataTestCase {
         reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.INCLUDE );
         assertContents( roadFeatures, reader );                                            
     }
-    void assertContents( Feature expected[], FeatureReader reader ) throws IOException {
+    void assertContents( SimpleFeature expected[], FeatureReader reader ) throws IOException {
         assertNotNull( reader );
         assertNotNull( expected );
-        Feature feature;
+        SimpleFeature feature;
         int count = 0;
         try {
             for( int i=0; i<expected.length;i++){
