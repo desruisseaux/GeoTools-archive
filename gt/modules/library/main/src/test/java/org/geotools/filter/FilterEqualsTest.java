@@ -137,7 +137,7 @@ public class FilterEqualsTest extends TestCase {
         attributes[7] = new Float(10000.4);
         attributes[8] = new Double(100000.5);
         attributes[9] = "test string data";
-        attributes[10] = "cow $10";
+        attributes[10] = "0.0";
 
         // Creates the feature itself
         //FlatFeatureFactory factory = new FlatFeatureFactory(testSchema);
