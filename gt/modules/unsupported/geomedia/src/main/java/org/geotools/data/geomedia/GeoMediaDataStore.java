@@ -37,8 +37,8 @@ import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -196,7 +196,7 @@ public class GeoMediaDataStore extends JDBCDataStore {
      *
      * @see org.geolbs.data.jdbc.JDBCDataStore#buildAttributeType(java.sql.ResultSet)
      */
-    protected AttributeType buildAttributeType(ResultSet rs)
+    protected AttributeDescriptor buildAttributeType(ResultSet rs)
         throws IOException {
         try {
             final int TABLE_NAME = 3;
@@ -215,7 +215,7 @@ public class GeoMediaDataStore extends JDBCDataStore {
 
             if (gFeature != null) {
                 if (columnName.compareToIgnoreCase(gFeature.getGeomColName()) == 0) {
-                    return AttributeTypeFactory.newAttributeType(columnName, Geometry.class);
+                    return new AttributeTypeBuilder().binding( Geometry.class ).buildDescriptor(columnName);
                 }
             }
 
@@ -233,7 +233,7 @@ public class GeoMediaDataStore extends JDBCDataStore {
     /**
      * @see org.geotools.data.jdbc.JDBCDataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType, org.geotools.data.jdbc.QueryData)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) throws IOException {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) throws IOException {
         return new GeoMediaAttributeIO();
     }
 
