@@ -41,19 +41,9 @@ public class AttributeImpl extends PropertyImpl implements Attribute {
 	public AttributeImpl(Object content, AttributeDescriptor descriptor,
 			String id) {
 	    super( content, descriptor );
+	    this.id = id;
 	    
-	    if(id == null && getType().isIdentified())
-			this.id = SimpleFeatureBuilder.createDefaultFeatureId(); 
-		else //set the id
-			this.id = id;
-		
-		//if the content is null and the descriptor says isNillable is false, 
-		// then set the default value
-		if ( content == null && !descriptor.isNillable()) {
-		    setValue(descriptor.getDefaultValue());
-		}
-		
-		Types.validate(this, getValue());
+	    Types.validate(this, getValue());
 	}
 
 	public AttributeImpl(Object content, AttributeType type, String id) {
