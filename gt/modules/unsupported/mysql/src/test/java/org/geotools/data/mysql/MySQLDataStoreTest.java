@@ -50,12 +50,9 @@ import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -64,6 +61,9 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 
 /**
@@ -80,7 +80,7 @@ public class MySQLDataStoreTest extends TestCase {
     private static GeometryFactory geomFac = new GeometryFactory();
     private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
     private FeatureCollection collection = FeatureCollections.newCollection();
-    private FeatureType schema;
+    private SimpleFeatureType schema;
     private int srid = -1;
     private MySQLDataStore dstore;
     private ManageableDataSource connPool;
@@ -204,7 +204,7 @@ public class MySQLDataStoreTest extends TestCase {
     //todo assert on schema.
     public void testFeatureTypes() throws Exception {
         String[] types = dstore.getTypeNames();
-        FeatureType schema1 = dstore.getSchema(types[0]);
+        SimpleFeatureType schema1 = dstore.getSchema(types[0]);
 
         //FeatureType schema2 = dstore.getSchema(types[1]);
         //need to figure out spatial_ref_system and geometry_columns
@@ -366,7 +366,7 @@ public class MySQLDataStoreTest extends TestCase {
         Integer attKey = new Integer(10);
         String attName = "name";
         String newAttVal = "LS 503";
-        Feature feature;
+        SimpleFeature feature;
 
         while (writer.hasNext()) {
             feature = writer.next();
@@ -404,7 +404,7 @@ public class MySQLDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyGeometry() throws IOException, IllegalAttributeException {
         FeatureWriter writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
-        Feature feature;
+        SimpleFeature feature;
         Coordinate[] points = {
                 new Coordinate(59, 59), new Coordinate(17, 17), new Coordinate(49, 39),
                 new Coordinate(57, 67), new Coordinate(79, 79)
@@ -431,7 +431,7 @@ public class MySQLDataStoreTest extends TestCase {
         throws IOException, IllegalAttributeException {
         FeatureWriter writer = dstore.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
-        Feature feature;
+        SimpleFeature feature;
         Coordinate[] points = {
                 new Coordinate(32, 44), new Coordinate(62, 51), new Coordinate(45, 35),
                 new Coordinate(55, 65), new Coordinate(73, 75)
@@ -464,7 +464,7 @@ public class MySQLDataStoreTest extends TestCase {
         int count = 0;
 
         while (writer.hasNext()) {
-            Feature feature = writer.next();
+            SimpleFeature feature = writer.next();
             count++;
         }
 
@@ -518,7 +518,7 @@ public class MySQLDataStoreTest extends TestCase {
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);
-        Feature feature;
+        SimpleFeature feature;
 
         while (writer.hasNext()) {
             feature = writer.next();

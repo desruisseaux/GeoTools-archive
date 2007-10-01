@@ -25,13 +25,16 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+
 
 
 /**
@@ -44,13 +47,13 @@ import org.geotools.feature.SchemaException;
 public class SQLEncoderMySQLTest extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
-    protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
+    //protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
-    protected static FeatureType testSchema = null;
+    protected static SimpleFeatureType testSchema = null;
 
     /** Schema on which to preform tests */
-    protected static Feature testFeature = null;
+    protected static SimpleFeature testFeature = null;
 
     /** Test suite for this test case */
     TestSuite suite = null;
@@ -86,36 +89,31 @@ public class SQLEncoderMySQLTest extends TestCase {
         //_log.getLoggerRepository().setThreshold(Level.INFO);
         // Create the schema attributes
         LOGGER.finer("creating flat feature...");
-
-        AttributeType geometryAttribute = AttributeTypeFactory.newAttributeType("testGeometry",
-                LineString.class);
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.add("testGeometry", LineString.class);
         LOGGER.finer("created geometry attribute");
 
-        AttributeType booleanAttribute = AttributeTypeFactory.newAttributeType("testBoolean",
+        builder.add("testBoolean",
                 Boolean.class);
 
-        AttributeType charAttribute = AttributeTypeFactory.newAttributeType("testCharacter",
+        builder.add("testCharacter",
                 Character.class);
-        AttributeType byteAttribute = AttributeTypeFactory.newAttributeType("testByte", Byte.class);
-        AttributeType shortAttribute = AttributeTypeFactory.newAttributeType("testShort",
+        builder.add("testByte", Byte.class);
+        builder.add("testShort",
                 Short.class);
-        AttributeType intAttribute = AttributeTypeFactory.newAttributeType("testInteger",
+        builder.add("testInteger",
                 Integer.class);
-        AttributeType longAttribute = AttributeTypeFactory.newAttributeType("testLong", Long.class);
-        AttributeType floatAttribute = AttributeTypeFactory.newAttributeType("testFloat",
+        builder.add("testLong", Long.class);
+        builder.add("testFloat",
                 Float.class);
-        AttributeType doubleAttribute = AttributeTypeFactory.newAttributeType("testDouble",
+        builder.add("testDouble",
                 Double.class);
-        AttributeType stringAttribute = AttributeTypeFactory.newAttributeType("testString",
+        builder.add("testString",
                 String.class);
 
-        AttributeType[] types = {
-                geometryAttribute, booleanAttribute, charAttribute, byteAttribute, shortAttribute,
-                intAttribute, longAttribute, floatAttribute, doubleAttribute, stringAttribute
-            };
-
+        builder.setName("testSchema");
         // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types, "testSchema");
+        testSchema = builder.buildFeatureType();
 
         GeometryFactory geomFac = new GeometryFactory();
 
@@ -139,7 +137,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         attributes[9] = "test string data";
 
         // Creates the feature itself
-        testFeature = testSchema.create(attributes);
+        testFeature = SimpleFeatureBuilder.build(testSchema, attributes, "fid.5");
         LOGGER.finer("...flat feature created");
 
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);

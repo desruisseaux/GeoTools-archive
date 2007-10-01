@@ -28,10 +28,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import org.geotools.data.DataSourceException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
 
 
@@ -85,9 +86,6 @@ public class MysqlGeomColumn {
 
     /** A map containing the raw geometric data, accessed by its geom ID */
     private static Map gidMap = new HashMap();
-
-    /** factory for attribute types. */
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     static {
         sqlTypeMap.put("TINY", Byte.class);
@@ -150,7 +148,7 @@ public class MysqlGeomColumn {
     private int spacRefID;
 
     /** The featureType schema corresponding to this geometry column. */
-    private FeatureType schema = null;
+    private SimpleFeatureType schema = null;
 
     /**
      * Default constructor
@@ -483,7 +481,7 @@ public class MysqlGeomColumn {
      *
      * @return the schema corresponding to this geometry column.
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
         return schema;
     }
 
@@ -492,7 +490,7 @@ public class MysqlGeomColumn {
      *
      * @param schema for this geometry column.
      */
-    public void setSchema(FeatureType schema) {
+    public void setSchema(SimpleFeatureType schema) {
         //TODO: check to make sure the schema is correct (geom col names are same, etc.)
         this.schema = schema;
     }
@@ -511,12 +509,12 @@ public class MysqlGeomColumn {
      * @todo Fix FeatureType name - IanS tasks TODO: put this method
      *       MysqlGeomColumn or a SchemaFactory.
      */
-    public static FeatureType makeSchema(ResultSetMetaData metaData, String geoColumn)
+    public static SimpleFeatureType makeSchema(ResultSetMetaData metaData, String geoColumn)
         throws SQLException, SchemaException {
         String columnName = null;
         Class colClass = null;
         int numCols = metaData.getColumnCount();
-        AttributeType[] attributes = new AttributeType[numCols - 1];
+        AttributeDescriptor[] attributes = new AttributeDescriptor[numCols - 1];
 
         LOGGER.finer("about to loop through cols");
 
@@ -525,20 +523,25 @@ public class MysqlGeomColumn {
             columnName = metaData.getColumnName(i);
             LOGGER.finer("reading col: " + i + " named: " + columnName);
             LOGGER.finer("reading col: " + metaData.getColumnTypeName(i));
-
+            AttributeTypeBuilder build = new AttributeTypeBuilder();
             // set column name and type from database
             //TODO: use MysqlGeomColumn.getGeomType, once it's fully implemented
+            build.setNillable(true);
             if (columnName.equals(geoColumn)) { //if it is a geomtry column, by name
-                attributes[i - COLUMN_OFFSET] = AttributeTypeFactory.newAttributeType(columnName,
-                        Geometry.class);
+            	//build.setCRS(crs); TODO: use CRS's in mysql
+            	build.setBinding(Geometry.class);
+                attributes[i - COLUMN_OFFSET] = build.buildDescriptor(columnName);
             } else {
                 colClass = (Class) sqlTypeMap.get(metaData.getColumnTypeName(i));
-                attributes[i - COLUMN_OFFSET] = AttributeTypeFactory.newAttributeType(columnName,
-                        colClass);
+                build.setBinding(colClass);
+                attributes[i - COLUMN_OFFSET] = build.buildDescriptor(columnName);
             }
         }
 
         // @todo Fix FeatureType name - IanS 
-        return FeatureTypeFactory.newFeatureType(attributes, "mysql-feature");
+        SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+        b.setName("mysql-features");
+        b.addAll(attributes);
+        return b.buildFeatureType();
     }
 }
