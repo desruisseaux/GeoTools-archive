@@ -91,42 +91,48 @@ public class JDBCFeatureSource extends ContentFeatureSource {
             ResultSet primaryKeys = metaData.getPrimaryKeys(null, getDataStore().getDatabaseSchema(),
                    tableName);
 
-            SQLDialect dialect = getDataStore().getSQLDialect();
-            while (columns.next()) {
-                String name = columns.getString("COLUMN_NAME");
-
-                //do not include primary key in the type
-                while (primaryKeys.next()) {
-                    String keyName = primaryKeys.getString("COLUMN_NAME");
-
-                    if (name.equals(keyName)) {
-                        name = null;
-
-                        break;
+            try {
+                SQLDialect dialect = getDataStore().getSQLDialect();
+                while (columns.next()) {
+                    String name = columns.getString("COLUMN_NAME");
+    
+                    //do not include primary key in the type
+                    while (primaryKeys.next()) {
+                        String keyName = primaryKeys.getString("COLUMN_NAME");
+    
+                        if (name.equals(keyName)) {
+                            name = null;
+    
+                            break;
+                        }
                     }
+    
+                    primaryKeys.beforeFirst();
+    
+                    if (name == null) {
+                        continue;
+                    }
+    
+                    //get the type
+                    int dataType = columns.getInt("DATA_TYPE");
+    
+                    //get the mapping
+                    Class binding = getDataStore().getMapping(dataType);
+                    if ( binding == null ) {
+                        JDBCDataStore.LOGGER.warning("Could not find mapping for:" + dataType );
+                        binding = Object.class;
+                    }
+                    
+                    //add the attribute
+                    tb.add(name, binding);
                 }
-
-                primaryKeys.beforeFirst();
-
-                if (name == null) {
-                    continue;
-                }
-
-                //get the type
-                int dataType = columns.getInt("DATA_TYPE");
-
-                //get the mapping
-                Class binding = getDataStore().getMapping(dataType);
-                if ( binding == null ) {
-                    JDBCDataStore.LOGGER.warning("Could not find mapping for:" + dataType );
-                    binding = Object.class;
-                }
-                
-                //add the attribute
-                tb.add(name, binding);
+    
+                return tb.buildFeatureType();
             }
-
-            return tb.buildFeatureType();
+            finally {
+                getDataStore().closeSafe( columns );
+                getDataStore().closeSafe( primaryKeys );
+            }
            
         }
         catch( SQLException e ) {

@@ -123,7 +123,6 @@ public class JDBCTestSupport extends TestCase {
         
         //create the dataStore
         dataStore = new JDBCDataStore();
-        
         dataStore.setNamespaceURI("http://www.geotools.org/test");
         dataStore.setDataSource( dataSource );
         dataStore.setDatabaseSchema("geotools");

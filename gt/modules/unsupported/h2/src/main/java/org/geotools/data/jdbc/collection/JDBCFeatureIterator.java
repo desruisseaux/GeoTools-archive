@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.jdbc.PrimaryKey;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
+import org.geotools.data.jdbc.collection.JDBCFeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 public class JDBCFeatureIterator implements FeatureIterator {
 
@@ -38,13 +40,13 @@ public class JDBCFeatureIterator implements FeatureIterator {
 		}
 	}
 
-	public Feature next() throws NoSuchElementException {
-		FeatureType featureType = collection.getSchema();
+	public SimpleFeature next() throws NoSuchElementException {
+		SimpleFeatureType featureType = collection.getSchema();
 		
 		//round up attributes
 		List attributes = new ArrayList();
 		for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
-			AttributeType type = featureType.getAttributeType( i );
+			AttributeDescriptor type = featureType.getAttribute( i );
 			try {
 				Object value = st.getResultSet().getObject( type.getLocalName() );
 				if ( value != null ) {
@@ -69,7 +71,7 @@ public class JDBCFeatureIterator implements FeatureIterator {
 		
 		//create the feature
 		try {
-			return featureType.create( attributes.toArray(), fid );
+		    return SimpleFeatureBuilder.build( featureType, attributes, fid );
 		} 
 		catch (IllegalAttributeException e) {
 			throw new RuntimeException( e );

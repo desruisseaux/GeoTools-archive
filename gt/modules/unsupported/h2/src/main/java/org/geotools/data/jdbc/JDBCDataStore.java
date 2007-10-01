@@ -1,11 +1,15 @@
 package org.geotools.data.jdbc;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,76 +27,82 @@ import org.geotools.data.store.ContentState;
 import org.geotools.feature.Name;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class JDBCDataStore extends ContentDataStore {
-//    /**
-//     * Mappings from sql type, to java class
-//     */
-//    static HashMap MAPPINGS = new HashMap();
-//
-//    static {
-//        MAPPINGS.put(new Integer(Types.VARCHAR), String.class);
-//        MAPPINGS.put(new Integer(Types.CHAR), String.class);
-//        MAPPINGS.put(new Integer(Types.LONGVARCHAR), String.class);
-//
-//        MAPPINGS.put(new Integer(Types.BIT), Boolean.class);
-//        MAPPINGS.put(new Integer(Types.BOOLEAN), Boolean.class);
-//
-//        MAPPINGS.put(new Integer(Types.TINYINT), Short.class);
-//        MAPPINGS.put(new Integer(Types.SMALLINT), Short.class);
-//
-//        MAPPINGS.put(new Integer(Types.INTEGER), Integer.class);
-//        MAPPINGS.put(new Integer(Types.BIGINT), Long.class);
-//
-//        MAPPINGS.put(new Integer(Types.REAL), Float.class);
-//        MAPPINGS.put(new Integer(Types.FLOAT), Double.class);
-//        MAPPINGS.put(new Integer(Types.DOUBLE), Double.class);
-//
-//        MAPPINGS.put(new Integer(Types.DECIMAL), BigDecimal.class);
-//        MAPPINGS.put(new Integer(Types.NUMERIC), BigDecimal.class);
-//
-//        MAPPINGS.put(new Integer(Types.DATE), Date.class);
-//        MAPPINGS.put(new Integer(Types.TIME), Time.class);
-//        MAPPINGS.put(new Integer(Types.TIMESTAMP), Timestamp.class);
-//
-//        MAPPINGS.put(new Integer(Types.OTHER), Geometry.class);
-//    }
-//
-//    /**
-//     * Mappings from java class to sql tpe
-//     */
-//    static HashMap RMAPPINGS = new HashMap();
-//
-//    static {
-//        RMAPPINGS.put(String.class, new Integer(Types.VARCHAR));
-//
-//        RMAPPINGS.put(Boolean.class, new Integer(Types.BOOLEAN));
-//
-//        RMAPPINGS.put(Short.class, new Integer(Types.SMALLINT));
-//
-//        RMAPPINGS.put(Integer.class, new Integer(Types.INTEGER));
-//        RMAPPINGS.put(Long.class, new Integer(Types.BIGINT));
-//
-//        RMAPPINGS.put(Float.class, new Integer(Types.REAL));
-//        RMAPPINGS.put(Double.class, new Integer(Types.DOUBLE));
-//
-//        RMAPPINGS.put(BigDecimal.class, new Integer(Types.NUMERIC));
-//
-//        RMAPPINGS.put(Date.class, new Integer(Types.DATE));
-//        RMAPPINGS.put(Time.class, new Integer(Types.TIME));
-//        RMAPPINGS.put(Timestamp.class, new Integer(Types.TIMESTAMP));
-//
-//        RMAPPINGS.put(Geometry.class, new Integer(Types.OTHER));
-//        RMAPPINGS.put(Point.class, new Integer(Types.OTHER));
-//        RMAPPINGS.put(LineString.class, new Integer(Types.OTHER));
-//        RMAPPINGS.put(Polygon.class, new Integer(Types.OTHER));
-//        
-//    }
+    /**
+     * Mappings from sql type, to java class
+     */
+    static HashMap MAPPINGS = new HashMap();
+
+    static {
+        MAPPINGS.put(new Integer(Types.VARCHAR), String.class);
+        MAPPINGS.put(new Integer(Types.CHAR), String.class);
+        MAPPINGS.put(new Integer(Types.LONGVARCHAR), String.class);
+
+        MAPPINGS.put(new Integer(Types.BIT), Boolean.class);
+        MAPPINGS.put(new Integer(Types.BOOLEAN), Boolean.class);
+
+        MAPPINGS.put(new Integer(Types.TINYINT), Short.class);
+        MAPPINGS.put(new Integer(Types.SMALLINT), Short.class);
+
+        MAPPINGS.put(new Integer(Types.INTEGER), Integer.class);
+        MAPPINGS.put(new Integer(Types.BIGINT), Long.class);
+
+        MAPPINGS.put(new Integer(Types.REAL), Float.class);
+        MAPPINGS.put(new Integer(Types.FLOAT), Double.class);
+        MAPPINGS.put(new Integer(Types.DOUBLE), Double.class);
+
+        MAPPINGS.put(new Integer(Types.DECIMAL), BigDecimal.class);
+        MAPPINGS.put(new Integer(Types.NUMERIC), BigDecimal.class);
+
+        MAPPINGS.put(new Integer(Types.DATE), Date.class);
+        MAPPINGS.put(new Integer(Types.TIME), Time.class);
+        MAPPINGS.put(new Integer(Types.TIMESTAMP), Timestamp.class);
+
+        MAPPINGS.put(new Integer(Types.OTHER), Geometry.class);
+    }
+
+    /**
+     * Mappings from java class to sql tpe
+     */
+    static HashMap RMAPPINGS = new HashMap();
+
+    static {
+        RMAPPINGS.put(String.class, new Integer(Types.VARCHAR));
+
+        RMAPPINGS.put(Boolean.class, new Integer(Types.BOOLEAN));
+
+        RMAPPINGS.put(Short.class, new Integer(Types.SMALLINT));
+
+        RMAPPINGS.put(Integer.class, new Integer(Types.INTEGER));
+        RMAPPINGS.put(Long.class, new Integer(Types.BIGINT));
+
+        RMAPPINGS.put(Float.class, new Integer(Types.REAL));
+        RMAPPINGS.put(Double.class, new Integer(Types.DOUBLE));
+
+        RMAPPINGS.put(BigDecimal.class, new Integer(Types.NUMERIC));
+
+        RMAPPINGS.put(Date.class, new Integer(Types.DATE));
+        RMAPPINGS.put(Time.class, new Integer(Types.TIME));
+        RMAPPINGS.put(Timestamp.class, new Integer(Types.TIMESTAMP));
+
+        RMAPPINGS.put(Geometry.class, new Integer(Types.OTHER));
+        RMAPPINGS.put(Point.class, new Integer(Types.OTHER));
+        RMAPPINGS.put(LineString.class, new Integer(Types.OTHER));
+        RMAPPINGS.put(Polygon.class, new Integer(Types.OTHER));
+        
+    }
     
 	/**
 	 * logging instance
 	 */
-	static final Logger LOGGER = Logger.getLogger( "org.geotools.data.jdbc" );
+	public static final Logger LOGGER = Logger.getLogger( "org.geotools.data.jdbc" );
 	/**
 	 * data source
 	 */
@@ -100,7 +110,7 @@ public class JDBCDataStore extends ContentDataStore {
 	/**
 	 * the dialect of sql
 	 */
-	protected SQLDialect dialect;
+	protected SQLDialect dialect = new SQLDialect();
 	/**
      * The database schema.
      */
@@ -109,11 +119,11 @@ public class JDBCDataStore extends ContentDataStore {
     /**
      * sql type to java class mappings
      */
-    protected HashMap/*<Integer,Class>*/ sqlTypeToClassMappings;
+    protected HashMap/*<Integer,Class>*/ sqlTypeToClassMappings = MAPPINGS;
     /**
      * java class to sql type mappings;
      */
-    protected HashMap/*<Class,Integer>*/ classToSqlTypeMappings;
+    protected HashMap/*<Class,Integer>*/ classToSqlTypeMappings = RMAPPINGS;
     
     public void setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
@@ -189,8 +199,14 @@ public class JDBCDataStore extends ContentDataStore {
         Connection cx = connection();
         try {
             String sql = createTableSQL( featureType, cx );
+            LOGGER.fine( sql );
             Statement st = cx.createStatement();
-            st.execute(sql);
+            try {
+                st.execute(sql);    
+            }
+            finally {
+                closeSafe( st );
+            }
         }
         catch( Exception e ) {
             String msg = "Error occurred creating table";
@@ -266,21 +282,28 @@ public class JDBCDataStore extends ContentDataStore {
          *        <LI><B>NUM_PREC_RADIX</B> int => usually 2 or 10
          */
         ResultSet types = metaData.getTypeInfo();
-        while (types.next()) {
-            int sqlType = types.getInt("DATA_TYPE");
-            String sqlTypeName = types.getString("TYPE_NAME");
+        try {
+            while (types.next()) {
+                int sqlType = types.getInt("DATA_TYPE");
+                String sqlTypeName = types.getString("TYPE_NAME");
 
-            for (int i = 0; i < sqlTypes.length; i++) {
-                if (sqlType == sqlTypes[i]) {
-                    sqlTypeNames[i] = sqlTypeName;
+                for (int i = 0; i < sqlTypes.length; i++) {
+                    if (sqlType == sqlTypes[i]) {
+                        sqlTypeNames[i] = sqlTypeName;
+                    }
                 }
-            }
+            }    
         }
+        finally {
+            closeSafe( types );
+        }
+        
 
         //build the table sql
         StringBuffer sql = new StringBuffer();
         sql.append("CREATE TABLE ");
 
+        encodeDatabaseSchema(sql);
         dialect.table( featureType.getTypeName(), sql );
         sql.append(" ( ");
 
@@ -303,6 +326,31 @@ public class JDBCDataStore extends ContentDataStore {
         return sql.toString();
     }
     
+    protected String selectSQL( SimpleFeatureType featureType, Filter filter ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "SELECT * FROM ");
+        
+        encodeDatabaseSchema(sql);
+        dialect.table( featureType.getTypeName(), sql );
+        
+        if ( filter != null ) {
+            //encode filter
+        }
+        
+        return sql.toString();
+        
+    }
+    
+    /**
+     * Helper method to check for null and encode database schema.
+     */
+    protected void encodeDatabaseSchema( StringBuffer sql ) {
+        if ( databaseSchema != null ) {
+            dialect.schema(databaseSchema, sql);
+            sql.append( "." ); 
+        }
+    }
+    
     protected PrimaryKey getPrimaryKey( ContentEntry entry ) throws IOException {
 	 
         JDBCState state = (JDBCState) entry.getState(Transaction.AUTO_COMMIT);
@@ -318,37 +366,43 @@ public class JDBCDataStore extends ContentDataStore {
                         ResultSet primaryKey = 
                             metaData.getPrimaryKeys(null,databaseSchema, tableName);
 
-                        /*
-                         *        <LI><B>TABLE_CAT</B> String => table catalog (may be <code>null</code>)
-                         *        <LI><B>TABLE_SCHEM</B> String => table schema (may be <code>null</code>)
-                         *        <LI><B>TABLE_NAME</B> String => table name
-                         *        <LI><B>COLUMN_NAME</B> String => column name
-                         *        <LI><B>KEY_SEQ</B> short => sequence number within primary key
-                         *        <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
-                         */
-                        ArrayList keyColumns = new ArrayList();
+                        try {
+                            /*
+                             *        <LI><B>TABLE_CAT</B> String => table catalog (may be <code>null</code>)
+                             *        <LI><B>TABLE_SCHEM</B> String => table schema (may be <code>null</code>)
+                             *        <LI><B>TABLE_NAME</B> String => table name
+                             *        <LI><B>COLUMN_NAME</B> String => column name
+                             *        <LI><B>KEY_SEQ</B> short => sequence number within primary key
+                             *        <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
+                             */
+                            ArrayList keyColumns = new ArrayList();
 
-                        while (primaryKey.next()) {
-                            String columnName = primaryKey.getString("COLUMN_NAME");
+                            while (primaryKey.next()) {
+                                String columnName = primaryKey.getString("COLUMN_NAME");
 
-                            //look up the type ( should only be one row )
-                            ResultSet columns = 
-                                metaData.getColumns(null, databaseSchema, tableName, columnName);
-                            columns.next();
+                                //look up the type ( should only be one row )
+                                ResultSet columns = 
+                                    metaData.getColumns(null, databaseSchema, tableName, columnName);
+                                columns.next();
 
-                            int binding = columns.getInt("DATA_TYPE");
-                            Class columnType = getMapping( binding );
-                            if ( columnType == null ) {
-                                LOGGER.warning("No class for sql type " + binding );
-                                columnType = Object.class;
+                                int binding = columns.getInt("DATA_TYPE");
+                                Class columnType = getMapping( binding );
+                                if ( columnType == null ) {
+                                    LOGGER.warning("No class for sql type " + binding );
+                                    columnType = Object.class;
+                                }
+                                
+                                keyColumns.add(new PrimaryKey.Column(columnName, columnType));
                             }
-                            
-                            keyColumns.add(new PrimaryKey.Column(columnName, columnType));
-                        }
 
-                        state.setPrimaryKey(
-                            new PrimaryKey((PrimaryKey.Column[]) keyColumns.toArray( new PrimaryKey.Column[keyColumns.size()]))
-                        );
+                            state.setPrimaryKey(
+                                new PrimaryKey((PrimaryKey.Column[]) keyColumns.toArray( new PrimaryKey.Column[keyColumns.size()]))
+                            );
+                        }
+                        finally {
+                            closeSafe( primaryKey );
+                        }
+                       
                     }
                     catch( SQLException e ) {
                         String msg = "Error looking up primary key";
@@ -376,7 +430,7 @@ public class JDBCDataStore extends ContentDataStore {
      * </p>.
      *
      */
-    protected final Connection connection() {
+    public final Connection connection() {
         try {
 			return getDataSource().getConnection();
 		} 
@@ -413,17 +467,21 @@ public class JDBCDataStore extends ContentDataStore {
          *                  SELF_REFERENCING_COL_NAME are created. Values are
          *                  "SYSTEM", "USER", "DERIVED". (may be <code>null</code>)
          */
-        List typeNames;
+        List typeNames = new ArrayList();
         try {
             DatabaseMetaData metaData = cx.getMetaData();
             ResultSet tables = metaData.getTables(null, databaseSchema, "%", null);
-
-            typeNames = new ArrayList();
-
-            while (tables.next()) {
-                String tableName = tables.getString("TABLE_NAME");
-                typeNames.add(new Name(tableName));
+            
+            try {
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+                    typeNames.add(new Name(tableName));
+                }    
             }
+            finally {
+                closeSafe( tables );
+            }
+            
         } catch (SQLException e) {
             throw (IOException) new IOException("Error occurred getting table name list.").initCause(e);
         }
@@ -434,6 +492,31 @@ public class JDBCDataStore extends ContentDataStore {
         return typeNames;
     }
 
+    protected void closeSafe( ResultSet rs ) {
+        try {
+            rs.close();
+        }
+        catch( SQLException e ) {
+            String msg = "Error occurred closing result set";
+            LOGGER.warning(msg);
+            if ( LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.log(Level.FINE, msg, e );
+            }
+        }
+    }
+    
+    protected void closeSafe( Statement st ) {
+        try {
+            st.close();
+        }
+        catch( SQLException e ) {
+            String msg = "Error occurred closing statement";
+            LOGGER.warning(msg);
+            if ( LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.log(Level.FINE, msg, e );
+            }
+        }
+    }
     protected void closeSafe( Connection cx ) {
         try {
             cx.close();

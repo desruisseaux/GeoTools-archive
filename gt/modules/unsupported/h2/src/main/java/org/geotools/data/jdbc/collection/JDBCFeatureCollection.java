@@ -20,18 +20,18 @@ import org.geotools.data.jdbc.JDBCRunnable;
 import org.geotools.data.jdbc.JDBCState;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.data.jdbc.SQLDialect;
 import org.geotools.data.store.FeatureIteratorIterator;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureList;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.ProgressListener;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 
@@ -79,7 +79,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 				    listener.collectionChanged( event );
 				}
 				catch (Throwable t ){
-					source.getLogger().log( Level.WARNING, "Problem encountered during notification of "+event, t );
+					JDBCDataStore.LOGGER.log( Level.WARNING, "Problem encountered during notification of "+event, t );
 				}
 			}
 		}			
@@ -182,10 +182,12 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	}
 
     protected FeatureIterator createFeatureIterator() throws Exception {
-    	SQLBuilder sql = new SQLBuilder( (JDBCDataStore) source.getDataStore() );
-    	
-    	Statement st = state.getConnection().createStatement();
-    	st.execute( sql.select( source.getSchema(), filter ) );
+        //build up a statement for the content
+        JDBCDataStore dataStore = source.getDataStore();
+        String sql = dataStore.selectSQL( source.getSchema(), filter );
+        
+        Statement st = state.getConnection().createStatement();
+    	st.execute( sql );
     	
     	return new JDBCFeatureIterator( st, this );
     }
@@ -200,7 +202,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
                 }
                 catch( Throwable e){
                 	String msg = "Error occured closing iterator";
-                	source.getLogger().log( Level.WARNING, msg, e );
+                	JDBCDataStore.LOGGER.log( Level.WARNING, msg, e );
                 }
                 finally {
                     i.remove();
@@ -223,7 +225,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
             for( iterator = iterator(); !progress.isCanceled() && iterator.hasNext();){
                 if (size > 0) progress.progress( position++/size );
                 try {
-                    Feature feature = (Feature) iterator.next();
+                    SimpleFeature feature = (SimpleFeature) iterator.next();
                     visitor.visit(feature);
                 }
                 catch( Exception erp ){
@@ -237,7 +239,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
         }
     }
 
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
 		return source.getSchema();
 	}
 
@@ -347,63 +349,6 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	public Object[] toArray(Object[] arg0) {
 		throw new UnsupportedOperationException();
 	}
-
-	public FeatureList sort(SortBy order) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public FeatureCollection subCollection(Filter filter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	//Feature API
-	public FeatureType getFeatureType() {
-		return null;
-	}
-	
-	public Object getAttribute(String xPath) {
-		return null;
-	}
-
-	public Object getAttribute(int index) {
-		return null;
-	}
-
-	public Object[] getAttributes(Object[] attributes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Geometry getDefaultGeometry() {
-		return null;
-	}
-	
-	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public int getNumberOfAttributes() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
-		
-	}
-	
 
 }
 
