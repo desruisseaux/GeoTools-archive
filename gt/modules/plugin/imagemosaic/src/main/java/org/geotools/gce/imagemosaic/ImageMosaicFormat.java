@@ -37,13 +37,13 @@ import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.Hints;
-import org.geotools.feature.FeatureType;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -228,9 +228,9 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 			final String typeName = typeNames[0];
 			final FeatureSource featureSource = tileIndexStore
 					.getFeatureSource(typeName);
-			final FeatureType schema = featureSource.getSchema();
+			final SimpleFeatureType schema = featureSource.getSchema();
 			// looking for the location attribute
-			if (schema.getAttributeType("location") == null)
+			if (schema.getAttribute("location") == null)
 				return false;
 			
 			// /////////////////////////////////////////////////////////////////////

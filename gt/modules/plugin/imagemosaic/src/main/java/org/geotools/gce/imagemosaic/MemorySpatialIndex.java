@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -77,8 +78,8 @@ public final class MemorySpatialIndex {
 		}
 		index = new com.vividsolutions.jts.index.strtree.STRtree();
 		while (it.hasNext()) {
-			final Feature f = it.next();
-			final Geometry g = f.getDefaultGeometry();
+			final SimpleFeature f = it.next();
+			final Geometry g = (Geometry) f.getDefaultGeometry();
 			index.insert(g.getEnvelopeInternal(), f);
 		}
 		// closing he iterator to free some resources.

@@ -67,7 +67,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
-import org.geotools.feature.Feature;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
@@ -86,9 +85,11 @@ import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * This reader is repsonsible for providing access to mosaic of georeferenced
@@ -273,7 +274,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					crs.toWKT()).toString());
 		} else {
 			final CoordinateReferenceSystem tempcrs = featureSource.getSchema()
-					.getDefaultGeometry().getCoordinateSystem();
+					.getDefaultGeometry().getCRS();
 			if (tempcrs == null) {
 				// use the default crs
 				crs = AbstractGridFormat.getDefaultCRS();
@@ -770,9 +771,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			final File tempFile = new File(this.sourceURL.getFile());
 			final String parentLocation = tempFile.getParent();
-			Feature feature;
+			SimpleFeature feature;
 			String location;
-			Envelope bound;
+			ReferencedEnvelope bound;
 			PlanarImage loadedImage;
 			File imageFile;
 			final ROI[] rois = new ROI[numImages];
@@ -797,9 +798,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// Get location and envelope of the image to load.
 				//
 				// /////////////////////////////////////////////////////////////////////
-				feature = (Feature) it.next();
+				feature = (SimpleFeature) it.next();
 				location = (String) feature.getAttribute("location");
-				bound = feature.getBounds();
+				bound = ReferencedEnvelope.reference(feature.getBounds());
 
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -1103,8 +1104,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		final Envelope loadedULC = new Envelope();
 		Iterator it = features.iterator();
 		while (it.hasNext()) {
-			loadedULC.expandToInclude(((Feature) it.next())
-					.getDefaultGeometry().getEnvelopeInternal());
+		    SimpleFeature f = (SimpleFeature) it.next();
+		    loadedULC.expandToInclude(((Geometry)f.getDefaultGeometry()).getEnvelopeInternal());
 		}
 		return loadedULC;
 
