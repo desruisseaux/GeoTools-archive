@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
-import org.geotools.feature.Feature;
 import org.geotools.xml.StreamingParser;
+import org.opengis.feature.simple.SimpleFeature;
 
 public class GMLIterator implements Iterator {
 
@@ -22,7 +22,7 @@ public class GMLIterator implements Iterator {
 	/**
 	 * The next feature 
 	 */
-	Feature feature;
+	SimpleFeature feature;
 	
 	GMLIterator( GMLTypeEntry entry ) throws IOException {
 
@@ -44,7 +44,7 @@ public class GMLIterator implements Iterator {
 	}
 
 	public boolean hasNext() {
-		feature = (Feature) parser.parse();
+		feature = (SimpleFeature) parser.parse();
 		return feature != null;
 	}
 

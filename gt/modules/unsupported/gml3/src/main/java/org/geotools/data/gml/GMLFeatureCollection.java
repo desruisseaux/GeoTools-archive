@@ -3,20 +3,12 @@ package org.geotools.data.gml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.store.DataFeatureCollection;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.gml3.GMLConfiguration;
 import org.geotools.xml.StreamingParser;
-import org.opengis.filter.Filter;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public class GMLFeatureCollection extends DataFeatureCollection {
 
@@ -46,11 +38,11 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 			throw new RuntimeException( e );
 		}
 		
-		Envelope bounds = null;
+		ReferencedEnvelope bounds = null;
 		try {
 			StreamingParser parser = 
 				new StreamingParser( entry.parent().configuration(), input, "/boundedBy" );
-			bounds = (Envelope) parser.parse();
+			bounds = (ReferencedEnvelope) parser.parse();
 		} 
 		catch( Exception e ) {
 			throw new RuntimeException( e );
@@ -65,7 +57,7 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 		if ( bounds == null ) {
 			//bounds must have not been declared, calculate manually
 			try {
-				bounds = new Envelope();
+				bounds = new ReferencedEnvelope();
 				FeatureReader reader = reader();
 				if ( !reader.hasNext() ) {
 					bounds.setToNull();
@@ -73,7 +65,7 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 				else {
 					bounds.init( reader.next().getBounds() );
 					while( reader.hasNext() ) {
-						bounds.expandToInclude( reader.next().getBounds() );
+						bounds.include( reader.next().getBounds() );
 					}
 				}
 				
@@ -84,7 +76,7 @@ public class GMLFeatureCollection extends DataFeatureCollection {
 			}
 		}
 		
-		return ReferencedEnvelope.reference(bounds);
+		return bounds;
 	}
 
 	public int getCount() throws IOException {

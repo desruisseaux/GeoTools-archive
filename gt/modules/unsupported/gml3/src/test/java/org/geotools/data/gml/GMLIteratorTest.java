@@ -3,8 +3,7 @@ package org.geotools.data.gml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
 
 public class GMLIteratorTest extends GMLDataStoreTestSupport {
 
@@ -18,7 +17,7 @@ public class GMLIteratorTest extends GMLDataStoreTestSupport {
 		
 		assertEquals( 3, features.size() );
 		for ( int i = 0; i < features.size(); i++ ) {
-			Feature feature = (Feature) features.get( i );
+			SimpleFeature feature = (SimpleFeature) features.get( i );
 			assertNotNull( feature );
 			assertEquals( "" + i, feature.getID() );
 		}

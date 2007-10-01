@@ -7,10 +7,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.gml3.ApplicationSchemaConfiguration;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 
@@ -37,30 +37,30 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 	}
 	
 	public void testGetSchema1() throws IOException {
-		FeatureType featureType = 
+		SimpleFeatureType featureType = 
 			dataStore.getSchema( "PrimitiveGeoFeature" );
 		assertNotNull( featureType );
 		
-		assertNotNull( featureType.getAttributeType( "pointProperty" ) );
-		assertNotNull( featureType.getAttributeType( "curveProperty" ) );
-		assertNotNull( featureType.getAttributeType( "surfaceProperty" ) );
+		assertNotNull( featureType.getAttribute( "pointProperty" ) );
+		assertNotNull( featureType.getAttribute( "curveProperty" ) );
+		assertNotNull( featureType.getAttribute( "surfaceProperty" ) );
 	}
 	
 	public void testGetSchema2() throws IOException {
-		FeatureType featureType = 
+	    SimpleFeatureType featureType = 
 			dataStore.getSchema( "AggregateGeoFeature" );
 		assertNotNull( featureType );
 		
-		assertNotNull( featureType.getAttributeType( "multiPointProperty" ) );
-		assertNotNull( featureType.getAttributeType( "multiCurveProperty" ) );
-		assertNotNull( featureType.getAttributeType( "multiSurfaceProperty" ) );
+		assertNotNull( featureType.getAttribute( "multiPointProperty" ) );
+		assertNotNull( featureType.getAttribute( "multiCurveProperty" ) );
+		assertNotNull( featureType.getAttribute( "multiSurfaceProperty" ) );
 	}
 	
 	public void testGetSchema3() throws Exception {
-		FeatureType featureType = 
+	    SimpleFeatureType featureType = 
 			dataStore.getSchema( "Entit\u00e9G\u00e9n\u00e9rique" );
 		assertNotNull( featureType );
-		assertNotNull( featureType.getAttributeType( "attribut.G\u00e9om\u00e9trie" ) );
+		assertNotNull( featureType.getAttribute( "attribut.G\u00e9om\u00e9trie" ) );
 		
 	}
 	
@@ -71,7 +71,7 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		Iterator iterator = features.iterator();
 		assertTrue( iterator.hasNext() );
 		try {
-			Feature f = (Feature) iterator.next();
+			SimpleFeature f = (SimpleFeature) iterator.next();
 			assertEquals( "f001", f.getID() );
 		}
 		finally {
@@ -86,7 +86,7 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		Iterator iterator = features.iterator();
 		assertTrue( iterator.hasNext() );
 		try {
-			Feature f = (Feature) iterator.next();
+		    SimpleFeature f = (SimpleFeature) iterator.next();
 			assertEquals( "f005", f.getID() );
 		}
 		finally {

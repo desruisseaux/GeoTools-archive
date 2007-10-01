@@ -3,18 +3,18 @@ package org.geotools.data.gml;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class GMLDataStoreTest extends GMLDataStoreTestSupport {
 
 	
 	public void testGetSchema() throws Exception {
-		FeatureType featureType = dataStore.getSchema( "TestFeature" );
+		SimpleFeatureType featureType = dataStore.getSchema( "TestFeature" );
 		assertNotNull( featureType );
 	
-		assertEquals( "http://www.geotools.org/test", featureType.getNamespace().toString() );
-		assertTrue( featureType.getAttributeType( "geom" ) != null );
-		assertTrue( featureType.getAttributeType( "count" ) != null );
+		assertEquals( "http://www.geotools.org/test", featureType.getName().getNamespaceURI().toString() );
+		assertTrue( featureType.getAttribute( "geom" ) != null );
+		assertTrue( featureType.getAttribute( "count" ) != null );
 	}
 	
 	public void testGetTypeNames() throws Exception {

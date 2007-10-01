@@ -14,24 +14,21 @@ import java.util.List;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDTypeDefinition;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.store.AbstractDataStore2;
-import org.geotools.feature.FeatureType;
 import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.gml3.GML;
 import org.geotools.gml3.GMLConfiguration;
 import org.geotools.gml3.bindings.GML3ParsingUtils;
 import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.Configuration;
-import org.geotools.xml.Schemas;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.BindingWalkerFactoryImpl;
 import org.geotools.xml.impl.TypeWalker;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 public class GMLDataStore extends AbstractDataStore2 {
@@ -190,7 +187,7 @@ public class GMLDataStore extends AbstractDataStore2 {
 				new TypeWalker().walk( type, visitor );
 				
 				if ( !isFeatureType.isEmpty() ) {
-					FeatureType featureType = featureType( element );
+					SimpleFeatureType featureType = featureType( element );
 					contents.add( new GMLTypeEntry( this, featureType, null ) );
 				}
 			}
@@ -208,7 +205,7 @@ public class GMLDataStore extends AbstractDataStore2 {
 	 * @return
 	 * @throws IOException
 	 */
-	private FeatureType featureType( XSDElementDeclaration element )
+	private SimpleFeatureType featureType( XSDElementDeclaration element )
 		throws IOException {
 		
 		//load up the bindings for type conversion

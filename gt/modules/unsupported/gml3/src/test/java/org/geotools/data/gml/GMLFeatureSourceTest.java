@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.FeatureId;
@@ -56,7 +56,7 @@ public class GMLFeatureSourceTest extends GMLDataStoreTestSupport {
 		Iterator i = features.iterator();
 		assertTrue( i.hasNext() );
 		
-		Feature f = (Feature) i.next();
+		SimpleFeature f = (SimpleFeature) i.next();
 		assertNotNull( f );
 		
 		assertEquals( 1, f.getFeatureType().getAttributeCount() );
