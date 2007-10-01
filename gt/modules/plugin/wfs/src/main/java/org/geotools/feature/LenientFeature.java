@@ -1,7 +1,9 @@
 package org.geotools.feature;
 
 import java.rmi.server.UID;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,82 +126,73 @@ public class LenientFeature extends SimpleFeatureImpl {
     }
 
     /**
-     * Sets all attributes for this feature, passed as an array.  All
-     * attributes are checked for validity before adding.
-     *
+     * Sets all attributes for this feature, passed in as a list.
      * @param attributes All feature attributes.
-     *
      * @throws IllegalAttributeException Passed attributes do not match feature
      *         type.
      */
-    public void setAttributes(Object[] attributes)
-        throws IllegalAttributeException {
-        // the passed in attributes were null, lets make that a null array
-        Object[] newAtts = attributes;
-
-        if (attributes == null) {
-            newAtts = new Object[this.attributes.length];
-        }
-
+    
+    public void setAttributes(List<Object> attributes) {
         if( constructing ){
-
-            // We're trying to make this work no matter what 
-            // so try to figure out some mapping
-            Object[] tmp = assumeCorrectOrder( newAtts );
-            if( tmp==null )
-                newAtts = greedyMatch(newAtts);
-            else
-                newAtts=tmp;
-        }else{
-            if (newAtts.length != this.attributes.length) {
-                throw new IllegalAttributeException(
-                    "Wrong number of attributes expected "
-                    + schema.getAttributeCount() + " got " + newAtts.length);
+            // we are going to make this work no matter what
+            // so try and figure out some mapping
+            if ( attributes == null ){
+                attributes = Arrays.asList(new Object[getFeatureType().getAttributeCount()]);
             }
+            if ( attributes.size() != getFeatureType().getAttributeCount() ) {
+                String msg = "Expected " + getFeatureType().getAttributeCount() + " attributes but " 
+                    + attributes.size() + " were specified";
+                    throw new IllegalArgumentException( msg );                    
+            }
+            List<Object> fixed;
+            fixed = assumeCorrectOrder( attributes );
+            if( fixed == null ){
+                //fixed = greedyMatch(attributes);
+            }
+            super.setAttributes( fixed );
         }
-        
-        for (int i = 0, ii = newAtts.length; i < ii; i++) {
-            setAttribute(i, newAtts[i]);
+        else {
+            super.setAttributes( attributes );
         }
     }
 
-    private Object[] assumeCorrectOrder( Object[] newAtts ) {
-        Object[] tmp=new Object[schema.getAttributeCount()];
-        for( int i = 0; i < newAtts.length && i<schema.getAttributeCount(); i++ ) {
-            Object object = newAtts[i];
-            AttributeType att = schema.getAttributeType(i);
-            if( object==null )
+    private List<Object> assumeCorrectOrder( List<Object> newAtts ) {
+        SimpleFeatureType schema = getFeatureType();
+        List<Object> tmp = Arrays.asList(new Object[schema.getAttributeCount()]);
+        for( int i = 0; i < newAtts.size() && i<schema.getAttributeCount(); i++ ) {
+            Object object = newAtts.get(i);
+            AttributeDescriptor att = schema.getAttribute(i);
+            if( object==null ){
                 continue;
-            Class requiredClass = att.getBinding();
-            Class realClass = object.getClass();
-            if( !requiredClass.isAssignableFrom(realClass) )
-                return null;
-            else
-                tmp[i]=object;
-            
+            }
+            Object value = Types.parse( att, object );
+            tmp.set(i, value);
         }
         return tmp;
     }
 
-    private Object[] greedyMatch( Object[] newAtts ) {
-        Object[] relaxedAttrs=new Object[this.attributes.length];
+    private List<Object> greedyMatch(List<Object> newAtts ) {
+        SimpleFeatureType schema = getFeatureType();
+        List<Object> relaxedAttrs=Arrays.asList(new Object[schema.getAttributeCount()]);
         boolean inValid = false;
-        for( int i = 0; i < newAtts.length; i++ ) {
-            Object object = newAtts[i];
+        for( int i = 0; i < newAtts.size(); i++ ) {
+            Object object = newAtts.get(i);
             boolean found = false;
             if( object==null )
                 continue;
             Class realClass = object.getClass();
             for( int j = 0; j < schema.getAttributeCount(); j++ ) {
-                AttributeType att = schema.getAttributeType(j);
-                Class requiredClass = att.getBinding();
-                if( relaxedAttrs[j]==null && requiredClass.isAssignableFrom(realClass) ){
-                    relaxedAttrs[j]=object;
+                AttributeDescriptor att = schema.getAttribute(j);
+                Class requiredClass = att.getType().getBinding();
+                if( relaxedAttrs.get(j)==null && requiredClass.isAssignableFrom(realClass) ){
+                    relaxedAttrs.set(j,object);
                     found=true;
                     break;
                 }
             }
-            if( !found ) inValid=true;
+            if( !found ) {
+                inValid=true;
+            }
         }
         newAtts=relaxedAttrs;
         if( inValid ){
@@ -208,21 +201,21 @@ public class LenientFeature extends SimpleFeatureImpl {
             buf.append("\nAttributes were not correct for the feature Type:");
             buf.append(schema.getTypeName());
             buf.append(".  Made best guess:\n Recieved: ");
-            for( int i = 0; i < newAtts.length; i++ ) {
-                Object object = newAtts[i];
+            for( int i = 0; i < newAtts.size(); i++ ) {
+                Object object = newAtts.get(i);
                 buf.append(object==null?"null":object.toString());
                 buf.append(",");
             }
             buf.append("\nBest Guess: \n");
-            for( int i = 0; i < relaxedAttrs.length; i++ ) {
-                Object object = relaxedAttrs[i];
+            for( int i = 0; i < relaxedAttrs.size(); i++ ) {
+                Object object = relaxedAttrs.get(i);
                 buf.append(object==null?"null":object.toString());
                 buf.append(",");
             }
 
             LOGGER.warning(buf.toString());
         }
-        return newAtts;
+        return relaxedAttrs;
     }
 
 
