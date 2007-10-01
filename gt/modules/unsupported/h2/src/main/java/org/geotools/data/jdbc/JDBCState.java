@@ -30,6 +30,7 @@ import org.geotools.data.store.ContentState;
  */
 public final class JDBCState extends ContentState {
     private Connection connection;
+    private PrimaryKey primaryKey;
     
     /**
      * Duplicates provided JDBCState .. for everything except connection & listeners.
@@ -46,8 +47,15 @@ public final class JDBCState extends ContentState {
     public void setConnection( Connection connection ){
     	this.connection = connection;
     }
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
+    }
+    public void setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
+    }
     public void flush() {
     	connection = null;
+    	primaryKey = null;
     	super.flush();
     }
 }

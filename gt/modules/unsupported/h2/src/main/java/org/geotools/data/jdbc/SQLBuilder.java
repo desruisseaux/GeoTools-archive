@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
+
 import org.geotools.filter.LikeFilterImpl;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
@@ -93,7 +94,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
     /**
      * Feature type being worked on
      */
-    FeatureType featureType;
+    SimpleFeatureType featureType;
     /**
      * Post-processing filter
      */
@@ -125,7 +126,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * worked on.
      * 
      */
-    protected void init(FeatureType featureType) {
+    protected void init(SimpleFeatureType featureType) {
     	init();
     	this.featureType = featureType;
     }
@@ -140,7 +141,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      *
      * @return A statement of the form "CREATE TABLE ...".
      */
-	public String createTable( FeatureType featureType ) {
+	public String createTable( SimpleFeatureType featureType ) {
 		init(featureType);
 
 	    sql.append("CREATE TABLE ");
@@ -152,7 +153,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	    String[] sqlTypeNames = null;
 
 	    try {
-	        sqlTypeNames = JDBCUtils.sqlTypeNames( featureType, dataStore );
+	        //sqlTypeNames = JDBCUtils.sqlTypeNames( featureType, dataStore );
 	    } catch (Exception e) {
 	        throw new RuntimeException(e);
 	    }
@@ -160,7 +161,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	    sql.append(" ( ");
 
 	    for (int i = 0; i < sqlTypeNames.length; i++) {
-	        AttributeType type = featureType.getAttributeType(i);
+	        AttributeDescriptor type = featureType.getAttribute(i);
 
 	        //the column name
 	        name(type.getLocalName());
@@ -183,7 +184,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      *
      * @return A statement of the form "DROP TABLE ...".
      */
-	public String dropTable( FeatureType featureType ) {
+	public String dropTable( SimpleFeatureType featureType ) {
 		init(featureType);
 		
 		sql.append("DROP TABLE ");
@@ -203,7 +204,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * 
      * @return A statement of the form "SELECT envelope(...) FROM ..."
      */
-	public String bounds(FeatureType featureType) {
+	public String bounds(SimpleFeatureType featureType) {
 		return bounds( featureType, null );
 	}
 	
@@ -217,7 +218,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * 
      * @return A statement of the form "SELECT envelope(...) FROM ... WHERE ..."
      */
-	public String bounds( FeatureType featureType, Filter filter ) {
+	public String bounds( SimpleFeatureType featureType, Filter filter ) {
 		init(featureType);
 		
 		//select
@@ -243,7 +244,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * </p>
      * @return A statement of the form "SELECT count(*) FROM ..."
      */
-	public String count(FeatureType featureType) {
+	public String count(SimpleFeatureType featureType) {
 		return count( featureType, null );
 	}
 	
@@ -257,7 +258,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      *
      * @return A statement of the form "SELECT count(*) FROM ... WHERE ..."
      */
-	public String count( FeatureType featureType, Filter filter ) {
+	public String count( SimpleFeatureType featureType, Filter filter ) {
 		init(featureType);
 		
 		//select
@@ -281,7 +282,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	 * </p>
 	 * 
 	 */
-	public String select( FeatureType featureType, Filter filter ) {
+	public String select( SimpleFeatureType featureType, Filter filter ) {
 		init(featureType);
 		
 		PrimaryKey pkey;
@@ -296,7 +297,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 		//select
 		int n = pkey.columns.length;
 		String[] propertyNames = 
-			new String[ n + featureType.getAttributeTypes().length ];
+			new String[ n + featureType.getAttributeCount() ];
 		
 		//primary key columns
 		for ( int i = 0; i < n; i++ ) {
@@ -304,7 +305,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 		}
 		//attribute columns
 		for ( int i = n; i < propertyNames.length; i++ ) {
-			propertyNames[i] = featureType.getAttributeType( i - n ).getLocalName();
+			propertyNames[i] = featureType.getAttribute( i - n ).getLocalName();
 		}
 		select( featureType, propertyNames );
 		
@@ -326,7 +327,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
 	 * </p>
 	 * 
 	 */
-	public void delete( FeatureType featureType, Filter filter ) {
+	public void delete( SimpleFeatureType featureType, Filter filter ) {
 		init(featureType);
 		
 		//delete
@@ -375,7 +376,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * </p>
      * @param propertyNames The array of properties / columns in the select.
      */
-    protected void select(FeatureType featureType, String[] propertyNames) {
+    protected void select(SimpleFeatureType featureType, String[] propertyNames) {
         sql.append("SELECT ");
 
         if ((propertyNames == null) || (propertyNames.length == 0)) {
@@ -385,11 +386,11 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
                 PropertyName propertyName = filterFactory.property(propertyNames[i]);
                 
                 //get the attribute type
-                AttributeType attributeType = (AttributeType) propertyName.evaluate(featureType);
+                AttributeDescriptor attributeType = (AttributeDescriptor) propertyName.evaluate(featureType);
                 
                 if (attributeType != null) {
                     //check for geometry, because it is encided differnently
-                    if (Geometry.class.isAssignableFrom(attributeType.getBinding())) {
+                    if (Geometry.class.isAssignableFrom(attributeType.getType().getBinding())) {
                     	
                     }
                 }
@@ -408,7 +409,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * Encodes "FROM <table>".
      *
      */
-    protected void from( FeatureType featureType ) {
+    protected void from( SimpleFeatureType featureType ) {
     	sql.append( " FROM " );
     	table( featureType.getTypeName() );
     }
@@ -448,7 +449,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
      * </p>
      *
      */
-    protected void geometry(FeatureType featureType) {
+    protected void geometry(SimpleFeatureType featureType) {
     	if ( featureType.getDefaultGeometry() == null ) {
     		String msg = "No geometry column to encode";
     		throw new IllegalStateException( msg );
@@ -543,14 +544,15 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
     public Object visit(PropertyName propertyName, Object data) {
         try {
             //1. evaluate against the type to get the AttributeType
-        	AttributeType attributeType = (AttributeType) propertyName.evaluate(featureType);
+            AttributeDescriptor attributeType = 
+                (AttributeDescriptor) propertyName.evaluate(featureType);
 
             if (attributeType != null) {
                 //encode the name of the attribute, not the property name itself
                 name(attributeType.getLocalName());
 
                 //return the type as the return 
-                return attributeType.getBinding();
+                return attributeType.getType().getBinding();
             }
 
             //2. not in type, could it be a primary key?
@@ -647,7 +649,7 @@ public class SQLBuilder implements ExpressionVisitor, FilterVisitor {
             } else {
                 //check the feature type
                 if (featureType.getDefaultGeometry() != null) {
-                    crs = featureType.getDefaultGeometry().getCoordinateSystem();
+                    crs = featureType.getDefaultGeometry().getCRS();
                 }
             }
 

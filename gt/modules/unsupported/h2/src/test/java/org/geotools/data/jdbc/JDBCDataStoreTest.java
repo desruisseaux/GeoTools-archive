@@ -1,14 +1,14 @@
 package org.geotools.data.jdbc;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.simple.SimpleTypeBuilder;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -20,56 +20,52 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 	}
 	
 	public void testGetSchema() throws Exception {
-		FeatureType ft1 = dataStore.getSchema( "ft1" ); 
+		SimpleFeatureType ft1 = dataStore.getSchema( "ft1" ); 
 		assertNotNull( ft1 );
 		
-		assertNotNull( ft1.getAttributeType("geometry") );
-		assertNotNull( ft1.getAttributeType("intProperty") );
-		assertNotNull( ft1.getAttributeType("doubleProperty") );
-		assertNotNull( ft1.getAttributeType("stringProperty") );
+		assertNotNull( ft1.getAttribute("geometry") );
+		assertNotNull( ft1.getAttribute("intProperty") );
+		assertNotNull( ft1.getAttribute("doubleProperty") );
+		assertNotNull( ft1.getAttribute("stringProperty") );
 		
-		assertEquals( Geometry.class, ft1.getAttributeType("geometry").getBinding() );
-		assertEquals( Integer.class, ft1.getAttributeType("intProperty").getBinding()  );
-		assertEquals( Double.class, ft1.getAttributeType("doubleProperty").getBinding()  );
-		assertEquals( String.class, ft1.getAttributeType("stringProperty").getBinding()  );
+		assertEquals( Geometry.class, ft1.getAttribute("geometry").getType().getBinding() );
+		assertEquals( Integer.class, ft1.getAttribute("intProperty").getType().getBinding()  );
+		assertEquals( Double.class, ft1.getAttribute("doubleProperty").getType().getBinding()  );
+		assertEquals( String.class, ft1.getAttribute("stringProperty").getType().getBinding()  );
 		
 	}
 	
 	public void testCreateSchema() throws Exception {
-		SimpleTypeBuilder builder = 
-			new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder( );
 		builder.setName( "ft2" );
 		builder.setNamespaceURI( dataStore.getNamespaceURI() );
-		builder.attribute( "geometry", Geometry.class );
-		builder.attribute( "intProperty", Integer.class );
-		builder.attribute( "dateProperty", Date.class );
+		builder.add( "geometry", Geometry.class );
+		builder.add( "intProperty", Integer.class );
+		builder.add( "dateProperty", Date.class );
 		
-		FeatureType featureType = builder.buildFeatureType(); 
+		SimpleFeatureType featureType = builder.buildFeatureType(); 
 		dataStore.createSchema( featureType );
 		
-		FeatureType ft2 = dataStore.getSchema( "ft2" );
+		SimpleFeatureType ft2 = dataStore.getSchema( "ft2" );
 		assertFalse( ft2 == featureType );
 		
 		assertEquals( ft2, featureType );
 		
-		JDBCUtils.statement(dataStore, new JDBCRunnable() {
-			public Object run(Statement st) throws IOException, SQLException {
-				try {
-					st.executeQuery( "SELECT * from \"geotools\".\"ft2\";" );	
-				}
-				catch( SQLException e ) {
-					fail( "table ft2 does not exist");
-				}
-				
-				return null;
-			}
-		});
+		Connection cx = dataStore.connection();
+		Statement st = cx.createStatement();
+          try {
+              st.executeQuery( "SELECT * from \"geotools\".\"ft2\";" );   
+          }
+          catch( SQLException e ) {
+              fail( "table ft2 does not exist");
+          }
+          
+		st.close();
 	}
 	
 	public void testGetFeatureSource() throws Exception {
 		FeatureSource featureSource = dataStore.getFeatureSource( "ft1" );
 		assertNotNull( featureSource );
 	}
-	
 	
 }

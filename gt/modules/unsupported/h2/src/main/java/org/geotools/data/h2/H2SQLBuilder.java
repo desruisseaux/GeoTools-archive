@@ -144,7 +144,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
         String[] sqlTypeNames = null;
 
         try {
-            sqlTypeNames = JDBCUtils.sqlTypeNames(state.getMemberType(),null );
+            sqlTypeNames = JDBCUtils.sqlTypeNames(state.getFeatureType(),null );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -175,7 +175,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
     
     FeatureType featureType() {
         try {
-            return state.getMemberType();
+            return state.getFeatureType();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -981,7 +981,7 @@ public class H2SQLBuilder implements FilterVisitor, ExpressionVisitor {
     public Object visit(PropertyName propertyName, Object data) {
         try {
             //1. evaluate against the type to get the AttributeType
-            FeatureType featureType = state.getMemberType();
+            FeatureType featureType = state.getFeatureType();
 
             AttributeType attributeType = (AttributeType) propertyName.evaluate(featureType);
 

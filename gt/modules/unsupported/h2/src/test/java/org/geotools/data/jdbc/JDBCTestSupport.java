@@ -11,8 +11,6 @@ import java.sql.Statement;
 import junit.framework.TestCase;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
-import org.geotools.feature.simple.SimpleTypeFactoryImpl;
 import org.geotools.filter.FilterFactoryImpl;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
@@ -129,8 +127,6 @@ public class JDBCTestSupport extends TestCase {
         dataStore.setNamespaceURI("http://www.geotools.org/test");
         dataStore.setDataSource( dataSource );
         dataStore.setDatabaseSchema("geotools");
-        dataStore.setTypeFactory(new SimpleTypeFactoryImpl());
-        dataStore.setFeatureFactory(new SimpleFeatureFactoryImpl());
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
         
