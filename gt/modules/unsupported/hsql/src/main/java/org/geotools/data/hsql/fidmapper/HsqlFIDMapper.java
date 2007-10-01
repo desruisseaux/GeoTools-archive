@@ -22,7 +22,7 @@ import java.sql.Statement;
 import org.geotools.data.jdbc.fidmapper.AbstractFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * This fidmapper just takes another fid mapper aand wraps it! Due
@@ -146,7 +146,7 @@ public class HsqlFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
      *      org.geotools.feature.Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
         throws IOException {
         return featureTypeName + "."
         + wrappedMapper.createID(conn, feature, statement);

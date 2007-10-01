@@ -15,12 +15,13 @@
  */
 package org.geotools.data.hsql;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -42,7 +43,7 @@ public class HsqlSQLBuilder extends DefaultSQLBuilder {
         super(encoder);
     }
 
-	public HsqlSQLBuilder(SQLEncoder encoder, FeatureType ft) {
+	public HsqlSQLBuilder(SQLEncoder encoder, SimpleFeatureType ft) {
         super(encoder, ft, null);
     }
 	
@@ -67,7 +68,7 @@ public class HsqlSQLBuilder extends DefaultSQLBuilder {
      * @param attributes
      */
     public void sqlColumns(StringBuffer sql, FIDMapper mapper,
-        AttributeType[] attributes) {
+        AttributeDescriptor[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
             sql.append(mapper.getColumnName(i));
 

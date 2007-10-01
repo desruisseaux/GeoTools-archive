@@ -25,11 +25,13 @@ import org.geotools.data.AbstractDataStoreTest;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.SimpleFeature;
+
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -71,7 +73,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         //  2,2 +-----+-----+ 4,2
         //     /     rd1     \
         // 1,1+               +5,1
-        roadFeatures[0] = (SimpleFeature)roadType.create(new Object[] {
+        roadFeatures[0] = SimpleFeatureBuilder.build(roadType,new Object[] {
                 new Integer(1),
                 line(new int[] { 1, 1, 2, 2, 4, 2, 5, 1 }),
                 "r1",
@@ -84,7 +86,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         //  rd2  + 3,2
         //       |
         //    3,0+
-        roadFeatures[1] = (SimpleFeature)roadType.create(new Object[] {
+        roadFeatures[1] = SimpleFeatureBuilder.build(roadType,new Object[] {
                 new Integer(2), line(new int[] { 3, 0, 3, 2, 3, 3, 3, 4 }),
                 "r2"
             },
@@ -94,16 +96,16 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         //     rd3     + 5,3
         //            / 
         //  3,2 +----+ 4,2
-        roadFeatures[2] = (SimpleFeature)roadType.create(new Object[] {
+        roadFeatures[2] = SimpleFeatureBuilder.build(roadType,new Object[] {
                 new Integer(3),
                 line(new int[] { 3, 2, 4, 2, 5, 3 }), "r3"
             },
             "road.rd3"
         );
-        roadBounds = new Envelope();
-        roadBounds.expandToInclude( roadFeatures[0].getBounds() );
-        roadBounds.expandToInclude( roadFeatures[1].getBounds() );
-        roadBounds.expandToInclude( roadFeatures[2].getBounds() );
+        roadBounds = new ReferencedEnvelope();
+        roadBounds.include( roadFeatures[0].getBounds() );
+        roadBounds.include( roadFeatures[1].getBounds() );
+        roadBounds.include( roadFeatures[2].getBounds() );
         
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         rd1Filter = factory.createFidFilter("0");
@@ -115,13 +117,13 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         
         rd12Filter = create;
         
-        rd12Bounds = new Envelope();
-        rd12Bounds.expandToInclude(roadFeatures[0].getBounds());
-        rd12Bounds.expandToInclude(roadFeatures[1].getBounds());        
+        rd12Bounds = new ReferencedEnvelope();
+        rd12Bounds.include(roadFeatures[0].getBounds());
+        rd12Bounds.include(roadFeatures[1].getBounds());        
         //   + 2,3
         //  / rd4
         // + 1,2
-        newRoad = roadType.create(new Object[] {
+        newRoad = SimpleFeatureBuilder.build(roadType,new Object[] {
                     new Integer(4), line(new int[] { 1, 2, 2, 3 }), "r4"
                 }, "road.rd4");
 
@@ -130,7 +132,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         subRiverType = DataUtilities.createType(namespace+".RIVER",
                 "RIVER:String,FLOW:0.0");
         gf = new GeometryFactory();
-        riverFeatures = new Feature[2];
+        riverFeatures = new SimpleFeature[2];
 
         //       9,7     13,7
         //        +------+
@@ -138,7 +140,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         //  +---+ rv1
         //   7,5 \
         //    9,3 +----+ 11,3
-        riverFeatures[0] = riverType.create(new Object[] {
+        riverFeatures[0] = SimpleFeatureBuilder.build(riverType,new Object[] {
                     new Integer(1),
                     lines(new int[][] {
                             { 5, 5, 7, 4 },
@@ -152,15 +154,15 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         //    rv2+ 4,8
         //       |
         //   4,6 +
-        riverFeatures[1] = riverType.create(new Object[] {
+        riverFeatures[1] = SimpleFeatureBuilder.build(riverType,new Object[] {
                     new Integer(2),
                     lines(new int[][] {
                             { 4, 6, 4, 8, 6, 10 }
                         }), "rv2", new Double(3.0)
                 }, "river.rv2");
-        riverBounds = new Envelope();
-        riverBounds.expandToInclude( riverFeatures[0].getBounds());
-        riverBounds.expandToInclude( riverFeatures[1].getBounds());
+        riverBounds = new ReferencedEnvelope();
+        riverBounds.include( riverFeatures[0].getBounds());
+        riverBounds.include( riverFeatures[1].getBounds());
                 
         rv1Filter = FilterFactoryFinder.createFilterFactory().createFidFilter("0");
 
@@ -169,7 +171,7 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         //     rv3  \ 
         //           + 13,3
         //                     
-        newRiver = riverType.create(new Object[] {
+        newRiver = SimpleFeatureBuilder.build(riverType,new Object[] {
                 new Integer(3),
                 lines(new int[][] {
                         { 9, 5, 11, 5, 13, 3 }
@@ -180,22 +182,22 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
         
         lakeType = DataUtilities.createType(namespace+".LAKE",
                     "ID:0,GEOM:Polygon:nillable,NAME:String");
-        lakeFeatures = new Feature[1];
+        lakeFeatures = new SimpleFeature[1];
         //             + 14,8
         //            / \
         //      12,6 +   + 16,6
         //            \  | 
         //        14,4 +-+ 16,4
         //
-        lakeFeatures[0] = lakeType.create( new Object[]{
+        lakeFeatures[0] = SimpleFeatureBuilder.build(lakeType, new Object[]{
                 new Integer(0),
                 polygon( new int[]{ 12,6, 14,8, 16,6, 16,4, 14,4, 12,6} ),
                 "muddy"
             },
             "lake.lk1"
         );
-        lakeBounds = new Envelope();
-        lakeBounds.expandToInclude(lakeFeatures[0].getBounds());
+        lakeBounds = new ReferencedEnvelope();
+        lakeBounds.include(lakeFeatures[0].getBounds());
 		
 	}
 

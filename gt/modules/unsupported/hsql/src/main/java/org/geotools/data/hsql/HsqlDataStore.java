@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
@@ -44,13 +45,12 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderHsql;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -133,7 +133,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      */
     public FeatureReader getFeatureReader(final String typeName)
         throws IOException {
-    	FeatureType featureType = getSchema(typeName);
+    	SimpleFeatureType featureType = getSchema(typeName);
     	return getFeatureReader(featureType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
     
@@ -297,7 +297,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      *         default implementation if a type is present that is not present
      *         in the TYPE_MAPPINGS.
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeDescriptor buildAttributeType(ResultSet rs) throws IOException {
         final int COLUMN_NAME = 4;
         final int TABLE_NAME = 3; //Position of table name in the ResultSet
 
@@ -305,8 +305,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
             String tableName = rs.getString(TABLE_NAME);
             String type = findType(tableName, rs.getString(COLUMN_NAME));
             
-            return AttributeTypeFactory.newAttributeType(
-            		rs.getString(COLUMN_NAME), Class.forName(type));
+            return new AttributeTypeBuilder().binding( Class.forName(type)).buildDescriptor( rs.getString("COLUMN_NAME"));
         } catch (SQLException e) {
             throw new IOException("SQL exception occurred: " + e.getMessage());
         } catch (ClassNotFoundException e) {
@@ -328,7 +327,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
     /**
      * @see org.geotools.data.jdbc.JDBC1DataStore#getGeometryAttributeIO(org.geotools.feature.AttributeType)
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) {
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type, QueryData queryData) {
         return new WKTAttributeIO();
     }
 
@@ -409,14 +408,14 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      *
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
-	public void createSchema(FeatureType featureType) throws IOException {
+	public void createSchema(SimpleFeatureType featureType) throws IOException {
 		String typeName = featureType.getTypeName();
-		String namespace = featureType.getNamespace().toString();
+		String namespace = featureType.getName().getNamespaceURI();
 		String colName = null;
 		Class colClass = null;
 		String colType = null;
 		
-		AttributeType[] atts = featureType.getAttributeTypes();
+		List<AttributeDescriptor> atts = featureType.getAttributes();
 		try {
 			createConnection();
 			Statement st = connection.createStatement();
@@ -426,11 +425,11 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		    sql += "_FID INTEGER IDENTITY";
 		    addTypeTable(typeName, namespace, "_FID", "java.lang.Integer");
 		    
-			for( int i = 0; i < atts.length; i++ ) {
+			for( int i = 0; i < atts.size(); i++ ) {
 				//if( i != 0 ) 
 				sql += ",";
-				colName = atts[i].getName().getLocalPart();
-				colClass = atts[i].getType().getBinding();
+				colName = atts.get(i).getName().getLocalPart();
+				colClass = atts.get(i).getType().getBinding();
 				if (colClass.isAssignableFrom(int.class) 
 						|| colClass.isAssignableFrom(Integer.class)) {
 					colType = "integer";
@@ -445,7 +444,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 					colType = "varchar";
 				}
 				sql += " " + colName + " " + colType;
-				addTypeTable(typeName, namespace, atts[i]);
+				addTypeTable(typeName, namespace, atts.get(i));
 			}
 		    sql += " )";
 		    st.execute(sql);
@@ -468,7 +467,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      *
      * @param featureType FeatureType to be removed
      */
-	public void removeSchema(FeatureType featureType) {
+	public void removeSchema(SimpleFeatureType featureType) {
 		String typeName = featureType.getTypeName();
 		
 		try {
@@ -512,7 +511,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 	 * @param namespace the featureType namespace
 	 * @param attribute the attribute we want to store info about
 	 */
-	private void addTypeTable(String typeName, String namespace, AttributeType attribute) {
+	private void addTypeTable(String typeName, String namespace, AttributeDescriptor attribute) {
 		addTypeTable(typeName, namespace, 
 				attribute.getName().getLocalPart().toUpperCase(), attribute.getType().getName().getLocalPart());
 	}

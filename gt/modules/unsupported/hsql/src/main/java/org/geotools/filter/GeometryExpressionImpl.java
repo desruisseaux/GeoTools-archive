@@ -15,7 +15,7 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Defines a complex filter (could also be called logical filter). This filter
@@ -49,7 +49,7 @@ public class GeometryExpressionImpl extends DefaultExpression {
      *
      * @param feature Feature from which to extract attribute value.
      */
-    public Object evaluate(Feature feature) {
+    public Object evaluate(SimpleFeature feature) {
         return feature.getAttribute(attPath);
     }
 
