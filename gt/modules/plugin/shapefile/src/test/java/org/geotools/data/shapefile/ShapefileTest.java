@@ -138,7 +138,7 @@ public class ShapefileTest extends TestCaseSupport {
   public void testHolyPolygons() throws Exception {
     Geometry g = readGeometry("holyPoly");
     
-    SimpleFeatureType type = DataUtilities.createType("junk", "a:Geometry");
+    SimpleFeatureType type = DataUtilities.createType("junk", "a:MultiPolygon");
     FeatureCollection features = FeatureCollections.newCollection();
     
     SimpleFeature feature = SimpleFeatureBuilder.build(type, new Object[] {g}, null);    

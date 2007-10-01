@@ -63,6 +63,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
@@ -490,7 +491,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     private SimpleFeatureType createExampleSchema() {
         SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
         build.setName("junk");
-        build.add("a", Geometry.class);
+        build.add("a", Point.class);
         build.add("b",Byte.class);
         build.add("c",Short.class);
         build.add("d",Double.class);
@@ -591,7 +592,10 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
     private void runWriteReadTest(Geometry geom, boolean d3) throws Exception {
         // make features
-        SimpleFeatureType type = DataUtilities.createType("junk", "a:Geometry");
+    	SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName("Junk");
+        ftb.add("a", geom.getClass());
+        SimpleFeatureType type = ftb.buildFeatureType();
         
         FeatureCollection features = FeatureCollections.newCollection();
 

@@ -710,6 +710,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     
                     build.setNillable(true);
                     build.setLength( length );
+                    build.setBinding(attributeClass);
                     attributes.add( build.buildDescriptor(name) );
                 }
             }
@@ -795,8 +796,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     || MultiPolygon.class.isAssignableFrom(geomType)) {
                 shapeType = ShapeType.POLYGON;
             } else {
-                // can't determine what type because type is Geometry so just return.
-                return;
+                throw new DataSourceException("Cannot create a shapefile whose geometry type is " + geomType);
             }
 
             FileChannel shpChannel = (FileChannel) getWriteChannel(getStorageURL(
@@ -1079,6 +1079,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             String colName = type.getLocalName();
 
             int fieldLen = FeatureTypes.getFieldLength( type );
+            if(fieldLen == FeatureTypes.ANY_LENGTH)
+            	fieldLen = 255;
             if ((colType == Integer.class) || (colType == Short.class)
                     || (colType == Byte.class)) {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 9), 0);

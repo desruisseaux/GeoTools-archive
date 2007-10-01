@@ -1478,9 +1478,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 					header.addColumn(colName, 'N', Math.min(fieldLen, 9), 0);
 				} else if (colType == Long.class) {
 					header.addColumn(colName, 'N', Math.min(fieldLen, 19), 0);
-				} else if ((colType == Double.class)
-						|| (colType == Float.class)
-						|| (colType == Number.class)) {
+				} else if (Number.class.isAssignableFrom(colType)) {
 					int l = Math.min(fieldLen, 33);
 					int d = Math.max(l - 2, 0);
 					header.addColumn(colName, 'N', l, d);

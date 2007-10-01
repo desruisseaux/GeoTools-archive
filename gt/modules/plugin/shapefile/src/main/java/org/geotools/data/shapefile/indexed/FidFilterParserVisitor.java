@@ -16,6 +16,7 @@
 package org.geotools.data.shapefile.indexed;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,7 +65,7 @@ class FidFilterParserVisitor implements FilterVisitor{
     }
 
     public void visit(FidFilter filter) {
-        fids.addAll( (Collection<? extends String>) filter.getIDs() );        
+        fids.addAll( (Collection<? extends String>) ((Set) filter.getIDs()) );        
     }
 
     public void visit(AttributeExpression expression) {

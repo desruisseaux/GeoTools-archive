@@ -64,6 +64,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -143,7 +144,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		String typeName = STATE_POP.substring(STATE_POP.lastIndexOf('/')+1,
                 STATE_POP.lastIndexOf('.'));
 		FeatureType schema = store.getSchema(); 
-		assertEquals(namespace, schema.getName().getNamespaceURI());
+		assertEquals(namespace.toString(), schema.getName().getNamespaceURI());
 	}
     
     public void testSchema() throws Exception {
@@ -435,7 +436,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     private SimpleFeatureType createExampleSchema() {
         SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
         build.setName("junk");
-        build.add("a", Geometry.class);
+        build.add("a", Point.class);
         build.add("b",Byte.class);
         build.add("c",Short.class);
         build.add("d",Double.class);
@@ -461,7 +462,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     
     public void testWriteReadBigNumbers() throws Exception {
     	// create feature type
-        SimpleFeatureType type = DataUtilities.createType("junk", "a:Geometry,b:BigDecimal,c:BigInteger");
+        SimpleFeatureType type = DataUtilities.createType("junk", "a:Point,b:java.math.BigDecimal,c:java.math.BigInteger");
         FeatureCollection features = FeatureCollections.newCollection();
 		
         BigInteger bigInteger = new BigInteger("1234567890123456789");
@@ -548,7 +549,11 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     
     private void runWriteReadTest(Geometry geom,boolean d3) throws Exception {
         // make features
-        SimpleFeatureType type = DataUtilities.createType( "Junk", "a:Geometry" );
+        
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName("Junk");
+        ftb.add("a", geom.getClass());
+        SimpleFeatureType type = ftb.buildFeatureType();
 
         FeatureCollection features = FeatureCollections.newCollection();
         SimpleFeatureBuilder  build = new SimpleFeatureBuilder(type);        
