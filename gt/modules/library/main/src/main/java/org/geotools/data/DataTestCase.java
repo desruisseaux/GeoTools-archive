@@ -75,13 +75,13 @@ public class DataTestCase extends TestCase {
     protected SimpleFeatureType riverType; // river: id, geom, river, flow
     protected SimpleFeatureType subRiverType; // river: river, flow     
     protected SimpleFeature[] riverFeatures;
-    protected Envelope riverBounds;
+    protected ReferencedEnvelope riverBounds;
     protected Filter rv1Filter;
     protected SimpleFeature newRiver;    
 
     protected SimpleFeatureType lakeType; // lake: id, geom, name
     protected SimpleFeature[] lakeFeatures;
-    protected Envelope lakeBounds;
+    protected ReferencedEnvelope lakeBounds;
     protected FilterFactory ff;
     
     
@@ -205,7 +205,7 @@ public class DataTestCase extends TestCase {
                             { 4, 6, 4, 8, 6, 10 }
                         }), "rv2", new Double(3.0)
                 }, "river.rv2");
-        riverBounds = new Envelope();
+        riverBounds = new ReferencedEnvelope();
         riverBounds.expandToInclude(ReferencedEnvelope.reference(riverFeatures[0].getBounds()));
         riverBounds.expandToInclude(ReferencedEnvelope.reference(riverFeatures[1].getBounds()));
                 
