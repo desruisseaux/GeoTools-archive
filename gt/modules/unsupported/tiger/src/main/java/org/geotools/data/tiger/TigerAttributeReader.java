@@ -25,9 +25,9 @@ import java.util.NoSuchElementException;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -59,7 +59,7 @@ public class TigerAttributeReader implements AttributeReader {
     private BufferedReader rt2Reader;
 
     /** DOCUMENT ME! */
-    private FeatureType featureType;
+    private SimpleFeatureType featureType;
 
     /** DOCUMENT ME! */
     private String currentLine;
@@ -121,7 +121,7 @@ public class TigerAttributeReader implements AttributeReader {
      *
      * @return FeatureType
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return featureType;
     }
 
@@ -171,8 +171,8 @@ public class TigerAttributeReader implements AttributeReader {
      *
      * @throws ArrayIndexOutOfBoundsException
      */
-    public AttributeType getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
-        return featureType.getAttributeType(index);
+    public AttributeDescriptor getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
+        return featureType.getAttribute(index);
     }
 
     /**
@@ -271,23 +271,23 @@ public class TigerAttributeReader implements AttributeReader {
         if (elements[index].getClassType() == "Geometry") {
             Object geom = geometryAdapter.deSerialize(getFeatureID(), currentLine);
 
-            return featureType.getAttributeType(index).parse(geom);
+            return geom;//featureType.getAttribute(index).getType().parse(geom);
         } else {
             String elemData = currentLine.substring(elements[index].getStartPos(), elements[index].getEndPos()).trim();
 
             // Always return a null if the string is 0 length
             if (elemData.length() == 0) {
-                return featureType.getAttributeType(index).parse(null);
+                return null;
             }
 
             if (elements[index].getClassType() == "String") {
-                return featureType.getAttributeType(index).parse(elemData);
+                return elemData.toString();//featureType.getAttributeType(index).parse(elemData);
             } else if (elements[index].getClassType() == "Integer") {
                 Integer ival = new Integer(elemData.trim());
 
-                return featureType.getAttributeType(index).parse(ival);
+                return ival;//featureType.getAttributeType(index).parse(ival);
             } else {
-                return featureType.getAttributeType(index).parse(elemData);
+                return elemData;//featureType.getAttributeType(index).parse(elemData);
             }
         }
     }

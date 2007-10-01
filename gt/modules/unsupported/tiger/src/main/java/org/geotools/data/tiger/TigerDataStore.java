@@ -25,7 +25,7 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.SchemaException;
 
 
@@ -113,11 +113,11 @@ public class TigerDataStore extends AbstractDataStore {
      * @throws IOException
      * @throws DataSourceException DOCUMENT ME!
      */
-    public FeatureType getSchema(String typeName) throws IOException {
+    public SimpleFeatureType getSchema(String typeName) throws IOException {
         try {
             TigerSchemaManager manager = new TigerSchemaManager();
 
-            FeatureType featureType = DataUtilities.createType(directory.getName() + "." + typeName,
+            SimpleFeatureType featureType = DataUtilities.createType(directory.getName() + "." + typeName,
                     manager.getTypeSpec(typeName));
 
             return featureType;

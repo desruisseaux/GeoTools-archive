@@ -21,9 +21,10 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 
 
 /**
@@ -89,7 +90,7 @@ public class TigerFeatureReader implements FeatureReader {
      *
      * @return FeatureType
      */
-    public FeatureType getFeatureType() {
+    public SimpleFeatureType getFeatureType() {
         return reader.getFeatureType();
     }
 
@@ -102,10 +103,10 @@ public class TigerFeatureReader implements FeatureReader {
      * @throws IllegalAttributeException
      * @throws NoSuchElementException
      */
-    public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+    public SimpleFeature next() throws IOException, IllegalAttributeException, NoSuchElementException {
         reader.next();
 
-        FeatureType type = reader.getFeatureType();
+        SimpleFeatureType type = reader.getFeatureType();
         String fid = reader.getFeatureID();
 
         int numAtts = reader.getAttributeCount();
@@ -114,8 +115,8 @@ public class TigerFeatureReader implements FeatureReader {
         for (int i = 0; i < numAtts; i++) {
             values[i] = reader.read(i);
         }
-
-        return type.create(values, fid);
+        
+        return SimpleFeatureBuilder.build(type, values, fid);
     }
 
     /**
