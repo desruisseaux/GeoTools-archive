@@ -128,7 +128,7 @@ public class IndexedRenderingTest_Disabled extends TestCase {
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         assertEquals(treeType, renderer.layerIndexInfo[0].treeType);
         map.setAreaOfInterest(map.getLayerBounds(),
-            ds.getSchema().getDefaultGeometry().getCoordinateSystem());
+            ds.getSchema().getDefaultGeometry().getCRS());
 
         if (env == null) {
             env = map.getLayerBounds();

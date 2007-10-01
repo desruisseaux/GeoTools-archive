@@ -54,12 +54,11 @@ import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
+
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
 import org.geotools.geometry.jts.Decimator;
@@ -95,6 +94,10 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.visitor.DuplicatingStyleVisitor;
 import org.geotools.util.NumberRange;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -273,7 +276,7 @@ public class ShapefileRenderer implements GTRenderer {
         }
 
         FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
-        FeatureType type;
+        SimpleFeatureType type;
 
         try {
             type = createFeatureType(query, style, datastore);
@@ -291,9 +294,9 @@ public class ShapefileRenderer implements GTRenderer {
             FeatureTypeStyle fts = featureStylers[i];
             String typeName = datastore.getSchema().getTypeName();
 
-            if ((typeName != null)
-                    && (datastore.getSchema().isDescendedFrom(null, fts.getFeatureTypeName()) || typeName
-                            .equalsIgnoreCase(fts.getFeatureTypeName()))) {
+            if ((typeName != null) &&
+                    ( FeatureTypes.isDecendedFrom(datastore.getSchema(), null, fts.getFeatureTypeName()) 
+                    || typeName .equalsIgnoreCase(fts.getFeatureTypeName()))) {
                 // get applicable rules at the current scale
                 Rule[] rules = fts.getRules();
                 List ruleList = new ArrayList();
@@ -371,7 +374,7 @@ public class ShapefileRenderer implements GTRenderer {
         }
 
         if (!diff.isEmpty()) {
-            Feature feature;
+            SimpleFeature feature;
 
             for( Iterator modifiedIter = modified.keySet().iterator(), 
             		addedIter=added.values().iterator(); 
@@ -383,10 +386,10 @@ public class ShapefileRenderer implements GTRenderer {
                 boolean doElse = true;
                 if( modifiedIter.hasNext() ){
                 	String fid=(String)modifiedIter.next();
-                	feature = (Feature) modified.get(fid);
+                	feature = (SimpleFeature) modified.get(fid);
                     fids.add(fid);
                 }else{
-                    feature = (Feature) addedIter.next();
+                    feature = (SimpleFeature) addedIter.next();
                 }
                 
                 if (!query.getFilter().evaluate(feature))
@@ -471,7 +474,7 @@ public class ShapefileRenderer implements GTRenderer {
     }
 
     private void processShapefile( Graphics2D graphics, ShapefileDataStore datastore,
-            Envelope bbox, Rectangle screenSize, MathTransform mt, IndexInfo info, FeatureType type, Query query,
+            Envelope bbox, Rectangle screenSize, MathTransform mt, IndexInfo info, SimpleFeatureType type, Query query,
             List ruleList, List elseRuleList, Set modifiedFIDs, NumberRange scaleRange, String layerId )
             throws IOException {
         IndexedDbaseFileReader dbfreader = null;
@@ -549,7 +552,7 @@ public class ShapefileRenderer implements GTRenderer {
                         continue;
                     }
 
-                    Feature feature = createFeature(type, record, dbfreader, nextFid);
+                    SimpleFeature feature = createFeature(type, record, dbfreader, nextFid);
                     if (!query.getFilter().evaluate(feature))
                         continue;
 
@@ -643,19 +646,20 @@ public class ShapefileRenderer implements GTRenderer {
         }
     }
 
-    private Class[] getAcceptableSymbolizers( GeometryAttributeType defaultGeometry ) {
-        if (Polygon.class.isAssignableFrom(defaultGeometry.getBinding())
-                || MultiPolygon.class.isAssignableFrom(defaultGeometry.getBinding())) {
+    private Class[] getAcceptableSymbolizers( GeometryDescriptor defaultGeometry ) {
+        Class binding = defaultGeometry.getType().getBinding();
+        if (Polygon.class.isAssignableFrom(binding)
+                || MultiPolygon.class.isAssignableFrom(binding)) {
             return new Class[]{PointSymbolizer.class, LineSymbolizer.class, PolygonSymbolizer.class};
         }
 
         return new Class[]{PointSymbolizer.class, LineSymbolizer.class};
     }
 
-    Feature createFeature( FeatureType type, Record record, DbaseFileReader dbfreader, String id )
+    SimpleFeature createFeature( SimpleFeatureType type, Record record, DbaseFileReader dbfreader, String id )
             throws Exception {
         if (type.getAttributeCount() == 1) {
-            return type.create(new Object[]{getGeom(record.shape(), type.getDefaultGeometry())}, id);
+            return SimpleFeatureBuilder.build(type,new Object[]{getGeom(record.shape(), type.getDefaultGeometry())}, id);
         } else {
             DbaseFileHeader header = dbfreader.getHeader();
 
@@ -665,14 +669,14 @@ public class ShapefileRenderer implements GTRenderer {
             for( int i = 0; i < (values.length - 1); i++ ) {
                 values[i] = all[attributeIndexing[i]];
 
-                if (header.getFieldName(attributeIndexing[i]).equals(type.getAttributeType(i))) {
+                if (header.getFieldName(attributeIndexing[i]).equals(type.getAttribute(i))) {
                     System.out.println("ok");
                 }
             }
 
             values[values.length - 1] = getGeom(record.shape(), type.getDefaultGeometry());
 
-            return type.create(values, id);
+            return SimpleFeatureBuilder.build(type,values, id);
         }
     }
 
@@ -683,18 +687,19 @@ public class ShapefileRenderer implements GTRenderer {
      * @param defaultGeometry
      * @return
      */
-    private Object getGeom( Object geom, GeometryAttributeType defaultGeometry ) {
+    private Object getGeom( Object geom, GeometryDescriptor defaultGeometry ) {
         if( geom instanceof Geometry){
             return geom;
         }
+        Class binding = defaultGeometry.getType().getBinding();
         if (defaultGeom == null) {
-            if (MultiPolygon.class.isAssignableFrom(defaultGeometry.getBinding())) {
+            if (MultiPolygon.class.isAssignableFrom(binding)) {
                 defaultGeom = MULTI_POLYGON_GEOM;
-            } else if (MultiLineString.class.isAssignableFrom(defaultGeometry.getBinding())) {
+            } else if (MultiLineString.class.isAssignableFrom(binding)) {
                 defaultGeom = MULTI_LINE_GEOM;
-            } else if (Point.class.isAssignableFrom(defaultGeometry.getBinding())) {
+            } else if (Point.class.isAssignableFrom(binding)) {
                 defaultGeom = POINT_GEOM;
-            } else if (MultiPoint.class.isAssignableFrom(defaultGeometry.getBinding())) {
+            } else if (MultiPoint.class.isAssignableFrom(binding)) {
                 defaultGeom = MULTI_POINT_GEOM;
             }
         }
@@ -712,20 +717,20 @@ public class ShapefileRenderer implements GTRenderer {
      * @throws FactoryConfigurationError
      * @throws SchemaException
      */
-    FeatureType createFeatureType( Query query, Style style, ShapefileDataStore ds)
+    SimpleFeatureType createFeatureType( Query query, Style style, ShapefileDataStore ds)
             throws SchemaException, IOException {
-        FeatureType schema = ds.getSchema();
+        SimpleFeatureType schema = ds.getSchema();
         String[] attributes = findStyleAttributes((query == null) ? Query.ALL : query, style,
                 schema);
-        AttributeType[] types = new AttributeType[attributes.length];
+        AttributeDescriptor[] types = new AttributeDescriptor[attributes.length];
         attributeIndexing = new int[attributes.length];
         
         if(attributes.length == 1 && attributes[0].equals(schema.getDefaultGeometry().getLocalName())) {
-            types[0] = schema.getAttributeType(attributes[0]);
+            types[0] = schema.getAttribute(attributes[0]);
         } else {
             dbfheader = getDBFHeader(ds);
             for( int i = 0; i < types.length; i++ ) {
-                types[i] = schema.getAttributeType(attributes[i]);
+                types[i] = schema.getAttribute(attributes[i]);
     
                 for( int j = 0; j < dbfheader.getNumFields(); j++ ) {
                     if (dbfheader.getFieldName(j).equals(attributes[i])) {
@@ -737,10 +742,12 @@ public class ShapefileRenderer implements GTRenderer {
             }
         }
 
-        FeatureType type = FeatureTypeBuilder.newFeatureType(types, schema.getTypeName(), schema
-                .getNamespace(), false, null, schema.getDefaultGeometry());
-
-        return type;
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName( schema.getName() );
+        tb.addAll( types );
+        tb.setDefaultGeometry( schema.getDefaultGeometry().getLocalName() );
+        
+        return tb.buildFeatureType();
     }
 
     /**
@@ -752,7 +759,7 @@ public class ShapefileRenderer implements GTRenderer {
      * @param schema the featuresource schema
      * @return the minimun set of attribute names needed to render <code>layer</code>
      */
-    private String[] findStyleAttributes( final Query query, Style style, FeatureType schema ) {
+    private String[] findStyleAttributes( final Query query, Style style, SimpleFeatureType schema ) {
         StyleAttributeExtractor sae = new StyleAttributeExtractor(){
             public void visit( Rule rule ) {
 
@@ -784,7 +791,7 @@ public class ShapefileRenderer implements GTRenderer {
      * @param scaleRange
      * @param layerId 
      */
-    private void processSymbolizers( Graphics2D graphics, Feature feature, Object geom,
+    private void processSymbolizers( Graphics2D graphics, SimpleFeature feature, Object geom,
             Symbolizer[] symbolizers, NumberRange scaleRange, boolean isJTS, String layerId ) {
         for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINER)) {
@@ -799,7 +806,7 @@ public class ShapefileRenderer implements GTRenderer {
                 try {
                     labelCache.put(layerId,(TextSymbolizer) symbolizers[m], 
                             feature, 
-                            new LiteShape2(feature.getDefaultGeometry(), null, null, false, false),
+                            new LiteShape2((Geometry)feature.getDefaultGeometry(), null, null, false, false),
                             scaleRange);
                 } catch (Exception e) {
                     fireErrorEvent(e);
@@ -837,7 +844,7 @@ public class ShapefileRenderer implements GTRenderer {
      * @throws TransformException
      * @throws FactoryException
      */
-    private void processSymbolizers( final Graphics2D graphics, final Feature feature,
+    private void processSymbolizers( final Graphics2D graphics, final SimpleFeature feature,
             final Symbolizer[] symbolizers, Range scaleRange, MathTransform transform, String layerId )
             throws TransformException, FactoryException {
         LiteShape2 shape;
@@ -847,7 +854,7 @@ public class ShapefileRenderer implements GTRenderer {
                 LOGGER.finer("applying symbolizer " + symbolizers[m]);
             }
 
-            Geometry g = feature.getDefaultGeometry();
+            Geometry g = (Geometry) feature.getDefaultGeometry();
             shape = new LiteShape2(g, transform, getDecimator(transform), false);
 
             if (symbolizers[m] instanceof TextSymbolizer) {
@@ -1006,7 +1013,7 @@ public class ShapefileRenderer implements GTRenderer {
         renderListeners.remove(listener);
     }
 
-    private void fireFeatureRenderedEvent( Feature feature ) {
+    private void fireFeatureRenderedEvent( SimpleFeature feature ) {
         Object[] objects = renderListeners.getListeners();
 
         for( int i = 0; i < objects.length; i++ ) {
@@ -1124,7 +1131,7 @@ public class ShapefileRenderer implements GTRenderer {
         /**
          * @see org.geotools.renderer.lite.RenderListener#featureRenderer(org.geotools.feature.Feature)
          */
-        public void featureRenderer( Feature feature ) {
+        public void featureRenderer( SimpleFeature feature ) {
             // do nothing.
         }
 
@@ -1276,11 +1283,11 @@ public class ShapefileRenderer implements GTRenderer {
             ReferencedEnvelope bbox = envelope;
 
             try {
-                GeometryAttributeType geom = currLayer.getFeatureSource().getSchema().getDefaultGeometry();
+                GeometryDescriptor geom = currLayer.getFeatureSource().getSchema().getDefaultGeometry();
                 
                 CoordinateReferenceSystem dataCRS;
                 if( getForceCRSHint()==null )
-                	dataCRS = geom.getCoordinateSystem();
+                	dataCRS = geom.getCRS();
                 else
                 	dataCRS=getForceCRSHint();
                 

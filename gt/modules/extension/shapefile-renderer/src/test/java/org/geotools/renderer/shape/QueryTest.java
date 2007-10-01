@@ -20,7 +20,6 @@ import junit.framework.TestCase;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.feature.Feature;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
@@ -28,6 +27,7 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -57,7 +57,7 @@ public class QueryTest extends TestCase {
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         renderer.addRenderListener(new RenderListener() {
-                public void featureRenderer(Feature feature) {
+                public void featureRenderer(SimpleFeature feature) {
                     assertEquals("theme1.2", feature.getID());
                 }
 
@@ -85,7 +85,7 @@ public class QueryTest extends TestCase {
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         renderer.addRenderListener(new RenderListener() {
-                public void featureRenderer(Feature feature) {
+                public void featureRenderer(SimpleFeature feature) {
                     assertEquals("theme1.1", feature.getID());
                 }
 

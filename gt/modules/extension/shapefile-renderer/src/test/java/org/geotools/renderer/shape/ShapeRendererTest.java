@@ -37,10 +37,10 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.map.DefaultMapContext;
@@ -48,6 +48,8 @@ import org.geotools.map.MapContext;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -164,15 +166,15 @@ public class ShapeRendererTest extends TestCase {
         IndexedDbaseFileReader reader = ShapefileRendererUtil
                         .getDBFReader(ds);
         renderer.dbfheader = reader.getHeader();
-        FeatureType type = renderer.createFeatureType(null, style, ds);
-        assertEquals("NAME", type.getAttributeType(0).getLocalName());
+        SimpleFeatureType type = renderer.createFeatureType(null, style, ds);
+        assertEquals("NAME", type.getAttribute(0).getLocalName());
         assertEquals(2, type.getAttributeCount());
         Envelope bounds = ds.getFeatureSource().getBounds();
         ShapefileReader shpReader = ShapefileRendererUtil
                         .getShpReader(ds, bounds, 
                                 new Rectangle(0,0,(int)bounds.getWidth(), (int)bounds.getHeight()),
                                 IDENTITY, false, false);
-        Feature feature = renderer.createFeature(type, shpReader.nextRecord(), reader, "id");
+        SimpleFeature feature = renderer.createFeature(type, shpReader.nextRecord(), reader, "id");
         shpReader.close();
         reader.close();
         
@@ -209,22 +211,20 @@ public class ShapeRendererTest extends TestCase {
 
         collection = store.getFeatures();
         iter = collection.features();
-        final Feature feature = iter.next();
+        final SimpleFeature feature = iter.next();
         collection.close(iter);
 
         // now add a new feature new fid should be theme2.4 remove it and assure
         // that it is not rendered
-        store.addFeatures(DataUtilities.collection(new Feature[] { store
-                .getSchema().create(
-                        feature.getAttributes(new Object[feature
-                                .getNumberOfAttributes()]), "newFeature") })); //$NON-NLS-1$
+        SimpleFeatureType type = store.getSchema();
+        store.addFeatures(DataUtilities.collection(new SimpleFeature[] { SimpleFeatureBuilder.build( type, new Object[feature.getAttributeCount()], "newFeature") } )); //$NON-NLS-1$
         t.commit();
         listener.count = 0;
         TestUtilites.showRender("testTransaction", renderer, 2000, env);
         assertEquals(3, listener.count);
 
         iter = store.getFeatures().features();
-        Feature last = null;
+        SimpleFeature last = null;
         while (iter.hasNext()) {
             last = iter.next();
         }
@@ -247,13 +247,11 @@ public class ShapeRendererTest extends TestCase {
         store.setTransaction(t);
         FeatureCollection collection = store.getFeatures();
         FeatureIterator iter = collection.features();
-        final Feature feature = iter.next();
+        final SimpleFeature feature = iter.next();
         collection.close(iter);
 
-        store.addFeatures(DataUtilities.collection(new Feature[] { ds
-                .getSchema().create(
-                        feature.getAttributes(new Object[feature
-                                .getNumberOfAttributes()]), "newFeature") }));
+        SimpleFeatureType type = ds.getSchema();
+        store.addFeatures(DataUtilities.collection(SimpleFeatureBuilder.build(type, new Object[feature.getAttributeCount()], "newFeature")));
 
         MapContext context = new DefaultMapContext();
         context.addLayer(store, st);
@@ -276,7 +274,7 @@ public class ShapeRendererTest extends TestCase {
         FeatureStore store = (FeatureStore) ds.getFeatureSource();
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
-        store.modifyFeatures(ds.getSchema().getAttributeType("NAME"), "bleep",
+        store.modifyFeatures(ds.getSchema().getAttribute("NAME"), "bleep",
                 Filter.NONE);
 
         MapContext context = new DefaultMapContext();
@@ -286,7 +284,7 @@ public class ShapeRendererTest extends TestCase {
         renderer.addRenderListener(listener);
         renderer.addRenderListener(new RenderListener() {
 
-            public void featureRenderer(Feature feature) {
+            public void featureRenderer(SimpleFeature feature) {
                 assertEquals("bleep", feature.getAttribute("NAME"));
             }
 

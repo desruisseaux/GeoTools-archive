@@ -26,13 +26,13 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
+
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -54,20 +54,20 @@ public class createTestData {
 
         IndexedShapefileDataStoreFactory factory = new IndexedShapefileDataStoreFactory();
         DataStore datastore = factory.createDataStore(file.toURL());
-        FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
-                "test_lines");
-        builder.setDefaultGeometry((GeometryAttributeType) AttributeTypeFactory
-            .newAttributeType("geom", LineString.class));
-        builder.addType(AttributeTypeFactory.newAttributeType("x", Integer.class));
-        builder.addType(AttributeTypeFactory.newAttributeType("y", Integer.class));
-
-        final FeatureType featureType = builder.getFeatureType();
+        
+        SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+        builder.setName( "test_lines" );
+        builder.add("x", Integer.class);
+        builder.add("y", Integer.class);
+        builder.add("geom", LineString.class);
+        
+        final SimpleFeatureType featureType = builder.buildFeatureType();
         datastore.createSchema(featureType);
 
         FeatureStore store = (FeatureStore) datastore.getFeatureSource(
                 "test_lines");
         FeatureCollection collection = DataUtilities.collection(new FeatureReader() {
-            public FeatureType getFeatureType() {
+            public SimpleFeatureType getFeatureType() {
                 return featureType;
             }
 
@@ -75,16 +75,17 @@ public class createTestData {
             int x = 0;
             int y = 0;
 
-            public Feature next()
+            public SimpleFeature next()
                 throws IOException, IllegalAttributeException, 
                     NoSuchElementException {
                 LineString geom = factory.createLineString(new Coordinate[] {
                             new Coordinate(x + 0.0, y + 0.0),
                             new Coordinate(x + .9, y + 0.9)
                         });
-                Feature feature = featureType.create(new Object[] {
+                SimpleFeature feature = 
+                    SimpleFeatureBuilder.build( featureType,new Object[] {
                             geom, new Integer(x), new Integer(y)
-                        });
+                        }, null);
 
                 if (x == (d.width - 1)) {
                     y++;

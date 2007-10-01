@@ -3,10 +3,10 @@ package org.geotools.renderer.shape;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class BoundsExtractorTest extends TestCase {
-	private FeatureType schema;
+	private SimpleFeatureType schema;
 	protected void setUp() throws Exception {
 		schema=DataUtilities.createType("type","the_geom:Geometry,name:String");
 	}

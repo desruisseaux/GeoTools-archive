@@ -129,7 +129,7 @@ public class Rendering2DTest extends TestCase {
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
-               .getCoordinateSystem());
+               .getCRS());
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
@@ -148,7 +148,7 @@ public class Rendering2DTest extends TestCase {
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
-               .getCoordinateSystem());
+               .getCRS());
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
@@ -167,7 +167,7 @@ public class Rendering2DTest extends TestCase {
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
-               .getCoordinateSystem());
+               .getCRS());
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - 200000, env.getMaxX() + 200000,
@@ -185,7 +185,7 @@ public class Rendering2DTest extends TestCase {
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(),
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
-               .getCoordinateSystem());
+               .getCRS());
 
         ReferencedEnvelope env = map.getLayerBounds();
         env = new ReferencedEnvelope(env.getMinX() - env.getWidth(),

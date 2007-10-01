@@ -34,7 +34,6 @@ import junit.framework.TestCase;
 import org.geotools.TestData;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
-import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
@@ -51,6 +50,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -286,7 +286,7 @@ public class TestUtilites {
         /* (non-Javadoc)
          * @see org.geotools.renderer.lite.RenderListener#featureRenderer(org.geotools.feature.Feature)
          */
-        public void featureRenderer(Feature feature) {
+        public void featureRenderer(SimpleFeature feature) {
             count++;
         }
 
