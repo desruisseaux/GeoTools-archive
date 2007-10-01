@@ -241,7 +241,7 @@ public class DataTestCase extends TestCase {
             },
             "lake.lk1"
         );
-        lakeBounds = new Envelope();
+        lakeBounds = new ReferencedEnvelope();
         lakeBounds.expandToInclude(ReferencedEnvelope.reference(lakeFeatures[0].getBounds()));                 
     }
 
