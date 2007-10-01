@@ -271,7 +271,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         FeatureReader reader = data.getFeatureReader(new DefaultQuery("river", Filter.INCLUDE),
                 Transaction.AUTO_COMMIT);
 
-        Envelope bounds = new Envelope();
+        ReferencedEnvelope bounds = new ReferencedEnvelope();
 
         try {
             SimpleFeature f;
