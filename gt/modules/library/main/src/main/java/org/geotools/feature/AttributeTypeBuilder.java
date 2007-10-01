@@ -115,11 +115,11 @@ public class AttributeTypeBuilder {
 	 * default value
 	 */
 	protected Object defaultValue;
+	protected boolean isDefaultValueSet = false;
 	
 	//GeometryType
 	//
 	protected CoordinateReferenceSystem crs;
-	
 	protected boolean isCrsSet = false;
 	
 	//AttributeDescriptor
@@ -202,6 +202,7 @@ public class AttributeTypeBuilder {
 		crs = null;
 		length = null;
 		isCrsSet = false;
+		isDefaultValueSet = false;
 	}
 	
 	protected void resetDescriptorState() {
@@ -254,6 +255,17 @@ public class AttributeTypeBuilder {
 	
 	public void setBinding(Class binding) {
 		this.binding = binding;
+		
+		//JD: tidbit here
+		if ( !isDefaultValueSet ) {
+		    //genereate a good default value based on class
+		    try {
+		        defaultValue = DataUtilities.defaultValue(binding);
+		    }
+		    catch( Exception e ) {
+		        //do nothing
+		    }
+		}
 	}
 
 	public void setName(String name) {
@@ -310,53 +322,52 @@ public class AttributeTypeBuilder {
 	
 	public void setDefaultValue(Object defaultValue) {
 		this.defaultValue = defaultValue;
+		isDefaultValueSet = true;
 	}
 	
 	public AttributeTypeBuilder binding(Class binding) {
-		this.binding = binding;
+		setBinding(binding);
 		return this;
 	}
 
 	public AttributeTypeBuilder name(String name) {
-		this.name = name;
+		setName(name);
 		return this;
 	}
 
 	public AttributeTypeBuilder namespaceURI(String namespaceURI) {
-		this.namespaceURI = namespaceURI;
+		setNamespaceURI(namespaceURI);
 		return this;
 		
 	}
 	
 	public AttributeTypeBuilder crs(CoordinateReferenceSystem crs) {
-		this.crs = crs;
-		isCrsSet = true;
-		return this;
+		setCRS(crs);
+	    return this;
 	}
 
 	public AttributeTypeBuilder description(String description) {
-		this.description = description;
+		setDescription(description);
 		return this;
 	}
 
 	public AttributeTypeBuilder abstrct(boolean isAbstract) {
-		this.isAbstract = isAbstract;
-
+		setAbstract(isAbstract);
 		return this;
 	}
 
 	public AttributeTypeBuilder identifiable(boolean isIdentifiable) {
-		this.isIdentifiable = isIdentifiable;
+		setIdentifiable(isIdentifiable);
 		return this;
 	}
 
 	public AttributeTypeBuilder length( int length ) {
-	    this.length = length;
+	    setLength(length);
 	    return this;
 	}
 	
 	public AttributeTypeBuilder restriction(Filter restriction) {
-		restrictions().add(restriction);
+		addRestriction(restriction);
 		return this;
 	}
 	
@@ -364,22 +375,22 @@ public class AttributeTypeBuilder {
 	//
 	
 	public AttributeTypeBuilder nillable(boolean isNillable) {
-		this.isNillable = isNillable;
+		setNillable(isNillable);
 		return this;
 	}
 
 	public AttributeTypeBuilder maxOccurs(int maxOccurs) {
-		this.maxOccurs = maxOccurs;
+		setMaxOccurs(maxOccurs);
 		return this;
 	}
 
 	public AttributeTypeBuilder minOccurs(int minOccurs) {
-		this.minOccurs = minOccurs;
+		setMinOccurs(minOccurs);
 		return this;
 	}
 	
 	public AttributeTypeBuilder defaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue;
+		setDefaultValue(defaultValue);
 		return this;
 	}
 	
@@ -517,7 +528,7 @@ public class AttributeTypeBuilder {
     }
 	
 	private Object defaultValue(){
-	    if( defaultValue == null && !isNillable){
+	    if( defaultValue == null && !isNillable && binding != null){
 	        defaultValue = DataUtilities.defaultValue( binding );
 	    }
 	    return defaultValue;
