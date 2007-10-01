@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -195,6 +196,14 @@ public class SchemaFactory {
         return getInstance(targetNamespace, is1, Level.WARNING);
     }
 
+    public synchronized static Schema getInstance(String targetNamespace) {
+        try {
+            URI uri = new URI(targetNamespace );
+            return getInstance( uri );
+        } catch (URISyntaxException e) {
+            return null;
+        }        
+    }
     /**
      * Returns an instance of the targetNamespace if it can be found ... null
      * otherwise. targetNamespaces which can be found are either hard-coded

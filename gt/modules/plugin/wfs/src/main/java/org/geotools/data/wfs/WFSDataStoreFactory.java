@@ -114,6 +114,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
     
     protected Map cache = new HashMap();
     protected static final Logger logger = logger();
+    
     private static Logger logger(){
     	Logger r = Logger.getLogger("org.geotools.data.wfs");
     	return r;

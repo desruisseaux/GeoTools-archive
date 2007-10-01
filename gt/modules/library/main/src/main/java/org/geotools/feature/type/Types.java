@@ -1,9 +1,12 @@
 package org.geotools.feature.type;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.NameImpl;
+import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -487,6 +490,7 @@ public class Types {
         validate(type, attribute, attributeContent, false);
     }
 
+    
     protected static void validate(AttributeType type, Attribute attribute,
             Object attributeContent, boolean isSuper) throws IllegalAttributeException {
 
@@ -766,4 +770,82 @@ public class Types {
 //
 //    }
 
+    /**
+     * Ensure that attributeContent is a good value for descriptor.
+     */
+    public static void validate(AttributeDescriptor descriptor,
+            Object value) throws IllegalAttributeException {
+
+        if (descriptor == null) {
+            throw new NullPointerException("Attribute descriptor required for validation");
+        }
+        
+        if (value == null) {
+            if (!descriptor.isNillable()) {
+                throw new IllegalArgumentException(descriptor.getName() + " requires a non null value");
+            }           
+        }
+        validate( descriptor.getType(), value, false );
+    }
+    
+    /**
+     * Do our best to make the provided value line up with the needs of descriptor.
+     * <p>
+     * This helper method uses the Coverters api to convert the provided
+     * value into the required class. If the value is null (and the attribute
+     * is not nillable) a default value will be returned.
+     * @param descriptor Attribute descriptor we need to supply a value for.
+     * @param value The provided value
+     * @return Our best attempt to make a valid value
+     * @throws IllegalArgumentException if we really could not do it.
+     */
+    public Object parse(AttributeDescriptor descriptor, Object value) throws IllegalArgumentException {
+        if (value == null){
+            if( descriptor.isNillable()){
+                return descriptor.getDefaultValue();
+            }
+        }
+        else {
+            Class target = descriptor.getType().getBinding(); 
+            if ( !target.isAssignableFrom( value.getClass() ) ) {
+                // attempt to convert
+                Object converted = Converters.convert(value,target);
+                if ( converted != null ) {
+                    return converted;
+                }
+            }
+        }        
+        return value;
+    }
+    
+    protected static void validate(final AttributeType type, final Object value, boolean isSuper) throws IllegalAttributeException {
+        if (!isSuper) {
+            // JD: This is an issue with how the xml simpel type hierarchy
+            // maps to our current Java Type hiearchy, the two are inconsitent.
+            // For instance, xs:integer, and xs:int, the later extend the
+            // former, but their associated java bindings, (BigDecimal, and
+            // Integer)
+            // dont.
+            Class clazz = value.getClass();
+            Class binding = type.getBinding();
+            if (binding != null && !binding.isAssignableFrom(clazz)) {
+                throw new IllegalAttributeException(clazz.getName()
+                        + " is not an acceptable class for " + type.getName()
+                        + " as it is not assignable from " + binding);
+            }
+        }
+
+        if (type.getRestrictions() != null && type.getRestrictions().size() > 0) {
+            for (Filter filter : type.getRestrictions()) {
+                if (!filter.evaluate(value)) {
+                    throw new IllegalAttributeException( type.getName() + " restriction "+ filter + " not met by: " + value);
+                }
+            }
+        }
+
+        // move up the chain,
+        if (type.getSuper() != null) {
+            validate(type.getSuper(), value, true );
+        }
+    }
 }

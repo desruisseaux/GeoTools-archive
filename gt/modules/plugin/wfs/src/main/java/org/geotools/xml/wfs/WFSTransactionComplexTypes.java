@@ -37,7 +37,6 @@ import org.geotools.data.wfs.WFSTransactionState;
 import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
-import org.geotools.feature.Feature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -65,6 +64,7 @@ import org.geotools.xml.wfs.WFSSchema.WFSAttribute;
 import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
 import org.geotools.xml.wfs.WFSSchema.WFSElement;
 import org.geotools.xml.xsi.XSISimpleTypes;
+import org.opengis.feature.simple.SimpleFeature;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -913,9 +913,8 @@ public class WFSTransactionComplexTypes {
 
             // find element definition
             // should exist when original from a WFS ...
-            Feature f = a.getFeature();
-            Schema schema = SchemaFactory.getInstance(f.getFeatureType()
-                                                       .getNamespace());
+            SimpleFeature f = a.getFeature();
+            Schema schema = SchemaFactory.getInstance(f.getFeatureType().getName().getNamespaceURI() );
             Element[] els = schema.getElements();
             Element e = null;
 
@@ -1448,7 +1447,7 @@ public class WFSTransactionComplexTypes {
             	// can only be a primative, geometry or feature for version 2.0
             	// in the future use output.findElement(t[1]) ... posibly with a newer search order
             	output.startElement(elems[1].getNamespace(),elems[1].getName(),null);
-            	if(t[1] instanceof Feature){
+            	if(t[1] instanceof SimpleFeature){
             		// Feature
             		GMLSchema.getInstance().getElements()[0].getType().encode(GMLSchema.getInstance().getElements()[0],t[1],output,hints);
             	}else{

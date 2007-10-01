@@ -45,6 +45,7 @@ import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.filter.FidFilter;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
@@ -52,10 +53,9 @@ import org.geotools.xml.wfs.WFSSchema;
 import org.xml.sax.SAXException;
 
 /**
- * DOCUMENT ME!
+ * Hold the list of actions to perform in the Transaction.
  * 
- * @author dzwiers TODO To change the template for this generated type comment go to Window -
- *         Preferences - Java - Code Style - Code Templates
+ * @author dzwiers
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.2.x/plugin/wfs/src/org/geotools/data/wfs/WFSTransactionState.java $
  */
@@ -65,17 +65,17 @@ public class WFSTransactionState implements State {
      * A map of <String, String[]>. String is the typename and String[] are the fids returned by
      * Transaction Results during the last commit. They are the fids of the inserted elements.
      */
-    private Map          fids      = new HashMap();
+    private Map<String,String[]>      fids      = new HashMap<String,String[]>();
     /**
      * A Map of <String, List<Action>> where string is the typeName of the feature type and the
      * list is the list of actions that have modified the feature type
      */
-    Map          actionMap = new HashMap();
+    Map<String,List<Action>>          actionMap = new HashMap<String,List<Action>>();
     
     private long latestFid=Long.MAX_VALUE;
 
+    /** Private - should not be used */
     private WFSTransactionState() {
-        // should not be used
     }
 
     /**
@@ -237,7 +237,9 @@ public class WFSTransactionState implements State {
         ns.add(WFSSchema.NAMESPACE.toString());
         i = fts.iterator();
         while( i.hasNext() ) {
-            ns.add(ds.getSchema((String) i.next()).getNamespace().toString());
+            String target = (String) i.next();            
+            SimpleFeatureType schema = ds.getSchema( target );            
+            ns.add( schema.getName().getNamespaceURI() );
         }
         hints.put(DocumentWriter.SCHEMA_ORDER, ns.toArray(new String[ns.size()])); // Transaction
 
