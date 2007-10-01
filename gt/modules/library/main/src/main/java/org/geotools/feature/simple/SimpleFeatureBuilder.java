@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureFactoryImpl;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.util.Converters;
@@ -197,9 +198,26 @@ public class SimpleFeatureBuilder {
     	        }
     	    }
     	}
+    	else {
+    	    //if the content is null and the descriptor says isNillable is false, 
+            // then set the default value
+            if (!descriptor.isNillable()) {
+                value = descriptor.getDefaultValue();
+                if ( value == null ) {
+                    //no default value, try to generate one
+                    value = DataUtilities.defaultValue(descriptor.getType().getBinding());
+                }
+            }
+    	}
+    	
+    	//check if the attribute type is identifiable
+    	String id = null;
+    	if ( descriptor.getType().isIdentified() ) {
+    	    id = createDefaultFeatureId();
+    	}
     	if ( descriptor instanceof GeometryDescriptor ) {
     		//TODO: set crs on teh builder
-    		attribute = factory.createGeometryAttribute(value, (GeometryDescriptor) descriptor, null, featureType.getCRS() );
+    		attribute = factory.createGeometryAttribute(value, (GeometryDescriptor) descriptor, id, featureType.getCRS() );
     		
     		//is this the default geometry?
     		if ( descriptor.equals( featureType.getDefaultGeometry() ) ) {
@@ -207,7 +225,7 @@ public class SimpleFeatureBuilder {
     		}
     	}
     	else {
-    		attribute = factory.createAttribute( value, descriptor, null ) ;
+    		attribute = factory.createAttribute( value, descriptor, id ) ;
     	}
     	
     	//add it
