@@ -421,7 +421,7 @@ public class FeatureTypes {
                 }
             }
             else {
-                if ( Utilities.equals(superType.getName().getNamespaceURI(),namespace) && 
+                if ( Utilities.equals(superType.getName().getNamespaceURI(),namespace.toString()) && 
                         Utilities.equals(superType.getName().getLocalPart(), typeName)) {
                     return true;
                 }    

@@ -1678,7 +1678,7 @@ public class DataUtilities {
 	            return new AttributeDescriptorImpl( at, new Name(name), 0,1, nillable, null );
             }
         } catch (ClassNotFoundException e) {
-            throw new SchemaException("Could not type " + name + " as:" + type);
+            throw new SchemaException("Could not type " + name + " as:" + type, e);
         }
     }
 
