@@ -17,6 +17,7 @@ package org.geotools.xml.gml;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -6750,10 +6751,10 @@ public class GMLComplexTypes {
             Class[] choices=collectionChoices(l);
             Name typeName = new Name(name);
             if( Geometry.class.isAssignableFrom(type)) {
-            	return new ChoiceGeometryTypeImpl(typeName,choices,type,nillable,1,1,null, null, Filter.INCLUDE);
+            	return new ChoiceGeometryTypeImpl(typeName,choices,type,nillable,1,1,null, null, Collections.EMPTY_LIST);
             }
             else {
-                return new ChoiceAttributeTypeImpl(typeName,choices,type,nillable,1,1,null, Filter.INCLUDE);
+                return new ChoiceAttributeTypeImpl(typeName,choices,type,nillable,1,1,null, Collections.EMPTY_LIST);
             }
     }
     
