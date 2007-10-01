@@ -25,9 +25,8 @@ import java.util.Map;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
-import org.geotools.feature.FeatureType;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * 
@@ -108,7 +107,7 @@ public class GMLDataStore extends AbstractDataStore {
 	 * 
 	 * @see org.geotools.data.DataStore#getSchema(java.lang.String)
 	 */
-	public FeatureType getSchema(String typeName) throws IOException {
+	public SimpleFeatureType getSchema(String typeName) throws IOException {
 		return getFileDataStore(typeName).getSchema();
 	}
 	
@@ -142,7 +141,7 @@ public class GMLDataStore extends AbstractDataStore {
 		return getFileDataStore(typeName).getFeatureReader(typeName);
 	}
 	
-	public Envelope getBounds(Query query) throws IOException {
+	public ReferencedEnvelope getBounds(Query query) throws IOException {
 		if( query.getTypeName()==null )
 			throw new NullPointerException("TypeName in query may not be null");
 		

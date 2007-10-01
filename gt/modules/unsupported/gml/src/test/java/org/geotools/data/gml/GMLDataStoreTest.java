@@ -16,22 +16,14 @@
  */
 package org.geotools.data.gml;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-
-import com.vividsolutions.jts.geom.MultiLineString;
-import junit.framework.TestCase;
-import org.geotools.TestData;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.referencing.CRS;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
+import com.vividsolutions.jts.geom.MultiLineString;
 
 
 /**
@@ -68,14 +60,14 @@ public class GMLDataStoreTest extends AbstractGMLTestCase {
      * @throws Exception DOCUMENT ME!
      */
     public void testGetSchema() throws Exception {
-        FeatureType schema = ds.getSchema(name);
+        SimpleFeatureType schema = ds.getSchema(name);
         assertNotNull(schema);
         assertEquals(3, schema.getAttributeCount());
         assertEquals(MultiLineString.class,
-            schema.getAttributeType("the_geom").getBinding());
-        assertEquals(String.class, schema.getAttributeType("FID").getBinding());
-        assertEquals(String.class, schema.getAttributeType("NAME").getBinding());
-        assertEquals(CRS.decode("EPSG:4326"), schema.getDefaultGeometry().getCoordinateSystem());
+            schema.getAttribute("the_geom").getType().getBinding());
+        assertEquals(String.class, schema.getAttribute("FID").getType().getBinding());
+        assertEquals(String.class, schema.getAttribute("NAME").getType().getBinding());
+        assertEquals(CRS.decode("EPSG:4326"), schema.getDefaultGeometry().getCRS());
     }
 
     /**
@@ -92,7 +84,7 @@ public class GMLDataStoreTest extends AbstractGMLTestCase {
         try {
             assertTrue(reader.hasNext());
 
-            Feature feature1 = reader.next();
+            SimpleFeature feature1 = reader.next();
             assertEquals("Streams.1", feature1.getID());
             assertEquals("Cam Stream", feature1.getAttribute("NAME"));
             assertEquals("111", feature1.getAttribute("FID"));

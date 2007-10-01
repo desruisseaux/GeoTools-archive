@@ -22,15 +22,16 @@ import java.net.URI;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
+
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.Filter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.gml.FCBuffer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
@@ -59,7 +60,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 	private int bufferSize;
 	/** length of time before the datastore gives up. */
 	private int timeout;
-	private FeatureType schema;
+	private SimpleFeatureType schema;
 
 	/**
 	 * New instance
@@ -111,7 +112,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 	 * 
 	 * @see org.geotools.data.DataStore#getSchema(java.lang.String)
 	 */
-	public FeatureType getSchema(String typeName) throws IOException {
+	public SimpleFeatureType getSchema(String typeName) throws IOException {
 		if( !getTypeNames()[0].equals(typeName) )
 			throw new IOException("Feature type "+typeName+" does not exist.  This datastore only has "+getTypeNames()[0]);
 		
@@ -145,7 +146,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 		}
 	}
 
-	public FeatureType getSchema() throws IOException {
+	public SimpleFeatureType getSchema() throws IOException {
 		if( fcbuffer==null ){
 			synchronized (this) {
 				if( fcbuffer==null ){
@@ -153,7 +154,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 						fcbuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,bufferSize,timeout);
 						try{
 						if( fcbuffer.hasNext() ){
-							Feature f=fcbuffer.next();
+							SimpleFeature f=fcbuffer.next();
 							try {
 								schema=createFinalSchema(f);
 							} catch (SchemaException e) {
@@ -174,19 +175,20 @@ public class FileGMLDataStore extends AbstractDataStore {
 		return schema;
 	}
 	
-	private FeatureType createFinalSchema(Feature f) throws SchemaException {
-		FeatureTypeBuilder builder=FeatureTypeBuilder.newInstance(f.getFeatureType().getTypeName());
-		for (int i = 0; i < f.getNumberOfAttributes(); i++) {
-			AttributeType att = f.getFeatureType().getAttributeType(i);
-			if( !Geometry.class.isAssignableFrom(att.getBinding()) ){
-				builder.addType(att);
+	private SimpleFeatureType createFinalSchema(SimpleFeature f) throws SchemaException {
+	    
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.setName(f.getFeatureType().getTypeName());
+		
+		for (int i = 0; i < f.getAttributeCount(); i++) {
+		    AttributeDescriptor att = f.getFeatureType().getAttribute(i);
+			if( !Geometry.class.isAssignableFrom(att.getType().getBinding()) ){
+				builder.add(att);
 			}else{
 				Geometry geom = (Geometry) f.getAttribute(i);
 				Object data = geom.getUserData();
 				if( data instanceof CoordinateReferenceSystem ){
-					builder.addType(AttributeTypeFactory.newAttributeType(att.getLocalName(), 
-							att.getBinding(), att.isNillable(), att.getRestriction(), 
-							att.createDefaultValue(), data));
+				    builder.descriptor(att).crs((CoordinateReferenceSystem)data).add( att.getLocalName(), att.getType().getBinding());
 				}else if( data instanceof String){
 					String string=(String) data;
 					String[] parts=string.split("#");
@@ -204,16 +206,14 @@ public class FileGMLDataStore extends AbstractDataStore {
 					}else{
 						crs=null;
 					}
-					builder.addType(AttributeTypeFactory.newAttributeType(att.getLocalName(), 
-							att.getBinding(), att.isNillable(), att.getRestriction(), 
-							att.createDefaultValue(), crs));
+					builder.descriptor(att).crs((CoordinateReferenceSystem)data).add( att.getLocalName(), att.getType().getBinding());
 				}
 			}
 		}
-		return builder.getFeatureType();
+		return builder.buildFeatureType();
 	}
 
-	protected Envelope getBounds(Query query) throws IOException {
+	protected ReferencedEnvelope getBounds(Query query) throws IOException {
 		if( query==Query.ALL || query.getFilter().equals(Filter.INCLUDE) ){
 			//TODO parse out bounds
 			return null;
