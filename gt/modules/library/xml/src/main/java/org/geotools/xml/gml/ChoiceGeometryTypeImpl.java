@@ -1,10 +1,5 @@
 package org.geotools.xml.gml;
 
-import org.geotools.feature.DefaultAttributeType;
-import org.geotools.feature.type.AttributeDescriptorImpl;
-import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.feature.type.GeometryDescriptorImpl;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;

@@ -18,9 +18,7 @@ package org.geotools.feature;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.GeoTools;
 import org.opengis.filter.Filter;
 
 
@@ -43,7 +41,7 @@ public abstract class AttributeTypeFactory implements Factory {
     public static AttributeTypeFactory defaultInstance() {
         // depend on CommonFactoryFinder to keep singleton cached
         //
-        return CommonFactoryFinder.getAttributeTypeFactory( GeoTools.getDefaultHints() );
+        return new DefaultAttributeTypeFactory();
     }
 
     /**

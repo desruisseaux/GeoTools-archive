@@ -105,16 +105,16 @@ public class FeatureFlatTest extends TestCase {
         tb.nillable(false).add( "jimmy", String.class );
         
         SimpleFeatureType test = tb.buildFeatureType();
-        try {
-            SimpleFeatureBuilder.build(test, (Object[])null, null);
-            fail("no error");
-        } catch (IllegalAttributeException iae) {
-        }
+//        try {
+//            SimpleFeatureBuilder.build(test, (Object[])null, null);
+//            fail("no error");
+//        } catch (IllegalAttributeException iae) {
+//        }
 
         try {
             SimpleFeatureBuilder.build(test, new Object[32],null);
             fail("no error");
-        } catch (IllegalAttributeException iae) {
+        } catch (IllegalArgumentException iae) {
         }
 
     }

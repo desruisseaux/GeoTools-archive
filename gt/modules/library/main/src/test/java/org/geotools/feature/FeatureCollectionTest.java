@@ -108,7 +108,7 @@ public class FeatureCollectionTest extends TestCase {
     SimpleFeatureBuilder b = new SimpleFeatureBuilder(t);
     
     for (int i = 0; i < g.length; i++) {
-        b.add( new Geometry[] {g[i]});
+        b.add( g[i]);
         fc.add( b.buildFeature(null) );
     } 
     assertEquals(gc.getEnvelopeInternal(),fc.getBounds());

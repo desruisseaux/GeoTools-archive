@@ -29,6 +29,8 @@ import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * A schema builder, because FeatureTypes are meant to be immutable, this
@@ -65,6 +67,19 @@ import org.geotools.factory.Hints;
  * @version $Id$
  */
 public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory {
+	
+	/** abstract base type for all feature types */
+    public final static FeatureType ABSTRACT_FEATURE_TYPE;
+    static {
+        FeatureType featureType = null;
+        try {
+            featureType = new DefaultFeatureType("Feature",new URI("http://www.opengis.net/gml"), null, null, null);
+        }
+        catch(Exception e ) {
+            //shold not happen
+        }
+        ABSTRACT_FEATURE_TYPE = featureType;
+    }
     
     /** If the base types have been initialized */
     private static boolean initialized;
@@ -150,7 +165,7 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
             hints.put( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
         }
         hints.put( Hints.FEATURE_TYPE_FACTORY_NAME, typeName );
-        return CommonFactoryFinder.getFeatureTypeFactory( hints );
+        return new DefaultFeatureTypeFactory();
     }
     
     /**

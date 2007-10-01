@@ -179,6 +179,9 @@ public class SimpleFeatureBuilder {
      */
     public void add(Object value) {
     	//get the descriptor from the type
+    	if(attributes().size() >= featureType.getAttributeCount())
+    		throw new IllegalArgumentException("Too many attribute values, this feature " +
+    				"type has only " + featureType.getAttributeCount() + " attributes");
     	AttributeDescriptor descriptor = featureType.getAttribute(attributes().size());
     	Attribute attribute = null;
     	
@@ -246,7 +249,7 @@ public class SimpleFeatureBuilder {
      * </code>
      * </p>
      */
-    public void add(Object[] values ) {
+    public void addAll(Object[] values ) {
     	if ( values == null ) {
     		return;
     	}
@@ -355,7 +358,7 @@ public class SimpleFeatureBuilder {
     /**
      * Internal method for creating feature id's when none is specified.
      */
-    protected String createDefaultFeatureId() {
+    public static String createDefaultFeatureId() {
           // According to GML and XML schema standards, FID is a XML ID
         // (http://www.w3.org/TR/xmlschema-2/#ID), whose acceptable values are those that match an
         // NCNAME production (http://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-NCName):
@@ -398,7 +401,7 @@ public class SimpleFeatureBuilder {
 	 */
 	public static SimpleFeature build( SimpleFeatureType type, Object[] values, String id ) {
 	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
-	    builder.add(values);
+	    builder.addAll(values);
 	    return builder.buildFeature(id);
 	}
 	

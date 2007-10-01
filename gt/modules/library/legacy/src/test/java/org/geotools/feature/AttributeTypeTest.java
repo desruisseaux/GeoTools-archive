@@ -156,36 +156,37 @@ public class AttributeTypeTest extends TestCase {
     }
     
     public void testFeatureValidate() throws SchemaException {
-        try{
-            //FeatureType b = FeatureTypeFactory.newFeatureType(new AttributeType[]{AttributeTypeFactory.newAttributeType("testAttribute", Double.class)},"oneAttribs");
-            
-            FeatureType type = FeatureTypeFactory.newFeatureType(new AttributeType[]{},"noAttribs");
-            AttributeType feat = AttributeTypeFactory.newAttributeType("foo",  type);
-            Feature good = type.create(new Object[]{});
-            feat.validate(good);
-        }
-        catch(IllegalAttributeException iae){
-            fail();
-        }
-        Feature bad = null;
-        FeatureType b = FeatureTypeFactory.newFeatureType(new AttributeType[]{AttributeTypeFactory.newAttributeType("testAttribute", Double.class)},"oneAttribs");
-        
-        try{
-            bad = b.create(new Object[]{new Double(4)});
-        }
-        catch(IllegalAttributeException iae){
-            fail();
-        }
-        
-       try{
-            FeatureType type = FeatureTypeFactory.newFeatureType(new AttributeType[]{},"noAttribs");
-            AttributeType feat = AttributeTypeFactory.newAttributeType("foo",  type);
-            feat.validate(bad);
-            fail();
-       }
-       catch(IllegalArgumentException iae){
-           
-       }
+//        try{
+//            //FeatureType b = FeatureTypeFactory.newFeatureType(new AttributeType[]{AttributeTypeFactory.newAttributeType("testAttribute", Double.class)},"oneAttribs");
+//            
+//            FeatureType type = FeatureTypeFactory.newFeatureType(new AttributeType[]{},"noAttribs");
+//            AttributeType feat = AttributeTypeFactory.newAttributeType("foo",  type);
+//            Feature good = type.create(new Object[]{});
+//            feat.validate(good);
+//        }
+//        catch(IllegalAttributeException iae){
+//            fail();
+//        }
+//        Feature bad = null;
+//        FeatureType b = FeatureTypeFactory.newFeatureType(new AttributeType[]{AttributeTypeFactory.newAttributeType("testAttribute", Double.class)},"oneAttribs");
+//        
+//        try{
+//            bad = b.create(new Object[]{new Double(4)});
+//        }
+//        catch(IllegalAttributeException iae){
+//            fail();
+//        }
+//        
+    	
+//       try{
+//            FeatureType type = FeatureTypeFactory.newFeatureType(new AttributeType[]{},"noAttribs");
+//            AttributeType feat = AttributeTypeFactory.newAttributeType("foo",  type);
+//            feat.validate(bad);
+//            fail();
+//       }
+//       catch(IllegalArgumentException iae){
+//           
+//       }
            
         
         

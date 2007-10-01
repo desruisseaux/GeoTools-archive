@@ -424,6 +424,10 @@ public class ChoiceAttributeType extends AttributeDescriptorImpl implements Attr
 
             return first.getCoordinateSystem();
         }
+        
+        public CoordinateReferenceSystem getCRS() {
+        	return getCoordinateSystem();
+        }
 
         public GeometryFactory getGeometryFactory() {
             //Hack - this is not guaranteed to be right, since right now we

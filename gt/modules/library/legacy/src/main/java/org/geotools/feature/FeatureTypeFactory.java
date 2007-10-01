@@ -17,6 +17,7 @@ package org.geotools.feature;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
@@ -107,7 +108,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
         String name, URI ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
         throws FactoryRegistryException, SchemaException {
         
-        return FeatureTypes.newFeatureType(types,name,ns,isAbstract,superTypes,defaultGeometry);
+        return new DefaultFeatureType(name,ns, (List) Arrays.asList(types), (List) Arrays.asList(superTypes), (GeometryAttributeType) defaultGeometry);
     }
     
     /**
@@ -132,7 +133,9 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
             String name, URI ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
             throws FactoryRegistryException, SchemaException {
          
-            return FeatureTypes.newFeatureType(types, name, ns, isAbstract, superTypes, defaultGeometry);
+            List typeList = types == null ? null : (List) Arrays.asList(types);
+			List superTypeList = superTypes == null ? null : (List) Arrays.asList(superTypes);
+			return new DefaultFeatureType(name, ns, typeList, superTypeList, defaultGeometry);
         }
 
     /**

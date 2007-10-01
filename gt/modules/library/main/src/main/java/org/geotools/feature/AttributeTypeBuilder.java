@@ -196,7 +196,7 @@ public class AttributeTypeBuilder {
 		restrictions = null;
 		description = null;
 		isIdentifiable = false;
-		binding = Object.class;
+		binding = null;
 		defaultValue = null;
 		superType = null;
 		crs = null;
@@ -443,6 +443,8 @@ public class AttributeTypeBuilder {
 	 * @see #buildDescriptor(String, AttributeType) 
 	 */
 	public AttributeDescriptor buildDescriptor( String name ) {
+		if(binding == null)
+			throw new IllegalStateException("No binding has been provided for this attribute");
 		if ( crs != null || Geometry.class.isAssignableFrom(binding)) {
 			return buildDescriptor(name, buildGeometryType());
 		}

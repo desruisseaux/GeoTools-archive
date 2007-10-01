@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.Descriptors;
 import org.geotools.feature.type.Types;
@@ -41,8 +42,10 @@ public class AttributeImpl extends PropertyImpl implements Attribute {
 			String id) {
 	    super( content, descriptor );
 	    
-	    //set the id
-		this.id = id;
+	    if(id == null && getType().isIdentified())
+			this.id = SimpleFeatureBuilder.createDefaultFeatureId(); 
+		else //set the id
+			this.id = id;
 		
 		//if the content is null and the descriptor says isNillable is false, 
 		// then set the default value
@@ -50,6 +53,7 @@ public class AttributeImpl extends PropertyImpl implements Attribute {
 		    setValue(descriptor.getDefaultValue());
 		}
 		
+		Types.validate(this, getValue());
 	}
 
 	public AttributeImpl(Object content, AttributeType type, String id) {

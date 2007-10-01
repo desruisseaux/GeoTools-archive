@@ -1,28 +1,16 @@
 package org.geotools.xml.gml;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.DefaultAttributeType;
-import org.geotools.feature.type.AttributeDescriptorImpl;
 import org.geotools.feature.type.AttributeTypeImpl;
-import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
-
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Created for GML generated FeatureTypes.  Represents a Choice type.  
@@ -33,7 +21,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Jesse
  */
 class ChoiceAttributeTypeImpl extends AttributeTypeImpl implements ChoiceAttributeType {
-
+	private static final Class[] EMPTY = new Class[0];
     protected Class[] types;
     private boolean isNillable;
     private int maxOccurs;
@@ -51,7 +39,7 @@ class ChoiceAttributeTypeImpl extends AttributeTypeImpl implements ChoiceAttribu
     }
 
 	public Class[] getChoices() {
-		return types;
+		return EMPTY;
 	}
 	public Object convert(Object obj) {
 		return obj;

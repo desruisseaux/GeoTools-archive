@@ -251,9 +251,7 @@ public class DefaultFeatureType extends SimpleFeatureTypeImpl implements Feature
 		      }
 	    
         try {
-    		DefaultFeatureBuilder builder = new DefaultFeatureBuilder();
-        	builder.init( original );
-        	
+    		DefaultFeatureBuilder builder = new DefaultFeatureBuilder(original);
         	return (Feature) builder.buildFeature(original.getID());	
     	}
     	catch( Exception e ) {

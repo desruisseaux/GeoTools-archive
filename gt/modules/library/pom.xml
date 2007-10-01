@@ -58,6 +58,7 @@
     <module>referencing</module>
     <module>coverage</module>
     <module>api</module>
+    <module>legacy</module>
     <module>main</module>
     <module>data</module>
     <module>sample-data</module>
