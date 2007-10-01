@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import junit.framework.TestCase;
 
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureImplUtils;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
@@ -250,6 +251,9 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
             }
             public boolean isNillable() {
                 return false;
+            }
+            public Collection<Property> getProperties() {
+            	return null;
             }
 		}
 		SimpleFeature f = new TestFeature();
