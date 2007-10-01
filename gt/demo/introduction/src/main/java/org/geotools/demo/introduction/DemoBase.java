@@ -38,16 +38,13 @@ import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.demo.mappane.MapViewer;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
@@ -64,6 +61,10 @@ import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -235,7 +236,7 @@ public class DemoBase {
         demoGUI.textArea.append("Start: Create Features.\n");
         
         /* Create a Point Feature representing London as a FeatureCollection.*/
-        Feature london = createLondonPointFeatureFromScratch();
+        SimpleFeature london = createLondonPointFeatureFromScratch();
         FeatureCollection londonCollection = makeLondonFeatureCollection(london);
         loadLondonFeatureCollectionIntoList(londonCollection);
         demoGUI.textArea.append(" Done: Created London from scratch.\n");
@@ -334,7 +335,7 @@ public class DemoBase {
         
     }
     
-    public Feature createLondonPointFeatureFromScratch(){
+    public SimpleFeature createLondonPointFeatureFromScratch(){
 
         // Wikipedia gives London as:  51?? 30.4167??? N 0?? 7.65??? W 
        // NOTE: in Gt 2.2 axis order is Long/Lat throughout; in 2.3 the CRS rules
@@ -349,37 +350,35 @@ public class DemoBase {
        Integer pop = new Integer(7500000);
    
        /* AttributeTypes, starting with Geometry using pre-made CRS */
-       GeometryAttributeType ptGA = 
-               (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
-                                                         "the_geom", 
-                                                         ptG.getClass(), 
-                                                         true, 
-                                                         1, 
-                                                         null,
-              org.geotools.referencing.crs.DefaultGeographicCRS.WGS84);    
-       AttributeType cityAT = 
-           AttributeTypeFactory.newAttributeType(
-                                         "CITYNAME", 
-                                         String.class, 
-                                         true, 
-                                         48, 
-                                         null);
-       AttributeType popAT = 
-           AttributeTypeFactory.newAttributeType(
-                                         "CITYPOP", 
-                                         Integer.class, 
-                                         true, 
-                                         48, 
-                                         null);
+       AttributeTypeBuilder atb = new AttributeTypeBuilder();
+       atb.setName("the_geom");
+       atb.setBinding(ptG.getClass());
+       atb.setNillable(true);
+       atb.setLength(1);
+       atb.setDefaultValue(null);
+       atb.setCRS(org.geotools.referencing.crs.DefaultGeographicCRS.WGS84);
        
+       GeometryDescriptor ptGA = 
+               (GeometryDescriptor) atb.buildDescriptor("the_geom");
+       
+       atb.setName("CITYNAME");
+       atb.setBinding(String.class);
+       atb.setLength(48);
+              
+       AttributeDescriptor cityAT = atb.buildDescriptor("CITYNAME"); 
+       
+       atb.setName("CITYPOP");
+       atb.setBinding(Integer.class);
+       
+       AttributeDescriptor popAT = atb.buildDescriptor("CITYPOP");        
        
        /* FeatureType */
-       AttributeType[] ptATs = new AttributeType[3];
+       AttributeDescriptor[] ptATs = new AttributeDescriptor[3];
        ptATs[0] = ptGA;
        ptATs[1] = cityAT;
        ptATs[2] = popAT;
 
-       FeatureType ptFT = null;
+       SimpleFeatureType ptFT = null;
        try{
           ptFT = FeatureTypes.newFeatureType(ptATs, "Metropolis");
        } 
@@ -392,9 +391,9 @@ public class DemoBase {
        /* Feature */
        Object [] ptElems = { ptG, name, pop };
        
-       Feature ptF = null;
+       SimpleFeature ptF = null;
        try {
-           ptF = ptFT.create(ptElems);
+           ptF = SimpleFeatureBuilder.build(ptFT, ptElems, null);
        } 
        catch (IllegalAttributeException iaex){
            System.err.println("IllegalAttributeException on Feature creation: " + iaex);
@@ -405,7 +404,7 @@ public class DemoBase {
         return ptF;
     }
     
-    public FeatureCollection makeLondonFeatureCollection(Feature f){
+    public FeatureCollection makeLondonFeatureCollection(SimpleFeature f){
         
         FeatureCollection fc = FeatureCollections.newCollection();
         fc.add(f);
