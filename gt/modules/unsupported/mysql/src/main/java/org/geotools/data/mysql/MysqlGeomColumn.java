@@ -23,17 +23,18 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-import org.geotools.data.DataSourceException;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.geotools.feature.AttributeTypeBuilder;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.feature.SchemaException;
 
 
 /**

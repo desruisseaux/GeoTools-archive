@@ -15,10 +15,6 @@
  */
 package org.geotools.data.mysql;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSourceFactory;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,9 +25,11 @@ import java.sql.Statement;
 import java.util.NoSuchElementException;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.filter.Filter;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -48,7 +46,6 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
@@ -64,7 +61,10 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
