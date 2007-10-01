@@ -46,7 +46,7 @@ public abstract class BaseFeatureCollection extends SimpleFeatureImpl
 	 * @param id The identifier of the feature collection.
 	 */
     protected BaseFeatureCollection( String id ){
-    	this(id,(SimpleFeatureType)null);
+    	this(id != null ? id : "featureCollection",(SimpleFeatureType)null);
     }
     
     /**
@@ -56,7 +56,7 @@ public abstract class BaseFeatureCollection extends SimpleFeatureImpl
 	 * @param memberType The type of the members of the collection.
 	 */
     protected BaseFeatureCollection( String id, SimpleFeatureType memberType ){
-    	super( Collections.EMPTY_LIST, new BaseFeatureCollectionType(memberType), id );
+    	super( Collections.EMPTY_LIST, new BaseFeatureCollectionType(memberType), id != null ? id : "featureCollection" );
     }
     
 //    /**
