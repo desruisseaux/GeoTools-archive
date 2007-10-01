@@ -21,7 +21,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.AttributeTypeFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.IllegalAttributeException;
@@ -90,7 +89,6 @@ public class FeatureGraphGeneratorTest extends TestCase {
 		SimpleFeatureType schema = b.buildFeatureType();
 		SimpleFeature[] features = new SimpleFeature[ lines.length ];
 		
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder();
 		for ( int i = 0; i < lines.length; i++) {
 			Integer id = new Integer(i);
 			features[i] = SimpleFeatureBuilder.build(schema, new Object[] {lines[i], id}, "fid" + id.toString());
