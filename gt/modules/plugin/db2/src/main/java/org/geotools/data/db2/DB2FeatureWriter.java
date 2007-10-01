@@ -16,19 +16,19 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
-import java.io.IOException;
-
-import java.util.logging.Logger;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -70,7 +70,7 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
 	 * @throws IOException
 	 * @throws UnsupportedOperationException
 	 */
-	protected String makeDeleteSql(Feature feature) throws IOException {
+	protected String makeDeleteSql(SimpleFeature feature) throws IOException {
 		String deleteSQL  = this.sqlBuilder.makeDeleteSql(feature);
 		return (deleteSQL);
 	}
@@ -84,10 +84,10 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
      *
      * @throws IOException
      */
-    protected String makeInsertSql(Feature feature) throws IOException {
+    protected String makeInsertSql(SimpleFeature feature) throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-        FeatureType featureType = ftInfo.getSchema();
-        AttributeType[] attributes = featureType.getAttributeTypes();
+        SimpleFeatureType featureType = ftInfo.getSchema();
+        List<AttributeDescriptor> attributes = featureType.getAttributes();
 		String insertSQL  = this.sqlBuilder.makeInsertSql(attributes, feature);
         return (insertSQL);
     }
@@ -101,11 +101,11 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
 	 * @throws IOException
 	 * @throws UnsupportedOperationException
 	 */
-	protected String makeUpdateSql(Feature live, Feature current)
+	protected String makeUpdateSql(SimpleFeature live, SimpleFeature current)
 			throws IOException {
 		FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-		FeatureType featureType = ftInfo.getSchema();
-		AttributeType[] attributes = featureType.getAttributeTypes();
+		SimpleFeatureType featureType = ftInfo.getSchema();
+		List<AttributeDescriptor> attributes = featureType.getAttributes();
 		
 		String updateSQL  = this.sqlBuilder.makeUpdateSql(attributes, live, current);
 

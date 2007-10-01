@@ -15,19 +15,21 @@
  */
 package org.geotools.data.gpx.test;
 
-import junit.framework.TestCase;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+
+import junit.framework.TestCase;
+
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.gpx.GpxDataStore;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Feature;
 
 
 public class GpxTest extends TestCase {

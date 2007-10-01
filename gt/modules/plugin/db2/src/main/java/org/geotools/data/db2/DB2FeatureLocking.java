@@ -22,7 +22,7 @@
  */
 package org.geotools.data.db2;
 
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -40,7 +40,7 @@ public class DB2FeatureLocking extends DB2FeatureStore {
      * @param dataStore
      * @param featureType
      */
-    public DB2FeatureLocking(DB2DataStore dataStore, FeatureType featureType) {
+    public DB2FeatureLocking(DB2DataStore dataStore, SimpleFeatureType featureType) {
         super(dataStore, featureType);
 
         // TODO Auto-generated constructor stub

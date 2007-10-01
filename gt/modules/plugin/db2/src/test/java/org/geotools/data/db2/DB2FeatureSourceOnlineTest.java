@@ -16,20 +16,22 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.util.Iterator;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -99,7 +101,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
         features = featureSource.getFeatures();
         it = features.iterator();
         while (it.hasNext()) {
-        	Feature f = (Feature) it.next();
+        	SimpleFeature f = (SimpleFeature) it.next();
         	String s = f.toString();
         	int pos = testValue.indexOf(s);
         	System.out.println(pos + s);
@@ -153,7 +155,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
         // Check "Roads"
         featureSource = dataStore.getFeatureSource("Roads");
         crs = featureSource.getSchema().getDefaultGeometry()
-                           .getCoordinateSystem();
+                           .getCRS();
         assertEquals("CRS mismatch",
             "NAD_1983_StatePlane_New_York_East_FIPS_3101_Feet",
             crs.getName().toString());
@@ -161,7 +163,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
         // Check "Places"
         featureSource = dataStore.getFeatureSource("Places");
         crs = featureSource.getSchema().getDefaultGeometry()
-                           .getCoordinateSystem();
+                           .getCRS();
         assertEquals("CRS mismatch", "GCS_North_American_1983",
             crs.getName().toString());
     }
@@ -193,7 +195,7 @@ public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     private DefaultQuery getBBOXQuery(FeatureSource featureSource, Envelope env)
         throws IllegalFilterException {
         BBOX bbox = getBBOXFilter(featureSource, env);
-        FeatureType ft = featureSource.getSchema();
+        SimpleFeatureType ft = featureSource.getSchema();
 
         return new DefaultQuery(ft.getTypeName(), bbox);
     }

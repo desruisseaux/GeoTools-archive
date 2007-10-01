@@ -16,22 +16,23 @@
  */
 package org.geotools.data.db2;
 
+import java.io.IOException;
+import java.sql.Types;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.GeoAPISQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import java.io.IOException;
-import java.sql.Types;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -65,7 +66,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      * @param tableSchema table schema to qualify table names
      * @param featureType the feature type to be used by this SQL builder
      */
-    public DB2SQLBuilder(FilterToSQL encoder, String tableSchema, FeatureType featureType, FIDMapper mapper) {
+    public DB2SQLBuilder(FilterToSQL encoder, String tableSchema, SimpleFeatureType featureType, FIDMapper mapper) {
         super(encoder, featureType, null);
         this.tableSchema = tableSchema;
         this.mapper = mapper;
@@ -83,7 +84,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      *        to.
      * @param geomAttribute An AttributeType for a geometry attribute
      */
-    public void sqlGeometryColumn(StringBuffer sql, AttributeType geomAttribute) {
+    public void sqlGeometryColumn(StringBuffer sql, AttributeDescriptor geomAttribute) {
         sql.append( "DB2GSE.ST_AsText(" + sqlGeometryColumnName(geomAttribute) + ")");
     }
 
@@ -94,7 +95,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      *
      * @return the String with the escaped name.
      */
-    String sqlGeometryColumnName(AttributeType geomAttribute) {
+    String sqlGeometryColumnName(AttributeDescriptor geomAttribute) {
         return this.encoder.escapeName(geomAttribute.getLocalName());
     }
 
@@ -105,7 +106,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      *
      * @return the string with the 4 column expressions.
      */
-    String sqlGeometryMinMaxValues(AttributeType geomAttribute) {
+    String sqlGeometryMinMaxValues(AttributeDescriptor geomAttribute) {
         String sql;
         String gcName = sqlGeometryColumnName(geomAttribute);
         sql = "MIN(db2gse.ST_MinX(" + gcName + ")), " + "MIN(db2gse.ST_MinY("
@@ -148,7 +149,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      *
      * @throws SQLEncoderException
      */
-    public String buildSQLBoundsQuery(String typeName, AttributeType geomAttr,
+    public String buildSQLBoundsQuery(String typeName, AttributeDescriptor geomAttr,
         org.opengis.filter.Filter filter) throws SQLEncoderException {
         StringBuffer sqlBuffer = new StringBuffer();
 
@@ -217,7 +218,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
      *
      * @throws IOException
      */
-    protected String makeInsertSql(AttributeType[] attributes, Feature feature) throws IOException {
+    protected String makeInsertSql(List<AttributeDescriptor> attributes, SimpleFeature feature) throws IOException {
 
 		SQLEncoderDB2 db2Encoder = (SQLEncoderDB2) encoder;
 
@@ -226,8 +227,8 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 		StringBuffer colNameList = new StringBuffer("");
 		StringBuffer valueList = new StringBuffer("");
 
-        for (int i = 0; i < attributes.length; i++) {
-			String colName = escapeName(attributes[i].getLocalName());
+        for (int i = 0; i < attributes.size(); i++) {
+			String colName = escapeName(attributes.get(i).getLocalName());
 			if (!firstAttr) {
 				colNameList.append(", ");
 				valueList.append(", ");
@@ -240,10 +241,10 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 				attrValue = "NULL";
 			}
 			else 
-			if (Geometry.class.isAssignableFrom(attributes[i].getBinding())) {
+			if (Geometry.class.isAssignableFrom(attributes.get(i).getType().getBinding())) {
 				attrValue = db2Encoder.db2Geom((Geometry) currAtt);
 			} else 
-			if (String.class.isAssignableFrom(attributes[i].getBinding())) {
+			if (String.class.isAssignableFrom(attributes.get(i).getType().getBinding())) {
 				attrValue = "'" + currAtt.toString() + "'";
 				} else	{
 					attrValue = currAtt.toString();
@@ -271,7 +272,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 	 * @throws IOException
 	 * @throws UnsupportedOperationException
 	 */
-	protected String makeUpdateSql(AttributeType[] attributes, Feature live, Feature current)
+	protected String makeUpdateSql(List<AttributeDescriptor> attributes, SimpleFeature live, SimpleFeature current)
 			throws IOException {
 
 		boolean firstAttr = true;
@@ -279,7 +280,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 		StringBuffer statementSQL = new StringBuffer("UPDATE " + getSchemaTableName()
 				+ " SET ");
 
-		for (int i = 0; i < current.getNumberOfAttributes(); i++) {
+		for (int i = 0; i < current.getAttributeCount(); i++) {
 			Object currAtt = current.getAttribute(i);
 			Object liveAtt = live.getAttribute(i);
 
@@ -288,13 +289,13 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 					LOGGER.fine("modifying att# " + i + " to " + currAtt);
 				}
 				String attrValue = null;
-				String attrName = attributes[i].getLocalName();
+				String attrName = attributes.get(i).getLocalName();
 
-				if (Geometry.class.isAssignableFrom(attributes[i].getBinding())) {
+				if (Geometry.class.isAssignableFrom(attributes.get(i).getType().getBinding())) {
 
 					attrValue = db2Encoder.db2Geom((Geometry) currAtt);
 				} else 
-				if (String.class.isAssignableFrom(attributes[i].getBinding())) {
+				if (String.class.isAssignableFrom(attributes.get(i).getType().getBinding())) {
 					attrValue = "'" + currAtt.toString() + "'";
 					} else {
 						attrValue = currAtt.toString();
@@ -322,7 +323,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 	 * @throws IOException
 	 * @throws UnsupportedOperationException
 	 */
-	public String makeDeleteSql(Feature feature) throws IOException {
+	public String makeDeleteSql(SimpleFeature feature) throws IOException {
 		String deleteSQL  = "DELETE FROM "
 			+ getSchemaTableName() + makeFIDWhere(feature);
 		return (deleteSQL);
@@ -335,7 +336,7 @@ public class DB2SQLBuilder extends GeoAPISQLBuilder {
 	 * @return A DB2 WHERE clause based on the FID column values.
 	 * @throws IOException
 	 */
-	protected String makeFIDWhere(Feature feature) throws IOException {
+	protected String makeFIDWhere(SimpleFeature feature) throws IOException {
 		
 		StringBuffer statementSQL = new StringBuffer(" WHERE ");
 		Object[] pkValues = mapper.getPKAttributes(feature.getID());

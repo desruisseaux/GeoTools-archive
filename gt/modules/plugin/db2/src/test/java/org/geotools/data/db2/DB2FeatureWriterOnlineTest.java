@@ -16,18 +16,17 @@
  */
 package org.geotools.data.db2;
 
+import java.io.IOException;
+
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
-
-
-import java.io.IOException;
 
 
 /**
@@ -58,7 +57,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             FeatureWriter fw = this.dataStore.getFeatureWriter("Roads", trans);
 
             if (fw.hasNext()) {
-                Feature f = fw.next();
+                SimpleFeature f = fw.next();
                 System.out.println(f);
                 fw.remove();
             }
@@ -80,7 +79,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             FeatureWriter fw = this.dataStore.getFeatureWriter("Roads", trans);
 
             if (fw.hasNext()) {
-                Feature f = fw.next();
+                SimpleFeature f = fw.next();
                 System.out.println(f);
                 Object a0 = f.getAttribute(0);
                 String name = (String) f.getAttribute(1);
@@ -112,7 +111,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             FeatureWriter fw = this.dataStore.getFeatureWriter("Places", trans);
 
             if (fw.hasNext()) {
-                Feature f = fw.next();
+                SimpleFeature f = fw.next();
                 System.out.println(f);
 
                 String name = (String) f.getAttribute(0);
@@ -140,7 +139,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Roads",
                     Transaction.AUTO_COMMIT);
             boolean hasNext = fw.hasNext();
-            Feature f = fw.next();
+            SimpleFeature f = fw.next();
             f.setAttribute(0,"100");
             f.setAttribute(1, "name" + "1");
             Object a2 = f.getAttribute(2);
@@ -165,7 +164,7 @@ public class DB2FeatureWriterOnlineTest extends AbstractDB2OnlineTestCase {
             FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Places",
                     Transaction.AUTO_COMMIT);
             boolean hasNext = fw.hasNext();
-            Feature f = fw.next();
+            SimpleFeature f = fw.next();
             System.out.println(f);
             f.setAttribute(0, "name" + "1");
             Geometry a1 = (Geometry) f.getAttribute(1);

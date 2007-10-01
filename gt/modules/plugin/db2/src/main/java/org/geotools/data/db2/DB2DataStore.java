@@ -16,12 +16,18 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.sql.DataSource;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -33,8 +39,6 @@ import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
-import org.geotools.data.db2.filter.SQLEncoderDB2;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.FeatureTypeHandler;
 import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.FilterToSQL;
@@ -48,25 +52,19 @@ import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
-
+import org.geotools.feature.AttributeTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.sql.DataSource;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -161,7 +159,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
      *
      * @throws IOException If an error occurs processing the ResultSet.
      */
-    protected AttributeType buildAttributeType(ResultSet rs)
+    protected AttributeDescriptor buildAttributeType(ResultSet rs)
         throws IOException {
         try {
         	String spatialTypePrefix = "\"DB2GSE\".\"ST_";
@@ -191,8 +189,16 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
                     throw new IOException("Exception: " + e.getMessage());
                 }
 
-                GeometryAttributeType geometryAttribute = (GeometryAttributeType) AttributeTypeFactory
-                    .newAttributeType(columnName, geomClass, true, 0, null, crs);
+                AttributeTypeBuilder atb = new AttributeTypeBuilder();
+                atb.setName(columnName);
+                atb.setBinding(geomClass);
+                atb.setNillable(true);
+                atb.setLength(0);
+                atb.setDefaultValue(null);
+                atb.setCRS(crs);
+                
+                GeometryDescriptor geometryAttribute = (GeometryDescriptor) atb
+						.buildDescriptor(columnName);
 
                 return geometryAttribute;
             }
@@ -278,7 +284,7 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
      *
      * @return AttributIO
      */
-    protected AttributeIO getGeometryAttributeIO(AttributeType type,
+    protected AttributeIO getGeometryAttributeIO(AttributeDescriptor type,
         QueryData queryData) {
         return new WKTAttributeIO();
     }
@@ -502,11 +508,11 @@ public class DB2DataStore extends JDBCDataStore implements DataStore{
 	 * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
 	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
 	 */
-	public FeatureReader getFeatureReader(final FeatureType requestType,
+	public FeatureReader getFeatureReader(final SimpleFeatureType requestType,
 			final Filter filter, final Transaction transaction)
 			throws IOException {
 		String typeName = requestType.getTypeName();
-		FeatureType schemaType = getSchema(typeName);
+		SimpleFeatureType schemaType = getSchema(typeName);
         LOGGER.fine("requestType: " + requestType);
         LOGGER.fine("schemaType: " + schemaType);
 

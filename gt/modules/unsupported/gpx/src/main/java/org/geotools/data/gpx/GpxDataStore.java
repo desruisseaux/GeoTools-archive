@@ -30,9 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gpx.GPXConfiguration;
@@ -102,50 +100,88 @@ public class GpxDataStore extends AbstractDataStore {
         gpxData = loadGpx();
     }
     private void init() throws URISyntaxException {
-        FeatureTypeBuilder ftb = FeatureTypeBuilder.newInstance(TYPE_NAME_POINT);
-        ftb.addType(AttributeTypeFactory.newAttributeType("geometry", Point.class, true, 0, null,
-                DefaultGeographicCRS.WGS84));
-        ftb.addType(AttributeTypeFactory.newAttributeType("name", String.class, true, -1, null));
-        ftb.addType(AttributeTypeFactory.newAttributeType("description", String.class, true, -1,
-                null));
-        ftb.addType(AttributeTypeFactory.newAttributeType("comment", String.class, true, -1, null));
-        ftb.setNamespace(new URI(namespace));
-
-        try {
-            pointType = ftb.getFeatureType(); // TODO simpleFeatureType ??
-        } catch (SchemaException e) {
-            throw new RuntimeException(e);
-        }
-
-        ftb = FeatureTypeBuilder.newInstance(TYPE_NAME_TRACK);
-        ftb.addType(AttributeTypeFactory.newAttributeType("geometry", MultiLineString.class, true,
-                0, null, DefaultGeographicCRS.WGS84));
-        ftb.addType(AttributeTypeFactory.newAttributeType("name", String.class, true, -1, null));
-        ftb.addType(AttributeTypeFactory.newAttributeType("description", String.class, true, -1,
-                null));
-        ftb.addType(AttributeTypeFactory.newAttributeType("comment", String.class, true, -1, null));
-        ftb.setNamespace(new URI(namespace));
-
-        try {
-            trackType = ftb.getFeatureType(); // TODO simpleFeatureType ??
-        } catch (SchemaException e) {
-            throw new RuntimeException(e);
-        }
+        SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName(TYPE_NAME_POINT);
         
-        ftb = FeatureTypeBuilder.newInstance(TYPE_NAME_ROUTE);
-        ftb.addType(AttributeTypeFactory.newAttributeType("geometry", MultiLineString.class, true,
-                0, null, DefaultGeographicCRS.WGS84));
-        ftb.addType(AttributeTypeFactory.newAttributeType("name", String.class, true, -1, null));
-        ftb.addType(AttributeTypeFactory.newAttributeType("description", String.class, true, -1,
-                null));
-        ftb.addType(AttributeTypeFactory.newAttributeType("comment", String.class, true, -1, null));
-        ftb.setNamespace(new URI(namespace));
+        
+        	AttributeTypeBuilder atb = new AttributeTypeBuilder();
+		atb.setName("geometry");
+		atb.setBinding(Point.class);
+		atb.setNillable(true);
+		atb.setLength(0);
+		atb.setDefaultValue(null);
+		atb.setCRS(DefaultGeographicCRS.WGS84);
+		ftb.add(atb.buildDescriptor("geometry"));
 
-        try {
-            routeType = ftb.getFeatureType(); // TODO simpleFeatureType ??
-        } catch (SchemaException e) {
-            throw new RuntimeException(e);
-        }
+		atb.setName("name");
+		atb.setBinding(String.class);
+		atb.setLength(-1);
+
+		ftb.add(atb.buildDescriptor("name"));
+
+		atb.setName("description");
+		ftb.add(atb.buildDescriptor("description"));
+
+		atb.setName("comment");
+		ftb.add(atb.buildDescriptor("comment"));        
+        
+        ftb.setNamespaceURI(new URI(namespace));
+
+        pointType = ftb.buildFeatureType(); // TODO simpleFeatureType ??
+
+        ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName(TYPE_NAME_TRACK);
+        
+        atb.setName("geometry");
+		atb.setBinding(MultiLineString.class);
+		atb.setNillable(true);
+		atb.setLength(0);
+		atb.setDefaultValue(null);
+		atb.setCRS(DefaultGeographicCRS.WGS84);
+        
+        ftb.add(atb.buildDescriptor("geometry"));
+        
+        atb.setName("name");
+        atb.setBinding(String.class);
+        atb.setLength(-1);
+        ftb.add(atb.buildDescriptor("name"));
+
+        atb.setName("description");
+        ftb.add(atb.buildDescriptor("description"));
+
+        atb.setName("comment");
+        ftb.add(atb.buildDescriptor("comment"));
+        
+        ftb.setNamespaceURI(new URI(namespace));
+
+        trackType = ftb.buildFeatureType(); // TODO simpleFeatureType ??
+        
+        ftb = new SimpleFeatureTypeBuilder();
+        ftb.setName(TYPE_NAME_ROUTE);
+        
+        atb.setName("geometry");
+		atb.setBinding(MultiLineString.class);
+		atb.setNillable(true);
+		atb.setLength(0);
+		atb.setDefaultValue(null);
+		atb.setCRS(DefaultGeographicCRS.WGS84);
+        
+        ftb.add(atb.buildDescriptor("geometry"));
+        
+        atb.setName("name");
+        atb.setBinding(String.class);
+        atb.setLength(-1);
+        ftb.add(atb.buildDescriptor("name"));
+
+        atb.setName("description");
+        ftb.add(atb.buildDescriptor("description"));
+
+        atb.setName("comment");
+        ftb.add(atb.buildDescriptor("comment"));
+        
+        ftb.setNamespaceURI(new URI(namespace));
+
+        routeType = ftb.buildFeatureType(); // TODO simpleFeatureType ??
     }
 
     private void buildFeatureTypes() throws URISyntaxException {
@@ -328,13 +364,13 @@ public class GpxDataStore extends AbstractDataStore {
     }
 
     @Override
-    public FeatureType getSchema(String typeName) {
+    public SimpleFeatureType getSchema(String typeName) {
         if (TYPE_NAME_POINT.equals(typeName)) {
-            return (FeatureType) pointType;
+            return (SimpleFeatureType) pointType;
         } else if (TYPE_NAME_TRACK.equals(typeName)) {
-            return (FeatureType) trackType;
+            return (SimpleFeatureType) trackType;
         } else if (TYPE_NAME_ROUTE.equals(typeName)) {
-            return (FeatureType) routeType;
+            return (SimpleFeatureType) routeType;
         } else {
             throw new IllegalArgumentException("No such type: " + typeName);
         }

@@ -3,7 +3,6 @@ package org.geotools.data.gpx;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gpx.bean.RteType;
@@ -56,7 +55,7 @@ public class FeatureTranslator {
 //        builder.add(attrs);
 //        return builder.feature(type.getName());
         try {
-            return ((FeatureType)featureType).create(attrs, type.getName());
+            return SimpleFeatureBuilder.build((SimpleFeatureType)featureType, attrs, type.getName());
         } catch (IllegalAttributeException e) {
             throw new RuntimeException("illegal attributes", e);
         }
@@ -94,7 +93,7 @@ public class FeatureTranslator {
 //        builder.add(attrs);
 //        return builder.feature(type.getName());
         try {
-            return ((FeatureType)featureType).create(attrs, type.getName());
+            return SimpleFeatureBuilder.build((SimpleFeatureType)featureType, attrs, type.getName());
         } catch (IllegalAttributeException e) {
             throw new RuntimeException("illegal attributes", e);
         }
@@ -122,7 +121,7 @@ public class FeatureTranslator {
 //        builder.add(attrs);
 //        return builder.feature(type.getName());
         try {
-            return ((FeatureType)featureType).create(attrs, type.getName());
+            return SimpleFeatureBuilder.build((SimpleFeatureType)featureType, attrs, type.getName());
         } catch (IllegalAttributeException e) {
             throw new RuntimeException("illegal attributes", e);
         }

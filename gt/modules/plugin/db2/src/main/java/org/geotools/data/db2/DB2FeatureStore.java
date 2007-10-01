@@ -33,15 +33,12 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.JDBCFeatureStore;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
-
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -62,7 +59,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
      * @param dataStore
      * @param featureType
      */
-    public DB2FeatureStore(DB2DataStore dataStore, FeatureType featureType) {
+    public DB2FeatureStore(DB2DataStore dataStore, SimpleFeatureType featureType) {
         super(dataStore, featureType);
     }
     /**
@@ -76,14 +73,14 @@ public class DB2FeatureStore extends JDBCFeatureStore{
      * @throws DataSourceException if there was an error executing the query to
      *         get the bounds.
      */
-    public Envelope getBounds(Query query) throws IOException {
-        Envelope env = new Envelope();
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
+        ReferencedEnvelope env = new ReferencedEnvelope();
         CoordinateReferenceSystem crs = null;
         String typeName = "null";
 
         if (getSchema() != null) {
             typeName = getSchema().getTypeName();
-            GeometryAttributeType geomType = getSchema()
+            GeometryDescriptor geomType = getSchema()
                 .getDefaultGeometry();
 
             if (query.getFilter() != Filter.EXCLUDE) {
@@ -114,9 +111,9 @@ public class DB2FeatureStore extends JDBCFeatureStore{
                         double miny = results.getDouble(2);
                         double maxx = results.getDouble(3);
                         double maxy = results.getDouble(4);
-                        env = new Envelope(minx, maxx, miny, maxy);
+                        env = new ReferencedEnvelope(minx, maxx, miny, maxy, null);
                     } else {
-                        env = new Envelope();
+                        env = new ReferencedEnvelope();
                     }
                 } catch (SQLException e) {
                     closeAll(results, statement, conn, transaction, e);
@@ -128,7 +125,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
                 closeAll(results, statement, conn, transaction, null);
             }
 
-            crs = geomType.getCoordinateSystem();
+            crs = geomType.getCRS();
             env = new ReferencedEnvelope(env, crs);
         }
 
@@ -177,7 +174,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
 
 		if (getSchema() != null) {
 			typeName = getSchema().getTypeName();
-			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
+			GeometryDescriptor geomType = (GeometryDescriptor)getSchema().getDefaultGeometry();
 
 			if (filter != Filter.EXCLUDE) {
 				DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore) 

@@ -16,26 +16,22 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCFeatureSource;
-import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.DefaultExpression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Literal;
@@ -44,12 +40,9 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Intersects;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * DB2 Feature Source implementation. Overrides functionality in
@@ -73,7 +66,7 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 	 * @param dataStore
 	 * @param featureType
 	 */
-	public DB2FeatureSource(DB2DataStore dataStore, FeatureType featureType) {
+	public DB2FeatureSource(DB2DataStore dataStore, SimpleFeatureType featureType) {
 		super(dataStore, featureType);
 
 	}
@@ -113,14 +106,14 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 	 * @throws DataSourceException
 	 *             if there was an error executing the query to get the bounds.
 	 */
-	public Envelope getBounds(Query query) throws IOException {
-		Envelope env = new Envelope();
+	public ReferencedEnvelope getBounds(Query query) throws IOException {
+		ReferencedEnvelope env = new ReferencedEnvelope();
 		CoordinateReferenceSystem crs = null;
 		LOGGER.fine("Query: " + query.toString());
 
 		if (getSchema() != null) {
 			String typeName = getSchema().getTypeName();
-			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
+			GeometryDescriptor geomType = getSchema().getDefaultGeometry();
 
 			if (geomType != null) {
 				Filter filter = query.getFilter();
@@ -157,9 +150,9 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 							double miny = results.getDouble(2);
 							double maxx = results.getDouble(3);
 							double maxy = results.getDouble(4);
-							env = new Envelope(minx, maxx, miny, maxy);
+							env = new ReferencedEnvelope(minx, maxx, miny, maxy, null);
 						} else {
-							env = new Envelope();
+							env = new ReferencedEnvelope();
 						}
 					} catch (SQLException e) {
 						closeAll(results, statement, conn, transaction, e);
@@ -171,7 +164,7 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 					closeAll(results, statement, conn, transaction, null);
 				}
 
-				crs = geomType.getCoordinateSystem();
+				crs = geomType.getCRS();
 				env = new ReferencedEnvelope(env, crs);
 			}
 		}
@@ -192,7 +185,7 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 		double xmin = 0, ymin = 0, xmax = 0, ymax = 0;
 		if (operator.getExpression1() == null) {
 			String attName = null;
-			GeometryAttributeType dg = getSchema().getDefaultGeometry();
+			GeometryDescriptor dg = getSchema().getDefaultGeometry();
 			if (dg != null)
 				attName = dg.getLocalName();
 			if (attName != null) {

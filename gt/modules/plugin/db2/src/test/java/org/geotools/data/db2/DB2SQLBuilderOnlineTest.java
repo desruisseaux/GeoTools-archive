@@ -16,17 +16,18 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
-
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.filter.SQLEncoderException;
-
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -36,9 +37,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.FeatureId;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Exercise DB2SQLBuilder.
@@ -68,7 +67,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 
 	public void testFidFilter() throws SQLEncoderException, IOException {
 		FeatureSource fs = dataStore.getFeatureSource("Places");
-		FeatureType ft = fs.getSchema();
+		SimpleFeatureType ft = fs.getSchema();
 		FilterFactory ff2 = CommonFactoryFinder.getFilterFactory(null);
 
 		Set ids = new HashSet();
@@ -81,11 +80,11 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
 		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 		String[] attrNames = new String[ft.getAttributeCount()];
-		AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
+		AttributeDescriptor[] attrTypes = new AttributeDescriptor[ft.getAttributeCount()];
 
 		for (int i = 0; i < ft.getAttributeCount(); i++) {
-			attrNames[i] = ft.getAttributeType(i).getLocalName();
-			attrTypes[i] = ft.getAttributeType(i);
+			attrNames[i] = ft.getAttribute(i).getLocalName();
+			attrTypes[i] = ft.getAttribute(i);
 		}
 
 		String fidQuery = this.sqlBuilder.buildSQLQuery("Places",
@@ -112,7 +111,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 	public void testCompareFilter() throws SQLEncoderException, IOException {
 		String typeName = "Places";
 		FeatureSource fs = dataStore.getFeatureSource("Places");
-		FeatureType ft = fs.getSchema();
+		SimpleFeatureType ft = fs.getSchema();
 		org.opengis.filter.FilterFactory ff = CommonFactoryFinder
 				.getFilterFactory(null);
 
@@ -121,11 +120,11 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 		PropertyIsEqualTo filter = ff.equals(column, compareValue);
 
 		String[] attrNames = new String[ft.getAttributeCount()];
-		AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
+		AttributeDescriptor[] attrTypes = new AttributeDescriptor[ft.getAttributeCount()];
 
 		for (int i = 0; i < ft.getAttributeCount(); i++) {
-			attrNames[i] = ft.getAttributeType(i).getLocalName();
-			attrTypes[i] = ft.getAttributeType(i);
+			attrNames[i] = ft.getAttribute(i).getLocalName();
+			attrTypes[i] = ft.getAttribute(i);
 		}
 		sqlBuilder = (DB2SQLBuilder) dataStore.getSqlBuilder("Places");
 		DefaultQuery query = new DefaultQuery("Places", filter);
@@ -156,7 +155,7 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 	public void testLikeFilter() throws SQLEncoderException, IOException {
 		String typeName = "Places";
 		FeatureSource fs = dataStore.getFeatureSource("Places");
-		FeatureType ft = fs.getSchema();
+		SimpleFeatureType ft = fs.getSchema();
 
 		org.opengis.filter.FilterFactory ff = CommonFactoryFinder
 				.getFilterFactory(null);
@@ -171,11 +170,11 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
 		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 		String[] attrNames = new String[ft.getAttributeCount()];
-		AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
+		AttributeDescriptor[] attrTypes = new AttributeDescriptor[ft.getAttributeCount()];
 
 		for (int i = 0; i < ft.getAttributeCount(); i++) {
-			attrNames[i] = ft.getAttributeType(i).getLocalName();
-			attrTypes[i] = ft.getAttributeType(i);
+			attrNames[i] = ft.getAttribute(i).getLocalName();
+			attrTypes[i] = ft.getAttribute(i);
 		}
 
 		String likeQuery = this.sqlBuilder.buildSQLQuery("Places",
@@ -197,8 +196,12 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 	public void testSqlGeometryColumn() {
 		String columnName = "Geom";
 		Class geomClass = Point.class;
-		AttributeType geomAttr = AttributeTypeFactory.newAttributeType(
-				columnName, geomClass);
+		
+		AttributeTypeBuilder atb = new AttributeTypeBuilder();
+		atb.setName(columnName);
+		atb.setBinding(geomClass);
+		
+		AttributeDescriptor geomAttr = atb.buildDescriptor(columnName);
 
 		StringBuffer sb = new StringBuffer();
 		this.sqlBuilder.sqlGeometryColumn(sb, geomAttr);

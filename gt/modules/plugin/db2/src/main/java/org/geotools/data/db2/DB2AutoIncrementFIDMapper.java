@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * Overrides AutoIncrementFIDMapper methods for DB2-specific handling.
@@ -43,7 +43,7 @@ public class DB2AutoIncrementFIDMapper extends AutoIncrementFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
      *      org.geotools.feature.Feature, Statement)
      */
-    public String createID(Connection conn, Feature feature, Statement statement)
+    public String createID(Connection conn, SimpleFeature feature, Statement statement)
         throws IOException {
     	if( tableName==null || getColumnName()==null )
     		return null;
