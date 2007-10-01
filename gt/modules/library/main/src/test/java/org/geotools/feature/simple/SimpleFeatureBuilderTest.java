@@ -100,4 +100,16 @@ public class SimpleFeatureBuilderTest extends TestCase {
         assertEquals( new Integer( 1 ) , feature.getAttribute( 1 ) );
         assertNull( feature.getAttribute( 2 ) );
 	}
+	
+	public void testConverting() throws Exception {
+	    builder.set( "integer", "1" );
+	    SimpleFeature feature = builder.buildFeature("fid");
+	    
+	    try {
+	        builder.set( "integer", "foo" );    
+	        fail( "should have failed" );
+	    }
+	    catch( Exception e ) {}
+	    
+	}
 }
