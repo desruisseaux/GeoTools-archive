@@ -29,8 +29,8 @@ class ChoiceAttributeTypeImpl extends AttributeTypeImpl implements ChoiceAttribu
     Object defaultValue;
     
 	public ChoiceAttributeTypeImpl(Name name, Class<?>[] types, Class<?> defaultType, boolean nillable, int min, int max,
-            Object defaultValue, Filter filter) {
-	    super( name, defaultType, false, false, toRestrictions(filter), null, toDescription(types) );
+            Object defaultValue, List<Filter> filter) {
+	    super( name, defaultType, false, false, filter, null, toDescription(types) );
 	    if( defaultValue == null && !isNillable ){
 	        defaultValue = DataUtilities.defaultValue( defaultType );
 	    }
@@ -69,14 +69,6 @@ class ChoiceAttributeTypeImpl extends AttributeTypeImpl implements ChoiceAttribu
         return isNillable;
     }
 
-    static List<Filter> toRestrictions( Filter filter ){
-        if( filter == null ){
-            return (List<Filter>)Collections.EMPTY_LIST;
-        }
-        else {
-            return Collections.singletonList( filter );
-        }
-    }
     static InternationalString toDescription( Class[] bindings ){
         StringBuffer buf = new StringBuffer();
         buf.append("Choice betwee ");

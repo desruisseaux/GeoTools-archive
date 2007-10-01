@@ -3,9 +3,10 @@ package org.geotools.data.wfs;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,15 +25,26 @@ public class WFSFeatureTypeTest extends TestCase {
      * @throws Exception 
      */
     public void testCreateObjectArrayString() throws Exception {
-        FeatureTypeBuilder builder=FeatureTypeBuilder.newInstance("type");
-        builder.addType(AttributeTypeFactory.newAttributeType("geom", Geometry.class, false));
-        builder.addType(AttributeTypeFactory.newAttributeType("id", Integer.class, false));
-        builder.addType(AttributeTypeFactory.newAttributeType("name", String.class, false));
+        SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+        build.setName("type");
+        build.add("geom", Geometry.class );
+        build.add("id", Integer.class );
+        build.add("name", String.class );
+        build.add("name2", String.class );
+        build.add("double", Double.class );
+        
+        SimpleFeatureType ft = build.buildFeatureType();
+        
+//        FeatureTypeBuilder builder=FeatureTypeBuilder.newInstance("type");
+//        builder.addType(AttributeTypeFactory.newAttributeType("geom", Geometry.class, false));
+//        builder.addType(AttributeTypeFactory.newAttributeType("id", Integer.class, false));
+//        builder.addType(AttributeTypeFactory.newAttributeType("name", String.class, false));
         String name2 = "name2";
-        builder.addType(AttributeTypeFactory.newAttributeType(name2, String.class, false));
-        builder.addType(AttributeTypeFactory.newAttributeType("double", Double.class, false));
-        WFSFeatureType ft = new WFSFeatureType(builder.getFeatureType(),null);
-        ft.setLenient(true);
+//        builder.addType(AttributeTypeFactory.newAttributeType(name2, String.class, false));
+//        builder.addType(AttributeTypeFactory.newAttributeType("double", Double.class, false));
+//        WFSFeatureType ft = new WFSFeatureType(builder.getFeatureType(),null);
+        ft.getUserData().put("lenient", true );
+        
         GeometryFactory fac=new GeometryFactory();
         
         Point point = fac.createPoint(new Coordinate(10,10));
@@ -48,7 +60,7 @@ public class WFSFeatureTypeTest extends TestCase {
                 name2
         };
         
-        Feature feature = ft.create(atts);
+        SimpleFeature feature = SimpleFeatureBuilder.build(ft, atts, null );
         
         assertNotNull(feature.getID());
         assertEquals(point, feature.getAttribute(0));
@@ -59,7 +71,9 @@ public class WFSFeatureTypeTest extends TestCase {
         
         atts[1]=null;
         String fid="fid";
-        feature = ft.create(atts, fid);
+        
+        feature = SimpleFeatureBuilder.build(ft, atts, fid );
+        //feature = ft.create(atts, fid);
         
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
@@ -74,7 +88,8 @@ public class WFSFeatureTypeTest extends TestCase {
                 name2,
                 double1
         };
-        feature = ft.create(atts, fid);
+        feature = SimpleFeatureBuilder.build(ft, atts, fid );
+        //feature = ft.create(atts, fid);
         
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
@@ -89,7 +104,8 @@ public class WFSFeatureTypeTest extends TestCase {
                 name2,
                 double1
         };
-        feature = ft.create(atts, fid);
+        feature = SimpleFeatureBuilder.build(ft, atts, fid );
+        //feature = ft.create(atts, fid);
         
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
@@ -104,9 +120,8 @@ public class WFSFeatureTypeTest extends TestCase {
                 name2,
                 double1
         };
-        
-        feature = ft.create(atts, fid);
-        
+        feature = SimpleFeatureBuilder.build(ft, atts, fid );
+        //feature = ft.create(atts, fid);        
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
         assertEquals(id, feature.getAttribute(1));

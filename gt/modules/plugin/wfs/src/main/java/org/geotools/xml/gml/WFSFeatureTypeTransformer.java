@@ -15,12 +15,13 @@
  */
 package org.geotools.xml.gml;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -33,53 +34,64 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class WFSFeatureTypeTransformer {
 
     public static SimpleFeatureType transform( SimpleFeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
-        FeatureTypeBuilder factory = FeatureTypeBuilder.newInstance(schema.getTypeName());
-
-        factory.setNamespace(schema.getNamespace());
-        factory.setName(schema.getTypeName());
-
-        GeometryAttributeType defaultGeometryType = null;
+        SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+        build.setName( schema.getName() );
+        //build.setDefaultGeometry( schema.getDefaultGeometry().getLocalName() );
+        
+        GeometryDescriptor defaultGeometryType = null;
         for( int i = 0; i < schema.getAttributeCount(); i++ ) {
-            AttributeType attributeType = schema.getAttributeType(i);
-            if( attributeType instanceof ChoiceAttributeType.Geometry ){
-                defaultGeometryType = handleChoiceGeometryAttribute(schema, crs, factory, defaultGeometryType, attributeType);
-            }else if (attributeType instanceof GeometryAttributeType) {
-                defaultGeometryType = handleGeometryAttribute(schema, crs, factory, defaultGeometryType, attributeType);
-            } else {
-                factory.addType(attributeType);
+            AttributeDescriptor attributeType = schema.getAttribute(i);
+            if( attributeType instanceof ChoiceGeometryType ){
+                defaultGeometryType = handleChoiceGeometryAttribute(schema, crs, build, defaultGeometryType, attributeType);
+            }
+            else if (attributeType instanceof GeometryDescriptor) {
+                defaultGeometryType = handleGeometryAttribute(schema, crs, build, defaultGeometryType, attributeType);
+            }
+            else {
+                build.add(attributeType);
             }
         }
-        factory.setDefaultGeometry(defaultGeometryType);
-        return factory.getFeatureType();
+        build.setDefaultGeometry(defaultGeometryType.getLocalName());
+        return build.buildFeatureType();
     }
 
-    private static GeometryAttributeType handleGeometryAttribute( FeatureType schema, CoordinateReferenceSystem crs, FeatureTypeBuilder factory, GeometryAttributeType defaultGeometryType, AttributeType attributeType ) {
-        GeometryAttributeType geometryType = (GeometryAttributeType) attributeType;
-        GeometryAttributeType geometry;
+    private static GeometryDescriptor handleGeometryAttribute( SimpleFeatureType schema, CoordinateReferenceSystem crs, SimpleFeatureTypeBuilder factory, GeometryDescriptor defaultGeometryType, AttributeDescriptor attributeType ) {
+        GeometryDescriptor geometryType = (GeometryDescriptor) attributeType;
+        GeometryDescriptor geometry;
 
-        geometry = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
-                geometryType.getLocalName(), geometryType.getBinding(), geometryType.isNillable(),
-                0, geometryType.createDefaultValue(), crs);
+        AttributeTypeBuilder builder = new AttributeTypeBuilder();
+        builder.setName( geometryType.getLocalName()  );
+        builder.setBinding( geometryType.getType().getBinding() );
+        builder.setNillable( geometryType.isNillable() );
+        
+        //builder.setDefaultValue(defaultValue);
+        builder.setCRS( crs );
+        
+        geometry = builder.buildDescriptor( geometryType.getLocalName(), builder.buildGeometryType() );
+        
+//        geometry = (GeometryDescriptor) AttributeTypeFactory.newAttributeType(
+//                geometryType.getLocalName(), geometryType.getBinding(), geometryType.isNillable(),
+//                0, geometryType.createDefaultValue(), crs);
 
         if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
             defaultGeometryType = geometry;
         }
-        factory.addType(geometry);
+        factory.add(geometry);
         return defaultGeometryType;
     }
 
-    private static GeometryAttributeType handleChoiceGeometryAttribute( FeatureType schema, CoordinateReferenceSystem crs, FeatureTypeBuilder factory, GeometryAttributeType defaultGeometryType, AttributeType attributeType ) {
-        ChoiceAttributeType.Geometry geometryType = (ChoiceAttributeType.Geometry) attributeType;
-        ChoiceAttributeType.Geometry geometry;
+    private static GeometryDescriptor handleChoiceGeometryAttribute( SimpleFeatureType schema, CoordinateReferenceSystem crs, SimpleFeatureTypeBuilder factory, GeometryDescriptor defaultGeometryType, AttributeDescriptor attributeType ) {
+        ChoiceGeometryTypeImpl geometryType = (ChoiceGeometryTypeImpl) attributeType;
+        ChoiceGeometryTypeImpl geometry;
 
-        geometry = new ChoiceAttributeTypeImpl.Geometry(
-                geometryType.getLocalName(), geometryType.getChoices(), geometryType.getBinding(), geometryType.isNillable(),
-                geometryType.getMinOccurs(), geometryType.getMaxOccurs(), geometryType.createDefaultValue(), crs, geometryType.getRestriction());
+        geometry = new ChoiceGeometryTypeImpl(
+            geometryType.getName(), geometryType.getChoices(), geometryType.getBinding(), geometryType.isNillable(),
+            geometryType.getMinOccurs(), geometryType.getMaxOccurs(), geometryType.createDefaultValue(), crs, geometryType.getRestrictions());
 
         if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
             defaultGeometryType = geometry;
         }
-        factory.addType(geometry);
+        factory.add(geometry);
         return defaultGeometryType;
     }
 

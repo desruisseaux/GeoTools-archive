@@ -31,12 +31,12 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -67,7 +67,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
     
-    public static Id doInsert(DataStore ds,FeatureType ft,FeatureCollection insert) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public static Id doInsert(DataStore ds,SimpleFeatureType ft,FeatureCollection insert) throws NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	WFSFeatureStore fs = (WFSFeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
@@ -148,7 +148,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	return ff;
     }
     
-    public static void doDelete(DataStore ds,FeatureType ft, Id ff) throws NoSuchElementException, IllegalAttributeException, IOException{
+    public static void doDelete(DataStore ds,SimpleFeatureType ft, Id ff) throws NoSuchElementException, IllegalAttributeException, IOException{
     	assertNotNull("doInsertFailed?",ff);
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
@@ -191,12 +191,12 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	assertTrue(count2==count3);
     }
     
-    public static void doUpdate(DataStore ds,FeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
+    public static void doUpdate(DataStore ds,SimpleFeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	
-    	AttributeType at = ft.getAttributeType(attributeToChange);
+    	AttributeDescriptor at = ft.getAttribute(attributeToChange);
     	assertNotNull("Attribute "+attributeToChange+" does not exist",at);
     	
     	FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);

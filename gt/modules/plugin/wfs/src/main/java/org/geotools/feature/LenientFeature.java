@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
 
 import org.geotools.data.wfs.WFSDataStoreFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.type.Types;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -41,14 +43,14 @@ public class LenientFeature extends SimpleFeatureImpl {
      *         type schema.
      * @throws NullPointerException if schema is null.
      */
-    protected LenientFeature(SimpleFeatureType schema, Object[] attributes,String featureID)
+    protected LenientFeature(List<Attribute> attributes, SimpleFeatureType schema, String featureID)
         throws IllegalAttributeException, NullPointerException {
-        super(Arrays.asList(attributes),
+        super(attributes,
               checkSchema( schema),
               checkId( featureID ));
         // superclass just punts the values in ... we are going to validate if needed
         constructing=true;
-        setAttributes(attributes);
+        setValue(attributes);
         constructing=false;
     }
 
@@ -57,24 +59,6 @@ public class LenientFeature extends SimpleFeatureImpl {
             throw new NullPointerException("schema");
         }
         return schema;
-    }
-
-    /**
-     * Creates a new instance of flat feature, which must take a flat feature
-     * type schema and all attributes as arguments.
-     *
-     * @param schema Feature type schema for this flat feature.
-     * @param attributes Initial attributes for this feature.
-     *
-     * @throws IllegalAttributeException Attribtues do not conform to feature
-     *         type schema.
-     *
-     * @task REVISIT: should we allow this?  Force users to explicitly set
-     *       featureID to null?
-     */
-    protected LenientFeature(SimpleFeatureType schema, Object[] attributes)
-        throws IllegalAttributeException {
-        this(schema, attributes, null);
     }
 
     /**
@@ -228,8 +212,7 @@ public class LenientFeature extends SimpleFeatureImpl {
      */
     public Object clone() {
         try {
-            DefaultFeature clone = (DefaultFeature) super.clone();
-
+            LenientFeature clone = (LenientFeature) super.clone();
             for (int i = 0; i < getAttributeCount(); i++) {
                 clone.setAttribute(i, getAttribute(i));                
             }

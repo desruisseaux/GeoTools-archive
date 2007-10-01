@@ -393,13 +393,11 @@ public class WFSDataStore extends AbstractDataStore {
         }
         
         if(ftName!=null){
-            try {
-                SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
-                build.init( t );
-                build.setName( ftName==null?typeName:ftName );
+            SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+            build.init( t );
+            build.setName( ftName );
                 
-                t = build.buildFeatureType();
-                
+            t = build.buildFeatureType();
 //            	t = FeatureTypeBuilder.newFeatureType(
 //            	        t.getAttributeTypes(),
 //            	        ftName==null?typeName:ftName,
@@ -407,22 +405,21 @@ public class WFSDataStore extends AbstractDataStore {
 //    	                t.isAbstract(),
 //    	                t.getAncestors(),
 //    	                t.getDefaultGeometry());                
-            } catch (SchemaException e1) {
-                WFSDataStoreFactory.logger.warning(e1.getMessage());
-            }
         }
         try{
             URL url = getDescribeFeatureTypeURLGet(typeName);
             if( url!=null ) {
-				t=new WFSFeatureType(t, new URI(url.toString()));
+                SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
+                build.init( t );
+                build.setNamespaceURI( url.toURI() );
+                t = build.buildFeatureType();                
 			}
         }catch (URISyntaxException e) {
             throw (RuntimeException) new RuntimeException( e );
         }
         if (t != null) {
-            featureTypeCache.put(typeName, t);
+            featureTypeCache.put( typeName, t );
         }
-
         return t;
     }
 
@@ -646,18 +643,17 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
 
-        WFSFeatureType schema = (WFSFeatureType)getSchema(request.getTypeName());
+        SimpleFeatureType schema = getSchema(request.getTypeName());
         
         SimpleFeatureType featureType;
         try {
-            featureType = DataUtilities.createSubType( schema.delegate, request.getPropertyNames(), 
+            featureType = DataUtilities.createSubType( schema, request.getPropertyNames(), 
                     request.getCoordinateSystem() );
         } catch (SchemaException e) {
-            featureType=schema.delegate;
+            featureType=schema;
         }
-        WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), lenient));
-
+        schema.getUserData().put("lenient", true );
+        WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,timeout, ts, schema);
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
@@ -810,18 +806,18 @@ public class WFSDataStore extends AbstractDataStore {
                 transaction.putState(this, ts);
             }
         }
-        WFSFeatureType schema = (WFSFeatureType)getSchema(query.getTypeName());
+        SimpleFeatureType schema = getSchema(query.getTypeName());
         
         SimpleFeatureType featureType;
         try {
-            featureType = DataUtilities.createSubType( schema.delegate, query.getPropertyNames(), 
+            featureType = DataUtilities.createSubType( schema, query.getPropertyNames(), 
                     query.getCoordinateSystem() );
         } catch (SchemaException e) {
-            featureType=schema.delegate;
+            featureType=schema;
         }
-
+        schema.getUserData().put("lenient", true );
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), lenient));
+                timeout, ts, schema);
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");

@@ -33,14 +33,16 @@ import org.geotools.data.Transaction;
 import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.DefaultFeature;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.LenientFeatureFactory;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -78,13 +80,13 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         List features=new ArrayList();
         while(reader.hasNext()){
             try {
-                Feature next = reader.next();
+                SimpleFeature next = reader.next();
                 features.add(next);
             } catch (Exception e) {
                 throw (IOException) new IOException( ).initCause( e );
             }
         }
-        return addFeatures(DataUtilities.collection((Feature[]) features.toArray(new Feature[0])));
+        return addFeatures(DataUtilities.collection((SimpleFeature[]) features.toArray(new SimpleFeature[0])));
     }
 
 	public Set addFeatures(FeatureCollection collection) throws IOException {
@@ -98,31 +100,51 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         HashSet r = new HashSet();
         
-        AttributeType[] atrs = getSchema().getAttributeTypes();
+        SimpleFeatureType schema = getSchema();
+        SimpleFeatureBuilder build = new SimpleFeatureBuilder( schema );
+        
+        boolean isLenient = true;
+        if( schema.getUserData().containsKey("lenient")){
+            isLenient = (Boolean) schema.getUserData().get("lenient");
+        }
+        
+        if( isLenient ){
+            build.setFeatureFactory( new LenientFeatureFactory());
+        }
+        
+        List<AttributeDescriptor> atrs = schema.getAttributes();
         FeatureIterator iter=collection.features();
         try{
-            Envelope bounds=null;
+            ReferencedEnvelope bounds=null;
+            
         while (iter.hasNext()){
             try {
-                Feature newFeature;
+                SimpleFeature newFeature;
                 try {
-                        Feature f = iter.next();
-                        newFeature = getSchema().create( f.getAttributes(new Object[getSchema().getAttributeCount()]), ts.nextFid(getSchema().getTypeName()));
-                        r.add(newFeature.getID());
+                    SimpleFeature f = iter.next();
+                    
+                    String nextFid = ts.nextFid(schema.getTypeName());
+                    Object[] values = f.getAttributes().toArray();
+                    
+                    build.addAll(values );
+                    newFeature = build.buildFeature( nextFid );
+                    
+                    r.add(newFeature.getID());
                 } catch (IllegalAttributeException e) {
                     throw (IOException) new IOException( e.getLocalizedMessage() );
                 }
 
-                for(int i=0;i<atrs.length;i++){
-                    if(atrs[i] instanceof GeometryAttributeType){
-                        Geometry g = (Geometry)newFeature.getAttribute(i);
-                        CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
+                for(int i=0;i<atrs.size();i++){
+                    AttributeDescriptor att = atrs.get(i);
+                    if(att instanceof GeometryDescriptor){
+                        Geometry g = (Geometry) newFeature.getAttribute(i);
+                        CoordinateReferenceSystem cs = ((GeometryDescriptor)att).getCRS();
                         if( g==null )
                             continue;
                         if( cs!=null && !cs.getIdentifiers().isEmpty() )
                             g.setUserData(cs.getIdentifiers().iterator().next().toString());
                         if( bounds==null ){
-                            bounds=new Envelope(g.getEnvelopeInternal());
+                            bounds=new ReferencedEnvelope(g.getEnvelopeInternal(), schema.getCRS() );
                         }else{
                             bounds.expandToInclude(g.getEnvelopeInternal());
                         }
@@ -130,7 +152,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                 }
                 
                 
-                ts.addAction(getSchema().getTypeName(), new InsertAction(newFeature));
+                ts.addAction(schema.getTypeName(), new InsertAction(newFeature));
 
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
@@ -143,10 +165,11 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         if( bounds==null){
             // if bounds are null then send an envelope to say that features were added but
             // at an unknown location.
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
-                    getTransaction(), new Envelope(), false);
+            bounds = new ReferencedEnvelope( getSchema().getCRS() );
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(schema.getTypeName(),
+                    getTransaction(), bounds, false);
         }else{
-            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(schema.getTypeName(),
                     getTransaction(), bounds, false);                   
         }
 
@@ -156,7 +179,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
 
-            String[] fids = ts.getFids(getSchema().getTypeName());
+            String[] fids = ts.getFids(schema.getTypeName());
             r = new HashSet(Arrays.asList(fids));
 
             return r;
@@ -186,7 +209,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         // know what."  Can't be null because the convention states that null is sent on commits only.
         // JE
         ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
-        		getTransaction(), new Envelope(), false);
+        		getTransaction(), null, false);
 
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
@@ -196,7 +219,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
      * 
      * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType[], java.lang.Object[], org.geotools.filter.Filter)
      */
-    public void modifyFeatures(AttributeType[] type, Object[] value,
+    public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
         Filter filter2) throws IOException {
     	Filter filter=ds.processFilter(filter2);
         WFSTransactionState ts = null;
@@ -209,11 +232,11 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         Map props = new HashMap();
         
-        Envelope bounds=null;
+        ReferencedEnvelope bounds=null;
         for (int i = 0; i < type.length; i++) {
-        	if(type[i] instanceof GeometryAttributeType){
+        	if(type[i] instanceof GeometryDescriptor){
         		Geometry g = (Geometry)value[i];
-        		CoordinateReferenceSystem cs = ((GeometryAttributeType)type[i]).getCoordinateSystem();
+        		CoordinateReferenceSystem cs = ((GeometryDescriptor)type[i]).getCRS();
 
                 if( cs!=null && !cs.getIdentifiers().isEmpty() )
                     g.setUserData(cs.getIdentifiers().iterator().next().toString());
@@ -224,7 +247,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                 if( g==null )
                 	continue;
                 if( bounds==null ){
-                    bounds=new Envelope(g.getEnvelopeInternal());
+                    bounds=new ReferencedEnvelope(g.getEnvelopeInternal(),cs);
                 }else{
                     bounds.expandToInclude(g.getEnvelopeInternal());
                 }
@@ -239,8 +262,9 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         if( bounds==null ){
             // if bounds are null then send an envelope to say that features were modified but
             // at an unknown location.
+            bounds = new ReferencedEnvelope(getSchema().getCRS());
             ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
-                    getTransaction(), new Envelope(), false);
+                    getTransaction(), bounds, false);
         }else{
             ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
                     getTransaction(), bounds, false);                   
@@ -254,9 +278,9 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
      * 
      * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType, java.lang.Object, org.geotools.filter.Filter)
      */
-    public void modifyFeatures(AttributeType type, Object value, Filter filter)
+    public void modifyFeatures(AttributeDescriptor type, Object value, Filter filter)
         throws IOException {
-        modifyFeatures(new AttributeType[] { type, }, new Object[] { value, },
+        modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, },
             filter);
     }
 
@@ -275,22 +299,22 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         ts.addAction(getSchema().getTypeName(), new DeleteAction(getSchema().getTypeName(), Filter.INCLUDE));
         
-        Envelope bounds=null;
+        ReferencedEnvelope bounds=null;
         while (reader.hasNext()){
 
             try {
-            	Feature f = reader.next();
-            	AttributeType[] atrs = f.getFeatureType().getAttributeTypes();
-            	for(int i=0;i<atrs.length;i++){
-            		if(atrs[i] instanceof GeometryAttributeType){
+            	SimpleFeature f = reader.next();
+            	List<AttributeDescriptor> atrs = f.getFeatureType().getAttributes();
+            	for(int i=0;i<atrs.size();i++){
+            		if(atrs.get(i) instanceof GeometryDescriptor){
             			Geometry g = (Geometry)f.getAttribute(i);
-                		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
+                		CoordinateReferenceSystem cs = ((GeometryDescriptor)atrs.get(i)).getCRS();
                         if( cs!=null && !cs.getIdentifiers().isEmpty() )
                             g.setUserData(cs.getIdentifiers().iterator().next().toString());
                         if( g==null )
                         	continue;
                         if( bounds==null ){
-                            bounds=new Envelope(g.getEnvelopeInternal());
+                            bounds=new ReferencedEnvelope(g.getEnvelopeInternal(),cs);
                         }else{
                             bounds.expandToInclude(g.getEnvelopeInternal());
                         }
@@ -309,8 +333,9 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         if( bounds==null){
             // if bounds are null then send an envelope to say that features were added but
             // at an unknown location.
+            bounds = new ReferencedEnvelope( getSchema().getCRS() );
             ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
-                    getTransaction(), new Envelope(), false);
+                    getTransaction(), bounds, false);
         }else{
             ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
                     getTransaction(), bounds, false);                   

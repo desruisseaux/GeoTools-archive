@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.SAXException;
 
 
@@ -53,7 +55,7 @@ public class WFSFeatureReader extends FCBuffer {
     private int insertSearchIndex = -1;
 
     private WFSFeatureReader(InputStream is, int capacity, int timeout,
-        WFSTransactionState trans, WFSFeatureType ft) {
+        WFSTransactionState trans, SimpleFeatureType ft) {
         //document may be null
         super(null, capacity, timeout,ft);
         this.is = is;
@@ -71,7 +73,7 @@ public class WFSFeatureReader extends FCBuffer {
      * @throws SAXException
      */
     public static FeatureReader getFeatureReader(URI document, int capacity,
-        int timeout, WFSTransactionState transaction, WFSFeatureType ft) throws SAXException {
+        int timeout, WFSTransactionState transaction, SimpleFeatureType ft) throws SAXException {
         HttpURLConnection hc;
 
         try {
@@ -99,7 +101,7 @@ public class WFSFeatureReader extends FCBuffer {
      * @throws SAXException
      */
     public static WFSFeatureReader getFeatureReader(InputStream is,
-        int capacity, int timeout, WFSTransactionState transaction, WFSFeatureType ft)
+        int capacity, int timeout, WFSTransactionState transaction, SimpleFeatureType ft)
         throws SAXException {
         WFSFeatureReader fc = new WFSFeatureReader(is, capacity, timeout,
                 transaction, ft);
@@ -150,11 +152,17 @@ public class WFSFeatureReader extends FCBuffer {
     protected void initHints( XMLHandlerHints hints ) {
         super.initHints(hints);
 
-        if( ft instanceof WFSFeatureType){
-            Map schemas=new HashMap(1);
-            WFSFeatureType wfsFT=(WFSFeatureType) ft;
-            schemas.put(wfsFT.getNamespace().toString(), wfsFT.getSchemaURI());
+        Map<String,URI> schemas=new HashMap<String,URI>(1);
+        SimpleFeatureType wfsFT= ft;
+        
+        String namespace = ft.getName().getNamespaceURI();
+        URI uri;
+        try {
+            uri = new URI( namespace );
+            schemas.put(namespace,uri);
             hints.put(XMLHandlerHints.NAMESPACE_MAPPING, schemas);
+            
+        } catch (URISyntaxException e) {            
         }
     }
     

@@ -18,9 +18,9 @@ package org.geotools.data.wfs;
 import java.io.InputStream;
 
 import org.geotools.TestData;
-import org.geotools.feature.FeatureType;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.schema.Schema;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
@@ -41,12 +41,12 @@ public class CreateFeatureTypeTest extends TestCase {
 		InputStream in = TestData.openStream("xml/feature-type-simple.xsd");
 		try{
 	        Schema schema = SchemaFactory.getInstance(null, in);
-	        FeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
+	        SimpleFeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
 	        assertNotNull(ft);
-	        assertEquals(Integer.class, ft.getAttributeType("ID").getBinding());
-	        assertEquals(String.class, ft.getAttributeType("CODE").getBinding());
-	        assertEquals(Float.class, ft.getAttributeType("KM").getBinding());
-	        assertEquals(Polygon.class, ft.getAttributeType("GEOM").getBinding());
+	        assertEquals(Integer.class, ft.getAttribute("ID").getType().getBinding());
+	        assertEquals(String.class, ft.getAttribute("CODE").getType().getBinding());
+	        assertEquals(Float.class, ft.getAttribute("KM").getType().getBinding());
+	        assertEquals(Polygon.class, ft.getAttribute("GEOM").getType().getBinding());
 		}finally{
 			in.close();
 		}
@@ -56,12 +56,12 @@ public class CreateFeatureTypeTest extends TestCase {
 		InputStream in = TestData.openStream("xml/feature-type-choice.xsd");
 		try{
 	        Schema schema = SchemaFactory.getInstance(null, in);
-	        FeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
+	        SimpleFeatureType ft = WFSDataStore.parseDescribeFeatureTypeResponse("WATER", schema);
 	        assertNotNull(ft);
-	        assertEquals(Integer.class, ft.getAttributeType("ID").getBinding());
-	        assertEquals(String.class, ft.getAttributeType("CODE").getBinding());
-	        assertEquals(Float.class, ft.getAttributeType("KM").getBinding());
-	        assertEquals(MultiPolygon.class, ft.getAttributeType("GEOM").getBinding());
+	        assertEquals(Integer.class, ft.getAttribute("ID").getType().getBinding());
+	        assertEquals(String.class, ft.getAttribute("CODE").getType().getBinding());
+	        assertEquals(Float.class, ft.getAttribute("KM").getType().getBinding());
+	        assertEquals(MultiPolygon.class, ft.getAttribute("GEOM").getType().getBinding());
 		}finally{
 			in.close();
 		}

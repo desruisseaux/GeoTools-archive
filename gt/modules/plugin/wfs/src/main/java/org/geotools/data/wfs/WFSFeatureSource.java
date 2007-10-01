@@ -27,9 +27,9 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -77,7 +77,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getSchema()
      */
-    public FeatureType getSchema() {
+    public SimpleFeatureType getSchema() {
     	try {
 			return ds.getSchema(fname);
 		} catch (IOException e) {
@@ -89,7 +89,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getBounds()
      */
-    public Envelope getBounds() throws IOException {
+    public ReferencedEnvelope getBounds() throws IOException {
         return getBounds((fname == null) ? Query.ALL
                                       : new DefaultQuery(fname));
     }
@@ -98,7 +98,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getBounds(org.geotools.data.Query)
      */
-    public Envelope getBounds(Query query) throws IOException {
+    public ReferencedEnvelope getBounds(Query query) throws IOException {
         return ds.getBounds(namedQuery(query));
     }
 
@@ -123,7 +123,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
     public FeatureCollection getFeatures(Query query) throws IOException  {
-        FeatureType schema = getSchema();        
+        SimpleFeatureType schema = getSchema();        
         String typeName = schema.getTypeName();
         
         if( query.getTypeName() == null ){ // typeName unspecified we will "any" use a default
@@ -170,7 +170,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * 
          * @see org.geotools.data.FeatureResults#getSchema()
          */
-        public FeatureType getSchema(){
+        public SimpleFeatureType getSchema(){
             return fs.getSchema();
         }
 
@@ -188,7 +188,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          */
         public ReferencedEnvelope getBounds(){
             try {
-				return ReferencedEnvelope.reference(fs.getBounds(query));
+				return fs.getBounds(query);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;

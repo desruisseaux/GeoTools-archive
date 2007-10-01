@@ -799,7 +799,7 @@ public class Types {
      * @return Our best attempt to make a valid value
      * @throws IllegalArgumentException if we really could not do it.
      */
-    public Object parse(AttributeDescriptor descriptor, Object value) throws IllegalArgumentException {
+    public static Object parse(AttributeDescriptor descriptor, Object value) throws IllegalArgumentException {
         if (value == null){
             if( descriptor.isNillable()){
                 return descriptor.getDefaultValue();

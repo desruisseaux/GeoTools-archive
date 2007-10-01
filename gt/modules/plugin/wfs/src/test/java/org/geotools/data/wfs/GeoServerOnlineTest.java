@@ -46,12 +46,13 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
@@ -119,9 +120,9 @@ public class GeoServerOnlineTest extends TestCase {
             typeName = types[i];
             if( typeName.equals("topp:geometrytype"))
             	continue;
-            FeatureType type = wfs.getSchema( typeName );
+            SimpleFeatureType type = wfs.getSchema( typeName );
             type.getTypeName();
-            type.getNamespace();
+            type.getName().getNamespaceURI();
             
             FeatureSource source = wfs.getFeatureSource( typeName );
             source.getBounds();
@@ -136,13 +137,13 @@ public class GeoServerOnlineTest extends TestCase {
             features.size();
             Iterator reader = features.iterator();
             while( reader.hasNext() ){
-                Feature feature = (Feature)reader.next();
+                SimpleFeature feature = (SimpleFeature) reader.next();
             }
             features.close(reader);
             
             FeatureIterator iterator = features.features();
             while( iterator.hasNext() ){
-                Feature feature = iterator.next();
+                SimpleFeature feature = iterator.next();
             }
             features.close( iterator );
         }
@@ -163,9 +164,9 @@ public class GeoServerOnlineTest extends TestCase {
             return;
         }
         String typeName = "tiger:poi";        
-            FeatureType type = wfs.getSchema( typeName );
+        SimpleFeatureType type = wfs.getSchema( typeName );
             type.getTypeName();
-            type.getNamespace();
+            type.getName().getNamespaceURI();
             
             FeatureSource source = wfs.getFeatureSource( typeName );
             source.getBounds();
@@ -181,14 +182,14 @@ public class GeoServerOnlineTest extends TestCase {
             
             Iterator reader = features.iterator();
             while( reader.hasNext() ){
-                Feature feature = (Feature)reader.next();
+                SimpleFeature feature = (SimpleFeature)reader.next();
                 System.out.println(feature);
             }
             features.close(reader);
             
             FeatureIterator iterator = features.features();
             while( iterator.hasNext() ){
-                Feature feature = iterator.next();
+                SimpleFeature feature = iterator.next();
             }
             features.close( iterator );
     }
@@ -278,7 +279,7 @@ public class GeoServerOnlineTest extends TestCase {
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000000));
         DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
         String typename = TO_EDIT_TYPE;
-        FeatureType ft = post.getSchema( typename );
+        SimpleFeatureType ft = post.getSchema( typename );
         FeatureSource fs = post.getFeatureSource( typename );        
         class Watcher implements FeatureListener {
             public int count=0;
@@ -302,18 +303,22 @@ public class GeoServerOnlineTest extends TestCase {
 		Query query=new DefaultQuery(typename, filterFac.not(geomNullCheck), 1, Query.ALL_NAMES, null);
         FeatureIterator inStore = fs.getFeatures(query).features();
         
-        Feature f,f2;
+        SimpleFeature f,f2;
         try{
-            Feature feature = inStore.next();
-            f = ft.create(ft.duplicate(feature).getAttributes(new Object[ft.getAttributeCount()]));
-            f2 = ft.create(ft.duplicate(feature).getAttributes(new Object[ft.getAttributeCount()]));
+            SimpleFeature feature = inStore.next();
+            
+            SimpleFeature copy = SimpleFeatureBuilder.deep( feature);
+            SimpleFeature copy2 = SimpleFeatureBuilder.deep( feature);
+            
+            f = SimpleFeatureBuilder.build( ft, copy.getAttributes(), null);            
+            f2 = SimpleFeatureBuilder.build( ft, copy2.getAttributes(), null);
             assertFalse("Max Feature failed", inStore.hasNext());
         }finally{
             inStore.close();
         }
         
         Logger.getLogger("org.geotools.data.wfs").setLevel(Level.FINE);
-        FeatureCollection inserts = DataUtilities.collection(new Feature[] {f,f2});
+        FeatureCollection inserts = DataUtilities.collection(new SimpleFeature[] {f,f2});
         Id fp = WFSDataStoreWriteOnlineTest.doInsert(post,ft,inserts);
         
         /// okay now count ...

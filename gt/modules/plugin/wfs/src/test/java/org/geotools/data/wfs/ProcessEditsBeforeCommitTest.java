@@ -22,9 +22,8 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.wfs.Action.InsertAction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AbstractFilterImpl;
 import org.geotools.filter.CompareFilter;
@@ -33,6 +32,8 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
@@ -55,7 +56,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 		);
 	}
 	private WFSTransactionState state;
-	private FeatureType featureType;
+	private SimpleFeatureType featureType;
 	private String typename;
 	private String GEOM_ATT="geom";
 	private String NAME_ATT="name";
@@ -67,15 +68,15 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 		featureType=DataUtilities.createType(typename, GEOM_ATT+":Point,"+NAME_ATT+":String");
 	}
 	
-	private Feature createFeature(int x, int y, String name) throws IllegalAttributeException {
+	private SimpleFeature createFeature(int x, int y, String name) throws IllegalAttributeException {
 		GeometryFactory fac=new GeometryFactory();
 		Object p = fac.createPoint(new Coordinate(x,y));
 		
-		return featureType.create(new Object[]{p,name});
+		return SimpleFeatureBuilder.build( featureType, new Object[]{p,name}, null );
 	}
 
 	public void testBasicInsertFIDFilterUpdateCollapse() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+		SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature));
 		Map properties=new HashMap(); 
 		properties.put(NAME_ATT, "newName");
@@ -92,7 +93,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 	
 
 	public void testMultiInsertUpdateCollapse() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+		SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature));
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature(10,10,NAME_ATT)));
 		Map properties=new HashMap(); 
@@ -111,7 +112,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 	
 
 	public void testMultiFIDFilterUpdateCollapse() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+	    SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature));
 		Map properties=new HashMap(); 
 		properties.put(NAME_ATT, "newName");
@@ -132,7 +133,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 
 
 	public void testFidAndNonFidFilterUpdates() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+	    SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		Map updateProperties=new HashMap(); 
 		updateProperties.put(NAME_ATT, "noMatch");
 		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, Filter.INCLUDE, updateProperties));
@@ -158,7 +159,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 	}
 	
 	public void testDeleteAndInsert() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+	    SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		Map updateProperties=new HashMap(); 
 		updateProperties.put(NAME_ATT, "noMatch");
 		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, Filter.INCLUDE, updateProperties));
@@ -184,7 +185,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 	}
 	
 	public void testInsertAndDelete() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+	    SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature));
 		state.addAction(featureType.getTypeName(), new Action.DeleteAction(typename, 
 				filterFac.createFidFilter(createFeature.getID())));
@@ -194,7 +195,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 	}	
 	
 	public void testUpdatesDeletesAndInsertes() throws Exception {
-		Feature createFeature = createFeature(0,0,NAME_ATT);
+	    SimpleFeature createFeature = createFeature(0,0,NAME_ATT);
 		Map updateProperties=new HashMap(); 
 		updateProperties.put(NAME_ATT, "noMatch");
 		

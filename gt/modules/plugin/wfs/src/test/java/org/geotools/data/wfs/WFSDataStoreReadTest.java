@@ -29,8 +29,6 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
@@ -39,6 +37,8 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -83,15 +83,15 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("FT name = "+wfs.getTypeNames()[i]);
         if(get){
             // get
-            FeatureType ft = wfs.getSchemaGet(wfs.getTypeNames()[i]);
+            SimpleFeatureType ft = wfs.getSchemaGet(wfs.getTypeNames()[i]);
             assertNotNull("FeatureType was null",ft);
-            assertTrue(wfs.getTypeNames()[i]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+            assertTrue(wfs.getTypeNames()[i]+" must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributes()!=null && ft.getAttributeCount()>0);
         }
         if(post){
             // post
-            FeatureType ft = wfs.getSchemaPost(wfs.getTypeNames()[i]);
+            SimpleFeatureType ft = wfs.getSchemaPost(wfs.getTypeNames()[i]);
             assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributeTypes()!=null && ft.getAttributeCount()>0);
+            assertTrue("must have 1 geom and atleast 1 other attribute -- fair assumption",ft.getDefaultGeometry()!=null && ft.getAttributes()!=null && ft.getAttributeCount()>0);
         }
         }catch(java.net.SocketException se){
             se.printStackTrace();
@@ -136,7 +136,7 @@ public class WFSDataStoreReadTest extends TestCase {
         WFSDataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
-        FeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
+        SimpleFeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
         
         String[] props;
@@ -151,12 +151,12 @@ public class WFSDataStoreReadTest extends TestCase {
             try{
                 assertNotNull("FeatureType was null",ft);
                 
-                FeatureType featureType = fr.getFeatureType();
+                SimpleFeatureType featureType = fr.getFeatureType();
                 if( ft.getAttributeCount()>1 ){
                     assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
                 }
                 assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && featureType!=null );
-                Feature feature = fr.next();
+                SimpleFeature feature = fr.next();
                 featureType=feature.getFeatureType();
                 if( ft.getAttributeCount()>1 ){
                     assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
@@ -177,12 +177,12 @@ public class WFSDataStoreReadTest extends TestCase {
             FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
             try{
                 assertNotNull("FeatureType was null",ft);
-                FeatureType featureType = fr.getFeatureType();
+                SimpleFeatureType featureType = fr.getFeatureType();
                 if( ft.getAttributeCount()>1 ){
                     assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
                 }
                 assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && featureType!=null );
-                Feature feature = fr.next();
+                SimpleFeature feature = fr.next();
                 featureType=feature.getFeatureType();
                 if( ft.getAttributeCount()>1 ){
                     assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
@@ -234,7 +234,7 @@ public class WFSDataStoreReadTest extends TestCase {
         WFSDataStore wfs = getDataStore(url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
-        FeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
+        SimpleFeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
         
         

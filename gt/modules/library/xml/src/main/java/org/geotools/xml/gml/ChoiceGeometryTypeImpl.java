@@ -1,5 +1,7 @@
 package org.geotools.xml.gml;
 
+import java.util.List;
+
 import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -31,7 +33,7 @@ class ChoiceGeometryTypeImpl extends ChoiceAttributeTypeImpl implements
 
     public ChoiceGeometryTypeImpl(Name name, Class[] types,
             Class defaultType, boolean nillable, int min, int max,
-            Object defaultValue, CoordinateReferenceSystem crs, Filter filter) {
+            Object defaultValue, CoordinateReferenceSystem crs, List<Filter> filter) {
         super(name, types,defaultType, nillable, min, max, defaultValue, filter );
         this.crs = crs;
     }
