@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.TopologyException;
 
 // Geotools dependencies
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -59,11 +59,6 @@ public class FeatureTableModelTest extends TestBase {
      * Standard logging instance.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
-
-    /**
-     * The attribute factory instance.
-     */
-    protected static final AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
     
     /**
      * Feature on which to perform tests.
