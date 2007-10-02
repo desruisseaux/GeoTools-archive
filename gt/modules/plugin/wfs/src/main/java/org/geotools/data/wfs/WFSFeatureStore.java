@@ -36,8 +36,8 @@ import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.LenientBuilder;
 import org.geotools.feature.LenientFeatureFactory;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -101,7 +101,8 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         HashSet r = new HashSet();
         
         SimpleFeatureType schema = getSchema();
-        SimpleFeatureBuilder build = new SimpleFeatureBuilder( schema );
+        
+        LenientBuilder build = new LenientBuilder( schema );
         
         boolean isLenient = true;
         if( schema.getUserData().containsKey("lenient")){
@@ -126,7 +127,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                     String nextFid = ts.nextFid(schema.getTypeName());
                     Object[] values = f.getAttributes().toArray();
                     
-                    build.addAll(values );
+                    build.addAll( values );
                     newFeature = build.buildFeature( nextFid );
                     
                     r.add(newFeature.getID());

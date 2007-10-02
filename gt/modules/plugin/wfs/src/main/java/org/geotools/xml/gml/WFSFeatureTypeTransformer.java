@@ -17,7 +17,6 @@ package org.geotools.xml.gml;
 
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;

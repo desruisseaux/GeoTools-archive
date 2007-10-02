@@ -1,25 +1,11 @@
 package org.geotools.feature;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.type.AttributeDescriptorImpl;
-import org.geotools.feature.type.Descriptors;
-import org.geotools.feature.type.Types;
 import org.geotools.resources.Utilities;
 import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
-import org.opengis.feature.type.PropertyType;
-
-import sun.security.action.GetBooleanAction;
 
 /**
  * Simple, mutable class to store attributes - that does not validate!

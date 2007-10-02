@@ -7,22 +7,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.opengis.feature.Attribute;
-import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.PropertyDescriptor;
-
-import org.geotools.data.wfs.WFSDataStoreFactory;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.type.Types;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.Converters;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.feature.Attribute;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 /**
  * An implementation of SimpleFeature that has a more relaxed attitude about being valid.

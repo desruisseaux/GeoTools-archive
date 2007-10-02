@@ -1,15 +1,9 @@
 package org.geotools.data.wfs;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.TestCase;
 
-import org.geotools.data.DataUtilities;
-import org.geotools.feature.LenientFeatureFactory;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.LenientBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -17,7 +11,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class WFSFeatureTypeTest extends TestCase {
 
@@ -50,7 +43,7 @@ public class WFSFeatureTypeTest extends TestCase {
                 double1,
                 name2,                
         };
-        SimpleFeature feature = createFeature( ft, atts, null );
+        SimpleFeature feature = LenientBuilder.build( ft, atts, null );
         
         assertNotNull(feature.getID());
         assertEquals(point, feature.getAttribute(0));
@@ -62,8 +55,7 @@ public class WFSFeatureTypeTest extends TestCase {
         atts[1]=null;
         String fid="fid";
         
-        feature = SimpleFeatureBuilder.build(ft, atts, fid );
-        feature = createFeature( ft, atts, fid );
+        feature = LenientBuilder.build(ft, atts, fid );
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
         assertNull(feature.getAttribute(1));
@@ -93,16 +85,15 @@ public class WFSFeatureTypeTest extends TestCase {
                 name2,
                 double1
         };
-        feature = createFeature(ft, atts, fid );
-        //feature = ft.create(atts, fid);
+        feature = LenientBuilder.build(ft, atts, fid );
         
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
         assertEquals(id, feature.getAttribute(1));
         assertEquals(name2, feature.getAttribute(2));
         if( false ){
-            //assertNull(feature.getAttribute(3));
-            //assertEquals(double1, feature.getAttribute(4));        
+            assertNull(feature.getAttribute(3));
+            assertEquals(double1, feature.getAttribute(4));        
         }
         atts=new Object[]{
                 point,
@@ -111,7 +102,7 @@ public class WFSFeatureTypeTest extends TestCase {
                 name2,
                 double1
         };
-        feature = createFeature(ft, atts, fid );
+        feature = LenientBuilder.build(ft, atts, fid );
         //feature = ft.create(atts, fid);        
         assertEquals(fid, feature.getID());
         assertEquals(point, feature.getAttribute(0));
@@ -142,16 +133,6 @@ public class WFSFeatureTypeTest extends TestCase {
         return ft;
     }
 
-    private SimpleFeature createFeature( SimpleFeatureType ft, Object atts[], String fid ){
-        LenientFeatureFactory featureFactory = new LenientFeatureFactory();
-        List properties = new ArrayList();
-        for( int i=0; i<atts.length;i++){
-            Object value = atts[i];
-            Property property = featureFactory.createAttribute(value, ft.getAttribute(i), null);
-            properties.add(property);            
-        }
-        return featureFactory.createSimpleFeature(properties, ft, fid );
-    }
 }
 
 

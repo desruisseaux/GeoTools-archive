@@ -55,7 +55,6 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;

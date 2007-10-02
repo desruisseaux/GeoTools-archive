@@ -23,14 +23,13 @@ import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.Filter;
+import org.geotools.feature.LenientBuilder;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.Filters;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -237,7 +236,7 @@ public interface Action {
         	SimpleFeature feature;
             try {
                 // WARNNING: deep copy
-                feature = SimpleFeatureBuilder.copy( f );
+                feature = LenientBuilder.copy( f );
 			} catch (IllegalAttributeException e) {
 				Logger.getLogger("org.geotools.data.wfs").warning("Failed to duplicate feature:"+f);
 				feature=f;
