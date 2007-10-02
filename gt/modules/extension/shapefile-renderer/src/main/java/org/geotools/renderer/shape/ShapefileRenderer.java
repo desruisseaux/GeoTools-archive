@@ -760,7 +760,7 @@ public class ShapefileRenderer implements GTRenderer {
      * @return the minimun set of attribute names needed to render <code>layer</code>
      */
     private String[] findStyleAttributes( final Query query, Style style, SimpleFeatureType schema ) {
-        StyleAttributeExtractor sae = new StyleAttributeExtractor(){
+        StyleAttributeExtractor sae = new StyleAttributeExtractor() {
             public void visit( Rule rule ) {
 
                 DuplicatingStyleVisitor dupeStyleVisitor = new DuplicatingStyleVisitor();
@@ -778,6 +778,10 @@ public class ShapefileRenderer implements GTRenderer {
         query.getFilter().accept(qae,null);
         Set ftsAttributes=new HashSet(sae.getAttributeNameSet());
         ftsAttributes.addAll(qae.getAttributeNameSet());
+        if (sae.getDefaultGeometryUsed()
+				&& (!ftsAttributes.contains(schema.getDefaultGeometry().getLocalName()))) {
+        	ftsAttributes.add(schema.getDefaultGeometry().getLocalName());
+		}
         return (String[]) ftsAttributes.toArray(new String[0]);
     }
 
