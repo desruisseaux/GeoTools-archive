@@ -813,6 +813,9 @@ public class Types {
                 if ( converted != null ) {
                     return converted;
                 }
+//                else {
+//                    throw new IllegalArgumentException( descriptor.getLocalName()+ " could not convert "+value+" into "+target);
+//                }
             }
         }        
         return value;

@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.opengis.feature.Attribute;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -18,6 +19,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.feature.type.Types;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.Converters;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,15 +47,25 @@ public class LenientFeature extends SimpleFeatureImpl {
      */
     protected LenientFeature(List<Attribute> attributes, SimpleFeatureType schema, String featureID)
         throws IllegalAttributeException, NullPointerException {
-        super(attributes,
+        super( preFix(attributes, schema),
               checkSchema( schema),
               checkId( featureID ));
         // superclass just punts the values in ... we are going to validate if needed
         constructing=true;
-        setValue(attributes);
+        List<Object> values = toValues( attributes );
+        //values = fixed( values );
+        setAttributes(values);
         constructing=false;
     }
-
+    private static List<Attribute> preFix( List<Attribute> attributes, SimpleFeatureType schema ){
+        while( attributes.size() < schema.getAttributeCount() ){
+            AttributeDescriptor required = schema.getAttribute(attributes.size()-1);
+            // or use required.getDefaultValue()
+            Attribute newAttribute = new LenientAttribute( null, required, null );
+            attributes.add( newAttribute );
+        }
+        return attributes;
+    }
     private static SimpleFeatureType checkSchema(SimpleFeatureType schema) {
         if (schema == null) {
             throw new NullPointerException("schema");
@@ -114,33 +126,49 @@ public class LenientFeature extends SimpleFeatureImpl {
      * @param attributes All feature attributes.
      * @throws IllegalAttributeException Passed attributes do not match feature
      *         type.
-     */
-    
+     */    
     public void setAttributes(List<Object> attributes) {
         if( constructing ){
-            // we are going to make this work no matter what
-            // so try and figure out some mapping
-            if ( attributes == null ){
-                attributes = Arrays.asList(new Object[getFeatureType().getAttributeCount()]);
-            }
-            if ( attributes.size() != getFeatureType().getAttributeCount() ) {
-                String msg = "Expected " + getFeatureType().getAttributeCount() + " attributes but " 
-                    + attributes.size() + " were specified";
-                    throw new IllegalArgumentException( msg );                    
-            }
-            List<Object> fixed;
-            fixed = assumeCorrectOrder( attributes );
-            if( fixed == null ){
-                //fixed = greedyMatch(attributes);
-            }
-            super.setAttributes( fixed );
+            super.setAttributes( fixed( attributes ));
         }
         else {
             super.setAttributes( attributes );
         }
     }
 
-    private List<Object> assumeCorrectOrder( List<Object> newAtts ) {
+    /** We are going to make this work no matter what so try and figure out some mapping */
+    List<Object> fixed( List<Object> attributes ){
+        if ( attributes == null ){
+            attributes = Arrays.asList(new Object[getFeatureType().getAttributeCount()]);
+        }
+        if ( attributes.size() != getFeatureType().getAttributeCount() ) {
+            String msg = "Expected " + getFeatureType().getAttributeCount() + " attributes but " 
+                + attributes.size() + " were specified";
+                throw new IllegalArgumentException( msg );                    
+        }
+        List<Object> fixed;
+        fixed = assumeCorrectOrder( attributes );
+        if( fixed == null ){
+            fixed = greedyMatch(attributes);
+        }
+        return fixed;
+    }
+    /** Extract the values out of a properties  */
+    static List<Object> toValues( List<Attribute> properties ){
+        List<Object> values = new ArrayList<Object>();
+        for( Property property : properties ){
+            values.add( property.getValue() );
+        }
+        return values;
+    }
+
+    /**
+     * Try to figure out how to use the values in the order provided.
+     * 
+     * @param newAtts List of values in the correct order (may not be complete?)
+     * @return List of objects in the correct order; or null if we could not do it
+     */
+    List<Object> assumeCorrectOrder( List<Object> newAtts ) {
         SimpleFeatureType schema = getFeatureType();
         List<Object> tmp = Arrays.asList(new Object[schema.getAttributeCount()]);
         for( int i = 0; i < newAtts.size() && i<schema.getAttributeCount(); i++ ) {
@@ -149,13 +177,18 @@ public class LenientFeature extends SimpleFeatureImpl {
             if( object==null ){
                 continue;
             }
-            Object value = Types.parse( att, object );
-            tmp.set(i, value);
+            try {
+                Object value = parse( att, object );
+                tmp.set(i, value);
+            }
+            catch ( IllegalArgumentException cannotConvert ){
+                return null; // we cannot use these values in the provided order
+            }
         }
         return tmp;
     }
 
-    private List<Object> greedyMatch(List<Object> newAtts ) {
+    List<Object> greedyMatch(List<Object> newAtts ) {
         SimpleFeatureType schema = getFeatureType();
         List<Object> relaxedAttrs=Arrays.asList(new Object[schema.getAttributeCount()]);
         boolean inValid = false;
@@ -221,5 +254,26 @@ public class LenientFeature extends SimpleFeatureImpl {
             throw new RuntimeException("The impossible has happened", e);
         }
     }
-
+    /**
+     * Old version of Types.parse that returns null when unhappy.
+     */
+    public static Object parse(AttributeDescriptor descriptor, Object value) throws IllegalArgumentException {
+        if (value == null){
+            if( descriptor.isNillable()){
+                return descriptor.getDefaultValue();
+            }
+        }
+        else {
+            Class target = descriptor.getType().getBinding(); 
+            if ( !target.isAssignableFrom( value.getClass() ) ) {
+                // attempt to convert
+                Object converted = Converters.convert(value,target);
+                if( converted != null){
+                    return converted;
+                }
+                throw new IllegalArgumentException("Could not convert");
+            }
+        }        
+        return value;
+    }
 }
