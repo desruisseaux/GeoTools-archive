@@ -15,10 +15,13 @@
  */
 package org.geotools.feature.type;
 
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -84,7 +87,13 @@ public class BasicFeatureTypes
         SimpleFeatureType tmpPoint = null;
         SimpleFeatureType tmpPolygon = null;
         SimpleFeatureType tmpLine = null;
-        SimpleFeatureType tmpFeature = null;
+        
+        // Feature is the base of everything else, must be created directly instead
+    	// of going thru the builder because the builder assumes it as the default base type
+    	FEATURE = new SimpleFeatureTypeImpl(new NameImpl("Feature"), 
+    			Collections.EMPTY_LIST, null, true, 
+    			Collections.EMPTY_LIST, null, null);
+        
         try {
             SimpleFeatureTypeBuilder build = new SimpleFeatureTypeBuilder();
             
@@ -94,7 +103,6 @@ public class BasicFeatureTypes
             tmpPoint = build.name("pointFeature").buildFeatureType();            
             tmpLine = build.name("lineFeature").buildFeatureType();
             tmpPolygon  = build.name("polygonFeature").buildFeatureType();   
-            tmpFeature = build.name("Feature").buildFeatureType();
         } catch (Exception ex) {
             Logger.getLogger( "org.geotools.feature.type.BasicFeatureTypes" ).log(
                Level.SEVERE, "Error creating basic feature types", ex );
@@ -102,7 +110,6 @@ public class BasicFeatureTypes
         POINT = tmpPoint;
         LINE = tmpLine;
         POLYGON = tmpPolygon;
-        FEATURE = tmpFeature;
     }
 
     /**
