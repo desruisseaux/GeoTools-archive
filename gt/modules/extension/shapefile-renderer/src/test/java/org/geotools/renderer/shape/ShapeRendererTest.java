@@ -32,6 +32,7 @@ import org.geotools.TestData;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -52,7 +53,11 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.operation.MathTransform;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
  * Tests ShapeRenderer class
@@ -78,6 +83,8 @@ public class ShapeRendererTest extends TestCase {
     private String typename;
 
     private File directory;
+    
+    private SimpleFeature sf;
 
     protected void setUp() throws Exception {
         Logger.getLogger("org.geotools").setLevel(Level.FINE);
@@ -102,6 +109,14 @@ public class ShapeRendererTest extends TestCase {
         copy(shx, shx2);
         copy(prj, prj2);
         copy(dbf, dbf2);
+        
+        // setup a sample feature
+        ShapefileDataStore ds = TestUtilites.getDataStore(shp2.getName());
+        SimpleFeatureType type = ds.getSchema();
+        GeometryFactory gf = new GeometryFactory();
+        LineString ls = gf.createLineString(new Coordinate[] {new Coordinate(0,0), new Coordinate(10,10)});
+        MultiLineString mls = gf.createMultiLineString(new LineString[] {ls});
+        sf = SimpleFeatureBuilder.build( type, new Object[] {mls, new Integer(0), "Hi"}, "newFeature");
     }
 
     protected void tearDown() throws Exception {
@@ -184,6 +199,7 @@ public class ShapeRendererTest extends TestCase {
 
     public void testRemoveTransaction() throws Exception {
         ShapefileDataStore ds = TestUtilites.getDataStore(shp2.getName());
+        System.out.println("Count: " + ds.getFeatureSource().getCount(Query.ALL));
         Style st = TestUtilites.createTestStyle(null, typename);
         final FeatureStore store = (FeatureStore) ds.getFeatureSource();
         Transaction t = new DefaultTransaction();
@@ -217,8 +233,9 @@ public class ShapeRendererTest extends TestCase {
         // now add a new feature new fid should be theme2.4 remove it and assure
         // that it is not rendered
         SimpleFeatureType type = store.getSchema();
-        store.addFeatures(DataUtilities.collection(new SimpleFeature[] { SimpleFeatureBuilder.build( type, new Object[feature.getAttributeCount()], "newFeature") } )); //$NON-NLS-1$
+        store.addFeatures(DataUtilities.collection(new SimpleFeature[] { sf } )); //$NON-NLS-1$
         t.commit();
+        System.out.println("Count: " + ds.getFeatureSource().getCount(Query.ALL));
         listener.count = 0;
         TestUtilites.showRender("testTransaction", renderer, 2000, env);
         assertEquals(3, listener.count);
@@ -251,7 +268,7 @@ public class ShapeRendererTest extends TestCase {
         collection.close(iter);
 
         SimpleFeatureType type = ds.getSchema();
-        store.addFeatures(DataUtilities.collection(SimpleFeatureBuilder.build(type, new Object[feature.getAttributeCount()], "newFeature")));
+        store.addFeatures(DataUtilities.collection(sf));
 
         MapContext context = new DefaultMapContext();
         context.addLayer(store, st);
