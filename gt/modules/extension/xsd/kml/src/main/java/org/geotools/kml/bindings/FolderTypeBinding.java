@@ -16,9 +16,9 @@
 package org.geotools.kml.bindings;
 
 import java.util.Collection;
-
 import javax.xml.namespace.QName;
-
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.kml.KML;
@@ -26,8 +26,6 @@ import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 
 /**
@@ -99,7 +97,7 @@ public class FolderTypeBinding extends AbstractComplexBinding {
 
         SimpleFeature feature = (SimpleFeature) value;
         b.init(feature);
-        
+
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:Feature"/&gt;
         b.set("Feature", node.getChildValues(SimpleFeature.class));
 

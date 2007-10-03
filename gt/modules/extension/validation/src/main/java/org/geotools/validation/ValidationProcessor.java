@@ -38,9 +38,6 @@ import org.geotools.validation.xml.XMLReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-
 /**
  * ValidationProcessor Runs validation tests against Features and reports the
  * outcome of the tests.
