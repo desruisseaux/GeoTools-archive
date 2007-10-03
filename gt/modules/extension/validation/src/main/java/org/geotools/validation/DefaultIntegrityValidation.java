@@ -19,6 +19,8 @@ package org.geotools.validation;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 
@@ -26,7 +28,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Tests to see if a Feature ...
  * 
  * <p>
- * This class is ment to be copied as a starting point for implementing
+ * This class is intended to be copied as a starting point for implementing
  * IntegrityValidation. Chances are you are not working against a single
  * typeName when performing an integrity test.
  * </p>
@@ -150,7 +152,7 @@ public class DefaultIntegrityValidation implements IntegrityValidation {
      *
      * @throws Exception DOCUMENT ME!
      */
-    public boolean validate(Map layers, Envelope envelope,
+    public boolean validate(Map layers, ReferencedEnvelope envelope,
         ValidationResults results) throws Exception {
         results.warning(null, "Validation not yet implemented");
 

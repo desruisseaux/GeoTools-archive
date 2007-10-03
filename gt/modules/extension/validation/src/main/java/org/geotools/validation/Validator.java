@@ -31,6 +31,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Repository;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -194,7 +195,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void integrityValidation(Map featureStores, Envelope bBox, ValidationResults results )
+	public void integrityValidation(Map featureStores, ReferencedEnvelope bBox, ValidationResults results )
 		throws IOException, Exception// WfsTransactionException 
 	{
 		//Data catalog = request.getWFS().getData();

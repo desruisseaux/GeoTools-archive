@@ -18,6 +18,8 @@ package org.geotools.validation;
 
 import java.util.Map;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 
@@ -107,6 +109,6 @@ public interface IntegrityValidation extends Validation {
      *
      * @return <code>true</code> if all the features pass this test.
      */
-    public boolean validate(Map layers, Envelope envelope,
+    public boolean validate(Map layers, ReferencedEnvelope envelope,
         ValidationResults results) throws Exception;
 }

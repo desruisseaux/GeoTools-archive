@@ -33,6 +33,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultRepository;
 import org.geotools.data.FeatureSource;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.dto.ArgumentDTO;
 import org.geotools.validation.dto.PlugInDTO;
 import org.geotools.validation.dto.TestDTO;
@@ -141,7 +142,7 @@ public class BatchValidator {
 			
 		}
 		
-		Envelope envelope = makeEnvelope();
+		ReferencedEnvelope envelope = makeEnvelope();
 		
 		
 		/** do the integrity validation dance */
@@ -229,11 +230,11 @@ public class BatchValidator {
     }
 
 
-	private static Envelope makeEnvelope()
+	private static ReferencedEnvelope makeEnvelope()
 	{
-		Envelope env;
+	    ReferencedEnvelope env;
 		try {
-			double minx = Double.parseDouble(transProp.getProperty(
+		    double minx = Double.parseDouble(transProp.getProperty(
 						"Bounds.minX"));
 			double miny = Double.parseDouble(transProp.getProperty(
 						"Bounds.maxX"));
@@ -241,15 +242,15 @@ public class BatchValidator {
 						"Bounds.maxX"));
 			double maxy = Double.parseDouble(transProp.getProperty(
 						"Bounds.maxY"));
-			env = new Envelope(minx, miny, maxx, maxy);
+			env = new ReferencedEnvelope(minx, miny, maxx, maxy, null);
 		} catch (Exception e) {
 			System.err.println("Envelope not specified in Transaction.properties.");
-			env = new Envelope();
+			env = new ReferencedEnvelope();
 		}
 		
 		if (env == null) {
-			env = new Envelope(Integer.MIN_VALUE, Integer.MIN_VALUE,
-					Integer.MAX_VALUE, Integer.MAX_VALUE);
+			env = new ReferencedEnvelope(Integer.MIN_VALUE, Integer.MIN_VALUE,
+					Integer.MAX_VALUE, Integer.MAX_VALUE,null);
 		}
 		
 		return env;

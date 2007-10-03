@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.validation.DefaultIntegrityValidation;
 import org.geotools.validation.ValidationResults;
 import org.opengis.feature.simple.SimpleFeature;
@@ -124,7 +125,7 @@ public class UniqueFIDValidation extends DefaultIntegrityValidation {
      *      com.vividsolutions.jts.geom.Envelope,
      *      org.geotools.validation.ValidationResults)
      */
-    public boolean validate(Map layers, Envelope envelope,
+    public boolean validate(Map layers, ReferencedEnvelope envelope,
         ValidationResults results) throws Exception {
         HashMap FIDs = new HashMap(); // FIDs used for lookup to see if any match
         boolean result = true;

@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.resources.TestData;
 import org.geotools.validation.dto.ArgumentDTO;
 import org.geotools.validation.dto.PlugInDTO;
@@ -390,7 +391,7 @@ public class ValidationProcessor {
      * @throws Exception Throws an exception if the HashMap contains a value
      *         that is not a FeatureSource
      */
-    public void runIntegrityTests(Set typeRefs, Map stores, Envelope envelope,
+    public void runIntegrityTests(Set typeRefs, Map stores, ReferencedEnvelope envelope,
         ValidationResults results) throws Exception {
         if ((integrityLookup == null) || (integrityLookup.size() == 0)) {
             LOGGER.fine(

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -179,7 +180,7 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * @param envelope
 	 * @param results
 	 */
-	public boolean validate(Map layers, Envelope envelope, ValidationResults results) throws Exception{
+	public boolean validate(Map layers, ReferencedEnvelope envelope, ValidationResults results) throws Exception{
 		
 		HashMap FIDs = new HashMap();
 		boolean result = true;
