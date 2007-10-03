@@ -39,6 +39,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
+ * Testing the ability of WFS to turn transaction state into a series of actions
+ * for encoding into a Transaction request.
+ * <p>
+ * This test focuses on ability to combine a bunch of update actions for the same
+ * feature into a single action.
+ * 
  * @author Jesse
  */
 public class ProcessEditsBeforeCommitTest extends TestCase {

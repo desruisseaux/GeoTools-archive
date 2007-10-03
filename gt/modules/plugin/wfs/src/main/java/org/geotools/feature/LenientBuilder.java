@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
@@ -63,7 +64,10 @@ public class LenientBuilder {
     }
 
     public static SimpleFeature copy(SimpleFeature f) {
-        // TODO Auto-generated method stub
-        return null;
+        if( f == null ) return null;
+        
+        LenientBuilder builder = new LenientBuilder(f.getFeatureType());        
+        builder.addAll( f.getAttributes().toArray() );
+        return builder.buildFeature(f.getID());
     }
 }

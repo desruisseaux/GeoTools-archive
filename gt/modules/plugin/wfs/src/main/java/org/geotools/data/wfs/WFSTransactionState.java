@@ -404,8 +404,11 @@ public class WFSTransactionState implements State {
     private void removeFilterAllActions(List actions) {
         for( Iterator iter = actions.iterator(); iter.hasNext(); ) {
             Action element = (Action) iter.next();
-            if (Filter.EXCLUDE.equals(element.getFilter()))
+            Filter filter = element.getFilter();
+            
+            if (Filter.EXCLUDE.equals(filter)) {
                 iter.remove();
+            }
         }
     }
 

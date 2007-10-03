@@ -96,9 +96,9 @@ public class PropertyImpl implements Property {
     public String toString() {
         StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append(":");
         sb.append(getDescriptor().getName().getLocalPart());
-        sb.append(": ");
+        sb.append("<");
         sb.append(getDescriptor().getType().getName().getLocalPart());
-        sb.append(": ");
+        sb.append(">=");
         sb.append(value);
 
         return sb.toString();

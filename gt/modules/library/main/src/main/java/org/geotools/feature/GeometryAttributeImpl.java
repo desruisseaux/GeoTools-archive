@@ -8,6 +8,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.geometry.BoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -170,4 +171,31 @@ public class GeometryAttributeImpl extends AttributeImpl implements
 		
 		return hash;
 	}
+	
+	   public String toString() {
+	        StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append(":");
+	        sb.append(getDescriptor().getName().getLocalPart());
+	        CoordinateReferenceSystem crs = getDescriptor().getType().getCRS();
+	        if(!getDescriptor().getName().getLocalPart().equals(getDescriptor().getType().getName().getLocalPart()) ||
+	                id != null || crs != null){
+	            sb.append("<");
+	            sb.append(getDescriptor().getType().getName().getLocalPart());
+	            if( id != null ){
+	                sb.append( " id=");
+	                sb.append( id );
+	            }
+	            if( crs != null ){
+	                sb.append( " crs=");
+	                sb.append( crs );
+	            }
+    	        if( id != null ){
+    	            sb.append( " id=");
+    	            sb.append( id );
+    	        }
+    	        sb.append(">");
+	        }
+	        sb.append("=");
+	        sb.append(value);
+	        return sb.toString();
+	    }
 }

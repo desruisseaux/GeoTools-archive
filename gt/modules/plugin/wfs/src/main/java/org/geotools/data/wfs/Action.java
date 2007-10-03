@@ -18,10 +18,12 @@
 package org.geotools.data.wfs;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.LenientBuilder;
 import org.geotools.filter.FilterFactoryFinder;
@@ -30,6 +32,8 @@ import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.identity.FeatureId;
 
 
 /**
@@ -270,10 +274,22 @@ public interface Action {
          * @see org.geotools.data.wfs.Action#getFilter()
          */
         public Filter getFilter() {
-            return (feature.getID() == null) ? null
-                                             : (FilterFactoryFinder.createFilterFactory()
-                                                             .createFidFilter(feature
-                .getID()));
+            if( feature == null ) {
+                return Filter.EXCLUDE;
+            }
+            String fid = feature.getID();
+            if( fid != null ){
+                FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+                FeatureId identifier = ff.featureId( fid );
+                HashSet<FeatureId> fids = new HashSet<FeatureId>();
+                fids.add( identifier );                
+                Filter filter = ff.id( fids );
+         
+                return filter;
+            }
+            else {
+                return Filter.EXCLUDE;
+            }
         }
 		public String toString() {
 			return "INSERT "+feature;

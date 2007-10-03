@@ -112,7 +112,21 @@ public class AttributeImpl extends PropertyImpl implements Attribute {
 	}
 
 	public String toString() {
-		return super.toString() + ":" + id; 
+		StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append(":");
+        sb.append(getDescriptor().getName().getLocalPart());
+        if(!getDescriptor().getName().getLocalPart().equals(getDescriptor().getType().getName().getLocalPart()) ||
+                id != null){
+            sb.append("<");
+            sb.append(getDescriptor().getType().getName().getLocalPart());
+            if( id != null ){
+                sb.append( " id=");
+                sb.append( id );
+            }
+            sb.append(">");
+        }
+        sb.append("=");
+        sb.append(value);
+        return sb.toString();
 	}
 	
 	/**
