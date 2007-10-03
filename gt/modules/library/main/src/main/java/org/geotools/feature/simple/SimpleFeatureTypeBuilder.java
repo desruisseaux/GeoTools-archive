@@ -638,6 +638,18 @@ public class SimpleFeatureTypeBuilder {
 	    attributes().add(descriptor);
 	}
 
+	/**
+	 * Adds a descriptor directly to the builder.
+	 * <p>
+	 * Use of this method is discouraged. Consider using {@link #add(String, Class)}. 
+	 * </p>
+	 */
+	public void add( int index, AttributeDescriptor descriptor ) {
+	    attributes().add(index, descriptor);
+	}
+
+	
+	
     /**
      * Adds a list of descriptors directly to the builder.
      * <p>
