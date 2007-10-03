@@ -157,7 +157,6 @@ public class SimpleFeatureBuilder {
      */
     public void init( SimpleFeature feature ) {
 		init();
-		this.featureType = (SimpleFeatureType) feature.getType();
 		for ( int i = 0; i < feature.getAttributeCount(); i++ ) {
 			add( feature.getAttribute( i ) );
 		}
@@ -496,8 +495,4 @@ public class SimpleFeatureBuilder {
 		}
 		return builder.buildFeature(featureId);
 	}
-
-    public void setType(SimpleFeatureType schema) {
-        this.featureType = schema;
-    }
 }

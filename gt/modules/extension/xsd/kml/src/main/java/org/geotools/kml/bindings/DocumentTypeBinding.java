@@ -97,7 +97,6 @@ public class DocumentTypeBinding extends AbstractComplexBinding {
 
         SimpleFeature feature = (SimpleFeature) value;
         b.init(feature);
-        b.setType(featureType);
 
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="kml:Feature"/&gt;
         b.set("Feature", node.getChildValues(SimpleFeature.class));

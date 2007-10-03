@@ -285,7 +285,6 @@ public class GML2MockData {
         SimpleFeatureType type = (SimpleFeatureType) typeBuilder.buildFeatureType();
 
         SimpleFeatureBuilder builder = new SimpleFeatureBuilder(type);
-        builder.setType(type);
         builder.add("theName");
         builder.add("theDescription");
         builder.add(point());

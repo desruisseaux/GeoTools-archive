@@ -42,7 +42,6 @@ public class ForceCoordinateSystemFeatureReaderTest extends TestCase {
         SimpleFeatureType ft = builder.buildFeatureType();
         
         SimpleFeatureBuilder b = new SimpleFeatureBuilder(ft);
-        b.setType( ft );
         b.add( p );
         
         SimpleFeature[] features=new SimpleFeature[]{

@@ -148,7 +148,6 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
             return next;
         
         builder.init(next);
-        builder.setType( schema );
         return builder.buildFeature(next.getID());
     }
 
