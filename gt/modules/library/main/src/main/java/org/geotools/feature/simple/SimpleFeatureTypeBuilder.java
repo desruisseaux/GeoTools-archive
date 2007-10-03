@@ -879,4 +879,22 @@ public class SimpleFeatureTypeBuilder {
             throw (IllegalArgumentException) new IllegalArgumentException( msg ).initCause( e );
         }
 	}
+	
+	/**
+	 * Removes the AttributeDescriptor from the builder
+	 * 
+	 * @param attributeName the name of the AttributeDescriptor to remove
+	 * 
+	 * @return the AttributeDescriptor with the name attributeName
+	 * @throws IllegalArgumentException if there is no AttributeDescriptor with the name attributeName
+	 */
+	public AttributeDescriptor remove(String attributeName){
+		for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
+			AttributeDescriptor descriptor = (AttributeDescriptor) iterator.next();
+			if( descriptor.getLocalName().equals(attributeName) ){
+				return descriptor;
+			}
+		}
+		throw new IllegalArgumentException(attributeName+" is not an existing attribute descriptor in this builder");
+	}
 }
