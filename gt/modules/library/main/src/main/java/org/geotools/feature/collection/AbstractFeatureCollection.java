@@ -18,6 +18,7 @@ package org.geotools.feature.collection;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
@@ -34,7 +35,7 @@ import org.opengis.filter.sort.SortBy;
  * </p>
  * @author Jody Garnett, Refractions Research Inc.
  */
-public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*extends AbstractResourceCollection*/ implements FeatureCollection {
+public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*extends AbstractResourceCollection*/ implements FeatureCollection, ResourceCollection {
     
 	AbstractResourceCollection rc;
 
@@ -185,21 +186,5 @@ public abstract class AbstractFeatureCollection extends BaseFeatureCollection /*
     public FeatureCollection sort( SortBy order ) {
         return new SubFeatureList(this, order );
     }
-
-    //
-    // FeatureCollection - Legacy
-    //
-    /*
-    public FeatureReader reader() throws IOException {
-        return new DelegateFeatureReader( getSchema(), features() );
-    }
-    public int getCount() throws IOException {
-        return size();
-    }
-    public FeatureCollection collection() throws IOException {
-        return this;
-    }
-    */
-    
     
 }

@@ -18,8 +18,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Base feature collection for geotools feature collection implementations as 
- * the transisition to the geoapi feature model is made.
+ * Base feature collection for GeoTools feature collection implementations as 
+ * the transition to the GeoAPI feature model is made.
  * <p>
  * The primary role of this base collection is to implement the feature aspect 
  * of the feature collection api, leaving the collection aspect to subclasses. 

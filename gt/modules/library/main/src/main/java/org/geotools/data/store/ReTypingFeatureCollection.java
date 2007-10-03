@@ -25,12 +25,10 @@ import org.opengis.filter.sort.SortBy;
 public class ReTypingFeatureCollection extends DecoratingFeatureCollection
 	implements FeatureCollection {
 
-	FeatureCollection delegate;
 	SimpleFeatureType featureType;
     
 	public ReTypingFeatureCollection ( FeatureCollection delegate, SimpleFeatureType featureType ) {
 		super(delegate);
-		this.delegate = delegate;
 		this.featureType = featureType;
 	}
 	

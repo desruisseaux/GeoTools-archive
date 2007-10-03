@@ -41,11 +41,6 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
 	implements FeatureCollection {
 
     /**
-     * The decorated collection
-     */
-    FeatureCollection delegate;
-
-    /**
      * The transform to the target coordinate reference system
      */
     MathTransform transform;
@@ -79,7 +74,6 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
 		FeatureCollection delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target
 	) {
     	super(delegate);
-    	this.delegate = delegate;
         this.target = target;
         SimpleFeatureType schema = delegate.getSchema();
         this.schema = reType(schema, target);
