@@ -816,6 +816,9 @@ public class DataUtilities {
         if( type==Character.class ){
             return new Character(' ');
         }
+        if( type==Boolean.class){
+        	return Boolean.FALSE;
+        }
         
         GeometryFactory fac=new GeometryFactory();
         Coordinate coordinate = new Coordinate(0, 0);

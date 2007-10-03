@@ -96,7 +96,7 @@ public class MIFDataStoreFactoryTest extends TestCase {
                         MIFTestUtils.fileName(""), uri));
 
             SimpleFeatureType ft = ds.getSchema("grafo");
-            assertEquals("Bad URI", new URI(strURI), ft.getName().getNamespaceURI());
+            assertEquals("Bad URI", strURI, ft.getName().getNamespaceURI());
         } catch (Exception e) {
             fail(e.getMessage());
         }
