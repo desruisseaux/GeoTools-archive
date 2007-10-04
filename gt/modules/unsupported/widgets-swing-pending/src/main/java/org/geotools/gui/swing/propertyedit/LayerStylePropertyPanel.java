@@ -68,21 +68,25 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
 
                 if (obj != null) {
                     if (obj instanceof StylePanel) {
-                        activePanel = (StylePanel) obj;
-                        lbl_title.setTitle(((StylePanel) obj).getTitle());
-                        lbl_title.setIcon(((StylePanel) obj).getIcon());
-
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            public void run() {
-                                pan_style.removeAll();
-                                pan_style.add(((StylePanel) obj).getPanel());
-                                pan_style.revalidate();
-                                pan_style.repaint();
-                            }
-                        });
+                        activeStylePanel((StylePanel) obj);
                     }
                 }
+            }
+        });
+    }
+
+    private void activeStylePanel(final StylePanel pan) {
+        activePanel = pan;
+        lbl_title.setTitle(pan.getTitle());
+        lbl_title.setIcon(pan.getIcon());
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                pan_style.removeAll();
+                pan_style.add(pan.getPanel());
+                pan_style.revalidate();
+                pan_style.repaint();
             }
         });
     }
@@ -212,10 +216,7 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
         }
 
         if (types.size() > 0) {
-            pan_style.removeAll();
-            pan_style.add(types.get(0).getPanel());
-            pan_style.revalidate();
-            pan_style.repaint();
+            activeStylePanel(types.get(0));
         }
     }
 

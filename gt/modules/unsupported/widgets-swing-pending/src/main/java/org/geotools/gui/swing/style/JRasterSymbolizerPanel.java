@@ -14,43 +14,42 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.extended;
+package org.geotools.gui.swing.style;
 
-
-import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import javax.swing.JColorChooser;
-import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.propertyedit.styleproperty.*;
+import javax.swing.JComponent;
+import org.geotools.map.MapLayer;
+import org.geotools.styling.Style;
+import org.geotools.styling.Symbolizer;
 
 /**
+ *
  * @author  johann sorel
  */
-public class JColorPanel extends javax.swing.JPanel {
+public class JRasterSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel{
     
-    /** Creates new form JColorButton */
-    public JColorPanel() {
+    /** Creates new form RasterStylePanel */
+    public JRasterSymbolizerPanel(MapLayer layer) {
         initComponents();
+    }
+    
+    public Symbolizer getSymbolizer(){
         
-         this.addMouseListener(new MouseListener() {
-
-            public void mouseClicked(MouseEvent e) {
-                Color color = JColorChooser.showDialog(null, TextBundle.getResource().getString("color"), getBackground());
-                setBackground(color);
-            }
-
-            public void mousePressed(MouseEvent e) {
-            }
-
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            public void mouseExited(MouseEvent e) {
-            }
-        });
+        return null;
+    }
+    
+     public Style getStyle(){
+     /*   StyleBuilder sb = new StyleBuilder();
+        Symbolizer ps = sb.createLineSymbolizer(color, opa);
+                
+        Style style = sb.createStyle();
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
+        return style;*/
+         return null;
+    }
+    
+    public JComponent getComponent(){
+        return this;
     }
     
     /** This method is called from within the constructor to
@@ -61,21 +60,15 @@ public class JColorPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setBackground(new java.awt.Color(0, 0, 0));
-        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        setMaximumSize(new java.awt.Dimension(50, 20));
-        setMinimumSize(new java.awt.Dimension(50, 20));
-        setPreferredSize(new java.awt.Dimension(50, 20));
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 48, Short.MAX_VALUE)
+            .add(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 18, Short.MAX_VALUE)
+            .add(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     

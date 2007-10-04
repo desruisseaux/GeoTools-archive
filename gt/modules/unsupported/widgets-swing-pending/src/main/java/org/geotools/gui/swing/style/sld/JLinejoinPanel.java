@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.extended;
+package org.geotools.gui.swing.style.sld;
 
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.styling.StyleBuilder;
@@ -37,15 +37,26 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     }
     
     
-    public void setlineJoin(String exp){
-        
-        if(exp.toLowerCase().equals("bevel"))
+    public void setLineJoin(String exp){
+                
+        if( "bevel".equals(exp.toLowerCase()) )
             but_bevel.setSelected(true);
-        else if(exp.toLowerCase().equals("mitre"))
+        else if( "mitre".equals(exp.toLowerCase()) )
             but_mitre.setSelected(true);
         else 
             but_round.setSelected(true);        
     }
+    
+    public void setLineJoin(Expression exp){
+                
+        if( "bevel".equals(exp.toString().toLowerCase()) )
+            but_bevel.setSelected(true);
+        else if( "mitre".equals(exp.toString().toLowerCase()) )
+            but_mitre.setSelected(true);
+        else 
+            but_round.setSelected(true);        
+    }
+       
     
     public Expression getLineJoin(){
         StyleBuilder sb = new StyleBuilder();

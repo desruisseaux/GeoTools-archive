@@ -28,8 +28,12 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.EventListenerList;
+import org.geotools.filter.Filters;
 import org.geotools.gui.swing.extended.event.NumberEventListener;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.styling.SLD;
+import org.geotools.styling.StyleBuilder;
+import org.opengis.filter.expression.Expression;
 
 
 
@@ -153,6 +157,24 @@ public class JNumberPanel extends JPanel implements ActionListener {
 
         fireNumberChanged();
     }
+    
+    /**
+     * @param v : nouvelle valeur
+     */
+    public void setValue(Expression exp) {
+        if( exp!= null ){
+            double d = Filters.asDouble(exp);
+            
+            if(d != Double.NaN)
+                setValue(d);
+            else
+                setValue(1);
+        }
+        else{
+            setValue(1);
+        }        
+        fireNumberChanged();
+    }
 
     /**
      * @return retourne un entier.
@@ -163,6 +185,11 @@ public class JNumberPanel extends JPanel implements ActionListener {
 
     public float getFloatValue() {
         return new Double(val).floatValue();
+    }
+    
+    public Expression getExpressionValue() {
+        StyleBuilder sb = new StyleBuilder();        
+        return sb.literalExpression(val);
     }
 
     @Override

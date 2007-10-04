@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.extended;
+package org.geotools.gui.swing.style.sld;
 
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.styling.StyleBuilder;
@@ -25,39 +25,53 @@ import org.opengis.filter.expression.Expression;
  * @author  johann sorel
  */
 public class JLinecapPanel extends javax.swing.JPanel {
-    
+
     /** Creates new form JLinecapPanel */
     public JLinecapPanel() {
         initComponents();
-        but_round.setIcon( IconBundle.getResource().getIcon("24_linecap_round"));
-        but_butt.setIcon( IconBundle.getResource().getIcon("24_linecap_butt"));
-        but_square.setIcon( IconBundle.getResource().getIcon("24_linecap_square"));
-        
+        but_round.setIcon(IconBundle.getResource().getIcon("24_linecap_round"));
+        but_butt.setIcon(IconBundle.getResource().getIcon("24_linecap_butt"));
+        but_square.setIcon(IconBundle.getResource().getIcon("24_linecap_square"));
+
         but_round.setSelected(true);
     }
-    
-    
-    public void setlineCap(String exp){
-        
-        if(exp.toLowerCase().equals("butt"))
-            but_butt.setSelected(true);
-        else if(exp.toLowerCase().equals("square"))
-            but_square.setSelected(true);
-        else 
-            but_round.setSelected(true);        
+
+    public void setLineCap(String exp) {
+        if (exp != null) {
+            if (exp.toLowerCase().equals("butt")) {
+                but_butt.setSelected(true);
+            } else if (exp.toLowerCase().equals("square")) {
+                but_square.setSelected(true);
+            } else {
+                but_round.setSelected(true);
+            }
+        }
     }
-    
-    public Expression getLinecap(){
+
+    public void setLineCap(Expression exp) {
+        if (exp != null) {
+            if (exp.toString().toLowerCase().equals("butt")) {
+                but_butt.setSelected(true);
+            } else if (exp.toString().toLowerCase().equals("square")) {
+                but_square.setSelected(true);
+            } else {
+                but_round.setSelected(true);
+            }
+        }
+    }
+
+    public Expression getLinecap() {
         StyleBuilder sb = new StyleBuilder();
-        
-        if(but_butt.isSelected())
+
+        if (but_butt.isSelected()) {
             return sb.literalExpression("butt");
-        else if(but_square.isSelected())
+        } else if (but_square.isSelected()) {
             return sb.literalExpression("square");
-        else
-            return sb.literalExpression("round");        
+        } else {
+            return sb.literalExpression("round");
+        }
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -107,13 +121,10 @@ public class JLinecapPanel extends javax.swing.JPanel {
         layout.linkSize(new java.awt.Component[] {but_butt, but_round, but_square}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton but_butt;
     private javax.swing.JToggleButton but_round;
     private javax.swing.JToggleButton but_square;
     private javax.swing.ButtonGroup buttonGroup1;
     // End of variables declaration//GEN-END:variables
-    
 }

@@ -16,6 +16,10 @@
 
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
+import org.geotools.gui.swing.style.JRasterSymbolizerPanel;
+import org.geotools.gui.swing.style.JPointSymbolizerPanel;
+import org.geotools.gui.swing.style.JLineSymbolizerPanel;
+import org.geotools.gui.swing.style.JPolygonSymbolizerPanel;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import com.vividsolutions.jts.geom.LineString;

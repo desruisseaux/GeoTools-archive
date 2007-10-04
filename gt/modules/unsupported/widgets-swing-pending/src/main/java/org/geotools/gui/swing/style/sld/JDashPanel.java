@@ -14,9 +14,11 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.extended;
+package org.geotools.gui.swing.style.sld;
 
+import org.geotools.filter.Filters;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
 import org.opengis.filter.expression.Expression;
 
@@ -64,7 +66,8 @@ public class JDashPanel extends javax.swing.JPanel {
         StyleBuilder sb = new StyleBuilder();        
         return sb.literalExpression(jsp_offset.getFloatValue());
     }
-    
+
+       
     public void setOffset(Expression exp){
         
         if(exp != null)
