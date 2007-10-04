@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.column.OpacityColumnModel;
 import org.geotools.map.MapContext;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -63,7 +64,8 @@ public class JContextTree extends JPanel {
         
         if(complete){
             addColumnModel( new VisibleColumnModel());
-            addColumnModel( new StyleColumnModel());
+            addColumnModel( new OpacityColumnModel());
+            addColumnModel( new StyleColumnModel());            
             getPopup().activeDefaultPopups();
         }
         

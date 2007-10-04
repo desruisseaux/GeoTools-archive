@@ -27,11 +27,15 @@ import java.awt.image.BufferedImage;
 import org.geotools.data.FeatureSource;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
 import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.SLD;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
@@ -76,7 +80,14 @@ public class RandomStyleFactory {
             }else if( cla.equals(LineString.class) || cla.equals(MultiLineString.class) ){
                 ps = sb.createLineSymbolizer(Color.BLUE,2d);
             }else if( cla.equals(Point.class) || cla.equals(MultiPoint.class) ){
-                ps = sb.createPointSymbolizer();
+                Fill fill = sb.createFill(Color.RED, 1d);
+                Stroke stroke = sb.createStroke(Color.BLACK, 2d);
+                Mark mark = sb.createMark("square", fill, stroke  );
+                Graphic gra = sb.createGraphic();
+                gra.setOpacity( sb.literalExpression(1) );
+                gra.setMarks(new Mark[]{mark});
+                gra.setSize(sb.literalExpression(8));
+                ps = sb.createPointSymbolizer(gra);
             }
                         
         } catch (Exception ex) {
