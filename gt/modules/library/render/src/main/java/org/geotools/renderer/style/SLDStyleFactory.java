@@ -572,37 +572,12 @@ public class SLDStyleFactory {
             LOGGER.finer("geomName = " + geomName);
         }
 
-        // extract geometry
-        Geometry geom = findGeometry(feature, geomName);
-
-        if ( (geom == null) || geom.isEmpty())
-        {
-            if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.finer("empty geometry");
-            }
-
-            return null;
-        }
-
         // extract label
         Object obj = symbolizer.getLabel().evaluate(feature);
-
-        if (obj == null) {
-            if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.finer("Null label in render text");
-            }
-
-            return null;
-        }
-
-        String label = obj.toString();
+        String label = obj == null ? "" : obj.toString();
 
         if (LOGGER.isLoggable(Level.FINER)) {
             LOGGER.finer("label is " + label);
-        }
-
-        if (label == null) {
-            return null;
         }
 
         ts2d.setLabel(label);
