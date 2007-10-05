@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -661,19 +662,12 @@ public class ShapefileRenderer implements GTRenderer {
         if (type.getAttributeCount() == 1) {
             return SimpleFeatureBuilder.build(type,new Object[]{getGeom(record.shape(), type.getDefaultGeometry())}, id);
         } else {
-            DbaseFileHeader header = dbfreader.getHeader();
-
             Object[] all = dbfreader.readEntry();
             Object[] values = new Object[type.getAttributeCount()];
 
             for( int i = 0; i < (values.length - 1); i++ ) {
                 values[i] = all[attributeIndexing[i]];
-
-                if (header.getFieldName(attributeIndexing[i]).equals(type.getAttribute(i))) {
-                    System.out.println("ok");
-                }
             }
-
             values[values.length - 1] = getGeom(record.shape(), type.getDefaultGeometry());
 
             return SimpleFeatureBuilder.build(type,values, id);
@@ -776,7 +770,7 @@ public class ShapefileRenderer implements GTRenderer {
         
         FilterAttributeExtractor qae = new FilterAttributeExtractor();
         query.getFilter().accept(qae,null);
-        Set ftsAttributes=new HashSet(sae.getAttributeNameSet());
+        Set ftsAttributes=new LinkedHashSet(sae.getAttributeNameSet());
         ftsAttributes.addAll(qae.getAttributeNameSet());
         if (sae.getDefaultGeometryUsed()
 				&& (!ftsAttributes.contains(schema.getDefaultGeometry().getLocalName()))) {
