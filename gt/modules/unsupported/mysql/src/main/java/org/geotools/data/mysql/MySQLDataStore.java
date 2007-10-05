@@ -208,49 +208,28 @@ public class MySQLDataStore extends JDBCDataStore {
 
                 //TODO: Get at CRS info, put geometry stuff in its own method
                 if ("geometry".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(Geometry.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("point".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(Point.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("linestring".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(LineString.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("polygon".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(Polygon.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multipoint".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(MultiPoint.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multilinestring".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(MultiLineString.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("multipolygon".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(MultiPolygon.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else if ("geometrycollection".equals(typeNameLower)) {
-                    builder.setNillable(true);
                     builder.setBinding(GeometryCollection.class);
-
-                    return builder.buildDescriptor(rs.getString(COLUMN_NAME));
                 } else {
                     //nothing else we can do
                     return super.buildAttributeType(rs);
                 }
+                builder.setNillable(true);
+                builder.setName(rs.getString(COLUMN_NAME));
+                return builder.buildDescriptor(rs.getString(COLUMN_NAME));
             } else {
                 return super.buildAttributeType(rs);
             }

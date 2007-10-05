@@ -163,7 +163,7 @@ public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
                 maxIdle, validate);
 
         if (namespace != null) {
-            return new MySQLDataStore(ds, namespace);
+            return new MySQLDataStore(ds, null, namespace);
         } else {
             return new MySQLDataStore(ds);
         }

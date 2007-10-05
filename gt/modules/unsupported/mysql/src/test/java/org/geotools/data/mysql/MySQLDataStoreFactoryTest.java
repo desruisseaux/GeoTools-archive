@@ -26,8 +26,9 @@ import java.util.Properties;
 import java.util.PropertyResourceBundle;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.DataStoreFactorySpi.Param;
-
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Test Params used by PostgisDataStoreFactory.
@@ -70,5 +71,11 @@ public class MySQLDataStoreFactoryTest extends TestCase {
             expected.printStackTrace();
             assertEquals("Could not get connection", expected.getMessage());
         }
+    }
+    
+    public void testNamespace() throws Exception {
+        DataStore ds = factory.createDataStore(local);
+        SimpleFeatureType ft = ds.getSchema("road");
+        assertEquals(local.get("namespace"), ft.getName().getNamespaceURI());
     }
 }
