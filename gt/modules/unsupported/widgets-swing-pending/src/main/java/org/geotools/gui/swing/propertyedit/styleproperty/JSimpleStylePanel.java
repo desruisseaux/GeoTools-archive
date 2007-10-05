@@ -99,7 +99,6 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements StylePanel 
             if (layer.getFeatureSource() != null) {
 
 
-                FeatureTypeStyle[] fts = layer.getStyle().getFeatureTypeStyles();
                 Class val = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
 
                 if (layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")) {

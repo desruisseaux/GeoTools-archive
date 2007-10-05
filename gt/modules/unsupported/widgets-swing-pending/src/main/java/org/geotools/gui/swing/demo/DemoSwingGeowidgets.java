@@ -48,6 +48,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.control.JMapPaneInfoPanel;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -74,6 +75,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private JContextTree tree;
     private JMapPane map;
     private JLightMapPaneControl lightcontrol;
+    private JMapPaneInfoPanel infopanel;
     private JDataChooser.STATE state = JDataChooser.STATE.BUTTONED;
     private int nb = 1;
 
@@ -154,12 +156,19 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         pan_lightmappanecontrol.add(lightcontrol);
 
 
+        /************************JMAPPANEINFOPANEL*****************************/
+        pan_mappaneinfo.setLeftDecoration(new JLabel(ICO_INFORMATION));
+        infopanel = new JMapPaneInfoPanel();
+        infopanel.setMapPane(map);
+        pan_mappaneinfo.add(infopanel);
 
         /************************LISTENER**************************************/
         pan_listener.setLayout(new GridLayout(1, 1));
         ContextTreeListener ecouteur = new ContextTreeListener(map);
         pan_listener.add(ecouteur);
         tree.addTreeListener(ecouteur);
+        
+        
     }
 
     /** This method is called from within the constructor to
@@ -189,6 +198,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         pan_listener = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         pan_lightmappanecontrol = new org.jdesktop.swingx.JXTitledPanel();
+        pan_mappaneinfo = new org.jdesktop.swingx.JXTitledPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -283,7 +293,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
                 .add(lbl_working)
                 .add(31, 31, 31)
                 .add(lbl_stop)
-                .addContainerGap(273, Short.MAX_VALUE))
+                .addContainerGap(264, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -308,11 +318,11 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         pan_jmappane.setLayout(pan_jmappaneLayout);
         pan_jmappaneLayout.setHorizontalGroup(
             pan_jmappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 448, Short.MAX_VALUE)
+            .add(0, 439, Short.MAX_VALUE)
         );
         pan_jmappaneLayout.setVerticalGroup(
             pan_jmappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 356, Short.MAX_VALUE)
+            .add(0, 341, Short.MAX_VALUE)
         );
 
         jSplitPane1.setRightComponent(pan_jmappane);
@@ -327,7 +337,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         );
         pan_jcontexttreeLayout.setVerticalGroup(
             pan_jcontexttreeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 219, Short.MAX_VALUE)
+            .add(0, 204, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout titled_jcontexttreeLayout = new org.jdesktop.layout.GroupLayout(titled_jcontexttree.getContentContainer());
@@ -385,11 +395,24 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         pan_lightmappanecontrol.getContentContainer().setLayout(pan_lightmappanecontrolLayout);
         pan_lightmappanecontrolLayout.setHorizontalGroup(
             pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 650, Short.MAX_VALUE)
+            .add(0, 641, Short.MAX_VALUE)
         );
         pan_lightmappanecontrolLayout.setVerticalGroup(
             pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(0, 30, Short.MAX_VALUE)
+        );
+
+        pan_mappaneinfo.setTitle("JMapPaneInfoPanel");
+
+        org.jdesktop.layout.GroupLayout pan_mappaneinfoLayout = new org.jdesktop.layout.GroupLayout(pan_mappaneinfo.getContentContainer());
+        pan_mappaneinfo.getContentContainer().setLayout(pan_mappaneinfoLayout);
+        pan_mappaneinfoLayout.setHorizontalGroup(
+            pan_mappaneinfoLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 641, Short.MAX_VALUE)
+        );
+        pan_mappaneinfoLayout.setVerticalGroup(
+            pan_mappaneinfoLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 35, Short.MAX_VALUE)
         );
 
         jMenu1.setText("File");
@@ -475,7 +498,8 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
+            .add(pan_mappaneinfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -485,7 +509,9 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE))
+                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pan_mappaneinfo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -599,6 +625,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private javax.swing.JPanel pan_jmappane;
     private org.jdesktop.swingx.JXTitledPanel pan_lightmappanecontrol;
     private javax.swing.JPanel pan_listener;
+    private org.jdesktop.swingx.JXTitledPanel pan_mappaneinfo;
     private org.jdesktop.swingx.JXTitledPanel titled_jcontexttree;
     // End of variables declaration//GEN-END:variables
 }

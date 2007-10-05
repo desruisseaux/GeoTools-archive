@@ -25,6 +25,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import org.geotools.data.FeatureSource;
+import org.geotools.legend.Glyph;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
