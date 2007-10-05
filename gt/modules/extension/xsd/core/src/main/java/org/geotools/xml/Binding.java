@@ -15,7 +15,9 @@
  */
 package org.geotools.xml;
 
+import java.awt.List;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 /**
@@ -24,8 +26,9 @@ import javax.xml.namespace.QName;
  * Bindings have the following responsibilities.
  *   <ul>
  *       <li>Parsing components from an instance document (elements and attributes)
- * into model objects
- *       <li>Encoding model objects as xml components
+ * into model objects</li>
+ *       <li>Encoding model objects as xml components</li>
+ *       <li>Sorting themselves in case multiple bindings target the same type</li>
  *  </ul>
  * </p>
  *
@@ -208,7 +211,17 @@ import javax.xml.namespace.QName;
  *}
  *          </code>
  *  </pre>
- * </p>
+ *  </p>
+ *
+ *  <h3>Conflict resolution</h3>
+ *  In some cases multiple bindings are targetting the same java class. This happens, for example,
+ *  in GML3 where {@link MultiPolygon} is associated to two different elements, gml:MultiPolygon
+ *  and gml:MultiSurface (the former being deprecated and kept for backwards compatibility).
+ *
+ *  <p>In such occasions, binding implementations must implement the {@link Comparable} interface,
+ *  in case of doubt the bindings associated to a specific class will be sorted and the first
+ *  element in the resulting {@link List} will be used.
+ *
  *
  * @author Justin Deoliveira,Refractions Research Inc.,jdeolive@refractions.net
  *
