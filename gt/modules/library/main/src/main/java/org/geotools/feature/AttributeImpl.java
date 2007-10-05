@@ -36,7 +36,7 @@ public class AttributeImpl extends PropertyImpl implements Attribute {
 	/**
 	 * id of the attribute.
 	 */
-	protected final String id;
+	protected String id;
 
 	public AttributeImpl(Object content, AttributeDescriptor descriptor,
 			String id) {
