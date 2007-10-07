@@ -637,9 +637,28 @@ public class SimpleFeatureTypeBuilder {
 	public void add( AttributeDescriptor descriptor ) {
 	    attributes().add(descriptor);
 	}
+	
+	/**
+     * Removes an attribute from the builder
+     * 
+     * @param attributeName the name of the AttributeDescriptor to remove
+     * 
+     * @return the AttributeDescriptor with the name attributeName
+     * @throws IllegalArgumentException if there is no AttributeDescriptor with the name attributeName
+     */
+    public AttributeDescriptor remove(String attributeName){
+        for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
+            AttributeDescriptor descriptor = (AttributeDescriptor) iterator.next();
+            if( descriptor.getLocalName().equals(attributeName) ){
+                iterator.remove();
+                return descriptor;
+            }
+        }
+        throw new IllegalArgumentException(attributeName+" is not an existing attribute descriptor in this builder");
+    }
 
 	/**
-	 * Adds a descriptor directly to the builder.
+	 * Adds a descriptor to the builder by index.
 	 * <p>
 	 * Use of this method is discouraged. Consider using {@link #add(String, Class)}. 
 	 * </p>
@@ -893,20 +912,25 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	/**
-	 * Removes the AttributeDescriptor from the builder
-	 * 
-	 * @param attributeName the name of the AttributeDescriptor to remove
-	 * 
-	 * @return the AttributeDescriptor with the name attributeName
-	 * @throws IllegalArgumentException if there is no AttributeDescriptor with the name attributeName
+	 * H
+	 * @param original
+	 * @param types
+	 * @return
 	 */
-	public AttributeDescriptor remove(String attributeName){
-		for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
-			AttributeDescriptor descriptor = (AttributeDescriptor) iterator.next();
-			if( descriptor.getLocalName().equals(attributeName) ){
-				return descriptor;
-			}
-		}
-		throw new IllegalArgumentException(attributeName+" is not an existing attribute descriptor in this builder");
+	public static SimpleFeatureType retype( SimpleFeatureType original, String[] types ) {
+	    SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+	    
+	    //initialize the builder
+	    b.init( original );
+	    
+	    //clear the attributes
+	    b.attributes().clear();
+	    
+	    //add attributes in order
+	    for ( int i = 0; i < types.length; i++ ) {
+	        b.add( original.getAttribute( types[i] ) );
+	    }
+	    
+	    return b.buildFeatureType();
 	}
 }
