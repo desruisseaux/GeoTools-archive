@@ -20,6 +20,7 @@ package org.geotools.gui.swing.contexttree.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
+
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 

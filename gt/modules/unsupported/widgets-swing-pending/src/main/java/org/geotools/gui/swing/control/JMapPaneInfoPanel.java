@@ -12,11 +12,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JPanel;
+
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.referencing.AuthorityCodesComboBox;
-import org.geotools.map.MapContext;
+import org.jdesktop.layout.GroupLayout;
 import org.opengis.referencing.FactoryException;
 
 /**
@@ -76,15 +78,15 @@ public class JMapPaneInfoPanel extends javax.swing.JPanel implements PropertyCha
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 437, Short.MAX_VALUE)
+            layout.createParallelGroup(GroupLayout.LEADING)
+            .add(0, 437, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 30, Short.MAX_VALUE)
+            layout.createParallelGroup(GroupLayout.LEADING)
+            .add(0, 30, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
 import javax.swing.JComponent;
+
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 

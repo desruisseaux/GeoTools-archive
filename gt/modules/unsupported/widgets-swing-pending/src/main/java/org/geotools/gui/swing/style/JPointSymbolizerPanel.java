@@ -16,17 +16,14 @@
 
 package org.geotools.gui.swing.style;
 
-import org.geotools.gui.swing.propertyedit.styleproperty.*;
-import org.geotools.gui.swing.contexttree.renderer.StyleCellProvider;
-import org.geotools.gui.swing.contexttree.renderer.StyleCellRenderer;
-import org.geotools.gui.swing.i18n.TextBundle;
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import javax.swing.JComponent;
-import javax.swing.ListSelectionModel;
-import org.geotools.gui.swing.style.sld.DemoTableModel;
+
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.propertyedit.styleproperty.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -35,11 +32,9 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;
-import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
-import org.jdesktop.swingx.renderer.ComponentProvider;
 
 /**
  *

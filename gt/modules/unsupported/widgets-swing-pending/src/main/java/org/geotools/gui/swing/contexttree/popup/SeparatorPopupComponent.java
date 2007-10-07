@@ -16,10 +16,12 @@
 
 package org.geotools.gui.swing.contexttree.popup;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import java.awt.Component;
+
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 
 /**
  * @author johann sorel

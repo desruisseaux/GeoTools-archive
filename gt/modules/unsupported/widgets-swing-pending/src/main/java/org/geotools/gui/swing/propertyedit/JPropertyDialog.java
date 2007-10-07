@@ -16,13 +16,13 @@
 
 package org.geotools.gui.swing.propertyedit;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.geotools.gui.swing.i18n.TextBundle;
 
 /**
  * @author johann sorel

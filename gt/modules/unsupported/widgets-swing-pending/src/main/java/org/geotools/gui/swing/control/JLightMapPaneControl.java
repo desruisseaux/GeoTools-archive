@@ -16,15 +16,17 @@
 
 package org.geotools.gui.swing.control;
 
-import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.icon.IconBundle;
 
 /**
  * @author johann sorel

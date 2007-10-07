@@ -16,8 +16,9 @@
 
 package org.geotools.gui.swing.style;
 
-import org.geotools.gui.swing.propertyedit.styleproperty.*;
 import javax.swing.JComponent;
+
+import org.geotools.gui.swing.propertyedit.styleproperty.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;

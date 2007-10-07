@@ -16,13 +16,15 @@
 
 package org.geotools.gui.swing.contexttree.popup;
 
-import org.geotools.gui.swing.contexttree.JContextTree;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBoxMenuItem;
+
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 
 

@@ -16,13 +16,14 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
+import javax.swing.JLabel;
+import javax.swing.table.TableCellRenderer;
+
+import org.geotools.gui.swing.contexttree.ContextTreeRenderer;
 import org.geotools.gui.swing.contexttree.renderer.ColumnHeader;
 import org.geotools.gui.swing.contexttree.renderer.HeaderRenderer;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
-import javax.swing.JLabel;
-import javax.swing.table.TableCellRenderer;
-import org.geotools.gui.swing.contexttree.ContextTreeRenderer;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.table.TableColumnExt;

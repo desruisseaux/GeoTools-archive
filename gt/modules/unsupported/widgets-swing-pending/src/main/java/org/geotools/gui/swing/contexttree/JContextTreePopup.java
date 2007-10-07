@@ -19,8 +19,10 @@ package org.geotools.gui.swing.contexttree;
 
 import java.awt.Point;
 import java.util.ArrayList;
+
 import javax.swing.JPopupMenu;
 import javax.swing.tree.TreePath;
+
 import org.geotools.gui.swing.contexttree.popup.ContextActivePopupComponent;
 import org.geotools.gui.swing.contexttree.popup.ContextDeletePopupComponent;
 import org.geotools.gui.swing.contexttree.popup.ContextPropertyPopupComponent;

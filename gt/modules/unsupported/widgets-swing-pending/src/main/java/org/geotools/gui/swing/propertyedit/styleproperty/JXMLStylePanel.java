@@ -20,19 +20,20 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
-import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.icon.IconBundle;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.xml.transform.TransformerException;
+
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.FastFile;
 import org.geotools.gui.swing.misc.filtre.FiltreSLD;
 import org.geotools.map.MapLayer;
 import org.geotools.sld.SLDConfiguration;
 import org.geotools.styling.SLDTransformer;
-import org.geotools.xml.Configuration;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;

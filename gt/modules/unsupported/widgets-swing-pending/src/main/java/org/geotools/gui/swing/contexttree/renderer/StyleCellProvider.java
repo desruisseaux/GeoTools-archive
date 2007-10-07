@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.contexttree.renderer;
 
 import javax.swing.JLabel;
+
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 

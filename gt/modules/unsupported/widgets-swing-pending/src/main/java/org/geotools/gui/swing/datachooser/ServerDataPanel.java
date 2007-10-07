@@ -16,12 +16,14 @@
 
 package org.geotools.gui.swing.datachooser;
 
-import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.ImageIcon;
+
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 
 /**

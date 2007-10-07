@@ -16,29 +16,31 @@
 
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.column.ColumnModel;
-import org.geotools.gui.swing.contexttree.column.StyleColumnModel;
-import org.geotools.gui.swing.contexttree.column.VisibleColumnModel;
-import org.geotools.gui.swing.contexttree.renderer.ColumnHeader;
-import org.geotools.gui.swing.contexttree.renderer.HeaderRenderer;
-import org.geotools.gui.swing.contexttree.renderer.TreeNodeProvider;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreePath;
+
+import org.geotools.gui.swing.contexttree.column.ColumnModel;
 import org.geotools.gui.swing.contexttree.column.OpacityColumnModel;
+import org.geotools.gui.swing.contexttree.column.StyleColumnModel;
+import org.geotools.gui.swing.contexttree.column.VisibleColumnModel;
+import org.geotools.gui.swing.contexttree.renderer.ColumnHeader;
+import org.geotools.gui.swing.contexttree.renderer.HeaderRenderer;
+import org.geotools.gui.swing.contexttree.renderer.TreeNodeProvider;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
-import org.geotools.gui.swing.i18n.TextBundle;
 
 /**
  * Tree Component for easy MapContext and MapLayer management

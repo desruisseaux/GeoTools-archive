@@ -10,6 +10,7 @@
 package org.geotools.gui.swing.datachooser;
 
 import java.util.EventListener;
+
 import org.geotools.map.MapLayer;
 
 /**

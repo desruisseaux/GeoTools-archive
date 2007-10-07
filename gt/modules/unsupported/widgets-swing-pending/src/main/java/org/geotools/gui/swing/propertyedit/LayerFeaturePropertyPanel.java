@@ -16,16 +16,16 @@
 
 package org.geotools.gui.swing.propertyedit;
 
-import org.geotools.gui.swing.i18n.TextBundle;
-import com.vividsolutions.jts.geom.Geometry;
 import java.awt.Color;
 import java.awt.Component;
-import java.io.IOException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.model.FeatureSourceModel;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellEditor;
 import org.geotools.gui.swing.propertyedit.model.GeometryCellRenderer;
@@ -33,6 +33,8 @@ import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  *

@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.misc.filtre.txt;
 
 import java.io.File;
+
 import javax.swing.filechooser.FileFilter;
 
 

@@ -16,14 +16,13 @@
 
 package org.geotools.gui.swing.propertyedit.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureIterator;

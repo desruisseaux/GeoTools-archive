@@ -16,13 +16,15 @@
 
 package org.geotools.gui.swing.contexttree.popup;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 import javax.swing.JMenuItem;
+
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;

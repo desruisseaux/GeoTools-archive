@@ -17,7 +17,9 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
+
 import javax.swing.ListSelectionModel;
+
 import org.geotools.gui.swing.contexttree.renderer.StyleCellProvider;
 import org.geotools.gui.swing.contexttree.renderer.StyleCellRenderer;
 import org.jdesktop.swingx.JXTable;

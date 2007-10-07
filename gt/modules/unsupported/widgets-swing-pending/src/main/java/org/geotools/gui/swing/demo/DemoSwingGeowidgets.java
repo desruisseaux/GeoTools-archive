@@ -16,17 +16,6 @@
 
 package org.geotools.gui.swing.demo;
 
-import org.geotools.gui.swing.contexttree.JContextTree;
-import org.geotools.gui.swing.contexttree.TreeEvent;
-import org.geotools.gui.swing.contexttree.TreeListener;
-import org.geotools.gui.swing.control.JLightMapPaneControl;
-import org.geotools.gui.swing.datachooser.DataPanel;
-import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
-import org.geotools.gui.swing.datachooser.JFileDataPanel;
-import org.geotools.gui.swing.datachooser.JDataChooser;
-import org.geotools.gui.swing.datachooser.ServerDataPanel;
-import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -38,17 +27,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.TreeEvent;
+import org.geotools.gui.swing.contexttree.TreeListener;
+import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.control.JMapPaneInfoPanel;
+import org.geotools.gui.swing.datachooser.DataPanel;
+import org.geotools.gui.swing.datachooser.JDataChooser;
+import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
+import org.geotools.gui.swing.datachooser.JFileDataPanel;
+import org.geotools.gui.swing.datachooser.ServerDataPanel;
+import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;

@@ -19,6 +19,8 @@ package org.geotools.gui.swing.style.sld;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.StyleBuilder;
+import org.jdesktop.layout.GroupLayout;
+import org.jdesktop.layout.LayoutStyle;
 
 /**
  * @author  johann sorel
@@ -64,48 +66,48 @@ public class JFillPanel extends javax.swing.JPanel {
 
         lbl_color1.setText(TextBundle.getResource().getString("color"));
 
-        javax.swing.GroupLayout GuiFillColorLayout = new javax.swing.GroupLayout(GuiFillColor);
+        GroupLayout GuiFillColorLayout = new GroupLayout(GuiFillColor);
         GuiFillColor.setLayout(GuiFillColorLayout);
         GuiFillColorLayout.setHorizontalGroup(
-            GuiFillColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 61, Short.MAX_VALUE)
+            GuiFillColorLayout.createParallelGroup(GroupLayout.LEADING)
+            .add(0, 61, Short.MAX_VALUE)
         );
         GuiFillColorLayout.setVerticalGroup(
-            GuiFillColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 18, Short.MAX_VALUE)
+            GuiFillColorLayout.createParallelGroup(GroupLayout.LEADING)
+            .add(0, 18, Short.MAX_VALUE)
         );
 
         lbl_alpha1.setText(TextBundle.getResource().getString("opacity"));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            layout.createParallelGroup(GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbl_color1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(GuiFillColor, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lbl_alpha1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(GuiFillAlpha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+                    .add(layout.createSequentialGroup()
+                        .add(lbl_color1)
+                        .addPreferredGap(LayoutStyle.RELATED)
+                        .add(GuiFillColor, GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(lbl_alpha1)
+                        .addPreferredGap(LayoutStyle.RELATED)
+                        .add(GuiFillAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            layout.createParallelGroup(GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lbl_color1)
-                    .addComponent(GuiFillColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(GuiFillAlpha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_alpha1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(GroupLayout.TRAILING)
+                    .add(lbl_color1)
+                    .add(GuiFillColor, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(GroupLayout.TRAILING)
+                    .add(GuiFillAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .add(lbl_alpha1))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

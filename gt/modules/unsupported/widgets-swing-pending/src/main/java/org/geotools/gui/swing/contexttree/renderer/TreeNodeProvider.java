@@ -17,14 +17,14 @@
 package org.geotools.gui.swing.contexttree.renderer;
 
 
-import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.Font;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
-
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.renderer.CellContext;

@@ -16,12 +16,14 @@
 
 package org.geotools.gui.swing.style;
 
-import org.geotools.gui.swing.propertyedit.styleproperty.*;
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import javax.swing.JComponent;
+
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.propertyedit.styleproperty.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.PolygonSymbolizer;

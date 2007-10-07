@@ -19,6 +19,7 @@ package org.geotools.gui.swing.misc;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.GeoTiffReader;

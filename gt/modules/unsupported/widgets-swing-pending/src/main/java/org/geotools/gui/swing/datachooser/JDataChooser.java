@@ -16,19 +16,21 @@
 
 package org.geotools.gui.swing.datachooser;
 
-import org.geotools.gui.swing.extended.JButtonPanel;
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+
 import org.geotools.gui.swing.datachooser.model.DataModel;
+import org.geotools.gui.swing.extended.JButtonPanel;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 
 /**

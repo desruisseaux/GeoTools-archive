@@ -16,15 +16,6 @@
 
 package org.geotools.gui.swing.datachooser;
 
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.geotools.gui.swing.misc.GridCoverageFinder;
-import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
-import org.geotools.gui.swing.misc.filtre.raster.FiltreTIF;
-import org.geotools.gui.swing.misc.filtre.vecteur.FiltreShape;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
@@ -32,12 +23,23 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.event.EventListenerList;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.misc.GridCoverageFinder;
+import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
+import org.geotools.gui.swing.misc.filtre.raster.FiltreTIF;
+import org.geotools.gui.swing.misc.filtre.vecteur.FiltreShape;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Style;

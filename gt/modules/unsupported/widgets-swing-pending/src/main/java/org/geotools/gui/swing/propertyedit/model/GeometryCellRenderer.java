@@ -16,14 +16,13 @@
 
 package org.geotools.gui.swing.propertyedit.model;
 
-import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,6 +31,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
+
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 
 /**
  * @author johann sorel

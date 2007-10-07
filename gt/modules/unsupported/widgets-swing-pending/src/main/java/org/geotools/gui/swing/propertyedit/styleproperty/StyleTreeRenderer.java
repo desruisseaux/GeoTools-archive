@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
 import java.awt.Component;
+
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 

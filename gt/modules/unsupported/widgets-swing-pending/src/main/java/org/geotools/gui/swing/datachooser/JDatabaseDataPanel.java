@@ -16,20 +16,22 @@
 
 package org.geotools.gui.swing.datachooser;
 
-import java.io.IOException;
-import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.Component;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.gui.swing.datachooser.model.DBModel;
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;

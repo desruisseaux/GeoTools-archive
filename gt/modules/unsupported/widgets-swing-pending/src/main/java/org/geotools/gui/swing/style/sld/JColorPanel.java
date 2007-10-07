@@ -19,7 +19,9 @@ package org.geotools.gui.swing.style.sld;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import javax.swing.JColorChooser;
+
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;

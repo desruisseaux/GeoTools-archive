@@ -17,8 +17,10 @@
 package org.geotools.gui.swing.contexttree.renderer;
 
 import java.awt.GridLayout;
+
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+
 import org.geotools.filter.Filters;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;

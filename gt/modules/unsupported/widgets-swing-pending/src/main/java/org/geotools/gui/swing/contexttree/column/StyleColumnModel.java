@@ -17,22 +17,24 @@
 package org.geotools.gui.swing.contexttree.column;
 
 
-import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.icon.IconBundle;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+
 import org.geotools.gui.swing.contexttree.renderer.ColumnHeader;
 import org.geotools.gui.swing.contexttree.renderer.HeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.StyleCellProvider;
 import org.geotools.gui.swing.contexttree.renderer.StyleCellRenderer;
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;

@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
+
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 
 /**

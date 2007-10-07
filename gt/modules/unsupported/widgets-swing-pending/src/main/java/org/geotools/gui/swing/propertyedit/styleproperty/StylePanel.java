@@ -18,6 +18,7 @@ package org.geotools.gui.swing.propertyedit.styleproperty;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+
 import org.geotools.map.MapLayer;
 
 /**

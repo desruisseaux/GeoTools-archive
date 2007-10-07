@@ -16,10 +16,12 @@
 
 package org.geotools.gui.swing.style.sld;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.io.InputStream;
+
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.sld.SLDConfiguration;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLD;

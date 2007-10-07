@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.contexttree;
 
 import java.util.EventObject;
+
 import org.geotools.map.MapContext;
 
 /**

@@ -25,10 +25,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreePath;
+
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTreeTable;

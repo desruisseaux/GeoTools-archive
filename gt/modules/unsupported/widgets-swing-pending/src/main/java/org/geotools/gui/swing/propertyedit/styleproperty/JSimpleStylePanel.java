@@ -16,24 +16,26 @@
 
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
-import org.geotools.gui.swing.style.JRasterSymbolizerPanel;
-import org.geotools.gui.swing.style.JPointSymbolizerPanel;
-import org.geotools.gui.swing.style.JLineSymbolizerPanel;
-import org.geotools.gui.swing.style.JPolygonSymbolizerPanel;
+import java.awt.BorderLayout;
+
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.style.JLineSymbolizerPanel;
+import org.geotools.gui.swing.style.JPointSymbolizerPanel;
+import org.geotools.gui.swing.style.JPolygonSymbolizerPanel;
+import org.geotools.gui.swing.style.JRasterSymbolizerPanel;
+import org.geotools.map.MapLayer;
+
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import java.awt.BorderLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import org.geotools.map.MapLayer;
-import org.geotools.styling.FeatureTypeStyle;
 
 /**
  *

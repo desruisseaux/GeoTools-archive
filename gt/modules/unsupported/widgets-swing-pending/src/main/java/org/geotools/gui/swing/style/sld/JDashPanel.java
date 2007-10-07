@@ -16,9 +16,7 @@
 
 package org.geotools.gui.swing.style.sld;
 
-import org.geotools.filter.Filters;
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
 import org.opengis.filter.expression.Expression;
 

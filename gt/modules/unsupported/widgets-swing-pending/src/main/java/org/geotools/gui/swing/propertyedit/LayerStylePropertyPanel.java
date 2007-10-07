@@ -19,6 +19,7 @@ package org.geotools.gui.swing.propertyedit;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
@@ -26,12 +27,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
-import org.geotools.gui.swing.propertyedit.PropertyPanel;
+
 import org.geotools.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
+import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
 import org.geotools.gui.swing.propertyedit.styleproperty.StyleNode;
 import org.geotools.gui.swing.propertyedit.styleproperty.StylePanel;
 import org.geotools.gui.swing.propertyedit.styleproperty.StyleTreeRenderer;
-import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
 import org.geotools.map.MapLayer;
 
 /**

@@ -16,8 +16,9 @@
 
 package org.geotools.gui.swing.contexttree.renderer;
 
-import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import java.awt.Graphics;
+
+import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Symbolizer;
 import org.jdesktop.swingx.renderer.JRendererLabel;

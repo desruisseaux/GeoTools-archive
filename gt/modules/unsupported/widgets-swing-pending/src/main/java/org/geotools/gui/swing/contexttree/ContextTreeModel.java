@@ -16,13 +16,15 @@
 
 package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.column.ColumnModel;
-import org.geotools.gui.swing.i18n.TextBundle;
 import java.util.ArrayList;
 import java.util.Vector;
+
 import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+import org.geotools.gui.swing.contexttree.column.ColumnModel;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;

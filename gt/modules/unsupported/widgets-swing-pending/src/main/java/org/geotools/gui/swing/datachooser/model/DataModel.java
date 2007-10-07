@@ -18,8 +18,10 @@ package org.geotools.gui.swing.datachooser.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 

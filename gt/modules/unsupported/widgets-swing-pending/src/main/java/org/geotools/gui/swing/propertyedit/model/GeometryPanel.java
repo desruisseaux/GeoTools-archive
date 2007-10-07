@@ -17,7 +17,9 @@
 package  org.geotools.gui.swing.propertyedit.model;
 
 import java.awt.Component;
+
 import javax.swing.ImageIcon;
+
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 
 /**

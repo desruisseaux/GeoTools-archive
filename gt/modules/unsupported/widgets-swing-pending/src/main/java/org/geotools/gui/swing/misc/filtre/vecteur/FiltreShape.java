@@ -16,6 +16,7 @@
 
 package org.geotools.gui.swing.misc.filtre.vecteur;
 import java.io.File;
+
 import javax.swing.filechooser.FileFilter;
 /**
  * Filtre par fichier Shape
