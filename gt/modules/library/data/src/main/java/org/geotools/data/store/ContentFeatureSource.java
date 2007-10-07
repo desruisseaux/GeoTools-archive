@@ -18,7 +18,6 @@ package org.geotools.data.store;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
@@ -30,8 +29,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -67,6 +64,10 @@ public abstract class ContentFeatureSource implements FeatureSource {
 
     public ContentEntry getEntry() {
     	return entry;
+    }
+    
+    public ContentState getState() {
+        return entry.getState(transaction);
     }
     
     public void setTransaction(Transaction transaction) {
@@ -139,7 +140,8 @@ public abstract class ContentFeatureSource implements FeatureSource {
         }
 
         if (query.getPropertyNames() != Query.ALL_NAMES) {
-            // features = features.reType( query.getPropertyNames() );
+            SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
+            features = new ReTypingFeatureCollection( features, retyped );
         }
 
         return features;

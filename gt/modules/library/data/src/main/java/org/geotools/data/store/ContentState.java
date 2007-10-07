@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.data.FeatureListener;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -54,7 +55,7 @@ public class ContentState {
 	/**
 	 * cached bounds of features
 	 */
-	protected Envelope bounds;
+	protected ReferencedEnvelope bounds;
 
     /**
      * entry maintaining the state
@@ -81,7 +82,7 @@ public class ContentState {
 		
         featureType = state.featureType;
         count = state.count;
-        bounds = state.bounds == null ? null : new Envelope( state.bounds );
+        bounds = state.bounds == null ? null : new ReferencedEnvelope( state.bounds );
 	}
 
 	public SimpleFeatureType getFeatureType(){
@@ -100,11 +101,11 @@ public class ContentState {
     	this.count = count;
     }
     
-    public Envelope getBounds(){
+    public ReferencedEnvelope getBounds(){
     	return bounds;
     }
     
-    public void setBounds( Envelope bounds ){
+    public void setBounds( ReferencedEnvelope bounds ){
     	this.bounds = bounds;
     }
     
@@ -115,6 +116,10 @@ public class ContentState {
         featureType = null;
         count = -1;
         bounds = null;
+    }
+    
+    public void dispose() {
+
     }
 
     /**

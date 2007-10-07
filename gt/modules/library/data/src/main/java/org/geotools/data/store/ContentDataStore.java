@@ -23,7 +23,6 @@ import java.util.Map;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
@@ -44,22 +43,53 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
- * Abstract implementation of DataStore.
+ * Abstract base class for data stores.
  * <p>
- * Subclasses must implement the following methods.
+ * A datastore contains a set of entries ({@link ContentEntry}). Each entry 
+ * corresponds to a "real world dataset". For instance, a shapefile datastore
+ * would contain a single entry which would represent the shapefile on disk. A 
+ * postgis datastore could contain many entries, one for each table in the database.
+ * </p>
+ * <p>
+ * Each entry is identified by a name ({@link Name}). The name can be qualified
+ * with a namespace uri, or unqualified (in which the namespace uri is null). An 
+ * example of a datastore that might use qualified names is WFS, where in each 
+ * entry corresponds to a WFS "Feature Type", which have namespace qualified name.
+ * Other datastores (such as databases) use unqualified names.
+ * </p>
+ * <p>
+ * When entry names of a datastore are unqualified, a default namespace uri can 
+ * be set "globally" on the datastore itself, see {@link #setNamespaceURI(String)}. 
+ * When this value is set, unqualified entry names are implicitly qualified with 
+ * the global namespace uri. 
+ * </p>
+ * <h3>Subclasses</h3>
+ * <p>
+ * At a minimum subclasses must implement the following methods:
  * <ul>
  *   <li>{@link #createTypeNames()}
  *   <li>{@link #createFeatureSource(ContentEntry)}
  * </ul>
- *
+ * The following methods may also be overriden:
+ * <ul>
+ *   <li>{@link #createContentState(ContentEntry)}
+ * </ul>
+ * The following methods may be overriden but <b>only</b> to narrow the return 
+ * type to a specific subclass of {@link ContentFeatureSource}.
+ * <ul>
+ *   <li>{@link #getFeatureSource(String)}
+ *   <li>{@link #getFeatureSource(String, Transaction)}
+ *   <li>{@link #getFeatureSource(Name, Transaction)}
+ * </ul>
+ * </p>
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
  */
 public abstract class ContentDataStore implements DataStore {
 	/**
-     * Map<TypeName,ContentEntry> one for each kind of content served up.
+     * name, entry map
      */
-    final protected Map entries;
+    final protected Map<Name,ContentEntry> entries;
 
     /**
      * Factory used to create feature types
@@ -82,72 +112,117 @@ public abstract class ContentDataStore implements DataStore {
     protected GeometryFactory geometryFactory;
 
     /**
-     * Application namespace uri of the datastore
+     * namespace uri of the datastore itself, or default namespace
      */
     protected String namespaceURI;
 
     public ContentDataStore() {
-        this.entries = new HashMap();
+        this.entries = new HashMap<Name,ContentEntry>();
     }
 
     //
     // Property accessors
     //
-    public void setTypeFactory(FeatureTypeFactory typeFactory) {
+    
+    /**
+     * The factory used to create feature types.
+     */
+    public FeatureTypeFactory getFeatureTypeFactory() {
+        return typeFactory;
+    }
+    
+    /**
+     * Sets the factory used to create feature types.
+     */
+    public void setFeatureTypeFactory(FeatureTypeFactory typeFactory) {
         this.typeFactory = typeFactory;
     }
 
-    public FeatureTypeFactory getTypeFactory() {
-        return typeFactory;
-    }
-
+    
+    /**
+     * Sets the factory used to create features.
+     */
     public void setFeatureFactory(FeatureFactory featureFactory) {
         this.featureFactory = featureFactory;
     }
-
+    
+    /**
+     * The factory used to create filters.
+     */
+    public FilterFactory getFilterFactory() {
+        return filterFactory;
+    }
+    
+    /**
+     * The factory used to create features.
+     */
     public FeatureFactory getFeatureFactory() {
         return featureFactory;
     }
 
+    /**
+     * Sets the factory used to create filters.
+     */
     public void setFilterFactory(FilterFactory filterFactory) {
         this.filterFactory = filterFactory;
     }
-
-    public FilterFactory getFilterFactory() {
-        return filterFactory;
-    }
-
+    
+   
+    /**
+     * The factory used to create geometries.
+     */
     public GeometryFactory getGeometryFactory() {
         return geometryFactory;
     }
 
+    /**
+     * Sets the factory used to create geometries.
+     * 
+     */
     public void setGeometryFactory(GeometryFactory geometryFactory) {
         this.geometryFactory = geometryFactory;
     }
 
+    /**
+     * The namespace uri of the datastore.
+     * 
+     * @return The namespace uri, may be <code>null</code>.
+     */
+    public String getNamespaceURI() {
+        return namespaceURI;
+    }
+    
+    /**
+     * Sets the namespace uri of the datastore.
+     * <p>
+     * This will be used to qualify the entries or types of the datastore.
+     * </p>
+     * @param namespaceURI The namespace uri, may be <code>null</code>.
+     */
     public void setNamespaceURI(String namespaceURI) {
         this.namespaceURI = namespaceURI;
     }
 
-    public String getNamespaceURI() {
-        return namespaceURI;
-    }
-
+    
     //
     // DataStore API
     //
 
     /**
-     * This method delegates to {@link #createTypeNames()}.
+     * Returns the names of all entries or types provided by the datastore.
+     * <p>
+     * This method is marked final and delegates to {@link #createTypeNames()},
+     * which subclasses are intended to implement. 
+     * </p>
      *
      * @see DataStore#getTypeNames()
      */
     public final String[] getTypeNames() throws IOException {
-        List typeNames = createTypeNames();
+        List<Name> typeNames = createTypeNames();
         String[] names = new String[typeNames.size()];
 
         for (int i = 0; i < typeNames.size(); i++) {
-            Name typeName = (Name) typeNames.get(i);
+            Name typeName = typeNames.get(i);
             names[i] = typeName.getLocalPart();
         }
 
@@ -155,8 +230,26 @@ public abstract class ContentDataStore implements DataStore {
     }
 
     /**
-     * Calls through to <code>getFeatureSource(typeName).getSchema()</code>
+     * Creates a new schema in the datastore.
+     * <p>
+     * This implementation throws a{@link UnsupportedOperationException}. Subclasses
+     * should override to support schema creation.
+     * </p>
+     * 
      *
+     * @see DataStore#createSchema(FeatureType)
+     */
+    public void createSchema(SimpleFeatureType featureType)
+        throws IOException {
+        throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * Returns the feature type or schema matching the specified name.
+     * <p>
+     * This method calls through to <code>getFeatureSource(typeName).getSchema()</code>
+     * </p>
+     * 
      * @see DataStore#getSchema(String)
      */
     public final SimpleFeatureType getSchema(String typeName)
@@ -165,29 +258,48 @@ public abstract class ContentDataStore implements DataStore {
     }
 
     /**
-     * Delegates to {@link #getFeatureSource(Name, Transaction)}.
+     * Returns the feature source matching the specified name.
+     * <p>
+     * Subclasses should not implement this method. However overriding in order 
+     * to perform a type narrowing to a subclasses of {@link ContentFeatureSource}
+     * is acceptable.
+     * </p>
      *
      * @see DataStore#getFeatureSource(String)
      */
-    public final FeatureSource getFeatureSource(String typeName)
+    public ContentFeatureSource getFeatureSource(String typeName)
         throws IOException {
-        return getFeatureSource(name(typeName), Transaction.AUTO_COMMIT);
+        return getFeatureSource(new org.geotools.feature.Name(namespaceURI,typeName), Transaction.AUTO_COMMIT);
     }
 
     /**
-     * Returns a feature source for a feature type and transaction.
+     * Returns the feature source matching the specified name and explicitly 
+     * specifies a transaction.
      * <p>
-     * The resulting feature source is cached in the state of the entry for
-     * the type.
+     * Subclasses should not implement this method. However overriding in order 
+     * to perform a type narrowing to a subclasses of {@link ContentFeatureSource}
+     * is acceptable.
      * </p>
      *
-     * @param typeName The entry name.
-     * @param tx A transaction.
-     *
-     * @return The feature source for the name and transaction.
-     *
+     * @see DataStore#getFeatureSource(String)
      */
-    public final FeatureSource getFeatureSource(Name typeName, Transaction tx)
+    public ContentFeatureSource getFeatureSource(String typeName, Transaction tx) 
+        throws IOException {
+        return getFeatureSource( name(typeName), tx );
+    }
+    
+    /**
+     * Returns the feature source matching the specified name and explicitly 
+     * specifies a transaction.
+     * <p>
+     * Subclasses should not implement this method. However overriding in order 
+     * to perform a type narrowing to a subclasses of {@link ContentFeatureSource}
+     * is acceptable.
+     * </p>
+     *
+     * @see DataStore#getFeatureSource(String)
+     */
+    public ContentFeatureSource getFeatureSource(Name typeName, Transaction tx)
         throws IOException {
     	
         ContentEntry entry = ensureEntry(typeName);
@@ -199,37 +311,71 @@ public abstract class ContentDataStore implements DataStore {
     }
 
     /**
-     * Delegates to {@link #query(Query, Transaction)} and wraps the result in
-     * a {@link DelegateFeatureReader}.
-     *
-     * @see DataStore#getFeatureReader(Query, Transaction)
+     * Returns a feature reader for the specified query and transaction.
+     * <p>
+     * This method is not intended to be overridden and is marked final. This 
+     * implementation delegates to {@link FeatureCollection} and wraps an iterator
+     * in a {@link FeatureReader}.
+     * </p>
      */
-    public final FeatureReader getFeatureReader(Query query, Transaction transaction)
+    public final FeatureReader getFeatureReader(Query query, Transaction tx)
         throws IOException {
-        FeatureCollection collection = query(query, transaction);
+        
+        if ( query.getTypeName() == null ) {
+            throw new IllegalArgumentException( "Query does not specify type.");
+        }
+        
+        FeatureCollection collection = 
+           getFeatureSource(query.getTypeName(),tx).getFeatures( query );
 
         return new DelegateFeatureReader(collection.getSchema(), collection.features());
     }
 
     /**
-     * The default implementation of this method throws a
-     * {@link UnsupportedOperationException}, subclasses should implement to
-     * support schema creation.
-     *
-     * @see DataStore#createSchema(FeatureType)
+     * Returns a feature writer for the specified query and transaction.
+     * <p>
+     * This method is not intended to be overridden and is marked final. This 
+     * implementation delegates to {@link FeatureCollection} and wraps an iterator
+     * in a {@link FeatureWriter}.
+     * </p>
      */
-    public void createSchema(SimpleFeatureType featureType)
-        throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    public final FeatureWriter getFeatureWriter(String typeName, Filter filter,
-        Transaction transaction) throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+        Transaction tx) throws IOException {
+        
+        //TODO: implement and make final when feature collection api is fixed
+        // for now subclasses must implement
+        //FeatureCollection collection = getFeatureSource(typeName,tx).getFeatures( filter );
+        //return new DelegateFeatureWriter( collection.getSchema(), collection.writer() );
         return null;
     }
-
-    public final FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+ 
+    /**
+     * Returns a feature writer for the specified type name and transaction.
+     * <p>
+     * This method is convenience for <code>getFeatureWriter(typeName,Filter.INCLUDE,tx)</code>.
+     * </p>
+     */
+    public final FeatureWriter getFeatureWriter(String typeName, Transaction tx)
         throws IOException {
+        
+        return getFeatureWriter( typeName, Filter.INCLUDE, tx );
+    }
+    
+    /**
+     * Returns an appending feature writer for the specified type name and 
+     * transaction.
+     * <p>
+     * This method is not intended to be overridden and is marked final. This 
+     * implementation delegates to {@link FeatureCollection} and wraps an iterator
+     * in a {@link FeatureWriter}.
+     * </p>
+     */
+    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+        throws IOException {
+        //TODO: implement and make final when feature collection api is fixed
+        // for now subclasses must implement
+        //FeatureCollection collection = getFeatureSource(typeName,tx).getFeatures( filter );
+        //return new DelegateFeatureWriter( collection.getSchema(), collection.inserter() );
         return null;
     }
 
@@ -245,44 +391,28 @@ public abstract class ContentDataStore implements DataStore {
         throws IOException {
     }
 
-    public final FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
-        throws IOException {
-        return null;
+  
+    
+    public final void dispose() throws IOException {
+        for ( ContentEntry entry :  entries.values() ) {
+            entry.dispose();
+        }
+    }
+    
+    /**
+     * Returns the entry for a specified name, or <code>null</code> if no such 
+     * entry exists.
+     */
+    public ContentEntry getEntry( Name name ) {
+        return (ContentEntry) entries.get(name);
     }
 
     //
     // Internal API
     //
+    
     /**
-     * Creates a set of qualified names corresponding to the types that the
-     * datastore provides.
-     * <p>
-     * Namespaces may be left <code>null</code> for data stores which do not
-     * support namespace qualified type names.
-     * </p>
-     *
-     * @return A list of {@link TypeName}.
-     *
-     * @throws IOException Any errors occuring connecting to data.
-     */
-    protected abstract List /*<TypeName>*/ createTypeNames()
-        throws IOException;
-
-    /**
-     * Instantiates new feature source for the entry.
-     * <p>
-     * Subclasses should override this method to return a specific subclass of
-     * {@link ContentFeatureSource}.
-     * </p>
-     * @param entry The entry.
-     *
-     * @return An new instance of {@link ContentFeatureSource} for the entry.
-     */
-    protected abstract ContentFeatureSource createFeatureSource(ContentEntry entry)
-    	throws IOException;
-
-    /**
-     * Instantiates a new conent state for the entry.
+     * Instantiates a new content state for the entry.
      * <p>
      * Subclasses may override this method to return a specific subclass of 
      * {@link ContentState}.
@@ -300,7 +430,7 @@ public abstract class ContentDataStore implements DataStore {
      * Helper method to wrap a non-qualified name.
      */
     final protected Name name(String typeName) {
-        return new org.geotools.feature.Name(typeName);
+        return new org.geotools.feature.Name(namespaceURI,typeName);
     }
 
     /**
@@ -325,7 +455,7 @@ public abstract class ContentDataStore implements DataStore {
         //do we already know about the entry
         if (!entries.containsKey(name)) {
             //is this type available?
-            List typeNames = createTypeNames();
+            List<Name> typeNames = createTypeNames();
 
             if (typeNames.contains(name)) {
                 //yes, create an entry for it
@@ -351,7 +481,7 @@ public abstract class ContentDataStore implements DataStore {
      *
      * @return The entry.
      *
-     * @throws IOException If hte entry does not exist, or if there was an error
+     * @throws IOException If the entry does not exist, or if there was an error
      * looking it up.
      */
     final protected ContentEntry ensureEntry(Name name)
@@ -364,31 +494,32 @@ public abstract class ContentDataStore implements DataStore {
 
         return entry;
     }
-
+    
     /**
-     * Helper method for returning the feature collection for a
-     * query / transaction pair.
+     * Creates a set of qualified names corresponding to the types that the
+     * datastore provides.
      * <p>
-     * The implementation of this method delegates to
-     * {@link ContentFeatureSource#getFeatures(Query)}
+     * Namespaces may be left <code>null</code> for data stores which do not
+     * support namespace qualified type names.
      * </p>
      *
-     * @param query The query to make against the datastore.
-     * @param transaction A transaction
+     * @return A list of {@link Name}.
      *
-     * @return A FeatureCollection matching the query.
-     *
-     * @throws IOException Any errors that occur when interacting with the data.
+     * @throws IOException Any errors occuring connecting to data.
      */
-    final protected FeatureCollection query(Query query, Transaction transaction)
-        throws IOException {
-        FeatureSource source = getFeatureSource(query.getTypeName());
+    protected abstract List<Name> createTypeNames()
+        throws IOException;
 
-        //TODO: transaction should be moved up to FeatureSource
-        if (source instanceof FeatureStore) {
-            ((FeatureStore) source).setTransaction(transaction);
-        }
-
-        return source.getFeatures(query);
-    }
+    /**
+     * Instantiates new feature source for the entry.
+     * <p>
+     * Subclasses should override this method to return a specific subclass of
+     * {@link ContentFeatureSource}.
+     * </p>
+     * @param entry The entry.
+     *
+     * @return An new instance of {@link ContentFeatureSource} for the entry.
+     */
+    protected abstract ContentFeatureSource createFeatureSource(ContentEntry entry)
+        throws IOException;
 }

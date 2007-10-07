@@ -17,15 +17,29 @@ package org.geotools.data.store;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.opengis.feature.type.Name;
+
 import org.geotools.data.Transaction;
+import org.opengis.feature.type.Name;
 
 
 /**
- * An entry for a type provided by a datastore.
+ * An entry for a type or feature source provided by a datastore.
  * <p>
- * A content entry maintains the "state" of an entry for a particular
- * transaction.
+ * An entry maintains state on a per-transaction basis. The {@link #getState(Transaction)}
+ * method is used to get at this state.
+ * <pre>
+ *   <code>
+ *   ContentEntry entry = ...;
+ *   
+ *   Transaction tx1 = new Transaction();
+ *   Transaction tx2 = new Transaction();
+ *   
+ *   ContentState s1 = entry.getState( tx1 );
+ *   ContentState s2 = entry.getState( tx2 );
+ *   
+ *   s1 != s2;
+ *   </code>
+ * </pre>
  * </p>
  *
  * @author Jody Garnett, Refractions Research Inc.
@@ -40,18 +54,24 @@ public final class ContentEntry {
     /**
      * Map<Transaction,ContentState> state according to Transaction.
      */
-    Map state;
+    Map<Transaction,ContentState> state;
 
     /**
-     * Backpointer to datastore
+     * backpointer to datastore
      */
     ContentDataStore dataStore;
 
+    /**
+     * Creates the entry.
+     * 
+     * @param dataStore The datastore of the entry.
+     * @param typeName The name of the entry.
+     */
     public ContentEntry(ContentDataStore dataStore, Name typeName) {
         this.typeName = typeName;
         this.dataStore = dataStore;
 
-        this.state = new HashMap();
+        this.state = new HashMap<Transaction, ContentState>();
 
         //create a state for the auto commit transaction
         ContentState autoState = dataStore.createContentState(null);
@@ -104,6 +124,16 @@ public final class ContentEntry {
         }
     }
 
+    /**
+     * Disposes the entry by disposing all maintained state.
+     */
+    public void dispose() {
+        //kill all state
+        for (ContentState s : state.values() ) {
+            s.dispose();
+        }
+    }
+    
     public String toString() {
         return getTypeName();
     }
