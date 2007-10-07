@@ -52,31 +52,4 @@ public class ReTypingFeatureCollection extends DecoratingFeatureCollection
 		ReTypingIterator reType = (ReTypingIterator) close;
 		delegate.close( reType.getDelegate() );
 	}
-
-	public FeatureCollection subCollection(Filter filter) {
-		throw new UnsupportedOperationException();
-	}
-
-	public FeatureCollection sort(SortBy order) {
-		throw new UnsupportedOperationException();
-	}
-
-	public Object[] toArray() {
-		return toArray( new Object[ size() ] );
-	}
-
-	public Object[] toArray(Object[] a) {
-		List list = new ArrayList();
-		Iterator i = iterator();
-		try {
-			while( i.hasNext() ) {
-				list.add( i.next() );
-			}
-			
-			return list.toArray( a );
-		}
-		finally {
-			close( i );
-		}
-	}
 }
