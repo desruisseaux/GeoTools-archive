@@ -7,13 +7,23 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactoryImpl;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 
@@ -34,46 +44,25 @@ public class JDBCTestSupport extends TestCase {
 	 */
 	static BasicDataSource dataSource = new BasicDataSource();
 	static {
+	    
+	    //set up the data source
 		dataSource.setUrl("jdbc:h2:geotools");
 		dataSource.setDriverClassName("org.h2.Driver");
 		dataSource.setPoolPreparedStatements(false);
+	
+		//turn up logging
+		ConsoleHandler handler = new ConsoleHandler();
+		handler.setLevel(Level.FINE);
+		Logger.getLogger("org.geotools.data.jdbc").setLevel( Level.FINE );
+		Logger.getLogger("org.geotools.data.jdbc").addHandler( handler );
 	}
 	
-	/**
-     * Embedded server instance, created statically to live over the life
-     * of many test cases, with a shutdown hook to cleanup
-     */
-    static Server server;
-
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                if (server != null) {
-                    //stop the server
-                    server.stop();
-
-                    //kill the files
-                    try {
-                    	//bug with h2? if hte log file doesn't get 
-                    	// deleted the subsequent run crashes, if 
-                    	// you execute twice, then the log file gets
-                    	// deleted
-                    	DeleteDbFiles.main(null);
-                    	DeleteDbFiles.main(null);
-                    } catch (SQLException e) {
-                    }
-                }
-            }
-        }));
-    }
-
     /**
      * Runs an sql string aginst the database.
      * 
      * @param input The sql.
      */
     static void run( String input ) throws Exception {
-    	JDBCDataStore.LOGGER.info( input );
     	run( new ByteArrayInputStream( input.getBytes() ) );
     }
     
@@ -93,15 +82,19 @@ public class JDBCTestSupport extends TestCase {
         try {
             Statement st = conn.createStatement();
 
-            String line = null;
+            try {
+                String line = null;
 
-            while ((line = reader.readLine()) != null) {
-            	st.execute(line);
+                while ((line = reader.readLine()) != null) {
+                    st.execute(line);
+                }
+
+                reader.close();    
             }
-
-            reader.close();
-
-            st.close();
+            finally {
+                st.close();
+            }
+            
         } finally {
             conn.close();
         }
@@ -111,16 +104,27 @@ public class JDBCTestSupport extends TestCase {
     
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (server == null) {
-            //create the server instance
-            server = Server.createTcpServer(new String[] {  });
-            server.start();
-
-            //spatialy enable it
+        
+        //spatially enable the database
+        
+        try {
             run( getClass().getResourceAsStream( "h2.sql" ) );
         }
+        catch( Exception e ) {
+            
+        }
         
+        FilterCapabilities filterCapabilities = new FilterCapabilities();
+
+        filterCapabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+        filterCapabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        filterCapabilities.addType(PropertyIsNull.class);
+        filterCapabilities.addType(PropertyIsBetween.class);
+        filterCapabilities.addType(Id.class);
+        filterCapabilities.addType(IncludeFilter.class);
+        filterCapabilities.addType(ExcludeFilter.class);
+        filterCapabilities.addType(PropertyIsLike.class);
+
         //create the dataStore
         dataStore = new JDBCDataStore();
         dataStore.setNamespaceURI("http://www.geotools.org/test");
@@ -128,36 +132,53 @@ public class JDBCTestSupport extends TestCase {
         dataStore.setDatabaseSchema("geotools");
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
+        dataStore.setFilterCapabilities(filterCapabilities);
+        
+        //drop old data
+        try {
+            run ( "DROP TABLE \"geotools\".\"ft1\"; COMMIT;" );    
+        }
+        catch( Exception e ) {
+            //e.printStackTrace();
+        }
+        try {
+            run ( "DROP SCHEMA \"geotools\"; COMMIT;" );    
+        }
+        catch( Exception e ) {
+            //e.printStackTrace();
+        }
         
         //create some data
         StringBuffer sb = new StringBuffer().append( "CREATE SCHEMA \"geotools\";" ); 
 		
 		sb.append( "CREATE TABLE \"geotools\".\"ft1\" " )
-			.append( "(\"id\" int AUTO_INCREMENT(1) primary key , " )
+			.append( "(\"id\" int AUTO_INCREMENT(1) PRIMARY KEY , " )
 			.append( "\"geometry\" OTHER, \"intProperty\" int, " ) 
 			.append( "\"doubleProperty\" double, \"stringProperty\" varchar);" );
 		
 		sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-			.append( "0,GeometryFromText('POINT(0 0)'), 0, 0.0,'zero');");
+			.append( "0,setSRID(GeometryFromText('POINT(0 0)'),4326), 0, 0.0,'zero');");
 	
 		sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-			.append( "1,GeometryFromText('POINT(1 1)'), 1, 1.1,'one');");
+			.append( "1,setSRID(GeometryFromText('POINT(1 1)'),4326), 1, 1.1,'one');");
 
 		sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-			.append( "2,GeometryFromText('POINT(2 2)'), 2, 2.2,'two');");
+			.append( "2,setSRID(GeometryFromText('POINT(2 2)'),4326), 2, 2.2,'two');");
 
 		
 		run( sb.toString() );
-		
-
     }
     
     protected void tearDown() throws Exception {
     	super.tearDown();
     	
+    	dataStore.dispose();
+    	
     	StringBuffer sb = new StringBuffer("DROP TABLE \"geotools\".\"ft1\";")
 			.append( "DROP SCHEMA \"geotools\";" ); 
 			
 		run( sb.toString() );
+		
+		Thread.sleep(100);
     }
 }

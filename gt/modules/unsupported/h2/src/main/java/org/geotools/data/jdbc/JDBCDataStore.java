@@ -12,19 +12,28 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
+import org.geotools.data.collection.DelegateFeatureWriter;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.Name;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
@@ -125,6 +134,11 @@ public class JDBCDataStore extends ContentDataStore {
      */
     protected HashMap/*<Class,Integer>*/ classToSqlTypeMappings = RMAPPINGS;
     
+    /**
+     * filter capabilities of the datastore
+     */
+    protected FilterCapabilities filterCapabilities;
+    
     public void setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
     }
@@ -147,6 +161,14 @@ public class JDBCDataStore extends ContentDataStore {
     
     public SQLDialect getSQLDialect() {
         return dialect;
+    }
+    
+    public void setFilterCapabilities(FilterCapabilities filterCapabilities) {
+        this.filterCapabilities = filterCapabilities;
+    }
+    
+    public FilterCapabilities getFilterCapabilities() {
+        return filterCapabilities;
     }
     
     public HashMap getClassToSqlTypeMappings() {
@@ -196,7 +218,7 @@ public class JDBCDataStore extends ContentDataStore {
         }
         //execute the create table statement
         //TODO: create a primary key and a spatial index
-        Connection cx = connection();
+        Connection cx = createConnection();
         try {
             String sql = createTableSQL( featureType, cx );
             LOGGER.fine( sql );
@@ -224,8 +246,26 @@ public class JDBCDataStore extends ContentDataStore {
         entries.put(entry.getName(), entry);
     }
     
+    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+            Transaction tx) throws IOException {
+        
+        JDBCFeatureCollection collection = 
+            (JDBCFeatureCollection) getFeatureSource( typeName,tx).getFeatures( filter );
+        return new DelegateFeatureWriter( collection.getSchema(), collection.writer() );
+    }
+    
+    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction tx) 
+        throws IOException {
+        
+        JDBCFeatureCollection collection = 
+            (JDBCFeatureCollection) getFeatureSource(typeName,tx).getFeatures();
+        return new DelegateFeatureWriter( collection.getSchema(), collection.inserter() );
+    }
+    
     protected String createTableSQL( SimpleFeatureType featureType, Connection cx ) 
         throws Exception {
+        StringBuffer sql = new StringBuffer();
+        
         //figure out what the sql types are corresponding to the feature type
         // attributes
         int[] sqlTypes = new int[featureType.getAttributeCount()];
@@ -299,14 +339,17 @@ public class JDBCDataStore extends ContentDataStore {
         }
         
 
-        //build the table sql
-        StringBuffer sql = new StringBuffer();
+        //build the create table sql
         sql.append("CREATE TABLE ");
-
-        encodeDatabaseSchema(sql);
-        dialect.table( featureType.getTypeName(), sql );
+        
+        encodeTableName( featureType.getTypeName(), sql );
         sql.append(" ( ");
 
+        //fid column
+        dialect.primaryKey( "fid", sql );
+        sql.append( ", ");
+        
+        //normal attributes
         for (int i = 0; i < sqlTypeNames.length; i++) {
             AttributeDescriptor att = featureType.getAttribute(i);
 
@@ -330,25 +373,258 @@ public class JDBCDataStore extends ContentDataStore {
         StringBuffer sql = new StringBuffer();
         sql.append( "SELECT * FROM ");
         
-        encodeDatabaseSchema(sql);
-        dialect.table( featureType.getTypeName(), sql );
+        encodeTableName( featureType.getTypeName(), sql );
         
         if ( filter != null ) {
             //encode filter
+            try {
+                FilterToSQL toSQL = createFilterToSQL( featureType );
+                sql.append( " ").append( toSQL.encodeToString( filter ) );
+            } 
+            catch (FilterToSQLException e) {
+                throw new RuntimeException(e);
+            }
         }
         
         return sql.toString();
         
     }
     
+    protected String selectBoundsSQL( SimpleFeatureType featureType, Filter filter ) {
+        StringBuffer sql = new StringBuffer();
+        
+        sql.append( "SELECT " );
+        
+        //check for aggregate vs per row bounds
+        String geometryColumn = featureType.getDefaultGeometry().getLocalName();
+        if ( dialect.hasAggregateExtent() ) {
+            dialect.aggregateExtent(geometryColumn, sql);
+        }
+        else {
+            dialect.extent( geometryColumn, sql );
+        }
+        sql.append( "FROM" );
+        encodeTableName( featureType.getTypeName(), sql );
+        
+        if ( filter != null ) {
+            //encode filter
+            try {
+                FilterToSQL toSQL = createFilterToSQL( featureType );
+                sql.append( " ").append( toSQL.encodeToString( filter ) );
+            } 
+            catch (FilterToSQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        return sql.toString();
+    }
+    
+    protected String selectCountSQL( SimpleFeatureType featureType, Filter filter ) {
+        StringBuffer sql = new StringBuffer();
+        
+        sql.append( "SELECT count(*) FROM " );
+        encodeTableName( featureType.getTypeName(), sql );
+        
+        if ( filter != null ) {
+            //encode filter
+            try {
+                FilterToSQL toSQL = createFilterToSQL( featureType );
+                sql.append( " " ).append( toSQL.encodeToString( filter ) );
+            } 
+            catch (FilterToSQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        return sql.toString();
+    }
+    
+    protected String deleteSQL( SimpleFeatureType featureType, Filter filter ) {
+        StringBuffer sql = new StringBuffer();
+        
+        sql.append( "DELETE FROM " );
+        encodeTableName( featureType.getTypeName(), sql );
+        
+        if ( filter != null ) {
+          //encode filter
+            try {
+                FilterToSQL toSQL = createFilterToSQL( featureType );
+                sql.append( " " ).append( toSQL.encodeToString( filter ) );
+            } 
+            catch (FilterToSQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        return sql.toString();
+    }
+    
+    protected String insertSQL( SimpleFeatureType featureType, SimpleFeature feature ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "INSERT INTO " );
+        encodeTableName(featureType.getTypeName(), sql);
+        
+        
+        //column names
+        sql.append( " ( ");
+        for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
+            dialect.column(featureType.getAttribute(i).getLocalName(), sql );
+            sql.append( "," );
+        }
+        
+        //TODO: check for primary key that is not auto incrementing
+//        PrimaryKey key = getPrimaryKey(featureType);
+//        for ( int i = 0; i < key.columns.length; i++ ) {
+//            dialect.column(key.columns[i].name, sql);
+//            sql.append(", ");
+//        }
+        sql.setLength(sql.length()-1);
+        
+        //values
+        sql.append( " ) VALUES ( ");
+        for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
+            AttributeDescriptor att = featureType.getAttribute(i);
+            Class binding = att.getType().getBinding();
+            
+            Object value = feature.getAttribute( att.getLocalName() );
+            if ( value == null && !att.isNillable()) {
+                //TODO: throw an exception
+            }
+            
+            if ( Geometry.class.isAssignableFrom(binding) ) {
+                dialect.encodeGeometryValue( (Geometry) value, sql );
+            }
+            else {
+                dialect.value(value, binding, sql);    
+            }
+            
+            sql.append( "," );
+        }
+        sql.setLength(sql.length()-1);
+        
+        sql.append(");");
+        return sql.toString();
+    }
+    
+    protected String updateSQL( SimpleFeatureType featureType, AttributeDescriptor[] attributes, Object[] values, Filter filter ) {
+        StringBuffer sql = new StringBuffer();
+        sql.append( "UPDATE ");
+        encodeTableName(featureType.getTypeName(), sql);
+        
+        sql.append( " SET ");
+        for ( int i = 0; i < attributes.length; i++ ) {
+            dialect.column( attributes[i].getLocalName(), sql);
+            sql.append( " = " );
+            dialect.value( values[i], attributes[i].getType().getBinding(), sql );
+            sql.append( "," );
+        }
+        sql.setLength( sql.length()-1 );
+        sql.append( " ");
+        
+        if ( filter != null ) {
+            //encode filter
+              try {
+                  FilterToSQL toSQL = createFilterToSQL( featureType );
+                  sql.append( " " ).append( toSQL.encodeToString( filter ) );
+              } 
+              catch (FilterToSQLException e) {
+                  throw new RuntimeException(e);
+              }
+          }
+          
+        return sql.toString();
+    }
+    
+    protected FilterToSQL createFilterToSQL(SimpleFeatureType featureType ) {
+        //set up a fid mapper
+        //TODO: remove this
+        final PrimaryKey key;
+        try {
+            key = getPrimaryKey( featureType );
+        } 
+        catch (IOException e) {
+            throw new RuntimeException( e );
+        }
+        
+        FIDMapper mapper = new FIDMapper() {
+
+            public String createID(Connection conn, SimpleFeature feature,
+                    Statement statement) throws IOException {
+                return null;
+            }
+
+            public int getColumnCount() {
+                return 1;
+            }
+
+            public int getColumnDecimalDigits(int colIndex) {
+                return 0;
+            }
+
+            public String getColumnName(int colIndex) {
+                return key.getColumnName();
+            }
+
+            public int getColumnSize(int colIndex) {
+                return 0;
+            }
+
+            public int getColumnType(int colIndex) {
+                return 0;
+            }
+
+            public String getID(Object[] attributes) {
+                return null;
+            }
+
+            public Object[] getPKAttributes(String FID) throws IOException {
+                try {
+                    return new Object[]{key.decode(FID)};
+                } 
+                catch (Exception e) {
+                    throw (IOException) new IOException().initCause( e );
+                }
+            }
+
+            public boolean hasAutoIncrementColumns() {
+                return false;
+            }
+
+            public void initSupportStructures() {
+            }
+
+            public boolean isAutoIncrement(int colIndex) {
+                return false;
+            }
+
+            public boolean isVolatile() {
+                return false;
+            }
+
+            public boolean returnFIDColumnsAsAttributes() {
+                return false;
+            }
+            
+        };
+        FilterToSQL toSQL = new FilterToSQL();
+        toSQL.setFeatureType(featureType);
+        toSQL.setSqlNameEscape( dialect.getNameEscape() );
+        toSQL.setFIDMapper( mapper );
+        
+        return toSQL;
+    }
+    
     /**
-     * Helper method to check for null and encode database schema.
+     * Helper method to encode table name which checks if a schema is set and
+     * prefixes the table name with it.
      */
-    protected void encodeDatabaseSchema( StringBuffer sql ) {
+    protected void encodeTableName(  String tableName, StringBuffer sql ) {
         if ( databaseSchema != null ) {
             dialect.schema(databaseSchema, sql);
             sql.append( "." ); 
         }
+        dialect.table( tableName, sql);
     }
     
     protected PrimaryKey getPrimaryKey( ContentEntry entry ) throws IOException {
@@ -358,7 +634,7 @@ public class JDBCDataStore extends ContentDataStore {
             synchronized ( this ) {
                 if ( state.getPrimaryKey() == null ) {
                     //get metadata from database
-                    Connection cx = connection();
+                    Connection cx = createConnection();
 
                     try {
                         String tableName = entry.getName().getLocalPart();
@@ -375,8 +651,7 @@ public class JDBCDataStore extends ContentDataStore {
                              *        <LI><B>KEY_SEQ</B> short => sequence number within primary key
                              *        <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
                              */
-                            ArrayList keyColumns = new ArrayList();
-
+                            ArrayList keys = new ArrayList();
                             while (primaryKey.next()) {
                                 String columnName = primaryKey.getString("COLUMN_NAME");
 
@@ -392,12 +667,68 @@ public class JDBCDataStore extends ContentDataStore {
                                     columnType = Object.class;
                                 }
                                 
-                                keyColumns.add(new PrimaryKey.Column(columnName, columnType));
+                                //determine which type of primary key we have
+                                PrimaryKey key = null;
+                                
+                                //1. Auto Incrementing?
+                                Statement st = cx.createStatement();
+                                try {
+                                    //not actually going to get data
+                                    st.setFetchSize(1);
+                                    
+                                    StringBuffer sql = new StringBuffer();
+                                    sql.append( "SELECT ");
+                                    dialect.column( columnName, sql );
+                                    sql.append( " FROM ");
+                                    encodeTableName( tableName, sql );
+                                    
+                                    sql.append( " WHERE 0=1" );
+                                    
+                                    ResultSet rs= st.executeQuery( sql.toString() );
+                                    try {
+                                        if ( rs.getMetaData().isAutoIncrement(1) ) {
+                                            key = new AutoGeneratedPrimaryKey(tableName, columnName, columnType);
+                                        }
+                                    }
+                                    finally {
+                                        closeSafe( rs );
+                                    }
+                                }
+                                finally {
+                                    closeSafe( st );
+                                }
+                                
+                                //2. Has a sequence?
+                                if ( key == null ) {
+                                    //TODO: look for a sequence
+                                }
+                                
+                                if ( key == null ) {
+                                    String msg = "Could not determine how to map " +
+                                		"primary key values for (" + tableName + "," + 
+                                		columnName + "), restorting to null mapping.";
+                                    LOGGER.warning(msg);
+                                    
+                                    key = new NullPrimaryKey(tableName,columnName,columnType);
+                                }
+                                
+                                keys.add( key );
                             }
 
-                            state.setPrimaryKey(
-                                new PrimaryKey((PrimaryKey.Column[]) keyColumns.toArray( new PrimaryKey.Column[keyColumns.size()]))
-                            );
+                            if ( keys.isEmpty() ) {
+                                String msg = "No primary key found for " + tableName + "."; 
+                                LOGGER.warning(msg);
+                                
+                                state.setPrimaryKey( new NullPrimaryKey(tableName, null,null) );
+                            }
+                            else if ( keys.size() > 1 ) {
+                                //TODO: create a composite key
+                                
+                            }
+                            else {
+                                state.setPrimaryKey( (PrimaryKey) keys.get( 0 ) );    
+                            }
+                            
                         }
                         finally {
                             closeSafe( primaryKey );
@@ -418,11 +749,184 @@ public class JDBCDataStore extends ContentDataStore {
         return state.getPrimaryKey();
     }
     
-    public PrimaryKey getPrimaryKey( SimpleFeatureType featureType ) throws IOException {
+    protected PrimaryKey getPrimaryKey( SimpleFeatureType featureType ) throws IOException {
     	return getPrimaryKey( ensureEntry( featureType.getName() ) );
 	}
     
-  
+    protected ReferencedEnvelope getBounds( SimpleFeatureType featureType, Filter filter, Connection cx ) throws IOException {
+       
+        String sql = selectBoundsSQL(featureType, filter);
+        LOGGER.fine( sql );
+        
+        try {
+            Statement st = cx.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            try {
+                rs.next();
+                ReferencedEnvelope bounds = dialect.envelope(rs, 1);
+                
+                //keep going to handle case where envelope is not calculated
+                // as aggregate function
+                while( rs.next() ) {
+                    bounds.expandToInclude(dialect.envelope(rs,1));
+                }
+                
+                return bounds;
+            } 
+            
+            finally {
+                closeSafe( rs );
+                closeSafe( st );    
+            }
+        }
+        catch (SQLException e) {
+            String msg = "Error occured calculating bounds";
+            throw (IOException) new IOException(msg).initCause( e );
+        }
+    }
+    
+    protected int getCount(SimpleFeatureType featureType, Filter filter, Connection cx ) throws IOException {
+        String sql = selectCountSQL(featureType, filter);
+        LOGGER.fine( sql );
+        
+        try {
+            Statement st = cx.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            try {
+                rs.next();
+                return rs.getInt(1);
+            } 
+            
+            finally {
+                closeSafe( rs );
+                closeSafe( st );    
+            }
+        }
+        catch (SQLException e) {
+            String msg = "Error occured calculating count";
+            throw (IOException) new IOException(msg).initCause( e );
+        }
+    }
+    
+    protected void insert( SimpleFeatureType featureType, SimpleFeature feature, Connection cx ) throws IOException {
+        insert( Collections.singletonList(feature), featureType, cx );
+    }
+    
+    protected void insert( Collection features, SimpleFeatureType featureType, Connection cx ) throws IOException {
+        PrimaryKey key = getPrimaryKey( featureType );
+        
+        // we do this in a synchronized block because we need to do two queries,
+        // first to figure out what the id will be, then the insert statement
+        synchronized ( this )  {
+            Statement st = null;
+            try {
+                st = cx.createStatement();
+            
+                for ( Iterator f = features.iterator(); f.hasNext(); ) {
+                    SimpleFeature feature = (SimpleFeature) f.next();
+                    
+                    //figure out what the next fid will be
+                    String fid = null;
+                    try {
+                        Object value = 
+                            dialect.getNextPrimaryKeyValue(databaseSchema, key.getTableName(), key.getColumnName(), cx);
+                        fid = value.toString();
+                    }
+                    catch( SQLException e ) {
+                        String msg = "Error obtaining next feature id";
+                        throw (IOException) new IOException(msg).initCause(e);
+                    }
+                    
+                    String sql = insertSQL( featureType, feature );
+                    LOGGER.fine(sql);
+                
+                    //TODO: execute in batch to improve performance?
+                    st.execute( sql );
+                       
+                    //report the feature id as user data since we cant set the fid
+                    feature.getUserData().put( "fid", fid );
+                    
+                }
+                
+                //st.executeBatch();
+            } 
+            catch (SQLException e) {
+                String msg = "Error inserting features";
+                throw (IOException) new IOException(msg).initCause(e);
+            }
+            finally {
+                closeSafe( st );
+            }
+        }
+       
+    }
+    
+    protected void update( SimpleFeatureType featureType, AttributeDescriptor[] attributes, Object[] values, Filter filter,  Connection cx ) 
+        throws IOException {
+        
+        String sql = updateSQL( featureType, attributes, values, filter );
+        LOGGER.fine( sql );
+        
+        try {
+            Statement st = cx.createStatement();
+            try {
+                st.execute( sql );
+            } 
+            
+            finally {
+                closeSafe( st );
+            }
+        }
+        catch (SQLException e) {
+            String msg = "Error occured updating features";
+            throw (IOException) new IOException(msg).initCause( e );
+        }
+        
+    }
+    
+    protected void delete( SimpleFeatureType featureType, Filter filter, Connection cx ) throws IOException {
+        String sql = deleteSQL( featureType, filter );
+        LOGGER.fine( sql );
+        try {
+            Statement st = cx.createStatement();
+            try {
+                st.execute( sql );
+            } 
+            
+            finally {
+                closeSafe( st );    
+            }
+        }
+        catch (SQLException e) {
+            String msg = "Error occured calculating bounds";
+            throw (IOException) new IOException(msg).initCause( e );
+        }
+    }
+    
+    protected final Connection getConnection( JDBCFeatureSource featureSource ) {
+        JDBCState state = featureSource.getState();
+        Connection cx = state.getConnection();
+        
+        if ( cx == null ) {
+            synchronized ( state ) {
+                //create a new connection
+                cx = createConnection();
+                
+                //set auto commit to false if tx != auto commit
+                try {
+                    cx.setAutoCommit( featureSource.getTransaction() == Transaction.AUTO_COMMIT );
+                }
+                catch( SQLException e ) {
+                    throw new RuntimeException( e );
+                }
+                
+                state.setConnection( cx );    
+            }
+        }
+        
+        return cx;
+    }
+    
     /**
      * Convenience method for grabbing a new connection.
      * <p>
@@ -430,9 +934,14 @@ public class JDBCDataStore extends ContentDataStore {
      * </p>.
      *
      */
-    public final Connection connection() {
+    protected final Connection createConnection() {
         try {
-			return getDataSource().getConnection();
+			Connection cx = getDataSource().getConnection();
+			
+			//TODO: make this configurable
+			cx.setTransactionIsolation( Connection.TRANSACTION_READ_UNCOMMITTED );
+			
+			return cx;
 		} 
         catch (SQLException e) {
         	throw new RuntimeException( "Unable to obtain connection", e );
@@ -440,7 +949,7 @@ public class JDBCDataStore extends ContentDataStore {
     }
     
     protected ContentFeatureSource createFeatureSource(ContentEntry entry) throws IOException {
-        return new JDBCFeatureSource( entry );
+        return new JDBCFeatureStore( entry );
     }
     
     protected ContentState createContentState(ContentEntry entry) {
@@ -448,7 +957,7 @@ public class JDBCDataStore extends ContentDataStore {
     }
     
     protected List createTypeNames() throws IOException {
-        Connection cx = connection();
+        Connection cx = createConnection();
         
         /*
          *        <LI><B>TABLE_CAT</B> String => table catalog (may be <code>null</code>)
@@ -475,7 +984,7 @@ public class JDBCDataStore extends ContentDataStore {
             try {
                 while (tables.next()) {
                     String tableName = tables.getString("TABLE_NAME");
-                    typeNames.add(new Name(tableName));
+                    typeNames.add(new Name(namespaceURI, tableName));
                 }    
             }
             finally {
@@ -492,40 +1001,49 @@ public class JDBCDataStore extends ContentDataStore {
         return typeNames;
     }
 
-    protected void closeSafe( ResultSet rs ) {
+    protected static void closeSafe( ResultSet rs ) {
+        if ( rs == null ) 
+            return;
+            
         try {
             rs.close();
         }
         catch( SQLException e ) {
             String msg = "Error occurred closing result set";
             LOGGER.warning(msg);
-            if ( LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, msg, e );
+            if ( LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(Level.FINER, msg, e );
             }
         }
     }
     
-    protected void closeSafe( Statement st ) {
+    protected static void closeSafe( Statement st ) {
+        if ( st == null ) 
+            return;
+        
         try {
             st.close();
         }
         catch( SQLException e ) {
             String msg = "Error occurred closing statement";
             LOGGER.warning(msg);
-            if ( LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, msg, e );
+            if ( LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(Level.FINER, msg, e );
             }
         }
     }
-    protected void closeSafe( Connection cx ) {
+    protected static void closeSafe( Connection cx ) {
+        if ( cx == null ) 
+            return;
+        
         try {
             cx.close();
         } 
         catch (SQLException e) {
             String msg = "Error occurred closing connection";
             LOGGER.warning(msg);
-            if ( LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, msg, e );
+            if ( LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(Level.FINER, msg, e );
             }
         }
     }

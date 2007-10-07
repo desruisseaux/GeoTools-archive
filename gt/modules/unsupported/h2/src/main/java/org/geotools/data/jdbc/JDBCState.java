@@ -36,8 +36,10 @@ public final class JDBCState extends ContentState {
      * Duplicates provided JDBCState .. for everything except connection & listeners.
      */
     public JDBCState( JDBCState state ){
-    	super( state );    	
-	}
+    	super( state );
+    	connection = state.getConnection();
+    	primaryKey = state.getPrimaryKey();
+    }
     public JDBCState( ContentEntry entry ){
     	super( entry );
 	}
@@ -57,6 +59,15 @@ public final class JDBCState extends ContentState {
     	connection = null;
     	primaryKey = null;
     	super.flush();
+    }
+    
+    public ContentState copy() {
+        return new JDBCState( this );
+    }
+    
+    public void dispose() {
+        JDBCDataStore.closeSafe( connection );
+        super.dispose();
     }
 }
 

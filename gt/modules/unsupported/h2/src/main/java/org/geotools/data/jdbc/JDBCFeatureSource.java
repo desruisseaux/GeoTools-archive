@@ -29,6 +29,10 @@ public class JDBCFeatureSource extends ContentFeatureSource {
         return (JDBCDataStore) super.getDataStore();
     }
     
+    public JDBCState getState() {
+        return (JDBCState) super.getState();
+    }
+    
     public PrimaryKey getPrimaryKey() {
 		return primaryKey;
 	}
@@ -49,9 +53,10 @@ public class JDBCFeatureSource extends ContentFeatureSource {
             tb.setNamespaceURI( getDataStore().getNamespaceURI() );
         }
         
+        //ensure we have a connection
+        Connection cx = getDataStore().getConnection( this );
+        
         //get metadata about columns from database
-        Connection cx = getDataStore().connection();
-
         try {
             DatabaseMetaData metaData = cx.getMetaData();
 
@@ -139,19 +144,14 @@ public class JDBCFeatureSource extends ContentFeatureSource {
             String msg = "Error occurred building feature type";
             throw (IOException) new IOException( ).initCause(e); 
         } 
-        finally {
-            getDataStore().closeSafe(cx);
-        }
     }
     
-    protected FeatureCollection all(ContentState state) {
-        return null;
-        //return new JDBCFeatureCollection( this, (JDBCState) state );
+    protected JDBCFeatureCollection all(ContentState state) {
+        return new JDBCFeatureCollection( this, getState() );
     }
 
-    protected FeatureCollection filtered(ContentState state, Filter filter) {
-        return null;
-        //return new JDBCFeatureCollection( this, (JDBCState) state, filter );
+    protected JDBCFeatureCollection filtered(ContentState state, Filter filter) {
+        return new JDBCFeatureCollection( this, getState(), filter );
     }
 
 }
