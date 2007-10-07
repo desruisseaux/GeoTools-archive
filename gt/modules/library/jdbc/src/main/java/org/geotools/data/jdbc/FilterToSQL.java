@@ -602,7 +602,8 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
                 "Must set a fid mapper before trying to encode FIDFilters");
         }
 
-        FeatureId[] fids = (FeatureId[]) filter.getIdentifiers().toArray();
+        FeatureId[] fids = (FeatureId[]) filter.getIdentifiers()
+            .toArray(new FeatureId[filter.getIdentifiers().size()]);
         LOGGER.finer("Exporting FID=" + Arrays.asList(fids));
 
         // prepare column name array
