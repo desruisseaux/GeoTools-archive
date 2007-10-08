@@ -96,7 +96,6 @@
     <module>xml-gpx</module>
     <module>gpx</module>
     <module>vpf</module>
-    <module>widgets-swing-pending</module>
   </modules>
 
 </project>
