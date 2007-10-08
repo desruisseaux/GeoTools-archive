@@ -203,8 +203,11 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	private boolean concatTransforms = false;
 
-	/** Geographic map extent */
+	/** Geographic map extent, eventually expanded to consider buffer area around the map */
 	private ReferencedEnvelope mapExtent;
+	
+	/** Geographic map extent, as provided by the caller */
+    private ReferencedEnvelope originalMapExtent;
 
 	/** The size of the output area in output units. */
 	private Rectangle screenSize;
@@ -581,6 +584,7 @@ public final class StreamingRenderer implements GTRenderer {
         //
         //////////////////////////////////////////////////////////////////////
         int buffer = getRenderingBuffer();
+        originalMapExtent = mapExtent;
         if(buffer > 0) {
             mapExtent = new ReferencedEnvelope(expandEnvelope(mapExtent, worldToScreen, buffer), 
                     mapExtent.getCoordinateReferenceSystem()); 
@@ -1742,7 +1746,7 @@ public final class StreamingRenderer implements GTRenderer {
 //			METABUFFER SUPPORT			
 //			final GeneralEnvelope metaBufferedEnvelope=handleTileBordersArtifacts(mapExtent,java2dHints,this.worldToScreenTransform);
 			final GridCoverageRenderer gcr = new GridCoverageRenderer(
-					destinationCRS, mapExtent, screenSize, java2dHints);
+					destinationCRS, originalMapExtent, screenSize, java2dHints);
 
 			// //
 			// It is a grid coverage
