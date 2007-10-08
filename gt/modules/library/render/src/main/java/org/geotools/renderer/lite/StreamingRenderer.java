@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBicubic;
 import javax.media.jai.InterpolationBilinear;
@@ -164,8 +165,6 @@ public final class StreamingRenderer implements GTRenderer {
      */
     public static final String SCALE_OGC = "OGC";
     
-	public IdentityHashMap symbolizerAssociationHT = new IdentityHashMap(); // associate a value
-
 	/** Tolerance used to compare doubles for equality */
 	private static final double TOLERANCE = 1e-6;
 
@@ -1513,7 +1512,6 @@ public final class StreamingRenderer implements GTRenderer {
         final Collection result;
         final CoordinateReferenceSystem sourceCrs;
         final NumberRange scaleRange = new NumberRange(scaleDenominator,scaleDenominator);
-        symbolizerAssociationHT = new IdentityHashMap();// TODO use clear? MT issues?
         final ArrayList lfts ;
         
         if ( featureSource != null ) {
@@ -1560,16 +1558,17 @@ public final class StreamingRenderer implements GTRenderer {
 				.toArray(new LiteFeatureTypeStyle[n_lfts]);
 
 		try {
-			Object feature;
+			RenderableFeature rf = new RenderableFeature(fts_array.length > 1);
+			rf.setLayer(currLayer);
 			int t = 0;
 			while (!renderingStopRequested) { // loop exit condition tested inside try catch
 				try {
 					if (!iterator.hasNext()) {
 						break;
 					}
-					feature = iterator.next(); // read the content
+					rf.setFeature(iterator.next());
 					for (t = 0; t < n_lfts; t++) {
-						process(currLayer, feature, fts_array[t], scaleRange, at, destinationCrs, layerId);
+						process(rf, fts_array[t], scaleRange, at, destinationCrs, layerId);
                         // draw the content on the image(s)
 					}
 				} catch (Throwable tr) {
@@ -1600,12 +1599,12 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
-	 * @param content
+	 * @param rf
 	 * @param feature 
 	 * @param style
 	 * @param layerId 
 	 */
-	final private void process(MapLayer currLayer, Object content, LiteFeatureTypeStyle style,
+	final private void process(RenderableFeature rf, LiteFeatureTypeStyle style,
 			Range scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs, String layerId)
 			throws TransformException, FactoryException {
@@ -1622,10 +1621,10 @@ public final class StreamingRenderer implements GTRenderer {
 			r = ruleList[t];
 			filter = r.getFilter();
 
-			if ((filter == null) || filter.evaluate(content)) {
+			if ((filter == null) || filter.evaluate(rf.content)) {
 				doElse = false;
 				symbolizers = r.getSymbolizers();
-				processSymbolizers(currLayer, graphics, content, symbolizers, scaleRange,
+				processSymbolizers(graphics, rf, symbolizers, scaleRange,
 						at, destinationCrs, layerId);
 			}
 		}
@@ -1636,7 +1635,7 @@ public final class StreamingRenderer implements GTRenderer {
 				r = elseRuleList[tt];
 				symbolizers = r.getSymbolizers();
 
-				processSymbolizers(currLayer, graphics, content, symbolizers, scaleRange,
+				processSymbolizers(graphics, rf, symbolizers, scaleRange,
 						at, destinationCrs, layerId);
 
 			}
@@ -1664,15 +1663,11 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
-	final private void processSymbolizers(MapLayer currLayer, final Graphics2D graphics,
-			final Object drawMe, final Symbolizer[] symbolizers,
+	final private void processSymbolizers(final Graphics2D graphics,
+			final RenderableFeature drawMe, final Symbolizer[] symbolizers,
 			Range scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs, String layerId)
 			throws TransformException, FactoryException {
-		LiteShape2 shape;
-		Geometry g;
-		SymbolizerAssociation sa;
-		MathTransform2D transform = null;
 		final int length = symbolizers.length;
 		for (int m = 0; m < length; m++) {
 
@@ -1681,9 +1676,10 @@ public final class StreamingRenderer implements GTRenderer {
 			// RASTER
 			//
 			// /////////////////////////////////////////////////////////////////
-			if (symbolizers[m] instanceof RasterSymbolizer) {
-				renderRaster(graphics, drawMe,
-						(RasterSymbolizer) symbolizers[m], destinationCrs,
+			final Symbolizer symbolizer = symbolizers[m];
+			if (symbolizer instanceof RasterSymbolizer) {
+				renderRaster(graphics, drawMe.content,
+						(RasterSymbolizer) symbolizer, destinationCrs,
 						scaleRange);
 
 			} else {
@@ -1693,104 +1689,24 @@ public final class StreamingRenderer implements GTRenderer {
 				// FEATURE
 				//
 				// /////////////////////////////////////////////////////////////////
-				g = findGeometry(drawMe, symbolizers[m]); // pulls the
-				// geometry
-
-				if ( g == null ) continue;
-				
-				sa = (SymbolizerAssociation) symbolizerAssociationHT
-						.get(symbolizers[m]);
-				if (sa == null) {
-					sa = new SymbolizerAssociation();
-					sa.setCRS(findGeometryCS(currLayer, drawMe, symbolizers[m]));
-					try {
-						// DJB: this should never be necessary since we've
-						// already taken care to make sure the reader is
-						// producing the correct coordinate system
-						if (sa.crs == null || CRS.equalsIgnoreMetadata(sa.crs,
-								destinationCrs))
-							transform = null;
-						else
-							transform = (MathTransform2D) StreamingRenderer
-									.getMathTransform(sa.crs, destinationCrs);
-						if (transform != null && !transform.isIdentity()) {
-							transform = (MathTransform2D) ConcatenatedTransform
-									.create(transform, ProjectiveTransform
-											.create(at));
-
-						} else {
-							transform = (MathTransform2D) ProjectiveTransform
-									.create(at);
-						}
-					} catch (Exception e) {
-						// fall through
-						LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-					}
-					sa.setXform(transform);
-					symbolizerAssociationHT.put(symbolizers[m], sa);
-				}
-
-				// some shapes may be too close to projection boundaries to
-				// get transformed, try to be lenient
-				try {
-					shape = getTransformedShape(g, sa.getXform(), !currLayer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED));
-				} catch (TransformException te) {
-                                        LOGGER.log(Level.FINE, te.getLocalizedMessage(), te);
-					fireErrorEvent(te);
+				LiteShape2 shape = drawMe.getShape(symbolizer, at);
+				if(shape == null)
 					continue;
-				} catch (AssertionError ae) {
-                                        LOGGER.log(Level.FINE, ae.getLocalizedMessage(), ae);
-					fireErrorEvent(new RuntimeException(ae));
-					continue;
-				}
-				if (symbolizers[m] instanceof TextSymbolizer && drawMe instanceof SimpleFeature) {
-                    // TODO: double back and make labelCache work with Objects
-					labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (SimpleFeature)drawMe,
+				if (symbolizer instanceof TextSymbolizer && drawMe.content instanceof SimpleFeature) {
+					labelCache.put(layerId, (TextSymbolizer) symbolizers[m], (SimpleFeature) drawMe.content,
 							shape, scaleRange);
 				} else {
-					Style2D style = styleFactory.createStyle(drawMe,
-							symbolizers[m], scaleRange);
+					Style2D style = styleFactory.createStyle(drawMe.content,
+							symbolizer, scaleRange);
 					painter.paint(graphics, shape, style, scaleDenominator);
 				}
 
 			}
 		}
-		fireFeatureRenderedEvent(drawMe);
+		fireFeatureRenderedEvent(drawMe.content);
 	}
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param g
-	 * @param transform
-	 * @throws TransformException
-	 * @throws FactoryException
-	 */
-	private final LiteShape2 getTransformedShape(Geometry g,
-			MathTransform2D transform, boolean clone) throws TransformException,
-			FactoryException {
-
-		return new LiteShape2(g, transform, getDecimator(transform), false, clone);
-	}
-
-	private HashMap decimators = new HashMap();
-
-	/**
-	 * @throws org.opengis.referencing.operation.NoninvertibleTransformException
-	 */
-	private Decimator getDecimator(MathTransform2D mathTransform)
-			throws org.opengis.referencing.operation.NoninvertibleTransformException {
-		Decimator decimator = (Decimator) decimators.get(mathTransform);
-		if (decimator == null) {
-			if (mathTransform != null && !mathTransform.isIdentity())
-				decimator = new Decimator(mathTransform.inverse(), screenSize);
-			else
-				decimator = new Decimator(null, screenSize);
-
-			decimators.put(mathTransform, decimator);
-		}
-		return decimator;
-	}
+	
 
 	/**
 	 * Renders a grid coverage on the device.
@@ -2090,8 +2006,7 @@ public final class StreamingRenderer implements GTRenderer {
                 GeometryDescriptor geom = (GeometryDescriptor) schema.getAttribute( geomName );
                 return geom.getType().getCRS();
             }
-        }
-        else if ( currLayer.getSource() != null ) {
+        } else if ( currLayer.getSource() != null ) {
         	return currLayer.getSource().getInfo().getCRS();
         }
         
@@ -2299,5 +2214,112 @@ public final class StreamingRenderer implements GTRenderer {
 			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		return null;
+	}
+	
+	private class RenderableFeature {
+		Object content;
+		private MapLayer layer;
+		private IdentityHashMap symbolizerAssociationHT = new IdentityHashMap(); // associate a value
+		private List geometries = new ArrayList();
+		private List shapes = new ArrayList();
+		private boolean multiLayerRendering;
+		private boolean clone;
+		private HashMap decimators = new HashMap();
+		
+		public RenderableFeature(boolean multiLayerRendering) {
+			this.multiLayerRendering = multiLayerRendering;
+		}
+		
+		public void setLayer(MapLayer layer) {
+			this.layer = layer;
+			this.clone = !layer.getFeatureSource().getSupportedHints().contains(Hints.FEATURE_DETACHED);
+		}
+		
+		public void setFeature(Object feature) {
+			this.content = feature;
+			geometries.clear();
+			shapes.clear();
+		}
+		
+		public LiteShape2 getShape(Symbolizer symbolizer, AffineTransform at) throws FactoryException {
+			Geometry g = findGeometry(content, symbolizer); // pulls the geometry
+
+			if ( g == null )
+				return null;
+			
+			SymbolizerAssociation sa = (SymbolizerAssociation) symbolizerAssociationHT
+					.get(symbolizer);
+			MathTransform2D transform = null;
+			if (sa == null) {
+				sa = new SymbolizerAssociation();
+				sa.setCRS(findGeometryCS(layer, content, symbolizer));
+				try {
+					if (sa.crs == null || CRS.equalsIgnoreMetadata(sa.crs,
+							destinationCrs))
+						transform = null;
+					else
+						transform = (MathTransform2D) StreamingRenderer
+								.getMathTransform(sa.crs, destinationCrs);
+					if (transform != null && !transform.isIdentity()) {
+						transform = (MathTransform2D) ConcatenatedTransform
+								.create(transform, ProjectiveTransform
+										.create(at));
+
+					} else {
+						transform = (MathTransform2D) ProjectiveTransform.create(at);
+					}
+				} catch (Exception e) {
+					// fall through
+					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+				}
+				sa.setXform(transform);
+				symbolizerAssociationHT.put(symbolizer, sa);
+			}
+
+			// some shapes may be too close to projection boundaries to
+			// get transformed, try to be lenient
+			try {
+				return getTransformedShape(g, sa.getXform());
+			} catch (TransformException te) {
+                                    LOGGER.log(Level.FINE, te.getLocalizedMessage(), te);
+				fireErrorEvent(te);
+				return null;
+			} catch (AssertionError ae) {
+                                    LOGGER.log(Level.FINE, ae.getLocalizedMessage(), ae);
+				fireErrorEvent(new RuntimeException(ae));
+				return null;
+			}
+		}
+		
+		private final LiteShape2 getTransformedShape(Geometry g, MathTransform2D transform) throws TransformException,
+				FactoryException {
+				for (int i = 0; i < geometries.size(); i++) {
+					if(geometries.get(i) == g)
+						return (LiteShape2) shapes.get(i);
+				}
+				LiteShape2 shape = new LiteShape2(g, transform, getDecimator(transform), false, clone);
+				geometries.add(g);
+				shapes.add(shape);
+				return shape;
+		}
+		
+		
+
+		/**
+		 * @throws org.opengis.referencing.operation.NoninvertibleTransformException
+		 */
+		private Decimator getDecimator(MathTransform2D mathTransform)
+				throws org.opengis.referencing.operation.NoninvertibleTransformException {
+			Decimator decimator = (Decimator) decimators.get(mathTransform);
+			if (decimator == null) {
+				if (mathTransform != null && !mathTransform.isIdentity())
+					decimator = new Decimator(mathTransform.inverse(), screenSize);
+				else
+					decimator = new Decimator(null, screenSize);
+
+				decimators.put(mathTransform, decimator);
+			}
+			return decimator;
+		}
 	}
 }
