@@ -25,6 +25,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
+import java.text.Bidi;
 
 import org.geotools.resources.Utilities;
 
@@ -145,10 +146,17 @@ public class TextStyle2D extends Style2D {
      * recompute each time
      */
     public GlyphVector getTextGlyphVector(Graphics2D graphics) {
-       
-            textGlyphVector = font.createGlyphVector(graphics.getFontRenderContext(), label);
-   
-
+        // arabic and hebrew are scripted and right to left, they do require full layout
+        // whilst western chars are easier to deal with. Find out which case we're dealing with,
+        // and create the glyph vector with the appropriate call
+        final char[] chars = label.toCharArray();
+        final int length = label.length();
+        if(Bidi.requiresBidi(chars, 0, length) && 
+                new Bidi(label, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).isRightToLeft())
+            textGlyphVector = font.layoutGlyphVector(graphics.getFontRenderContext(), chars, 
+                    0, length, Font.LAYOUT_RIGHT_TO_LEFT);
+        else
+            textGlyphVector = font.createGlyphVector(graphics.getFontRenderContext(), chars);
         return textGlyphVector;
     }
 
