@@ -34,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.geotools.coverage.FactoryFinder;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -56,11 +57,15 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.styling.Style;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  *
@@ -93,8 +98,9 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         Style style;
         MapLayer layer;
         try {
-            _context = new DefaultMapContext(CRS.decode("EPSG:4326"));
-
+            
+            //_context = new DefaultMapContext(CRS.decode("EPSG:4326"));
+            _context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
             hash = new HashMap();
             hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
             store = DataStoreFinder.getDataStore(hash);
@@ -139,7 +145,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         /***********************JMAPPANE***************************************/
         map = new JMapPane();
         map.setOpaque(false);
-        map.setRenderer(new ShapefileRenderer());
+        map.setRenderer(new ShapefileRenderer());        
         map.setContext(_context);
         pan_jmappane.setLayout(new GridLayout(1, 1));
         pan_jmappane.add(map);

@@ -66,48 +66,48 @@ public class JFillPanel extends javax.swing.JPanel {
 
         lbl_color1.setText(TextBundle.getResource().getString("color"));
 
-        GroupLayout GuiFillColorLayout = new GroupLayout(GuiFillColor);
+        org.jdesktop.layout.GroupLayout GuiFillColorLayout = new org.jdesktop.layout.GroupLayout(GuiFillColor);
         GuiFillColor.setLayout(GuiFillColorLayout);
         GuiFillColorLayout.setHorizontalGroup(
-            GuiFillColorLayout.createParallelGroup(GroupLayout.LEADING)
-            .add(0, 61, Short.MAX_VALUE)
+            GuiFillColorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 66, Short.MAX_VALUE)
         );
         GuiFillColorLayout.setVerticalGroup(
-            GuiFillColorLayout.createParallelGroup(GroupLayout.LEADING)
+            GuiFillColorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(0, 18, Short.MAX_VALUE)
         );
 
         lbl_alpha1.setText(TextBundle.getResource().getString("opacity"));
 
-        GroupLayout layout = new GroupLayout(this);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.LEADING)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(GroupLayout.LEADING, false)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(layout.createSequentialGroup()
                         .add(lbl_color1)
-                        .addPreferredGap(LayoutStyle.RELATED)
-                        .add(GuiFillColor, GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(GuiFillColor, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(lbl_alpha1)
-                        .addPreferredGap(LayoutStyle.RELATED)
-                        .add(GuiFillAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(GroupLayout.LEADING)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(GroupLayout.TRAILING)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(lbl_color1)
-                    .add(GuiFillColor, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(GroupLayout.TRAILING)
-                    .add(GuiFillAlpha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .add(GuiFillColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(lbl_alpha1))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

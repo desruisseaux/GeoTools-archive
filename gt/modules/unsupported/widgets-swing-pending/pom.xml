@@ -173,7 +173,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-epsg-hsql-2.5-SNAPSHOT.jar -->
+<!-- gt2-epsg-hsql-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>

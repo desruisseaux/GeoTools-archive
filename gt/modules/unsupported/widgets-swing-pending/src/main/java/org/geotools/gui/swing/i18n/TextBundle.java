@@ -16,6 +16,9 @@
 
 package org.geotools.gui.swing.i18n;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -23,27 +26,60 @@ import java.util.ResourceBundle;
  */
 public class TextBundle {
     
-    private static TextBundle BUNDLE;    
-    private ResourceBundle bundle = ResourceBundle.getBundle("org/geotools/gui/swing/i18n/translate");
+    private static TextBundle instance;    
+    private List<ResourceBundle> bundles = new ArrayList<ResourceBundle>();
     
-    private TextBundle() {}
-    
-    public String getString(String key){
-        String retour = "";
-        
-        try{
-            retour = bundle.getString(key);
-        } catch(Exception e){
-            retour = "Key:"+ key +" -missing text-" ;
-        }
-        return retour;
+    private TextBundle() {
+        bundles.add( ResourceBundle.getBundle("org/geotools/gui/swing/i18n/translate") );
     }
     
-    public static TextBundle getResource() {
-        if (BUNDLE == null) {
-            BUNDLE = new TextBundle();
+        
+    
+    public String getString(String key){
+        
+        for(int i = bundles.size()-1; i>=0; i--){
+            ResourceBundle bundle = bundles.get(i);
+            
+            if (existe(bundle, key)) {
+                String text = bundle.getString(key);
+                if (text.startsWith("$")) {
+                    return getString(text.substring(1));
+                } else {
+                    return text;
+                }
+            }
         }
-        return BUNDLE;
+
+        return "Key:"+ key +" -missing text-";        
+    }
+    
+    
+    private boolean existe(ResourceBundle bundle, String key) {
+
+        Enumeration<String> keys = bundle.getKeys();
+
+        while (keys.hasMoreElements()) {
+            if (key.equals(keys.nextElement())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    
+    
+    public void addBundle(ResourceBundle bundle){
+        bundles.add(bundle);
+    }
+    
+    
+    
+    public static TextBundle getResource() {
+        if (instance == null) {
+            instance = new TextBundle();
+        }
+        return instance;
     }
     
 }
