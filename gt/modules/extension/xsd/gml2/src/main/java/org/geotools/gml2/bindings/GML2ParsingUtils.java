@@ -28,6 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.feature.Name;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -75,7 +76,7 @@ public class GML2ParsingUtils {
 
         if (!decl.isAbstract()) {
             //first look in cache
-            fType = ftCache.get(decl.getName());
+            fType = ftCache.get(new Name(decl.getTargetNamespace(), decl.getName()));
 
             if (fType == null) {
                 //build from element declaration
@@ -84,7 +85,7 @@ public class GML2ParsingUtils {
             }
         } else {
             // first look in cache
-            fType = ftCache.get(node.getComponent().getName());
+            fType = ftCache.get(new Name(node.getComponent().getNamespace(), node.getComponent().getName()));
 
             if (fType == null) {
                 //build from node

@@ -17,25 +17,22 @@ package org.geotools.gml2;
 
 import java.util.HashMap;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
 
 public class FeatureTypeCache {
-    HashMap<String, SimpleFeatureType> map = new HashMap<String, SimpleFeatureType>();
+    HashMap<Name, SimpleFeatureType> map = new HashMap<Name, SimpleFeatureType>();
 
-    public SimpleFeatureType get(String name) {
+    public SimpleFeatureType get(Name name) {
         synchronized (this) {
             return (SimpleFeatureType) map.get(name);
         }
     }
 
     public void put(SimpleFeatureType type) {
-        if (type.getTypeName() == null) {
-            throw new IllegalArgumentException("Type name must be non null");
-        }
-
         synchronized (this) {
-            if (map.get(type.getTypeName()) != null) {
-                SimpleFeatureType other = map.get(type.getTypeName());
+            if (map.get(type.getName()) != null) {
+                SimpleFeatureType other = map.get(type.getName());
 
                 if (!other.equals(type)) {
                     String msg = "Type with same name already exists in cache.";
@@ -45,7 +42,7 @@ public class FeatureTypeCache {
                 return;
             }
 
-            map.put(type.getTypeName(), type);
+            map.put(type.getName(), type);
         }
     }
 }
