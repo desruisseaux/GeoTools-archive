@@ -85,7 +85,8 @@ public class GML2ParsingUtils {
             }
         } else {
             // first look in cache
-            fType = ftCache.get(new Name(node.getComponent().getNamespace(), node.getComponent().getName()));
+            fType = ftCache.get(new Name(node.getComponent().getNamespace(),
+                        node.getComponent().getName()));
 
             if (fType == null) {
                 //build from node
