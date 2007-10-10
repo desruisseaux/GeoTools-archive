@@ -56,6 +56,12 @@ public class FeaturePropertyExtractor implements PropertyExtractor {
         //find the type in the schema
         element = schemaIndex.getElementDeclaration(new QName(namespace, typeName));
 
+        if (element == null) {
+            String msg = "Could not find element declaration: (" + namespace + ", " + typeName
+                + " )";
+            throw new RuntimeException(msg);
+        }
+
         List particles = Schemas.getChildElementParticles(element.getType(), true);
         List properties = new ArrayList();
 
