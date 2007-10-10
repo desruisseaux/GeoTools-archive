@@ -21,6 +21,7 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -252,7 +253,7 @@ public abstract class XMLTestSupport extends TestCase {
      *
      *
      */
-    protected void print(Document dom) throws Exception {
+    protected void print(Node dom) throws Exception {
         TransformerFactory txFactory = TransformerFactory.newInstance();
         Transformer tx = txFactory.newTransformer();
         tx.setOutputProperty(OutputKeys.INDENT, "yes");
