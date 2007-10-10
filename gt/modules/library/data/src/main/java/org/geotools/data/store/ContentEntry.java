@@ -25,6 +25,10 @@ import org.opengis.feature.type.Name;
 /**
  * An entry for a type or feature source provided by a datastore.
  * <p>
+ * This class is only of concern to subclasses, client code should never see
+ * this class.
+ * </p>
+ * <p>
  * An entry maintains state on a per-transaction basis. The {@link #getState(Transaction)}
  * method is used to get at this state.
  * <pre>
@@ -130,7 +134,7 @@ public final class ContentEntry {
     public void dispose() {
         //kill all state
         for (ContentState s : state.values() ) {
-            s.dispose();
+            s.close();
         }
     }
     

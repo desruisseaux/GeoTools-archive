@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -34,15 +33,24 @@ import org.opengis.filter.Filter;
 /**
  * Abstract implementation of FeatureSource.
  * <p>
- * Implementations are based around feature collections. Subclasses must
- * implement the following methods to provide feature collection based data
- * access:
+ * This feature source works off of operations provided by {@link FeatureCollection}.
+ * Individual FeatureCollection implementations are provided by subclasses:
  * <ul>
- * <li>{@link #all(ContentState)}: Access to entire dataset
- * <li>{@link #filtered(ContentState, Filter)}: Access to filtered dataset
+ *   {@link #all(ContentState)}: Access to entire dataset
+ *   {@link #filtered(ContentState, Filter)}: Access to filtered dataset
  * </ul>
- * In addition, subclasses must implement {@link #buildFeatureType(SimpleTypeFactory)}
- * in which constructs the feature type for the feature.
+ * </p>
+ * <p>
+ * Even though a feature source is read-only, this class is transaction aware.
+ * (see {@link #setTransaction(Transaction)}. The transaction is taken into 
+ * account during operations such as {@link #getCount()} and {@link #getBounds()}
+ * since these values may be affected by another operation (like writing to 
+ * a FeautreStore) working against the same transaction. 
+ * </p>
+ * <p>
+ * Subclasses must also implement the {@link #buildFeatureType()} method which 
+ * builds the schema for the feature source.
+ * </p>
  *
  * @author Jody Garnett, Refractions Research Inc.
  * @author Justin Deoliveira, The Open Planning Project
@@ -52,36 +60,80 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * The entry for the feautre source.
      */
     protected ContentEntry entry;
-
     /**
      * The transaction to work from
      */
     protected Transaction transaction;
 
+    /**
+     * Creates the new feature source from an entry.
+     */
     public ContentFeatureSource(ContentEntry entry) {
         this.entry = entry;
     }
 
+    /**
+     * The entry for the feature source.
+     */
     public ContentEntry getEntry() {
     	return entry;
     }
     
-    public ContentState getState() {
-        return entry.getState(transaction);
-    }
-    
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
-
+    /**
+     * The current transaction the feature source is working against.
+     * <p>
+     * This transaction is used to derive the state for the feature source. A
+     * <code>null</code> value for a transaction represents the auto commit
+     * transaction: {@link Transaction#AUTO_COMMIT}.
+     * </p>
+     * @see {@link #getState()}.
+     */
     public Transaction getTransaction() {
         return transaction;
     }
+    
+    /**
+     * Sets the current transaction the feature source is working against.
+     * <p>
+     * <tt>transaction</tt> may be <code>null</code>. This signifies that the 
+     * auto-commit transaction is used: {@link Transaction#AUTO_COMMIT}.
+     * </p>
+     * @param transaction The new transaction, or <code>null</code>.
+     */
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
+    }
+    /**
+     * The current state for the feature source.
+     * <p>
+     * This value is derived from current transaction of the feature source.
+     * </p>
+     * 
+     * @see {@link #setTransaction(Transaction)}.
+     */
+    public ContentState getState() {
+        return entry.getState(transaction);
+    }
 
-    public DataStore getDataStore() {
+    /**
+     * The datastore that this feature source originated from.
+     * <p>
+     * Subclasses may wish to extend this method in order to type narrow its 
+     * return type.
+     * </p>
+     */
+    public ContentDataStore getDataStore() {
         return entry.getDataStore();
     }
 
+    /**
+     * Returns the feature type or the schema of the feature source.
+     * <p>
+     * This method delegates to {@link #buildFeatureType()}, which must be 
+     * implemented by subclasses. The result is cached in 
+     * {@link ContentState#getFeatureType()}.
+     * </p>
+     */
     public final SimpleFeatureType getSchema() {
         ContentState state = entry.getState(transaction);
         SimpleFeatureType featureType = state.getFeatureType();
@@ -102,22 +154,55 @@ public abstract class ContentFeatureSource implements FeatureSource {
         return featureType;
     }
 
+    /**
+     * Returns the bounds of the entire feature source.
+     * <p>
+     * This method delegates to the {@link FeatureCollection#getBounds()} method 
+     * of the feature collection created by {@link #all(ContentState)}.
+     * </p>
+     */
     public final ReferencedEnvelope getBounds() throws IOException {
         return all(entry.getState(transaction)).getBounds();
     }
 
+    /**
+     * Returns the bounds of the results of the specified query against the 
+     * feature source.
+     * <p>
+     * This method delegates to the {@link FeatureCollection#getBounds()} method 
+     * of the feature collection created by {@link #filtered(ContentState, Filter)}.
+     * </p>
+     */
     public final ReferencedEnvelope getBounds(Query query) throws IOException {
         return filtered(entry.getState(transaction), query.getFilter()).getBounds();
     }
 
+    /**
+     * Returns the count of the number of features of the feature source.
+     * <p>
+     * This method delegates to the {@link FeatureCollection#size()} method of 
+     * the feature collection created by {@link #filtered(ContentState, Filter)}.
+     * </p>
+     */
     public final int getCount(Query query) throws IOException {
         return filtered(entry.getState(transaction), query.getFilter()).size();
     }
 
+    /**
+     * Returns the feature collection of all the features of the feature source.
+     * <p>
+     * This method delegates to {@link #all(ContentState)} which must be 
+     * implemented by subclasses.
+     * </p>
+     */
     public final FeatureCollection getFeatures() throws IOException {
         return getFeatures(Query.ALL);
     }
 
+    /**
+     * Returns the feature collection if the features of the feature source which 
+     * meet the specified query criteria.
+     */
     public final FeatureCollection getFeatures(Query query)
         throws IOException {
         FeatureCollection features = getFeatures(query.getFilter());
@@ -147,6 +232,15 @@ public abstract class ContentFeatureSource implements FeatureSource {
         return features;
     }
 
+    /**
+     * Returns the feature collection if the features of the feature source which 
+     * meet the specified filter criteria.
+     * <p>
+     * If <tt>filter</tt> is <code>null</code> or equal to {@link Filter#INCLUDE}
+     * this method is reduced to {@link #all(ContentState)}, otherwise it is 
+     * reduced to {@link #filtered(ContentState, Filter)}.
+     * </p>
+     */
     public final FeatureCollection getFeatures(Filter filter)
         throws IOException {
         if ((filter == null) || (filter == Filter.INCLUDE)) {
@@ -156,16 +250,27 @@ public abstract class ContentFeatureSource implements FeatureSource {
         return filtered(entry.getState(transaction), filter);
     }
 
+    /**
+     * Adds an listener or observer to the feature source.
+     * <p>
+     * Listeners are stored on a per-transaction basis. 
+     * </p>
+     */
     public final void addFeatureListener(FeatureListener listener) {
         entry.getState(transaction).addListener(listener);
     }
 
+    /**
+     * Removes a listener from the feature source.
+     */
     public final void removeFeatureListener(FeatureListener listener) {
         entry.getState(transaction).removeListener(listener);
     }
 
     /**
      * Returns an empty set, subclasses should override if need be.
+     * 
+     * @see FeatureSource#getSupportedHints()
      */
     public Set getSupportedHints() {
         return Collections.EMPTY_SET;
@@ -175,45 +280,45 @@ public abstract class ContentFeatureSource implements FeatureSource {
     // Internal API
     //
     /**
-     * Creates a feature type for the entry.
+     * Creates the feature type or schema for the feature source.
      * <p>
-     * An implementation of this method should create a new instance of
-     * {@link SimpleFeatureTypeBuilder}, injecting it with the factory provided by
-     * the datastore via. Example.
+     * Implementations should use {@link SimpleFeatureTypeBuilder} to build the 
+     * feature type. Also, the builder should be injected with the feature factory
+     * which has been set on the datastore (see {@link ContentDataStore#getFeatureFactory()}.
+     * Example:
      * <pre>
-     *   <code>
-     *   SimpleTypeBuilder builder = new SimpleTypeBuilder( entry.getDataStore().getTypeFactory());
+     *   SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+     *   b.setFeatureTypeFactory( getDataStore().getFeatureTypeFactory() );
+     *   
+     *   //build the feature type
      *   ...
-     *   </code>
      * </pre>
+     * </p>
      */
     protected abstract SimpleFeatureType buildFeatureType() throws IOException;
 
     /**
-     * FeatureCollection representing the entire contents.
+     * Returns a new feature collection containing all the features of the 
+     * feature source.
      * <p>
-     * Available via getFeatureSource():
-     * <ul>
-     * <li>getFeatures()
-     * <li>getFeatures( Filter.INCLUDES )
-     * </ul>
+     * Subclasses are encouraged to provide a feature collection implementation 
+     * which provides optimized access to the underlying data format.
+     * </p>
      *
-     * @param state
-     * @return all content
+     * @param state The state the feature collection must work from.
      */
     protected abstract FeatureCollection all(ContentState state);
 
     /**
-     * FeatureCollection representing a subset of available content.
+     * Returns a new feature collection containing all the features of the 
+     * feature source which match the specified filter.
      * <p>
-     * Available via getFeatureSource():
-     * <ul>
-     * <li>getFeatures().filter( filter )
-     * <li>getFeatures( filter )
-     * </ul>
-     * @param state
-     * @param filter
-     * @return subset of content
+     * Subclasses are encouraged to provide a feature collection implementation 
+     * which provides optimized access to the underlying data format.
+     * </p>
+     * @param state The state the feature collection must work from.
+     * @param filter The constraint filtering the data to return.
+     * 
      */
     protected abstract FeatureCollection filtered(ContentState state, Filter filter);
 
