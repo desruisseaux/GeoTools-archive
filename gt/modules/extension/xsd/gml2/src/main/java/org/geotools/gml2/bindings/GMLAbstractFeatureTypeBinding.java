@@ -99,6 +99,10 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
         throws Exception {
         SimpleFeature feature = (SimpleFeature) object;
 
+        //JD: here we only handle the "GML" attributes, all the application 
+        // schema attributes are handled by FeaturePropertyExtractor
+        //JD: TODO: handle all properties here and kill FeautrePropertyExtractor
+        
         if (GML.name.equals(name)) {
             return feature.getAttribute("name");
         }
@@ -107,6 +111,10 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
             return feature.getAttribute("description");
         }
 
+        if (GML.location.equals(name)) {
+            return feature.getAttribute( "location" );
+        }
+        
         if (GML.boundedBy.equals(name)) {
             return feature.getBounds();
         }

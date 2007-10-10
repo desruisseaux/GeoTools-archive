@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -33,6 +35,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
+import org.geotools.gml2.GML;
 import org.geotools.referencing.CRS;
 import org.geotools.util.Converters;
 import org.geotools.xml.Binding;
@@ -217,6 +220,17 @@ public class GML2ParsingUtils {
 
             // create the type
             ftBuilder.minOccurs(min).maxOccurs(max).add(property.getName(), theClass);
+            
+            //set the default geometry explicitly
+            if ( Geometry.class.isAssignableFrom( theClass ) && 
+                !GML.NAMESPACE.equals( property.getTargetNamespace() ) ) {
+                //only set if non-gml, we do this because of "gml:location", 
+                // we dont want that to be the default if the user has another
+                // geometry attribute
+                if ( ftBuilder.getDefaultGeometry() == null ) {
+                    ftBuilder.setDefaultGeometry( property.getName() );
+                }
+            }
         }
 
         return ftBuilder.buildFeatureType();
