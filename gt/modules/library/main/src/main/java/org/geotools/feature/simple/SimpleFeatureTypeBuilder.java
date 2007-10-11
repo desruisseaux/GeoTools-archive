@@ -542,11 +542,17 @@ public class SimpleFeatureTypeBuilder {
 	/**
 	 * Sets the srs of the next attribute added to the feature type.
 	 * <p>
+	 * The <tt>srs</tt> parameter is the id of a spatial reference system, for
+	 * example: "epsg:4326".
+	 * </p>
+	 * <p>
 	 * This only applies if the attribute added is geometric.
 	 * </p>
 	 * <p>
      * This value is reset after a call to {@link #add(String, Class)}
      * </p>
+     * 
+     * @param srs The spatial reference system.
 	 */
 	public SimpleFeatureTypeBuilder srs( String srs ) {
 	    if ( srs == null ) {
@@ -554,6 +560,30 @@ public class SimpleFeatureTypeBuilder {
 	    }
 	    
 	    return crs(decode(srs));
+	}
+	
+	/**
+	 * Sets the srid of the next attributed added to the feature type.
+	 * <p>
+     * The <tt>srid</tt> parameter is the epsg code of a spatial reference 
+     * system, for example: "4326".
+     * </p>
+	 * <p>
+     * This only applies if the attribute added is geometric.
+     * </p>
+     * <p>
+     * This value is reset after a call to {@link #add(String, Class)}
+     * </p>
+	 * 
+	 * @param srid
+	 * @return
+	 */
+	public SimpleFeatureTypeBuilder srid( Integer srid ) {
+	    if ( srid == null ) {
+	        return crs( null );
+	    }
+	    
+	    return crs( decode( "EPSG:" + srid ) );
 	}
 	
 	/**
@@ -725,9 +755,29 @@ public class SimpleFeatureTypeBuilder {
 	public void add(String name, Class binding, String srs) {
 	    if ( srs == null ) {
 	        add(name,binding,(CoordinateReferenceSystem)null);
+	        return;
 	    }
 	
 	    add(name,binding,decode(srs));
+	}
+	
+	/**
+     * Adds a new geometric attribute w/ provided name, class, and spatial 
+     * reference system identifier
+     * <p>
+     * The <tt>srid</tt> parameter may be <code>null</code>.
+     * </p>
+     * @param name The name of the attribute.
+     * @param binding The class that the attribute is bound to.
+     * @param srid The srid of of the geometry, may be <code>null</code>.
+     */
+	public void add(String name, Class binding, Integer srid) {
+	    if ( srid == null ) {
+	        add(name,binding,(CoordinateReferenceSystem)null);
+	        return;
+	    }
+	    
+	    add( name, binding, decode( "EPSG:" + srid ) );
 	}
 	
 	/**
