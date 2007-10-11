@@ -22,7 +22,7 @@ import org.opengis.filter.PropertyIsEqualTo;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class JDBCFeatureStoreTest extends JDBCTestSupport {
+public abstract class JDBCFeatureStoreTest extends JDBCTestSupport {
 
     JDBCFeatureStore featureStore;
     

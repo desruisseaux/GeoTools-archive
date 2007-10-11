@@ -9,10 +9,10 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.resources.JDBC;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class JDBCTransactionTest extends JDBCTestSupport {
+public abstract class JDBCTransactionTest extends JDBCTestSupport {
 
     public void testCommit() throws IOException {
-    JDBCFeatureStore fs = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
+        JDBCFeatureStore fs = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
         
         Transaction tx = new DefaultTransaction();
         tx.putState( fs, new JDBCTransactionState( fs ) );
@@ -41,6 +41,7 @@ public class JDBCTransactionTest extends JDBCTestSupport {
         feature.setAttribute( "intProperty", new Integer( 100 ) );
         
         writer.close();
+        tx.rollback();
         tx.close();
         
         FeatureCollection fc = dataStore.getFeatureSource("ft1").getFeatures();

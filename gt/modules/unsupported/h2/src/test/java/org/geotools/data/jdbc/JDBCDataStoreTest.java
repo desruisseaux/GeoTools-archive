@@ -10,7 +10,6 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -18,22 +17,15 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsEqualTo;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
-public class JDBCDataStoreTest extends JDBCTestSupport {
+public abstract class JDBCDataStoreTest extends JDBCTestSupport {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        
-        try {
-            run( "DROP TABLE \"geotools\".\"ft2\";" );
-        }
-        catch( Exception e ) {}
-    }
-    
-	public void testGetNames() throws IOException {
+   public void testGetNames() throws IOException {
 		String[] typeNames = dataStore.getTypeNames();
 		assertEquals( 1, typeNames.length );
 	}
@@ -47,7 +39,7 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 		assertNotNull( ft1.getAttribute("doubleProperty") );
 		assertNotNull( ft1.getAttribute("stringProperty") );
 		
-		assertEquals( Geometry.class, ft1.getAttribute("geometry").getType().getBinding() );
+		assertTrue( Geometry.class.isAssignableFrom(ft1.getAttribute("geometry").getType().getBinding() ));
 		assertEquals( Integer.class, ft1.getAttribute("intProperty").getType().getBinding()  );
 		assertEquals( Double.class, ft1.getAttribute("doubleProperty").getType().getBinding()  );
 		assertEquals( String.class, ft1.getAttribute("stringProperty").getType().getBinding()  );
@@ -71,7 +63,12 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 		Connection cx = dataStore.createConnection();
 		Statement st = cx.createStatement();
           try {
-              st.executeQuery( "SELECT * from \"geotools\".\"ft2\";" );   
+              StringBuffer sql = new StringBuffer();
+              sql.append( "SELECT * FROM ");
+              dataStore.getSQLDialect().schema("geotools", sql);
+              sql.append( "." );
+              dataStore.getSQLDialect().table("ft2", sql);
+              st.executeQuery( sql.toString() );   
           }
           catch( SQLException e ) {
               fail( "table ft2 does not exist");
@@ -86,6 +83,8 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 	}
 	
 	public void testGetFeatureReader() throws Exception {
+	    GeometryFactory gf = dataStore.getGeometryFactory();
+	    
 	    DefaultQuery query = new DefaultQuery("ft1");
 	    FeatureReader reader = dataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
 	    
@@ -94,6 +93,11 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
 	        SimpleFeature feature = reader.next();
 	        assertNotNull( feature );
 	        assertEquals( 4, feature.getAttributeCount() );
+	        
+	        Point p = gf.createPoint( new Coordinate( i, i ) );
+	        assertTrue( p.equals( (Geometry) feature.getAttribute( "geometry") ) );
+	    
+	        assertEquals( new Integer( i ), feature.getAttribute( "intProperty" ) );
 	    }
 	    assertFalse( reader.hasNext() );
 	    reader.close();
@@ -172,5 +176,5 @@ public class JDBCDataStoreTest extends JDBCTestSupport {
         
         FeatureCollection features = dataStore.getFeatureSource("ft1").getFeatures();
         assertEquals( 6, features.size() );
-	}
+    }
 }

@@ -4,29 +4,30 @@ import java.util.Iterator;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
+import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 
-public class JDBCFeatureSourceTest extends JDBCTestSupport {
+public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
 
-    JDBCFeatureSource featureSource;
+    ContentFeatureSource featureSource;
     
     protected void setUp() throws Exception {
         super.setUp();
         
-        featureSource = (JDBCFeatureSource) dataStore.getFeatureSource("ft1");
+        featureSource = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
     }
     
-    public void testSchema() {
+    public void testSchema() throws Exception {
         SimpleFeatureType schema = featureSource.getSchema();
         assertEquals( "ft1", schema.getTypeName() );
         assertEquals( dataStore.getNamespaceURI(), schema.getName().getNamespaceURI() );
+        assertEquals( CRS.decode("EPSG:4326"), schema.getCRS());
         
         assertEquals( 4, schema.getAttributeCount() );
         assertNotNull( schema.getAttribute("geometry"));

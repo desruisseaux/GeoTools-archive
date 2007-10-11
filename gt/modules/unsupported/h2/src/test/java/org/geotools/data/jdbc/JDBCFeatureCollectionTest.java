@@ -16,14 +16,14 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class JDBCFeatureCollectionTest extends JDBCTestSupport {
+public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
 
     JDBCFeatureCollection collection;
     
     protected void setUp() throws Exception {
         super.setUp();
         
-        JDBCFeatureSource source = (JDBCFeatureSource) dataStore.getFeatureSource("ft1"); 
+        JDBCFeatureStore source = (JDBCFeatureStore) dataStore.getFeatureSource("ft1"); 
         
         collection = new JDBCFeatureCollection( 
             source, (JDBCState) source.getEntry().getState(Transaction.AUTO_COMMIT)
@@ -35,13 +35,18 @@ public class JDBCFeatureCollectionTest extends JDBCTestSupport {
         Iterator i = collection.iterator();
         assertNotNull( i );
         
+        int base = -1;
         for ( int x = 0; x < 3; x++ ) {
             assertTrue( i.hasNext() );
             
             SimpleFeature feature = (SimpleFeature) i.next();
             assertNotNull( feature );
             
-            assertEquals( "" + x, feature.getID() );
+            if ( base == -1 ) {
+                base = Integer.parseInt( feature.getID() );
+            }
+            
+            assertEquals( "" + base++, feature.getID() );
             assertEquals( new Integer(x), feature.getAttribute("intProperty" ) );
         }
         

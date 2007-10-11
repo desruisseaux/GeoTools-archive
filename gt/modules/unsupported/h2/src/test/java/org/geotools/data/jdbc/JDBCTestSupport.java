@@ -1,23 +1,17 @@
 package org.geotools.data.jdbc;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactoryImpl;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Server;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
@@ -37,85 +31,57 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
-public class JDBCTestSupport extends TestCase {
+public abstract class JDBCTestSupport extends TestCase {
 	
 	/**
 	 * data source
 	 */
-	static BasicDataSource dataSource = new BasicDataSource();
 	static {
-	    
-	    //set up the data source
-		dataSource.setUrl("jdbc:h2:geotools");
-		dataSource.setDriverClassName("org.h2.Driver");
-		dataSource.setPoolPreparedStatements(false);
-	
-		//turn up logging
+	    //turn up logging
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setLevel(Level.FINE);
 		Logger.getLogger("org.geotools.data.jdbc").setLevel( Level.FINE );
 		Logger.getLogger("org.geotools.data.jdbc").addHandler( handler );
 	}
 	
-    /**
-     * Runs an sql string aginst the database.
-     * 
-     * @param input The sql.
-     */
-    static void run( String input ) throws Exception {
-    	run( new ByteArrayInputStream( input.getBytes() ) );
-    }
+	protected JDBCTestSetup setup;
+    protected JDBCDataStore dataStore;
     
     /**
-     * Runs an sql script against the database.
-     * 
-     * @param script Input stream to the sql script to run.
+     * Override to check if a database connection can be obtained, if not 
+     * tests are ignored.
      */
-    static void run(InputStream script) throws Exception {
-        //load the script
-        BufferedReader reader = 
-        	new BufferedReader(new InputStreamReader( script ) );
-
-        //connect
-        Connection conn = dataSource.getConnection();
-
+    public void run(TestResult result) {
         try {
-            Statement st = conn.createStatement();
-
-            try {
-                String line = null;
-
-                while ((line = reader.readLine()) != null) {
-                    st.execute(line);
-                }
-
-                reader.close();    
-            }
-            finally {
-                st.close();
-            }
-            
-        } finally {
-            conn.close();
+            JDBCTestSetup setup = createTestSetup();
+            DataSource dataSource = setup.createDataSource();
+            Connection cx = dataSource.getConnection();
+            cx.close();
         }
+        catch ( Throwable t ) {
+            return;
+        }
+        
+        super.run( result );
     }
-
-    protected JDBCDataStore dataStore;
     
     protected void setUp() throws Exception {
         super.setUp();
         
-        //spatially enable the database
+        //create the test harness
+        if ( setup == null ) {
+            setup = createTestSetup(); 
+        }
         
-        try {
-            run( getClass().getResourceAsStream( "h2.sql" ) );
-        }
-        catch( Exception e ) {
-            
-        }
+        setup.setUp();
+        
+        //do any further setup
+        setUpInternal();
+        
+        //initialize the data
+        setup.setUpData();
         
         FilterCapabilities filterCapabilities = new FilterCapabilities();
-
         filterCapabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
         filterCapabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
         filterCapabilities.addType(PropertyIsNull.class);
@@ -127,58 +93,26 @@ public class JDBCTestSupport extends TestCase {
 
         //create the dataStore
         dataStore = new JDBCDataStore();
+        dataStore.setSQLDialect( setup.createSQLDialect() );
         dataStore.setNamespaceURI("http://www.geotools.org/test");
-        dataStore.setDataSource( dataSource );
+        dataStore.setDataSource( setup.getDataSource() );
         dataStore.setDatabaseSchema("geotools");
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
         dataStore.setFilterCapabilities(filterCapabilities);
-        
-        //drop old data
-        try {
-            run ( "DROP TABLE \"geotools\".\"ft1\"; COMMIT;" );    
-        }
-        catch( Exception e ) {
-            //e.printStackTrace();
-        }
-        try {
-            run ( "DROP SCHEMA \"geotools\"; COMMIT;" );    
-        }
-        catch( Exception e ) {
-            //e.printStackTrace();
-        }
-        
-        //create some data
-        StringBuffer sb = new StringBuffer().append( "CREATE SCHEMA \"geotools\";" ); 
-		
-		sb.append( "CREATE TABLE \"geotools\".\"ft1\" " )
-			.append( "(\"id\" int AUTO_INCREMENT(1) PRIMARY KEY , " )
-			.append( "\"geometry\" OTHER, \"intProperty\" int, " ) 
-			.append( "\"doubleProperty\" double, \"stringProperty\" varchar);" );
-		
-		sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-			.append( "0,setSRID(GeometryFromText('POINT(0 0)'),4326), 0, 0.0,'zero');");
-	
-		sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-			.append( "1,setSRID(GeometryFromText('POINT(1 1)'),4326), 1, 1.1,'one');");
-
-		sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-			.append( "2,setSRID(GeometryFromText('POINT(2 2)'),4326), 2, 2.2,'two');");
-
-		
-		run( sb.toString() );
+    }
+    
+    protected abstract JDBCTestSetup createTestSetup();
+   
+    protected void setUpInternal() throws Exception {
+       
     }
     
     protected void tearDown() throws Exception {
     	super.tearDown();
     	
-    	dataStore.dispose();
+    	setup.tearDown();
     	
-    	StringBuffer sb = new StringBuffer("DROP TABLE \"geotools\".\"ft1\";")
-			.append( "DROP SCHEMA \"geotools\";" ); 
-			
-		run( sb.toString() );
-		
-		Thread.sleep(100);
+    	dataStore.dispose();
     }
 }
