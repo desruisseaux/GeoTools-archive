@@ -49,9 +49,9 @@ public class JDBCFeatureCollection implements FeatureCollection {
      */
     JDBCDataStore dataStore;
 	/**
-	 * feature source the collection originated from.
+	 * feature store the collection originated from.
 	 */
-	JDBCFeatureSource source;
+	JDBCFeatureStore featureStore;
 	/**
 	 * state of the feature source 
 	 */
@@ -92,12 +92,12 @@ public class JDBCFeatureCollection implements FeatureCollection {
     /** Set of open resource iterators */
     protected final Set open = new HashSet();
 
-   public JDBCFeatureCollection( JDBCFeatureSource source, JDBCState state ) {
+   public JDBCFeatureCollection( JDBCFeatureStore source, JDBCState state ) {
 		this( source, state, null );
 	}
 	
-	public JDBCFeatureCollection( JDBCFeatureSource source, JDBCState state, Filter filter ) {
-		this.source = source;
+	public JDBCFeatureCollection( JDBCFeatureStore source, JDBCState state, Filter filter ) {
+		this.featureStore = source;
 		this.dataStore = source.getDataStore();
 		this.state = state;
 		this.filter = filter;
@@ -118,10 +118,10 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	}
 	
 	/**
-	 * @return The feautre source the collection originates from.
+	 * @return The feature source the collection originates from.
 	 */
-	public JDBCFeatureSource getFeatureSource() {
-		return source;
+	public JDBCFeatureStore getFeatureSource() {
+		return featureStore;
 	}
 	
 	/**
@@ -201,15 +201,15 @@ public class JDBCFeatureCollection implements FeatureCollection {
 
     protected FeatureIterator createFeatureIterator() throws Exception {
         //build up a statement for the content
-        JDBCDataStore dataStore = source.getDataStore();
-        String sql = dataStore.selectSQL( source.getSchema(), preFilter );
+        JDBCDataStore dataStore = featureStore.getDataStore();
+        String sql = dataStore.selectSQL( featureStore.getSchema(), preFilter );
         JDBCDataStore.LOGGER.fine( sql );
         
         //create a statement and pass it off to the iterator
         Statement st = state.getConnection().createStatement();
     	st.execute( sql );
     	
-    	FeatureIterator iterator = new JDBCFeatureIterator( st, source.getSchema(), source.getDataStore() );
+    	FeatureIterator iterator = new JDBCFeatureIterator( st, featureStore.getSchema(), featureStore.getDataStore() );
     	
     	//if post filter, wrap it
     	if ( postFilter != null ) {
@@ -220,15 +220,15 @@ public class JDBCFeatureCollection implements FeatureCollection {
     
     protected FeatureIterator createFeatureWriter() throws Exception {
         //build up a statement for the content
-        JDBCDataStore dataStore = source.getDataStore();
-        String sql = dataStore.selectSQL( source.getSchema(), preFilter );
+        JDBCDataStore dataStore = featureStore.getDataStore();
+        String sql = dataStore.selectSQL( featureStore.getSchema(), preFilter );
         JDBCDataStore.LOGGER.fine( sql );
         
         //create a statement and pass it off to the iterator
         Statement st = state.getConnection().createStatement();
         st.execute( sql );
         
-        FeatureIterator iterator = new JDBCFeatureWriter( st, source.getSchema(), source.getDataStore() );
+        FeatureIterator iterator = new JDBCFeatureWriter( st, featureStore.getSchema(), featureStore.getDataStore() );
         
         //if post filter, wrap it
         if ( postFilter != null ) {
@@ -239,15 +239,15 @@ public class JDBCFeatureCollection implements FeatureCollection {
     
     protected FeatureIterator createFeatureInserter() throws Exception {
         //build up a statement for the content
-        JDBCDataStore dataStore = source.getDataStore();
-        String sql = dataStore.selectSQL( source.getSchema(), Filter.EXCLUDE );
+        JDBCDataStore dataStore = featureStore.getDataStore();
+        String sql = dataStore.selectSQL( featureStore.getSchema(), Filter.EXCLUDE );
         JDBCDataStore.LOGGER.fine( sql );
         
         //create a statement and pass it off to the iterator
         Statement st = state.getConnection().createStatement();
         st.execute( sql );
         
-        FeatureIterator iterator = new JDBCFeatureInserter( st, source.getSchema(), source.getDataStore() );
+        FeatureIterator iterator = new JDBCFeatureInserter( st, featureStore.getSchema(), featureStore.getDataStore() );
         
         //TODO: should make sure that any inserted features satisfy the filter
         return iterator;
@@ -305,7 +305,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
     }
     
     public SimpleFeatureType getSchema() {
-		return source.getSchema();
+		return featureStore.getSchema();
 	}
 
     public ReferencedEnvelope getBounds() {
@@ -339,14 +339,14 @@ public class JDBCFeatureCollection implements FeatureCollection {
             } 
             else if ( preFilter != null ) {
                 //filter can be encoded, use optimization
-                return dataStore.getBounds(source.getSchema(), preFilter, state.getConnection() );
+                return dataStore.getBounds(featureStore.getSchema(), preFilter, state.getConnection() );
             }
             else {
                 //bounds is for entire dataset, use the cached value if we can
                 if (state.getBounds() == null) {
                     synchronized (state) {
                         if (state.getBounds() == null) {
-                            state.setBounds(dataStore.getBounds(source
+                            state.setBounds(dataStore.getBounds(featureStore
                                     .getSchema(), null, state.getConnection()));
                         }
                     }
@@ -383,14 +383,14 @@ public class JDBCFeatureCollection implements FeatureCollection {
                 //TODO: cache the count locally
             } else if ( preFilter != null ) {
                 //filter can be encoded, use optimization
-                return dataStore.getCount(source.getSchema(), preFilter, state.getConnection());
+                return dataStore.getCount(featureStore.getSchema(), preFilter, state.getConnection());
             }
             else {
                 //bounds is for entire dataset, use the cached value if we can
                 if (state.getCount() == -1) {
                     synchronized (state) {
                         if (state.getCount() == -1) {
-                            state.setCount(dataStore.getCount(source
+                            state.setCount(dataStore.getCount(featureStore
                                     .getSchema(), null, state.getConnection()));
                         }
                     }
@@ -409,7 +409,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	        filter = dataStore.getFilterFactory().and(this.filter, filter );
 	    }
 	    
-	    return new JDBCFeatureCollection( source, state, filter );
+	    return new JDBCFeatureCollection( featureStore, state, filter );
 	}
 	
 	public boolean isEmpty() {
@@ -422,7 +422,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 
 	public boolean addAll(Collection c) {
         try {
-            dataStore.insert( c, source.getSchema(), state.getConnection() );
+            dataStore.insert( c, featureStore.getSchema(), state.getConnection() );
             added( c );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -451,7 +451,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	public void clear() {
 	    try {
 	        if ( filter == null ) {
-	            dataStore.delete( source.getSchema(), null, state.getConnection() );
+	            dataStore.delete( featureStore.getSchema(), null, state.getConnection() );
 	            
 	            //entire dataset deleted, update cache
 	            state.setCount( 0 );
@@ -463,7 +463,7 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	        else {
 	            if ( preFilter != null ) {
 	                //delete what we can up front
-	                dataStore.delete( source.getSchema(), preFilter, state.getConnection() );    
+	                dataStore.delete( featureStore.getSchema(), preFilter, state.getConnection() );    
 	            }
 	            
 	            //delete any remaining
@@ -485,12 +485,12 @@ public class JDBCFeatureCollection implements FeatureCollection {
 	public void update( AttributeDescriptor[] attributes, Object[] values ) {
 	    try {
 	        if ( filter == null ) {
-                dataStore.update( source.getSchema(), attributes, values, null, state.getConnection() );
+                dataStore.update( featureStore.getSchema(), attributes, values, null, state.getConnection() );
             }
             else {
                 if ( preFilter != null ) {
                     //delete what we can up front
-                    dataStore.update( source.getSchema(), attributes, values, preFilter, state.getConnection() );
+                    dataStore.update( featureStore.getSchema(), attributes, values, preFilter, state.getConnection() );
                 }
                 
                 //update any remaining

@@ -16,9 +16,9 @@ public final class JDBCTransactionState implements State {
      * the datastore
      * 
      */
-    JDBCFeatureSource featureSource;
+    JDBCFeatureStore featureSource;
     
-    public JDBCTransactionState( JDBCFeatureSource featureSource ) {
+    public JDBCTransactionState( JDBCFeatureStore featureSource ) {
         this.featureSource = featureSource;
     }
     

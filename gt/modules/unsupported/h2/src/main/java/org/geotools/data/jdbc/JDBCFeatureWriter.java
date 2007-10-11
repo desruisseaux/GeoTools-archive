@@ -1,21 +1,15 @@
 package org.geotools.data.jdbc;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.geotools.feature.FeatureIterator;
-import org.opengis.feature.GeometryAttribute;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.Name;
-import org.opengis.geometry.BoundingBox;
+import org.opengis.filter.Id;
 
 public class JDBCFeatureWriter extends JDBCFeatureIteratorSupport {
 
@@ -31,25 +25,42 @@ public class JDBCFeatureWriter extends JDBCFeatureIteratorSupport {
     public JDBCFeatureWriter( Statement st, SimpleFeatureType featureType, JDBCDataStore dataStore ) {
         super( st, featureType, dataStore );
         
-        try {
-            st.getResultSet().beforeFirst();
-        } 
-        catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
     
     public boolean hasNext() {
         if ( next == null ) {
             try {
-                if ( !st.getResultSet().isBeforeFirst() ) {
-                    //do the write
-                    st.getResultSet().updateRow();
+                if ( last == null ) {
+                    //first call
+                    last = new ResultSetFeature( rs );
                 }
-                
-                next = Boolean.valueOf( st.getResultSet().next() );
+                else {
+                    //figure out what the fid is
+                    PrimaryKey key = dataStore.getPrimaryKey( featureType );
+                    String fid = key.encode( rs );
+                    
+                    Id filter = dataStore.getFilterFactory().id(
+                        Collections.singleton( dataStore.getFilterFactory().featureId( fid ) )
+                    );
+                    
+                    //figure out which attributes changed
+                    List<AttributeDescriptor> changed = new ArrayList<AttributeDescriptor>();
+                    List<Object> values = new ArrayList<Object>();
+                    
+                    for ( AttributeDescriptor att : featureType.getAttributes() ) {
+                        if ( last.isDirrty( att.getLocalName() ) ) {
+                            changed.add( att );
+                            values.add( last.getAttribute( att.getLocalName() ) );
+                        }
+                    }
+                    
+                    //do the write
+                    dataStore.update(featureType, changed, values, filter, st.getConnection());
+                }
+               
+                next = Boolean.valueOf( rs.next() );
             } 
-            catch (SQLException e) {
+            catch (Exception e) {
                 throw new RuntimeException( e );
             }
         }
@@ -61,26 +72,16 @@ public class JDBCFeatureWriter extends JDBCFeatureIteratorSupport {
             throw new IllegalStateException("Must call hasNext before calling next");
         }
         
-        if ( last != null ) {
-            last.close();
-        }
-        
-        try {
-            last = new ResultSetFeature( st.getResultSet() );
-        } 
-        catch (SQLException e) {
-            throw new RuntimeException( e );
-        }
-        
         //reset next flag
         next = null;
         
+        last.init();
         return last;
     }
 
     public void remove() {
         try {
-            st.getResultSet().deleteRow();
+            rs.deleteRow();
         } 
         catch (SQLException e) {
             throw new RuntimeException( e );

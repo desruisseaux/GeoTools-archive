@@ -4,8 +4,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
 
+import org.geotools.data.jdbc.JDBCFeatureIteratorSupport.ResultSetFeature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 
 public class JDBCFeatureInserter extends JDBCFeatureIteratorSupport {
 
@@ -21,16 +23,16 @@ public class JDBCFeatureInserter extends JDBCFeatureIteratorSupport {
 
     public SimpleFeature next() throws NoSuchElementException {
         try {
-            if ( last != null ) {
-                st.getResultSet().insertRow();
-                last.close();
+            if (last != null) {
+                dataStore.insert( last, featureType, st.getConnection() ); 
+            }
+            else {
+                last = new ResultSetFeature( rs );
             }
             
-            st.getResultSet().moveToInsertRow();
-            
-            last = new ResultSetFeature( st.getResultSet() );
+            last.init();
         } 
-        catch (SQLException e) {
+        catch (Exception e) {
             throw new RuntimeException( e );
         }
         

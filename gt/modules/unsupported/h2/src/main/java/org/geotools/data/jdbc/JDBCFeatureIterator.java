@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
@@ -28,7 +27,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 		super( st, featureType, dataStore );
 		
 		try {
-            st.getResultSet().beforeFirst();
+            rs.beforeFirst();
         } 
 		catch (SQLException e) {
 		    throw new RuntimeException( e );
@@ -38,7 +37,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 	public boolean hasNext() {
 	    if ( next == null ) {
 	    	try {
-    			next = Boolean.valueOf( st.getResultSet().next() );
+    			next = Boolean.valueOf( rs.next() );
     		} 
     		catch (SQLException e) {
     			throw new RuntimeException( e );
@@ -57,14 +56,21 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 		for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
 			AttributeDescriptor type = featureType.getAttribute( i );
 			try {
-				Object value = st.getResultSet().getObject( type.getLocalName() );
+				Object value = rs.getObject( type.getLocalName() );
 				
 				//is this a geometry?
 				if ( type instanceof GeometryDescriptor ) {
 				    GeometryDescriptor gatt = (GeometryDescriptor) type;
 				    //if the value is not of type Geometry, try to decode it
 				    if ( value != null && !( value instanceof Geometry ) ) {
-				        Object decoded = dataStore.getSQLDialect().decodeGeometryValue(value, gatt);
+				        Object decoded;
+                        try {
+                            decoded = dataStore.getSQLDialect().decodeGeometryValue(value, gatt);
+                        } 
+                        catch (IOException e) {
+                            throw new RuntimeException( e );
+                        }
+                        
 				        if ( decoded != null ) {
 				            value = decoded;
 				        }
@@ -74,8 +80,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 				attributes.add( value );
 			}
 			catch( SQLException e ) {
-				//log
-				attributes.add( null );
+				throw new RuntimeException( e );
 			}
 		}
 		
@@ -91,7 +96,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
         //figure out the fid
 		String fid;
 		try {
-			fid = pkey.encode( st.getResultSet() );
+			fid = pkey.encode( rs );
 		} 
 		catch (Exception e) {
 			throw new RuntimeException( "Could not determine fid from primary key", e );
@@ -112,7 +117,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 
 	public void remove() {
 	    try {
-            st.getResultSet().deleteRow();
+            rs.deleteRow();
         } 
 	    catch (SQLException e) {
 	        throw new RuntimeException ( e );

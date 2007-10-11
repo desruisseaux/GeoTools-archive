@@ -65,9 +65,9 @@ public final class JDBCState extends ContentState {
         return new JDBCState( this );
     }
     
-    public void dispose() {
+    public void close() {
         JDBCDataStore.closeSafe( connection );
-        super.dispose();
+        super.close();
     }
 }
 
