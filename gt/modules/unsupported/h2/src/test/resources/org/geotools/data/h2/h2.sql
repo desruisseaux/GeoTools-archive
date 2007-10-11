@@ -1,13 +1,15 @@
---		 (C) 2005 by David Blasby and The Open Planning Project 
---		 http://openplans.org 
+--       (C) 2005 by David Blasby and The Open Planning Project 
+--       http://openplans.org 
 -- 
---		 Released under the LGPL 
+--       Released under the LGPL 
 -- 
---		 contact: dblasby@openplans.org 
+--       contact: dblasby@openplans.org 
 
 CREATE ALIAS geometryFromText for "org.openplans.spatialdbbox.JTS.geometryFromText";
 CREATE ALIAS geometryFromBytes for "org.openplans.spatialdbbox.JTS.geometryFromBytes";
-CREATE ALIAS envelope FOR "org.openplans.spatialdbbox.JTS.getEnvelope";
+CREATE ALIAS extent FOR "org.openplans.spatialdbbox.JTS.extentB";
+CREATE ALIAS setSRID FOR "org.openplans.spatialdbbox.JTS.setSRID";
+CREATE ALIAS getSRID FOR "org.openplans.spatialdbbox.JTS.getSRID";
 
 CREATE ALIAS equals FOR "org.openplans.spatialdbbox.StaticGeometry.equals";
 CREATE ALIAS toString FOR "org.openplans.spatialdbbox.StaticGeometry.toString";
