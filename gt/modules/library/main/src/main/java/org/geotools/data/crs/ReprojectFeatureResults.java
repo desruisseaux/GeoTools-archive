@@ -97,7 +97,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
                         
         this.results = origionalCollection( results );        
         
-        CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCRS();
+        CoordinateReferenceSystem originalCs = this.results.getSchema().getDefaultGeometry().getCRS();
         this.transform = CRS.findMathTransform(originalCs,destinationCS, true);
         
         setResourceCollection(createResourceCollection());
