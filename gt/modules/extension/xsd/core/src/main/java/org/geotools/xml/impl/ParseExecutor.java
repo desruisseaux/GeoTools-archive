@@ -174,7 +174,7 @@ public class ParseExecutor implements Visitor {
                 text = Whitespace.COLLAPSE.preparse(text);
 
                 //lists are seperated by spaces
-                String[] list = text.split(" ");
+                String[] list = text.split(" +");
 
                 //apply the facets
                 // 1. length
