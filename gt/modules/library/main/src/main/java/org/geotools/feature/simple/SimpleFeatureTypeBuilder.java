@@ -318,15 +318,6 @@ public class SimpleFeatureTypeBuilder {
 	 * The name of the default geometry attribute of the built type.
 	 */
 	public String getDefaultGeometry() {
-		if (defaultGeometry == null) {
-			for (Iterator i = attributes().iterator(); i.hasNext();) {
-				AttributeDescriptor att = (AttributeDescriptor) i.next();
-				if ( att.getType() instanceof GeometryType ) {
-					return att.getName().getLocalPart();
-				}
-			}
-			return null;
-		}
 		return defaultGeometry;
 	}
 	
