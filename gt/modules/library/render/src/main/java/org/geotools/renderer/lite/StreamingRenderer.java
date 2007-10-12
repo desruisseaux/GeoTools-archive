@@ -18,7 +18,9 @@ package org.geotools.renderer.lite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Transparency;
+import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
@@ -248,6 +250,26 @@ public final class StreamingRenderer implements GTRenderer {
     private int renderingBufferDEFAULT = 0;
     
     private String scaleComputationMethodDEFAULT = SCALE_OGC;
+    
+    /**
+     * Text will be rendered using the usual calls gc.drawString/drawGlyphVector.
+     * This is a little faster, and more consistent with how the platform renders
+     * the text in other applications. The downside is that on most platform the label
+     * and its eventual halo are not properly centered.
+     */
+    public static final String TEXT_RENDERING_STRING = "STRING";
+    
+    /**
+     * Text will be rendered using the associated {@link GlyphVector} outline, that is, a {@link Shape}.
+     * This ensures perfect centering between the text and the halo, but introduces more text aliasing.
+     */
+    public static final String TEXT_RENDERING_OUTLINE = "OUTLINE";
+    
+    /**
+     * The text rendering method, either TEXT_RENDERING_OUTLINE or TEXT_RENDERING_STRING
+     */
+    public static final String TEXT_RENDERING_KEY = "textRenderingMethod";
+    private String textRenderingModeDEFAULT = TEXT_RENDERING_STRING;
 
 	public static final String LABEL_CACHE_KEY = "labelCache";
 	public static final String FORCE_CRS_KEY = "forceCRS";
@@ -256,6 +278,7 @@ public final class StreamingRenderer implements GTRenderer {
 	public static final String MEMORY_PRE_LOADING_KEY = "memoryPreloadingEnabled";
 	public static final String OPTIMIZED_DATA_LOADING_KEY = "optimizedDataLoadingEnabled";
 	public static final String SCALE_COMPUTATION_METHOD_KEY = "scaleComputationMethod";
+	
     
     
     /**
@@ -599,6 +622,10 @@ public final class StreamingRenderer implements GTRenderer {
 		// ////////////////////////////////////////////////////////////////////
 		final MapLayer[] layers = context.getLayers();
 		labelCache.start();
+		if(labelCache instanceof LabelCacheDefault) {
+		    boolean outlineEnabled = TEXT_RENDERING_OUTLINE.equals(getTextRenderingMethod());
+            ((LabelCacheDefault) labelCache).setOutlineRenderingEnabled(outlineEnabled);
+		}
 		final int layersNumber = layers.length;
 		MapLayer currLayer;
 		for (int i = 0; i < layersNumber; i++) // DJB: for each layer (ie. one
@@ -2116,6 +2143,18 @@ public final class StreamingRenderer implements GTRenderer {
         String result = (String) rendererHints.get("scaleComputationMethod");
         if (result == null)
             return scaleComputationMethodDEFAULT;
+        return result;
+    }
+    
+    /**
+     * Returns the text rendering method
+     */
+    private String getTextRenderingMethod() {
+        if (rendererHints == null)
+            return textRenderingModeDEFAULT;
+        String result = (String) rendererHints.get(TEXT_RENDERING_KEY);
+        if (result == null)
+            return textRenderingModeDEFAULT;
         return result;
     }
 

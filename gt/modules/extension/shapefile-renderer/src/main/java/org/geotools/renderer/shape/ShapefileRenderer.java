@@ -20,6 +20,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
@@ -209,6 +210,26 @@ public class ShapefileRenderer implements GTRenderer {
     /** The painter class we use to depict shapes onto the screen */
     private StyledShapePainter painter = new StyledShapePainter(labelCache);
     private Map decimators = new HashMap();
+    
+    /**
+     * Text will be rendered using the usual calls gc.drawString/drawGlyphVector.
+     * This is a little faster, and more consistent with how the platform renders
+     * the text in other applications. The downside is that on most platform the label
+     * and its eventual halo are not properly centered.
+     */
+    public static final String TEXT_RENDERING_STRING = "STRING";
+    
+    /**
+     * Text will be rendered using the associated {@link GlyphVector} outline, that is, a {@link Shape}.
+     * This ensures perfect centering between the text and the halo, but introduces more text aliasing.
+     */
+    public static final String TEXT_RENDERING_OUTLINE = "OUTLINE";
+    
+    /**
+     * The text rendering method, either TEXT_RENDERING_OUTLINE or TEXT_RENDERING_STRING
+     */
+    public static final String TEXT_RENDERING_KEY = "textRenderingMethod";
+    private String textRenderingModeDEFAULT = TEXT_RENDERING_STRING;
     
 	public static final String LABEL_CACHE_KEY = "labelCache";
 	public static final String FORCE_CRS_KEY = "forceCRS";
@@ -1260,6 +1281,10 @@ public class ShapefileRenderer implements GTRenderer {
         CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
         labelCache.start();
         labelCache.clear();
+        if(labelCache instanceof LabelCacheDefault) {
+            boolean outlineEnabled = TEXT_RENDERING_OUTLINE.equals(getTextRenderingMethod());
+            ((LabelCacheDefault) labelCache).setOutlineRenderingEnabled(outlineEnabled);
+        }
         for( int i = 0; i < layers.length; i++ ) {
             MapLayer currLayer = layers[i];
 
@@ -1351,6 +1376,18 @@ public class ShapefileRenderer implements GTRenderer {
         labelCache.end(graphics, paintArea);
         LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio() + " , hits "
                 + styleFactory.getHits() + ", requests " + styleFactory.getRequests());
+    }
+    
+    /**
+     * Returns the text rendering method
+     */
+    private String getTextRenderingMethod() {
+        if (rendererHints == null)
+            return textRenderingModeDEFAULT;
+        String result = (String) rendererHints.get(TEXT_RENDERING_KEY);
+        if (result == null)
+            return textRenderingModeDEFAULT;
+        return result;
     }
     
     /**

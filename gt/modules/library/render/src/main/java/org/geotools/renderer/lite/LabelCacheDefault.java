@@ -18,6 +18,7 @@
 package org.geotools.renderer.lite;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
@@ -50,6 +51,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -128,11 +130,17 @@ public final class LabelCacheDefault implements LabelCache {
 	/** non-grouped labels get thrown in here* */
 	protected ArrayList labelCacheNonGrouped = new ArrayList();
 
-	public boolean DEFAULT_GROUP = false; // what to do if there's no grouping
-
-	// option
+	public boolean DEFAULT_GROUP = false; // what to do if there's no grouping option
 
 	public int DEFAULT_SPACEAROUND = 0;
+	
+	/**
+	 * When true, the text is rendered as its GlyphVector outline (as a geometry) instead of using
+	 * drawGlypVector. Pro: labels and halos are perfectly centered, some people prefer the 
+	 * extra antialiasing obtained. Cons: possibly slower, some people do not like the 
+	 * extra antialiasing :) 
+	 */
+	protected boolean outlineRenderingEnabled = false;
 	
 	protected SLDStyleFactory styleFactory=new SLDStyleFactory();
 	boolean stop=false;
@@ -545,18 +553,16 @@ public final class LabelCacheDefault implements LabelCache {
 						graphics.setTransform(tempTransform);
 					}
 
+					java.awt.Shape outline = glyphVector.getOutline();
 					if (labelItem.getTextStyle().getHaloFill() != null) {
-						// float radious = ts2d.getHaloRadius();
-
-						// graphics.translate(radious, -radious);
 						graphics.setPaint(labelItem.getTextStyle()
 								.getHaloFill());
 						graphics.setComposite(labelItem.getTextStyle()
 								.getHaloComposite());
-						graphics.fill(labelItem.getTextStyle().getHaloShape(
-								graphics));
-
-						// graphics.translate(radious, radious);
+						
+						graphics.setStroke(new BasicStroke(2f * haloRadius, BasicStroke.CAP_ROUND,
+								BasicStroke.JOIN_ROUND));
+						graphics.draw(outline);
 					}
 					// DJB: added this because several people were using
 					// "font-color" instead of fill
@@ -578,7 +584,10 @@ public final class LabelCacheDefault implements LabelCache {
 					if (fill != null) {
 						graphics.setPaint(fill);
 						graphics.setComposite(comp);
-						graphics.drawGlyphVector(glyphVector, 0, 0);
+						if(outlineRenderingEnabled)
+						    graphics.fill(outline);
+						else
+						    graphics.drawGlyphVector(glyphVector, 0, 0);
 						Rectangle bounds = glyphVector.getPixelBounds(
 								new FontRenderContext(tempTransform, true,
 										false), 0, 0);
@@ -753,8 +762,6 @@ public final class LabelCacheDefault implements LabelCache {
 		//double theta = Math.atan(slope);
 		// double rotation=theta;
 
-		double rotation = middleTheta(line, 0.5);
-
 		Rectangle2D textBounds = glyphVector.getVisualBounds();
 		Point centroid = middleLine(line, 0.5); // DJB: changed from centroid to
 		// "middle point" -- see
@@ -777,11 +784,13 @@ public final class LabelCacheDefault implements LabelCache {
 		double anchorY = textStyle.getAnchorY();
 
 		// undo the above if its point placement!
+		double rotation;
 		if (textStyle.isPointPlacement()) {
 			rotation = textStyle.getRotation(); // use the one the user
 			// supplied!
 		} else // lineplacement
 		{
+			rotation = middleTheta(line, 0.5);
 			displacementY -= textStyle.getPerpendicularOffset(); // move it
 			// off the
 			// line
@@ -1295,19 +1304,23 @@ public final class LabelCacheDefault implements LabelCache {
 		double dist = percent * len;
 
 		double running_sum_dist = 0;
-		Coordinate[] pts = l.getCoordinates();
+		CoordinateSequence pts = l.getCoordinateSequence();
 		double segmentLen;
 		double dx;
 		double dy;
 		double slope;
-		final int length = pts.length;
+		final int length = pts.size();
+		Coordinate curr = new Coordinate();
+		Coordinate next = new Coordinate();
 		for (int i = 0; i < length - 1; i++) {
-			segmentLen = pts[i].distance(pts[i + 1]);
+			pts.getCoordinate(i, curr);
+			pts.getCoordinate(i + 1, next);
+			segmentLen = curr.distance(next);
 
 			if ((running_sum_dist + segmentLen) >= dist) {
 				// it is on this segment pts[i] to pts[i+1]
-				dx = (pts[i + 1].x - pts[i].x);
-				dy = (pts[i + 1].y - pts[i].y);
+				dx = (next.x - curr.x);
+				dy = (next.y - curr.y);
 				slope = dy / dx;
 				return Math.atan(slope);
 			}
@@ -1702,5 +1715,20 @@ public final class LabelCacheDefault implements LabelCache {
 		needsOrdering=true;
 		enabledLayers.add(layerId);
 	}
+
+    public boolean isOutlineRenderingEnabled() {
+        return outlineRenderingEnabled;
+    }
+
+    /**
+     * Sets the text rendering mode. 
+     * When true, the text is rendered as its GlyphVector outline (as a geometry) instead of using
+     * drawGlypVector. Pro: labels and halos are perfectly centered, some people prefer the 
+     * extra antialiasing obtained. Cons: possibly slower, some people do not like the 
+     * extra antialiasing :) 
+     */
+    public void setOutlineRenderingEnabled(boolean outlineRenderingEnabled) {
+        this.outlineRenderingEnabled = outlineRenderingEnabled;
+    }
 	
 }
