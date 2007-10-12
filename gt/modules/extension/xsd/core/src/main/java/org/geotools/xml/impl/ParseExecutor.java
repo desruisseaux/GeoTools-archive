@@ -27,6 +27,8 @@ import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.XSDVariety;
+import org.eclipse.xsd.XSDWhiteSpace;
+import org.eclipse.xsd.XSDWhiteSpaceFacet;
 import org.picocontainer.MutablePicoContainer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -270,11 +272,25 @@ public class ParseExecutor implements Visitor {
                 return text;
             } else {
                 //atomic
-                List facets = new ArrayList();
-
+                
+                //walk through the facets and preparse as necessary 
                 for (Iterator f = type.getFacets().iterator(); f.hasNext();) {
                     XSDFacet facet = (XSDFacet) f.next();
-                    facets.add(facet);
+
+                    //white space
+                    if ( facet instanceof XSDWhiteSpaceFacet ) {
+                        XSDWhiteSpaceFacet whitespace = (XSDWhiteSpaceFacet) facet;
+                        if ( whitespace.getValue() == XSDWhiteSpace.REPLACE_LITERAL ) {
+                            text = Whitespace.REPLACE.preparse(text);
+                        }
+                        if ( whitespace.getValue() == XSDWhiteSpace.COLLAPSE_LITERAL ) {
+                            text = Whitespace.COLLAPSE.preparse(text);
+                        }
+                        if ( whitespace.getValue() == XSDWhiteSpace.PRESERVE_LITERAL ) {
+                            //do nothing
+                        }
+                            
+                    }
                 }
 
                 return text;

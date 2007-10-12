@@ -32,7 +32,7 @@ public class FacetTest extends TestCase {
         Document doc = db.parse(getClass().getResourceAsStream("list.xml"));
 
         String schemaLocation = "http://geotools.org/test "
-            + getClass().getResource("list.xsd").getFile();
+            + getClass().getResource("facets.xsd").getFile();
 
         doc.getDocumentElement()
            .setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation",
@@ -48,5 +48,25 @@ public class FacetTest extends TestCase {
         assertEquals(new Integer(1), list.get(0));
         assertEquals(new Integer(2), list.get(1));
         assertEquals(new Integer(3), list.get(2));
+    }
+    
+    public void testWhitespace() throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(getClass().getResourceAsStream("whitespace.xml"));
+
+        String schemaLocation = "http://geotools.org/test "
+            + getClass().getResource("facets.xsd").getFile();
+
+        doc.getDocumentElement()
+           .setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation",
+            schemaLocation);
+
+        DOMParser parser = new DOMParser(new XSConfiguration(), doc);
+        String s = (String) parser.parse();
+        
+        assertEquals( "this is a normal string with some whitespace and some new lines", s );
     }
 }
