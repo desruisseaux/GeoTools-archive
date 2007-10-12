@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import org.opengis.feature.simple.SimpleFeature;
@@ -220,15 +219,15 @@ public class GML2ParsingUtils {
 
             // create the type
             ftBuilder.minOccurs(min).maxOccurs(max).add(property.getName(), theClass);
-            
+
             //set the default geometry explicitly
-            if ( Geometry.class.isAssignableFrom( theClass ) && 
-                !GML.NAMESPACE.equals( property.getTargetNamespace() ) ) {
+            if (Geometry.class.isAssignableFrom(theClass)
+                    && !GML.NAMESPACE.equals(property.getTargetNamespace())) {
                 //only set if non-gml, we do this because of "gml:location", 
                 // we dont want that to be the default if the user has another
                 // geometry attribute
-                if ( ftBuilder.getDefaultGeometry() == null ) {
-                    ftBuilder.setDefaultGeometry( property.getName() );
+                if (ftBuilder.getDefaultGeometry() == null) {
+                    ftBuilder.setDefaultGeometry(property.getName());
                 }
             }
         }

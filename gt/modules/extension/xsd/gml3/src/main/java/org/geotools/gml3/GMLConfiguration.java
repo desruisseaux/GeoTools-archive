@@ -138,7 +138,8 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentImplementation(GML.LineStringSegmentType,
             LineStringSegmentTypeBinding.class);
         container.registerComponentImplementation(GML.LineStringType, LineStringTypeBinding.class);
-        container.registerComponentImplementation(GML.LocationPropertyType, LocationPropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.LocationPropertyType,
+            LocationPropertyTypeBinding.class);
 
         container.registerComponentImplementation(GML.MeasureType, MeasureTypeBinding.class);
         container.registerComponentImplementation(GML.MultiCurveType, MultiCurveTypeBinding.class);
