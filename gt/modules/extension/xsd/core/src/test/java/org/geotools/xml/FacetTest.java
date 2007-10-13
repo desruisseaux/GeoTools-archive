@@ -49,7 +49,7 @@ public class FacetTest extends TestCase {
         assertEquals(new Integer(2), list.get(1));
         assertEquals(new Integer(3), list.get(2));
     }
-    
+
     public void testWhitespace() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -66,7 +66,7 @@ public class FacetTest extends TestCase {
 
         DOMParser parser = new DOMParser(new XSConfiguration(), doc);
         String s = (String) parser.parse();
-        
-        assertEquals( "this is a normal string with some whitespace and some new lines", s );
+
+        assertEquals("this is a normal string with some whitespace and some new lines", s);
     }
 }
