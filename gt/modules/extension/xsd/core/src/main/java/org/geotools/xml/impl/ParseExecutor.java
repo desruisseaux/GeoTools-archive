@@ -272,28 +272,38 @@ public class ParseExecutor implements Visitor {
                 return text;
             } else {
                 //atomic
-                
+
                 //walk through the facets and preparse as necessary 
                 for (Iterator f = type.getFacets().iterator(); f.hasNext();) {
                     XSDFacet facet = (XSDFacet) f.next();
 
                     //white space
-                    if ( facet instanceof XSDWhiteSpaceFacet ) {
+                    if (facet instanceof XSDWhiteSpaceFacet) {
                         XSDWhiteSpaceFacet whitespace = (XSDWhiteSpaceFacet) facet;
-                        if ( whitespace.getValue() == XSDWhiteSpace.REPLACE_LITERAL ) {
+
+                        if (whitespace.getValue() == XSDWhiteSpace.REPLACE_LITERAL) {
                             text = Whitespace.REPLACE.preparse(text);
                         }
-                        if ( whitespace.getValue() == XSDWhiteSpace.COLLAPSE_LITERAL ) {
+
+                        if (whitespace.getValue() == XSDWhiteSpace.COLLAPSE_LITERAL) {
                             text = Whitespace.COLLAPSE.preparse(text);
                         }
-                        if ( whitespace.getValue() == XSDWhiteSpace.PRESERVE_LITERAL ) {
+
+                        if (whitespace.getValue() == XSDWhiteSpace.PRESERVE_LITERAL) {
                             //do nothing
                         }
-                            
                     }
                 }
 
                 return text;
+            }
+        } else {
+            //type is not simple, or complex with simple content, do a check 
+            // for mixed
+            if (instance.getTypeDefinition() instanceof XSDComplexTypeDefinition
+                    && ((XSDComplexTypeDefinition) instance.getTypeDefinition()).isMixed()) {
+                //collape the text
+                text = Whitespace.COLLAPSE.preparse(text);
             }
         }
 
