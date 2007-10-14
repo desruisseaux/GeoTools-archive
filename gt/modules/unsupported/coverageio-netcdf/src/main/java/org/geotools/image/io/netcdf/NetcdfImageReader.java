@@ -515,11 +515,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         if (variable == null || variableIndex != imageIndex) {
             ensureFileOpen();
             final String name = variableNames[imageIndex];
-            final Variable candidate = dataset.findVariable(name);
-            if (candidate == null) {
-                throw new IIOException(Errors.format(
-                        ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, name, dataset.getLocation()));
-            }
+            final Variable candidate = findVariable(name);
             final int rank = candidate.getRank();
             if (rank < Math.max(X_DIMENSION, Y_DIMENSION)) {
                 throw new IIOException(Errors.format(
@@ -531,6 +527,43 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns the variable of the given name. This method is similar to
+     * {@link NetcdfDataset#findVariable(String)} except that the search
+     * is case-insensitive and an exception is thrown if no variable has
+     * been found for the given name.
+     *
+     * @param  name The name of the variable to search.
+     * @return The variable for the given name.
+     * @throws IIOException if no variable has been found for the given name.
+     */
+    private Variable findVariable(final String name) throws IIOException {
+        /*
+         * First tries a case-sensitive search. Case matter since the same letter in different
+         * case may represent different variables. For example "t" and "T" are typically "time"
+         * and "temperature" respectively.
+         */
+        Variable candidate = dataset.findVariable(name);
+        if (candidate != null) {
+            return candidate;
+        }
+        /*
+         * We tried a case-sensitive search without success. Now tries a case-insensitive search
+         * before to report a failure.
+         */
+        final List/*<Variable>*/ variables = dataset.getVariables();
+        if (variables != null) {
+            for (final java.util.Iterator/*<Variable>*/ it=variables.iterator(); it.hasNext();) {
+                candidate = (Variable) it.next();
+                if (candidate!=null && name.equalsIgnoreCase(candidate.getName())) {
+                    return candidate;
+                }
+            }
+        }
+        throw new IIOException(Errors.format(
+                ErrorKeys.VARIABLE_NOT_FOUND_IN_FILE_$2, name, dataset.getLocation()));
     }
 
     /**

@@ -294,7 +294,7 @@ public class NetcdfMetadata extends GeographicMetadata {
     private Object /*<T>*/ parse(final AxisType type, String value,
                                  final Class/*<T>*/ expected, final String caller)
     {
-        final LoggedFormat format = createLoggedFormat(getAxisFormat(type), expected);
+        final LoggedFormat format = createLoggedFormat(getAxisFormat(type, value), expected);
         format.setLogger("org.geotools.image.io.netcdf");
         format.setCaller(NetcdfMetadata.class, caller);
         return format.parse(value);
@@ -312,21 +312,68 @@ public class NetcdfMetadata extends GeographicMetadata {
      *   <li>For all other kind of axis, a {@link NumberFormat}.</li>
      * </ul>
      * <p>
-     * The {@linkplain Locale#CANADA Canada locale} is used by default for all formats because
+     * The {@linkplain Locale#CANADA Canada locale} is used by default for most formats because
      * it is relatively close to ISO (for example regarding days and months order in dates) while
      * using the English symbols.
      *
      * @param  type The type of the axis.
+     * @param  prototype An example of the values to be parsed. Implementations may parse this
+     *         prototype when the axis type alone is not suffisient. For example the {@linkplain
+     *         AxisType#Time time axis type} should uses the {@code "yyyy-MM-dd"} date pattern,
+     *         but some files do not follow this convention and use the default local instead.
      * @return The format for parsing values along the axis.
      */
-    protected Format getAxisFormat(final AxisType type) {
-        if (type.equals(AxisType.Time)) {
-            final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA);
-            format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return format;
-        } else {
+    protected Format getAxisFormat(final AxisType type, final String prototype) {
+        if (!type.equals(AxisType.Time)) {
             return NumberFormat.getNumberInstance(Locale.CANADA);
         }
+        char dateSeparator = '-';   // The separator used in ISO format.
+        boolean yearLast   = false; // Year is first in ISO pattern.
+        boolean namedMonth = false; // Months are numbers in the ISO pattern.
+        if (prototype != null) {
+            /*
+             * Performs a quick check on the prototype content. If the prototype seems to use a
+             * different date separator than the ISO one, we will adjust the pattern accordingly.
+             * Also checks if the year seems to appears last rather than first, and if the month
+             * seems to be written using letters rather than digits.
+             */
+            int field = 1;
+            int digitCount = 0;
+            final int length = prototype.length();
+            for (int i=0; i<length; i++) {
+                final char c = prototype.charAt(i);
+                if (Character.isWhitespace(c)) {
+                    break; // Checks only the dates, ignore the hours.
+                }
+                if (Character.isDigit(c)) {
+                    digitCount++;
+                    continue; // Digits are legal in all cases.
+                }
+                if (field == 2 && Character.isLetter(c)) {
+                    namedMonth = true;
+                    continue; // Letters are legal for month only.
+                }
+                if (field == 1) {
+                    dateSeparator = c;
+                }
+                digitCount = 0;
+                field++;
+            }
+            if (digitCount >= 4) {
+                yearLast = true;
+            }
+        }
+        String pattern;
+        if (yearLast) {
+            pattern = namedMonth ? "dd-MMM-yyyy" : "dd-MM-yyyy";
+        } else {
+            pattern = namedMonth ? "yyyy-MMM-dd" : "yyyy-MM-dd";
+        }
+        pattern = pattern.replace('-', dateSeparator);
+        pattern += " HH:mm:ss";
+        final DateFormat format = new SimpleDateFormat(pattern, Locale.CANADA);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format;
     }
 
     /**
