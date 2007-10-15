@@ -15,21 +15,18 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.LinkedHashSet;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Acts as a typed {@link java.util.Set} while we wait for Java 5.0.
- * 
+ * Acts as a typed {@link java.util.Set}. Type checks are performed at run-time in
+ * addition of compile-time checks.
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -40,7 +37,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
  *       after a clone (this work may be done in {@code MetadataEntity.unmodifiable(Object)}).
  */
-public class CheckedHashSet extends LinkedHashSet implements CheckedCollection, Cloneable {
+public class CheckedHashSet<E> extends LinkedHashSet<E> implements CheckedCollection<E>, Cloneable {
     /**
      * Serial version UID for compatibility with different versions.
      */
@@ -49,14 +46,14 @@ public class CheckedHashSet extends LinkedHashSet implements CheckedCollection, 
     /**
      * The element type.
      */
-    private final Class type;
+    private final Class<E> type;
 
     /**
      * Constructs a set of the specified type.
      *
      * @param type The element type (should not be null).
      */
-    public CheckedHashSet(final Class type) {
+    public CheckedHashSet(final Class<E> type) {
         super();
         this.type = type;
         ensureNonNull();
@@ -70,19 +67,10 @@ public class CheckedHashSet extends LinkedHashSet implements CheckedCollection, 
      *
      * @since 2.4
      */
-    public CheckedHashSet(final Class type, final int capacity) {
+    public CheckedHashSet(final Class<E> type, final int capacity) {
         super(capacity);
         this.type = type;
         ensureNonNull();
-    }
-
-    /**
-     * Returns the element type given at construction time.
-     *
-     * @since 2.4
-     */
-    public Class getElementType() {
-        return type;
     }
 
     /**
@@ -95,13 +83,22 @@ public class CheckedHashSet extends LinkedHashSet implements CheckedCollection, 
     }
 
     /**
+     * Returns the element type given at construction time.
+     *
+     * @since 2.4
+     */
+    public Class<E> getElementType() {
+        return type;
+    }
+
+    /**
      * Checks the type of the specified object. The default implementation ensure
      * that the object is assignable to the type specified at construction time.
      *
      * @param  element the object to check, or {@code null}.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    protected void ensureValidType(final Object element) throws IllegalArgumentException {
+    protected void ensureValidType(final E element) throws IllegalArgumentException {
         if (element!=null && !type.isInstance(element)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                       Utilities.getShortClassName(element), Utilities.getShortName(type)));
@@ -115,7 +112,8 @@ public class CheckedHashSet extends LinkedHashSet implements CheckedCollection, 
      * @return {@code true} if the set did not already contain the specified element.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    public boolean add(final Object element) {
+    @Override
+    public boolean add(final E element) {
         ensureValidType(element);
         return super.add(element);
     }

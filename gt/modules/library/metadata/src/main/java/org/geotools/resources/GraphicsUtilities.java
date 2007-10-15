@@ -16,8 +16,6 @@
  */
 package org.geotools.resources;
 
-// Graphics and geometry
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -58,8 +56,8 @@ public final class GraphicsUtilities {
     /**
      * Writes the specified exception trace in the specified graphics
      * context.  This method is useful when an exception has occurred
-     * inside a {@link Component#paint} method and we want to write it
-     * rather than leaving an empty window.
+     * inside a {@link java.awt.Component#paint} method and we want to
+     * write it rather than leaving an empty window.
      *
      * @param exception Exception whose trace we want to write.
      * @param graphics Graphics context in which to write exception.  The
@@ -82,8 +80,8 @@ public final class GraphicsUtilities {
          * of this to calculate the necessary space.
          */
         double width = 0, height = 0;
-        final List glyphs = new ArrayList();
-        final List bounds = new ArrayList();
+        final List<GlyphVector> glyphs = new ArrayList<GlyphVector>();
+        final List<Rectangle2D> bounds = new ArrayList<Rectangle2D>();
         final int length = message.length();
         final Font font = graphics.getFont();
         final FontRenderContext context = graphics.getFontRenderContext();
@@ -94,7 +92,7 @@ public final class GraphicsUtilities {
             if (in < 0) in = length;
             final int irn = Math.min(ir, in);
             final GlyphVector line = font.createGlyphVector(context, message.substring(i, irn));
-            final Rectangle2D rect=line.getVisualBounds();
+            final Rectangle2D rect = line.getVisualBounds();
             final double w = rect.getWidth();
             if (w > width) width = w;
             height += rect.getHeight();
@@ -109,8 +107,8 @@ public final class GraphicsUtilities {
         float ypos = (float) (0.5 * (widgetBounds.height - height));
         final int size = glyphs.size();
         for (int i = 0; i < size; i++) {
-            final GlyphVector line = (GlyphVector) glyphs.get(i);
-            final Rectangle2D rect = (Rectangle2D) bounds.get(i);
+            final GlyphVector line = glyphs.get(i);
+            final Rectangle2D rect = bounds.get(i);
             ypos += rect.getHeight();
             graphics.drawGlyphVector(line, xpos, ypos);
         }

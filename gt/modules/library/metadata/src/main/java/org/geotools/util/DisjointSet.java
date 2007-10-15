@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// Collections
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,7 +28,7 @@ import java.io.Serializable;
 
 /**
  * A set which is disjoint from others {@code DisjointSet}s. Two sets are
- * disjoint (or <em>mutually exclusive</em) if their intersection is the empty
+ * disjoint (or <em>mutually exclusive</em>) if their intersection is the empty
  * set. Adding an element to a {@code DisjointSet} remove it from any other
  * mutually exclusive {@code DisjointSet}. Optionnaly, {@code DisjointSet}s
  * may also have a trash set receiving removed elements. The example below
@@ -48,7 +47,7 @@ import java.io.Serializable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DisjointSet extends AbstractSet implements Serializable {
+public class DisjointSet<E> extends AbstractSet<E> implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -84,13 +83,12 @@ public class DisjointSet extends AbstractSet implements Serializable {
      *       removed from the underlying map.</li>
      * </ul>
      */
-    private final Map map;
+    private final Map<E, DisjointSet<E>> map;
 
     /**
-     * The set where to move removed elements,
-     * or {@code null} if there is none.
+     * The set where to move removed elements, or {@code null} if there is none.
      */
-    private final DisjointSet trash;
+    private final DisjointSet<E> trash;
 
     /**
      * Construct a initially empty set. There is initially no other set mutually
@@ -121,8 +119,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @see #getTrash
      */
     public DisjointSet(final boolean hasTrash) {
-        map   = new LinkedHashMap();
-        trash = (hasTrash) ? new DisjointSet(map) : null;
+        map   = new LinkedHashMap<E, DisjointSet<E>>();
+        trash = (hasTrash) ? new DisjointSet<E>(map) : null;
     }
 
     /**
@@ -135,7 +133,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
      *
      * @param disjointSet The set to be disjoint from.
      */
-    public DisjointSet(final DisjointSet disjointSet) {
+    public DisjointSet(final DisjointSet<E> disjointSet) {
         map   = disjointSet.map;
         trash = disjointSet.trash;
     }
@@ -143,7 +141,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
     /**
      * Construct a trash set.
      */
-    private DisjointSet(final Map map) {
+    private DisjointSet(final Map<E, DisjointSet<E>> map) {
         this.map = map;
         trash = null;
     }
@@ -152,7 +150,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * Returns the trash set, or {@code null} if there is none.
      * The trash set receive all elements removed from this set.
      */
-    public Set getTrash() {
+    public Set<E> getTrash() {
         return trash;
     }
 
@@ -178,9 +176,10 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @param  element Object to be checked for containment in this set.
      * @return {@code true} if this set contains the specified element.
      */
+    @Override
     public boolean contains(final Object element) {
         synchronized (map) {
-            return map.get(element)==this;
+            return map.get(element) == this;
         }
     }
 
@@ -192,7 +191,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @param  element Element whose presence in this set is to be ensured.
      * @return {@code true} if the set changed as a result of the call.
      */
-    public boolean add(final Object element) {
+    @Override
+    public boolean add(final E element) {
         synchronized (map) {
             return map.put(element, this) != this;
         }
@@ -206,13 +206,16 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @param  element Element to be removed from this set.
      * @return {@code true} if the set changed as a result of the call.
      */
+    @Override
     public boolean remove(final Object element) {
         synchronized (map) {
             if (map.get(element) != this) {
                 return false; // The element do not belongs to this set.
-            } else if (trash!=null) {
+            } else if (trash != null) {
                 // Do not remove. Move it to the "trash" set.
-                return map.put(element, trash) != trash;
+                @SuppressWarnings("unchecked")
+                final DisjointSet<E> old = map.put((E) element, trash);
+                return old != trash;
             } else {
                 // Completly remove the element from the set.
                 return map.remove(element) != null;
@@ -228,7 +231,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @return {@code true} if this set contains all of the elements in
      *         the specified collection.
      */
-    public boolean containsAll(final Collection c) {
+    @Override
+    public boolean containsAll(final Collection<?> c) {
         synchronized (map) {
             return super.containsAll(c);
         }
@@ -241,7 +245,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @param c collection whose elements are to be added to this set.
      * @return {@code true} if this set changed as a result of the call.
      */
-    public boolean addAll(final Collection c) {
+    @Override
+    public boolean addAll(final Collection<? extends E> c) {
         synchronized (map) {
             return super.addAll(c);
         }
@@ -255,7 +260,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @param  c elements to be removed from this set.
      * @return {@code true} if this set changed as a result of the call.
      */
-    public boolean removeAll(final Collection c) {
+    @Override
+    public boolean removeAll(final Collection<?> c) {
         synchronized (map) {
             return super.removeAll(c);
         }
@@ -269,7 +275,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @param  c elements to be retained in this collection.
      * @return {@code true} if this collection changed as a result of the call.
      */
-    public boolean retainAll(final Collection c) {
+    @Override
+    public boolean retainAll(final Collection<?> c) {
         synchronized (map) {
             return super.retainAll(c);
         }
@@ -279,6 +286,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * Removes all of the elements from this set. If this {@code DisjointSet}
      * has a trash set, all removed elements will be added to the trash set.
      */
+    @Override
     public void clear() {
         synchronized (map) {
             super.clear();
@@ -288,7 +296,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
     /**
      * Returns an iterator over the elements in this collection.
      */
-    public Iterator iterator() {
+    public Iterator<E> iterator() {
         synchronized (map) {
             return new Iter();
         }
@@ -299,6 +307,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
      *
      * @return an array containing all of the elements in this set.
      */
+    @Override
     public Object[] toArray() {
         synchronized (map) {
             return super.toArray();
@@ -313,7 +322,8 @@ public class DisjointSet extends AbstractSet implements Serializable {
      *           the same runtime type is allocated for this purpose.
      * @return an array containing the elements of the set.
      */
-    public Object[] toArray(final Object[] a) {
+    @Override
+    public <T> T[] toArray(final T[] a) {
         synchronized (map) {
             return super.toArray(a);
         }
@@ -322,6 +332,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
     /**
      * Returns a string representation of this set.
      */
+    @Override
     public String toString() {
         synchronized (map) {
             return super.toString();
@@ -331,6 +342,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
     /**
      * Returns an hash value for this set.
      */
+    @Override
     public int hashCode() {
         synchronized (map) {
             return super.hashCode();
@@ -340,6 +352,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
     /**
      * Compare this set with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object set) {
         synchronized (map) {
             return super.equals(set);
@@ -352,17 +365,17 @@ public class DisjointSet extends AbstractSet implements Serializable {
      * @version 1.0
      * @author Martin Desruisseaux
      */
-    private final class Iter implements Iterator {
+    private final class Iter implements Iterator<E> {
         /**
          * The iterator over the entries of the underlying {@link Map} object.
          */
-        private final Iterator iterator;
+        private final Iterator<Map.Entry<E, DisjointSet<E>>> iterator;
 
         /**
          * Entry for the next element to return, or
          * {@code null} if there is no more element.
          */
-        private Map.Entry prefetch;
+        private Map.Entry<E, DisjointSet<E>> prefetch;
 
         /**
          * Entry to remove if the {@link #remove} operation is invoked,
@@ -372,7 +385,7 @@ public class DisjointSet extends AbstractSet implements Serializable {
          * with the {@link Iterator#next} call on the underlying map's
          * iterator.
          */
-        private Map.Entry toRemove;
+        private Map.Entry<E, DisjointSet<E>> toRemove;
 
         /**
          * Construct a new iterator.
@@ -386,11 +399,11 @@ public class DisjointSet extends AbstractSet implements Serializable {
          * {@code null}, fetch the next entry. If there is no
          * more entries, returns {@code null}.
          */
-        private Map.Entry prefetch() {
+        private Map.Entry<E, DisjointSet<E>> prefetch() {
             toRemove = null;
-            if (prefetch==null) {
+            if (prefetch == null) {
                 while (iterator.hasNext()) {
-                    final Map.Entry next = (Map.Entry) iterator.next();
+                    final Map.Entry<E, DisjointSet<E>> next = iterator.next();
                     if (next.getValue() == DisjointSet.this) {
                         prefetch = next;
                         break;
@@ -404,29 +417,28 @@ public class DisjointSet extends AbstractSet implements Serializable {
          * Returns {@code true} if the iteration has more elements.
          */
         public boolean hasNext() {
-            return prefetch()!=null;
+            return prefetch() != null;
         }
-        
+
         /**
          * Returns the next element in the iteration.
          */
-        public Object next() {
+        public E next() {
             toRemove = prefetch();
             prefetch = null;
-            if (toRemove!=null) {
+            if (toRemove != null) {
                 return toRemove.getKey();
             } else {
                 throw new NoSuchElementException();
             }
         }
-        
+
         /**
-         * Removes from the underlying set the
-         * last element returned by the iterator.
+         * Removes from the underlying set the last element returned by the iterator.
          */
         public void remove() {
-            if (toRemove!=null) {
-                if (trash!=null) {
+            if (toRemove != null) {
+                if (trash != null) {
                     // Move to the trash set.
                     toRemove.setValue(trash);
                 } else {

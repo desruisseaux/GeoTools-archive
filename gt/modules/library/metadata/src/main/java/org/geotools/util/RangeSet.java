@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// Collections
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.AbstractSet;
@@ -25,7 +24,6 @@ import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-
 import javax.media.jai.util.Range;
 
 import org.geotools.resources.ClassChanger;
@@ -52,7 +50,9 @@ import org.opengis.util.Cloneable;
  * @author Martin Desruisseaux
  * @author Andrea Aime
  */
-public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Serializable {
+public class RangeSet extends AbstractSet<Range>
+        implements SortedSet<Range>, Cloneable, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -62,10 +62,9 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * The comparator for ranges. Defined only in order to comply to {@link #comparator}
      * contract, but not used for internal working in this class.
      */
-    private static final Comparator COMPARATOR = new Comparator() {
-        public int compare(final Object o1, final Object o2) {
-            final Range r1 = (Range) o1;
-            final Range r2 = (Range) o2;
+    private static final Comparator<Range> COMPARATOR = new Comparator<Range>() {
+        @SuppressWarnings("unchecked")
+        public int compare(final Range r1, final Range r2) {
             int cmin = r1.getMinValue().compareTo(r2.getMinValue());
             int cmax = r1.getMaxValue().compareTo(r2.getMaxValue());
             if (cmin == 0) cmin = (r1.isMinIncluded() ? -1 : 0) - (r2.isMinIncluded() ? -1 : 0);
@@ -84,7 +83,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * les types primitifs, tandis que les classes aux index
      * impairs sont leurs "wrappers".
      */
-    private static final Class[] PRIMITIVES = {
+    private static final Class<?>[] PRIMITIVES = {
         Double   .TYPE,    Double   .class,
         Float    .TYPE,    Float    .class,
         Long     .TYPE,    Long     .class,
@@ -105,14 +104,14 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * qui sera spécifié aux objets {@link Range} représentant
      * un intervalle.
      */
-    private final Class type;
+    private final Class<?> type;
 
     /**
      * Ce champ a une valeur identique à {@code type}, sauf
      * si {@code elementType} est un type primitif. Dans ce
      * cas, il sera <code>{@link Number}.class</code>.
      */
-    private final Class relaxedType;
+    private final Class<?> relaxedType;
 
     /**
      * Le type des données utilisé dans le tableau {@code array}.
@@ -120,7 +119,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * ce dernier était le "wrapper" d'un des types primitifs du Java.
      * Dans ce cas, {@code elementType} sera ce type primitif.
      */
-    private final Class elementType;
+    private final Class<?> elementType;
 
     /**
      * The primitive type, as one of {@code DOUBLE}, {@code FLOAT}, {@code LONG},
@@ -180,7 +179,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * @throws IllegalArgumentException if {@code type} is not a
      *         primitive type or a class implementing {@link Comparable}.
      */
-    public RangeSet(Class type) throws IllegalArgumentException {
+    public RangeSet(Class<?> type) throws IllegalArgumentException {
         // If 'type' is a primitive type,
         // find the corresponding wrapper.
         byte indexType = OTHER;
@@ -215,15 +214,34 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     }
 
     /**
+     * Returns the {@link #type} as a subtype of {@link Number}.
+     */
+    @SuppressWarnings("unchecked")
+    private Class<? extends Number> getNumericType() {
+        assert Number.class.isAssignableFrom(type) : type;
+        return (Class<? extends Number>) type;
+    }
+
+    /**
+     * Returns the {@link #type} as a subtype of {@link Comparable}.
+     */
+    @SuppressWarnings("unchecked")
+    private Class<? extends Comparable> getComparableType() {
+        assert Comparable.class.isAssignableFrom(type) : type;
+        return (Class<? extends Comparable>) type;
+    }
+
+    /**
      * Returns the comparator associated with this sorted set.
      */
-    public Comparator comparator() {
+    public Comparator<Range> comparator() {
         return COMPARATOR;
     }
 
     /**
      * Remove all elements from this set of ranges.
      */
+    @Override
     public void clear() {
         array = null;
         modCount++;
@@ -245,15 +263,15 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *       {@code Range.is[Min/Max]Included()} must return
      *       {@code true}). It may be fixed in a future version.
      *
-     * @param r The range to add. The {@code RangeSet} class
-     *          will never modify the supplied {@link Range} object.
+     * @param  range The range to add. The {@code RangeSet} class
+     *         will never modify the supplied {@link Range} object.
      * @return {@code true} if this set changed as a result of the call.
      * @throws ClassCastException if the argument is not a {@link Range} object.
      *
      * @todo support open intervals.
      */
-    public boolean add(final Object r) throws ClassCastException {
-        final Range range = (Range) r;
+    @Override
+    public boolean add(final Range range) throws ClassCastException {
         if (!range.isMinIncluded() || !range.isMaxIncluded()) {
             // TODO: support open intervals.
             throw new UnsupportedOperationException("Open interval not yet supported");
@@ -278,13 +296,15 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         if (!relaxedType.isAssignableFrom(upper.getClass())) {
             throw new IllegalArgumentException(String.valueOf(upper));
         }
-        if (lower.compareTo(upper) > 0) {
+        @SuppressWarnings("unchecked")
+        final int c = lower.compareTo(upper);
+        if (c > 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, lower, upper));
         }
         if (useClassChanger) {
             try {
-                lower = (Comparable)ClassChanger.toNumber(lower);
-                upper = (Comparable)ClassChanger.toNumber(upper);
+                lower = (Comparable) ClassChanger.toNumber(lower);
+                upper = (Comparable) ClassChanger.toNumber(upper);
             } catch (ClassNotFoundException exception) {
                 // Should not happen, since this operation is legal according the constructor.
                 final ClassCastException e=new ClassCastException(exception.getLocalizedMessage());
@@ -316,7 +336,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
              *             lower(i=3)   upper(i=5)
              */
             if (((i0=~i0) & 1) != 0) { // Attention: c'est ~ et non -
-                lower = (Comparable)Array.get(array, --i0);
+                lower = (Comparable) Array.get(array, --i0);
                 i1 = binarySearch(upper);
             } else {
                 /*
@@ -496,7 +516,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     public boolean add(double lower, double upper) throws IllegalArgumentException {
         return add(new Double(lower), new Double(upper));
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -512,7 +532,9 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         if (!relaxedType.isAssignableFrom(upper.getClass())) {
             throw new IllegalArgumentException(String.valueOf(upper));
         }
-        if (lower.compareTo(upper) >= 0) {
+        @SuppressWarnings("unchecked")
+        final int c = lower.compareTo(upper);
+        if (c >= 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, lower, upper));
         }
         if (useClassChanger) {
@@ -529,7 +551,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         // if already empty, or range outside the current set, nothing to change
         if (array == null) {
             return false;
-        } 
+        }
         final int modCountChk = modCount;
         int i0 = binarySearch(lower);
         int i1 = binarySearch(upper);
@@ -637,7 +659,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         assert (Array.getLength(array) & 1) == 0;
         return modCountChk != modCount;
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -649,7 +671,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     public boolean remove(byte lower, byte upper) throws IllegalArgumentException {
         return remove(new Byte(lower), new Byte(upper));
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -661,7 +683,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     public boolean remove(short lower, short upper) throws IllegalArgumentException {
         return remove(new Short(lower), new Short(upper));
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -673,7 +695,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     public boolean remove(int lower, int upper) throws IllegalArgumentException {
         return remove(new Integer(lower), new Integer(upper));
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -685,7 +707,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     public boolean remove(long lower, long upper) throws IllegalArgumentException {
         return remove(new Long(lower), new Long(upper));
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -697,7 +719,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     public boolean remove(float lower, float upper) throws IllegalArgumentException {
         return remove(new Float(lower), new Float(upper));
     }
-    
+
     /**
      * Remove a range of values from this set. Range may be removed in any order.
      *
@@ -756,7 +778,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      */
     private Range newRange(final Comparable lower, final Comparable upper) {
         if (isNumeric) {
-            return new NumberRange(type, lower, upper);
+            return new NumberRange(getNumericType(), lower, upper);
         } else {
             return new Range(type, lower, upper);
         }
@@ -769,7 +791,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     private Comparable get(final int index) {
         Comparable value = (Comparable) Array.get(array, index);
         if (useClassChanger) try {
-            value = ClassChanger.toComparable((Number)value, type);
+            value = ClassChanger.toComparable((Number)value, getComparableType());
         } catch (ClassNotFoundException exception) {
             // Should not happen, since class type should
             // have been checked by all 'add(...)' methods
@@ -841,13 +863,16 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     /**
      * Returns {@code true} if this set contains the specified element.
      */
+    @Override
     public boolean contains(final Object object) {
         final Range range = (Range) object;
         if (type.equals(range.getElementClass())) {
             if (range.isMinIncluded() && range.isMaxIncluded()) {
                 final int index = binarySearch(toNumber(range.getMinValue()));
                 if (index>=0 && (index&1)==0) {
-                    return get(index+1).compareTo(range.getMaxValue()) == 0;
+                    @SuppressWarnings("unchecked")
+                    final int c = get(index+1).compareTo(range.getMaxValue());
+                    return c == 0;
                 }
             }
         }
@@ -859,7 +884,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @throws NoSuchElementException if the set is empty.
      */
-    public Object first() throws NoSuchElementException {
+    public Range first() throws NoSuchElementException {
         if (array!=null && Array.getLength(array)!=0) {
             return newRange(get(0), get(1));
         }
@@ -871,7 +896,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @throws NoSuchElementException if the set is empty.
      */
-    public Object last() throws NoSuchElementException {
+    public Range last() throws NoSuchElementException {
         if (array != null) {
             final int length = Array.getLength(array);
             if (length != 0) {
@@ -886,10 +911,10 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * from {@code lower}, inclusive, to {@code upper}, exclusive.
      *
      * @param  lower Low endpoint (inclusive) of the sub set.
-     * @param  upper High endpoint (exclusive) of the sub set. 
+     * @param  upper High endpoint (exclusive) of the sub set.
      * @return A view of the specified range within this sorted set.
      */
-    public SortedSet subSet(final Object lower, final Object upper) {
+    public SortedSet<Range> subSet(final Range lower, final Range upper) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -900,7 +925,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * @param  upper High endpoint (exclusive) of the headSet.
      * @return A view of the specified initial range of this sorted set.
      */
-    public SortedSet headSet(final Object upper) {
+    public SortedSet<Range> headSet(final Range upper) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -908,10 +933,10 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * Returns a view of the portion of this sorted set whose elements are
      * greater than or equal to {@code lower}.
      *
-     * @param  lower Low endpoint (inclusive) of the tailSet. 
+     * @param  lower Low endpoint (inclusive) of the tailSet.
      * @return A view of the specified final range of this sorted set.
      */
-    public SortedSet tailSet(final Object lower) {
+    public SortedSet<Range> tailSet(final Range lower) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -919,7 +944,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * Returns an iterator over the elements in this set of ranges.
      * All elements are {@link Range} objects.
      */
-    public java.util.Iterator iterator() {
+    @Override
+    public java.util.Iterator<Range> iterator() {
         return new Iterator();
     }
 
@@ -931,7 +957,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final class Iterator implements java.util.Iterator {
+    private final class Iterator implements java.util.Iterator<Range> {
         /**
          * Modification count at construction time.
          */
@@ -953,11 +979,11 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         public boolean hasNext() {
             return position<length;
         }
-    
+
         /**
          * Returns the next element in the iteration.
          */
-        public Object next() {
+        public Range next() {
             if (hasNext()) {
                 final Comparable lower = get(position++);
                 final Comparable upper = get(position++);
@@ -970,7 +996,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
             }
             throw new NoSuchElementException();
         }
-    
+
         /**
          * Removes from the underlying collection the
          * last element returned by the iterator.
@@ -997,6 +1023,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         int code = type.hashCode();
         if (array!=null) {
@@ -1011,6 +1038,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * Compares the specified object with
      * this set of ranges for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final RangeSet that = (RangeSet) object;
@@ -1033,6 +1061,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     /**
      * Returns a clone of this range set.
      */
+    @Override
     public Object clone() {
         try {
             final RangeSet set = (RangeSet) super.clone();
@@ -1058,6 +1087,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * The returned string is implementation dependent.
      * It is usually provided for debugging purposes.
      */
+    @Override
     public String toString() {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
         buffer.append('[');

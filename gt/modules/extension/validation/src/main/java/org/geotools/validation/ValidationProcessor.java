@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.validation.dto.ArgumentDTO;
 import org.geotools.validation.dto.PlugInDTO;
 import org.geotools.validation.dto.TestDTO;

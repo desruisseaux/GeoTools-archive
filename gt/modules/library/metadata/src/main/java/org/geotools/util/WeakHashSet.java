@@ -16,18 +16,15 @@
  */
 package org.geotools.util;
 
-// Collections and references
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
@@ -37,7 +34,7 @@ import org.geotools.resources.XArray;
  * the presence of an entry will not prevent the entry from being discarded by the
  * garbage collector, that is, made finalizable, finalized, and then reclaimed.
  * When an entry has been discarded it is effectively removed from the set, so
- * this class behaves somewhat differently than other {@link Set} implementations.
+ * this class behaves somewhat differently than other {@link java.util.Set} implementations.
  * <p>
  * If you would like to use {@code WeakHashSet} as inside a factory to prevent creating
  * duplicate immutable objects, please look at the {@link CanonicalSet} subclass.
@@ -49,9 +46,9 @@ import org.geotools.resources.XArray;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see WeakHashMap
+ * @see java.util.WeakHashMap
  */
-public class WeakHashSet extends AbstractSet {
+public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<E> {
     /**
      * Minimal capacity for {@link #table}.
      */
@@ -66,7 +63,7 @@ public class WeakHashSet extends AbstractSet {
     /**
      * A weak reference to an element.
      */
-    private final class Entry extends WeakReference {
+    private final class Entry extends WeakReference<E> {
         /**
          * The next entry, or {@code null} if there is none.
          */
@@ -79,9 +76,9 @@ public class WeakHashSet extends AbstractSet {
         int index;
 
         /**
-         * Construct a new weak reference.
+         * Constructs a new weak reference.
          */
-        Entry(final Object obj, final Entry next, final int index) {
+        Entry(final E obj, final Entry next, final int index) {
             super(obj, WeakCollectionCleaner.DEFAULT.referenceQueue);
             this.next  = next;
             this.index = index;
@@ -90,6 +87,7 @@ public class WeakHashSet extends AbstractSet {
         /**
          * Clear the reference.
          */
+        @Override
         public void clear() {
             super.clear();
             removeEntry(this);
@@ -100,6 +98,11 @@ public class WeakHashSet extends AbstractSet {
      * Table of weak references.
      */
     private Entry[] table;
+    
+    /**
+     * The type of the elements in this set.
+     */
+    private final Class<E> type;
 
     /**
      * Number of non-nul elements in {@link #table}.
@@ -129,11 +132,46 @@ public class WeakHashSet extends AbstractSet {
 
     /**
      * Constructs a {@code WeakHashSet}.
+     * 
+     * @deprecated Use {@link WeakHashSet(Class)}.
      */
+    @SuppressWarnings("unchecked")
     public WeakHashSet() {
-        table = new Entry[MIN_CAPACITY];
+        this((Class) Object.class);
+    }
+
+    /**
+     * Constructs a {@code WeakHashSet}.
+     * 
+     * @param type The type of the element to be included in this set.
+     * 
+     * @since 2.5
+     */
+    public WeakHashSet(final Class<E> type) {
+        this.type = type;
+        newEntryTable(MIN_CAPACITY);
         threshold = Math.round(table.length*LOAD_FACTOR);
         lastRehashTime = System.currentTimeMillis();
+    }
+
+    /**
+     * Sets the {@link #table} array to the specified size. The content of the old array is lost.
+     *
+     * @todo Use the commented line instead if a future Java version supports generic arrays.
+     */
+    @SuppressWarnings("unchecked")
+    private void newEntryTable(final int size) {
+//      table = new Entry[size];
+        table = (Entry[]) Array.newInstance(Entry.class, size);
+    }
+    
+    /**
+     * Returns the element type.
+     * 
+     * @since 2.5
+     */
+    public Class<E> getElementType() {
+        return type;
     }
 
     /**
@@ -187,8 +225,7 @@ public class WeakHashSet extends AbstractSet {
      *        for augmenting {@link #table}, or {@code false} if
      *        it is invoked for making the table smaller.
      */
-    private void rehash(final boolean augmentation)
-    {
+    private void rehash(final boolean augmentation) {
         assert Thread.holdsLock(this);
         assert valid();
         final long currentTime = System.currentTimeMillis();
@@ -200,15 +237,15 @@ public class WeakHashSet extends AbstractSet {
         }
         lastRehashTime = currentTime;
         final Entry[] oldTable = table;
-        table     = new Entry[capacity];
+        newEntryTable(capacity);
         threshold = Math.round(capacity*LOAD_FACTOR);
         for (int i=0; i<oldTable.length; i++) {
             for (Entry old=oldTable[i]; old!=null;) {
                 final Entry e=old;
-                old=old.next; // On retient 'next' tout de suite car sa valeur va changer...
-                final Object obj_e = e.get();
+                old = old.next; // We keep 'next' right now because its value will change.
+                final E obj_e = e.get();
                 if (obj_e != null) {
-                    final int index=(obj_e.hashCode() & 0x7FFFFFFF) % table.length;
+                    final int index = (obj_e.hashCode() & 0x7FFFFFFF) % table.length;
                     e.index = index;
                     e.next  = table[index];
                     table[index]=e;
@@ -238,7 +275,7 @@ public class WeakHashSet extends AbstractSet {
      * help to get similar behaviour as if assertions hasn't been turned on.
      */
     private boolean valid() {
-        int n=0;
+        int n = 0;
         for (int i=0; i<table.length; i++) {
             for (Entry e=table[i]; e!=null; e=e.next) {
                 n++;
@@ -266,30 +303,20 @@ public class WeakHashSet extends AbstractSet {
      * @param  obj Object to be checked for containment in this set.
      * @return {@code true} if this set contains the specified element.
      */
-    public boolean contains(final Object obj) {
-        return obj==null || get(obj)!=null;
+    @Override
+    public synchronized boolean contains(final Object obj) {
+        return obj != null && intern(type.cast(obj), GET) != null;
     }
 
     /**
-     * Returns an object equals to the specified object, if present. If
-     * this set doesn't contains any object equals to {@code obj},
-     * then this method returns {@code null}.
-     *
-     * @deprecated Moved to the {@link CanonicalSet} subclass.
-     */
-    public synchronized Object get(final Object obj) {
-        return intern(obj, GET);
-    }
-
-    /**
-     * Removes a single instance of the specified element from this set,
-     * if it is present
+     * Removes a single instance of the specified element from this set, if it is present
      *
      * @param  obj element to be removed from this set, if present.
      * @return {@code true} if the set contained the specified element.
      */
+    @Override
     public synchronized boolean remove(final Object obj) {
-        return intern(obj, REMOVE) != null;
+        return intern(type.cast(obj), REMOVE) != null;
     }
 
     /**
@@ -298,10 +325,10 @@ public class WeakHashSet extends AbstractSet {
      * this set unchanged and returns {@code false}.
      *
      * @param  obj Element to be added to this set.
-     * @return {@code true} if this set did not already
-     *         contain the specified element.
+     * @return {@code true} if this set did not already contain the specified element.
      */
-    public synchronized boolean add(final Object obj) {
+    @Override
+    public synchronized boolean add(final E obj) {
         return intern(obj, ADD) == null;
     }
 
@@ -329,7 +356,7 @@ public class WeakHashSet extends AbstractSet {
      * &nbsp;  return object;
      * </pre></blockquote>
      */
-    final Object intern(final Object obj, final int operation) {
+    final E intern(final E obj, final int operation) {
         assert Thread.holdsLock(this);
         assert WeakCollectionCleaner.DEFAULT.isAlive();
         assert valid() : count;
@@ -341,7 +368,7 @@ public class WeakHashSet extends AbstractSet {
             final int hash = obj.hashCode() & 0x7FFFFFFF;
             int index = hash % table.length;
             for (Entry e=table[index]; e!=null; e=e.next) {
-                final Object candidate = e.get();
+                final E candidate = e.get();
                 if (candidate != null) {
                     if (candidate.equals(obj)) {
                         if (operation == REMOVE) {
@@ -371,49 +398,9 @@ public class WeakHashSet extends AbstractSet {
     }
 
     /**
-     * Returns an object equals to {@code object} if such an object already exist in this
-     * {@code WeakHashSet}. Otherwise, adds {@code object} to this {@code WeakHashSet}.
-     * This method is equivalents to the following code:
-     *
-     * <blockquote><pre>
-     * &nbsp;  if (object != null) {
-     * &nbsp;      Object current = get(object);
-     * &nbsp;      if (current != null) {
-     * &nbsp;          return current;
-     * &nbsp;      } else {
-     * &nbsp;          add(object);
-     * &nbsp;      }
-     * &nbsp;  }
-     * &nbsp;  return object;
-     * </pre></blockquote>
-     *
-     * @deprecated Moved to the {@link CanonicalSet} subclass.
-     */
-    public synchronized Object canonicalize(final Object object) {
-        return intern(object, INTERN);
-    }
-
-    /**
-     * Iteratively call {@link #canonicalize(Object)} for an array of objects.
-     * This method is equivalents to the following code:
-     *
-     * <blockquote><pre>
-     * &nbsp;  for (int i=0; i<objects.length; i++) {
-     * &nbsp;      objects[i] = canonicalize(objects[i]);
-     * &nbsp;  }
-     * </pre></blockquote>
-     *
-     * @deprecated Moved to the {@link CanonicalSet} subclass.
-     */
-    public synchronized void canonicalize(final Object[] objects) {
-        for (int i=0; i<objects.length; i++) {
-            objects[i] = intern(objects[i], INTERN);
-        }
-    }
-
-    /**
      * Removes all of the elements from this set.
      */
+    @Override
     public synchronized void clear() {
         Arrays.fill(table, null);
         count = 0;
@@ -424,9 +411,11 @@ public class WeakHashSet extends AbstractSet {
      * order. Note that this array contains strong reference.  Consequently, no
      * object reclamation will occurs as long as a reference to this array is hold.
      */
-    public synchronized Object[] toArray() {
+    @Override
+    public synchronized E[] toArray() {
         assert valid();
-        final Object[] elements = new Object[count];
+        @SuppressWarnings("unchecked")
+        final E[] elements = (E[]) Array.newInstance(type, count);
         int index = 0;
         for (int i=0; i<table.length; i++) {
             for (Entry el=table[i]; el!=null; el=el.next) {
@@ -443,7 +432,8 @@ public class WeakHashSet extends AbstractSet {
      * No element from this set will be garbage collected as long as a
      * reference to the iterator is hold.
      */
-    public Iterator iterator() {
+    @Override
+    public Iterator<E> iterator() {
         return Arrays.asList(toArray()).iterator();
     }
 }

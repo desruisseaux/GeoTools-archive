@@ -16,19 +16,15 @@
  */
 package org.geotools.resources;
 
-// Events
-import java.awt.Frame;
 import java.awt.event.WindowListener;
-
-import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 
 /**
- * Wrap a {@link WindowListener} into an {@link InternalFrameListener}. This is used
+ * Wraps a {@link WindowListener} into an {@link InternalFrameListener}. This is used
  * by {@link SwingUtilities} in order to have the same methods working seemless on both
- * {@link Frame} and {@link JInternalFrame}.
+ * {@link java.awt.Frame} and {@link javax.swing.JInternalFrame}.
  *
  * @since 2.0
  * @source $URL$

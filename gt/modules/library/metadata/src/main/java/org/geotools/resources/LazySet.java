@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// J2SE direct dependencies
 import java.util.AbstractSet;
 import java.util.Iterator;
 
@@ -32,16 +31,16 @@ import java.util.Iterator;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class LazySet extends AbstractSet {
+public final class LazySet<E> extends AbstractSet<E> {
     /**
      * The iterator to use for filling this set.
      */
-    private final Iterator iterator;
+    private final Iterator<E> iterator;
 
     /**
      * The elements in this set. This array will grown as needed.
      */
-    private Object[] elements = new Object[4];
+    private E[] elements;
 
     /**
      * The current size of this set. This size will increases as long as there is some elements
@@ -53,8 +52,10 @@ public final class LazySet extends AbstractSet {
      * Construct a set to be filled using the specified iterator.
      * Iteration in the given iterator will occurs only when needed.
      */
-    public LazySet(final Iterator iterator) {
+    @SuppressWarnings("unchecked")
+    public LazySet(final Iterator<E> iterator) {
         this.iterator = iterator;
+        elements = (E[]) new Object[4];
     }
 
     /**
@@ -64,9 +65,7 @@ public final class LazySet extends AbstractSet {
      */
     private void addNext() {
         if (size >= elements.length) {
-            final Object[] old = elements;
-            elements = new Object[size*2];
-            System.arraycopy(old, 0, elements, 0, size);
+            elements = XArray.resize(elements, size*2);
         }
         elements[size++] = iterator.next();
     }
@@ -75,7 +74,7 @@ public final class LazySet extends AbstractSet {
      * Returns an iterator over the elements contained in this set.
      * This is not the same iterator than the one given to the constructor.
      */
-    public Iterator iterator() {
+    public Iterator<E> iterator() {
         return new Iter();
     }
 
@@ -93,6 +92,7 @@ public final class LazySet extends AbstractSet {
     /**
      * Tests if this set has no elements.
      */
+    @Override
     public boolean isEmpty() {
         return size==0 && !iterator.hasNext();
     }
@@ -112,7 +112,7 @@ public final class LazySet extends AbstractSet {
     /**
      * Returns the element at the specified position in this set.
      */
-    public Object get(final int index) {
+    public E get(final int index) {
         while (index >= size) {
             if (!iterator.hasNext()) {
                 throw new IndexOutOfBoundsException(String.valueOf(index));
@@ -125,7 +125,7 @@ public final class LazySet extends AbstractSet {
     /**
      * The iterator implementation for the {@linkplain LazySet lazy set}.
      */
-    private final class Iter implements Iterator {
+    private final class Iter implements Iterator<E> {
         /** Index of the next element to be returned. */
         private int cursor;
 
@@ -135,7 +135,7 @@ public final class LazySet extends AbstractSet {
         }
 
         /** Returns the next element. */
-        public Object next() {
+        public E next() {
             return get(cursor++);
         }
 

@@ -16,12 +16,9 @@
  */
 package org.geotools.resources.i18n;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.MissingResourceException;
-
-// Geotools dependencies
-import org.geotools.resources.ResourceBundle;
+import org.geotools.resources.IndexedResourceBundle;
 
 
 /**
@@ -34,7 +31,7 @@ import org.geotools.resources.ResourceBundle;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Errors extends ResourceBundle {
+public class Errors extends IndexedResourceBundle {
     /**
      * Returns resources in the given locale.
      *

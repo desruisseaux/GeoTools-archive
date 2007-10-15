@@ -16,11 +16,9 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.Map;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -36,21 +34,26 @@ import org.geotools.resources.Utilities;
  * @todo This class will be removed when we will be allowed to compile for JSE 1.6, since a
  *       default map entry implementation is provided there.
  */
-public class MapEntry implements Map.Entry, Serializable {
+public class MapEntry<K,V> implements Map.Entry<K,V>, Serializable {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 8627698052283756776L;
+
     /**
      * The key.
      */
-    private final Object key;
+    private final K key;
 
     /**
      * The value.
      */
-    private final Object value;
+    private final V value;
 
     /**
      * Creates a new map entry with the specified key-value pair.
      */
-    public MapEntry(final Object key, final Object value) {
+    public MapEntry(final K key, final V value) {
         this.key   = key;
         this.value = value;
     }
@@ -58,14 +61,14 @@ public class MapEntry implements Map.Entry, Serializable {
     /**
      * Returns the key corresponding to this entry.
      */
-    public Object getKey() {
+    public K getKey() {
         return key;
     }
 
     /**
      * Returns the value corresponding to this entry.
      */
-    public Object getValue() {
+    public V getValue() {
         return value;
     }
 
@@ -74,13 +77,14 @@ public class MapEntry implements Map.Entry, Serializable {
      * value (optional operation). The default implementation throws an
      * {@link UnsupportedOperationException}.
      */
-    public Object setValue(final Object value) {
+    public V setValue(final V value) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * Compares the specified object with this entry for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof Map.Entry) {
             final Map.Entry that = (Map.Entry) object;
@@ -93,6 +97,7 @@ public class MapEntry implements Map.Entry, Serializable {
     /**
      * Returns the hash code value for this map entry
      */
+    @Override
     public int hashCode() {
         int code = 0;
         if (key   != null) code  =   key.hashCode();
@@ -103,6 +108,7 @@ public class MapEntry implements Map.Entry, Serializable {
     /**
      * Returns a string representation of this entry.
      */
+    @Override
     public String toString() {
         return Utilities.getShortClassName(this) + "[key=" + key + ", value=" + value + ']';
     }

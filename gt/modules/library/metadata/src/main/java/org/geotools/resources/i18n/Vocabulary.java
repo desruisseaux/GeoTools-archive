@@ -16,15 +16,10 @@
  */
 package org.geotools.resources.i18n;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.MissingResourceException;
-
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.resources.ResourceBundle;
+import org.geotools.resources.IndexedResourceBundle;
 import org.geotools.util.ResourceInternationalString;
 
 
@@ -38,7 +33,7 @@ import org.geotools.util.ResourceInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Vocabulary extends ResourceBundle {
+public class Vocabulary extends IndexedResourceBundle {
     /**
      * Returns resources in the given locale.
      *

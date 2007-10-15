@@ -15,22 +15,18 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Acts as a typed {@link java.util.List} while we wait for Java 5.0.
+ * Acts as a typed {@link java.util.List}. Type checks are performed at run-time in
+ * addition of compile-time checks.
  *
  * @since 2.1
  * @source $URL$
@@ -42,23 +38,23 @@ import org.geotools.resources.i18n.ErrorKeys;
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
  *       after a clone (this work may be done in {@code MetadataEntity.unmodifiable(Object)}).
  */
-public class CheckedArrayList extends ArrayList implements CheckedCollection, Cloneable {
+public class CheckedArrayList<E> extends ArrayList<E> implements CheckedCollection<E>, Cloneable {
     /**
      * Serial version UID for compatibility with different versions.
      */
     private static final long serialVersionUID = -587331971085094268L;
-    
+
     /**
      * The element type.
      */
-    private final Class type;
+    private final Class<E> type;
 
     /**
      * Constructs a list of the specified type.
      *
      * @param type The element type (should not be null).
      */
-    public CheckedArrayList(final Class type) {
+    public CheckedArrayList(final Class<E> type) {
         super();
         this.type = type;
         ensureNonNull();
@@ -72,7 +68,7 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      *
      * @since 2.4
      */
-    public CheckedArrayList(final Class type, final int capacity) {
+    public CheckedArrayList(final Class<E> type, final int capacity) {
         super(capacity);
         this.type = type;
         ensureNonNull();
@@ -83,7 +79,7 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      *
      * @since 2.4
      */
-    public Class getElementType() {
+    public Class<E> getElementType() {
         return type;
     }
 
@@ -103,7 +99,7 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @param  element the object to check, or {@code null}.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    protected void ensureValidType(final Object element) throws IllegalArgumentException {
+    protected void ensureValidType(final E element) throws IllegalArgumentException {
         if (element!=null && !type.isInstance(element)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                       Utilities.getShortClassName(element), Utilities.getShortName(type)));
@@ -116,10 +112,10 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @param  collection the collection to check, or {@code null}.
      * @throws IllegalArgumentException if at least one element is not of the expected type.
      */
-    private void ensureValid(final Collection collection) throws IllegalArgumentException {
+    private void ensureValid(final Collection<? extends E> collection) throws IllegalArgumentException {
         if (collection != null) {
-            for (final Iterator it=collection.iterator(); it.hasNext();) {
-                ensureValidType(it.next());
+            for (final E element : collection) {
+                ensureValidType(element);
             }
         }
     }
@@ -133,7 +129,8 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @throws IndexOutOfBoundsException if index out of range.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    public Object set(final int index, final Object element) {
+    @Override
+    public E set(final int index, final E element) {
         ensureValidType(element);
         return super.set(index, element);
     }
@@ -145,7 +142,8 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @return always {@code true}.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    public boolean add(final Object element) {
+    @Override
+    public boolean add(final E element) {
         ensureValidType(element);
         return super.add(element);
     }
@@ -158,7 +156,8 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @throws IndexOutOfBoundsException if index out of range.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    public void add(final int index, final Object element) {
+    @Override
+    public void add(final int index, final E element) {
         ensureValidType(element);
         super.add(index, element);
     }
@@ -171,7 +170,8 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @return {@code true} if this list changed as a result of the call.
      * @throws IllegalArgumentException if at least one element is not of the expected type.
      */
-    public boolean addAll(final Collection collection) {
+    @Override
+    public boolean addAll(final Collection<? extends E> collection) {
         ensureValid(collection);
         return super.addAll(collection);
     }
@@ -185,7 +185,8 @@ public class CheckedArrayList extends ArrayList implements CheckedCollection, Cl
      * @return {@code true} if this list changed as a result of the call.
      * @throws IllegalArgumentException if at least one element is not of the expected type.
      */
-    public boolean addAll(final int index, final Collection collection) {
+    @Override
+    public boolean addAll(final int index, final Collection<? extends E> collection) {
         ensureValid(collection);
         return super.addAll(index, collection);
     }

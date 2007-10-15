@@ -76,11 +76,6 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public final class RenderingContext {
     /**
-     * For logging purpose only.
-     */
-    private static final String CLASS_NAME = RenderingContext.class.getName();
-
-    /**
      * The originating canvas.
      */
     private final ReferencedCanvas canvas;
@@ -325,7 +320,8 @@ public final class RenderingContext {
             throws FactoryException
     {
         final MathTransform mt =
-                canvas.getMathTransform(sourceCRS, targetCRS, CLASS_NAME, "getAffineTransform");
+                canvas.getMathTransform(sourceCRS, targetCRS,
+                        RenderingContext.class, "getAffineTransform");
         try {
             return (AffineTransform) mt;
         } catch (ClassCastException cause) {
@@ -363,7 +359,8 @@ public final class RenderingContext {
                                           final CoordinateReferenceSystem targetCRS)
             throws FactoryException
     {
-        return canvas.getMathTransform(sourceCRS, targetCRS, CLASS_NAME, "getMathTransform");
+        return canvas.getMathTransform(sourceCRS, targetCRS,
+                RenderingContext.class, "getMathTransform");
     }
 
     /**
@@ -441,7 +438,8 @@ public final class RenderingContext {
             crs = CRSUtilities.getCRS2D(crs);
             final MathTransform mt;
             try {
-                mt = canvas.getMathTransform(displayCRS, crs, CLASS_NAME, "addPaintedArea");
+                mt = canvas.getMathTransform(displayCRS, crs,
+                        RenderingContext.class, "addPaintedArea");
             } catch (FactoryException e) {
                 throw new TransformException(Errors.format(ErrorKeys.CANT_TRANSFORM_ENVELOPE, e));
             }

@@ -16,14 +16,11 @@
  */
 package org.geotools.resources.i18n;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
-
-// Geotools dependencies
-import org.geotools.resources.ResourceBundle;
+import org.geotools.resources.IndexedResourceBundle;
 
 
 /**
@@ -36,7 +33,7 @@ import org.geotools.resources.ResourceBundle;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Logging extends ResourceBundle {
+public class Logging extends IndexedResourceBundle {
     /**
      * Returns resources in the given locale.
      *

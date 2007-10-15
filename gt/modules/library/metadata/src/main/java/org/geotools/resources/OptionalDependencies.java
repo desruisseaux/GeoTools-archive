@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.lang.reflect.Constructor;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeModel;

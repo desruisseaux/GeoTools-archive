@@ -16,14 +16,12 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -75,6 +73,7 @@ public class SimpleInternationalString extends AbstractInternationalString imple
     /**
      * Compares this international string with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final SimpleInternationalString that = (SimpleInternationalString) object;
@@ -86,6 +85,7 @@ public class SimpleInternationalString extends AbstractInternationalString imple
     /**
      * Returns a hash code value for this international text.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ defaultValue.hashCode();
     }

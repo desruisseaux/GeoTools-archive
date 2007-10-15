@@ -139,7 +139,12 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * The set of default axis name.
      */
-    private static final String[] DIMENSION_NAMES = { "x", "y", "z", "t" };
+    private static final InternationalString[] DIMENSION_NAMES = {
+        new SimpleInternationalString("x"),
+        new SimpleInternationalString("y"),
+        new SimpleInternationalString("z"),
+        new SimpleInternationalString("t")
+    };
 
     /**
      * The sequence of string to returns when there is no metadata.
@@ -273,7 +278,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                 names[i] = new SimpleInternationalString(cs.getAxis(i).getName().getCode());
             }
         } else {
-            names = (InternationalString[]) XArray.resize(DIMENSION_NAMES, getDimension());
+            names = XArray.resize(DIMENSION_NAMES, getDimension());
             for (int i=DIMENSION_NAMES.length; i<names.length; i++) {
                 names[i] = new SimpleInternationalString("dim" + (i + 1));
             }

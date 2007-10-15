@@ -156,7 +156,7 @@ public class ThreadedOracleEpsgFactory extends ThreadedEpsgFactory {
             p.load(in);
             in.close();
         } catch (IOException exception) {
-            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+            Logging.unexpectedException("org.geotools.referencing.factory", DataSource.class,
                                         "<init>", exception);
             // Continue. We will try to work with whatever properties are available.
         }
@@ -177,7 +177,7 @@ public class ThreadedOracleEpsgFactory extends ThreadedEpsgFactory {
             portNumber = Integer.parseInt(p.getProperty("portNumber", "5432"));
         } catch (NumberFormatException exception) {
             portNumber = 5432;
-            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+            Logging.unexpectedException("org.geotools.referencing.factory", DataSource.class,
                                         "<init>", exception);
         }
         String serverName = p.getProperty("serverName", "localhost");

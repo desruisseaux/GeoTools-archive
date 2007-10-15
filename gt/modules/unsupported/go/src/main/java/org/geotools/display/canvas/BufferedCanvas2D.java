@@ -431,7 +431,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
                  * Should not happen. If it happen anyway, declare that everything must be
                  * repainted. It will be slower, but will not prevent the renderer to work.
                  */
-                handleException("BufferedCanvas2D", "paint", exception);
+                handleException(BufferedCanvas2D.class, "paint", exception);
                 zoomChanged(null);
             }
             try {
@@ -445,7 +445,7 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
                 normalize.preConcatenate(normalizeToDots);
                 setScale(1 / XAffineTransform.getScale(normalize));
             } catch (NoninvertibleTransformException exception) {
-                handleException("BufferedCanvas2D", "paint", exception);
+                handleException(BufferedCanvas2D.class, "paint", exception);
             }
             /*
              * Now takes in account the zoom change. The 'displayCRS' must be recreated. Failure
@@ -559,9 +559,9 @@ public class BufferedCanvas2D extends ReferencedCanvas2D {
                     try {
                         paint(graphic, context, clipBounds);
                     } catch (TransformException exception) {
-                        handleException("GraphicPrimitive2D", "paint", exception);
+                        handleException(GraphicPrimitive2D.class, "paint", exception);
                     } catch (RuntimeException exception) {
-                        handleException("GraphicPrimitive2D", "paint", exception);
+                        handleException(GraphicPrimitive2D.class, "paint", exception);
                     }
                     continue;
                 }

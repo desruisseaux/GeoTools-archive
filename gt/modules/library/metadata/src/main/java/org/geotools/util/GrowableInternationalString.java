@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -29,11 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-// OpenGIS utilities
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.util.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -62,26 +57,26 @@ public class GrowableInternationalString extends AbstractInternationalString imp
      * The set of locales created in this virtual machine through methods of this class.
      * Used in order to get a {@linkplain #unique unique} instance of {@link Locale} objects.
      */
-    private static final Map LOCALES = new HashMap();
+    private static final Map<Locale,Locale> LOCALES = new HashMap<Locale,Locale>();
 
     /**
      * The string values in different locales (never {@code null}).
      * Keys are {@link Locale} objects and values are {@link String}s.
      */
-    private Map localMap;
+    private Map<Locale,String> localMap;
 
     /**
      * An unmodifiable view of the entry set in {@link #localMap}. This is the set of locales
      * defined in this international string. Will be constructed only when first requested.
      */
-    private transient Set localSet;
+    private transient Set<Locale> localSet;
 
     /**
      * Constructs an initially empty international string. Localized strings can been added
      * using one of {@link #add add(...)} methods.
      */
     public GrowableInternationalString() {
-        localMap = Collections.EMPTY_MAP;
+        localMap = Collections.emptyMap();
     }
 
     /**
@@ -97,12 +92,12 @@ public class GrowableInternationalString extends AbstractInternationalString imp
         if (string != null) {
             localMap = Collections.singletonMap(null, string);
         } else {
-            localMap = Collections.EMPTY_MAP;
+            localMap = Collections.emptyMap();
         }
     }
 
     /**
-     * Add a string for the given locale.
+     * Adds a string for the given locale.
      *
      * @param  locale The locale for the {@code string} value, or {@code null}.
      * @param  string The localized string.
@@ -120,11 +115,11 @@ public class GrowableInternationalString extends AbstractInternationalString imp
                     return;
                 }
                 case 1: {
-                    localMap = new HashMap(localMap);
+                    localMap = new HashMap<Locale,String>(localMap);
                     break;
                 }
             }
-            String old = (String) localMap.get(locale);
+            String old = localMap.get(locale);
             if (old != null) {
                 if (string.equals(old)) {
                     return;
@@ -138,7 +133,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     }
 
     /**
-     * Add a string for the given property key. This is a convenience method for constructing an
+     * Adds a string for the given property key. This is a convenience method for constructing an
      * {@code AbstractInternationalString} during iteration through the
      * {@linkplain java.util.Map.Entry entries} in a {@link Map}. It infers the {@link Locale}
      * from the property {@code key}, using the following steps:
@@ -230,7 +225,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
         /*
          * Now canonicalize the locale.
          */
-        final Locale candidate = (Locale) LOCALES.get(locale);
+        final Locale candidate = LOCALES.get(locale);
         if (candidate != null) {
             return candidate;
         }
@@ -241,10 +236,10 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     /**
      * Returns the set of locales defined in this international string.
      */
-    public Set getLocales() {
+    public Set<Locale> getLocales() {
         // No need to synchronize; this is not a big deal if this object is built twice.
         if (localSet == null) {
-            localSet = Collections.unmodifiableSet(localMap.entrySet());
+            localSet = Collections.unmodifiableSet(localMap.keySet());
         }
         return localSet;
     }
@@ -264,7 +259,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     public String toString(Locale locale) {
         String text;
         while (locale != null) {
-            text = (String) localMap.get(locale);
+            text = localMap.get(locale);
             if (text != null) {
                 return text;
             }
@@ -281,14 +276,14 @@ public class GrowableInternationalString extends AbstractInternationalString imp
             }
             break;
         }
-        
-        // Try the string in the 'null' locale.
-        text = (String) localMap.get(null);
+
+        // Tries the string in the 'null' locale.
+        text = localMap.get(null);
         if (text == null) {
             // No 'null' locale neither. Returns the first string in whatever locale.
-            final Iterator it = localMap.values().iterator();
+            final Iterator<String> it = localMap.values().iterator();
             if (it.hasNext()) {
-                return (String) it.next();
+                return it.next();
             }
         }
         return text;
@@ -322,24 +317,23 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     public boolean isSubsetOf(final Object candidate) {
         if (candidate instanceof InternationalString) {
             final InternationalString string = (InternationalString) candidate;
-            for (final Iterator it=localMap.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry  = (Map.Entry) it.next();
-                final Locale    locale = (Locale) entry.getKey();
-                final String    text   = (String) entry.getValue();
+            for (final Map.Entry<Locale,String> entry : localMap.entrySet()) {
+                final Locale locale = entry.getKey();
+                final String text   = entry.getValue();
                 if (!text.equals(string.toString(locale))) {
                     return false;
                 }
             }
         } else if (candidate instanceof CharSequence) {
             final String string = candidate.toString();
-            for (final Iterator it=localMap.values().iterator(); it.hasNext();) {
-                final String text = (String) it.next();
+            for (final String text : localMap.values()) {
                 if (!text.equals(string)) {
                     return false;
                 }
             }
         } else if (candidate instanceof Map) {
-            return ((Map) candidate).entrySet().containsAll(localMap.entrySet());
+            final Map<?,?> map = (Map<?,?>) candidate;
+            return map.entrySet().containsAll(localMap.entrySet());
         } else {
             return false;
         }
@@ -349,6 +343,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     /**
      * Compares this international string with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final GrowableInternationalString that = (GrowableInternationalString) object;
@@ -360,10 +355,11 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     /**
      * Returns a hash code value for this international text.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ localMap.hashCode();
     }
-    
+
     /**
      * Canonicalize the locales after deserialization.
      */
@@ -373,17 +369,18 @@ public class GrowableInternationalString extends AbstractInternationalString imp
         if (size == 0) {
             return;
         }
-        final Map.Entry[] entries;
-        entries = (Map.Entry[]) localMap.entrySet().toArray(new Map.Entry[size]);
+        @SuppressWarnings("unchecked")
+        Map.Entry<Locale,String>[] entries = new Map.Entry[size];
+        entries = localMap.entrySet().toArray(entries);
         if (size == 1) {
-            final Map.Entry entry = entries[0];
-            localMap = Collections.singletonMap(unique((Locale)entry.getKey()), entry.getValue());
+            final Map.Entry<Locale,String> entry = entries[0];
+            localMap = Collections.singletonMap(unique(entry.getKey()), entry.getValue());
         } else {
             localMap.clear();
             for (int i=0; i<entries.length; i++) {
-                final Map.Entry entry = entries[i];
-                localMap.put(unique((Locale)entry.getKey()), entry.getValue());
+                final Map.Entry<Locale,String> entry = entries[i];
+                localMap.put(unique(entry.getKey()), entry.getValue());
             }
         }
-    }    
+    }
 }

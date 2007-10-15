@@ -15,15 +15,10 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
-import java.util.logging.Handler;           // For javadoc
-import java.util.logging.ConsoleHandler;    // For javadoc
-import java.util.logging.SimpleFormatter;   // For javadoc
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -65,15 +60,15 @@ public final class Logging {
     }
 
     /**
-     * Configures the default {@linkplain ConsoleHandler console handler} in order to log records
-     * on a single line instead of two lines. More specifically, for each {@link ConsoleHandler}
-     * using a {@link SimpleFormatter}, this method replaces the simple formatter by an instance
-     * of {@link MonolineFormatter}. If no {@link ConsoleHandler} are found, then a new one is
-     * created.
+     * Configures the default {@linkplain java.util.logging.ConsoleHandler console handler} in
+     * order to log records on a single line instead of two lines. More specifically, for each
+     * {@link java.util.logging.ConsoleHandler} using a {@link java.util.logging.SimpleFormatter},
+     * this method replaces the simple formatter by an instance of {@link MonolineFormatter}. If
+     * no {@code ConsoleHandler} are found, then a new one is created.
      * <p>
      * Note that {@link MonolineFormatter} writes to the {@linkplain System#out standard
      * output stream} instead of the {@linkplain System#err standard error stream}.
-     * 
+     *
      * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
      */
     public void forceMonolineConsoleOutput() throws IllegalStateException {
@@ -82,13 +77,13 @@ public final class Logging {
 
     /**
      * Same as {@link #forceMonolineConsoleOutput()}, but additionnaly set an optional logging
-     * level. If the specified level is non-null, then all {@link Handler}s using the monoline
-     * formatter will be set to the specified level.
+     * level. If the specified level is non-null, then all {@link java.util.logging.Handler}s
+     * using the monoline formatter will be set to the specified level.
      * <p>
      * <b>Note:</b> Avoid this method as much as possible, since it overrides user's level
      * setting. A user trying to configure his logging properties may find confusing to see
      * his setting ignored.
-     * 
+     *
      * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
      *
      * @see org.geotools.factory.GeoTools#init
@@ -198,7 +193,7 @@ public final class Logging {
      *       private method. If a developper really want to know about the private method,
      *       the stack trace is still available anyway.</p></li>
      * </ul>
-     * 
+     *
      * @param logger  Where to log the error.
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
@@ -219,7 +214,7 @@ public final class Logging {
      * name. The originating class name and method name can optionnaly be specified.
      * If any of them is {@code null}, then it will be inferred from the error stack
      * trace as in {@link #unexpectedException(Logger, Throwable)}.
-     * 
+     *
      * @param paquet  The package where the error occurred, or {@code null}. This
      *                information is used for fetching an appropriate {@link Logger}
      *                for logging the error.
@@ -240,19 +235,16 @@ public final class Logging {
      * Same as {@link #unexpectedException(String, Class, String, Throwable)
      * unexpectedException(..., Class, ...)} except that the class name is
      * specified as a string.
-     * 
+     *
      * @param paquet  The package where the error occurred, or {@code null}. This
      *                information is used for fetching an appropriate {@link Logger}
      *                for logging the error.
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
-     *
-     * @deprecated Use {@link #unexpectedException(String, Class, String, Throwable)}
-     *             instead, for type safety.
      */
-    public static void unexpectedException(String paquet, String classe, String method,
-                                           final Throwable error)
+    private static void unexpectedException(String paquet, String classe, String method,
+                                            final Throwable error)
     {
         final LogRecord record = Utilities.getLogRecord(error);
         if (paquet==null || classe==null || method==null) {

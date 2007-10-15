@@ -16,14 +16,9 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 import java.util.logging.Logger;
-
-// Geotools dependencies
-import org.geotools.util.Logging;
 
 
 /**
@@ -54,12 +49,12 @@ final class WeakCollectionCleaner extends Thread {
      * List of reference collected by the garbage collector.
      * Those elements must be removed from {@link #table}.
      */
-    final ReferenceQueue referenceQueue = new ReferenceQueue();
+    final ReferenceQueue<Object> referenceQueue = new ReferenceQueue<Object>();
 
     /**
      * Constructs and starts a new thread as a daemon. This thread will be sleeping
      * most of the time.  It will run only some few nanoseconds each time a new
-     * {@link WeakReference} is enqueded.
+     * {@link Reference} is enqueded.
      */
     private WeakCollectionCleaner() {
         super("WeakCollectionCleaner");
@@ -71,6 +66,7 @@ final class WeakCollectionCleaner extends Thread {
     /**
      * Loop to be run during the virtual machine lifetime.
      */
+    @Override
     public void run() {
         // The reference queue should never be null.  However some strange cases (maybe caused
         // by an anormal JVM state) have been reported on the mailing list. In such case, stop

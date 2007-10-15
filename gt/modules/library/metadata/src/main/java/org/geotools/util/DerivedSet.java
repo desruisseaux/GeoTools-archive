@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -37,8 +36,8 @@ import java.util.Set;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/*<DerivedType>*/
-        implements Serializable
+public abstract class DerivedSet<BaseType, DerivedType> extends AbstractSet<DerivedType>
+        implements CheckedCollection<DerivedType>, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -51,15 +50,45 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      * @see #baseToDerived
      * @see #derivedToBase
      */
-    protected final Set/*<BaseType>*/ base;
-    
+    protected final Set<BaseType> base;
+
+    /**
+     * The derived type.
+     */
+    private final Class<DerivedType> derivedType;
+
     /**
      * Creates a new derived set from the specified base set.
      *
      * @param base The base set.
+     *
+     * @deprecated Use {@link #DerivedSet(Set,Class)} instead.
      */
-    public DerivedSet(final Set/*<BaseType>*/ base) {
-        this.base = base;
+    @SuppressWarnings("unchecked")
+    public DerivedSet(final Set<BaseType> base) {
+        this(base, (Class) Object.class);
+    }
+
+    /**
+     * Creates a new derived set from the specified base set.
+     *
+     * @param base The base set.
+     * @param derivedType The type of elements in this derived set.
+     *
+     * @since 2.5
+     */
+    public DerivedSet(final Set<BaseType> base, final Class<DerivedType> derivedType) {
+        this.base        = base;
+        this.derivedType = derivedType;
+    }
+
+    /**
+     * Returns the derived element type.
+     *
+     * @since 2.5
+     */
+    public Class<DerivedType> getElementType() {
+        return derivedType;
     }
 
     /**
@@ -71,7 +100,7 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      * @return The value that this view should contains instead of {@code element},
      *         or {@code null}.
      */
-    protected abstract /*DerivedType*/ Object baseToDerived(final /*BaseType*/Object element);
+    protected abstract DerivedType baseToDerived(final BaseType element);
 
     /**
      * Transforms a value in this set to a value in the {@linkplain #base} set.
@@ -79,7 +108,7 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      * @param  element A value in this set.
      * @return The value stored in the {@linkplain #base} set.
      */
-    protected abstract /*BaseType*/ Object derivedToBase(final /*DerivedType*/ Object element);
+    protected abstract BaseType derivedToBase(final DerivedType element);
 
     /**
      * Returns an iterator over the elements contained in this set.
@@ -87,10 +116,10 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      *
      * @return an iterator over the elements contained in this set.
      */
-    public Iterator/*<DerivedType>*/ iterator() {
+    public Iterator<DerivedType> iterator() {
         return new Iter(base.iterator());
     }
-    
+
     /**
      * Returns the number of elements in this set. The default implementation counts
      * the number of elements returned by the {@link #iterator iterator}.
@@ -111,6 +140,7 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      *
      * @return {@code true} if this set contains no elements.
      */
+    @Override
     public boolean isEmpty() {
         return base.isEmpty() || super.isEmpty();
     }
@@ -123,8 +153,13 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      * @param  element object to be checked for containment in this set.
      * @return {@code true} if this set contains the specified element.
      */
-    public boolean contains(final /*DerivedType*/ Object element) {
-        return base.contains(derivedToBase(element));
+    @Override
+    public boolean contains(final Object element) {
+        if (derivedType.isInstance(element)) {
+            return base.contains(derivedToBase(derivedType.cast(element)));
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -137,7 +172,8 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
      *         supports the {@code add} operation.
      */
-    public boolean add(final /*DerivedType*/ Object element) throws UnsupportedOperationException {
+    @Override
+    public boolean add(final DerivedType element) throws UnsupportedOperationException {
         return base.add(derivedToBase(element));
     }
 
@@ -151,28 +187,33 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
      * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
      *         supports the {@code remove} operation.
      */
-    public boolean remove(final /*DerivedType*/ Object element) throws UnsupportedOperationException {
-        return base.remove(derivedToBase(element));
+    @Override
+    public boolean remove(final Object element) throws UnsupportedOperationException {
+        if (derivedType.isInstance(element)) {
+            return base.remove(derivedToBase(derivedType.cast(element)));
+        } else {
+            return false;
+        }
     }
 
     /**
      * Iterates through the elements in the set.
      */
-    private final class Iter implements Iterator/*<DerivedType>*/ {
+    private final class Iter implements Iterator<DerivedType> {
         /**
          * The iterator from the {@linkplain #base} set.
          */
-        private final Iterator/*<BaseType>*/ iterator;
+        private final Iterator<BaseType> iterator;
 
         /**
          * The next element to be returned, or {@code null}.
          */
-        private transient /*DerivedType*/ Object next;
+        private transient DerivedType next;
 
         /**
          * The iterator from the {@linkplain #base} set.
          */
-        public Iter(final Iterator/*<BaseType>*/ iterator) {
+        public Iter(final Iterator<BaseType> iterator) {
             this.iterator = iterator;
         }
 
@@ -192,11 +233,11 @@ public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/
         /**
          * Returns the next element in the iteration.
          */
-        public /*DerivedType*/ Object next() {
+        public DerivedType next() {
             while (next == null) {
                 next = baseToDerived(iterator.next());
             }
-            final Object value = next;
+            final DerivedType value = next;
             next = null;
             return value;
         }

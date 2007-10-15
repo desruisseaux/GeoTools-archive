@@ -15,7 +15,6 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
@@ -25,8 +24,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Utility class for managing memory mapped buffers. 
- * 
+ * Utility class for managing memory mapped buffers.
+ *
  * @since 2.0
  * @source $URL$
  * @version $Id$
@@ -62,8 +61,8 @@ public class NIOUtilities {
         if (buffer == null || ! buffer.isDirect() ) {
             return false;
         }
-        Boolean b = (Boolean) AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
+        Boolean b = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            public Boolean run() {
                 Boolean success = Boolean.FALSE;
                 try {
                     Method getCleanerMethod = buffer.getClass().getMethod("cleaner", (Class[])null);
@@ -81,12 +80,11 @@ public class NIOUtilities {
                 return success;
             }
         });
-
         return b.booleanValue();
     }
 
     /**
-     * Check if a warning message should be logged.
+     * Checks if a warning message should be logged.
      */
     private static synchronized boolean isLoggable() {
         try {
@@ -101,7 +99,7 @@ public class NIOUtilities {
     }
 
     /**
-     * Log a warning message.
+     * Logs a warning message.
      */
     private static synchronized void log(final Exception e, final ByteBuffer buffer) {
         warned = true;

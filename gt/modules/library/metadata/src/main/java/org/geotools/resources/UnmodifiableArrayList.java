@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.AbstractList;
 
@@ -43,7 +42,7 @@ import java.util.AbstractList;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class UnmodifiableArrayList extends AbstractList implements Serializable {
+public class UnmodifiableArrayList<E> extends AbstractList<E> implements Serializable {
     /**
      * For compatibility with different versions.
      */
@@ -52,14 +51,26 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
     /**
      * The wrapped array.
      */
-    private final Object[] array;
+    private final E[] array;
 
     /**
      * Create a new instance of an array list.
      * The array given in argument is <strong>not</strong> cloned.
+     *
+     * @deprecated Use {@link #wrap} instead.
      */
-    public UnmodifiableArrayList(final Object[] array) {
+    public UnmodifiableArrayList(final E[] array) {
         this.array = array;
+    }
+
+    /**
+     * Create a new instance of an array list.
+     * The array given in argument is <strong>not</strong> cloned.
+     *
+     * @since 2.5
+     */
+    public static <E> UnmodifiableArrayList<E> wrap(final E[] array) {
+        return new UnmodifiableArrayList<E>(array);
     }
 
     /**
@@ -72,7 +83,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
     /**
      * Returns the element at the specified index.
      */
-    public Object get(final int index) {
+    public E get(final int index) {
         return array[index];
     }
 
@@ -82,6 +93,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
      * is overridden only for performance reason (the default implementation
      * would work as well).
      */
+    @Override
     public int indexOf(final Object object) {
         if (object == null) {
             for (int i=0; i<array.length; i++) {
@@ -105,6 +117,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
      * is overridden only for performance reason (the default implementation
      * would work as well).
      */
+    @Override
     public int lastIndexOf(final Object object) {
         int i = array.length;
         if (object == null) {
@@ -128,6 +141,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
      * This method is overridden only for performance reason (the default implementation
      * would work as well).
      */
+    @Override
     public boolean contains(final Object object) {
         int i = array.length;
         if (object == null) {

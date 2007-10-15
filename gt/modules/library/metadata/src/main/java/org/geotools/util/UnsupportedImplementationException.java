@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// Geotools implementation
 import org.geotools.resources.Utilities;
 
 
@@ -32,6 +31,11 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  */
 public class UnsupportedImplementationException extends UnsupportedOperationException {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -649050339146622730L;
+
     /**
      * Constructs an exception with the specified detail message.
      *
@@ -60,7 +64,6 @@ public class UnsupportedImplementationException extends UnsupportedOperationExce
      */
     public UnsupportedImplementationException(final Class classe, final Exception cause) {
         // TODO: Provides a localized message.
-        super(Utilities.getShortName(classe));
-        initCause(cause); // TODO: use the constructor with cause arg. in J2E 1.5.
+        super(Utilities.getShortName(classe), cause);
     }
 }

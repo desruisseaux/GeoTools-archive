@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// Collections and arrays
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -63,9 +62,9 @@ public final class Utilities {
      * if (sameInterfaces(cs1, cs2, {@linkplain org.opengis.referencing.cs.CoordinateSystem}.class))
      * </code></blockquote>
      */
-    public static boolean sameInterfaces(final Class object1,
-                                         final Class object2,
-                                         final Class  base)
+    public static <T> boolean sameInterfaces(final Class<? extends T> object1,
+                                             final Class<? extends T> object2,
+                                             final Class<T> base)
     {
         if (object1 == object2) {
             return true;
@@ -73,8 +72,8 @@ public final class Utilities {
         if (object1==null || object2==null) {
             return false;
         }
-        final Class[] c1 = object1.getInterfaces();
-        final Class[] c2 = object2.getInterfaces();
+        final Class<?>[] c1 = object1.getInterfaces();
+        final Class<?>[] c2 = object2.getInterfaces();
         /*
          * Trim all interfaces that are not assignable to 'base' in the 'c2' array.
          * Doing this once will avoid to redo the same test many time in the inner
@@ -82,7 +81,7 @@ public final class Utilities {
          */
         int n = 0;
         for (int i=0; i<c2.length; i++) {
-            final Class c = c2[i];
+            final Class<?> c = c2[i];
             if (base.isAssignableFrom(c)) {
                 c2[n++] = c;
             }
@@ -92,7 +91,7 @@ public final class Utilities {
          * this interface exists also in the 'c2' array. Order doesn't matter.
          */
 compare:for (int i=0; i<c1.length; i++) {
-            final Class c = c1[i];
+            final Class<?> c = c1[i];
             if (base.isAssignableFrom(c)) {
                 for (int j=0; j<n; j++) {
                     if (c.equals(c2[j])) {
@@ -150,7 +149,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * @todo Consider replacing by {@link Class#getSimpleName} when we will
      *       be allowed to compile for J2SE 1.5.
      */
-    public static String getShortName(Class classe) {
+    public static String getShortName(Class<?> classe) {
         if (classe == null) {
             return "<*>";
         }
@@ -184,30 +183,6 @@ compare:for (int i=0; i<c1.length; i++) {
      */
     public static String getShortClassName(final Object object) {
         return getShortName(object!=null ? object.getClass() : null);
-    }
-
-    /**
-     * Invoked when an unexpected error occurs.
-     *
-     * @param paquet  The package where the error occurred. This information
-     *                may be used to fetch an appropriate {@link Logger} for
-     *                logging the error.
-     * @param classe  The class name where the error occurred.
-     * @param method  The method name where the error occurred.
-     * @param error   The error.
-     *
-     * @deprecated Replaced by {@link org.geotools.util.Logging#unexpectedException}.
-     */
-    public static void unexpectedException(final String   paquet,
-                                           final String   classe,
-                                           final String   method,
-                                           final Throwable error)
-    {
-        final LogRecord record = getLogRecord(error);
-        record.setSourceClassName (classe);
-        record.setSourceMethodName(method);
-        record.setThrown          (error);
-        Logger.getLogger(paquet).log(record);
     }
 
     /**

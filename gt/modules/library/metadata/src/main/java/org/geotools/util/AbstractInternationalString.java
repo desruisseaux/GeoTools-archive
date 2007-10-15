@@ -19,13 +19,8 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.Locale;
-
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -37,10 +32,10 @@ import org.geotools.resources.i18n.ErrorKeys;
  * capable. The default value (as returned by {@link #toString()} and other
  * {@link CharSequence} methods} is the string in the current {@linkplain
  * Locale#getDefault system default}.
- *
- * <P>The {@linkplain Comparable natural ordering} is defined by the string in
+ * <P>
+ * The {@linkplain Comparable natural ordering} is defined by the string in
  * {@linkplain Locale#getDefault default locale}, as returned by {@link #toString()}.
- * This string also defines the {@linkplain CharSequence character sequence}.</P>
+ * This string also defines the {@linkplain CharSequence character sequence}.
  *
  * @since 2.1
  * @source $URL$
@@ -52,12 +47,12 @@ public abstract class AbstractInternationalString implements InternationalString
      * The string in the {@linkplain Locale#getDefault system default} locale, or {@code null}
      * if this string has not yet been determined. This is the default string returned by
      * {@link #toString()} and others methods from the {@link CharSequence} interface.
-     *
-     * <P>This field is not serialized because serialization is often used for data transmission
+     * <P>
+     * This field is not serialized because serialization is often used for data transmission
      * between a server and a client, and the client may not use the same locale than the server.
-     * We want the locale to be examined again on the client side.</P>
-     *
-     * <P>This field is read and write by {@link SimpleInternationalString}.</P>
+     * We want the locale to be examined again on the client side.
+     * <P>
+     * This field is read and write by {@link SimpleInternationalString}.
      */
     transient String defaultValue;
 
@@ -66,7 +61,7 @@ public abstract class AbstractInternationalString implements InternationalString
      */
     public AbstractInternationalString() {
     }
-    
+
     /**
      * Makes sure an argument is non-null.
      *
@@ -81,7 +76,7 @@ public abstract class AbstractInternationalString implements InternationalString
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
-    
+
     /**
      * Returns the length of the string in the {@linkplain Locale#getDefault default locale}.
      * This is the length of the string returned by {@link #toString()}.
@@ -118,12 +113,11 @@ public abstract class AbstractInternationalString implements InternationalString
      * Returns a subsequence of the string in the {@linkplain Locale#getDefault default locale}.
      * The subsequence is a {@link String} object starting with the character value at the specified
      * index and ending with the character value at index {@code end - 1}.
-     * 
+     *
      * @param   start The start index, inclusive.
      * @param   end   The end index, exclusive.
      * @return  The specified subsequence.
-     * @throws  IndexOutOfBoundsException  if {@code start} or {@code end} is
-     *          out of range.
+     * @throws  IndexOutOfBoundsException  if {@code start} or {@code end} is out of range.
      */
     public CharSequence subSequence(final int start, final int end) {
         if (defaultValue == null) {
@@ -154,6 +148,7 @@ public abstract class AbstractInternationalString implements InternationalString
      *
      * @return The string in the default locale.
      */
+    @Override
     public String toString() {
         if (defaultValue == null) {
             defaultValue = toString(Locale.getDefault());

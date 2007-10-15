@@ -71,7 +71,7 @@ public class ArcSDEGCReaderWorkingTest extends TestCase {
         
         conProps = new Properties();
         String propsFile = "liverasterdatasets.properties";
-        URL conParamsSource = org.geotools.resources.TestData.url(new ArcSDEPyramidTest(""), propsFile);
+        URL conParamsSource = org.geotools.test.TestData.url(new ArcSDEPyramidTest(""), propsFile);
 
         InputStream in = conParamsSource.openStream();
         if (in == null) {

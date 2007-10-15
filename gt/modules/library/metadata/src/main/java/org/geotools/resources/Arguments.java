@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// Input/output
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import java.util.Locale;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
-// Geotools dependencies
 import org.geotools.util.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -103,7 +101,7 @@ public class Arguments {
      *             be automatically parsed.
      */
     public Arguments(final String[] args) {
-        this.arguments     = (String[]) args.clone();
+        this.arguments     = args.clone();
         this.locale        = getLocale(getOptionalString("-locale"));
         String encoding    = getOptionalString("-encoding");
         String destination = getOptionalString("-Xout"); // Non-supported parameter.
@@ -452,12 +450,12 @@ public class Arguments {
             if (arg != null) {
                 if (count >= max) {
                     illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
-                                    format(ErrorKeys.UNEXPECTED_PARAMETER_$1, arguments[i])));
+                                    getString(ErrorKeys.UNEXPECTED_PARAMETER_$1, arguments[i])));
                 }
                 left[count++] = arg;
             }
         }
-        return (String[]) XArray.resize(left, count);
+        return XArray.resize(left, count);
     }
 
     /**
@@ -482,7 +480,7 @@ public class Arguments {
                 if (argument.length() != 0) {
                     if (argument.charAt(0) == forbiddenPrefix) {
                         illegalArgument(new IllegalArgumentException(Errors.getResources(locale).
-                                        format(ErrorKeys.UNKNOW_PARAMETER_$1, argument)));
+                                        getString(ErrorKeys.UNKNOW_PARAMETER_$1, argument)));
                     }
                 }
             }

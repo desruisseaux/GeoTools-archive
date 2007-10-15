@@ -29,7 +29,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.Style;
 
 import com.vividsolutions.jts.geom.Envelope;

@@ -360,8 +360,8 @@ public class DisplayObject {
      * @param  sourceMethodName The caller's method name, for logging purpose.
      * @param  exception        The exception.
      */
-    protected void handleException(final String sourceClassName,
-                                   final String sourceMethodName,
+    protected void handleException(final Class<?> sourceClassName,
+                                   final String  sourceMethodName,
                                    final Exception exception)
     {
         org.geotools.util.Logging.unexpectedException(getLogger().getName(),

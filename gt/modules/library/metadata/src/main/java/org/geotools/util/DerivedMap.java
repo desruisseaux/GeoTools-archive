@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -38,7 +37,7 @@ import java.util.Set;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class DerivedMap extends AbstractMap implements Serializable {
+public abstract class DerivedMap<BK,K,V> extends AbstractMap<K,V> implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -50,29 +49,50 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @see #baseToDerived
      * @see #derivedToBase
      */
-    protected final Map base;
+    protected final Map<BK,V> base;
 
     /**
      * Key set. Will be constructed only when first needed.
      *
      * @see #keySet
      */
-    private transient Set keySet;
+    private transient Set<K> keySet;
 
     /**
      * Entry set. Will be constructed only when first needed.
      *
      * @see #entrySet
      */
-    private transient Set entrySet;
+    private transient Set<Map.Entry<K,V>> entrySet;
+
+    /**
+     * The derived key type.
+     */
+    private final Class<K> keyType;
 
     /**
      * Creates a new derived map from the specified base map.
      *
      * @param base The base map.
+     *
+     * @deprecated Use {@link #DerivedMap(Map, Class} instead.
      */
-    public DerivedMap(final Map base) {
-        this.base = base;
+    @SuppressWarnings("unchecked")
+    public DerivedMap(final Map<BK,V> base) {
+        this(base, (Class) Object.class);
+    }
+
+    /**
+     * Creates a new derived map from the specified base map.
+     *
+     * @param base The base map.
+     * @param keyType the type of keys in the derived map.
+     *
+     * @since 2.5
+     */
+    public DerivedMap(final Map<BK,V> base, final Class<K> keyType) {
+        this.base    = base;
+        this.keyType = keyType;
     }
 
     /**
@@ -84,7 +104,7 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @return The key that this view should contains instead of {@code key},
      *         or {@code null}.
      */
-    protected abstract Object baseToDerived(final Object key);
+    protected abstract K baseToDerived(final BK key);
 
     /**
      * Transforms a key from this derived map to a key in the {@linkplain #base} map.
@@ -92,13 +112,14 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @param  key A key in this map.
      * @return The key stored in the {@linkplain #base} map.
      */
-    protected abstract Object derivedToBase(final Object key);
+    protected abstract BK derivedToBase(final K key);
 
     /**
      * Returns the number of key-value mappings in this map.
      *
      * @return the number of key-value mappings in this map.
      */
+    @Override
     public int size() {
 	return super.size();
     }
@@ -108,6 +129,7 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      *
      * @return {@code true} if this map contains no key-value mappings.
      */
+    @Override
     public boolean isEmpty() {
 	return base.isEmpty() || super.isEmpty();
     }
@@ -116,9 +138,10 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * Returns {@code true} if this map maps one or more keys to this value.
      * The default implementation invokes
      * <code>{@linkplain #base}.containsValue(value)</code>.
-     * 
+     *
      * @return {@code true} if this map maps one or more keys to this value.
      */
+    @Override
     public boolean containsValue(final Object value) {
         return base.containsValue(value);
     }
@@ -131,8 +154,13 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @param  key key whose presence in this map is to be tested.
      * @return {@code true} if this map contains a mapping for the specified key.
      */
+    @Override
     public boolean containsKey(final Object key) {
-        return base.containsKey(derivedToBase(key));
+        if (keyType.isInstance(key)) {
+            return base.containsKey(derivedToBase(keyType.cast(key)));
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -143,8 +171,13 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @param  key key whose associated value is to be returned.
      * @return the value to which this map maps the specified key.
      */
-    public Object get(final Object key) {
-        return base.get(derivedToBase(key));
+    @Override
+    public V get(final Object key) {
+        if (keyType.isInstance(key)) {
+            return base.get(derivedToBase(keyType.cast(key)));
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -159,7 +192,8 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @throws UnsupportedOperationException if the {@linkplain #base} map doesn't
      *         supports the {@code put} operation.
      */
-    public Object put(final Object key, final Object value) throws UnsupportedOperationException {
+    @Override
+    public V put(final K key, final V value) throws UnsupportedOperationException {
         return base.put(derivedToBase(key), value);
     }
 
@@ -174,8 +208,13 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @throws UnsupportedOperationException if the {@linkplain #base} map doesn't
      *         supports the {@code remove} operation.
      */
-    public Object remove(final Object key) throws UnsupportedOperationException {
-        return base.remove(derivedToBase(key));
+    @Override
+    public V remove(final Object key) throws UnsupportedOperationException {
+        if (keyType.isInstance(key)) {
+            return base.remove(derivedToBase(keyType.cast(key)));
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -183,7 +222,8 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      *
      * @return a set view of the keys contained in this map.
      */
-    public Set keySet() {
+    @Override
+    public Set<K> keySet() {
         if (keySet == null) {
             keySet = new KeySet(base.keySet());
         }
@@ -195,7 +235,8 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      *
      * @return a collection view of the values contained in this map.
      */
-    public Collection values() {
+    @Override
+    public Collection<V> values() {
         return base.values();
     }
 
@@ -204,9 +245,11 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      *
      * @return a set view of the mappings contained in this map.
      */
-    public Set entrySet() {
+    @Override
+    @SuppressWarnings("unchecked")
+    public Set<Map.Entry<K,V>> entrySet() {
         if (entrySet == null) {
-            entrySet = new EntrySet(base.entrySet());
+            entrySet = (Set) new EntrySet(base.entrySet());
         }
         return entrySet;
     }
@@ -214,18 +257,18 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
     /**
      * The key set.
      */
-    private final class KeySet extends DerivedSet {
+    private final class KeySet extends DerivedSet<BK,K> {
         private static final long serialVersionUID = -2931806200277420177L;
 
-        public KeySet(final Set base) {
-            super(base);
+        public KeySet(final Set<BK> base) {
+            super(base, keyType);
         }
 
-        protected Object baseToDerived(final Object element) {
+        protected K baseToDerived(final BK element) {
             return DerivedMap.this.baseToDerived(element);
         }
-        
-        protected Object derivedToBase(final Object element) {
+
+        protected BK derivedToBase(final K element) {
             return DerivedMap.this.derivedToBase(element);
         }
     }
@@ -233,45 +276,45 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
     /**
      * The entry set.
      */
-    private final class EntrySet extends DerivedSet {
+    private final class EntrySet extends DerivedSet<Map.Entry<BK,V>, Entry<BK,K,V>> {
         private static final long serialVersionUID = -2931806200277420177L;
 
-        public EntrySet(final Set base) {
-            super(base);
+        @SuppressWarnings("unchecked")
+        public EntrySet(final Set<Map.Entry<BK,V>> base) {
+            super(base, (Class) Entry.class);
         }
 
-        protected Object baseToDerived(final Object element) {
-            final Map.Entry entry = (Map.Entry) element;
-            final Object derived = DerivedMap.this.baseToDerived(entry.getKey());
-            return derived!=null ? new Entry(entry, derived) : null;
+        protected Entry<BK,K,V> baseToDerived(final Map.Entry<BK,V> entry) {
+            final K derived = DerivedMap.this.baseToDerived(entry.getKey());
+            return derived!=null ? new Entry<BK,K,V>(entry, derived) : null;
         }
-        
-        protected Object derivedToBase(final Object element) {
-            return ((Entry) element).entry;
+
+        protected Map.Entry<BK,V> derivedToBase(final Entry<BK,K,V> element) {
+            return element.entry;
         }
     }
 
     /**
      * The entry element.
      */
-    private static final class Entry implements Map.Entry {
-        public final Map.Entry entry;
-        private final Object derived;
+    private static final class Entry<BK,K,V> implements Map.Entry<K,V> {
+        public final Map.Entry<BK,V> entry;
+        private final K derived;
 
-        public Entry(final Map.Entry entry, final Object derived) {
+        public Entry(final Map.Entry<BK,V> entry, final K derived) {
             this.entry   = entry;
             this.derived = derived;
         }
 
-        public Object getKey() {
+        public K getKey() {
             return derived;
         }
-        
-        public Object getValue() {
+
+        public V getValue() {
             return entry.getValue();
         }
-        
-        public Object setValue(Object value) {
+
+        public V setValue(V value) {
             return entry.setValue(value);
         }
     }

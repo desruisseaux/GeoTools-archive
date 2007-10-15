@@ -155,7 +155,7 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
         try {
             load(p);
         } catch (IOException exception) {
-            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+            Logging.unexpectedException("org.geotools.referencing.factory", DataSource.class,
                                         "<init>", exception);
         }
         int port;
@@ -163,7 +163,7 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
             port = Integer.parseInt(p.getProperty("portNumber", "5432"));
         } catch (NumberFormatException exception) {
             port = 5432;
-            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+            Logging.unexpectedException("org.geotools.referencing.factory", DataSource.class,
                                         "<init>", exception);
         }
         setPortNumber  (port);

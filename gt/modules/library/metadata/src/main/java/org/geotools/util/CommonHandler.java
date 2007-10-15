@@ -15,22 +15,18 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import java.util.logging.Formatter;
 import java.util.logging.SimpleFormatter;
 
-// Apache dependencies
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 
@@ -51,10 +47,10 @@ final class CommonHandler extends Handler {
     /**
      * The Apache's log created up to date.
      */
-    private final Map/*<String,Log>*/ loggers = new HashMap();
+    private final Map<String,Log> loggers = new HashMap<String,Log>();
 
     /**
-     * The logger the handler is forwarding for. 
+     * The logger the handler is forwarding for.
      */
     private final Log logger;
 
@@ -143,7 +139,7 @@ final class CommonHandler extends Handler {
      */
     private Log getLog(final String name) {
         synchronized (loggers) {
-            Log log = (Log) loggers.get(name);
+            Log log = loggers.get(name);
             if (log == null) {
                 log = LogFactory.getLog(name);
                 assert !(log instanceof Jdk14Logger);

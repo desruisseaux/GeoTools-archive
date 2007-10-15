@@ -387,7 +387,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             final MathTransform transform;
             try {
                 transform = getMathTransform(graphicCRS, objectiveCRS,
-                        ReferencedCanvas.class.getName(), "getTypicalCellDimension");
+                        ReferencedCanvas.class, "getTypicalCellDimension");
             } catch (FactoryException exception) {
                 handleException("getTypicalCellDimension", exception);
                 continue;  // Ignores this graphic and continue...
@@ -533,7 +533,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             graphicCRS = referenced.getObjectiveCRS(); // May have changed.
             final Envelope graphicEnvelope = referenced.getEnvelope();
             graphicEnvelopeChanged(null, graphicEnvelope, graphicCRS,
-                    ReferencedCanvas.class.getName(), "add");
+                                   ReferencedCanvas.class, "add");
         }
         if (oldEnvelope != null) {
             listeners.firePropertyChange(ENVELOPE_PROPERTY, oldEnvelope, envelope);
@@ -555,7 +555,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                 final CoordinateReferenceSystem graphicCRS = referenced.getObjectiveCRS();
                 final Envelope graphicEnvelope = referenced.getEnvelope();
                 graphicEnvelopeChanged(graphicEnvelope, null, graphicCRS,
-                        ReferencedCanvas.class.getName(), "remove");
+                                       ReferencedCanvas.class, "remove");
             }
         }
         super.remove(graphic);
@@ -597,12 +597,12 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             }
             graphicEnvelopeChanged((Envelope) event.getOldValue(),
                                    (Envelope) event.getNewValue(),
-                                   crs, ReferencedGraphic.class.getName(), "setEnvelope");
+                                   crs, ReferencedGraphic.class, "setEnvelope");
             // Note: we declare "ReferencedGraphic" instead of "ReferencedCanvas" as the source
             //       class name because it is the one that trigged the envelope recomputation.
         } else if (propertyName.equalsIgnoreCase(OBJECTIVE_CRS_PROPERTY)) {
             oldEnvelope = new GeneralEnvelope(envelope);
-            computeEnvelope(ReferencedGraphic.class.getName(), "setObjectiveCRS");
+            computeEnvelope(ReferencedGraphic.class, "setObjectiveCRS");
             // Note: we declare "ReferencedGraphic" instead of "ReferencedCanvas" as the source
             //       class name because it is the one that trigged the envelope recomputation.
         } else {
@@ -829,7 +829,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         scaleFactor   = null;
         useDefaultCRS = false;
         updateNormalizationFactor(crs);
-        computeEnvelope(ReferencedCanvas.class.getName(), "setObjectiveCRS");
+        computeEnvelope(ReferencedCanvas.class, "setObjectiveCRS");
         /*
          * Set the display CRS last because it may fires a property change event,
          * and we don't want to expose our changes before they are completed.
@@ -864,7 +864,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param  sourceClassName  The caller's class name,  for logging purpose.
      * @param  sourceMethodName The caller's method name, for logging purpose.
      */
-    private void computeEnvelope(final String sourceClassName, final String sourceMethodName) {
+    private void computeEnvelope(final Class<?> sourceClassName, final String sourceMethodName) {
         assert Thread.holdsLock(this);
         envelope.setToNull();
         CoordinateReferenceSystem lastCRS = null;
@@ -921,7 +921,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     private void graphicEnvelopeChanged(final Envelope oldEnvelope,
                                         final Envelope newEnvelope,
                                         final CoordinateReferenceSystem crs,
-                                        final String sourceClassName,
+                                        final Class<?> sourceClassName,
                                         final String sourceMethodName)
     {
         assert Thread.holdsLock(this);
@@ -1355,7 +1355,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      */
     final synchronized MathTransform getMathTransform(final CoordinateReferenceSystem sourceCRS,
                                                       final CoordinateReferenceSystem targetCRS,
-                                                      final String sourceClassName,
+                                                      final Class<?> sourceClassName,
                                                       final String sourceMethodName)
             throws FactoryException
     {
@@ -1405,7 +1405,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             final LogRecord record = Logging.getResources(getLocale()).getLogRecord(Level.FINER,
                                              LoggingKeys.INITIALIZING_TRANSFORMATION_$2,
                                              toString(sourceCRS), toString(targetCRS));
-            record.setSourceClassName (sourceClassName);
+            record.setSourceClassName (sourceClassName.getName());
             record.setSourceMethodName(sourceMethodName);
             logger.log(record);
         }
@@ -1505,7 +1505,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @param  exception        The exception.
      */
     private void handleException(final String sourceMethodName, final Exception exception) {
-        handleException(ReferencedCanvas.class.getName(), sourceMethodName, exception);
+        handleException(ReferencedCanvas.class, sourceMethodName, exception);
     }
 
     /**

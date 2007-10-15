@@ -16,15 +16,13 @@
  */
 package org.geotools.util;
 
-import java.util.Set;
-
 
 /**
  * A canonical set of objects, used to optimize memory use.
  * The operation of this set is similar in spirit to the {@link String#intern} method.
  * The following example shows a convenient way to use {@code CanonicalSet} as an
  * internal pool of immutable objects.
- * 
+ *
  * <blockquote><pre>
  * public Foo create(String definition) {
  *      Foo created = new Foo(definition);
@@ -32,7 +30,7 @@ import java.util.Set;
  * }
  * </pre></blockquote>
  *
- * The {@code CanonicalSet} has a {@link #get} method that is not part of the {@link Set}
+ * The {@code CanonicalSet} has a {@link #get} method that is not part of the {@link java.util.Set}
  * interface. This {@code get} method retrieves an entry from this set that is equals to
  * the supplied object. The {@link #unique} method combines a {@code get} followed by a
  * {@code put} operation if the specified object was not in the set.
@@ -46,11 +44,31 @@ import java.util.Set;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class CanonicalSet extends WeakHashSet {
+public class CanonicalSet<E> extends WeakHashSet<E> {
     /**
      * Constructs a {@code CanonicalSet}.
+     *
+     * @deprecated Use {@link #newInstance} instead.
      */
     public CanonicalSet() {
+    }
+
+    /**
+     * Constructs a {@code CanonicalSet} for elements of the specified type.
+     *
+     * @since 2.5
+     */
+    protected CanonicalSet(final Class<E> type) {
+        super(type);
+    }
+
+    /**
+     * Constructs a {@code CanonicalSet} for elements of the specified type.
+     *
+     * @since 2.5
+     */
+    public static <E> CanonicalSet<E> newInstance(final Class<E> type) {
+        return new CanonicalSet<E>(type);
     }
 
     /**
@@ -60,7 +78,7 @@ public class CanonicalSet extends WeakHashSet {
      *
      * @see #unique(Object)
      */
-    public synchronized Object get(final Object object) {
+    public synchronized E get(final E object) {
         return intern(object, GET);
     }
 
@@ -81,7 +99,7 @@ public class CanonicalSet extends WeakHashSet {
      * return object;
      * </pre></blockquote>
      */
-    public synchronized Object unique(final Object object) {
+    public synchronized E unique(final E object) {
         return intern(object, INTERN);
     }
 
@@ -95,7 +113,7 @@ public class CanonicalSet extends WeakHashSet {
      * }
      * </pre></blockquote>
      */
-    public synchronized void uniques(final Object[] objects) {
+    public synchronized void uniques(final E[] objects) {
         for (int i=0; i<objects.length; i++) {
             objects[i] = intern(objects[i], INTERN);
         }

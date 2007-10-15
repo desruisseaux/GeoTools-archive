@@ -16,26 +16,24 @@
  */
 package org.geotools.util;
 
-// Collections and references
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
  * A hashtable-based {@link Map} implementation with <em>weak values</em>. An entry in a
  * {@code WeakValueHashMap} will automatically be removed when its value is no longer
- * in ordinary use. This class is similar to the standard {@link WeakHashMap} class provided
- * is J2SE, except that weak references are hold on values instead of keys.
+ * in ordinary use. This class is similar to the standard {@link java.util.WeakHashMap}
+ * class provided in J2SE, except that weak references are hold on values instead of keys.
  * <p>
  * The {@code WeakValueHashMap} class is thread-safe.
  *
@@ -44,10 +42,10 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see WeakHashMap
+ * @see java.util.WeakHashMap
  * @see WeakHashSet
  */
-public class WeakValueHashMap extends AbstractMap {
+public class WeakValueHashMap<K,V> extends AbstractMap<K,V> {
     /**
      * Minimal capacity for {@link #table}.
      */
@@ -63,11 +61,11 @@ public class WeakValueHashMap extends AbstractMap {
      * An entry in the {@link WeakValueHashMap}. This is a weak reference
      * to a value together with a strong reference to a key.
      */
-    private final class Entry extends WeakReference implements Map.Entry {
+    private final class Entry extends WeakReference<V> implements Map.Entry<K,V> {
         /**
          * The key.
          */
-        Object key;
+        K key;
 
         /**
          * The next entry, or {@code null} if there is none.
@@ -83,7 +81,7 @@ public class WeakValueHashMap extends AbstractMap {
         /**
          * Constructs a new weak reference.
          */
-        Entry(final Object key, final Object value, final Entry next, final int index) {
+        Entry(final K key, final V value, final Entry next, final int index) {
             super(value, WeakCollectionCleaner.DEFAULT.referenceQueue);
             this.key   = key;
             this.next  = next;
@@ -93,25 +91,25 @@ public class WeakValueHashMap extends AbstractMap {
         /**
          * Returns the key corresponding to this entry.
          */
-        public Object getKey() {
+        public K getKey() {
             return key;
         }
 
         /**
          * Returns the value corresponding to this entry.
          */
-        public Object getValue() {
+        public V getValue() {
             return get();
         }
 
         /**
          * Replaces the value corresponding to this entry with the specified value.
          */
-        public Object setValue(final Object value) {
+        public V setValue(final V value) {
             if (value != null) {
                 throw new UnsupportedOperationException();
             }
-            Object old = get();
+            V old = get();
             clear();
             return old;
         }
@@ -120,6 +118,7 @@ public class WeakValueHashMap extends AbstractMap {
          * Clear the reference. The {@link WeakCollectionCleaner} requires that this method is
          * overridden in order to remove this entry from the enclosing hash map.
          */
+        @Override
         public void clear() {
             super.clear();
             removeEntry(this);
@@ -129,6 +128,7 @@ public class WeakValueHashMap extends AbstractMap {
         /**
          * Compares the specified object with this entry for equality.
          */
+        @Override
         public boolean equals(final Object other) {
             if (other instanceof Map.Entry) {
                 final Map.Entry that = (Map.Entry) other;
@@ -141,6 +141,7 @@ public class WeakValueHashMap extends AbstractMap {
         /**
          * Returns the hash code value for this map entry.
          */
+        @Override
         public int hashCode() {
             final Object val = get();
             return (key==null ? 0 : key.hashCode()) ^
@@ -180,34 +181,44 @@ public class WeakValueHashMap extends AbstractMap {
     private static final long HOLD_TIME = 20*1000L;
 
     /**
-     * Construct a {@code WeakValueHashMap}.
+     * Creates a {@code WeakValueHashMap}.
      */
     public WeakValueHashMap() {
-        table = new Entry[MIN_CAPACITY];
-        threshold = Math.round(table.length*LOAD_FACTOR);
-        lastRehashTime = System.currentTimeMillis();
-    }
-    
-    /**
-     * Create a {@link WeakValueHashMap} of the requested size.
-     * @param initialSize
-     */
-    public WeakValueHashMap( int initialSize ){
-        table = new Entry[initialSize];
-        threshold = Math.round(table.length*LOAD_FACTOR);
-        lastRehashTime = System.currentTimeMillis();   
+        this(MIN_CAPACITY);
     }
 
     /**
-     * Create a new WeakValueHashMap populated with the contents of the provied map.
-     * 
-     * @param map Initial contents of the WeakValueHashMap
+     * Creates a {@code WeakValueHashMap} of the requested size and default load factor.
+     *
+     * @param initialSize The initial size.
      */
-    public WeakValueHashMap( Map map ){
-        this();
-        putAll( map );
+    public WeakValueHashMap(final int initialSize) {
+        newEntryTable(initialSize);
+        threshold = Math.round(table.length * LOAD_FACTOR);
+        lastRehashTime = System.currentTimeMillis();
     }
-    
+
+    /**
+     * Sets the {@link #table} array to the specified size. The content of the old array is lost.
+     *
+     * @todo Use the commented line instead if a future Java version supports generic arrays.
+     */
+    @SuppressWarnings("unchecked")
+    private void newEntryTable(final int size) {
+//      table = new Entry[size];
+        table = (Entry[]) Array.newInstance(Entry.class, size);
+    }
+
+    /**
+     * Creates a new {@code WeakValueHashMap} populated with the contents of the provied map.
+     *
+     * @param map Initial contents of the {@code WeakValueHashMap}.
+     */
+    public WeakValueHashMap(final Map<K,V> map) {
+        this(Math.round(map.size() / LOAD_FACTOR) + 1);
+        putAll(map);
+    }
+
     /**
      * Invoked by {@link Entry} when an element has been collected
      * by the garbage collector. This method will remove the weak reference
@@ -253,7 +264,7 @@ public class WeakValueHashMap extends AbstractMap {
     }
 
     /**
-     * Rehash {@link #table}.
+     * Rehashs {@link #table}.
      *
      * @param augmentation {@code true} if this method is invoked
      *        for augmenting {@link #table}, or {@code false} if
@@ -271,7 +282,7 @@ public class WeakValueHashMap extends AbstractMap {
         }
         lastRehashTime = currentTime;
         final Entry[] oldTable = table;
-        table     = new Entry[capacity];
+        newEntryTable(capacity);
         threshold = Math.round(capacity*LOAD_FACTOR);
         for (int i=0; i<oldTable.length; i++) {
             for (Entry old=oldTable[i]; old!=null;) {
@@ -291,7 +302,7 @@ public class WeakValueHashMap extends AbstractMap {
         final Logger logger = Logger.getLogger("org.geotools.util");
         final Level   level = Level.FINEST;
         if (logger.isLoggable(level)) {
-            final LogRecord record = new LogRecord(level, "Rehash from " + oldTable.length + 
+            final LogRecord record = new LogRecord(level, "Rehash from " + oldTable.length +
                                                                   " to " +    table.length);
             record.setSourceMethodName(augmentation ? "unique" : "remove");
             record.setSourceClassName(WeakValueHashMap.class.getName());
@@ -301,7 +312,7 @@ public class WeakValueHashMap extends AbstractMap {
     }
 
     /**
-     * Check if this {@code WeakValueHashMap} is valid. This method counts the
+     * Checks if this {@code WeakValueHashMap} is valid. This method counts the
      * number of elements and compare it to {@link #count}. If the check fails,
      * the number of elements is corrected (if we didn't, an {@link AssertionError}
      * would be thrown for every operations after the first error,  which make
@@ -326,6 +337,7 @@ public class WeakValueHashMap extends AbstractMap {
     /**
      * Returns the number of key-value mappings in this map.
      */
+    @Override
     public synchronized int size() {
         assert valid();
         return count;
@@ -337,6 +349,7 @@ public class WeakValueHashMap extends AbstractMap {
      * @param value value whose presence in this map is to be tested.
      * @return {@code true} if this map maps one or more keys to this value.
      */
+    @Override
     public synchronized boolean containsValue(final Object value) {
         return super.containsValue(value);
     }
@@ -348,6 +361,7 @@ public class WeakValueHashMap extends AbstractMap {
      * @return {@code true} if this map contains a mapping for the specified key.
      * @throws NullPointerException If key is {@code null}.
      */
+    @Override
     public boolean containsKey(final Object key) {
         return get(key) != null;
     }
@@ -360,7 +374,8 @@ public class WeakValueHashMap extends AbstractMap {
      * @return The value to which this map maps the specified key.
      * @throws NullPointerException if the key is {@code null}.
      */
-    public synchronized Object get(final Object key) {
+    @Override
+    public synchronized V get(final Object key) {
         assert WeakCollectionCleaner.DEFAULT.isAlive();
         assert valid() : count;
         final int index = (key.hashCode() & 0x7FFFFFFF) % table.length;
@@ -375,14 +390,14 @@ public class WeakValueHashMap extends AbstractMap {
     /**
      * Implementation of {@link #put} and {@link #remove} operations.
      */
-    private synchronized Object intern(final Object key, final Object value) {
+    private synchronized V intern(final K key, final V value) {
         assert WeakCollectionCleaner.DEFAULT.isAlive();
         assert valid() : count;
         /*
          * Check if {@code obj} is already contained in this
          * {@code WeakValueHashMap}. If yes, clear it.
          */
-        Object oldValue = null;
+        V oldValue = null;
         final int hash = key.hashCode() & 0x7FFFFFFF;
         int index = hash % table.length;
         for (Entry e=table[index]; e!=null; e=e.next) {
@@ -411,10 +426,11 @@ public class WeakValueHashMap extends AbstractMap {
      * @param  value value to be associated with the specified key.
      * @return previous value associated with specified key, or {@code null}
      *	       if there was no mapping for key.
-     * 
+     *
      * @throws NullPointerException if the key or the value is {@code null}.
      */
-    public Object put(final Object key, final Object value) {
+    @Override
+    public V put(final K key, final V value) {
         if (value == null) {
             throw new NullPointerException("Null value not allowed");
             // TODO: localize this message.
@@ -429,13 +445,16 @@ public class WeakValueHashMap extends AbstractMap {
      * @return previous value associated with specified key, or {@code null}
      *	       if there was no entry for key.
      */
-    public Object remove(final Object key) {
-        return intern(key, null);
+    @Override
+    @SuppressWarnings("unchecked")
+    public V remove(final Object key) {
+        return intern((K) key, null);
     }
 
     /**
      * Removes all of the elements from this map.
      */
+    @Override
     public synchronized void clear() {
         Arrays.fill(table, null);
         count = 0;
@@ -448,7 +467,8 @@ public class WeakValueHashMap extends AbstractMap {
      *
      * @return a set view of the mappings contained in this map.
      */
-    public Set entrySet() {
+    @Override
+    public Set<Map.Entry<K,V>> entrySet() {
         throw new UnsupportedOperationException();
     }
 }

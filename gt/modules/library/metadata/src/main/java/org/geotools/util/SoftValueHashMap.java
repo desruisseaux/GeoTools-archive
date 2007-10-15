@@ -15,7 +15,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.lang.ref.SoftReference;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -26,9 +25,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.NoSuchElementException;
-import java.util.ConcurrentModificationException;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -45,15 +42,16 @@ import org.geotools.resources.i18n.ErrorKeys;
  * This map is thread-safe. It accepts the null key, but doesn't accepts null values. Usage
  * of {@linkplain #values value}, {@linkplain #keySet key} or {@linkplain #entrySet entry}
  * collections are supported except for direct usage of their iterators, which may throw
- * {@link ConcurrentModificationException} randomly depending on the garbage collector activity.
- * 
+ * {@link java.util.ConcurrentModificationException} randomly depending on the garbage collector
+ * activity.
+ *
  * @since 2.3
  * @source $URL$
  * @version $Id$
  * @author Simone Giannecchini
  * @author Martin Desruisseaux
  */
-public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
+public class SoftValueHashMap<K,V> extends AbstractMap<K,V> {
     /**
      * The default value for {@link #hardReferencesCount}.
      */
@@ -63,13 +61,13 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
      * The map of hard or soft references. Values are either direct reference to the objects,
      * or wrapped in a {@code Reference} object.
      */
-    private final Map/*<K,Object>*/ hash = new HashMap/*<K,Object>*/();
+    private final Map<K,Object> hash = new HashMap<K,Object>();
 
     /**
      * The FIFO list of keys to hard references. Newest elements are first, and latest elements
      * are last. This list should never be longer than {@link #hardReferencesCount}.
      */
-    private final LinkedList/*<K>*/ hardCache = new LinkedList/*<K>*/();
+    private final LinkedList<K> hardCache = new LinkedList<K>();
 
     /**
      * The number of hard references to hold internally.
@@ -79,7 +77,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * The entries to be returned by {@link #entrySet()}, or {@code null} if not yet created.
      */
-    private transient Set entries;
+    private transient Set<Map.Entry<K,V>> entries;
 
     /**
      * Creates a map with the default hard references count.
@@ -98,7 +96,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Ensures that the specified value is non-null.
      */
-    private static void ensureNotNull(final Object/*V*/ value) throws IllegalArgumentException {
+    private static void ensureNotNull(final Object value) throws IllegalArgumentException {
         if (value == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "value"));
         }
@@ -111,8 +109,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     final boolean isValid() {
         int count=0, size=0;
         synchronized (hash) {
-            for (final Iterator it=hash.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
+            for (final Map.Entry<K,?> entry : hash.entrySet()) {
                 if (entry.getValue() instanceof Reference) {
                     count++;
                 } else {
@@ -129,6 +126,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Returns the number of entries in this map.
      */
+    @Override
     public int size() {
         synchronized (hash) {
             return hash.size();
@@ -138,6 +136,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Returns {@code true} if this map contains a mapping for the specified key.
      */
+    @Override
     public boolean containsKey(final Object key) {
         synchronized (hash) {
             return hash.containsKey(key);
@@ -147,6 +146,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Returns {@code true} if this map maps one or more keys to this value.
      */
+    @Override
     public boolean containsValue(final Object value) {
         ensureNotNull(value);
         synchronized (hash) {
@@ -165,7 +165,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
      * @param key key whose associated value is to be returned.
      * @return the value to which this map maps the specified key, or {@code null} if none.
      */
-    public /*V*/ Object get(final Object key) {
+    @Override
+    public V get(final Object key) {
         synchronized (hash) {
             Object value = hash.get(key);
             if (value instanceof Reference) {
@@ -181,15 +182,27 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
                  */
                 value = ((Reference) value).getAndClear();
                 if (value != null) {
-                    // Transforms the soft reference into a hard one.
-                    hash.put(key, value);
-                    retainStrongly(key);
+                    /*
+                     * Transforms the soft reference into a hard one. The cast should be safe
+                     * because hash.get(key) should not have returned a non-null value if the
+                     * key wasn't valid.
+                     */
+                    @SuppressWarnings("unchecked")
+                    final K k = (K) key;
+                    hash.put(k, value);
+                    retainStrongly(k);
                 } else {
                     // The value has already been garbage collected.
                     hash.remove(key);
                 }
             }
-            return value;
+            /*
+             * The safety of this cast depends only on this implementation, not on users.
+             * It should be safe if there is no bug in the way this class manages 'hash'.
+             */
+            @SuppressWarnings("unchecked")
+            final V v = (V) value;
+            return v;
         }
     }
 
@@ -198,16 +211,18 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
      * If there is already {@link #hardReferencesCount} hard references, then this method
      * replaces the oldest hard reference by a soft one.
      */
-    private void retainStrongly(final /*K*/ Object key) {
+    private void retainStrongly(final K key) {
         assert Thread.holdsLock(hash);
         assert !hardCache.contains(key) : key;
         hardCache.addFirst(key);
         if (hardCache.size() > hardReferencesCount) {
             // Remove the last entry if list longer than hardReferencesCount
-            final /*K*/ Object toRemove = hardCache.removeLast();
+            final K toRemove = hardCache.removeLast();
             final Object value = hash.get(toRemove);
             assert value!=null && !(value instanceof Reference) : toRemove;
-            hash.put(toRemove, new Reference(hash, toRemove, value));
+            @SuppressWarnings("unchecked")
+            final V v = (V) value;
+            hash.put(toRemove, new Reference<K,V>(hash, toRemove, v));
             assert hardCache.size() == hardReferencesCount;
         }
         assert isValid();
@@ -218,11 +233,12 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
      *
      * @param key Key with which the specified value is to be associated.
      * @param value Value to be associated with the specified key. The value can't be null.
-     * 
+     *
      * @return Previous value associated with specified key, or {@code null}
      *	       if there was no mapping for key.
      */
-    public Object put(final Object key, final Object value) {
+    @Override
+    public V put(final K key, final V value) {
         ensureNotNull(value);
         synchronized (hash) {
             Object oldValue = hash.put(key, value);
@@ -243,14 +259,17 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
                 }
             }
             retainStrongly(key);
-            return oldValue;
+            @SuppressWarnings("unchecked")
+            final V v = (V) oldValue;
+            return v;
         }
     }
 
     /**
      * Copies all of the mappings from the specified map to this map.
      */
-    public void putAll(Map/*<? extends K, ? extends V>*/ map) {
+    @Override
+    public void putAll(final Map<? extends K, ? extends V> map) {
         synchronized (hash) {
             super.putAll(map);
         }
@@ -263,7 +282,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
      * @return previous value associated with specified key, or {@code null}
      *	       if there was no entry for key.
      */
-    public Object remove(final Object key) {
+    @Override
+    public V remove(final Object key) {
         synchronized (hash) {
             Object oldValue = hash.remove(key);
             if (oldValue instanceof Reference) {
@@ -276,13 +296,16 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
                     throw new AssertionError(key);
                 }
             }
-            return oldValue;
+            @SuppressWarnings("unchecked")
+            final V v = (V) oldValue;
+            return v;
         }
     }
 
     /**
      * Removes all mappings from this map.
      */
+    @Override
     public void clear() {
         synchronized (hash) {
             for (final Iterator it=hash.values().iterator(); it.hasNext();) {
@@ -299,7 +322,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Returns a set view of the mappings contained in this map.
      */
-    public Set entrySet() {
+    @Override
+    public Set<Map.Entry<K,V>> entrySet() {
         synchronized (hash) {
             if (entries == null) {
                 entries = new Entries();
@@ -311,6 +335,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Compares the specified object with this map for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         synchronized (hash) {
             return super.equals(object);
@@ -320,6 +345,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Returns the hash code value for this map.
      */
+    @Override
     public int hashCode() {
         synchronized (hash) {
             return super.hashCode();
@@ -329,6 +355,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Returns a string representation of this map.
      */
+    @Override
     public String toString() {
         synchronized (hash) {
             return super.toString();
@@ -338,13 +365,13 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * Implementation of the entries set to be returned by {@link #entrySet()}.
      */
-    private final class Entries extends AbstractSet {
+    private final class Entries extends AbstractSet<Map.Entry<K,V>> {
         /**
          * Returns an iterator over the elements contained in this collection.
          */
-        public Iterator iterator() {
+        public Iterator<Map.Entry<K,V>> iterator() {
             synchronized (hash) {
-                return new Iter(hash);
+                return new Iter<K,V>(hash);
             }
         }
 
@@ -358,6 +385,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
         /**
          * Returns {@code true} if this collection contains the specified element.
          */
+        @Override
         public boolean contains(final Object entry) {
             synchronized (hash) {
                 return super.contains(entry);
@@ -367,6 +395,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
         /**
          * Returns an array containing all of the elements in this collection.
          */
+        @Override
         public Object[] toArray() {
             synchronized (hash) {
                 return super.toArray();
@@ -376,7 +405,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
         /**
          * Returns an array containing all of the elements in this collection.
          */
-        public /*<T> T[]*/ Object[] toArray(final /*T[]*/ Object[] array) {
+        @Override
+        public <T> T[] toArray(final T[] array) {
             synchronized (hash) {
                 return super.toArray(array);
             }
@@ -386,6 +416,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * Removes a single instance of the specified element from this collection,
          * if it is present.
          */
+        @Override
         public boolean remove(final Object entry) {
             synchronized (hash) {
                 return super.remove(entry);
@@ -396,7 +427,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * Returns {@code true} if this collection contains all of the elements
          * in the specified collection.
          */
-        public boolean containsAll(final Collection/*<?>*/ collection) {
+        @Override
+        public boolean containsAll(final Collection<?> collection) {
             synchronized (hash) {
                 return super.containsAll(collection);
             }
@@ -405,7 +437,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
         /**
          * Adds all of the elements in the specified collection to this collection.
          */
-        public boolean addAll(final Collection/*<? extends E>*/ collection) {
+        @Override
+        public boolean addAll(final Collection<? extends Map.Entry<K,V>> collection) {
             synchronized (hash) {
                 return super.addAll(collection);
             }
@@ -415,7 +448,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * Removes from this collection all of its elements that are contained in
          * the specified collection.
          */
-        public boolean removeAll(final Collection/*<?>*/ collection) {
+        @Override
+        public boolean removeAll(final Collection<?> collection) {
             synchronized (hash) {
                 return super.removeAll(collection);
             }
@@ -425,7 +459,8 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * Retains only the elements in this collection that are contained in the
          * specified collection.
          */
-        public boolean retainAll(final Collection/*<?>*/ collection) {
+        @Override
+        public boolean retainAll(final Collection<?> collection) {
             synchronized (hash) {
                 return super.retainAll(collection);
             }
@@ -434,6 +469,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
         /**
          * Removes all of the elements from this collection.
          */
+        @Override
         public void clear() {
             SoftValueHashMap.this.clear();
         }
@@ -441,6 +477,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
         /**
          * Returns a string representation of this collection.
          */
+        @Override
         public String toString() {
             synchronized (hash) {
                 return super.toString();
@@ -451,27 +488,27 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
     /**
      * The iterator to be returned by {@link Entries}.
      */
-    private static final class Iter implements Iterator {
+    private static final class Iter<K,V> implements Iterator<Map.Entry<K,V>> {
         /**
          * A copy of the {@link SoftValueHashMap#hash} field.
          */
-        private final Map hash;
+        private final Map<K,Object> hash;
 
         /**
          * The iterator over the {@link #hash} entries.
          */
-        private final Iterator iterator;
+        private final Iterator<Map.Entry<K,Object>> iterator;
 
         /**
          * The next entry to be returned by the {@link #next} method, or {@code null}
          * if not yet computed of if the iteration is finished.
          */
-        private transient Map.Entry entry;
+        private transient Map.Entry<K,V> entry;
 
         /**
          * Creates an iterator for the specified {@link SoftValueHashMap#hash} field.
          */
-        Iter(final Map hash) {
+        Iter(final Map<K,Object> hash) {
             this.hash = hash;
             this.iterator = hash.entrySet().iterator();
         }
@@ -480,18 +517,19 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * Set {@link #entry} to the next entry to iterate. Returns {@code true} if
          * an entry has been found, or {@code false} if the iteration is finished.
          */
+        @SuppressWarnings("unchecked")
         private boolean findNext() {
             assert Thread.holdsLock(hash);
             while (iterator.hasNext()) {
-                final Map.Entry candidate = (Map.Entry) iterator.next();
+                final Map.Entry<K,Object> candidate = iterator.next();
                 Object value = candidate.getValue();
                 if (value instanceof Reference) {
                     value = ((Reference) value).get();
-                    entry = new MapEntry(candidate.getKey(), value);
+                    entry = new MapEntry<K,V>(candidate.getKey(), (V) value);
                     return true;
                 }
                 if (value != null) {
-                    entry = candidate;
+                    entry = (Map.Entry<K,V>) candidate;
                     return true;
                 }
             }
@@ -513,13 +551,13 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * {@link ConcurrentModificationException} may be throw if the iteration
          * is not synchronized on {@link #hash}.
          */
-        public Object/*Map.Entry*/ next() {
+        public Map.Entry<K,V> next() {
             synchronized (hash) {
                 if (entry==null && !findNext()) {
                     throw new NoSuchElementException();
                 }
-                final Map.Entry next = entry;
-                entry = null; // Flag that a new entry will need to be lazily fetched.
+                final Map.Entry<K,V> next = entry;
+                entry = null; // Flags that a new entry will need to be lazily fetched.
                 return next;
             }
         }
@@ -539,23 +577,23 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
      * more than {@link #hardReferencesCount}, in order to avoid to put more pressure on the
      * garbage collector.
      */
-    private static final class Reference/*<K,V>*/ extends SoftReference/*<V>*/ {
+    private static final class Reference<K,V> extends SoftReference<V> {
         /**
          * A reference to the {@link SoftValueHashMap#hash} entries. We keep this reference instead
          * than a reference to {@link SoftValueHashMap} itself in order to avoid indirect retention
          * of {@link SoftValueHashMap#hardCache}, which is not needed for this reference.
          */
-        private final Map/*<K,V>*/ hash;
+        private final Map<K,Object> hash;
 
         /**
          * The key for the entry to be removed when the soft reference is cleared.
          */
-        private final /*K*/ Object key;
+        private final K key;
 
         /**
          * Creates a soft reference for the specified key-value pair.
          */
-        Reference(final Map/*<K,V>*/ hash, final /*K*/ Object key, final /*V*/ Object value) {
+        Reference(final Map<K,Object> hash, final K key, final V value) {
             super(value, WeakCollectionCleaner.DEFAULT.referenceQueue);
             this.hash = hash;
             this.key  = key;
@@ -583,6 +621,7 @@ public class SoftValueHashMap/*<K,V>*/ extends AbstractMap/*<K,V>*/ {
          * override the {@link SoftReference#clear} method because it is invoked
          * by {@link WeakCollectionCleaner}.
          */
+        @Override
         public void clear() {
             super.clear();
             synchronized (hash) {

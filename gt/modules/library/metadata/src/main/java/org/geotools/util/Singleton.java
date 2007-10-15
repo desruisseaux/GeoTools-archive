@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -29,15 +28,12 @@ import java.util.NoSuchElementException;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Not used anymore in the Geotools code base. If needed, use a small
- *             {@link java.util.ArrayList} instead.
  */
-public class Singleton extends AbstractSet {
+public class Singleton<E> extends AbstractSet<E> {
     /**
      * The element, or {@code null} if this set is empty.
      */
-    private Object element;
+    private E element;
 
     /**
      * Creates a initially empty singleton.
@@ -49,12 +45,13 @@ public class Singleton extends AbstractSet {
      * Returns 1 if this singleton contains an element, or 0 otherwise.
      */
     public int size() {
-        return (element!=null) ? 1 : 0;
+        return (element != null) ? 1 : 0;
     }
 
     /**
-     * Returns {@code true} if this singleton contains no elements.<p>
+     * Returns {@code true} if this singleton contains no elements.
      */
+    @Override
     public boolean isEmpty() {
 	return element == null;
     }
@@ -65,7 +62,7 @@ public class Singleton extends AbstractSet {
      * @return The singleton element (never null).
      * @throws NoSuchElementException if this singleton is empty.
      */
-    public Object get() throws NoSuchElementException {
+    public E get() throws NoSuchElementException {
         if (element == null) {
             throw new NoSuchElementException();
         }
@@ -75,6 +72,7 @@ public class Singleton extends AbstractSet {
     /**
      * Returns {@code true} if this singleton contains the specified element.
      */
+    @Override
     public boolean contains(final Object object) {
         return element!=null && element.equals(object);
     }
@@ -86,7 +84,8 @@ public class Singleton extends AbstractSet {
      * @throws NullPointerException if the argument is null.
      * @throws IllegalArgumentException if this set already contains an other element.
      */
-    public boolean add(final Object object) {
+    @Override
+    public boolean add(final E object) {
         if (object == null) {
             throw new NullPointerException();
         }
@@ -104,6 +103,7 @@ public class Singleton extends AbstractSet {
     /**
      * Removes the specified element from this singleton, if it is present.
      */
+    @Override
     public boolean remove(final Object object) {
         if (element!=null && element.equals(object)) {
             element = null;
@@ -115,6 +115,7 @@ public class Singleton extends AbstractSet {
     /**
      * Removes the element from this singleton.
      */
+    @Override
     public void clear() {
         element = null;
     }
@@ -122,14 +123,15 @@ public class Singleton extends AbstractSet {
     /**
      * Returns an iterator over the element of this singleton.
      */
-    public Iterator iterator() {
+    @Override
+    public Iterator<E> iterator() {
         return new Iter();
     }
 
     /**
      * The iterator for this singleton.
      */
-    private final class Iter implements Iterator {
+    private final class Iter implements Iterator<E> {
         /**
          * {@code false} if this iterator is done.
          */
@@ -141,7 +143,7 @@ public class Singleton extends AbstractSet {
         public Iter() {
             hasNext = (element != null);
         }
- 
+
         /**
          * Returns {@code true} if there is more element to return.
          */
@@ -152,14 +154,14 @@ public class Singleton extends AbstractSet {
         /**
          * Returns the next element.
          */
-        public Object next() {
+        public E next() {
             if (!hasNext) {
                 throw new NoSuchElementException();
             }
             hasNext = false;
             return element;
         }
- 
+
         /**
          * Remove the last element in this set.
          */

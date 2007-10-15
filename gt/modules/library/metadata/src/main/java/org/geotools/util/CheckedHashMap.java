@@ -15,21 +15,18 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.LinkedHashMap;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Acts as a typed {@link java.util.Map} while we wait for Java 5.0.
- * 
+ * Acts as a typed {@link java.util.Map}. Type checks are performed at run-time in
+ * addition of compile-time checks.
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -40,7 +37,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
  *       after a clone (this work may be done in {@code MetadataEntity.unmodifiable(Object)}).
  */
-public class CheckedHashMap extends LinkedHashMap implements Cloneable {
+public class CheckedHashMap<K,V> extends LinkedHashMap<K,V> implements Cloneable {
     /**
      * Serial version UID for compatibility with different versions.
      */
@@ -49,12 +46,12 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
     /**
      * The class type for keys.
      */
-    private final Class keyType;
+    private final Class<K> keyType;
 
     /**
      * The class type for values.
      */
-    private final Class valueType;
+    private final Class<V> valueType;
 
     /**
      * Constructs a map of the specified type.
@@ -62,7 +59,7 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
      * @param keyType   The key type (should not be null).
      * @param valueType The value type (should not be null).
      */
-    public CheckedHashMap(final Class keyType, final Class valueType) {
+    public CheckedHashMap(final Class<K> keyType, final Class<V> valueType) {
         this.keyType   = keyType;
         this.valueType = valueType;
         ensureNonNull(  keyType,   "keyType");
@@ -72,7 +69,7 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
     /**
      * Ensure that the given argument is non-null.
      */
-    private static void ensureNonNull(final Class type, final String name) {
+    private static void ensureNonNull(final Class<?> type, final String name) {
         if (type == null) {
             throw new NullPointerException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
@@ -85,7 +82,7 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
      * @param  element the object to check, or {@code null}.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
-    private static void ensureValidType(final Object element, final Class type)
+    private static <E> void ensureValidType(final E element, final Class<E> type)
             throws IllegalArgumentException
     {
         if (element!=null && !type.isInstance(element)) {
@@ -103,7 +100,8 @@ public class CheckedHashMap extends LinkedHashMap implements Cloneable {
      * @param value value to be associated with the specified key.
      * @return previous value associated with specified key, or {@code null}.
      */
-    public Object put(final Object key, final Object value) {
+    @Override
+    public V put(final K key, final V value) {
         ensureValidType(key,     keyType);
         ensureValidType(value, valueType);
         return super.put(key, value);

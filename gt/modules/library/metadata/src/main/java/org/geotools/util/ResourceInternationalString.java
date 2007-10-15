@@ -16,13 +16,11 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -107,6 +105,7 @@ public class ResourceInternationalString extends AbstractInternationalString imp
     /**
      * Compares this international string with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final ResourceInternationalString that = (ResourceInternationalString) object;
@@ -119,6 +118,7 @@ public class ResourceInternationalString extends AbstractInternationalString imp
     /**
      * Returns a hash code value for this international text.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ key.hashCode() ^ resources.hashCode();
     }

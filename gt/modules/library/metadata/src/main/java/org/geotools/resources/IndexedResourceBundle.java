@@ -255,10 +255,10 @@ public class IndexedResourceBundle extends ResourceBundle {
     /**
      * Returns an enumeration of the keys.
      */
-    public final Enumeration getKeys() {
+    public final Enumeration<String> getKeys() {
         // Synchronization performed by 'ensureLoaded'
         final String[] values = ensureLoaded(null);
-        return new Enumeration() {
+        return new Enumeration<String>() {
             private int i=0;
 
             public boolean hasMoreElements() {
@@ -269,7 +269,7 @@ public class IndexedResourceBundle extends ResourceBundle {
                 }
             }
 
-            public Object nextElement() {
+            public String nextElement() {
                 while (true) {
                     if (i >= values.length) throw new NoSuchElementException();
                     if (values[i] != null)  return String.valueOf(i++);
@@ -711,6 +711,7 @@ public class IndexedResourceBundle extends ResourceBundle {
      * Returns a string representation of this object.
      * This method is for debugging purposes only.
      */
+    @Override
     public synchronized String toString() {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
         buffer.append('[');

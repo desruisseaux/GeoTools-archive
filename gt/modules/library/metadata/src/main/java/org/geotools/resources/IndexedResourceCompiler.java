@@ -40,7 +40,7 @@ import java.lang.reflect.Field;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class IndexedResourceCompiler implements Comparator {
+public final class IndexedResourceCompiler implements Comparator<Object> {
     /**
      * The base directory for {@code "java"} {@code "resources"} sub-directories.
      * The directory structure must be consistent with Maven conventions.
@@ -52,7 +52,8 @@ public final class IndexedResourceCompiler implements Comparator {
     /**
      * The resources to process.
      */
-    private static final Class[] RESOURCES_TO_PROCESS = {
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends IndexedResourceBundle>[] RESOURCES_TO_PROCESS = new Class[] {
         org.geotools.resources.i18n.Descriptions.class,
         org.geotools.resources.i18n.Vocabulary  .class,
         org.geotools.resources.i18n.Logging     .class,
@@ -92,13 +93,13 @@ public final class IndexedResourceCompiler implements Comparator {
      * Integer IDs allocated to resource keys. This map will be shared for all languages
      * of a given resource bundle.
      */
-    private final Map/*<Integer,String>*/ allocatedIDs = new HashMap();
+    private final Map<Integer,String> allocatedIDs = new HashMap<Integer,String>();
 
     /**
      * Resource keys and their localized values. This map will be cleared for each language
      * in a resource bundle.
      */
-    private final Map/*<String,String>*/ resources = new HashMap();
+    private final Map<Object,Object> resources = new HashMap<Object,Object>();
 
     /**
      * The output stream for printing message.
@@ -118,7 +119,8 @@ public final class IndexedResourceCompiler implements Comparator {
      * @param  out The output stream for printing message.
      * @throws IOException if an input/output operation failed.
      */
-    private IndexedResourceCompiler(final File sourceDirectory, final Class bundleClass,
+    private IndexedResourceCompiler(final File sourceDirectory,
+                                    final Class<? extends IndexedResourceBundle> bundleClass,
                                     final boolean renumber, final PrintWriter out)
             throws IOException
     {
@@ -189,10 +191,9 @@ public final class IndexedResourceCompiler implements Comparator {
     private void processPropertyFile(final File file) throws IOException {
         final Properties properties = loadPropertyFile(file);
         resources.clear();
-        for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry entry = (Map.Entry) it.next();
-            final String key      = (String) entry.getKey();
-            final String value    = (String) entry.getValue();
+        for (final Map.Entry<Object,Object> entry : properties.entrySet()) {
+            final String key   = (String) entry.getKey();
+            final String value = (String) entry.getValue();
             /*
              * Checks key and value validity.
              */
@@ -241,7 +242,7 @@ public final class IndexedResourceCompiler implements Comparator {
         /*
          * Allocates an ID for each new key.
          */
-        final String[] keys = (String[]) resources.keySet().toArray(new String[resources.size()]);
+        final String[] keys = resources.keySet().toArray(new String[resources.size()]);
         Arrays.sort(keys, this);
         int freeID = 0;
         for (int i=0; i<keys.length; i++) {
@@ -264,7 +265,7 @@ public final class IndexedResourceCompiler implements Comparator {
      * @throws IOException if an input/output operation failed.
      */
     private void writeUTFFile(final File file) throws IOException {
-        final int count = allocatedIDs.isEmpty() ? 0 : ((Integer) Collections.max(allocatedIDs.keySet())).intValue()+1;
+        final int count = allocatedIDs.isEmpty() ? 0 : Collections.max(allocatedIDs.keySet()) + 1;
         final DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
         out.writeInt(count);
         for (int i=0; i<count; i++) {
@@ -425,7 +426,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         out.write("public final class "); out.write(classname); out.write(" {\n");
         out.write("    private "); out.write(classname); out.write("() {\n");
         out.write("    }\n");
-        final Map.Entry[] entries = (Map.Entry[]) allocatedIDs.entrySet().toArray(new Map.Entry[allocatedIDs.size()]);
+        final Map.Entry[] entries = allocatedIDs.entrySet().toArray(new Map.Entry[allocatedIDs.size()]);
         Arrays.sort(entries, this);
         for (int i=0; i<entries.length; i++) {
             out.write('\n');
@@ -483,7 +484,8 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
      * @param  out The output stream for printing message.
      * @throws IOException if an input/output operation failed.
      */
-    private static void scanForResources(final File sourceDirectory, final Class bundleClass,
+    private static void scanForResources(final File sourceDirectory,
+                                         final Class<? extends IndexedResourceBundle> bundleClass,
                                          final boolean renumber, final PrintWriter out)
             throws IOException
     {
@@ -543,7 +545,9 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
      * @param  resourcesToProcess The resource bundle base classes
      *         (e.g. <code>{@linkplain org.geotools.resources.i18n.Vocabulary}.class}</code>).
      */
-    public static void main(String[] args, final File sourceDirectory, final Class[] resourcesToProcess) {
+    public static void main(String[] args, final File sourceDirectory,
+                            final Class<? extends IndexedResourceBundle>[] resourcesToProcess)
+{
         final Arguments arguments = new Arguments(args);
         final boolean renumber = arguments.getFlag("-renumber");
         final PrintWriter out = arguments.out;

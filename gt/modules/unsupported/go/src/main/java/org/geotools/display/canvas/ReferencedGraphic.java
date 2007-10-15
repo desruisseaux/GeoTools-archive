@@ -204,13 +204,13 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
             final Canvas owner = getCanvas();
             if (owner instanceof ReferencedCanvas) {
                 return ((ReferencedCanvas) owner).getMathTransform(sourceCRS, targetCRS,
-                       ReferencedGraphic.class.getName(), sourceMethodName);
+                       ReferencedGraphic.class, sourceMethodName);
             } else {
                 return ReferencingFactoryFinder.getCoordinateOperationFactory(null)
                        .createOperation(sourceCRS, targetCRS).getMathTransform();
             }
         } catch (FactoryException exception) {
-            throw new TransformException(Errors.getResources(getLocale()).format(
+            throw new TransformException(Errors.getResources(getLocale()).getString(
                         ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception);
         }
     }

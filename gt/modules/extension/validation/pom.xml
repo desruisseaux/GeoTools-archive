@@ -118,7 +118,7 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
+      <scope>provided</scope> <!-- Should be "test", but this dependencies appears in the main directory! -->
     </dependency>
 
     <!-- Adding J-Unit back in due to conflict-->

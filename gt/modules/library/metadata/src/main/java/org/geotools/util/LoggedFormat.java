@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.text.AttributedCharacterIterator;
 import java.text.FieldPosition;
 import java.text.Format;
@@ -27,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -49,10 +47,8 @@ import org.geotools.resources.i18n.Errors;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Use generic when we will be allowed to compile for J2SE 1.5.
  */
-public class LoggedFormat/*<T>*/ extends Format {
+public class LoggedFormat<T> extends Format {
     /**
      * For cross-version compatibility.
      */
@@ -66,7 +62,7 @@ public class LoggedFormat/*<T>*/ extends Format {
     /**
      * The expected type for the parsed values.
      */
-    private final Class/*<T>*/ type;
+    private final Class<T> type;
 
     /**
      * The logger where to log warnings, or {@code null} if none.
@@ -95,7 +91,7 @@ public class LoggedFormat/*<T>*/ extends Format {
      * @param format The format to use for parsing and formatting.
      * @param type   The expected type of parsed values.
      */
-    protected LoggedFormat(final Format format, final Class/*<T>*/ type) {
+    protected LoggedFormat(final Format format, final Class<T> type) {
         this.format = format;
         this.type   = type;
     }
@@ -106,8 +102,8 @@ public class LoggedFormat/*<T>*/ extends Format {
      * @param format The format to use for parsing and formatting.
      * @param type   The expected type of parsed values.
      */
-    public static /*<T>*/ LoggedFormat getInstance(final Format format, final Class/*<T>*/ type) {
-        return new LoggedFormat/*<T>*/(format, type);
+    public static <T> LoggedFormat<T> getInstance(final Format format, final Class<T> type) {
+        return new LoggedFormat<T>(format, type);
     }
 
     /**
@@ -130,7 +126,7 @@ public class LoggedFormat/*<T>*/ extends Format {
      * @todo Use Class.getSimpleName() or something like that when we will be allowed to compile
      *       for J2SE 1.5.
      */
-    public void setCaller(final Class caller, final String method) {
+    public void setCaller(final Class<?> caller, final String method) {
         this.className  = (caller != null) ? caller.getName() : null;
         this.methodName = method;
     }
@@ -144,7 +140,7 @@ public class LoggedFormat/*<T>*/ extends Format {
      * @param  text The text to parse, or {@code null}.
      * @return The parsed object, or {@code null} if {@code text} was null or can't be parsed.
      */
-    public Object/*<T>*/ parse(String text) {
+    public T parse(String text) {
         if (text == null || (text=text.trim()).length() == 0) {
             return null;
         }
@@ -161,7 +157,7 @@ public class LoggedFormat/*<T>*/ extends Format {
             logWarning(ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), type);
             return null;
         }
-        return value; // Use Class.cast with J2SE 1.5.
+        return type.cast(value);
     }
 
     /**
@@ -173,7 +169,7 @@ public class LoggedFormat/*<T>*/ extends Format {
      * @return An object parsed from the string.
      * @throws ParseException if parsing failed.
      */
-    //@Override
+    @Override
     public Object parseObject(final String text) throws ParseException {
         return format.parseObject(text);
     }
@@ -213,7 +209,7 @@ public class LoggedFormat/*<T>*/ extends Format {
      * @param value The object to format.
      * @return The character iterator describing the formatted value.
      */
-    //@Override
+    @Override
     public AttributedCharacterIterator formatToCharacterIterator(final Object value) {
         return format.formatToCharacterIterator(value);
     }
@@ -262,6 +258,7 @@ public class LoggedFormat/*<T>*/ extends Format {
     /**
      * Returns a string representation for debugging purpose.
      */
+    @Override
     public String toString() {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this))
                 .append('[').append(Utilities.getShortClassName(format));

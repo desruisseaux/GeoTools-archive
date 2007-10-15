@@ -36,7 +36,7 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;

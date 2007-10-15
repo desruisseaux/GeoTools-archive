@@ -264,7 +264,7 @@ public class Category implements Serializable {
                      final int[]        ARGB,
                      final Number       sample)
     {
-        this(name, ARGB, new NumberRange(sample.getClass(), sample, sample), null);
+        this(name, ARGB, new NumberRange((Class) sample.getClass(), sample, sample), null);
         assert Double.isNaN(inverse.minimum) : inverse.minimum;
         assert Double.isNaN(inverse.maximum) : inverse.maximum;
     }

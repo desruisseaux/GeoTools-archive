@@ -472,7 +472,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             if (name == null) {
                 name = value.toString();
             }
-            final NumberRange range = new NumberRange(value.getClass(), value, value);
+            final NumberRange range = new NumberRange((Class) value.getClass(), value, value);
             final Color[] colors = ColorUtilities.subarray(palette, intValue, intValue + 1);
             categoryList.add(new Category(name, colors, range, (MathTransform1D) null));
         }

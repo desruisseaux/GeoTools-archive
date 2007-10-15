@@ -15,7 +15,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
@@ -36,7 +35,7 @@ import java.util.regex.Pattern;
  *
  * @see org.geotools.factory.GeoTools#getVersion
  */
-public class Version implements CharSequence, Comparable, Serializable {
+public class Version implements CharSequence, Comparable<Version>, Serializable {
     /**
      * For cross-version compatibility.
      */
@@ -66,7 +65,7 @@ public class Version implements CharSequence, Comparable, Serializable {
     /**
      * The parsed components of the version string. Will be created when first needed.
      */
-    private transient Comparable[] parsed;
+    private transient Comparable<?>[] parsed;
 
     /**
      * The hash code value. Will be computed when first needed.
@@ -119,7 +118,7 @@ public class Version implements CharSequence, Comparable, Serializable {
      * @return The value at the specified index, or {@code null} if none.
      * @throws IndexOutOfBoundsException if {@code index} is negative.
      */
-    public synchronized Comparable getComponent(final int index) {
+    public synchronized Comparable<?> getComponent(final int index) {
         if (parsed == null) {
             if (components == null) {
                 components = PATTERN.split(version);
@@ -129,7 +128,7 @@ public class Version implements CharSequence, Comparable, Serializable {
         if (index >= parsed.length) {
             return null;
         }
-        Comparable candidate = parsed[index];
+        Comparable<?> candidate = parsed[index];
         if (candidate == null) {
             final String value = components[index].trim();
             try {
@@ -170,15 +169,15 @@ public class Version implements CharSequence, Comparable, Serializable {
      */
     public int compareTo(final Version other, final int limit) {
         for (int i=0; i<limit; i++) {
-            final Comparable v1 =  this.getComponent(i);
-            final Comparable v2 = other.getComponent(i);
+            final Comparable<?> v1 =  this.getComponent(i);
+            final Comparable<?> v2 = other.getComponent(i);
             if (v1 == null) {
                 return (v2 == null) ? 0 : -1;
             } else if (v2 == null) {
                 return +1;
             }
-            int c = getTypeRank(v1) - getTypeRank(v2);
-            if (c != 0) {
+            final int dr = getTypeRank(v1) - getTypeRank(v2);
+            if (dr != 0) {
                 /*
                  * One value is a text while the other value is a number.  We could be tempted to
                  * force a comparaison by converting the number to a String and then invoking the
@@ -196,9 +195,10 @@ public class Version implements CharSequence, Comparable, Serializable {
                  * way to fix this inconsistency is to define all String as lexicographically
                  * preceding Integer, no matter their content. This is what we do here.
                  */
-                return c;
+                return dr;
             }
-            c = v1.compareTo(v2);
+            @SuppressWarnings("unchecked")
+            final int c = ((Comparable) v1).compareTo(v2);
             if (c != 0) {
                 return c;
             }
@@ -214,17 +214,18 @@ public class Version implements CharSequence, Comparable, Serializable {
      * @return A negative value if this version is lower than the supplied version, a positive
      *         value if it is higher, or 0 if they are equal.
      */
-    public int compareTo(final Object other) {
-        return compareTo((Version) other, Integer.MAX_VALUE);
+    public int compareTo(final Version other) {
+        return compareTo(other, Integer.MAX_VALUE);
     }
 
     /**
      * Compare this version string with the specified object for equality. Two version are
      * considered equal if <code>{@linkplain #compareTo(Object) compareTo}(other) == 0</code>.
      */
+    @Override
     public boolean equals(final Object other) {
         if (other != null && getClass().equals(other.getClass())) {
-            return compareTo(other) == 0;
+            return compareTo((Version) other) == 0;
         }
         return false;
     }
@@ -253,6 +254,7 @@ public class Version implements CharSequence, Comparable, Serializable {
     /**
      * Returns the version string. This is the string specified at construction time.
      */
+    @Override
     public String toString() {
         return version;
     }
@@ -260,6 +262,7 @@ public class Version implements CharSequence, Comparable, Serializable {
     /**
      * Returns a hash code value for this version.
      */
+    @Override
     public int hashCode() {
         if (hashCode == 0) {
             int code = (int)serialVersionUID;

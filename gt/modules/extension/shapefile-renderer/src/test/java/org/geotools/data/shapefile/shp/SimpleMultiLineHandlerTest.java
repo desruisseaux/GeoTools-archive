@@ -39,7 +39,7 @@ import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.TestUtilites;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;

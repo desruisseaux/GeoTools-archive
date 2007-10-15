@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// J2SE library
 import java.util.Locale;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -28,8 +27,6 @@ import java.awt.event.WindowListener;
 import java.awt.IllegalComponentStateException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-
-// Swing dependencies
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,9 +37,8 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
-import javax.swing.event.InternalFrameListener;
+import javax.swing.event.InternalFrameListener; // For javadoc
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 

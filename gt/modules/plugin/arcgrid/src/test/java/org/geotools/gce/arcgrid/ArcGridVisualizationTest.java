@@ -31,7 +31,7 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.resources.image.CoverageUtilities;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;

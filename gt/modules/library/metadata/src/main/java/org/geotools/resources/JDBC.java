@@ -16,14 +16,12 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.sql.Driver;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 
@@ -41,7 +39,7 @@ public final class JDBC {
     /**
      * Lists of JDBC drivers already loaded.
      */
-    private static final Set DRIVERS = new HashSet();
+    private static final Set<String> DRIVERS = new HashSet<String>();
 
     /**
      * Do not allow instantiation of this class.

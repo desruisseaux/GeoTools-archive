@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// Standard set of Java objects.
 import java.util.Date;
 
 
@@ -37,11 +36,12 @@ import java.util.Date;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class ClassChanger {
+public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     /**
      * Wrapper classes sorted by their wide.
      */
-    private static final Class[] CLASS_RANK = {
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends Number>[] CLASS_RANK = new Class[] {
         Byte   .class,
         Short  .class,
         Integer.class,
@@ -51,20 +51,20 @@ public abstract class ClassChanger {
     };
 
     /**
-     * Liste des classes d'objets pouvant être convertis en nombre. Cette liste
+     * Liste des classes d'objets pouvant être convertis en nombres. Cette liste
      * contiendra par défaut quelques instances de {@link ClassChanger} pour
      * quelques classes standards du Java, telle que {@link Date}. Toutefois,
      * d'autres objets pourront être ajoutés par la suite. Cette liste est
      * <u>ordonnée</u>. Les classe le plus hautes dans la hierarchie (les
      * classes parentes) doivent apparaître à la fin.
      */
-    private static ClassChanger[] list = new ClassChanger[] {
-        new ClassChanger(Date.class, Long.class) {
-            protected Number convert(final Comparable object) {
-                return new Long(((Date) object).getTime());
+    private static ClassChanger<?,?>[] list = new ClassChanger[] {
+        new ClassChanger<Date,Long>(Date.class, Long.class) {
+            protected Long convert(final Date object) {
+                return new Long(object.getTime());
             }
 
-            protected Comparable inverseConvert(final Number value) {
+            protected Date inverseConvert(final Long value) {
                 return new Date(value.longValue());
             }
         }
@@ -73,20 +73,20 @@ public abstract class ClassChanger {
     /**
      * Parent class for {@link #convert}'s input objects.
      */
-    private final Class source;
+    private final Class<S> source;
 
     /**
      * Parent class for {@link #convert}'s output objects.
      */
-    private final Class target;
+    private final Class<T> target;
 
     /**
-     * Construct a new class changer.
+     * Constructs a new class changer.
      *
      * @param source Parent class for {@link #convert}'s input objects.
      * @param target Parent class for {@link #convert}'s output objects.
      */
-    protected ClassChanger(final Class source, final Class target) {
+    protected ClassChanger(final Class<S> source, final Class<T> target) {
         this.source = source;
         this.target = target;
         if (!Comparable.class.isAssignableFrom(source)) {
@@ -104,7 +104,7 @@ public abstract class ClassChanger {
      * @return The object's numerical value.
      * @throws ClassCastException if {@code object} is not of the expected class.
      */
-    protected abstract Number convert(final Comparable object) throws ClassCastException;
+    protected abstract T convert(final S object) throws ClassCastException;
 
     /**
      * Returns an instance of the converted classe from a numerical value.
@@ -112,14 +112,14 @@ public abstract class ClassChanger {
      * @param  value The value to wrap.
      * @return An instance of the source classe.
      */
-    protected abstract Comparable inverseConvert(final Number value);
+    protected abstract S inverseConvert(final T value);
 
     /**
      * Returns a string representation for this class changer.
      */
-    //@Override
+    @Override
     public String toString() {
-        return "ClassChanger["+source.getName()+"\u00A0\u21E8\u00A0"+target.getName()+']';
+        return "ClassChanger[" + source.getName() + "\u00A0\u21E8\u00A0" + target.getName() + ']';
     }
 
     /**
@@ -145,7 +145,7 @@ public abstract class ClassChanger {
      *         not a concern since the registration usually take place during the
      *         class initialization ("static" constructor).
      */
-    public static synchronized void register(final ClassChanger converter) throws IllegalStateException {
+    public static synchronized void register(final ClassChanger<?,?> converter) throws IllegalStateException {
         int i;
         for (i=0; i<list.length; i++) {
             if (list[i].source.isAssignableFrom(converter.source)) {
@@ -164,7 +164,7 @@ public abstract class ClassChanger {
                 break;
             }
         }
-        list = (ClassChanger[]) XArray.insert(list, i, 1);
+        list = XArray.insert(list, i, 1);
         list[i] = converter;
     }
 
@@ -175,12 +175,15 @@ public abstract class ClassChanger {
      * @return The class changer for the specified class.
      * @throws ClassNotFoundException if {@code source} is not a registered class.
      */
-    private static synchronized ClassChanger getClassChanger(final Class source)
-        throws ClassNotFoundException
+    private static synchronized <S extends Comparable<S>> ClassChanger<S,?> getClassChanger(final Class<S> source)
+            throws ClassNotFoundException
     {
         for (int i=0; i<list.length; i++) {
-            if (list[i].source.isAssignableFrom(source)) {
-                return list[i];
+            final ClassChanger<?,?> candidate = list[i];
+            if (candidate.source.isAssignableFrom(source)) {
+                @SuppressWarnings("unchecked")
+                final ClassChanger<S,?> c = (ClassChanger<S,?>) candidate;
+                return c;
             }
         }
         throw new ClassNotFoundException(source.getName());
@@ -193,7 +196,7 @@ public abstract class ClassChanger {
      * {@link Number} subclass that will be returned as output by {@link #convert}.
      * If no suitable mapping is found, then {@code source} is returned.
      */
-    public static synchronized Class getTransformedClass(final Class source) {
+    public static synchronized Class<?> getTransformedClass(final Class<?> source) {
         if (source != null) {
             for (int i=0; i<list.length; i++) {
                 if (list[i].source.isAssignableFrom(source)) {
@@ -216,9 +219,8 @@ public abstract class ClassChanger {
      * @throws ClassNotFoundException if {@code object} is not an instance
      *         of a registered class.
      */
-    public static Number toNumber(final Comparable object)
-        throws ClassNotFoundException
-    {
+    @SuppressWarnings("unchecked")
+    public static Number toNumber(final Comparable<?> object) throws ClassNotFoundException {
         if (object != null) {
             if (object instanceof Number) {
                 return (Number) object;
@@ -230,7 +232,7 @@ public abstract class ClassChanger {
 
     /**
      * Wraps the specified number as an instance of the specified classe.
-     * For example <code>toComparable(Date.class,&nbsp;new&nbsp;Long(time))</code>
+     * For example <code>toComparable(new&nbsp;Long(time),&nbsp;Date.class)</code>
      * is equivalent to <code>new&nbsp;Date(time)</code>. There is of course no
      * point to use this method if the destination class is know at compile time.
      * This method is useful for creating instance of classes choosen dynamically
@@ -240,14 +242,16 @@ public abstract class ClassChanger {
      * @param  classe The desired classe for return value.
      * @throws ClassNotFoundException if {@code classe} is not a registered class.
      */
-    public static Comparable toComparable(final Number value, final Class classe)
-        throws ClassNotFoundException
+    public static <C extends Comparable> C toComparable(final Number value, final Class<C> classe)
+            throws ClassNotFoundException
     {
         if (value != null) {
             if (Number.class.isAssignableFrom(classe)) {
-                return (Comparable)value;
+                return classe.cast(value);
             }
-            return getClassChanger(classe).inverseConvert(value);
+            @SuppressWarnings("unchecked")
+            final Comparable<?> c = getClassChanger(classe).inverseConvert(value);
+            return classe.cast(c);
         }
         return null;
     }
@@ -260,7 +264,7 @@ public abstract class ClassChanger {
      * @return The primitive class.
      * @throws IllegalArgumentException if the specified class is not a wrapper for a primitive.
      */
-    public static Class toPrimitive(final Class c) throws IllegalArgumentException {
+    public static Class<?> toPrimitive(final Class<?> c) throws IllegalArgumentException {
         if (Double   .class.equals(c)) return Double   .TYPE;
         if (Float    .class.equals(c)) return Float    .TYPE;
         if (Long     .class.equals(c)) return Long     .TYPE;
@@ -280,7 +284,7 @@ public abstract class ClassChanger {
      * @return The wrapper class.
      * @throws IllegalArgumentException if the specified class is not a primitive.
      */
-    public static Class toWrapper(final Class c) throws IllegalArgumentException {
+    public static Class<?> toWrapper(final Class<?> c) throws IllegalArgumentException {
         if (Double   .TYPE.equals(c)) return Double   .class;
         if (Float    .TYPE.equals(c)) return Float    .class;
         if (Long     .TYPE.equals(c)) return Long     .class;
@@ -295,20 +299,19 @@ public abstract class ClassChanger {
     /**
      * Casts the number to the specified class. The class must by one of {@link Byte},
      * {@link Short}, {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     *
-     * @todo Use {@code valueOf} when we will be allowed to compile for J2SE 1.5.
      */
-    public static Number cast(final Number n, final Class c) {
-        if (n!=null && !n.getClass().equals(c)) {
-            if (Byte   .class.equals(c)) return new Byte   (n.  byteValue());
-            if (Short  .class.equals(c)) return new Short  (n. shortValue());
-            if (Integer.class.equals(c)) return new Integer(n.   intValue());
-            if (Long   .class.equals(c)) return new Long   (n.  longValue());
-            if (Float  .class.equals(c)) return new Float  (n. floatValue());
-            if (Double .class.equals(c)) return new Double (n.doubleValue());
-            throw new IllegalArgumentException(Utilities.getShortName(c));
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> N cast(final Number n, final Class<N> c) {
+        if (n==null || n.getClass().equals(c)) {
+            return (N) n;
         }
-        return n;
+        if (Byte   .class.equals(c)) return (N) Byte   .valueOf(n.  byteValue());
+        if (Short  .class.equals(c)) return (N) Short  .valueOf(n. shortValue());
+        if (Integer.class.equals(c)) return (N) Integer.valueOf(n.   intValue());
+        if (Long   .class.equals(c)) return (N) Long   .valueOf(n.  longValue());
+        if (Float  .class.equals(c)) return (N) Float  .valueOf(n. floatValue());
+        if (Double .class.equals(c)) return (N) Double .valueOf(n.doubleValue());
+        throw new IllegalArgumentException(Utilities.getShortName(c));
     }
 
     /**
@@ -316,7 +319,7 @@ public abstract class ClassChanger {
      * must be instance of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */
-    public static Class getWidestClass(final Number n1, final Number n2) {
+    public static Class<? extends Number> getWidestClass(final Number n1, final Number n2) {
         return getWidestClass((n1!=null) ? n1.getClass() : null,
                               (n2!=null) ? n2.getClass() : null);
     }
@@ -326,9 +329,11 @@ public abstract class ClassChanger {
      * must be of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */
-    public static Class getWidestClass(final Class c1, final Class c2) {
-        if (c1==null) return c2;
-        if (c2==null) return c1;
+    public static Class<? extends Number> getWidestClass(final Class<? extends Number> c1,
+                                                         final Class<? extends Number> c2)
+    {
+        if (c1 == null) return c2;
+        if (c2 == null) return c1;
         return CLASS_RANK[Math.max(getRank(c1), getRank(c2))];
     }
 
@@ -337,16 +342,18 @@ public abstract class ClassChanger {
      * must be of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */
-    public static Class getFinestClass(final Class c1, final Class c2) {
-        if (c1==null) return c2;
-        if (c2==null) return c1;
+    public static Class<? extends Number> getFinestClass(final Class<? extends Number> c1,
+                                                         final Class<? extends Number> c2)
+    {
+        if (c1 == null) return c2;
+        if (c2 == null) return c1;
         return CLASS_RANK[Math.min(getRank(c1), getRank(c2))];
     }
 
     /**
      * Returns the smallest class capable to hold the specified value.
      */
-    public static Class getFinestClass(final double value) {
+    public static Class<? extends Number> getFinestClass(final double value) {
         final long lg = (long)value;
         if (value == lg) {
             if (lg >=    Byte.MIN_VALUE  &&  lg <=    Byte.MAX_VALUE) return    Byte.class;
@@ -364,7 +371,7 @@ public abstract class ClassChanger {
     /**
      * Returns the rank (in the {@link #CLASS_RANK} array) of the specified class.
      */
-    private static int getRank(final Class c) {
+    private static int getRank(final Class<? extends Number> c) {
         for (int i=0; i<CLASS_RANK.length; i++) {
             if (CLASS_RANK[i].isAssignableFrom(c)) {
                 return i;

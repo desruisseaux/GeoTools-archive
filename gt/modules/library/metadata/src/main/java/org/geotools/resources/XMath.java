@@ -16,10 +16,8 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.text.ChoiceFormat;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -45,7 +43,7 @@ public final class XMath {
      * Approximately equal to 2.302585.
      */
     public static final double LN10 = 2.3025850929940456840179914546844;
-    
+
     /**
      * Table of some integer powers of 10. Used
      * for fast computation of {@link #pow10(int)}.
@@ -72,7 +70,7 @@ public final class XMath {
     public static double cbrt(final double x) {
         return Math.pow(x, 1.0/3);
     }
-    
+
     /**
      * Compute the hypotenuse (<code>sqrt(x²+y²)</code>).
      *
@@ -91,7 +89,7 @@ public final class XMath {
     public static double log10(final double x) {
         return Math.log(x) / LN10;
     }
-    
+
     /**
      * Compute 10 power <var>x</var>.
      */
@@ -103,7 +101,7 @@ public final class XMath {
             return Math.pow(10, x);
         }
     }
-    
+
     /**
      * Compute <var>x</var> to the power of 10. This computation is very fast
      * for small power of 10 but has some rounding error issues (see

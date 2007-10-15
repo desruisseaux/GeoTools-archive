@@ -15,7 +15,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.Collection;
 
 
@@ -29,9 +28,9 @@ import java.util.Collection;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public interface CheckedCollection extends Collection {
+public interface CheckedCollection<E> extends Collection<E> {
     /**
      * Returns the element type.
      */
-    Class getElementType();
+    Class<E> getElementType();
 }

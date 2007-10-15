@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -40,7 +40,6 @@ public final class X364 {
     /** Cyan foreground.          */ public  static final String CYAN    = ESCAPE + "36m";
     /** Default foreground.       */ public  static final String DEFAULT = ESCAPE + "39m";
 
-    /** Red background.     */ public  static final String BACKGROUND_RED     = ESCAPE + "41m";
-    /** Default background. */ public  static final String BACKGROUND_DEFAULT = ESCAPE + "49m";
-    
+    /** Red background.     */ public static final String BACKGROUND_RED     = ESCAPE + "41m";
+    /** Default background. */ public static final String BACKGROUND_DEFAULT = ESCAPE + "49m";
 }

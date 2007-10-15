@@ -112,8 +112,10 @@ public class MeasurementRange extends NumberRange {
      * @param isMaxIncluded Defines whether the maximum value is included in the Range.
      * @param units   The units of measurement, or {@code null} if unknown.
      */
-    public MeasurementRange(final Class type, final Number minimum, final boolean isMinIncluded,
-                            final Number maximum, final boolean isMaxIncluded, final Unit units)
+    public <N extends Number> MeasurementRange(final Class<N> type,
+                                               final N minimum, final boolean isMinIncluded,
+                                               final N maximum, final boolean isMaxIncluded,
+                                               final Unit units)
     {
         super(type, minimum, isMinIncluded, maximum, isMaxIncluded);
         this.units = units;
@@ -141,7 +143,7 @@ public class MeasurementRange extends NumberRange {
      * @param units   The units of measurement, or {@code null} if unknown.
      * @throws ClassCastException if some elements are not instances of {@link Number}.
      */
-    private MeasurementRange(final Class type, final Range range, final Unit units)
+    private MeasurementRange(final Class<? extends Number> type, final Range range, final Unit units)
             throws ClassCastException
     {
         super(type, range);
@@ -173,13 +175,13 @@ public class MeasurementRange extends NumberRange {
      * Casts the specified range to the specified type. If this class is associated to a unit of
      * measurement, then this method convert the {@code range} units to the same units than this
      * instance.
-     * 
+     *
      * @param type The class to cast to. Must be one of {@link Byte}, {@link Short},
      *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @return The casted range, or {@code range} if no cast is needed.
      */
-    //@Override
-    NumberRange convertAndCast(final Range range, final Class type) {
+    @Override
+    NumberRange convertAndCast(final Range range, final Class<? extends Number> type) {
         if (range instanceof MeasurementRange) {
             return ((MeasurementRange) range).convertAndCast(type, units);
         } else {
@@ -189,7 +191,7 @@ public class MeasurementRange extends NumberRange {
 
     /**
      * Casts this range to the specified type and converts to the specified units.
-     * 
+     *
      * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
      *             {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
      * @param  targetUnit the target units.
@@ -197,7 +199,7 @@ public class MeasurementRange extends NumberRange {
      * @throws ConversionException if the target units are not compatible with
      *         this {@linkplain #getUnits range units}.
      */
-    private MeasurementRange convertAndCast(final Class type, final Unit targetUnits)
+    private <N extends Number> MeasurementRange convertAndCast(final Class<N> type, final Unit targetUnits)
             throws ConversionException
     {
         if (targetUnits == null || targetUnits.equals(units)) {
@@ -234,7 +236,7 @@ public class MeasurementRange extends NumberRange {
     /**
      * Compares this range with the specified object for equality.
      */
-    //@Override
+    @Override
     public boolean equals(final Object other) {
         if (super.equals(other)) {
             if (other instanceof MeasurementRange) {
@@ -249,7 +251,7 @@ public class MeasurementRange extends NumberRange {
     /**
      * Returns a string representation of this range.
      */
-    //@Override
+    @Override
     public String toString() {
         String range = super.toString();
         if (units != null) {
