@@ -17,6 +17,7 @@ package org.geotools.filter;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,11 +34,13 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.PropertyIsEqualTo;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -862,6 +865,39 @@ public class FilterTest extends TestCase {
         //finaly test noting shortcut
         filter2 = (org.geotools.filter.Filter) filterFalse.not();
         assertTrue(filter2.contains(testFeature));
+    }
+    
+    public void testLiteralExpression(){
+    	LiteralExpressionImpl literal;
+		literal = new LiteralExpressionImpl(1.0D);
+		assertEquals(ExpressionType.LITERAL_DOUBLE, literal.getType());
+		assertEquals(Double.valueOf(1.0D), literal.evaluate((Feature)null));
+
+		GeometryFactory gf = new GeometryFactory();
+		literal = new LiteralExpressionImpl(gf.createPoint(new Coordinate(0,0)));
+		assertEquals(ExpressionType.LITERAL_GEOMETRY, literal.getType());
+		Geometry value = (Geometry) literal.evaluate((Feature)null);
+		assertTrue(gf.createPoint(new Coordinate(0,0)).equalsExact(value));
+		
+		literal = new LiteralExpressionImpl(1);
+		assertEquals(ExpressionType.LITERAL_INTEGER, literal.getType());
+		assertEquals(Integer.valueOf(1), literal.evaluate((Feature)null));
+
+		literal = new LiteralExpressionImpl(1L);
+		assertEquals(ExpressionType.LITERAL_LONG, literal.getType());
+		assertEquals(Long.valueOf(1), literal.evaluate((Feature)null));
+
+		literal = new LiteralExpressionImpl("string value");
+		assertEquals(ExpressionType.LITERAL_STRING, literal.getType());
+		assertEquals("string value", literal.evaluate((Feature)null));
+
+		literal = new LiteralExpressionImpl(new Date(0));
+		assertEquals(ExpressionType.LITERAL_UNDECLARED, literal.getType());
+		assertEquals(new Date(0), literal.evaluate((Feature)null));
+
+		literal = new LiteralExpressionImpl(null);
+		assertEquals(ExpressionType.LITERAL_UNDECLARED, literal.getType());
+		assertNull(literal.evaluate((Feature)null));
     }
     
     /**
