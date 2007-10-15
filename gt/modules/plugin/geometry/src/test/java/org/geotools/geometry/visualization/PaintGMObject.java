@@ -15,6 +15,7 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.DirectPosition;
@@ -75,16 +76,16 @@ public class PaintGMObject {
             object_type = PaintGMObject.TYPE_LINES;
 
             SurfaceBoundary sb = ((SurfaceImpl) object).getBoundary();
-            Ring exterior = (RingImpl) sb.getExterior();
+            Ring exterior = sb.getExterior();
             
             LineList coords = new LineList();
             
-            coords.addRingToCoords((RingImpl) exterior);
+            coords.addRingToCoords((RingImplUnsafe)exterior);
             
         	List<Ring> interiors = sb.getInteriors();
 
         	for (int i=0; i<interiors.size(); i++) {
-                coords.addRingToCoords((RingImpl) interiors.get(i));
+                coords.addRingToCoords((RingImplUnsafe) interiors.get(i));
         	}
         	
         	object_x = new int[coords.size()*2];
@@ -111,14 +112,14 @@ public class PaintGMObject {
             while (surfaces.hasNext()) {
             	
                 SurfaceBoundary sb = ((SurfaceImpl)surfaces.next()).getBoundary();
-                Ring exterior = (RingImpl) sb.getExterior();
+                Ring exterior = sb.getExterior();
                 
-                coords.addRingToCoords((RingImpl) exterior);
+                coords.addRingToCoords((RingImplUnsafe) exterior);
                 
             	List<Ring> interiors = sb.getInteriors();
 
             	for (int i=0; i<interiors.size(); i++) {
-                    coords.addRingToCoords((RingImpl) interiors.get(i));
+                    coords.addRingToCoords((RingImplUnsafe) interiors.get(i));
             	}
             }
         	
@@ -330,7 +331,7 @@ public class PaintGMObject {
     		return this.list.size();
     	}
     	
-        public void addRingToCoords(RingImpl ring) {
+        public void addRingToCoords(RingImplUnsafe ring) {
         	
         	List<DirectPosition> dps = ring.asDirectPositions();
         	

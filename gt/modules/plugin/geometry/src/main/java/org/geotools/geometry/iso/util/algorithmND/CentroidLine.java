@@ -25,8 +25,10 @@ import org.geotools.geometry.iso.complex.CompositeCurveImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.Geometry;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -63,11 +65,11 @@ public class CentroidLine {
 	 * @param geom
 	 *            the geometry to add
 	 */
-	public void add(GeometryImpl geom) {
+	public void add(Geometry geom) {
 		if (geom instanceof CurveImpl) {
 			this.addCurve((CurveImpl) geom);
 		} else if (geom instanceof RingImpl) {
-			this.addCurveIter(((RingImpl)geom).getGenerators().iterator());
+			this.addCurveIter(((RingImplUnsafe)geom).getGenerators().iterator());
 		} else if (geom instanceof MultiCurveImpl) {
 			this.addCurveIter(((MultiCurveImpl)geom).getElements().iterator());
 		} else if (geom instanceof CompositeCurveImpl) {

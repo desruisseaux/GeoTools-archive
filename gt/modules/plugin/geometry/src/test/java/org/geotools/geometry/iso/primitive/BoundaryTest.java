@@ -155,7 +155,7 @@ public class BoundaryTest extends TestCase {
 		curveList.add(curve1);
 		curveList.add(curve2);
 		
-		RingImpl exteriorring1 = tPrimFactory.createRing(curveList);
+		Ring exteriorring1 = tPrimFactory.createRing(curveList);
 
 		//System.out.println(exteriorring1);
 		

@@ -73,7 +73,7 @@ public class PicoMultiSurfaceTest extends TestCase {
 		directPositionList.add(pf.createDirectPosition(new double[] {10, 30}));
 		directPositionList.add(pf.createDirectPosition(new double[] {20, 10}));
 
-		RingImpl exteriorRing = (RingImpl) primf.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = primf.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundaryImpl surfaceBoundary1 = primf.createSurfaceBoundary(exteriorRing, interiors );

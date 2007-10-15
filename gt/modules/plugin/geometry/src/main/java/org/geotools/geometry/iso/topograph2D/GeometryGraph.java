@@ -35,6 +35,7 @@ import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -213,6 +214,9 @@ public class GeometryGraph extends PlanarGraph {
 			this.addCurve((CurveImpl) g);
 		else if (g instanceof CurveBoundaryImpl)
 			this.addCurveBoundary((CurveBoundaryImpl) g);
+		else if (g instanceof RingImplUnsafe) {
+			this.addRing((RingImplUnsafe) g);
+		}
 		else if (g instanceof RingImpl) {
 			this.addRing((RingImpl) g);
 		}
@@ -288,7 +292,7 @@ public class GeometryGraph extends PlanarGraph {
 	 * Adds a ring in clockwise orientation
 	 * @param aRing
 	 */
-	private void addRing(RingImpl aRing) {
+	private void addRing(Ring aRing) {
 		this.addRing(aRing, Location.EXTERIOR, Location.INTERIOR);
 	}
 	
@@ -307,9 +311,9 @@ public class GeometryGraph extends PlanarGraph {
 	 * @param cwRight
 	 *            Label for the right side of the ring
 	 */
-	private void addRing(RingImpl aRing, int cwLeft, int cwRight) {
+	private void addRing(Ring aRing, int cwLeft, int cwRight) {
 
-		List<DirectPosition> tDPList = aRing.asDirectPositions();
+		List<DirectPosition> tDPList = ((RingImplUnsafe)aRing).asDirectPositions();
 		Coordinate[] coord = CoordinateArrays.toCoordinateArray(tDPList);
 
 		// Remove neighboured identical points
@@ -374,7 +378,7 @@ public class GeometryGraph extends PlanarGraph {
 				.iterator();
 
 		while (tInteriorIter.hasNext()) {
-			this.addRing((RingImpl) tInteriorIter.next(), Location.INTERIOR,
+			this.addRing(tInteriorIter.next(), Location.INTERIOR,
 					Location.EXTERIOR);
 		}
 	}

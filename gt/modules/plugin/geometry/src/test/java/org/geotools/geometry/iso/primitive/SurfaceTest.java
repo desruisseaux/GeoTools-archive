@@ -175,7 +175,7 @@ public class SurfaceTest extends TestCase {
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {10, 30}));
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {20, 10}));
 
-		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = (Ring) tPrimFactory.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundaryImpl surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorRing, interiors );

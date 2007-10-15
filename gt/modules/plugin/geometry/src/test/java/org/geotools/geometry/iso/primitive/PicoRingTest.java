@@ -17,6 +17,7 @@ import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Ring;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -105,7 +106,7 @@ public class PicoRingTest extends TestCase {
 		curveList.add(curve1);
 		curveList.add(curve2);
 		
-		RingImpl ring1 = tPrimFactory.createRing(curveList);
+		Ring ring1 = tPrimFactory.createRing(curveList);
 
 		//System.out.println(ring1);
 

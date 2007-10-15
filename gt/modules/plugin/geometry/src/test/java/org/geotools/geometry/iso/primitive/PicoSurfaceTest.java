@@ -136,7 +136,7 @@ public class PicoSurfaceTest extends TestCase {
 		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {10, 30}));
 		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {20, 10}));
 
-		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = tPrimFactory.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundaryImpl surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorRing, interiors );
@@ -197,7 +197,7 @@ public class PicoSurfaceTest extends TestCase {
 		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {10, 30}));
 		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {20, 10}));
 
-		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = tPrimFactory.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundaryImpl surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorRing, interiors );
@@ -256,7 +256,7 @@ public class PicoSurfaceTest extends TestCase {
 		directPositionList.remove(directPositionList.size()-1);
 		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {15, 25}));
 		directPositionList.add(aGeomFactory.createDirectPosition(new double[] {20, 10}));
-		RingImpl exteriorRing2 = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing2 = tPrimFactory.createRingByDirectPositions(directPositionList);
 		SurfaceBoundaryImpl surfaceBoundary2 = tPrimFactory.createSurfaceBoundary(exteriorRing2, interiors );
 		assertFalse(surfaceBoundary1.equals(surfaceBoundary2));
 		

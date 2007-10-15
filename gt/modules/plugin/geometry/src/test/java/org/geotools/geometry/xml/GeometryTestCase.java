@@ -161,4 +161,7 @@ public class GeometryTestCase implements Test {
             op.runTest( geomA, geomB );            
         }
     }
+    public void testEmpty() {
+    	//do nothing
+    }
 }

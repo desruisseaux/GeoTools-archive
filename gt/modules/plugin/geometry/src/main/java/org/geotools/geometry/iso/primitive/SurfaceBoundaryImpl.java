@@ -133,9 +133,9 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.primitive.SurfaceBoundary#getExterior()
 	 */
-	public RingImpl getExterior() {
+	public Ring getExterior() {
 		// Return exterior ring of this boundary
-		return (RingImpl) this.exterior;
+		return this.exterior;
 	}
 
 	/* (non-Javadoc)

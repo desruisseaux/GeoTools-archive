@@ -25,6 +25,7 @@ import org.geotools.geometry.iso.aggregate.MultiSurfaceImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -109,9 +110,9 @@ public class CentroidArea2D {
 	}
 
 	private void addSurface(SurfaceBoundaryImpl sb) {
-		this.addShell(sb.getExterior().asDirectPositions());
+		this.addShell(((RingImplUnsafe)sb.getExterior()).asDirectPositions());
 		for (int i = 0; i < sb.getInteriors().size(); i++) {
-			this.addHole(((RingImpl)sb.getInteriors().get(i)).asDirectPositions());
+			this.addHole(((RingImplUnsafe)sb.getInteriors().get(i)).asDirectPositions());
 		}
 	}
 

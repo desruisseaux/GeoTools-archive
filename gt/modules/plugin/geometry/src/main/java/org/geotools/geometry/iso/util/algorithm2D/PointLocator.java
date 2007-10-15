@@ -25,6 +25,7 @@ import org.geotools.geometry.iso.aggregate.MultiPrimitiveImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
@@ -33,6 +34,7 @@ import org.geotools.geometry.iso.topograph2D.Location;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Ring;
 
 import com.vividsolutions.jts.geom.LinearRing;
 
@@ -164,9 +166,9 @@ public class PointLocator {
 		return Location.EXTERIOR;
 	}
 
-	private int locateInPolygonRing(Coordinate p, RingImpl ring) {
+	private int locateInPolygonRing(Coordinate p, Ring ring) {
 		// can this test be folded into isPointInRing ?
-		Coordinate[] coord = CoordinateArrays.toCoordinateArray(ring
+		Coordinate[] coord = CoordinateArrays.toCoordinateArray(((RingImplUnsafe)ring)
 				.asDirectPositions());
 		if (CGAlgorithms.isOnLine(p, coord)) {
 			return Location.BOUNDARY;
@@ -180,8 +182,8 @@ public class PointLocator {
 
 		// if (poly.isEmpty())
 		// return Location.EXTERIOR;
-		List<RingImpl> rings = aSurface.getBoundaryRings();
-		RingImpl shell = rings.get(0);
+		List<Ring> rings = aSurface.getBoundaryRings();
+		Ring shell = rings.get(0);
 
 		int shellLoc = locateInPolygonRing(p, shell);
 		if (shellLoc == Location.EXTERIOR)
@@ -190,7 +192,7 @@ public class PointLocator {
 			return Location.BOUNDARY;
 		// now test if the point lies in or on the holes
 		for (int i = 1; i < rings.size(); i++) {
-			RingImpl hole = (RingImpl) rings.get(i);
+			Ring hole = rings.get(i);
 			int holeLoc = locateInPolygonRing(p, hole);
 			if (holeLoc == Location.INTERIOR)
 				return Location.EXTERIOR;

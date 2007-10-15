@@ -61,7 +61,7 @@ public abstract class EdgeRing {
 	// surrounded by this ring
 
 	// private LinearRing ring; // the ring created for this EdgeRing
-	private RingImpl ring; // the ring created for this EdgeRing
+	private Ring ring; // the ring created for this EdgeRing
 
 	private boolean isHole;
 
@@ -120,7 +120,7 @@ public abstract class EdgeRing {
 
 	// If the ring obj is already computed, return it.  Otherwise, compute the ring and 
 	// store it for next time.
-	public RingImpl getRing() {
+	public Ring getRing() {
 		this.computeRing();
 		return this.ring;
 	}
@@ -204,7 +204,7 @@ public abstract class EdgeRing {
 		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
 		orientableCurves.add(curve);
 
-		this.ring = (RingImpl) new RingImpl(orientableCurves);		
+		this.ring = new RingImpl(orientableCurves);		
 		// this.ring = (RingImpl) this.mFeatGeomFactory.getPrimitiveFactory().createRingByDirectPositions(dpList);
 		
 		// isHole is now calculated in the constructor.
@@ -332,7 +332,7 @@ public abstract class EdgeRing {
 	 * holes, if they have been assigned.
 	 */
 	public boolean containsPoint(Coordinate p) {
-		RingImpl shell = this.getRing();
+		Ring shell = this.getRing();
 
 		// TODO: auskommentiert; anpassen!
 		// Envelope env = shell.getEnvelopeInternal();

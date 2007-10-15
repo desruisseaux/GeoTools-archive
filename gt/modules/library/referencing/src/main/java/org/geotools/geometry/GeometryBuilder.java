@@ -92,6 +92,7 @@ public class GeometryBuilder {
         this.crs = crs;
         this.hints = GeoTools.getDefaultHints();
         hints.put( Hints.CRS, crs );
+        hints.put( Hints.GEOMETRY_VALIDATE, true );
     }
     
     public GeometryBuilder( String code ) throws NoSuchAuthorityCodeException, FactoryException{

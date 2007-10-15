@@ -397,18 +397,18 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * the exterior ring (island), the following elements, if exist, define the
 	 * interior rings (holes)
 	 * 
-	 * @return List of RingImpl: First element is the exterior ring (island),
+	 * @return List of Ring: First element is the exterior ring (island),
 	 *         the following elements, if exist, define the interior rings
 	 *         (holes)
 	 */
-	public List<RingImpl> getBoundaryRings() {
+	public List<Ring> getBoundaryRings() {
 
-		List<RingImpl> rList = new ArrayList();
-		rList.add((RingImpl) this.boundary.getExterior());
+		List<Ring> rList = new ArrayList();
+		rList.add(this.boundary.getExterior());
 		Iterator tInteriorRings = this.boundary.getInteriors().iterator();
 
 		while (tInteriorRings.hasNext()) {
-			rList.add((RingImpl) tInteriorRings.next());
+			rList.add((Ring) tInteriorRings.next());
 		}
 
 		return rList;
@@ -471,19 +471,19 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// use the new rings to build a new Surface and return that.
 		PrimitiveFactory primitiveFactory = new PrimitiveFactoryImpl(newCRS, getPositionFactory());
 		
-		List<RingImpl> currentRings = this.getBoundaryRings();
-		Iterator<RingImpl> iter = currentRings.iterator();
-		RingImpl newExterior = null;
+		List<Ring> currentRings = this.getBoundaryRings();
+		Iterator<Ring> iter = currentRings.iterator();
+		Ring newExterior = null;
 		List<Ring> newInteriors = new ArrayList<Ring>();
 		while (iter.hasNext()) {
-			RingImpl thisRing = (RingImpl) iter.next();
+			Ring thisRing = (Ring) iter.next();
 			
 			// exterior Ring should be first element in the list
 			if (newExterior == null) {
-				newExterior = (RingImpl) thisRing.transform(newCRS, transform );
+				newExterior = (Ring) thisRing.transform(newCRS, transform );
 			}
 			else {
-				newInteriors.add((RingImpl) thisRing.transform(newCRS, transform));
+				newInteriors.add((Ring) thisRing.transform(newCRS, transform));
 			}
 		}
 		

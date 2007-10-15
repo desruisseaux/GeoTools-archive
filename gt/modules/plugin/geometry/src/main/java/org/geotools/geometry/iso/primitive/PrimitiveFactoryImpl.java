@@ -69,6 +69,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 	private static final long serialVersionUID = 1L;
 	private CoordinateReferenceSystem crs;
 	private PositionFactory positionFactory;
+	private Boolean geomValidate;
 
 	/** Map of hints we care about during construction, used by FactoryFinder/Registry madness */
 	private Map hintsWeCareAbout = new HashMap();
@@ -84,17 +85,24 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 			this.crs = DefaultGeographicCRS.WGS84;
 			hints = GeoTools.getDefaultHints();
 	        hints.put(Hints.CRS, crs );
+	        geomValidate = true;
+	        hints.put(Hints.GEOMETRY_VALIDATE, geomValidate);
 		}
 		else {
 			this.crs = (CoordinateReferenceSystem) hints.get( Hints.CRS );
 			if( crs == null ){
 				throw new NullPointerException("A CRS Hint is required in order to use PrimitiveFactoryImpl");
 			}
+			geomValidate = (Boolean) hints.get( Hints.GEOMETRY_VALIDATE );
+			if (geomValidate == null) {
+				geomValidate = true;
+			}
 		}
 		
 		this.positionFactory = GeometryFactoryFinder.getPositionFactory(hints);
 		hintsWeCareAbout.put(Hints.CRS, crs );
 		hintsWeCareAbout.put(Hints.POSITION_FACTORY, positionFactory );
+		hintsWeCareAbout.put(Hints.GEOMETRY_VALIDATE, geomValidate );
 	}
 
 	/**
@@ -113,9 +121,11 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		else {
 			this.positionFactory = positionFactory;
 		}
-
+		
+		geomValidate = true;
 		hintsWeCareAbout.put(Hints.CRS, crs );
 		hintsWeCareAbout.put(Hints.POSITION_FACTORY, positionFactory );
+		hintsWeCareAbout.put(Hints.GEOMETRY_VALIDATE, geomValidate );
 	}
 
 	/** These are the hints we used */
@@ -239,6 +249,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 			throw new NullPointerException(
 					"One or both of the parameters is NULL");
 		return new CurveBoundaryImpl(getCoordinateReferenceSystem(), p0, p1);
+		
 	}
 
 	/*
@@ -262,7 +273,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 	 * 
 	 * @see org.opengis.geometry.primitive.PrimitiveFactory#createRing(java.util.List)
 	 */
-	public RingImpl createRing(List<OrientableCurve> orientableCurves)
+	public Ring createRing(List<OrientableCurve> orientableCurves)
 			throws MismatchedReferenceSystemException,
 			MismatchedDimensionException {
 		/**
@@ -288,7 +299,15 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 				throw new MismatchedReferenceSystemException();
 			}
 		}
-		return new RingImpl(orientableCurves);
+		
+		// if we don't want to validate the ring upon creation (for faster creation) use
+		// RingImplUnsafe instead of RingImpl
+		if ( geomValidate ) {
+			return new RingImpl(orientableCurves);
+		}
+		else {
+			return new RingImplUnsafe(orientableCurves);
+		}
 	}
 
 	/*
@@ -457,11 +476,11 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		if( axis.getDirection() == AxisDirection.OTHER ){
 			return processSegmentToPrimitive( bounds, segment, dimension+1 );
 		}
-		RingImpl ring = processBoundsToRing( bounds, segment, dimension );
+		Ring ring = processBoundsToRing( bounds, segment, dimension );
 		return processRingToPrimitive( bounds, ring, dimension+1 );				
 	}
 
-	private PrimitiveImpl processRingToPrimitive(Envelope bounds, RingImpl ring, int dimension) {
+	private PrimitiveImpl processRingToPrimitive(Envelope bounds, Ring ring, int dimension) {
 		int D = crs.getCoordinateSystem().getDimension();
 		if( dimension == D ){ // create Surface from ring and return			
 			SurfaceBoundary boundary = new SurfaceBoundaryImpl( crs, ring, Collections.EMPTY_LIST );
@@ -474,7 +493,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		return processRingToVolumne( bounds, ring, dimension+1 );
 	}
 
-	private PrimitiveImpl processRingToVolumne(Envelope bounds, RingImpl ring, int i) {
+	private PrimitiveImpl processRingToVolumne(Envelope bounds, Ring ring, int i) {
 		// go into a volume
 		throw new UnsupportedOperationException("Not yet 3D");
 	}
@@ -505,7 +524,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 	 * This is pass #2 ...
 	 * @return
 	 */
-	public RingImpl processBoundsToRing( Envelope bounds, LineSegment segment, final int D ){
+	public Ring processBoundsToRing( Envelope bounds, LineSegment segment, final int D ){
 		DirectPosition one = positionFactory.createDirectPosition(segment.getStartPoint().getCoordinates()); //new DirectPositionImpl( segment.getStartPoint() );
 		one.setOrdinate( D, bounds.getMinimum(D) );
 		
@@ -528,7 +547,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		edges.add( new CurveImpl( edge2 ));
 		edges.add( new CurveImpl( edge3 ));
 		edges.add( new CurveImpl( edge4 ));
-		return new RingImpl( edges );
+		return this.createRing(edges);
 	}
 		
 	/**

@@ -119,10 +119,10 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		edges.add( new CurveImpl( edge2 ));
 		edges.add( new CurveImpl( edge3 ));
 		edges.add( new CurveImpl( edge4 ));
-		RingImpl expected = new RingImpl( edges );
+		Ring expected = new RingImpl( edges );
 		
 		// create ring and test
-		RingImpl actual = factory.processBoundsToRing(bounds, segment, 1);
+		Ring actual = factory.processBoundsToRing(bounds, segment, 1);
 		assertNotNull( actual );
 		assertEquals( expected, actual);
 	}
@@ -161,7 +161,7 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		edges.add( new CurveImpl( edge2 ));
 		edges.add( new CurveImpl( edge3 ));
 		edges.add( new CurveImpl( edge4 ));
-		RingImpl expectedRing = new RingImpl( edges );
+		Ring expectedRing = new RingImpl( edges );
 		
 		SurfaceBoundaryImpl sb = new SurfaceBoundaryImpl(crs,expectedRing,null);
 		//PrimitiveImpl expected = new PrimitiveImpl(crs,sb,null); //(PrimitiveImpl) sb;
@@ -226,7 +226,7 @@ public class PicoPrimitiveFactoryTest extends TestCase {
 		edges.add( new CurveImpl( edge1 ));
 		edges.add( new CurveImpl( edge2 ));
 		edges.add( new CurveImpl( edge3 ));
-		RingImpl exterior = new RingImpl( edges );
+		Ring exterior = new RingImpl( edges );
 		
 		// build interior ring
 		DirectPosition one2 = pf.createDirectPosition(new double[]{420,360});

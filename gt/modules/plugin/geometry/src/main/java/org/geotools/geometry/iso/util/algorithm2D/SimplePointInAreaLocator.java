@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
@@ -29,6 +30,7 @@ import org.geotools.geometry.iso.topograph2D.Location;
 import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.opengis.geometry.Geometry;
 import org.opengis.geometry.aggregate.MultiPrimitive;
+import org.opengis.geometry.primitive.Ring;
 
 /**
  * Computes whether a point lies in the interior of an area {@link Geometry}.
@@ -97,21 +99,21 @@ public class SimplePointInAreaLocator {
 		// if (poly.isEmpty())
 		// return false;
 
-		List<RingImpl> rings = aSurface.getBoundaryRings();
-		RingImpl shell = rings.get(0);
+		List<Ring> rings = aSurface.getBoundaryRings();
+		Ring shell = rings.get(0);
 
 		// The point lies in the ring defined by the coordinatearray
 		// representation of the exterior ring?
 		// if not, return false
 		if (!CGAlgorithms.isPointInRing(p, CoordinateArrays
-				.toCoordinateArray(shell.asDirectPositions()))) {
+				.toCoordinateArray(((RingImplUnsafe)shell).asDirectPositions()))) {
 			return false;
 		}
 
 		// The point lies in the ring defined by the coordinatearray
 		// representation of the exterior ring?
 		for (int i = 1; i < rings.size(); i++) {
-			RingImpl hole = (RingImpl) rings.get(i);
+			RingImplUnsafe hole = (RingImplUnsafe) rings.get(i);
 			// if so, return false
 			if (CGAlgorithms.isPointInRing(p, CoordinateArrays
 					.toCoordinateArray(hole.asDirectPositions()))) {

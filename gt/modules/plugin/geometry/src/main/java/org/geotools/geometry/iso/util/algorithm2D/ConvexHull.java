@@ -43,6 +43,7 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
@@ -110,11 +111,11 @@ public class ConvexHull {
 		} else if (geom instanceof RingImpl) {
 			// Add control points
 			positions = new ArrayList<DirectPositionImpl>();
-			positions = ((RingImpl)geom).asDirectPositions();
+			positions = ((RingImplUnsafe)geom).asDirectPositions();
 		} else if (geom instanceof SurfaceImpl) {
 			// Add control points of exterior ring of boundary
 			positions = new ArrayList<DirectPositionImpl>();
-			positions = ((SurfaceImpl)geom).getBoundary().getExterior().asDirectPositions();
+			positions = ((RingImplUnsafe)((SurfaceImpl)geom).getBoundary().getExterior()).asDirectPositions();
 		} else if (geom instanceof MultiPointImpl) {
 			// Add all points of the set
 			positions = new HashSet<PointImpl>();
@@ -131,7 +132,7 @@ public class ConvexHull {
 			positions = new HashSet<DirectPositionImpl>();
 			Iterator<OrientableSurface> surfaceIter = ((MultiSurfaceImpl)geom).getElements().iterator();
 			while(surfaceIter.hasNext()) {
-				positions.addAll(((SurfaceImpl)surfaceIter.next()).getBoundary().getExterior().asDirectPositions());
+				positions.addAll(((RingImplUnsafe)((SurfaceImpl)surfaceIter.next()).getBoundary().getExterior()).asDirectPositions());
 			}
 		} else if (geom instanceof MultiPrimitiveImpl) {
 			positions = new HashSet<PointImpl>();
@@ -154,7 +155,7 @@ public class ConvexHull {
 					}
 					else if (hull instanceof SurfaceImpl) {
 						SurfaceImpl surface = (SurfaceImpl) prim.getConvexHull();
-						positions.addAll( ((SurfaceImpl)surface).getBoundary().getExterior().asDirectPositions() );
+						positions.addAll( ((RingImplUnsafe)((SurfaceImpl)surface).getBoundary().getExterior()).asDirectPositions() );
 					}
 					
 					/*
@@ -194,7 +195,7 @@ public class ConvexHull {
 		} else if (geom instanceof SurfaceBoundaryImpl) {
 			// Add control points of exterior ring
 			positions = new ArrayList<DirectPositionImpl>();
-			positions = ((SurfaceBoundaryImpl)geom).getExterior().asDirectPositions();
+			positions = ((RingImplUnsafe)((SurfaceBoundaryImpl)geom).getExterior()).asDirectPositions();
 		}
 		
 		UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();

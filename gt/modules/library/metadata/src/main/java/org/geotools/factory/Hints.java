@@ -660,6 +660,7 @@ public final class Hints extends RenderingHints {
     public static final Key COMPLEX_FACTORY = new Key("org.opengis.geometry.complex.ComplexFactory");
     public static final Key AGGREGATE_FACTORY = new Key("org.opengis.geometry.aggregate.AggregateFactory");
     public static final Key PRIMITIVE_FACTORY = new Key("org.opengis.geometry.primitive.PrimitiveFactory");
+    public static final Key GEOMETRY_VALIDATE = new Key(Boolean.class);
 
     
 

@@ -41,6 +41,7 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
@@ -96,8 +97,6 @@ import org.opengis.referencing.operation.TransformException;
 public abstract class GeometryImpl implements Geometry, Serializable  {
 
 	private boolean mutable = true;
-	
-	//protected FeatGeomFactoryImpl xfactory;
 
 	// TODO: Remove this and use positionFactory.getCoordinateReferenceSystem()
 	protected final CoordinateReferenceSystem crs;
@@ -325,11 +324,14 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
         	else if (this instanceof CurveImpl) {
         		lines1 = ((CurveImpl)this).asLineSegments();
         	}
+        	else if (this instanceof RingImplUnsafe) {
+        		lines1 = ((RingImplUnsafe)this).asLineString().asLineSegments();
+        	}
         	else if (this instanceof RingImpl) {
         		lines1 = ((RingImpl)this).asLineString().asLineSegments();
         	}
         	else if (this instanceof SurfaceImpl) {
-        		lines1 = ((SurfaceImpl)this).getBoundary().getExterior().asLineString().asLineSegments();
+        		lines1 = ((RingImplUnsafe)((SurfaceImpl)this).getBoundary().getExterior()).asLineString().asLineSegments();
         	}
         	
         	// convert given geom
@@ -339,11 +341,14 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
         	else if (geometry instanceof CurveImpl) {
         		lines2 = ((CurveImpl)geometry).asLineSegments();
         	}
+        	else if (geometry instanceof RingImplUnsafe) {
+        		lines2 = ((RingImplUnsafe)geometry).asLineString().asLineSegments();
+        	}
         	else if (geometry instanceof RingImpl) {
         		lines2 = ((RingImpl)geometry).asLineString().asLineSegments();
         	}
         	else if (geometry instanceof SurfaceImpl) {
-        		lines2 = ((SurfaceImpl)geometry).getBoundary().getExterior().asLineString().asLineSegments();
+        		lines2 = ((RingImplUnsafe)((SurfaceImpl)geometry).getBoundary().getExterior()).asLineString().asLineSegments();
         	}
         	
         	// now determine which algorithm to use for finding the shortest

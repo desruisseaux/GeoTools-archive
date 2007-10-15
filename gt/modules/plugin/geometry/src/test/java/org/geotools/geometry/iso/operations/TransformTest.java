@@ -16,6 +16,7 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.geotools.referencing.CRS;
@@ -82,6 +83,19 @@ public class TransformTest extends TestCase {
 				assertEquals(p1, p2, epsilon);
 			}
 		}
+		else if (geom1 instanceof RingImpl && geom2 instanceof RingImplUnsafe) {
+			RingImplUnsafe ring1 = (RingImplUnsafe) geom1;
+			RingImplUnsafe ring2 = (RingImplUnsafe) geom2;
+			List<DirectPosition> list1 = ring1.asDirectPositions();
+			List<DirectPosition> list2 = ring2.asDirectPositions();
+			Iterator<DirectPosition> iterator1 = list1.iterator();
+			Iterator<DirectPosition> iterator2 = list2.iterator();
+			while (iterator1.hasNext() && iterator2.hasNext()) {
+				PointImpl p1 = new PointImpl(iterator1.next());
+				PointImpl p2 = new PointImpl(iterator2.next());
+				assertEquals(p1, p2, epsilon);
+			}
+		}
 		else if (geom1 instanceof RingImpl && geom2 instanceof RingImpl) {
 			RingImpl ring1 = (RingImpl) geom1;
 			RingImpl ring2 = (RingImpl) geom2;
@@ -98,13 +112,13 @@ public class TransformTest extends TestCase {
 		else if (geom1 instanceof SurfaceImpl && geom2 instanceof SurfaceImpl) {
 			SurfaceImpl surface1 = (SurfaceImpl) geom1;
 			SurfaceImpl surface2 = (SurfaceImpl) geom2;
-			List<RingImpl> list1 = surface1.getBoundaryRings();
-			List<RingImpl> list2 = surface2.getBoundaryRings();
-			Iterator<RingImpl> iterator1 = list1.iterator();
-			Iterator<RingImpl> iterator2 = list2.iterator();
+			List<Ring> list1 = surface1.getBoundaryRings();
+			List<Ring> list2 = surface2.getBoundaryRings();
+			Iterator<Ring> iterator1 = list1.iterator();
+			Iterator<Ring> iterator2 = list2.iterator();
 			while (iterator1.hasNext() && iterator2.hasNext()) {
-				RingImpl r1 = (RingImpl) iterator1.next();
-				RingImpl r2 = (RingImpl) iterator2.next();
+				RingImplUnsafe r1 = (RingImplUnsafe) iterator1.next();
+				RingImplUnsafe r2 = (RingImplUnsafe) iterator2.next();
 				assertEquals(r1, r2, epsilon);
 			}
 		}
@@ -198,8 +212,8 @@ public class TransformTest extends TestCase {
 		ArrayList<OrientableCurve> curveList = new ArrayList<OrientableCurve>();
 		curveList.add(curve1);
 		
-		RingImpl ring1 = (RingImpl) primitiveFactory.createRing(curveList);
-		RingImpl ring2 = (RingImpl) ring1.transform(crs2);
+		RingImplUnsafe ring1 = (RingImplUnsafe) primitiveFactory.createRing(curveList);
+		RingImplUnsafe ring2 = (RingImplUnsafe) ring1.transform(crs2);
 		
 		// create expected result
 		PositionFactory expectedPosF2 = new PositionFactoryImpl(crs2, new PrecisionModel());
@@ -221,7 +235,7 @@ public class TransformTest extends TestCase {
 		ArrayList<OrientableCurve> expectedCurveList = new ArrayList<OrientableCurve>();
 		expectedCurveList.add(expectedCurve);
 		
-		RingImpl expectedRing = (RingImpl) expectedPrimF2.createRing(expectedCurveList);
+		RingImplUnsafe expectedRing = (RingImplUnsafe) expectedPrimF2.createRing(expectedCurveList);
         
 		//System.out.println(ring1);
 		//System.out.println(ring2);

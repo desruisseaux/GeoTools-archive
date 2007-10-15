@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.DirectedEdge;
@@ -37,6 +38,7 @@ import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.CGAlgorithms;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -244,7 +246,7 @@ public class PolygonBuilder {
 	 */
 	private EdgeRing findEdgeRingContaining(EdgeRing testEr, List shellList) {
 
-		RingImpl testRing = testEr.getRing();
+		Ring testRing = testEr.getRing();
 		org.geotools.geometry.iso.coordinate.EnvelopeImpl env = (EnvelopeImpl) testRing
 				.getEnvelope();
 		Envelope testEnv = new Envelope(env.getLowerCorner().getOrdinate(X), env
@@ -258,7 +260,7 @@ public class PolygonBuilder {
 		Envelope minEnv = null;
 		for (Iterator it = shellList.iterator(); it.hasNext();) {
 			EdgeRing tryShell = (EdgeRing) it.next();
-			RingImpl tryRing = tryShell.getRing();
+			Ring tryRing = tryShell.getRing();
 
 			env = (EnvelopeImpl) tryRing.getEnvelope();
 			Envelope tryEnv = new Envelope(env.getLowerCorner().getOrdinate(X), env
@@ -275,7 +277,7 @@ public class PolygonBuilder {
 			boolean isContained = false;
 			if (tryEnv.contains(testEnv)
 					&& CGAlgorithms.isPointInRing(testPt, CoordinateArrays
-							.toCoordinateArray(tryRing.asDirectPositions()))) {
+							.toCoordinateArray( (((RingImplUnsafe) tryRing).asDirectPositions()) ))) {
 				isContained = true;
 			}
 			// check if this new containing ring is smaller than the current

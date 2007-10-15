@@ -14,6 +14,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.Ring;
 
 /**
  * @author sanjay
@@ -77,7 +78,7 @@ public class RingTest extends TestCase {
 		curveList.add(curve1);
 		curveList.add(curve2);
 		
-		RingImpl ring1 = tPrimFactory.createRing(curveList);
+		Ring ring1 = tPrimFactory.createRing(curveList);
 
 		//System.out.println(ring1);
 

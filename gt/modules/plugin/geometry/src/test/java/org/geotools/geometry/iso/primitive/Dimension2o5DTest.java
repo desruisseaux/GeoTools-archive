@@ -155,7 +155,7 @@ public class Dimension2o5DTest extends TestCase {
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {10, 30, 100}));
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {20, 10, 100}));
 
-		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = tPrimFactory.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundaryImpl surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorRing, interiors );
@@ -177,7 +177,7 @@ public class Dimension2o5DTest extends TestCase {
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {10, 30, 100}));
 		directPositionList.add(tCoordFactory.createDirectPosition(new double[] {20, 10, 100}));
 
-		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = tPrimFactory.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 		
 		SurfaceBoundaryImpl surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorRing, interiors );

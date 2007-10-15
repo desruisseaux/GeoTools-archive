@@ -140,7 +140,7 @@ public class PicoGeometryFactoryTest extends TestCase {
 		directPositionList.add(positionFactory.createDirectPosition(new double[] {10, 30, 0.0}));
 		directPositionList.add(positionFactory.createDirectPosition(new double[] {20, 10, 0.0}));
 
-		RingImpl exteriorRing = (RingImpl) tPrimFactory.createRingByDirectPositions(directPositionList);
+		Ring exteriorRing = tPrimFactory.createRingByDirectPositions(directPositionList);
 		List<Ring> interiors = new ArrayList<Ring>();
 
 		SurfaceBoundary boundary = new SurfaceBoundaryImpl(cf.getCoordinateReferenceSystem(), exteriorRing, interiors);

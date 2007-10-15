@@ -13,6 +13,7 @@ import org.geotools.geometry.iso.io.wkt.WKTReader;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.RingImpl;
+import org.geotools.geometry.iso.primitive.RingImplUnsafe;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.geometry.DirectPosition;
@@ -257,7 +258,7 @@ public class ConvexHullTest extends TestCase {
 	private List<DirectPosition> surfaceToPositions(Surface s) {
 		List<? extends DirectPosition> pos;
 		Ring ext = ((SurfaceBoundary)s.getBoundary()).getExterior();
-		pos = ((RingImpl)ext).asDirectPositions();
+		pos = ((RingImplUnsafe)ext).asDirectPositions();
 		return (List<DirectPosition>) pos;		
 	}
 	

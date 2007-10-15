@@ -205,13 +205,13 @@ public class GeometryToWKTString {
 	
 	private String surfaceBoundaryCoordToString(SurfaceBoundary sb) {
 		String rString = "(";
-		rString += ringCoordToString((RingImpl) sb.getExterior());
+		rString += ringCoordToString((Ring) sb.getExterior());
 		rString += ")";
 		List<Ring> interior = sb.getInteriors();
 		if (interior.size() > 0) {
 			for (int i = 0; i < interior.size(); i++) {
 				rString += ", (";
-				rString += ringCoordToString((RingImpl) interior.get(i));
+				rString += ringCoordToString((Ring) interior.get(i));
 				rString += ")";
 			}
 		}
