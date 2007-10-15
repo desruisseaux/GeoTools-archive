@@ -213,7 +213,7 @@ public class LiteralExpressionImpl extends DefaultExpression
         //try and be somewhat smart about this.
         
         //ASSERTION: literal is always a string.
-        if (literal.getClass() != String.class) {
+        if (literal == null || literal.getClass() != String.class) {
             return literal;
         }
         String s = (String)literal;
