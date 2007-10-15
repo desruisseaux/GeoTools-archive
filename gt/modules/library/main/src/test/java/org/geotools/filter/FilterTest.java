@@ -871,7 +871,7 @@ public class FilterTest extends TestCase {
     	LiteralExpressionImpl literal;
 		literal = new LiteralExpressionImpl(1.0D);
 		assertEquals(ExpressionType.LITERAL_DOUBLE, literal.getType());
-		assertEquals(Double.valueOf(1.0D), literal.evaluate((Feature)null));
+		assertEquals(new Double(1.0D), literal.evaluate((Feature)null));
 
 		GeometryFactory gf = new GeometryFactory();
 		literal = new LiteralExpressionImpl(gf.createPoint(new Coordinate(0,0)));
@@ -881,11 +881,11 @@ public class FilterTest extends TestCase {
 		
 		literal = new LiteralExpressionImpl(1);
 		assertEquals(ExpressionType.LITERAL_INTEGER, literal.getType());
-		assertEquals(Integer.valueOf(1), literal.evaluate((Feature)null));
+		assertEquals(new Integer(1), literal.evaluate((Feature)null));
 
 		literal = new LiteralExpressionImpl(1L);
 		assertEquals(ExpressionType.LITERAL_LONG, literal.getType());
-		assertEquals(Long.valueOf(1), literal.evaluate((Feature)null));
+		assertEquals(new Long(1), literal.evaluate((Feature)null));
 
 		literal = new LiteralExpressionImpl("string value");
 		assertEquals(ExpressionType.LITERAL_STRING, literal.getType());
