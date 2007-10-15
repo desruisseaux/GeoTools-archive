@@ -51,9 +51,13 @@ class RevisionInfo {
      */
     public RevisionInfo(String version) throws IOException {
         this.version = version;
-        if (version == null || version.trim().equals("") || version.trim().equals("CURRENT")) {
+        if (version == null || version.trim().equals("") || 
+                version.trim().equals("CURRENT") || version.trim().equals("LAST")) {
             revision = Long.MAX_VALUE;
-            this.version = "CURRENT";
+            this.version = "LAST";
+        } else if(version.trim().equals("FIRST")) {
+            revision = 1;
+            this.version = "FIRST";
         } else {
             try {
                 revision = Long.parseLong(version);
@@ -66,6 +70,10 @@ class RevisionInfo {
     public boolean isLast() {
         return revision == Long.MAX_VALUE;
     }
+    
+    public boolean isFirst() {
+        return revision == 1;
+    }
 
     /**
      * Returns the version in canonical form, that is, revision or "" if it's
@@ -75,7 +83,9 @@ class RevisionInfo {
      */
     public String getCanonicalVersion() {
         if (isLast())
-            return "CURRENT";
+            return "LAST";
+        else if(isFirst())
+            return "FIRST";
         else
             return String.valueOf(revision);
     }
@@ -90,9 +100,6 @@ class RevisionInfo {
     }
 
     public String toString() {
-        if (isLast())
-            return "LATEST";
-        else
-            return String.valueOf(revision);
+        return getCanonicalVersion();
     }
 }

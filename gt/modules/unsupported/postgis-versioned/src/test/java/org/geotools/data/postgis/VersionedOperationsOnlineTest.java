@@ -917,6 +917,16 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals("lamb", f.getAttribute("author"));
         assertEquals("first change", f.getAttribute("message"));
         it.close();
+        
+        // make sure the symbolic names for feature versions do work
+        fc = fs.getLog("FIRST", "LAST", Filter.INCLUDE, null);
+        System.out.println(fc.size());
+        assertEquals(4, fc.size());
+        
+        // make sure the old way to specify the current version works too
+        fc = fs.getLog("FIRST", "CURRENT", Filter.INCLUDE, null);
+        System.out.println(fc.size());
+        assertEquals(4, fc.size());
     }
 
     public void testDiff() throws IOException, IllegalAttributeException {
