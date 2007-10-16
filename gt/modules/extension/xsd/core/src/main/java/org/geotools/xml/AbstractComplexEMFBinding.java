@@ -62,6 +62,42 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
     }
 
     /**
+     * Dynamically tries to determine the type of the object using emf naming
+     * conventions and the name returned by {@link Binding#getTarget()}.
+     * <p>
+     * This implementation is a heuristic and is not guarenteed to work. Subclasses
+     * may override to provide the type explicity.
+     * </p>
+     */
+    public Class getType() {
+        //try to build up a class name 
+        String pkg = factory.getClass().getPackage().getName();
+
+        if (pkg.endsWith(".impl")) {
+            pkg = pkg.substring(0, pkg.length() - 5);
+        }
+
+        String className = getTarget().getLocalPart();
+
+        try {
+            return Class.forName(pkg + "." + className);
+        } catch (ClassNotFoundException e) {
+            //do an underscore check
+            if (className.startsWith("_")) {
+                className = className.substring(1) + "Type";
+            }
+
+            try {
+                return Class.forName(pkg + "." + className);
+            } catch (ClassNotFoundException e1) {
+                //try appending a Type
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Uses EMF reflection to create an instance of the EMF model object this
      * binding maps to. The properties of the resulting object are set using
      * the the contents of <param>node</param>
