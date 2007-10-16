@@ -55,10 +55,10 @@ import java.util.List;
  *
  */
 public class WptType {
-    protected double ele;
+    protected double ele = Double.NaN;
     protected Calendar time;
-    protected double magvar;
-    protected double geoidheight;
+    protected double magvar = Double.NaN;
+    protected double geoidheight = Double.NaN;
     protected String name;
     protected String cmt;
     protected String desc;
@@ -67,15 +67,15 @@ public class WptType {
     protected String sym;
     protected String type;
     protected String fix;
-    protected int sat;
-    protected double hdop;
-    protected double vdop;
-    protected double pdop;
-    protected double ageofdgpsdata;
-    protected int dgpsid;
+    protected int sat = -1;
+    protected double hdop = Double.NaN;
+    protected double vdop = Double.NaN;
+    protected double pdop = Double.NaN;
+    protected double ageofdgpsdata = Double.NaN;
+    protected int dgpsid = -1;
     protected ExtensionsType extensions;
-    protected double lat;
-    protected double lon;
+    protected double lat = Double.NaN;
+    protected double lon = Double.NaN;
 
     /**
      * Gets the value of the ele property.

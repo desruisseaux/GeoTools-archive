@@ -93,7 +93,12 @@ public class LongitudeTypeBinding extends AbstractSimpleBinding {
         Double lon = (Double) object;
 
         if ((lon >= 180) || (lon < -180)) {
-            throw new IllegalArgumentException("Longitude over 180 or under -180 degrees: " + lon);
+            //throw new IllegalArgumentException("Longitude over 180 or under -180 degrees: " + lon);
+            // instead of failing, we snap the coordinates.
+            while(lon >= 180)
+                lon -= 360;
+            while(lon < -180)
+                lon += 360;
         }
 
         return lon.toString();

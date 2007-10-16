@@ -15,6 +15,10 @@
  */
 package org.geotools.gpx.binding;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.geotools.gpx.GPX;
@@ -23,6 +27,9 @@ import org.geotools.gpx.bean.ObjectFactory;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
+import org.geotools.xml.impl.NodeImpl;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -88,9 +95,19 @@ public class ExtensionsTypeBinding extends AbstractComplexBinding {
         throws Exception {
         ExtensionsType et = factory.createExtensionsType();
 
-        // TODO somehow I should pack the extension into this bean...
+        et.getAny().addAll(node.getChildren());
+
         return et;
     }
+
+    @Override
+    public Object getProperty(Object object, QName name) throws Exception {
+        ExtensionsType et = (ExtensionsType) object;
+        
+        if("any".equals(name.getLocalPart()))
+            return et.getAny();
+
+        return null;
+    }
     
-    // TODO encode...
 }
