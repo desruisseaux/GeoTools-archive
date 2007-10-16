@@ -286,6 +286,16 @@ public class GeometryEncoderSDE implements FilterVisitor {
         // geometry to the extents of our layer.
         ArcSDEGeometryBuilder gb = ArcSDEGeometryBuilder.builderFor(Polygon.class);
         SeExtent seExtent = this.sdeLayer.getExtent();
+        
+        //If a layer just has one point in it (or one very horizontal or vertical line) then we may have
+        // a layer extent that's a point or line.  We need to correct this.
+        if (seExtent.getMaxX() == seExtent.getMinX()) {
+            seExtent = new SeExtent(seExtent.getMinX() - 100, seExtent.getMinY(), seExtent.getMaxX() + 100, seExtent.getMaxY());
+        }
+        if (seExtent.getMaxY() == seExtent.getMinY()) {
+            seExtent = new SeExtent(seExtent.getMinX(), seExtent.getMinY() -100, seExtent.getMaxX(), seExtent.getMaxY() + 100);
+        }
+        
         SeShape extent = new SeShape(this.sdeLayer.getCoordRef());
         extent.generateRectangle(seExtent);
 

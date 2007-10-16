@@ -183,7 +183,7 @@ class ArcSDEQuery {
 
         final ArcSDEQuery sdeQuery;
         final String typeName = schema.getTypeName();
-        final ArcSDEPooledConnection conn = pool.getConnection();
+        ArcSDEPooledConnection conn = null;
         final boolean isInprocessView = store.isView(typeName);
         final FIDReader fidReader;
         final SeLayer sdeLayer;
@@ -206,11 +206,13 @@ class ArcSDEQuery {
                 }catch(SeException e){
                     throw new DataSourceException("shouldn't happen: " + e.getMessage(), e);
                 }
+                conn = pool.getConnection();
                 sdeLayer = pool.getSdeLayer(conn, layerName);
             } else {
                 definitionQuery = null;
                 //sdeLayer = pool.getSdeLayer(conn, typeName);
                 sdeLayer = pool.getSdeLayer(typeName);
+                conn = pool.getConnection();
                 fidReader = FIDReader.getFidReader(conn, sdeLayer);
             }
     
@@ -247,7 +249,7 @@ class ArcSDEQuery {
         } catch (Throwable t) {
             //something went wrong while creating this connection.  Be sure and close out the
             //ArcSDE connection that we opened up.
-            conn.close();
+            if (conn != null) conn.close();
             if (t instanceof IOException) {
                 throw (IOException)t;
             } else {
@@ -561,7 +563,14 @@ class ArcSDEQuery {
         throws IOException {
         SimpleFeatureType queryFt = ds.getSchema(query.getTypeName());
         HashSet pnames = new HashSet();
-        pnames.addAll(Arrays.asList(query.getPropertyNames()));
+        
+        if (query.getPropertyNames() == null) {
+            //fetch the first attribute?
+            pnames.add(queryFt.getAttributes().get(0).getLocalName());
+        } else {
+            // add the individual property names, if they're actually spelled out specifically
+            pnames.addAll(Arrays.asList(query.getPropertyNames()));
+        }
         if (!pnames.contains(queryFt.getDefaultGeometry().getLocalName())) {
             //we're calculating the bounds, so we'd better be sure and add the spatial
             //column to the query's propertynames

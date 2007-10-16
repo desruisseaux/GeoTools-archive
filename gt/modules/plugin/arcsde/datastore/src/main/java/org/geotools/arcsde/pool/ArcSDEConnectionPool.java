@@ -615,4 +615,13 @@ public class ArcSDEConnectionPool {
             conn.destroy();
         }
     }
+    
+    public String toString() {
+        StringBuffer ret = new StringBuffer();
+        ret.append("[ACTIVE: ");
+        ret.append(pool.getNumActive() + "/" + ((GenericObjectPool)pool).getMaxActive());
+        ret.append("  INACTIVE: ");
+        ret.append(pool.getNumIdle() + "/" + ((GenericObjectPool)pool).getMaxIdle() + "]");
+        return ret.toString();
+    }
 }
