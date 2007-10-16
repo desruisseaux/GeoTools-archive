@@ -13,14 +13,18 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 public class GpxFeatureReader implements FeatureReader {
-
+    
     private final SimpleFeatureType featureType;
-    private final Iterator it;
     private final FeatureTranslator translator;
+    private final GpxDataStore dataStore;
+
+    private Iterator it;
 
     GpxFeatureReader(GpxDataStore dataStore, String featureName) {
+        this.dataStore = dataStore;
         featureType = dataStore.getSchema(featureName);
-    
+        
+        dataStore.getMemoryLock().acquireReadLock();
 
     	if(GpxDataStore.TYPE_NAME_POINT.equals(featureName)) {
             it = dataStore.getGpxData().getWpt().iterator();
@@ -35,9 +39,15 @@ public class GpxFeatureReader implements FeatureReader {
         translator = new FeatureTranslator(featureType);
     }
     
-    public void close() throws IOException {
-        // reading from memory, nothing to do.
-        // TODO: maybe we should do locking???
+    public synchronized void close() throws IOException {
+        if(it == null) {
+            // this indicates, that we were already closed
+            GpxDataStore.LOGGER.fine("GpxFeatureWriter.close(): called second time.");
+            return;
+        }
+        
+        dataStore.getMemoryLock().releaseReadLock();
+        it = null;
     }
 
     public SimpleFeatureType getFeatureType() {
@@ -52,11 +62,11 @@ public class GpxFeatureReader implements FeatureReader {
         Object element = it.next();
         
         if(element instanceof WptType) {
-            return (SimpleFeature) translator.convertFeature((WptType) element);
+            return translator.convertFeature((WptType) element);
         } else if(element instanceof TrkType) {
-            return (SimpleFeature) translator.convertFeature((TrkType) element);
+            return translator.convertFeature((TrkType) element);
         } else if(element instanceof RteType) {
-            return (SimpleFeature) translator.convertFeature((RteType) element);
+            return translator.convertFeature((RteType) element);
         } else {
             throw new RuntimeException("Illegal object class: " + element.getClass().getName());
         }

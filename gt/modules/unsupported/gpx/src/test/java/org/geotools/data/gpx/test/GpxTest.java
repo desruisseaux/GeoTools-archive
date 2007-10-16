@@ -35,7 +35,7 @@ import org.opengis.feature.Feature;
 public class GpxTest extends TestCase {
     public void testGpxDataStore() throws IOException {
         URL u = TestData.url(this, "folder with spaces/test1.gpx");
-
+        
         DataStore ds = FileDataStoreFinder.getDataStore(u);
 
         assertNotNull("Unable to load GPX file, DataStoreFactory failed.", ds);
@@ -59,10 +59,7 @@ public class GpxTest extends TestCase {
         while (it.hasNext()) {
             Feature f = it.next();
 
-            if (cnt == 0) {
-                // TODO check that first point is what we waited...
                 System.out.println(f);
-            }
 
             cnt++;
         }
