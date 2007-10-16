@@ -879,7 +879,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // get log only for newly created features
         Filter newIdFilter = ff.id(Collections.singleton(ff.featureId(newId)));
-        FeatureCollection fc = fs.getLog("1", "5", newIdFilter, null);
+        FeatureCollection fc = fs.getLog("1", "5", newIdFilter, null, -1);
         assertEquals(1, fc.size());
         FeatureIterator it = fc.features();
         SimpleFeature f = it.next();
@@ -890,7 +890,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // get log for rv2 (most modified)
         Filter rv2IdFilter = ff.id(Collections.singleton(ff.featureId("river.rv2")));
-        fc = fs.getLog("1", "5", rv2IdFilter, null);
+        fc = fs.getLog("1", "5", rv2IdFilter, null, -1);
         assertEquals(3, fc.size());
         it = fc.features();
         f = it.next();
@@ -909,7 +909,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // get log for rv1
         Filter rv1IdFilter = ff.id(Collections.singleton(ff.featureId("river.rv1")));
-        fc = fs.getLog("1", "5", rv1IdFilter, null);
+        fc = fs.getLog("1", "5", rv1IdFilter, null, -1);
         assertEquals(1, fc.size());
         it = fc.features();
         f = it.next();
@@ -919,13 +919,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         it.close();
         
         // make sure the symbolic names for feature versions do work
-        fc = fs.getLog("FIRST", "LAST", Filter.INCLUDE, null);
-        System.out.println(fc.size());
+        fc = fs.getLog("FIRST", "LAST", Filter.INCLUDE, null, -1);
         assertEquals(4, fc.size());
         
         // make sure the old way to specify the current version works too
-        fc = fs.getLog("FIRST", "CURRENT", Filter.INCLUDE, null);
-        System.out.println(fc.size());
+        fc = fs.getLog("FIRST", "CURRENT", Filter.INCLUDE, null, -1);
+        assertEquals(4, fc.size());
+        
+        // make sure maxRows works
+        fc = fs.getLog("FIRST", "LAST", Filter.INCLUDE, null, 1);
         assertEquals(4, fc.size());
     }
 

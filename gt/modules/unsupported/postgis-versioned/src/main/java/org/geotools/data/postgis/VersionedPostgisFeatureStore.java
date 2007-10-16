@@ -337,7 +337,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     }
 
-    public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter, String[] userIds)
+    public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter, String[] userIds, int maxRows)
             throws IOException {
         if(filter == null)
             filter = Filter.INCLUDE;
@@ -423,6 +423,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         DefaultQuery sq = new DefaultQuery();
         sq.setFilter(revisionFilter);
         sq.setSortBy(new SortBy[] { ff.sort("revision", SortOrder.DESCENDING) });
+        if(maxRows > 0)
+            sq.setMaxFeatures(maxRows);
         return changesets.getFeatures(sq);
     }
 

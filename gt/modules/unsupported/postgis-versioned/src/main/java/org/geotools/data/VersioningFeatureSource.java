@@ -55,11 +55,13 @@ public interface VersioningFeatureSource extends FeatureSource {
      *            limits the features whose log will be returned, by
      *            catching only those that have been modified by at least one of
      *            the specified users. May be null to avoid user filtering.
+     * @param maxRows
+     *            the maximum number of log rows returned from this call
      * @return a feature collection of the logs, sorted on revision, descending
      * @throws IOException
      */
     public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter,
-            String[] userIds) throws IOException;
+            String[] userIds, int maxRows) throws IOException;
 
     /**
      * Returns a feature difference reader providing the changes occurred on
