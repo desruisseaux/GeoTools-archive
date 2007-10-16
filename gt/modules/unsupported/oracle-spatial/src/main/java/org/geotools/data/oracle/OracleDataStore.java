@@ -214,8 +214,12 @@ public class OracleDataStore extends JDBCDataStore {
         }
 		try {
 			srid = determineSRID( tableName, columnName );
-//			CoordinateReferenceSystem crs = determineCRS( srid );
-            CoordinateReferenceSystem crs = CRS.decode("EPSG:" + srid);
+			CoordinateReferenceSystem crs = null;
+            try {
+              crs = CRS.decode("EPSG:" + srid);
+            } catch(Exception e) {
+              crs = determineCRS( srid );
+            }
             build.setCRS(crs);
     
 		} catch (Exception e) {
