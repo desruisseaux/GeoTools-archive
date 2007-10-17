@@ -90,12 +90,12 @@ public class ArcSDEAdapter {
         sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT32), Float.class);
         sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT64), Double.class);
         sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_DATE), Date.class);
-        // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),
-        // byte[].class);
+        // @TODO: not at all, only for capable open table with GeoServer
+	sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),byte[].class);
         // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_CLOB),
         // String.class);
-        // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_UUID),
-        // String.class);
+        // @Tested for view
+        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_UUID),String.class);
         // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_XML),
         // org.w3c.dom.Document.class);
 
@@ -371,7 +371,14 @@ public class ArcSDEAdapter {
             } else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {
                 throw new DataSourceException("Raster columns are not supported yet");
             } else {
-                typeClass = (Class) sde2JavaTypes.get(sdeType);
+		Object obj=sde2JavaTypes.get(sdeType);
+		if(obj==null)
+		{
+		    //interesting question:  Do we throw an exception here, or do we allow un-handle-able columns
+		    //to just 'disappear' when serving those tables?
+		    throw new DataSourceException("Unsupported column type ("+sdeType.intValue()+") for "+attName);
+		}
+                typeClass = (Class) obj;
                 // @TODO: add restrictions once the Restrictions utility methods
                 // are implemented
                 // Set restrictions = Restrictions.createLength(name, typeClass,

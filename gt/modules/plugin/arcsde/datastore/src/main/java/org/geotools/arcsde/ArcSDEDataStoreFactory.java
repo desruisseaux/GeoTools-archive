@@ -31,7 +31,6 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
-import com.esri.sde.sdk.GeoToolsDummyAPI;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeDBTune;
 import com.esri.sde.sdk.client.SeException;
@@ -111,10 +110,10 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
             //you need to uncomment line 2 and comment line 1 to make the
             //tests run in Eclipse with the ArcSDE jarfiles on the classpath.
             //1) 
-            int i = GeoToolsDummyAPI.DUMMY_API_VERSION;
+            //int i = com.esri.sde.sdk.GeoToolsDummyAPI.DUMMY_API_VERSION;
             
             //2)
-            //if (1==1) throw new Exception();
+            if (1==1) throw new Exception();
             JSDE_CLIENT_VERSION = JSDE_VERSION_DUMMY;
         } catch (Throwable t) {
             //good, we're not using the Dummy API placeholder.
