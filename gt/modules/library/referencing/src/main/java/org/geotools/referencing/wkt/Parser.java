@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -24,7 +24,9 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.units.NonSI;
 import javax.units.SI;
@@ -52,7 +54,7 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.Datum;  // For javadoc
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.EngineeringDatum;
@@ -107,10 +109,11 @@ public class Parser extends MathTransformParser {
 
     /**
      * The mapping between WKT element name and the object class to be created.
-     * Will be created by {@link #getClassOf} only when first needed.
+     * Will be created by {@link #getTypeMap} only when first needed. Keys must
+     * be upper case.
      */
-    private static Map types;
-    
+    private static Map/*<String,Class<?>>*/ TYPES;
+
     /**
      * The factory to use for creating {@linkplain Datum datum}.
      */
@@ -140,14 +143,14 @@ public class Parser extends MathTransformParser {
      * The list of {@linkplain AxisDirection axis directions} from their name.
      */
     private final Map directions;
-    
+
     /**
      * Constructs a parser using the default set of symbols and factories.
      */
     public Parser() {
         this(Symbols.DEFAULT);
     }
-    
+
     /**
      * Constructs a parser for the specified set of symbols using default factories.
      *
@@ -162,7 +165,7 @@ public class Parser extends MathTransformParser {
              ReferencingFactoryFinder.getCRSFactory          (null),
              ReferencingFactoryFinder.getMathTransformFactory(null));
     }
-    
+
     /**
      * Constructs a parser for the specified set of symbols using the specified set of factories.
      *
@@ -177,7 +180,7 @@ public class Parser extends MathTransformParser {
              factories.getMathTransformFactory());
         this.factories = factories;
     }
-    
+
     /**
      * Constructs a parser for the specified set of symbols using the specified factories.
      *
@@ -236,13 +239,19 @@ public class Parser extends MathTransformParser {
         final Object key = element.peek();
         if (key instanceof Element) {
             final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
-            if (   "GEOGCS".equals(keyword)) return parseGeoGCS  (element);
-            if (   "PROJCS".equals(keyword)) return parseProjCS  (element);
-            if (   "GEOCCS".equals(keyword)) return parseGeoCCS  (element);
-            if (  "VERT_CS".equals(keyword)) return parseVertCS  (element);
-            if ( "LOCAL_CS".equals(keyword)) return parseLocalCS (element);
-            if ( "COMPD_CS".equals(keyword)) return parseCompdCS (element);
-            if ("FITTED_CS".equals(keyword)) return parseFittedCS(element);
+            CoordinateReferenceSystem r = null;
+            try {
+                if (   "GEOGCS".equals(keyword)) return r=parseGeoGCS  (element);
+                if (   "PROJCS".equals(keyword)) return r=parseProjCS  (element);
+                if (   "GEOCCS".equals(keyword)) return r=parseGeoCCS  (element);
+                if (  "VERT_CS".equals(keyword)) return r=parseVertCS  (element);
+                if ( "LOCAL_CS".equals(keyword)) return r=parseLocalCS (element);
+                if ( "COMPD_CS".equals(keyword)) return r=parseCompdCS (element);
+                if ("FITTED_CS".equals(keyword)) return r=parseFittedCS(element);
+            } finally {
+                // Work around for simulating post-conditions in Java.
+                assert isValid(r, keyword) : element;
+            }
         }
         throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, key));
     }
@@ -262,19 +271,38 @@ public class Parser extends MathTransformParser {
         final Object key = element.peek();
         if (key instanceof Element) {
             final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
-            if (       "AXIS".equals(keyword)) return parseAxis      (element, SI.METER, true);
-            if (     "PRIMEM".equals(keyword)) return parsePrimem    (element, NonSI.DEGREE_ANGLE);
-            if (    "TOWGS84".equals(keyword)) return parseToWGS84   (element);
-            if (   "SPHEROID".equals(keyword)) return parseSpheroid  (element);
-            if ( "VERT_DATUM".equals(keyword)) return parseVertDatum (element);
-            if ("LOCAL_DATUM".equals(keyword)) return parseLocalDatum(element);
-            if (      "DATUM".equals(keyword)) return parseDatum     (element, DefaultPrimeMeridian.GREENWICH);
-        }
-        final MathTransform mt = parseMathTransform(element, false);
-        if (mt != null) {
-            return mt;
+            Object r = null;
+            try {
+                if (       "AXIS".equals(keyword)) return r=parseAxis      (element, SI.METER, true);
+                if (     "PRIMEM".equals(keyword)) return r=parsePrimem    (element, NonSI.DEGREE_ANGLE);
+                if (    "TOWGS84".equals(keyword)) return r=parseToWGS84   (element);
+                if (   "SPHEROID".equals(keyword)) return r=parseSpheroid  (element);
+                if ( "VERT_DATUM".equals(keyword)) return r=parseVertDatum (element);
+                if ("LOCAL_DATUM".equals(keyword)) return r=parseLocalDatum(element);
+                if (      "DATUM".equals(keyword)) return r=parseDatum     (element, DefaultPrimeMeridian.GREENWICH);
+                r = parseMathTransform(element, false);
+                if (r != null) {
+                    return r;
+                }
+            } finally {
+                // Work around for simulating post-conditions in Java.
+                assert isValid(r, keyword) : element;
+            }
         }
         return parseCoordinateReferenceSystem(element);
+    }
+
+    /**
+     * Checks if the parsed object is of the expected type. This is also a way to check
+     * the consistency of the {@link #TYPES} map.
+     */
+    private static boolean isValid(final Object parsed, final String keyword) {
+        if (parsed == null) {
+            // Required in order to avoid AssertionError in place of ParseException.
+            return true;
+        }
+        final Class type = getClassOf(keyword);
+        return type!=null && type.isInstance(parsed);
     }
 
     /**
@@ -486,8 +514,8 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "TOWGS84" can't be parsed.
      */
     private static BursaWolfParameters parseToWGS84(final Element parent)
-            throws ParseException 
-    {          
+            throws ParseException
+    {
         final Element element = parent.pullOptionalElement("TOWGS84");
         if (element == null) {
             return null;
@@ -517,7 +545,7 @@ public class Parser extends MathTransformParser {
      * @return The "SPHEROID" element as an {@link Ellipsoid} object.
      * @throws ParseException if the "SPHEROID" element can't be parsed.
      */
-    private Ellipsoid parseSpheroid(final Element parent) throws ParseException {       
+    private Ellipsoid parseSpheroid(final Element parent) throws ParseException {
         Element          element = parent.pullElement("SPHEROID");
         String              name = element.pullString("name");
         double     semiMajorAxis = element.pullDouble("semiMajorAxis");
@@ -555,7 +583,7 @@ public class Parser extends MathTransformParser {
                                                 final Unit      linearUnit,
                                                 final Unit      angularUnit)
         throws ParseException
-    {                
+    {
         final Element       element = parent.pullElement("PROJECTION");
         final String classification = element.pullString("name");
         final Map        properties = parseAuthority(element, classification);
@@ -650,7 +678,7 @@ public class Parser extends MathTransformParser {
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
-    }        
+    }
 
     /**
      * Parses a "VERT_DATUM" element. This element has the following pattern:
@@ -663,7 +691,7 @@ public class Parser extends MathTransformParser {
      * @return The "VERT_DATUM" element as a {@link VerticalDatum} object.
      * @throws ParseException if the "VERT_DATUM" element can't be parsed.
      */
-    private VerticalDatum parseVertDatum(final Element parent) throws ParseException {        
+    private VerticalDatum parseVertDatum(final Element parent) throws ParseException {
         final Element element = parent.pullElement("VERT_DATUM");
         final String     name = element.pullString ("name");
         final int       datum = element.pullInteger("datum");
@@ -722,7 +750,7 @@ public class Parser extends MathTransformParser {
      *       know which method to invokes in the {@link CSFactory} (is it a cartesian
      *       coordinate system? a spherical one? etc.).
      */
-    private EngineeringCRS parseLocalCS(final Element parent) throws ParseException {        
+    private EngineeringCRS parseLocalCS(final Element parent) throws ParseException {
         Element           element = parent.pullElement("LOCAL_CS");
         String               name = element.pullString("name");
         EngineeringDatum    datum = parseLocalDatum(element);
@@ -743,7 +771,7 @@ public class Parser extends MathTransformParser {
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
-    }        
+    }
 
     /**
      * Parses a "GEOCCS" element.
@@ -758,7 +786,7 @@ public class Parser extends MathTransformParser {
      * @return The "GEOCCS" element as a {@link GeocentricCRS} object.
      * @throws ParseException if the "GEOCCS" element can't be parsed.
      */
-    private GeocentricCRS parseGeoCCS(final Element parent) throws ParseException {        
+    private GeocentricCRS parseGeoCCS(final Element parent) throws ParseException {
         final Element        element = parent.pullElement("GEOCCS");
         final String            name = element.pullString("name");
         final Map         properties = parseAuthority(element, name);
@@ -783,7 +811,7 @@ public class Parser extends MathTransformParser {
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
-    }        
+    }
 
     /**
      * Parses an <strong>optional</strong> "VERT_CS" element.
@@ -797,7 +825,7 @@ public class Parser extends MathTransformParser {
      * @return The "VERT_CS" element as a {@link VerticalCRS} object.
      * @throws ParseException if the "VERT_CS" element can't be parsed.
      */
-    private VerticalCRS parseVertCS(final Element parent) throws ParseException { 
+    private VerticalCRS parseVertCS(final Element parent) throws ParseException {
         final Element element = parent.pullElement("VERT_CS");
         if (element == null) {
             return null;
@@ -979,17 +1007,51 @@ public class Parser extends MathTransformParser {
     }
 
     /**
-     * Returns the class of the specified WKT element. For example for this method returns
+     * Returns the class of the specified WKT element. For example this method returns
      * <code>{@linkplain ProjectedCRS}.class</code> for element "{@code PROJCS}".
      *
      * @param  element The WKT element name.
      * @return The GeoAPI class of the specified element, or {@code null} if unknow.
      */
     public static Class getClassOf(String element) {
-        // No need to synchronize.
-        element = element.trim().toUpperCase();
-        if (types == null) {
-            final Map map = new HashMap(25);
+        if (element == null) {
+            return null;
+        }
+        element = element.trim().toUpperCase(Locale.US);
+        final Class type = (Class) getTypeMap().get(element);
+        assert type == null || type.equals(MathTransform.class)
+                || element.equals(getNameOf(type)) : type;
+        return type;
+    }
+
+    /**
+     * Returns the WKT name of the specified object type. For example this method returns
+     * "{@code PROJCS}" for type <code>{@linkplain ProjectedCRS}.class</code>.
+     *
+     * @param type The GeoAPI class of the specified element.
+     * @return The WKT element name, or {@code null} if unknow.
+     *
+     * @since 2.4
+     */
+    public static String getNameOf(final Class/*<?>*/ type) {
+        if (type != null) {
+            for (final java.util.Iterator it=getTypeMap().entrySet().iterator(); it.hasNext();) {
+                final Map.Entry/*<String,Class<?>>*/ entry = (Map.Entry) it.next();
+                final Class candidate = (Class) entry.getValue();
+                if (candidate.isAssignableFrom(type)) {
+                    return (String) entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the type map.
+     */
+    private static Map getTypeMap() {
+        if (TYPES == null) {
+            final Map map = new LinkedHashMap/*<String,Class<?>>*/(25);
             map.put(        "GEOGCS",        GeographicCRS.class);
             map.put(        "PROJCS",         ProjectedCRS.class);
             map.put(        "GEOCCS",        GeocentricCRS.class);
@@ -1008,9 +1070,10 @@ public class Parser extends MathTransformParser {
             map.put(     "CONCAT_MT",        MathTransform.class);
             map.put(    "INVERSE_MT",        MathTransform.class);
             map.put("PASSTHROUGH_MT",        MathTransform.class);
-            types = map; // Set the field only once completed, in order to avoid synchronisation.
+            TYPES = map; // Sets the field only once completed, in order to avoid synchronisation.
+                         // It is not a big deal in current implementation if two Maps are created.
         }
-        return (Class) types.get(element);
+        return TYPES;
     }
 
     /**
@@ -1037,7 +1100,7 @@ public class Parser extends MathTransformParser {
         final String    authority = arguments.getOptionalString("-authority");
         args = arguments.getRemainingArguments(0);
         if (indentation != null) {
-            Formattable.setIndentation(indentation.intValue());        
+            Formattable.setIndentation(indentation.intValue());
         }
         final BufferedReader in = new BufferedReader(Arguments.getReader(System.in));
         try {

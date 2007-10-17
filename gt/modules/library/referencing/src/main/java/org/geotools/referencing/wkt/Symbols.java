@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2004, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -32,6 +31,27 @@ import java.util.Locale;
  * @author Martin Desruisseaux
  */
 public class Symbols {
+    /**
+     * The default set of symbols.
+     */
+    public static final Symbols DEFAULT = new Symbols(Locale.US);
+    // DONT't invoke the default constructor for this one.
+
+    /**
+     * A set of symbols with parameters between square brackets, like {@code [...]}.
+     */
+    public static final Symbols SQUARE_BRACKETS = DEFAULT;
+
+    /**
+     * A set of symbols with parameters between parentheses,
+     * like {@code (...)}.
+     */
+    public static final Symbols CURLY_BRACKETS = new Symbols();
+    static {
+        CURLY_BRACKETS.open  = '(';
+        CURLY_BRACKETS.close = ')';
+    }
+
     /* ----------------------------------------------------------
      * NOTE: Consider all fields below as final.
      *       It is not only in order to make construction easier.
@@ -144,30 +164,8 @@ public class Symbols {
     }
 
     /**
-     * The default set of symbols.
-     */
-    public static final Symbols DEFAULT = new Symbols(Locale.US);
-    // DONT't invoke the default constructor for this one.
-
-    /**
-     * A set of symbols with parameters between square brackets,
-     * like {@code [...]}.
-     */
-    public static final Symbols SQUARE_BRACKETS = DEFAULT;
-
-    /**
-     * A set of symbols with parameters between parentheses,
-     * like {@code (...)}.
-     */
-    public static final Symbols CURLY_BRACKETS = new Symbols();
-    static {
-        CURLY_BRACKETS.open  = '(';
-        CURLY_BRACKETS.close = ')';
-    }
-
-    /**
      * Returns {@code true} if the specified WKT contains at least one {@code AXIS[...]} element.
-     * This method try to make a quick checks taking in account a minimal set of WKT syntax rules.
+     * This method tries to make a quick checks taking in account a minimal set of WKT syntax rules.
      *
      * @since 2.4
      */

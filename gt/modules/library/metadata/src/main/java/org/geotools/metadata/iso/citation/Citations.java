@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -20,28 +20,20 @@
 package org.geotools.metadata.iso.citation;
 
 // J2SE direct dependencies
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.citation.CitationDate;
-import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.PresentationForm;
-import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.crs.CRSAuthorityFactory;       // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
 
 // Geotools dependencies
-import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -146,6 +138,20 @@ public final class Citations {
         final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.ORACLE);
         c.freeze();
         ORACLE = c;
+    }
+
+    /**
+     * The <A HREF="http://postgis.refractions.net">PostGIS</A> project.
+     *
+     * @see ResponsiblePartyImpl#POSTGIS
+     *
+     * @since 2.4
+     */
+    public static final Citation POSTGIS;
+    static {
+        final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.POSTGIS);
+        c.freeze();
+        POSTGIS = c;
     }
 
     /**
@@ -260,7 +266,7 @@ public final class Citations {
      * @see #AUTO
      * @see #AUTO2
      * @see #CRS
-     */    
+     */
     public static final Citation EPSG;
     static {
         final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.EPSG);

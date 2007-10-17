@@ -121,6 +121,20 @@ public class ContactImpl extends MetadataEntity implements Contact {
     }
 
     /**
+     * Contact informations for <A HREF="http://postgis.refractions.net">PostGIS</A>.
+     *
+     * @see OnLineResourceImpl#POSTGIS
+     *
+     * @since 2.4
+     */
+    public static final Contact POSTGIS;
+    static {
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.POSTGIS);
+        c.freeze();
+        POSTGIS = c;
+    }
+
+    /**
      * Contact informations for <A HREF="http://www.sun.com/">Sun Microsystems</A>.
      *
      * @see OnLineResourceImpl#SUN_MICROSYSTEMS

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -113,6 +113,18 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     static {
         final OnLineResourceImpl r;
         ORACLE = r = new OnLineResourceImpl("http://www.oracle.com");
+        r.freeze();
+    }
+
+    /**
+     * The online resources for <A HREF="http://postgis.refractions.net">PostGIS</A>.
+     *
+     * @since 2.4
+     */
+    public static final OnLineResource POSTGIS;
+    static {
+        final OnLineResourceImpl r;
+        POSTGIS = r = new OnLineResourceImpl("http://postgis.refractions.net");
         r.freeze();
     }
 
@@ -237,7 +249,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
 
     /**
      * Name of the online resource. Returns {@code null} if none.
-     * 
+     *
      * @since 2.4
      */
     public String getName() {
@@ -246,7 +258,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
 
     /**
      * Set the name of the online resource.
-     * 
+     *
      * @since 2.4
      */
     public synchronized void setName(final String newValue) {
@@ -304,7 +316,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     }
 
     /**
-     * Returns the connection protocol to be used. 
+     * Returns the connection protocol to be used.
      * Returns {@code null} if none.
      */
     public String getProtocol() {

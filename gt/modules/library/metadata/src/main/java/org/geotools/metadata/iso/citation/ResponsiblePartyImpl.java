@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -22,16 +22,13 @@ package org.geotools.metadata.iso.citation;
 // OpenGIS dependencies
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.MalformedURLException;
 
 // OpenGIS dependencies
-import org.opengis.metadata.citation.Address;
 import org.opengis.metadata.citation.Contact;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.citation.Telephone;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -73,7 +70,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
      * @return Responsible party describing OGC involvement.
      *
      * @since 2.2
-     */ 
+     */
     public static ResponsibleParty OGC(final Role role, final OnLineResource resource) {
         final ContactImpl contact = new ContactImpl(resource);
         contact.freeze();
@@ -94,7 +91,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
      * @param function       The OGC function (information, download, etc.) for a resource.
      * @param onlineResource The URI to the resource.
      * @return Responsible party describing OGC involvement.
-     */ 
+     */
     public static ResponsibleParty OGC(final Role role,
                                        final OnLineFunction function,
                                        final URI onlineResource)
@@ -113,7 +110,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
      * @param function       The OGC function (information, download, etc.) for a resource.
      * @param onlineResource The URI on the resource.
      * @return Responsible party describing OGC involvement.
-     */ 
+     */
     static ResponsibleParty OGC(final Role role,
                                 final OnLineFunction function,
                                 final String onlineResource)
@@ -138,7 +135,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     static {
         final ResponsiblePartyImpl r = new ResponsiblePartyImpl(Role.RESOURCE_PROVIDER);
         r.setOrganisationName(OGC_NAME);
-        r.setContactInfo(ContactImpl.OGC);        
+        r.setContactInfo(ContactImpl.OGC);
         r.freeze();
         OGC = r;
     }
@@ -216,6 +213,22 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     }
 
     /**
+     * The <A HREF="http://postgis.refractions.net">PostGIS</A> responsible party.
+     *
+     * @see ContactImpl#POSTGIS
+     *
+     * @since 2.4
+     */
+    public static ResponsibleParty POSTGIS;
+    static {
+        final ResponsiblePartyImpl r = new ResponsiblePartyImpl(Role.PRINCIPAL_INVESTIGATOR);
+        r.setOrganisationName(new SimpleInternationalString("PostGIS"));
+        r.setContactInfo(ContactImpl.POSTGIS);
+        r.freeze();
+        POSTGIS = r;
+    }
+
+    /**
      * The <A HREF="http://www.sun.com/">Sun Microsystems</A> party.
      *
      * @see ContactImpl#SUN_MICROSYSTEMS
@@ -252,7 +265,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
 
     /**
      * Name of the responsible organization.
-     */    
+     */
     private InternationalString organisationName;
 
     /**
