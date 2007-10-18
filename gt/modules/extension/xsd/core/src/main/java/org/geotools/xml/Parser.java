@@ -15,7 +15,6 @@
  */
 package org.geotools.xml;
 
-import org.apache.xerces.jaxp.SAXParserFactoryImpl;
 import org.apache.xerces.parsers.SAXParser;
 import org.eclipse.xsd.XSDSchema;
 import org.xml.sax.InputSource;
@@ -28,10 +27,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.xml.impl.ParserHandler;
