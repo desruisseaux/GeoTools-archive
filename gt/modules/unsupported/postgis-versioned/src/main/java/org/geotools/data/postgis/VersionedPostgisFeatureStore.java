@@ -81,58 +81,6 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         this.schema = schema;
         this.locking = (FeatureLocking) store.wrapped.getFeatureSource(schema.getTypeName());
     }
-
-//    public int lockFeatures(Query query) throws IOException {
-//        // check query does not need to work agains anything else than the last
-//        // revision (just to avoid users being surprised the specified revision
-//        // did not get locked/modified)
-//        RevisionInfo ri = new RevisionInfo(query.getVersion());
-//        if (ri.isLast())
-//            throw new IllegalArgumentException("Cannot work against revisions but "
-//                    + "the last one. Do not specify revision information in your write queries.");
-//
-//        DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
-//                new RevisionInfo());
-//        return locking.lockFeatures(versionedQuery);
-//    }
-//
-//    public int lockFeatures(Filter filter) throws IOException {
-//        Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
-//                new RevisionInfo());
-//        return locking.lockFeatures(versionedFilter);
-//    }
-//
-//    public int lockFeatures() throws IOException {
-//        return lockFeatures(Filter.INCLUDE);
-//    }
-//
-//    public void setFeatureLock(FeatureLock lock) {
-//        locking.setFeatureLock(lock);
-//    }
-//
-//    public void unLockFeatures() throws IOException {
-//        unLockFeatures(Filter.INCLUDE);
-//    }
-//
-//    public void unLockFeatures(Filter filter) throws IOException {
-//        Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
-//                new RevisionInfo());
-//        locking.unLockFeatures(versionedFilter);
-//    }
-//
-//    public void unLockFeatures(Query query) throws IOException {
-//        // check query does not need to work agains anything else than the last
-//        // revision (just to avoid users being surprised the specified revision
-//        // did not get locked/modified)
-//        RevisionInfo ri = new RevisionInfo(query.getVersion());
-//        if (ri.isLast())
-//            throw new IllegalArgumentException("Cannot work against revisions but "
-//                    + "the last one. Do not specify revision information in your write queries.");
-//
-//        DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
-//                new RevisionInfo());
-//        locking.unLockFeatures(versionedQuery);
-//    }
     
     // -----------------------------------------------------------------------------------------------
     // STANDARD FEATURE STORE METHODS 
@@ -344,14 +292,16 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         RevisionInfo r1 = new RevisionInfo(fromVersion);
         RevisionInfo r2 = new RevisionInfo(toVersion);
 
+        boolean swapped = false;
         if (r1.revision > r2.revision) {
             // swap them
             RevisionInfo tmpr = r1;
             r1 = r2;
-            r1 = tmpr;
+            r2 = tmpr;
             String tmps = toVersion;
             toVersion = fromVersion;
             fromVersion = tmps;
+            swapped = true;
         }
 
         // We implement this exactly as described. Happily, it seems Postgis does not have
@@ -422,7 +372,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
                 .getFeatureSource(VersionedPostgisDataStore.TBL_CHANGESETS);
         DefaultQuery sq = new DefaultQuery();
         sq.setFilter(revisionFilter);
-        sq.setSortBy(new SortBy[] { ff.sort("revision", SortOrder.DESCENDING) });
+        final SortOrder order = swapped ? SortOrder.ASCENDING : SortOrder.DESCENDING;
+        sq.setSortBy(new SortBy[] { ff.sort("revision", order) });
         if(maxRows > 0)
             sq.setMaxFeatures(maxRows);
         return changesets.getFeatures(sq);

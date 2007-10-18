@@ -928,7 +928,18 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         
         // make sure maxRows works
         fc = fs.getLog("FIRST", "LAST", Filter.INCLUDE, null, 1);
+        assertEquals(1, fc.size());
+        
+        // try out with an inverted sequence and see if we get an inverted log order
+        fc = fs.getLog("LAST", "FIRST", Filter.INCLUDE, null, -1);
         assertEquals(4, fc.size());
+        it = fc.features();
+        f = it.next();
+        long r1 = ((Long) f.getAttribute("revision")).longValue();
+        f = it.next();
+        long r2 = ((Long) f.getAttribute("revision")).longValue();
+        assertTrue(r1 < r2);
+        it.close();
     }
 
     public void testDiff() throws IOException, IllegalAttributeException {
