@@ -447,9 +447,27 @@ O:
                 decl.setName(qualifiedName.getLocalPart());
                 decl.setTargetNamespace(qualifiedName.getNamespaceURI());
 
-                //set the type to be of string
-                XSDTypeDefinition type = index.getTypeDefinition(XS.ANYTYPE);
-                decl.setTypeDefinition(type);
+                //check for a type definition in the context, this is only used by
+                // the parser in test mode
+                QName typeDefinition = (QName) context.getComponentInstance(
+                        "http://geotools.org/typeDefinition");
+
+                if (typeDefinition != null) {
+                    context.unregisterComponent("http://geotools.org/typeDefinition");
+
+                    XSDTypeDefinition type = index.getTypeDefinition(typeDefinition);
+
+                    if (type == null) {
+                        throw new NullPointerException();
+                    }
+
+                    decl.setTypeDefinition(type);
+                } else {
+                    //normal case, just set the type to be of string
+                    XSDTypeDefinition type = index.getTypeDefinition(XS.ANYTYPE);
+                    decl.setTypeDefinition(type);
+                }
+
                 handler = new ElementHandlerImpl(decl, parent, this);
             }
         }
