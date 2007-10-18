@@ -1,6 +1,6 @@
 package org.geotools.filter.capability;
 
-import org.opengis.filter.capability.Function;
+import org.opengis.filter.capability.FunctionName;
 
 /**
  * Implementation of the FunctionName interface.
@@ -8,7 +8,7 @@ import org.opengis.filter.capability.Function;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class FunctionNameImpl extends OperatorImpl implements Function {
+public class FunctionNameImpl extends OperatorImpl implements FunctionName {
 
     int argumentCount;
     

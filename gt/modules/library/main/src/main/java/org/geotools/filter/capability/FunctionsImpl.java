@@ -1,6 +1,6 @@
 package org.geotools.filter.capability;
 
-import org.opengis.filter.capability.Function;
+import org.opengis.filter.capability.FunctionName;
 import org.opengis.filter.capability.Functions;
 
 /**
@@ -11,21 +11,21 @@ import org.opengis.filter.capability.Functions;
  */
 public class FunctionsImpl implements Functions {
 
-    Function[] functionNames;
+    FunctionName[] functionNames;
     
-    public FunctionsImpl( Function[] functionNames ) {
+    public FunctionsImpl( FunctionName[] functionNames ) {
         if ( functionNames == null ) {
-            functionNames = new Function[]{};
+            functionNames = new FunctionName[]{};
         }
         
         this.functionNames = functionNames;
     }
     
-    public Function[] getFunctionNames() {
+    public FunctionName[] getFunctionNames() {
         return functionNames;
     }
     
-    public Function getFunctionName(String name) {
+    public FunctionName getFunctionName(String name) {
         if ( name == null ) {
             return null;
         }

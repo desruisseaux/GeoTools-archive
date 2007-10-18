@@ -74,6 +74,7 @@ import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.capability.ArithmeticOperators;
 import org.opengis.filter.capability.ComparisonOperators;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.capability.FunctionName;
 import org.opengis.filter.capability.Functions;
 import org.opengis.filter.capability.GeometryOperand;
 import org.opengis.filter.capability.IdCapabilities;
@@ -968,11 +969,11 @@ public class FilterFactoryImpl implements FilterFactory {
         return new SpatialOperatorImpl( name, geometryOperands );
     }
     
-    public org.opengis.filter.capability.Function functionName(String name, int nargs) {
+    public FunctionName functionName(String name, int nargs) {
         return new FunctionNameImpl( name, nargs );
     }
     
-    public Functions functions(org.opengis.filter.capability.Function[] functionNames) {
+    public Functions functions(FunctionName[] functionNames) {
         return new FunctionsImpl( functionNames );
     }
     
