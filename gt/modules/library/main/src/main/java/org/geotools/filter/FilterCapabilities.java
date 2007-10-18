@@ -29,8 +29,6 @@ import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsNotEqualTo;
 
-
-
 /**
  * Represents the Filter capabilities that are supported by a SQLEncoder.  Each
  * SQLEncoder class should have one static FilterCapabilities, representing
@@ -38,6 +36,8 @@ import org.opengis.filter.PropertyIsNotEqualTo;
  *
  * @author Chris Holmes, TOPP
  * @source $URL$
+ * 
+ * @deprecated use {@link org.opengis.filter.capability.FilterCapabilities}.
  */
 public class FilterCapabilities {
 	/**

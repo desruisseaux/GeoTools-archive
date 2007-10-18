@@ -26,6 +26,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.factory.Hints;
+import org.geotools.filter.capability.ArithmeticOperatorsImpl;
+import org.geotools.filter.capability.ComparisonOperatorsImpl;
+import org.geotools.filter.capability.FilterCapabilitiesImpl;
+import org.geotools.filter.capability.FunctionNameImpl;
+import org.geotools.filter.capability.FunctionsImpl;
+import org.geotools.filter.capability.IdCapabilitiesImpl;
+import org.geotools.filter.capability.OperatorImpl;
+import org.geotools.filter.capability.ScalarCapabilitiesImpl;
+import org.geotools.filter.capability.SpatialCapabiltiesImpl;
+import org.geotools.filter.capability.SpatialOperatorImpl;
+import org.geotools.filter.capability.SpatialOperatorsImpl;
 import org.geotools.filter.expression.AddImpl;
 import org.geotools.filter.expression.DivideImpl;
 import org.geotools.filter.expression.MultiplyImpl;
@@ -60,6 +71,17 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.capability.ArithmeticOperators;
+import org.opengis.filter.capability.ComparisonOperators;
+import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.capability.Functions;
+import org.opengis.filter.capability.GeometryOperand;
+import org.opengis.filter.capability.IdCapabilities;
+import org.opengis.filter.capability.Operator;
+import org.opengis.filter.capability.ScalarCapabilities;
+import org.opengis.filter.capability.SpatialCapabilities;
+import org.opengis.filter.capability.SpatialOperator;
+import org.opengis.filter.capability.SpatialOperators;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Expression;
@@ -935,5 +957,56 @@ public class FilterFactoryImpl implements FilterFactory {
     }
     public Within within( Expression geometry1, Geometry geometry2 ) {
         return within( geometry1, literal( geometry2 ));
+    }
+    
+    public Operator operator(String name) {
+        return new OperatorImpl( name );
+    }
+    
+    public SpatialOperator spatialOperator(
+            String name, GeometryOperand[] geometryOperands) {
+        return new SpatialOperatorImpl( name, geometryOperands );
+    }
+    
+    public org.opengis.filter.capability.Function functionName(String name, int nargs) {
+        return new FunctionNameImpl( name, nargs );
+    }
+    
+    public Functions functions(org.opengis.filter.capability.Function[] functionNames) {
+        return new FunctionsImpl( functionNames );
+    }
+    
+    public SpatialOperators spatialOperators(SpatialOperator[] spatialOperators) {
+        return new SpatialOperatorsImpl( spatialOperators );
+    }
+    
+    public ArithmeticOperators arithmeticOperators(boolean simple, Functions functions ) {
+        return new ArithmeticOperatorsImpl( simple, functions );
+    }
+    
+    public ComparisonOperators comparisonOperators(Operator[] comparisonOperators) {
+        return new ComparisonOperatorsImpl( comparisonOperators );
+    }
+    
+    public FilterCapabilities capabilities(String version,
+            ScalarCapabilities scalar, SpatialCapabilities spatial,
+            IdCapabilities id) {
+        return new FilterCapabilitiesImpl( version, scalar, spatial, id );
+    }
+    
+    public ScalarCapabilities scalarCapabilities(
+            ComparisonOperators comparison, ArithmeticOperators arithmetic,
+            boolean logicalOperators) {
+        return new ScalarCapabilitiesImpl( comparison, arithmetic, logicalOperators );
+    }
+    
+    public SpatialCapabilities spatialCapabilities(
+            GeometryOperand[] geometryOperands,
+            SpatialOperators spatial) {
+        return new SpatialCapabiltiesImpl( geometryOperands, spatial );
+    }
+    
+    public IdCapabilities idCapabilities(boolean eid, boolean fid) {
+        return new IdCapabilitiesImpl( eid, fid );
     }
 }
