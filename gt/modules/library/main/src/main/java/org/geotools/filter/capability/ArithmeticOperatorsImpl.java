@@ -3,6 +3,12 @@ package org.geotools.filter.capability;
 import org.opengis.filter.capability.ArithmeticOperators;
 import org.opengis.filter.capability.Functions;
 
+/**
+ * Implementation of the ArithmeticOperators interface.
+ * 
+ * @author Justin Deoliveira, The Open Planning Project
+ *
+ */
 public class ArithmeticOperatorsImpl implements ArithmeticOperators {
 
     boolean simpleArithmetic;

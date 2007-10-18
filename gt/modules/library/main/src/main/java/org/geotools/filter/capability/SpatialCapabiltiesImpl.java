@@ -4,6 +4,12 @@ import org.opengis.filter.capability.GeometryOperand;
 import org.opengis.filter.capability.SpatialCapabilities;
 import org.opengis.filter.capability.SpatialOperators;
 
+/**
+ * Implementation of the SpatialCapabilities interface.
+ * 
+ * @author Justin Deoliveira, The Open Planning Project
+ *
+ */
 public class SpatialCapabiltiesImpl implements SpatialCapabilities {
 
     GeometryOperand[] geometryOperands;
@@ -22,7 +28,4 @@ public class SpatialCapabiltiesImpl implements SpatialCapabilities {
     public SpatialOperators getSpatialOperators() {
         return spatialOperators;
     }
-
-    
-
 }
