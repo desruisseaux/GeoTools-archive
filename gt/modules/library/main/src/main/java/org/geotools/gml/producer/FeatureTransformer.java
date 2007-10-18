@@ -15,6 +15,7 @@
  */
 package org.geotools.gml.producer;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.FeatureReader;
@@ -577,7 +578,13 @@ public class FeatureTransformer extends TransformerBase {
                     + "boundedBy";
                
                 contentHandler.startElement("", "", boundedBy, NULL_ATTS);
-                geometryTranslator.encode(JTS.toGeometry(bounds), srsName);
+                
+                
+                Envelope env = null;
+                if (bounds != null){
+                	env = new Envelope(new Coordinate(bounds.getMinX(), bounds.getMinY()),new Coordinate(bounds.getMaxX(), bounds.getMaxY()));
+                }
+                geometryTranslator.encode(env, srsName);
                 contentHandler.endElement("", "", boundedBy);
             } catch (SAXException se) {
                 throw new RuntimeException(se);
