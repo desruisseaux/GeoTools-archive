@@ -412,7 +412,7 @@ public class AttributeTypeBuilder {
 	    
 		AttributeType type = factory.createAttributeType(
 			new org.geotools.feature.Name(namespaceURI,name), binding, isIdentifiable, isAbstract, 
-			restrictions, superType, description());
+			restrictions(), superType, description());
 		resetTypeState();
 		
 		return type;
@@ -431,7 +431,7 @@ public class AttributeTypeBuilder {
 	public GeometryType buildGeometryType() {
 		GeometryType type = factory.createGeometryType(
 			new org.geotools.feature.Name(namespaceURI,name), binding, crs, isIdentifiable, isAbstract, 
-			restrictions, superType, description());
+			restrictions(), superType, description());
 		
 		resetTypeState();
 		
