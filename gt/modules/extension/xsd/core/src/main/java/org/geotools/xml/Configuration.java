@@ -18,7 +18,9 @@ package org.geotools.xml;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
+import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -215,6 +217,11 @@ public abstract class Configuration {
     private List properties;
 
     /**
+     * Internal context
+     */
+    private MutablePicoContainer context;
+
+    /**
      * Creates a new configuration.
      * <p>
      * Any dependent schemas should be added in sublcass constructor. The xml schema
@@ -232,6 +239,7 @@ public abstract class Configuration {
         }
 
         properties = new ArrayList();
+        context = new DefaultPicoContainer();
     }
 
     /**
@@ -368,6 +376,19 @@ public abstract class Configuration {
     }
 
     /**
+     * Returns an internal context which is copied into the runtime context
+     * while parsing.
+     * <p>
+     * This context is provided to allow for placing values in the parsing context
+     * without having to sublcass.
+     * </p>
+     * @return The context.
+     */
+    public final MutablePicoContainer getContext() {
+        return context;
+    }
+
+    /**
      * Configures a container which houses all the bindings used during a parse.
      *
      * @param container The container housing the binding objects.
@@ -452,6 +473,16 @@ public abstract class Configuration {
             // configurations
             container = container.makeChildContainer();
             dependency.configureContext(container);
+        }
+
+        //copy the internal context over
+        if (!context.getComponentAdapters().isEmpty()) {
+            container = container.makeChildContainer();
+
+            for (Iterator ca = context.getComponentAdapters().iterator(); ca.hasNext();) {
+                ComponentAdapter adapter = (ComponentAdapter) ca.next();
+                container.registerComponent(adapter);
+            }
         }
 
         return container;
