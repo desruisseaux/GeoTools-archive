@@ -75,7 +75,9 @@ import org.geotools.util.WeakValueHashMap;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serializable {
+public class NamedIdentifier implements ReferenceIdentifier, GenericName,
+                                        Comparable<GenericName>, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -658,7 +660,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName, Serial
      * zero, or a positive integer as this name lexicographically precedes, is equals to,
      * or follows the specified object.
      */
-    public int compareTo(final Object object) {
+    public int compareTo(final GenericName object) {
         return getName().compareTo(object);
     }
 

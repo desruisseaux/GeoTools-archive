@@ -19,18 +19,14 @@
  */
 package org.geotools.util;
 
-// J2SE direct dependencies
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
-// OpenGIS dependencies
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NameSpace;
 import org.opengis.util.ScopedName;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -79,12 +75,12 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * Since this object is itself a locale name, this list is always a singleton
      * containing only {@code this}. It will be built only when first needed.
      */
-    private transient List parsedNames;
+    private transient List<org.opengis.util.LocalName> parsedNames;
 
     /**
      * Constructs a local name from the specified string with no scope.
      * If the specified name is an {@link InternationalString}, then the
-     * <code>{@linkplain InternationalString#toString(Locale) toString}(null)</code>
+     * <code>{@linkplain InternationalString#toString(java.util.Locale) toString}(null)</code>
      * method will be used in order to fetch an unlocalized name. Otherwise, the
      * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
@@ -162,10 +158,10 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * Since this object is itself a locale name, this method always returns a singleton
      * containing only {@code this}.
      */
-    public List getParsedNames() {
+    public List<org.opengis.util.LocalName> getParsedNames() {
         // No need to sychronize: it is not a big deal if this object is built twice.
         if (parsedNames == null) {
-            parsedNames = Collections.singletonList(this);
+            parsedNames = Collections.singletonList((org.opengis.util.LocalName) this);
         }
         return parsedNames;
     }
@@ -242,6 +238,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * This string do not includes the scope, which is consistent with the
      * {@linkplain #getParsedNames parsed names} definition.
      */
+    @Override
     public String toString() {
         if (asString == null) {
             if (name instanceof InternationalString) {
@@ -257,6 +254,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
     /**
      * Returns a local-dependent string representation of this locale name.
      */
+    @Override
     public InternationalString toInternationalString() {
         if (asInternationalString == null) {
             if (name instanceof InternationalString) {
@@ -273,13 +271,15 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * zero, or a positive integer as this name lexicographically precedes, is equals to,
      * or follows the specified object. The comparaison is case-insensitive.
      */
-    public int compareTo(final Object object) {
+    @Override
+    public int compareTo(final GenericName object) {
         return toString().compareToIgnoreCase(object.toString());
     }
 
     /**
      * Compares this local name with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -296,6 +296,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
     /**
      * Returns a hash code value for this local name.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         // Do not use 'asScopedName' in order to avoid never-ending loop.

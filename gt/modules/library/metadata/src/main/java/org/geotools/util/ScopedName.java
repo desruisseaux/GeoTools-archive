@@ -19,18 +19,15 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+import java.util.Locale; // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
+import org.opengis.util.InternationalString; // For javadoc
 import org.opengis.util.LocalName;
 import org.opengis.util.NameSpace;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -74,7 +71,7 @@ public class ScopedName extends org.geotools.util.GenericName
     /**
      * The list of parsed names. Will be constructed only when first needed.
      */
-    private transient List parsedNames;
+    private transient List<LocalName> parsedNames;
 
     /**
      * Constructs a scoped name from the specified international string.
@@ -86,9 +83,7 @@ public class ScopedName extends org.geotools.util.GenericName
      * @param scope The scope (or "tail") of the variable.
      * @param name  The head (never {@code null}).
      */
-    public ScopedName(final GenericName scope,
-                      final CharSequence name)
-    {
+    public ScopedName(final GenericName scope, final CharSequence name) {
         this(scope, DEFAULT_SEPARATOR, name);
     }
 
@@ -103,10 +98,7 @@ public class ScopedName extends org.geotools.util.GenericName
      * @param separator The separator character (usually <code>':'</code> or <code>'/'</code>).
      * @param name      The head (never {@code null}).
      */
-    public ScopedName(final GenericName scope,
-                      final char    separator,
-                      final CharSequence name)
-    {
+    public ScopedName(final GenericName scope, final char separator, final CharSequence name) {
         AbstractInternationalString.ensureNonNull("scope", scope);
         AbstractInternationalString.ensureNonNull("name",  name);
         this.scope     = scope;
@@ -224,6 +216,7 @@ public class ScopedName extends org.geotools.util.GenericName
     /**
      * Returns the separator character.
      */
+    @Override
     public char getSeparator() {
         return separator;
     }
@@ -254,12 +247,12 @@ public class ScopedName extends org.geotools.util.GenericName
     /**
      * Returns the sequence of local name for this {@linkplain GenericName generic name}.
      */
-    public List getParsedNames() {
+    public List<LocalName> getParsedNames() {
         if (parsedNames == null) {
-            final List parents = scope.getParsedNames();
+            final List<LocalName> parents = scope.getParsedNames();
             final int size = parents.size();
-            GenericName[] names = new GenericName[size + 1];
-            names = (GenericName[]) parents.toArray(names);
+            LocalName[] names = new LocalName[size + 1];
+            names = parents.toArray(names);
             names[size] = name;
             parsedNames = Arrays.asList(names);
         }
@@ -305,6 +298,7 @@ public class ScopedName extends org.geotools.util.GenericName
     /**
      * Compares this scoped name with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -321,6 +315,7 @@ public class ScopedName extends org.geotools.util.GenericName
     /**
      * Returns a hash code value for this generic name.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ name.hashCode() ^ scope.hashCode();
     }

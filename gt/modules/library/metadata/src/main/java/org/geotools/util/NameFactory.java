@@ -16,17 +16,14 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Locale;  // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
+import org.opengis.util.InternationalString;  // For javadoc
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -63,8 +60,8 @@ public final class NameFactory {
      * @param separator The separator character.
      */
     public static GenericName create(final String name, final char separator) {
-        final List names = new ArrayList();
-        int lower=0;
+        final List<String> names = new ArrayList<String>();
+        int lower = 0;
         while (true) {
             final int upper = name.indexOf(separator, lower);
             if (upper >= 0) {
@@ -75,7 +72,7 @@ public final class NameFactory {
                 break;
             }
         }
-        return create((String[]) names.toArray(new String[names.size()]), separator);
+        return create(names.toArray(new String[names.size()]), separator);
     }
 
     /**
