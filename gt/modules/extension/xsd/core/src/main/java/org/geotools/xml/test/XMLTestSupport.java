@@ -23,8 +23,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.helpers.NamespaceSupport;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,9 +42,11 @@ import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.DOMParser;
 import org.geotools.xml.Encoder;
+import org.geotools.xml.XSD;
 import org.geotools.xml.impl.BindingFactoryImpl;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.BindingWalkerFactoryImpl;
+import org.geotools.xml.impl.NamespaceSupportWrapper;
 
 
 /**
@@ -197,14 +204,14 @@ public abstract class XMLTestSupport extends TestCase {
     protected abstract Configuration createConfiguration();
 
     /**
-     * Parses the built document.
+     * Parses the build document, explicity specifying the type of the root
+     * element.
      * <p>
      * This method should be called after building the entire document.
-     *
-     * </p>
-     * @throws Exception
+     *</p>
+     * @param type The name of the type of the root element of the build document.
      */
-    protected Object parse() throws Exception {
+    protected Object parse(QName type) throws Exception {
         Element root = document.getDocumentElement();
 
         if (root == null) {
@@ -212,6 +219,10 @@ public abstract class XMLTestSupport extends TestCase {
         }
 
         Configuration config = createConfiguration();
+
+        if (type != null) {
+            config.getContext().registerComponentInstance("http://geotools.org/typeDefinition", type);
+        }
 
         registerNamespaces(root);
 
@@ -225,17 +236,36 @@ public abstract class XMLTestSupport extends TestCase {
     }
 
     /**
-     * Encodes an object, element name pair.
+     * Parses the built document.
+     * <p>
+     * This method should be called after building the entire document.
+     *</p>
+     */
+    protected Object parse() throws Exception {
+        return parse(null);
+    }
+
+    /**
+     * Encodes an object, element name pair explicitly specifying the type of
+     * the root element.
      *
      * @param object The object to encode.
      * @param element The name of the element to encode.
+     * @param type The type of the element
      *
      * @return The object encoded.
      * @throws Exception
      */
-    protected Document encode(Object object, QName element)
+    protected Document encode(Object object, QName element, QName type)
         throws Exception {
         Configuration configuration = createConfiguration();
+
+        if (type != null) {
+            //set the hint
+            configuration.getContext()
+                         .registerComponentInstance("http://geotools.org/typeDefinition", type);
+        }
+
         XSDSchema schema = configuration.getXSD().getSchema();
 
         Encoder encoder = new Encoder(configuration, schema);
@@ -246,6 +276,20 @@ public abstract class XMLTestSupport extends TestCase {
         dbf.setNamespaceAware(true);
 
         return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(output.toByteArray()));
+    }
+
+    /**
+     * Encodes an object, element name pair.
+     *
+     * @param object The object to encode.
+     * @param element The name of the element to encode.
+     *
+     * @return The object encoded.
+     * @throws Exception
+     */
+    protected Document encode(Object object, QName element)
+        throws Exception {
+        return encode(object, element, null);
     }
 
     /**
@@ -290,6 +334,37 @@ public abstract class XMLTestSupport extends TestCase {
 
         //logger
         context.registerComponentInstance(logger);
+
+        //setup the namespace support
+        NamespaceSupport namespaces = new NamespaceSupport();
+        HashMap mappings = new HashMap();
+
+        try {
+            for (Iterator d = configuration.getXSD().getDependencies().iterator(); d.hasNext();) {
+                XSD xsd = (XSD) d.next();
+                XSDSchema schema = xsd.getSchema();
+
+                mappings.putAll(schema.getQNamePrefixToNamespaceMap());
+            }
+
+            mappings.putAll(configuration.getXSD().getSchema().getQNamePrefixToNamespaceMap());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (Iterator m = mappings.entrySet().iterator(); m.hasNext();) {
+            Map.Entry mapping = (Map.Entry) m.next();
+            String key = (String) mapping.getKey();
+
+            if (key == null) {
+                key = "";
+            }
+
+            namespaces.declarePrefix(key, (String) mapping.getValue());
+        }
+
+        context.registerComponentInstance(namespaces);
+        context.registerComponentInstance(new NamespaceSupportWrapper(namespaces));
 
         return bindingLoader.loadBinding(name, context);
     }
