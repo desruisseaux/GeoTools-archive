@@ -355,6 +355,33 @@ public class Encoder {
 
         //add the first entry
         XSDElementDeclaration root = index.getElementDeclaration(name);
+
+        if (root == null) {
+            //check for context hint, this is only used when running the encoder
+            // in test mode
+            QName typeDefintion = (QName) context.getComponentInstance(
+                    "http://geotools.org/typeDefinition");
+
+            if (typeDefintion != null) {
+                XSDTypeDefinition type = index.getTypeDefinition(typeDefintion);
+
+                if (type == null) {
+                    throw new NullPointerException();
+                }
+
+                //create a mock element declaration
+                root = XSDFactory.eINSTANCE.createXSDElementDeclaration();
+                root.setName(name.getLocalPart());
+                root.setTargetNamespace(name.getNamespaceURI());
+                root.setTypeDefinition(type);
+            }
+        }
+
+        if (root == null) {
+            String msg = "Could not find elmeent declaration for:" + name;
+            throw new IllegalArgumentException(msg);
+        }
+
         encoded.add(new EncodingEntry(object, root));
 
         while (!encoded.isEmpty()) {
