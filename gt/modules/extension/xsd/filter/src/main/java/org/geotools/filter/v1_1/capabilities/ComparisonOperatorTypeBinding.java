@@ -13,33 +13,32 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_1.capabilities;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractSimpleBinding;
-import org.geotools.xml.InstanceComponent;
+import org.opengis.filter.capability.Operator;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:SpatialOperatorNameType.
+ * Binding object for the type http://www.opengis.net/ogc:ComparisonOperatorType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:simpleType name="SpatialOperatorNameType"&gt;
+ *  &lt;xsd:simpleType name="ComparisonOperatorType"&gt;
  *      &lt;xsd:restriction base="xsd:string"&gt;
- *          &lt;xsd:enumeration value="BBOX"/&gt;
- *          &lt;xsd:enumeration value="Equals"/&gt;
- *          &lt;xsd:enumeration value="Disjoint"/&gt;
- *          &lt;xsd:enumeration value="Intersects"/&gt;
- *          &lt;xsd:enumeration value="Touches"/&gt;
- *          &lt;xsd:enumeration value="Crosses"/&gt;
- *          &lt;xsd:enumeration value="Within"/&gt;
- *          &lt;xsd:enumeration value="Contains"/&gt;
- *          &lt;xsd:enumeration value="Overlaps"/&gt;
- *          &lt;xsd:enumeration value="Beyond"/&gt;
- *          &lt;xsd:enumeration value="DWithin"/&gt;
+ *          &lt;xsd:enumeration value="LessThan"/&gt;
+ *          &lt;xsd:enumeration value="GreaterThan"/&gt;
+ *          &lt;xsd:enumeration value="LessThanEqualTo"/&gt;
+ *          &lt;xsd:enumeration value="GreaterThanEqualTo"/&gt;
+ *          &lt;xsd:enumeration value="EqualTo"/&gt;
+ *          &lt;xsd:enumeration value="NotEqualTo"/&gt;
+ *          &lt;xsd:enumeration value="Like"/&gt;
+ *          &lt;xsd:enumeration value="Between"/&gt;
+ *          &lt;xsd:enumeration value="NullCheck"/&gt;
  *      &lt;/xsd:restriction&gt;
  *  &lt;/xsd:simpleType&gt;
  *
@@ -49,18 +48,18 @@ import org.geotools.xml.InstanceComponent;
  *
  * @generated
  */
-public class SpatialOperatorNameTypeBinding extends AbstractSimpleBinding {
-    FilterFactory filterfactory;
+public class ComparisonOperatorTypeBinding extends AbstractSimpleBinding {
+    FilterFactory factory;
 
-    public SpatialOperatorNameTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public ComparisonOperatorTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.SpatialOperatorNameType;
+        return OGC.ComparisonOperatorType;
     }
 
     /**
@@ -70,7 +69,11 @@ public class SpatialOperatorNameTypeBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Operator.class;
+    }
+
+    public int getExecutionMode() {
+        return Binding.OVERRIDE;
     }
 
     /**
@@ -81,7 +84,12 @@ public class SpatialOperatorNameTypeBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        return factory.operator((String) value);
+    }
+
+    public String encode(Object object, String value) throws Exception {
+        Operator op = (Operator) object;
+
+        return op.getName();
     }
 }

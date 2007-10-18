@@ -59,6 +59,20 @@ import org.geotools.filter.v1_0.OGCSubBinding;
 import org.geotools.filter.v1_0.OGCTouchesBinding;
 import org.geotools.filter.v1_0.OGCUpperBoundaryTypeBinding;
 import org.geotools.filter.v1_0.OGCWithinBinding;
+import org.geotools.filter.v1_0.capabilities.Arithmetic_OperatorsTypeBinding;
+import org.geotools.filter.v1_0.capabilities.Function_NameTypeBinding;
+import org.geotools.filter.v1_0.capabilities.Function_NamesTypeBinding;
+import org.geotools.filter.v1_0.capabilities.FunctionsTypeBinding;
+import org.geotools.filter.v1_0.capabilities.Scalar_CapabilitiesTypeBinding;
+import org.geotools.filter.v1_1.capabilities.ComparisonOperatorTypeBinding;
+import org.geotools.filter.v1_1.capabilities.ComparisonOperatorsTypeBinding;
+import org.geotools.filter.v1_1.capabilities.GeometryOperandTypeBinding;
+import org.geotools.filter.v1_1.capabilities.GeometryOperandsTypeBinding;
+import org.geotools.filter.v1_1.capabilities.Id_CapabilitiesTypeBinding;
+import org.geotools.filter.v1_1.capabilities.SpatialOperatorTypeBinding;
+import org.geotools.filter.v1_1.capabilities.SpatialOperatorsTypeBinding;
+import org.geotools.filter.v1_1.capabilities.Spatial_CapabilitiesTypeBinding;
+import org.geotools.filter.v1_1.capabilities._Filter_CapabilitiesBinding;
 import org.geotools.gml3.GMLConfiguration;
 import org.geotools.xml.Configuration;
 
@@ -82,8 +96,8 @@ public class OGCConfiguration extends Configuration {
     protected void registerBindings(MutablePicoContainer container) {
         //Types
         //container.registerComponentImplementation(OGC.ABSTRACTIDTYPE,AbstractIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.ArithmeticOperatorsType,
-            ArithmeticOperatorsTypeBinding.class);
+        //container.registerComponentImplementation(OGC.ArithmeticOperatorsType,
+        //    ArithmeticOperatorsTypeBinding.class);
         //container.registerComponentImplementation(OGC.BBOXTYPE,BBOXTypeBinding.class);
         container.registerComponentImplementation(OGC.BBOXType, OGCBBOXTypeBinding.class);
         container.registerComponentImplementation(OGC.BinaryComparisonOpType,
@@ -94,10 +108,10 @@ public class OGCConfiguration extends Configuration {
             OGCBinaryOperatorTypeBinding.class);
         container.registerComponentImplementation(OGC.BinarySpatialOpType,
             OGCBinarySpatialOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.ComparisonOperatorsType,
-            ComparisonOperatorsTypeBinding.class);
-        container.registerComponentImplementation(OGC.ComparisonOperatorType,
-            ComparisonOperatorTypeBinding.class);
+        //container.registerComponentImplementation(OGC.ComparisonOperatorsType,
+        //   ComparisonOperatorsTypeBinding.class);
+        //container.registerComponentImplementation(OGC.ComparisonOperatorType,
+        //    ComparisonOperatorTypeBinding.class);
         //container.registerComponentImplementation(OGC.COMPARISONOPSTYPE,ComparisonOpsTypeBinding.class);
         container.registerComponentImplementation(OGC.DistanceBufferType,
             OGCDistanceBufferTypeBinding.class);
@@ -110,20 +124,20 @@ public class OGCConfiguration extends Configuration {
         container.registerComponentImplementation(OGC.FeatureIdType, OGCFeatureIdTypeBinding.class);
         container.registerComponentImplementation(OGC.FilterType, FilterTypeBinding.class);
         //container.registerComponentImplementation(OGC.FILTERTYPE,FilterTypeBinding.class);
-        container.registerComponentImplementation(OGC.FunctionNamesType,
-            FunctionNamesTypeBinding.class);
-        container.registerComponentImplementation(OGC.FunctionNameType,
-            FunctionNameTypeBinding.class);
-        container.registerComponentImplementation(OGC.FunctionsType, FunctionsTypeBinding.class);
+        //container.registerComponentImplementation(OGC.FunctionNamesType,
+        //    FunctionNamesTypeBinding.class);
+        //container.registerComponentImplementation(OGC.FunctionNameType,
+        //    FunctionNameTypeBinding.class);
+        //container.registerComponentImplementation(OGC.FunctionsType, FunctionsTypeBinding.class);
         container.registerComponentImplementation(OGC.FunctionType, OGCFunctionTypeBinding.class);
         //container.registerComponentImplementation(OGC.FUNCTIONTYPE,FunctionTypeBinding.class);
-        container.registerComponentImplementation(OGC.GeometryOperandsType,
-            GeometryOperandsTypeBinding.class);
-        container.registerComponentImplementation(OGC.GeometryOperandType,
-            GeometryOperandTypeBinding.class);
+        //container.registerComponentImplementation(OGC.GeometryOperandsType,
+        //    GeometryOperandsTypeBinding.class);
+        //container.registerComponentImplementation(OGC.GeometryOperandType,
+        //    GeometryOperandTypeBinding.class);
         container.registerComponentImplementation(OGC.GmlObjectIdType, GmlObjectIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.Id_CapabilitiesType,
-            Id_CapabilitiesTypeBinding.class);
+        //container.registerComponentImplementation(OGC.Id_CapabilitiesType,
+        //    Id_CapabilitiesTypeBinding.class);
         container.registerComponentImplementation(OGC.LiteralType, OGCLiteralTypeBinding.class);
         //container.registerComponentImplementation(OGC.LITERALTYPE,LiteralTypeBinding.class);
         //container.registerComponentImplementation(OGC.LOGICOPSTYPE,LogicOpsTypeBinding.class);
@@ -139,20 +153,20 @@ public class OGCConfiguration extends Configuration {
             OGCPropertyIsNullTypeBinding.class);
         container.registerComponentImplementation(OGC.PropertyNameType,
             OGCPropertyNameTypeBinding.class);
-        container.registerComponentImplementation(OGC.Scalar_CapabilitiesType,
-            Scalar_CapabilitiesTypeBinding.class);
+        //container.registerComponentImplementation(OGC.Scalar_CapabilitiesType,
+        //    Scalar_CapabilitiesTypeBinding.class);
         container.registerComponentImplementation(OGC.SortByType, SortByTypeBinding.class);
         container.registerComponentImplementation(OGC.SortOrderType, SortOrderTypeBinding.class);
         container.registerComponentImplementation(OGC.SortPropertyType,
             SortPropertyTypeBinding.class);
-        container.registerComponentImplementation(OGC.Spatial_CapabilitiesType,
-            Spatial_CapabilitiesTypeBinding.class);
-        container.registerComponentImplementation(OGC.SpatialOperatorNameType,
-            SpatialOperatorNameTypeBinding.class);
-        container.registerComponentImplementation(OGC.SpatialOperatorsType,
-            SpatialOperatorsTypeBinding.class);
-        container.registerComponentImplementation(OGC.SpatialOperatorType,
-            SpatialOperatorTypeBinding.class);
+        //container.registerComponentImplementation(OGC.Spatial_CapabilitiesType,
+        //    Spatial_CapabilitiesTypeBinding.class);
+        //container.registerComponentImplementation(OGC.SpatialOperatorNameType,
+        //    SpatialOperatorNameTypeBinding.class);
+        //container.registerComponentImplementation(OGC.SpatialOperatorsType,
+        //    SpatialOperatorsTypeBinding.class);
+        //container.registerComponentImplementation(OGC.SpatialOperatorType,
+        //    SpatialOperatorTypeBinding.class);
         //container.registerComponentImplementation(OGC.SPATIALOPSTYPE,SpatialOpsTypeBinding.class);
         //container.registerComponentImplementation(OGC.UNARYLOGICOPTYPE,
         //    UnaryLogicOpTypeBinding.class);
@@ -171,20 +185,20 @@ public class OGCConfiguration extends Configuration {
         container.registerComponentImplementation(OGC.Disjoint, OGCDisjointBinding.class);
         container.registerComponentImplementation(OGC.Div, OGCDivBinding.class);
         container.registerComponentImplementation(OGC.DWithin, OGCDWithinBinding.class);
-        container.registerComponentImplementation(OGC.EID, EIDBinding.class);
+        //container.registerComponentImplementation(OGC.EID, EIDBinding.class);
         container.registerComponentImplementation(OGC.Equals, OGCEqualsBinding.class);
         //container.registerComponentImplementation(OGC.EXPRESSION, ExpressionBinding.class);
         //container.registerComponentImplementation(OGC.FEATUREID, FeatureIdBinding.class);
-        container.registerComponentImplementation(OGC.FID, FIDBinding.class);
+        //container.registerComponentImplementation(OGC.FID, FIDBinding.class);
         //container.registerComponentImplementation(OGC.FILTER,FilterBinding.class);
-        container.registerComponentImplementation(OGC.Filter_Capabilities,
-            Filter_CapabilitiesBinding.class);
+        //container.registerComponentImplementation(OGC.Filter_Capabilities,
+        //    Filter_CapabilitiesBinding.class);
         //container.registerComponentImplementation(OGC.FUNCTION, FunctionBinding.class);
         //container.registerComponentImplementation(OGC.GMLOBJECTID, GmlObjectIdBinding.class);
         container.registerComponentImplementation(OGC.Intersects, OGCIntersectsBinding.class);
         //container.registerComponentImplementation(OGC.LITERAL,LiteralBinding.class);
-        container.registerComponentImplementation(OGC.LogicalOperators,
-            LogicalOperatorsBinding.class);
+        //container.registerComponentImplementation(OGC.LogicalOperators,
+        //   LogicalOperatorsBinding.class);
         //container.registerComponentImplementation(OGC.LOGICOPS,LogicOpsBinding.class);
         container.registerComponentImplementation(OGC.Mul, OGCMulBinding.class);
         container.registerComponentImplementation(OGC.Not, OGCNotBinding.class);
@@ -207,13 +221,49 @@ public class OGCConfiguration extends Configuration {
         //container.registerComponentImplementation(OGC.PROPERTYISNULL,PropertyIsNullBinding.class);
         //        container.registerComponentImplementation(OGC.PROPERTYNAME,
         //            PropertyNameBinding.class);
-        container.registerComponentImplementation(OGC.SimpleArithmetic,
-            SimpleArithmeticBinding.class);
+        //container.registerComponentImplementation(OGC.SimpleArithmetic,
+        //    SimpleArithmeticBinding.class);
         //container.registerComponentImplementation(OGC.SORTBY,SortByBinding.class);
         //container.registerComponentImplementation(OGC.SPATIALOPS,SpatialOpsBinding.class);
         container.registerComponentImplementation(OGC.Sub, OGCSubBinding.class);
         container.registerComponentImplementation(OGC.Touches, OGCTouchesBinding.class);
         container.registerComponentImplementation(OGC.Within, OGCWithinBinding.class);
+
+        //capabilities
+        //Types
+        container.registerComponentImplementation(OGC.ArithmeticOperatorsType,
+            Arithmetic_OperatorsTypeBinding.class);
+        container.registerComponentImplementation(OGC.ComparisonOperatorsType,
+            ComparisonOperatorsTypeBinding.class);
+        container.registerComponentImplementation(OGC.ComparisonOperatorType,
+            ComparisonOperatorTypeBinding.class);
+        container.registerComponentImplementation(OGC.FunctionNamesType,
+            Function_NamesTypeBinding.class);
+        container.registerComponentImplementation(OGC.FunctionNameType,
+            Function_NameTypeBinding.class);
+        container.registerComponentImplementation(OGC.FunctionsType, FunctionsTypeBinding.class);
+        container.registerComponentImplementation(OGC.GeometryOperandsType,
+            GeometryOperandsTypeBinding.class);
+        container.registerComponentImplementation(OGC.GeometryOperandType,
+            GeometryOperandTypeBinding.class);
+        container.registerComponentImplementation(OGC.Id_CapabilitiesType,
+            Id_CapabilitiesTypeBinding.class);
+        container.registerComponentImplementation(OGC.Scalar_CapabilitiesType,
+            Scalar_CapabilitiesTypeBinding.class);
+        container.registerComponentImplementation(OGC.Spatial_CapabilitiesType,
+            Spatial_CapabilitiesTypeBinding.class);
+        //container.registerComponentImplementation(OGC.SpatialOperatorNameType,SpatialOperatorNameTypeBinding.class);
+        container.registerComponentImplementation(OGC.SpatialOperatorsType,
+            SpatialOperatorsTypeBinding.class);
+        container.registerComponentImplementation(OGC.SpatialOperatorType,
+            SpatialOperatorTypeBinding.class);
+        //container.registerComponentImplementation(OGC._EID,_EIDBinding.class);
+        //container.registerComponentImplementation(OGC._FID,_FIDBinding.class);
+        container.registerComponentImplementation(OGC._Filter_Capabilities,
+            _Filter_CapabilitiesBinding.class);
+
+        //container.registerComponentImplementation(OGC._LogicalOperators,_LogicalOperatorsBinding.class);
+        //container.registerComponentImplementation(OGC._SimpleArithmetic,_SimpleArithmeticBinding.class);
     }
 
     /**

@@ -13,12 +13,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_1.capabilities;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractSimpleBinding;
-import org.geotools.xml.InstanceComponent;
+import org.opengis.filter.capability.GeometryOperand;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.*;
+import org.geotools.xs.bindings.XSQNameBinding;
 
 
 /**
@@ -58,10 +60,10 @@ import org.geotools.xml.InstanceComponent;
  * @generated
  */
 public class GeometryOperandTypeBinding extends AbstractSimpleBinding {
-    FilterFactory filterfactory;
+    NamespaceContext namespaceContext;
 
-    public GeometryOperandTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public GeometryOperandTypeBinding(NamespaceContext namespaceContext) {
+        this.namespaceContext = namespaceContext;
     }
 
     /**
@@ -78,7 +80,7 @@ public class GeometryOperandTypeBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return GeometryOperand.class;
     }
 
     /**
@@ -89,7 +91,15 @@ public class GeometryOperandTypeBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        QName name = (QName) value;
+
+        return GeometryOperand.get(name.getNamespaceURI(), name.getLocalPart());
+    }
+
+    public String encode(Object object, String value) throws Exception {
+        GeometryOperand operand = (GeometryOperand) object;
+
+        return new XSQNameBinding(namespaceContext).encode(new QName(operand.getNamespaceURI(),
+                operand.getLocalPart()), value);
     }
 }

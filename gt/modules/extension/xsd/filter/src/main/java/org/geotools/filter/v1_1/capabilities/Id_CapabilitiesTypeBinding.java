@@ -13,25 +13,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_1.capabilities;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.IdCapabilities;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:GeometryOperandsType.
+ * Binding object for the type http://www.opengis.net/ogc:Id_CapabilitiesType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:complexType name="GeometryOperandsType"&gt;
- *      &lt;xsd:sequence&gt;
- *          &lt;xsd:element maxOccurs="unbounded" name="GeometryOperand" type="ogc:GeometryOperandType"/&gt;
- *      &lt;/xsd:sequence&gt;
+ *  &lt;xsd:complexType name="Id_CapabilitiesType"&gt;
+ *      &lt;xsd:choice maxOccurs="unbounded"&gt;
+ *          &lt;xsd:element ref="ogc:EID"/&gt;
+ *          &lt;xsd:element ref="ogc:FID"/&gt;
+ *      &lt;/xsd:choice&gt;
  *  &lt;/xsd:complexType&gt;
  *
  *          </code>
@@ -40,18 +41,18 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GeometryOperandsTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+public class Id_CapabilitiesTypeBinding extends AbstractComplexBinding {
+    FilterFactory factory;
 
-    public GeometryOperandsTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public Id_CapabilitiesTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.GeometryOperandsType;
+        return OGC.Id_CapabilitiesType;
     }
 
     /**
@@ -61,7 +62,7 @@ public class GeometryOperandsTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return IdCapabilities.class;
     }
 
     /**
@@ -72,7 +73,27 @@ public class GeometryOperandsTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        //&lt;xsd:element ref="ogc:EID"/&gt;
+        boolean eid = node.hasChild("EID");
+
+        //&lt;xsd:element ref="ogc:FID"/&gt;
+        boolean fid = node.hasChild("FID");
+
+        return factory.idCapabilities(eid, fid);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        IdCapabilities id = (IdCapabilities) object;
+
+        if (OGC.EID.equals(name) && id.hasEID()) {
+            return new Object();
+        }
+
+        if (OGC.FID.equals(name) && id.hasFID()) {
+            return new Object();
+        }
+
         return null;
     }
 }

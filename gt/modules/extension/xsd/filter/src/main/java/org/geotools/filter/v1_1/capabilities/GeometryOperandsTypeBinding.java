@@ -13,26 +13,25 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_1.capabilities;
 
+import java.util.List;
 import javax.xml.namespace.QName;
-import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.GeometryOperand;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:ArithmeticOperatorsType.
+ * Binding object for the type http://www.opengis.net/ogc:GeometryOperandsType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:complexType name="ArithmeticOperatorsType"&gt;
- *      &lt;xsd:choice maxOccurs="unbounded"&gt;
- *          &lt;xsd:element ref="ogc:SimpleArithmetic"/&gt;
- *          &lt;xsd:element name="Functions" type="ogc:FunctionsType"/&gt;
- *      &lt;/xsd:choice&gt;
+ *  &lt;xsd:complexType name="GeometryOperandsType"&gt;
+ *      &lt;xsd:sequence&gt;
+ *          &lt;xsd:element maxOccurs="unbounded" name="GeometryOperand" type="ogc:GeometryOperandType"/&gt;
+ *      &lt;/xsd:sequence&gt;
  *  &lt;/xsd:complexType&gt;
  *
  *          </code>
@@ -41,18 +40,12 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class ArithmeticOperatorsTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
-
-    public ArithmeticOperatorsTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
-    }
-
+public class GeometryOperandsTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.ArithmeticOperatorsType;
+        return OGC.GeometryOperandsType;
     }
 
     /**
@@ -62,7 +55,7 @@ public class ArithmeticOperatorsTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return GeometryOperand[].class;
     }
 
     /**
@@ -73,7 +66,17 @@ public class ArithmeticOperatorsTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        List gops = node.getChildValues(GeometryOperand.class);
+
+        return gops.toArray(new GeometryOperand[gops.size()]);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("GeometryOperand".equals(name.getLocalPart())) {
+            return object;
+        }
+
         return null;
     }
 }

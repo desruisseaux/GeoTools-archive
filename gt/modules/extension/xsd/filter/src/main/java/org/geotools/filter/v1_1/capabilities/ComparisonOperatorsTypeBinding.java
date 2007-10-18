@@ -13,28 +13,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_1.capabilities;
 
+import java.util.List;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.ComparisonOperators;
+import org.opengis.filter.capability.Operator;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:Scalar_CapabilitiesType.
+ * Binding object for the type http://www.opengis.net/ogc:ComparisonOperatorsType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:complexType name="Scalar_CapabilitiesType"&gt;
- *      &lt;xsd:sequence&gt;
- *          &lt;xsd:element maxOccurs="1" minOccurs="0" ref="ogc:LogicalOperators"/&gt;
- *          &lt;xsd:element maxOccurs="1" minOccurs="0"
- *              name="ComparisonOperators" type="ogc:ComparisonOperatorsType"/&gt;
- *          &lt;xsd:element maxOccurs="1" minOccurs="0"
- *              name="ArithmeticOperators" type="ogc:ArithmeticOperatorsType"/&gt;
+ *  &lt;xsd:complexType name="ComparisonOperatorsType"&gt;
+ *      &lt;xsd:sequence maxOccurs="unbounded"&gt;
+ *          &lt;xsd:element name="ComparisonOperator" type="ogc:ComparisonOperatorType"/&gt;
  *      &lt;/xsd:sequence&gt;
  *  &lt;/xsd:complexType&gt;
  *
@@ -44,18 +42,18 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class Scalar_CapabilitiesTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+public class ComparisonOperatorsTypeBinding extends AbstractComplexBinding {
+    FilterFactory factory;
 
-    public Scalar_CapabilitiesTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public ComparisonOperatorsTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.Scalar_CapabilitiesType;
+        return OGC.ComparisonOperatorsType;
     }
 
     /**
@@ -65,7 +63,7 @@ public class Scalar_CapabilitiesTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return ComparisonOperators.class;
     }
 
     /**
@@ -76,7 +74,19 @@ public class Scalar_CapabilitiesTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        List ops = node.getChildValues(Operator.class);
+
+        return factory.comparisonOperators((Operator[]) ops.toArray(new Operator[ops.size()]));
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("ComparisonOperator".equals(name.getLocalPart())) {
+            ComparisonOperators ops = (ComparisonOperators) object;
+
+            return ops.getOperators();
+        }
+
         return null;
     }
 }

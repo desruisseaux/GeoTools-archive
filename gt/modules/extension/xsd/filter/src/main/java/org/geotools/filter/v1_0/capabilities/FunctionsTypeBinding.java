@@ -13,24 +13,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_0.capabilities;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.FunctionName;
+import org.opengis.filter.capability.Functions;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the element http://www.opengis.net/ogc:SimpleArithmetic.
+ * Binding object for the type http://www.opengis.net/ogc:FunctionsType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:element name="SimpleArithmetic"&gt;
- *      &lt;xsd:complexType/&gt;
- *  &lt;/xsd:element&gt;
+ *  &lt;xsd:complexType name="FunctionsType"&gt;
+ *      &lt;xsd:sequence&gt;
+ *          &lt;xsd:element name="Function_Names" type="ogc:Function_NamesType"/&gt;
+ *      &lt;/xsd:sequence&gt;
+ *  &lt;/xsd:complexType&gt;
  *
  *          </code>
  *         </pre>
@@ -38,18 +40,18 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class SimpleArithmeticBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+public class FunctionsTypeBinding extends AbstractComplexBinding {
+    FilterFactory factory;
 
-    public SimpleArithmeticBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public FunctionsTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.SimpleArithmetic;
+        return OGC.FunctionsType;
     }
 
     /**
@@ -59,7 +61,7 @@ public class SimpleArithmeticBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Functions.class;
     }
 
     /**
@@ -70,7 +72,20 @@ public class SimpleArithmeticBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        FunctionName[] functionNames = (FunctionName[]) node.getChildValue(FunctionName[].class);
+
+        return factory.functions(functionNames);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("Function_Names".equals(name.getLocalPart())
+                || "FunctionNames".equals(name.getLocalPart()) /* 1.1 */) {
+            Functions functions = (Functions) object;
+
+            return functions.getFunctionNames();
+        }
+
         return null;
     }
 }

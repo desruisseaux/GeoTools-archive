@@ -13,13 +13,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_0.capabilities;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.SpatialCapabilities;
+import org.opengis.filter.capability.SpatialOperators;
+import org.geotools.xml.*;
 
 
 /**
@@ -30,22 +30,20 @@ import org.geotools.xml.Node;
  *         <code>
  *  &lt;xsd:complexType name="Spatial_CapabilitiesType"&gt;
  *      &lt;xsd:sequence&gt;
- *          &lt;xsd:element name="GeometryOperands" type="ogc:GeometryOperandsType"/&gt;
- *          &lt;xsd:element name="SpatialOperators" type="ogc:SpatialOperatorsType"/&gt;
+ *          &lt;xsd:element name="Spatial_Operators" type="ogc:Spatial_OperatorsType"/&gt;
  *      &lt;/xsd:sequence&gt;
  *  &lt;/xsd:complexType&gt;
- *
- *          </code>
+ *                </code>
  *         </pre>
  * </p>
  *
  * @generated
  */
 public class Spatial_CapabilitiesTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory factory;
 
-    public Spatial_CapabilitiesTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public Spatial_CapabilitiesTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
@@ -62,7 +60,7 @@ public class Spatial_CapabilitiesTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return SpatialCapabilities.class;
     }
 
     /**
@@ -73,7 +71,18 @@ public class Spatial_CapabilitiesTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        return factory.spatialCapabilities(null,
+            (SpatialOperators) node.getChildValue(SpatialOperators.class));
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        SpatialCapabilities spatial = (SpatialCapabilities) object;
+
+        if ("Spatial_Operators".equals(name.getLocalPart())) {
+            return spatial.getSpatialOperators();
+        }
+
         return null;
     }
 }

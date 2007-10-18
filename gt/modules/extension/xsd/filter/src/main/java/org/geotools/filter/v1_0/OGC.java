@@ -268,6 +268,4 @@ public final class OGC extends XSD {
     public String getSchemaLocation() {
         return getClass().getResource("filter.xsd").toString();
     }
-
-    /* Attributes */
 }

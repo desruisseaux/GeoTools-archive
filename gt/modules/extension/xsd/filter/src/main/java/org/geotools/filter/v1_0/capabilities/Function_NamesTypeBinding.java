@@ -13,24 +13,25 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_0.capabilities;
 
+import java.util.List;
 import javax.xml.namespace.QName;
-import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.FunctionName;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the element http://www.opengis.net/ogc:FID.
+ * Binding object for the type http://www.opengis.net/ogc:Function_NamesType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:element name="FID"&gt;
- *      &lt;xsd:complexType/&gt;
- *  &lt;/xsd:element&gt;
+ *  &lt;xsd:complexType name="Function_NamesType"&gt;
+ *      &lt;xsd:sequence maxOccurs="unbounded"&gt;
+ *          &lt;xsd:element name="Function_Name" type="ogc:Function_NameType"/&gt;
+ *      &lt;/xsd:sequence&gt;
+ *  &lt;/xsd:complexType&gt;
  *
  *          </code>
  *         </pre>
@@ -38,18 +39,12 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class FIDBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
-
-    public FIDBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
-    }
-
+public class Function_NamesTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.FID;
+        return OGC.Function_NamesType;
     }
 
     /**
@@ -59,7 +54,7 @@ public class FIDBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return FunctionName[].class;
     }
 
     /**
@@ -70,7 +65,18 @@ public class FIDBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        List functions = node.getChildValues(FunctionName.class);
+
+        return functions.toArray(new FunctionName[functions.size()]);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (name.getLocalPart().equals("Function_Name")
+                || name.getLocalPart().equals("FunctionName") /* 1.1 */) {
+            return object;
+        }
+
         return null;
     }
 }

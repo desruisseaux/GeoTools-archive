@@ -13,22 +13,24 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_0.capabilities;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.util.List;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.FunctionName;
+import org.geotools.xml.*;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:FunctionNameType.
+ * Binding object for the type http://www.opengis.net/ogc:Function_NameType.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:complexType name="FunctionNameType"&gt;
+ *  &lt;xsd:complexType name="Function_NameType"&gt;
  *      &lt;xsd:simpleContent&gt;
  *          &lt;xsd:extension base="xsd:string"&gt;
  *              &lt;xsd:attribute name="nArgs" type="xsd:string" use="required"/&gt;
@@ -42,18 +44,18 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class FunctionNameTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+public class Function_NameTypeBinding extends AbstractComplexBinding {
+    FilterFactory factory;
 
-    public FunctionNameTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public Function_NameTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.FunctionNameType;
+        return OGC.Function_NameType;
     }
 
     /**
@@ -63,7 +65,11 @@ public class FunctionNameTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return FunctionName.class;
+    }
+
+    public int getExecutionMode() {
+        return OVERRIDE;
     }
 
     /**
@@ -74,7 +80,20 @@ public class FunctionNameTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        String name = (String) value;
+
+        //&lt;xsd:attribute name="nArgs" type="xsd:string" use="required"/&gt;
+        String nargs = (String) node.getAttributeValue("nArgs");
+
+        return factory.functionName(name, Integer.parseInt(nargs));
+    }
+
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        FunctionName function = (FunctionName) object;
+        value.appendChild(document.createTextNode(function.getName()));
+        value.setAttributeNS("", "nArgs", function.getArgumentCount() + "");
+
+        return value;
     }
 }

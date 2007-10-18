@@ -13,13 +13,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_1.capabilities;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.opengis.filter.capability.GeometryOperand;
+import org.opengis.filter.capability.SpatialOperator;
+import org.geotools.filter.v1_1.OGC;
+import org.geotools.xml.*;
 
 
 /**
@@ -42,10 +43,10 @@ import org.geotools.xml.Node;
  * @generated
  */
 public class SpatialOperatorTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory factory;
 
-    public SpatialOperatorTypeBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public SpatialOperatorTypeBinding(FilterFactory factory) {
+        this.factory = factory;
     }
 
     /**
@@ -62,7 +63,7 @@ public class SpatialOperatorTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return SpatialOperator.class;
     }
 
     /**
@@ -73,7 +74,25 @@ public class SpatialOperatorTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        //&lt;xsd:element minOccurs="0" name="GeometryOperands" type="ogc:GeometryOperandsType"/&gt;
+        GeometryOperand[] gos = (GeometryOperand[]) node.getChildValue(GeometryOperand[].class);
+
+        //&lt;xsd:attribute name="name" type="ogc:SpatialOperatorNameType"/&gt;
+        return factory.spatialOperator((String) node.getAttributeValue("name"), gos);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        SpatialOperator sop = (SpatialOperator) object;
+
+        if ("GeometryOperands".equals(name.getLocalPart())) {
+            return sop.getGeometryOperands();
+        }
+
+        if ("name".equals(name.getLocalPart())) {
+            return sop.getName();
+        }
+
         return null;
     }
 }
