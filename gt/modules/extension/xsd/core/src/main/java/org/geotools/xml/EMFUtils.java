@@ -152,6 +152,29 @@ public class EMFUtils {
     }
 
     /**
+     * Method which looks up structural features of an eobject by type.
+     *
+     * @param eobject The eobject.
+     * @param propertyType The type of the properties.
+     *
+     * @return The list of structure features, or an empty list if none are found.
+     */
+    public static List /*<EStructuralFeature>*/ features(EObject eobject, Class propertyType) {
+        List match = new ArrayList();
+        List features = eobject.eClass().getEAllStructuralFeatures();
+
+        for (Iterator itr = features.iterator(); itr.hasNext();) {
+            EStructuralFeature feature = (EStructuralFeature) itr.next();
+
+            if (feature.getEType().getInstanceClass().isAssignableFrom(propertyType)) {
+                match.add(feature);
+            }
+        }
+
+        return match;
+    }
+
+    /**
      * Sets a particular property on each {@link EObject} in a list to a particular value.
      * <p>
      * The following must hold:
