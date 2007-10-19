@@ -17,6 +17,7 @@ package org.geotools.filter.v1_1.capabilities;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.capability.GeometryOperand;
 import org.opengis.filter.capability.SpatialCapabilities;
 import org.opengis.filter.capability.SpatialOperators;
 import org.geotools.filter.v1_1.OGC;
@@ -74,7 +75,8 @@ public class Spatial_CapabilitiesTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return factory.spatialCapabilities(null,
+        return factory.spatialCapabilities((GeometryOperand[]) node.getChildValue(
+                GeometryOperand[].class),
             (SpatialOperators) node.getChildValue(SpatialOperators.class));
     }
 
