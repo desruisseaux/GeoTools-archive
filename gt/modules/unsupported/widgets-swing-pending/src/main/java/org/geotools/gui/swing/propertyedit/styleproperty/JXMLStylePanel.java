@@ -214,7 +214,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements StylePanel {
         SLDTransformer st = new SLDTransformer();
 
         try {
-            String xml = st.transform(layer.getStyle());
+            String xml = st.transform(layer.getStyle());            
             editpane.setText(xml);
         } catch (TransformerException ex) {
             ex.printStackTrace();

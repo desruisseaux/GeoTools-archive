@@ -21,7 +21,6 @@ import org.geotools.styling.StyleBuilder;
 import org.opengis.filter.expression.Expression;
 
 /**
- *
  * @author  johann sorel
  */
 public class JLinecapPanel extends javax.swing.JPanel {
@@ -29,9 +28,9 @@ public class JLinecapPanel extends javax.swing.JPanel {
     /** Creates new form JLinecapPanel */
     public JLinecapPanel() {
         initComponents();
-        but_round.setIcon(IconBundle.getResource().getIcon("24_linecap_round"));
-        but_butt.setIcon(IconBundle.getResource().getIcon("24_linecap_butt"));
-        but_square.setIcon(IconBundle.getResource().getIcon("24_linecap_square"));
+        but_round.setIcon(IconBundle.getResource().getIcon("16_linecap_round"));
+        but_butt.setIcon(IconBundle.getResource().getIcon("16_linecap_butt"));
+        but_square.setIcon(IconBundle.getResource().getIcon("16_linecap_square"));
 
         but_round.setSelected(true);
     }

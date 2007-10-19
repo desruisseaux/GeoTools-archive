@@ -29,9 +29,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     /** Creates new form JLinecapPanel */
     public JLinejoinPanel() {
         initComponents();
-        but_round.setIcon( IconBundle.getResource().getIcon("24_linejoin_round"));
-        but_mitre.setIcon( IconBundle.getResource().getIcon("24_linejoin_mitre"));
-        but_bevel.setIcon( IconBundle.getResource().getIcon("24_linejoin_bevel"));
+        but_round.setIcon( IconBundle.getResource().getIcon("16_linejoin_round"));
+        but_mitre.setIcon( IconBundle.getResource().getIcon("16_linejoin_mitre"));
+        but_bevel.setIcon( IconBundle.getResource().getIcon("16_linejoin_bevel"));
         
         but_round.setSelected(true);
     }

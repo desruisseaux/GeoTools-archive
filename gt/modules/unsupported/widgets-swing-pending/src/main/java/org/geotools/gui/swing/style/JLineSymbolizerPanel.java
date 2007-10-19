@@ -40,12 +40,15 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
 
   
 
+    private MapLayer layer;
+    
     /** Creates new form LineStylePanel
      * @param layer
      */
     public JLineSymbolizerPanel(MapLayer layer) {
         initComponents();
 
+        this.layer = layer;
         parse(layer.getStyle());
 
         tab_demo.setSLDSource("/org/geotools/gui/swing/propertyedit/styleproperty/defaultset/linestyles.sld");
@@ -98,6 +101,7 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
             LineSymbolizer sym = (LineSymbolizer) symbol;
 
             GuiStroke.parseStroke(sym.getStroke());            
+            GuiStroke.setLayer(layer);
         }
     }
 
