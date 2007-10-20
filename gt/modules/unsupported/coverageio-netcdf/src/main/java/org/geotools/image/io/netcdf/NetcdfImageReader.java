@@ -800,7 +800,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         private static final String[] NAMES = new String[] {"netcdf", "NetCDF"};
 
         /**
-         * The mime types for the default {@link NetcdfImageReader} configuration.
+         * The mime types for the default {@link NetcdfImageReader} configuration.
          */
         private static final String[] MIME_TYPES = new String[] {"image/x-netcdf"};
 

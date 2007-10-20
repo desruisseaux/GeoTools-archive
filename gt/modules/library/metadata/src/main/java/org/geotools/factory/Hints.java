@@ -59,7 +59,7 @@ import org.geotools.resources.Utilities;
  * discovery mechanism} we have the complete geotools plugin system. By using hints to
  * allow application code to effect service discovery we allow client code to
  * retarget the geotools library for their needs.
- * 
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -71,7 +71,7 @@ public final class Hints extends RenderingHints {
      * A set of system-wide hints to use by default.
      */
     private static final Hints GLOBAL = new Hints(Collections.EMPTY_MAP);
-    
+
     /**
      * {@code true} if {@link #scanSystemProperties} needs to be invoked.
      */
@@ -91,7 +91,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
-     * 
+     *
      * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
     public static final ClassKey JTS_GEOMETRY_FACTORY = new ClassKey(
@@ -99,15 +99,15 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
-     * 
+     *
      * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
      */
     public static final ClassKey JTS_COORDINATE_SEQUENCE_FACTORY = new ClassKey(
             "com.vividsolutions.jts.geom.CoordinateSequenceFactory");
-    
+
     /**
      * The {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
-     * 
+     *
      * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
      */
     public static final Key JTS_PRECISION_MODEL = new Key(
@@ -115,14 +115,14 @@ public final class Hints extends RenderingHints {
 
     /**
      * The spatial reference ID for {@link com.vividsolutions.jts.geom.GeometryFactory}.
-     * 
+     *
      * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
     public static final Key JTS_SRID = new Key(Integer.class);
 
     /**
      * The {@link org.opengis.referencing.crs.CRSAuthorityFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      */
     public static final ClassKey CRS_AUTHORITY_FACTORY = new ClassKey(
@@ -130,7 +130,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.cs.CSAuthorityFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCSAuthorityFactory
      */
     public static final ClassKey CS_AUTHORITY_FACTORY = new ClassKey(
@@ -138,7 +138,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.datum.DatumAuthorityFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getDatumAuthorityFactory
      */
     public static final ClassKey DATUM_AUTHORITY_FACTORY = new ClassKey(
@@ -146,7 +146,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.crs.CRSFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      */
     public static final ClassKey CRS_FACTORY = new ClassKey(
@@ -154,7 +154,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.cs.CSFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      */
     public static final ClassKey CS_FACTORY = new ClassKey(
@@ -162,7 +162,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.datum.DatumFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getDatumFactory
      */
     public static final ClassKey DATUM_FACTORY = new ClassKey(
@@ -170,7 +170,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.operation.CoordinateOperationFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
     public static final ClassKey COORDINATE_OPERATION_FACTORY = new ClassKey(
@@ -179,7 +179,7 @@ public final class Hints extends RenderingHints {
     /**
      * The {@link org.opengis.referencing.operation.CoordinateOperationAuthorityFactory} instance
      * to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationAuthorityFactory
      */
     public static final ClassKey COORDINATE_OPERATION_AUTHORITY_FACTORY = new ClassKey(
@@ -187,7 +187,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.referencing.operation.MathTransformFactory} instance to use.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getMathTransformFactory
      */
     public static final ClassKey MATH_TRANSFORM_FACTORY = new ClassKey(
@@ -195,7 +195,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.geotools.data.FeatureLockFactory} instance to use.
-     * 
+     *
      * @see CommonFactoryFinder#getFeatureLockFactory
      *
      * @since 2.4
@@ -205,7 +205,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.geotools.feature.FeatureCollections} instance to use.
-     * 
+     *
      * @see CommonFactoryFinder#getFeatureCollections
      *
      * @since 2.4
@@ -215,7 +215,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.geotools.feature.FeatureTypeFactory} instance to use.
-     * 
+     *
      * @see CommonFactoryFinder#getFeatureTypeFactory
      *
      * @since 2.4
@@ -231,19 +231,20 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final Key FEATURE_TYPE_FACTORY_NAME = new Key(String.class);
-    
+
     /**
      * Whether the features returned by the feature collections should be considered detached from the
-     * datastore, that is, they are updatable without altering the backing store (makes sense only 
-     * if features are kept in memory or if there is some transparent persistent mechanism in place, 
-     * such as the Hibernate one) 
+     * datastore, that is, they are updatable without altering the backing store (makes sense only
+     * if features are kept in memory or if there is some transparent persistent mechanism in place,
+     * such as the Hibernate one)
+     *
      * @since 2.4
      */
     public static final Key FEATURE_DETACHED = new Key(Boolean.class);
 
     /**
      * The {@link org.geotools.styling.StyleFactory} instance to use.
-     * 
+     *
      * @see CommonFactoryFinder#getStyleFactory
      *
      * @since 2.4
@@ -253,7 +254,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.geotools.feature.AttributeTypeFactory} instance to use.
-     * 
+     *
      * @see CommonFactoryFinder#getAttributeTypeFactory
      *
      * @since 2.4
@@ -263,7 +264,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.filter.FilterFactory} instance to use.
-     * 
+     *
      * @see CommonFactoryFinder#getFilterFactory
      *
      * @since 2.4
@@ -278,12 +279,12 @@ public final class Hints extends RenderingHints {
     ////////              Coordinate Reference Systems              ////////
     ////////                                                        ////////
     ////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * The default {@link org.opengis.referencing.crs.CoordinateReferenceSystem}
      * to use. This is used by some factories capable to provide a default CRS
      * when no one were explicitly specified by the user.
-     * 
+     *
      * @since 2.2
      */
     public static final Key DEFAULT_COORDINATE_REFERENCE_SYSTEM = new Key(
@@ -337,7 +338,7 @@ public final class Hints extends RenderingHints {
      * Valid values are {@code "Molodenski"}, {@code "Abridged_Molodenski"} or {@code "Geocentric"}.
      * Other values may be supplied if a {@linkplain org.opengis.referencing.operation.MathTransform
      * math transform} exists for that name, but this is not guaranteed to work.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
     public static final OptionKey DATUM_SHIFT_METHOD = new OptionKey("Molodenski","Abridged_Molodenski","Geocentric","*");
@@ -357,7 +358,7 @@ public final class Hints extends RenderingHints {
      * DATUM_SHIFT_OMITTED}, this means that an "ellipsoid shift" were applied without real datum
      * shift method available, and the transformed coordinates may have one kilometer error. The
      * application should warn the user (e.g. popup a message dialog box) in such case.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
     public static final Key LENIENT_DATUM_SHIFT = new Key(Boolean.class);
@@ -398,16 +399,42 @@ public final class Hints extends RenderingHints {
      * <blockquote><pre>
      * -D{@value GeoTools#FORCE_LONGITUDE_FIRST_AXIS_ORDER}=<var>longitudeFirst</var>
      * </pre></blockquote>
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
      * @see org.geotools.referencing.factory.epsg.LongitudeFirstFactory
      * @tutorial http://docs.codehaus.org/display/GEOTOOLS/The+axis+order+issue
-     * 
+     *
      * @since 2.3
      */
     public static final Key FORCE_LONGITUDE_FIRST_AXIS_ORDER = new Key(Boolean.class);
+
+    /**
+     * Applies the {@link #FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint to some factories that usually
+     * ignore it. The <cite>axis order</cite> issue is of concern mostly to the {@code "EPSG"} name
+     * space. Codes in the {@value org.geotools.referencing.factory.HTTP_AuthorityFactory#BASE_URL}
+     * or {@code "urn:ogc"} name space usually ignore the axis order hint, especially the later
+     * which is clearly defined by OGC - in theory users are not allowed to change its behavior.
+     * If nevertheless a user really need to change its behavior, then he must provides explicitly
+     * a comma separated list of authorities with this {@code FORCE_AXIS_ORDER_HONORING} hint in
+     * addition to setting the {@link #FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint.
+     * <p>
+     * <b>Example:</b> In order to apply the (<var>longitude</var>,<var>latitude</var>) axis order
+     * to {@code "http://www.opengis.net/"} and {@code "urn:ogc"} name spaces in addition to EPSG,
+     * use the following hints:
+     *
+     * <blockquote>
+     * hints.put(FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+     * hints.put(FORCE_AXIS_ORDER_HONORING, "http, urn");
+     * </blockquote>
+     *
+     * Note that the application of (<var>longitude</var>,<var>latitude</var>) axis order
+     * to the {@code "urn:ogc"} name space is a clear violation of OGC specification.
+     *
+     * @since 2.4
+     */
+    public static final Key FORCE_AXIS_ORDER_HONORING = new Key(String.class);
 
     /**
      * Tells if the {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}
@@ -424,11 +451,11 @@ public final class Hints extends RenderingHints {
      * <code>{@linkplain org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      * FactoryFinder.getCRSAuthorityFactory}(...)</code>
      * method. Whatever this hint is supported or not is authority dependent.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
-     * 
+     *
      * @since 2.3
      */
     public static final Key FORCE_STANDARD_AXIS_DIRECTIONS = new Key(Boolean.class);
@@ -445,11 +472,11 @@ public final class Hints extends RenderingHints {
      * <code>{@linkplain org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      * FactoryFinder.getCRSAuthorityFactory}(...)</code> method. Whatever this hint is
      * supported or not is authority dependent.
-     * 
+     *
      * @see org.geotools.referencing.FactoryFinder#getCSFactory
      * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      * @see org.geotools.referencing.factory.OrderedAxisAuthorityFactory
-     * 
+     *
      * @since 2.3
      */
     public static final Key FORCE_STANDARD_AXIS_UNITS = new Key(Boolean.class);
@@ -482,7 +509,7 @@ public final class Hints extends RenderingHints {
     /**
      * The maximum number of active AuthorityFactories (default 2). 
      * <p>
-     * This hint is treated as an absolute LIMIT for AbstractAuthorityMediator 
+     * This hint is treated as an absolute LIMIT for AbstractAuthorityMediator
      * instances such as as HsqlDialectEpsgMediator. As such this will be the
      * absolute limit on the number of database connections the mediator will
      * make use of. When non-positive there is no limit to the number of
@@ -497,10 +524,10 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_MAX_ACTIVE = new IntegerKey(2);
-    
+
     /**
      * Minimum number of objects required before the evictor will begin
-     * removing objects.  This value is also used by 
+     * removing objects.  This value is also used by
      * AUTHORITY_SOFTMIN_EVICT_IDLETIME to keep this many idle workers
      * around.
      * <p>
@@ -513,10 +540,11 @@ public final class Hints extends RenderingHints {
      * <li>Server Application: 2-3
      * </ul>
      * To agree with J2EE conventions you will want this value to be zero.
+     *
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_MIN_IDLE = new IntegerKey(1);
-    
+
     /**
      * The number of idle AuthorityFactories.
      * <p>
@@ -533,35 +561,35 @@ public final class Hints extends RenderingHints {
      * Max idle controls the maximum number of objects that can sit idle in the
      * pool at any time. When negative, there is no limit to the number of
      * objects that may be idle at one time.
-     * 
+     *
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_MAX_IDLE = new IntegerKey(2);
-    
+
     /**
      * When the evictor is run, if more time (in milliseconds) than the value in
      * AUTHORITY_MIN_EVICT_IDLETIME has passed, then the worker is destroyed.
-     * 
+     *
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(2 * 60 * 000);
-    
+
     /**
      * When the evictor is run, workers which have been idle for more than this
      * value will be destroyed iff the number of idle workers exceeds
      * AUTHORITY_MIN_IDLE.
-     * 
+     *
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(10 * 000);
-    
+
     /**
      * Time in milliseconds to wait between eviction runs.
-     * 
+     *
      * @since 2.4
      */
     public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(5 * 000);
-    
+
     /**
      * Version number of the requested service. This hint is used for example in order to get
      * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
@@ -582,7 +610,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
-     * 
+     *
      * @deprecated The {@code GridCoverageProcessor} interface is not yet
      *             stable. Avoid dependencies if possible.
      */
@@ -632,9 +660,9 @@ public final class Hints extends RenderingHints {
      * <p>
      * <strong>Note:</strong> We recommend to avoid the {@code "jpeg"} codec
      * for grid coverages.
-     * 
+     *
      * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory
-     * 
+     *
      * @since 2.3
      */
     public static final Key TILE_ENCODING = new Key(String.class);
@@ -654,7 +682,7 @@ public final class Hints extends RenderingHints {
      * The {@link org.opengis.referencing.crs.CoordinateReferenceSystem} to use.
      */
     public static final Key CRS = new Key("org.opengis.referencing.crs.CoordinateReferenceSystem");
-    public static final Key PRECISION = new Key(" org.opengis.geometry.Precision");
+    public static final Key PRECISION = new Key("org.opengis.geometry.Precision");
     public static final Key POSITION_FACTORY = new Key("org.opengis.geometry.PositionFactory");
     public static final Key GEOMETRY_FACTORY = new Key("org.opengis.geometry.coordinate.GeometryFactory");
     public static final Key COMPLEX_FACTORY = new Key("org.opengis.geometry.complex.ComplexFactory");
@@ -666,7 +694,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * Constructs a new object with the specified key/value pair.
-     * 
+     *
      * @param key   The key of the particular hint property.
      * @param value The value of the hint property specified with {@code key}.
      */
@@ -676,7 +704,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * Constructs a new object with two key/value pair.
-     * 
+     *
      * @param key1   The key for the first pair
      * @param value1 The value for the first pair
      * @param key2   The key2 for the second pair
@@ -688,7 +716,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * Constructs a new object with key/value pairs from an array.
-     * 
+     *
      * @param pairs
      *            An array containing pairs of RenderingHints keys and values
      */
@@ -701,7 +729,7 @@ public final class Hints extends RenderingHints {
      * <p>
      * This method is intended for use with Java5:
      * <code>new Hints( Hints.BUFFER_LIMIT,1,Hints.BUFFER_POLICY,"weak" )</code>
-     * 
+     *
      * @param pairs
      *            Key value pairs
      */
@@ -712,7 +740,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * Utility method used to organize pairs into a Map.
-     * 
+     *
      * @param pairs
      *            An array of Key/Value pairs
      * @return Map<Key,Value>
@@ -728,7 +756,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * Utility method used to organize pairs into a Map.
-     * 
+     *
      * @param pairs
      *            An array of Key/Value pairs
      * @return Map<Key,Value>
@@ -745,7 +773,7 @@ public final class Hints extends RenderingHints {
 
     /**
      * Utility method used to organize pairs into a Map.
-     * 
+     *
      * @param pairs
      *            An array of Key/Value pairs
      * @return Map<Key,Value>
@@ -765,11 +793,11 @@ public final class Hints extends RenderingHints {
         }
         return map;
     }
-    
+
     /**
      * Constructs a new object with keys and values initialized from the
      * specified map (which may be null).
-     * 
+     *
      * @param hints A map of key/value pairs to initialize the hints, or
      *              {@code null} if the object should be empty.
      */
@@ -895,7 +923,7 @@ public final class Hints extends RenderingHints {
      * Default hints can be added by call to this {@code putDefaultHint} method, to the
      * {@link GeoTools#init} method or by {@linkplain System#getProperties system properties}
      * with keys defined by the {@link String} constants in the {@link GeoTools} class.
-     * 
+     *
      * @param key   The hint key.
      * @param value The hint value.
      * @return The previous value of the specified key, or {@code null} if none.
@@ -977,7 +1005,7 @@ public final class Hints extends RenderingHints {
      * creation. Factory creation impacts rendering (which is why extending
      * {@linkplain java.awt.RenderingHints.Key rendering key} is not a complete
      * non-sense), but may impact other aspects of an application as well.
-     * 
+     *
      * @since 2.1
      * @source $URL$
      * @version $Id$
@@ -1004,7 +1032,7 @@ public final class Hints extends RenderingHints {
 
         /**
          * Constructs a new key for values of the given class.
-         * 
+         *
          * @param classe
          *            The base class for all valid values.
          */
@@ -1017,7 +1045,7 @@ public final class Hints extends RenderingHints {
          * Constructs a new key for values of the given class. The class is
          * specified by name instead of a {@link Class} object. This allows to
          * defer class loading until needed.
-         * 
+         *
          * @param className
          *            Name of base class for all valid values.
          */
@@ -1060,7 +1088,7 @@ public final class Hints extends RenderingHints {
          * Note that many hint keys defined in the {@link Hints} class relax this rule and accept
          * {@link Class} object assignable to the expected {@linkplain #getValueClass value class}
          * as well.
-         * 
+         *
          * @param value
          *            The object to test for validity.
          * @return {@code true} if the value is valid; {@code false} otherwise.
@@ -1110,7 +1138,7 @@ public final class Hints extends RenderingHints {
     /**
      * A key for value that may be specified either as instance of {@code T}, or as
      * {@code Class<T>}.
-     * 
+     *
      * @since 2.4
      * @source $URL$
      * @version $Id$
@@ -1119,7 +1147,7 @@ public final class Hints extends RenderingHints {
     public static final class ClassKey/*<T>*/ extends Key/*<T>*/ {
         /**
          * Constructs a new key for values of the given class.
-         * 
+         *
          * @param classe
          *            The base class for all valid values.
          */
@@ -1131,7 +1159,7 @@ public final class Hints extends RenderingHints {
          * Constructs a new key for values of the given class. The class is
          * specified by name instead of a {@link Class} object. This allows to
          * defer class loading until needed.
-         * 
+         *
          * @param className
          *            Name of base class for all valid values.
          */
@@ -1177,7 +1205,7 @@ public final class Hints extends RenderingHints {
     /**
      * Key for hints to be specified as a {@link File}.
      * The file may also be specified as a {@link String} object.
-     * 
+     *
      * @since 2.4
      * @source $URL$
      * @version $Id$
@@ -1268,8 +1296,8 @@ public final class Hints extends RenderingHints {
                 } else if (value instanceof CharSequence) {
                     return Integer.parseInt(value.toString());
                 }
-            }            
-            return number;    
+            }
+            return number;
         }
 
         /**
@@ -1288,7 +1316,7 @@ public final class Hints extends RenderingHints {
                 }
             }
             return false;
-        }        
+        }
     }
 
     /**
@@ -1385,7 +1413,7 @@ public final class Hints extends RenderingHints {
      * to look for "jdbc:EPSG" in JBoss and "jdbc/EPSG" in Websphere. The
      * InitialContext.combineNames( String, String ) should be used to put together
      * your nam
-     * 
+     *
      * @since 2.4
      * @source $URL$
      * @version $Id$
@@ -1405,6 +1433,6 @@ public final class Hints extends RenderingHints {
         //@Override
         public boolean isCompatibleValue(final Object value) {
             return (value instanceof DataSource) || (value instanceof String) || (value instanceof Name);
-        }        
+        }
     }
 }

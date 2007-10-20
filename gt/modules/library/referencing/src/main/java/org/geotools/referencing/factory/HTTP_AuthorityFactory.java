@@ -44,6 +44,12 @@ import org.geotools.resources.i18n.Errors;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated This class will move in a <code>org.geotools.referencing.factory.<strong>web</strong></code>
+ *             package in Geotools 2.5, in order to put together other web-related factories.
+ *             Don't use this class directly. You should not need to anyway - use
+ *             {@link org.geotools.referencing.ReferencingFactoryFinder} instead, which will
+ *             continue to work no matter where this class is located.
  */
 public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CRSAuthorityFactory,
         CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
@@ -57,7 +63,7 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      * Creates a default wrapper.
      */
     public HTTP_AuthorityFactory() {
-        this(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE));
+        this(defaultAxisOrderHints("http"));
     }
 
     /**
@@ -79,6 +85,33 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      */
     public HTTP_AuthorityFactory(final AllAuthoritiesFactory factory) {
         super(factory);
+    }
+
+    /**
+     * Set {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} to {@code false}, unless system
+     * {@link Hints#FORCE_AXIS_ORDER_HONORING} is set to the specified authority. This method
+     * is invoked for factories that are usually not allowed to change the axis order.
+     *
+     * @param  authority The authority factory under creation.
+     * @return The hints to use (may be {@code null}).
+     */
+    static Hints defaultAxisOrderHints(final String authority) {
+        final Object value = Hints.getSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);
+        if (value instanceof CharSequence) {
+            final String list = value.toString();
+            int i = 0;
+            while ((i = list.indexOf(authority, i)) >= 0) {
+                if (i==0 || !Character.isJavaIdentifierPart(list.charAt(i - 1))) {
+                    final int j = i + authority.length();
+                    if (j==list.length() || !Character.isJavaIdentifierPart(list.charAt(j))) {
+                        // Found the authority in the list: we need to use the global setting.
+                        return null;
+                    }
+                }
+                i++;
+            }
+        }
+        return new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
     }
 
     /**

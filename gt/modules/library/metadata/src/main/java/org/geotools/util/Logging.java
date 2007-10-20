@@ -138,8 +138,6 @@ public final class Logging {
      * Returns {@code true} if the
      * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
      * framework seems to be available on the classpath.
-     *
-     * @since 2.4
      */
     public static boolean isCommonsLoggingAvailable() {
         try {
@@ -198,8 +196,6 @@ public final class Logging {
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
-     *
-     * @since 2.4
      */
     public static void unexpectedException(final Logger logger, final Class classe,
                                            final String method, final Throwable error)
@@ -221,8 +217,6 @@ public final class Logging {
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
-     *
-     * @since 2.4
      */
     public static void unexpectedException(final String paquet, final Class classe,
                                            final String method, final Throwable error)

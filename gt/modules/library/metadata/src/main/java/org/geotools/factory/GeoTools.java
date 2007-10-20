@@ -143,7 +143,7 @@ public final class GeoTools {
     /**
      * The initial context. Will be created only when first needed.
      */
-    static InitialContext context;
+    private static InitialContext context;
 
     /**
      * Do not allow instantiation of this class.
@@ -183,7 +183,7 @@ public final class GeoTools {
     }
 
     /**
-     * Initialize GeoTools for use. This convenience method performs various tasks (more may
+     * Initializes GeoTools for use. This convenience method performs various tasks (more may
      * be added in the future), including setting up the {@linkplain java.util.logging Java
      * logging framework} in one of the following states:
      * <p>
@@ -209,9 +209,11 @@ public final class GeoTools {
      * Example of typical invocation in a Geoserver environment:
      * 
      * <blockquote><pre>
-     * Geotools.init(new Hints({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, Boolean.TRUE));
+     * Hints hints = new Hints(null);
+     * hints.put({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, Boolean.TRUE);
+     * hints.put({@linkplain Hints#FORCE_AXIS_ORDER_HONORING}, "http");
+     * GeoTools.init(hints);
      * </pre></blockquote>
-     * 
      * 
      * @see Logging#redirectToCommonsLogging
      * @see Logging#forceMonolineConsoleOutput
@@ -223,6 +225,17 @@ public final class GeoTools {
             Logging.GEOTOOLS.forceMonolineConsoleOutput();
         }
         Hints.putSystemDefault(hints);
+    }
+
+    /**
+     * Forces the initial context for test cases, or as needed.
+     * 
+     * @see #getInitialContext
+     *
+     * @since 2.4
+     */
+    public static synchronized void init(final InitialContext applicationContext) {
+        context = applicationContext;
     }
 
     /**
@@ -323,6 +336,26 @@ public final class GeoTools {
     }
 
     /**
+     * Returns the default initial context.
+     *
+     * @param  hints An optional set of hints, or {@code null} if none.
+     * @return The initial context (never {@code null}).
+     * @throws NamingException if the initial context can't be created.
+     *
+     * @see #init(InitialContext)
+     *
+     * @since 2.4
+     */
+    public static synchronized InitialContext getInitialContext(final Hints hints)
+            throws NamingException
+    {
+        if (context == null) {
+            context = new InitialContext();
+        }
+        return context;
+    }
+
+    /**
      * Adds an alternative way to search for factory implementations. {@link FactoryRegistry} has
      * a default mechanism bundled in it, which uses the content of all {@code META-INF/services}
      * directories found on the classpath. This {@code addFactoryIteratorProvider} method allows
@@ -382,29 +415,10 @@ public final class GeoTools {
         args = arguments.getRemainingArguments(0);
         arguments.out.print("GeoTools version ");
         arguments.out.println(getVersion());
-    }
-
-    /**
-     * Used for force the initial context for test cases ... or as needed.
-     */
-    public static void init( InitialContext applicationContext ){
-        context = applicationContext;
-    }
-
-    /**
-     * Returns the default initial context.
-     *
-     * @param  hints An optional set of hints, or {@code null} if none.
-     * @return The initial context (never {@code null}).
-     * @throws NamingException if the initial context can't be created.
-     */
-    public static synchronized InitialContext getInitialContext(final Hints hints)
-            throws NamingException
-    {
-        if (context == null) {
-            context = new InitialContext();
+        final Hints hints = getDefaultHints();
+        if (hints!=null && !hints.isEmpty()) {
+            arguments.out.println(hints);
         }
-        return context;
     }
     
     public static String fixName( String name ) {

@@ -228,7 +228,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         super(rootName, CHILD_POLICY_SOME);
         /*
          * root
-         *   +-- CoordinateReferenceSystem (name, type)
+         *   +-- CoordinateReferenceSystem (name, type, WKT)
          *   |     +-- Datum (name)
          *   |     +-- CoordinateSystem (name, type)
          *   |           +-- Axis[0] (name, direction, units, origin)
@@ -248,6 +248,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
         addElement  ("CoordinateReferenceSystem", rootName,    CHILD_POLICY_SOME);
         addAttribute("CoordinateReferenceSystem", "name",      DATATYPE_STRING);
         addAttribute("CoordinateReferenceSystem", "type",      DATATYPE_STRING, false, null, CRS_TYPES);
+        addAttribute("CoordinateReferenceSystem", "WKT",       DATATYPE_STRING);
         addElement  ("Datum", "CoordinateReferenceSystem",     CHILD_POLICY_EMPTY);
         addAttribute("Datum",             "name",              DATATYPE_STRING, true,  null);
         addElement  ("CoordinateSystem",  "CoordinateReferenceSystem", 2, maximumDimensions);

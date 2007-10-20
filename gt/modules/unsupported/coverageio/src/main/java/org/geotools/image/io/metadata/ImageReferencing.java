@@ -61,7 +61,7 @@ public class ImageReferencing extends MetadataAccessor {
     /**
      * Returns the {@linkplain Identification#name name} and {@linkplain Identification#type type}
      * of the {@linkplain CoordinateReferenceSystem coordinate reference system}.
-     * 
+     *
      * @see CoordinateReferenceSystem
      */
     public Identification getCoordinateReferenceSystem() {
@@ -168,5 +168,23 @@ public class ImageReferencing extends MetadataAccessor {
         axis.setDirection(direction);
         axis.setUnits(units);
         return axis;
+    }
+
+    /**
+     * Returns the {@linkplain CoordinateReferenceSystem coordinate reference system} in
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> format</A>, or {@code null} if none.
+     */
+    public String getWKT() {
+        return getString("WKT");
+    }
+
+    /**
+     * Sets the {@linkplain CoordinateReferenceSystem coordinate reference system} in
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> format</A>.
+     */
+    public void setWKT(final String wkt) {
+        setString("WKT", wkt);
     }
 }

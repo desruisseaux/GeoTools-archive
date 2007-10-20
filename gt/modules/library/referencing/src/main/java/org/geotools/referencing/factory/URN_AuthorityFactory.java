@@ -26,7 +26,6 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
@@ -53,6 +52,12 @@ import org.geotools.metadata.iso.citation.Citations;
  *
  * @see <A HREF="https://portal.opengeospatial.org/files/?artifact_id=8814">URNs of definitions
  *      in OGC namespace</A>
+ *
+ * @deprecated This class will move in a <code>org.geotools.referencing.factory.<strong>web</strong></code>
+ *             package in Geotools 2.5, in order to put together other web-related factories.
+ *             Don't use this class directly. You should not need to anyway - use
+ *             {@link org.geotools.referencing.ReferencingFactoryFinder} instead, which will
+ *             continue to work no matter where this class is located.
  */
 public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRSAuthorityFactory,
         CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
@@ -78,7 +83,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * Creates a default wrapper.
      */
     public URN_AuthorityFactory() {
-        this(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE));
+        this(HTTP_AuthorityFactory.defaultAxisOrderHints("urn"));
     }
 
     /**
