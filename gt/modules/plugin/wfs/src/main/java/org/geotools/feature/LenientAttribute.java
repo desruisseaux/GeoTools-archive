@@ -11,7 +11,7 @@ import org.opengis.feature.type.AttributeType;
  * Simple, mutable class to store attributes - that does not validate!
  * 
  * @author Jody Garnett
- * @version $Id: AttributeImpl.java 27313 2007-10-01 03:07:20Z jdeolive $
+ * @version $Id$
  */
 public class LenientAttribute extends PropertyImpl implements Attribute {
 

@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Exercise DB2FeatureSource
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2FeatureSourceTest.java $
+ * @source $URL$
  */
 public class DB2FeatureSourceOnlineTest extends AbstractDB2OnlineTestCase {
     private DB2DataStore dataStore = null;

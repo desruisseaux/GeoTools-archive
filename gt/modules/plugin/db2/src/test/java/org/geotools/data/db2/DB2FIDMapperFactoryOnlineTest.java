@@ -30,7 +30,7 @@ import java.sql.SQLException;
  * Exercise DB2FIDMapperFactory.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2FIDMapperFactoryTest.java $
+ * @source $URL$
  */
 public class DB2FIDMapperFactoryOnlineTest extends AbstractDB2OnlineTestCase {
     public void testMappers() throws Exception {

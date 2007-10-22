@@ -25,7 +25,7 @@ import java.util.Map;
  * Exercise DB2DataStoreFactory.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/db2/src/test/java/org/geotools/data/db2/DB2DataStoreFactoryTest.java $
+ * @source $URL$
  */
 public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
     DB2DataStoreFactory factory = new DB2DataStoreFactory();

@@ -48,7 +48,7 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/modules/library/coverage/src/test/java/org/geotools/coverage/grid/CropTest.java $
- * @version $Id: CropTest.java 26974 2007-09-14 15:58:40Z simboss $
+ * @version $Id$
  * @author Simone Giannecchini,GeoSolutions
  * 
  * @since 2.3
