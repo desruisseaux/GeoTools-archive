@@ -45,6 +45,8 @@ public class JExpressionDialog extends javax.swing.JDialog {
         lst_field.addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
+                
+                if( lst_field.getSelectedValue() != null)
                 append(lst_field.getSelectedValue().toString());
             }
         });

@@ -16,13 +16,16 @@
 
 package org.geotools.gui.swing.style;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.styleproperty.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
@@ -52,25 +55,27 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
 
         this.layer = layer;
 
-        lbl_gen_alpha.setText(TextBundle.getResource().getString("opacity"));
-        lbl_gen_size.setText(TextBundle.getResource().getString("size"));
-        lbl_gen_color.setText(TextBundle.getResource().getString("color"));
-        lbl_gen_forme.setText(TextBundle.getResource().getString("shape"));
 
-        jcb_forme.addItem("square");
-        jcb_forme.addItem("circle");
-        jcb_forme.addItem("triangle");
-        jcb_forme.addItem("star");
-        jcb_forme.addItem("cross");
-        jcb_forme.addItem("x");
-        jcb_forme.setSelectedItem("cross");
+        gui_jcb_forme.addItem("square");
+        gui_jcb_forme.addItem("circle");
+        gui_jcb_forme.addItem("triangle");
+        gui_jcb_forme.addItem("star");
+        gui_jcb_forme.addItem("cross");
+        gui_jcb_forme.addItem("x");
+        gui_jcb_forme.setSelectedItem("cross");
 
         parse(layer.getStyle());
 
-        jsp_gen_alpha.setMargins(0, 100);
-        jsp_gen_alpha.setFloatable(false);
-        jsp_gen_size.setMargins(0, 65000);
-        jsp_gen_size.setFloatable(false);
+        gui_opacity.setLayer(layer);
+        gui_size.setLayer(layer);
+        gui_orientation.setLayer(layer);
+        gui_stroke.setLayer(layer);
+        gui_color.setLayer(layer);
+        
+        //jsp_gen_alpha.setMargins(0, 100);
+        //jsp_gen_alpha.setFloatable(false);
+        //jsp_gen_size.setMargins(0, 65000);
+        //jsp_gen_size.setFloatable(false);
 
 
         tab_demo.setSLDSource("/org/geotools/gui/swing/propertyedit/styleproperty/defaultset/pointstyles.sld");
@@ -119,30 +124,28 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
     }
 
     private void parse(Symbolizer symbol) {
-
+        
+        
         if (symbol instanceof PointSymbolizer) {
+            StyleBuilder sb = new StyleBuilder();
             PointSymbolizer sym = (PointSymbolizer) symbol;
-            
-            
+                        
             Graphic gra = sym.getGraphic();
             
+            gui_stroke.parseStroke( SLD.stroke(sym) );            
             
-            
-            jStrokePanel1.parseStroke( SLD.stroke(sym) );
-            
-            
-            jsp_gen_size.setValue(SLD.pointSize(sym));
-            clock.setDegree(    Double.parseDouble( sym.getGraphic().getRotation().toString() ));
-            but_gen_color.setBackground(SLD.pointFill(sym));
-            jsp_gen_alpha.setValue(SLD.pointOpacity(sym)*100);
+            gui_size.setExpression( gra.getSize() );
+            gui_orientation.setExpression( gra.getRotation());
+            gui_color.setExpression( sb.colorExpression(SLD.pointFill(sym)) );
+            gui_opacity.setExpression( gra.getOpacity() );
 
             
             Mark mark = SLD.pointMark(layer.getStyle());
             if(mark != null){
-                 jcb_forme.setSelectedItem( mark.getWellKnownName().toString() );
+                 gui_jcb_forme.setSelectedItem( mark.getWellKnownName().toString() );
             }
             else{
-                jcb_forme.setSelectedIndex(0);
+                gui_jcb_forme.setSelectedIndex(0);
             }
         }
     }
@@ -150,13 +153,13 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
     public Symbolizer getSymbolizer(){
         StyleBuilder sb = new StyleBuilder();
         
-        Fill fill = sb.createFill(but_gen_color.getBackground(), jsp_gen_alpha.getIntValue()/100f);
-        Mark mark = sb.createMark(jcb_forme.getSelectedItem().toString(), fill, jStrokePanel1.getStroke()  );
+        Fill fill = sb.createFill(gui_color.getExpression(), gui_opacity.getExpression());
+        Mark mark = sb.createMark(gui_jcb_forme.getSelectedItem().toString(), fill, gui_stroke.getStroke()  );
         Graphic gra = sb.createGraphic();
-        gra.setOpacity( sb.literalExpression( jsp_gen_alpha.getIntValue()) );
+        gra.setOpacity( gui_opacity.getExpression() );
         gra.setMarks(new Mark[]{mark});
-        gra.setRotation(sb.literalExpression(clock.getDegree()));
-        gra.setSize(sb.literalExpression(jsp_gen_size.getIntValue()));
+        gra.setRotation(gui_orientation.getExpression());
+        gra.setSize( gui_size.getExpression() );
         PointSymbolizer ps = sb.createPointSymbolizer(gra);
         
         return ps;
@@ -183,53 +186,36 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel7 = new javax.swing.JPanel();
-        jStrokePanel1 = new org.geotools.gui.swing.style.sld.JStrokePanel();
         jPanel1 = new javax.swing.JPanel();
         lbl_gen_forme = new javax.swing.JLabel();
-        jcb_forme = new javax.swing.JComboBox();
-        jsp_gen_alpha = new org.geotools.gui.swing.extended.JNumberPanel();
+        gui_jcb_forme = new javax.swing.JComboBox();
         lbl_gen_alpha = new javax.swing.JLabel();
-        but_gen_color = new org.geotools.gui.swing.style.sld.JColorPanel();
         lbl_gen_color = new javax.swing.JLabel();
+        gui_opacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        gui_color = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        jButton1 = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        gui_stroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
         jPanel6 = new javax.swing.JPanel();
-        clock = new org.geotools.gui.swing.extended.JDegreePanel();
-        jsp_gen_size = new org.geotools.gui.swing.extended.JNumberPanel();
+        gui_orientation = new org.geotools.gui.swing.extended.JDegreePanel();
         lbl_gen_size = new javax.swing.JLabel();
+        gui_size = new org.geotools.gui.swing.style.sld.JExpressionPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tab_demo = new org.geotools.gui.swing.style.sld.JDemoTable();
 
-        org.jdesktop.layout.GroupLayout jPanel7Layout = new org.jdesktop.layout.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jStrokePanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel7Layout.createSequentialGroup()
-                .add(jStrokePanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(53, Short.MAX_VALUE))
-        );
+        lbl_gen_forme.setText(TextBundle.getResource().getString("shape"));
 
-        jTabbedPane1.addTab(TextBundle.getResource().getString("border"), jPanel7);
+        lbl_gen_alpha.setText(TextBundle.getResource().getString("opacity"));
 
-        lbl_gen_forme.setText("_");
+        lbl_gen_color.setText(TextBundle.getResource().getString("color"));
 
-        lbl_gen_alpha.setText("_");
-
-        org.jdesktop.layout.GroupLayout but_gen_colorLayout = new org.jdesktop.layout.GroupLayout(but_gen_color);
-        but_gen_color.setLayout(but_gen_colorLayout);
-        but_gen_colorLayout.setHorizontalGroup(
-            but_gen_colorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 56, Short.MAX_VALUE)
-        );
-        but_gen_colorLayout.setVerticalGroup(
-            but_gen_colorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 18, Short.MAX_VALUE)
-        );
-
-        lbl_gen_color.setText("_");
+        jButton1.setIcon(IconBundle.getResource().getIcon("JS16_color"));
+        jButton1.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -241,42 +227,58 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(lbl_gen_forme)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jcb_forme, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(gui_jcb_forme, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(lbl_gen_color)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(but_gen_color, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 58, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(gui_color, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jPanel1Layout.createSequentialGroup()
                         .add(lbl_gen_alpha)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jsp_gen_alpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(173, Short.MAX_VALUE))
+                        .add(gui_opacity, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(99, 99, 99))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(lbl_gen_forme)
-                    .add(jcb_forme, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(2, 2, 2)
-                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(lbl_gen_color)
-                            .add(but_gen_color, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                        .add(lbl_gen_alpha)
-                        .add(jsp_gen_alpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(163, Short.MAX_VALUE))
+                    .add(gui_jcb_forme, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, gui_color, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, lbl_gen_color))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(lbl_gen_alpha)
+                    .add(gui_opacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(130, 130, 130))
         );
 
         jTabbedPane1.addTab(TextBundle.getResource().getString("simple"), jPanel1);
 
+        org.jdesktop.layout.GroupLayout jPanel7Layout = new org.jdesktop.layout.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(gui_stroke, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel7Layout.createSequentialGroup()
+                .add(gui_stroke, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 208, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab(TextBundle.getResource().getString("border"), jPanel7);
+
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(null, TextBundle.getResource().getString("fill"), javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(0, 0, 0)));
 
-        lbl_gen_size.setText("_");
+        lbl_gen_size.setText(TextBundle.getResource().getString("size"));
 
         org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -284,23 +286,23 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
             jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(clock, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(gui_orientation, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 127, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(lbl_gen_size)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jsp_gen_size, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(130, Short.MAX_VALUE))
+                .add(gui_size, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 89, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel6Layout.createSequentialGroup()
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(clock, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jPanel6Layout.createSequentialGroup()
-                        .addContainerGap()
+                        .add(13, 13, 13)
                         .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(lbl_gen_size)
-                            .add(jsp_gen_size, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                            .add(gui_size, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(lbl_gen_size)))
+                    .add(gui_orientation, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -326,39 +328,57 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jPanel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 238, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jTabbedPane1, 0, 0, Short.MAX_VALUE)
+                    .add(jPanel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(jPanel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
+                        .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 241, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("");
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        StyleBuilder sb = new StyleBuilder();
+        JColorChooser choose = new JColorChooser(gui_color.getBackground());
+
+        Color col = Color.WHITE;
+        if (gui_color.getExpression() != null) {
+            try {
+                Color origin = SLD.color(gui_color.getExpression());
+                col = JColorChooser.showDialog(null, "", (origin != null) ? origin : Color.WHITE);
+            } catch (Exception e) {
+            }
+        }
+
+        gui_color.setExpression(sb.colorExpression(col));
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.style.sld.JColorPanel but_gen_color;
-    private org.geotools.gui.swing.extended.JDegreePanel clock;
+    private org.geotools.gui.swing.style.sld.JExpressionPanel gui_color;
+    private javax.swing.JComboBox gui_jcb_forme;
+    private org.geotools.gui.swing.style.sld.JExpressionPanel gui_opacity;
+    private org.geotools.gui.swing.extended.JDegreePanel gui_orientation;
+    private org.geotools.gui.swing.style.sld.JExpressionPanel gui_size;
+    private org.geotools.gui.swing.style.sld.JStrokePanel gui_stroke;
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private org.geotools.gui.swing.style.sld.JStrokePanel jStrokePanel1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JComboBox jcb_forme;
-    private org.geotools.gui.swing.extended.JNumberPanel jsp_gen_alpha;
-    private org.geotools.gui.swing.extended.JNumberPanel jsp_gen_size;
     private javax.swing.JLabel lbl_gen_alpha;
     private javax.swing.JLabel lbl_gen_color;
     private javax.swing.JLabel lbl_gen_forme;

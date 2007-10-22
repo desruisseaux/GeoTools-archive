@@ -17,38 +17,43 @@
 package org.geotools.gui.swing.style.sld;
 
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.map.MapLayer;
 import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
 import org.geotools.styling.StyleBuilder;
-import org.jdesktop.layout.GroupLayout;
-import org.jdesktop.layout.LayoutStyle;
 
 /**
  * @author  johann sorel
  */
 public class JFillPanel extends javax.swing.JPanel {
 
+    
     /** Creates new form JFillPanel */
     public JFillPanel() {
         initComponents();
                 
-        GuiFillAlpha.setMargins(0, 1);
-        GuiFillAlpha.setFloatable(true);
     }
 
+    public void setLayer(MapLayer layer){
+        GuiFillColor.setLayer(layer);
+        GuiFillAlpha.setLayer(layer);
+    }
     
     public void parseFill(Fill fill) {
         if (fill != null) {
             // TODO : not yet implemented
             //fill.getBackgroundColor();
             //fill.getGraphicFill();
-            GuiFillColor.setColor(fill.getColor());
-            GuiFillAlpha.setValue(fill.getOpacity());
+            GuiFillColor.setExpression(fill.getColor());
+            GuiFillAlpha.setExpression(fill.getOpacity());
+            //Graphic graph = fill.getGraphicFill();
+            //graph.
         }
     }
 
     public Fill getFill() {
         StyleBuilder sb = new StyleBuilder();
-        return sb.createFill(GuiFillColor.getExpressionColor(), GuiFillAlpha.getExpressionValue());
+        return sb.createFill(GuiFillColor.getExpression(), GuiFillAlpha.getExpression());
     }
 
     /** This method is called from within the constructor to
@@ -60,22 +65,11 @@ public class JFillPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         lbl_color1 = new javax.swing.JLabel();
-        GuiFillColor = new org.geotools.gui.swing.style.sld.JColorPanel();
-        GuiFillAlpha = new org.geotools.gui.swing.extended.JNumberPanel();
         lbl_alpha1 = new javax.swing.JLabel();
+        GuiFillColor = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        GuiFillAlpha = new org.geotools.gui.swing.style.sld.JExpressionPanel();
 
         lbl_color1.setText(TextBundle.getResource().getString("color"));
-
-        org.jdesktop.layout.GroupLayout GuiFillColorLayout = new org.jdesktop.layout.GroupLayout(GuiFillColor);
-        GuiFillColor.setLayout(GuiFillColorLayout);
-        GuiFillColorLayout.setHorizontalGroup(
-            GuiFillColorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 66, Short.MAX_VALUE)
-        );
-        GuiFillColorLayout.setVerticalGroup(
-            GuiFillColorLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 18, Short.MAX_VALUE)
-        );
 
         lbl_alpha1.setText(TextBundle.getResource().getString("opacity"));
 
@@ -85,34 +79,32 @@ public class JFillPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(lbl_color1)
+                    .add(lbl_alpha1))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(layout.createSequentialGroup()
-                        .add(lbl_color1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(GuiFillColor, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(lbl_alpha1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(GuiFillColor, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
+                .add(12, 12, 12)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(lbl_color1)
                     .add(GuiFillColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(8, 8, 8)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lbl_alpha1))
+                    .add(lbl_alpha1)
+                    .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.extended.JNumberPanel GuiFillAlpha;
-    private org.geotools.gui.swing.style.sld.JColorPanel GuiFillColor;
+    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiFillAlpha;
+    private org.geotools.gui.swing.style.sld.JExpressionPanel GuiFillColor;
     private javax.swing.JLabel lbl_alpha1;
     private javax.swing.JLabel lbl_color1;
     // End of variables declaration//GEN-END:variables

@@ -16,11 +16,22 @@
 
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -29,7 +40,6 @@ import javax.xml.transform.TransformerException;
 
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.misc.FastFile;
 import org.geotools.gui.swing.misc.filtre.FiltreSLD;
 import org.geotools.map.MapLayer;
 import org.geotools.sld.SLDConfiguration;
@@ -174,7 +184,7 @@ public class JXMLStylePanel extends javax.swing.JPanel implements StylePanel {
                 String xml = st.transform(layer.getStyle());
                 ArrayList<String> str = new ArrayList<String>();
                 str.add(xml);
-                FastFile.Write(f.getPath(), str);                
+                new FileUtilities().write(f.getPath(), str); 
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -228,4 +238,165 @@ public class JXMLStylePanel extends javax.swing.JPanel implements StylePanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_check;
     // End of variables declaration//GEN-END:variables
+}
+
+
+
+/** 
+ * Utility class for file operations. Made for
+ * quick needs, this class is not optimised.
+ * 
+ * @author Johann Sorel
+ */
+class FileUtilities {
+    
+    
+    public FileUtilities(){        
+    }
+    
+    
+    /** 
+     * Doesn't read lines beginning with # or / and empty lines
+     * 
+     * @param adress : path to the file
+     * @return List<String> with one String for each line
+     * @throws FileNotFoundException if file doesn't exist
+     * @throws IOException if an error happen while reading
+     */
+    public List<String> read(String adress) throws FileNotFoundException, IOException {
+        List<String> str = new ArrayList<String>();
+
+        InputStream ips = new FileInputStream(adress);
+        InputStreamReader ipsr = new InputStreamReader(ips);
+        BufferedReader br = new BufferedReader(ipsr);
+        String l;
+        char ch1 = '/';
+        char ch2 = '#';
+
+        while ((l = br.readLine()) != null) {
+            if (l.length() > 0) {
+                if (l.charAt(0) != ch1 && l.charAt(0) != ch2) {
+                    str.add(l);
+                }
+            }
+        }
+        br.close();
+        ips.close();
+
+        return str;
+    }
+
+    /** 
+     * Use to read a serialized object
+     * 
+     * @param adress : path to the file
+     * @return Object : the serialized object
+     * @throws IOException if an error happen while reading
+     */
+    public Object readObjet(String adress) throws IOException, ClassCastException, ClassNotFoundException {
+        FileInputStream fileIn = new FileInputStream(adress);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        Object o = in.readObject();
+        return o;
+    }
+
+    /** 
+     * Same issue as java.util.Properties, faster for one value
+     * but much slower when making many acces
+     * 
+     * @param adress : path to the file
+     * @param nomparam : key
+     * @return String : linked value
+     * @throws IOException if an error happen while reading
+     */
+    public String readValue(String adress, String nomparam) throws IOException {
+        String str = "";
+
+        InputStream ips = new FileInputStream(adress);
+        InputStreamReader ipsr = new InputStreamReader(ips);
+        BufferedReader br = new BufferedReader(ipsr);
+        String l;
+        char ch1 = '/';
+        char ch2 = '#';
+
+        while ((l = br.readLine()) != null) {
+            if (l.length() > 0) {
+                if (l.charAt(0) != ch1 && l.charAt(0) != ch2 && l.subSequence(0, l.indexOf("=")).equals(nomparam)) {
+                    str = l.substring(l.indexOf("=") + 1, l.length());
+                }
+            }
+        }
+        br.close();
+        ips.close();
+
+        return str;
+    }
+
+    /** 
+     * Same issue as a propertie file, faster for one value
+     * but much slower when making many acces
+     * 
+     * @param flux : stream
+     * @param nomparam : key
+     * @return String : linked value
+     * @throws IOException if an error happen while reading
+     */
+    public String readValue(InputStream flux, String nomparam) throws IOException {
+        String str = "";
+
+        InputStreamReader ips = new InputStreamReader(flux);
+        BufferedReader br = new BufferedReader(ips);
+        String l;
+        char ch1 = '/';
+        char ch2 = '#';
+
+        while ((l = br.readLine()) != null) {
+            if (l.length() > 0) {
+                if (l.charAt(0) != ch1 && l.charAt(0) != ch2 && l.subSequence(0, l.indexOf("=")).equals(nomparam)) {
+                    str = l.substring(l.indexOf("=") + 1, l.length());
+                }
+            }
+        }
+        br.close();
+        ips.close();
+
+        return str;
+    }
+
+    /** 
+     * Write a String List in a file
+     * 
+     * @param adress : path to the file
+     * @param val : String List to write
+     * @throws IOException if an error happen while writing
+     */
+    public void write(String adress, List<String> val) throws IOException {        
+        FileWriter fw = new FileWriter(adress, false);
+        BufferedWriter output = new BufferedWriter(fw);
+
+        int size = val.size();
+        for (int i = 0; i < size; i++) {
+            output.write(val.get(i));
+            output.flush();
+        }
+
+        fw.close();
+        output.close();
+    }
+
+    /** 
+     * Serialize an object in a file.
+     * 
+     * @param adress : path to the file
+     * @param O : Object to serialize
+     * @throws IOException if an error happen while writing
+     */
+    public void writeObject(String adress, Object O) throws IOException {
+        FileOutputStream fileOut = new FileOutputStream(adress);
+        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
+        out.writeObject(O);
+        out.close();
+        fileOut.close();
+    }
 }

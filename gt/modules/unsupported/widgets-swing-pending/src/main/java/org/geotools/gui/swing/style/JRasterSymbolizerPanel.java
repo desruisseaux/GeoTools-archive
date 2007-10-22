@@ -18,9 +18,14 @@ package org.geotools.gui.swing.style;
 
 import javax.swing.JComponent;
 
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.styleproperty.SymbolizerPanel;
 import org.geotools.map.MapLayer;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.RasterSymbolizer;
+import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 
 /**
@@ -29,24 +34,57 @@ import org.geotools.styling.Symbolizer;
  */
 public class JRasterSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel{
     
+    
+    
     /** Creates new form RasterStylePanel */
     public JRasterSymbolizerPanel(MapLayer layer) {
+        super();
         initComponents();
+        
+        exp_opacity.setLayer(layer);
+    }
+    
+    private void parse(Style style) {
+
+        FeatureTypeStyle[] sty = style.getFeatureTypeStyles();
+
+        Rule[] rules = sty[0].getRules();
+        for (int i = 0; i < rules.length; i++) {
+            Rule r = rules[i];
+
+            //on regarde si la regle s'applique au maplayer (s'il n'y a aucun filtre)
+            if (r.getFilter() == null) {
+                Symbolizer[] symbolizers = r.getSymbolizers();
+                for (int j = 0; j < symbolizers.length; j++) {
+                    parse(symbolizers[j]);
+                }
+            }
+        }
+    }
+
+    private void parse(Symbolizer symbol) {
+
+        if (symbol instanceof RasterSymbolizer) {
+            RasterSymbolizer sym = (RasterSymbolizer) symbol;
+
+            exp_opacity.setExpression( sym.getOpacity() );
+        }
     }
     
     public Symbolizer getSymbolizer(){
-        
-        return null;
+        StyleBuilder sb = new StyleBuilder();
+        RasterSymbolizer sym = sb.createRasterSymbolizer();
+        sym.setOpacity(exp_opacity.getExpression());        
+        return sym;
     }
     
      public Style getStyle(){
-     /*   StyleBuilder sb = new StyleBuilder();
-        Symbolizer ps = sb.createLineSymbolizer(color, opa);
-                
+        StyleBuilder sb = new StyleBuilder();
+
         Style style = sb.createStyle();
-        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
-        return style;*/
-         return null;
+        style.addFeatureTypeStyle(sb.createFeatureTypeStyle(getSymbolizer()));
+
+        return style;
     }
     
     public JComponent getComponent(){
@@ -61,20 +99,37 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        exp_opacity = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+
+        jLabel1.setText(TextBundle.getResource().getString("opacity"));
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 400, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(exp_opacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 111, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 300, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(exp_opacity, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.geotools.gui.swing.style.sld.JExpressionPanel exp_opacity;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
     
 }
