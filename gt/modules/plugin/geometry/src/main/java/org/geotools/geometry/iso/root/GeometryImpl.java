@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -613,7 +613,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	public boolean within(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 		
-		// Return false, if the envelopes doesn´t intersect
+		// Return false, if the envelopes doesnÂ´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return false;
 
@@ -663,7 +663,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	 */
 	public boolean contains(DirectPosition position) {
 
-		// Return false, if the point doesn´t lie in the envelope of this object
+		// Return false, if the point doesnÂ´t lie in the envelope of this object
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(position))
 			return false;
 		
@@ -691,7 +691,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	public boolean disjoint(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 
-		// Return true, if the envelopes doesn´t intersect
+		// Return true, if the envelopes doesnÂ´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return true;
 		
@@ -751,7 +751,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	public boolean equals(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 
-		// Return false, if the envelopes doesn´t intersect
+		// Return false, if the envelopes doesnÂ´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return false;
 		
@@ -810,7 +810,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 	public boolean touches(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 
-		// Return false, if the envelopes doesn´t intersect
+		// Return false, if the envelopes doesnÂ´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return false;
 
@@ -881,7 +881,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 		if (d1 != d2) {
 			return false;
 		}
-		// Return false, if the envelopes doesn´t intersect
+		// Return false, if the envelopes doesnÂ´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return false;
 		
@@ -951,7 +951,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 			return false;
 		}
 
-		// Return false, if the envelopes doesn´t intersect
+		// Return false, if the envelopes doesnÂ´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return false;
 		
@@ -981,7 +981,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 //		// TO-DO documentation
 //		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 //
-//		// Return false, if the envelopes doesn´t intersect
+//		// Return false, if the envelopes doesnÂ´t intersect
 //		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 //			return false;
 //		
@@ -999,7 +999,7 @@ public abstract class GeometryImpl implements Geometry, Serializable  {
 //		// TO-DO documentation
 //		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 //
-//		// Return false, if the envelopes doesn´t intersect
+//		// Return false, if the envelopes doesnÂ´t intersect
 //		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 //			return false;
 //		

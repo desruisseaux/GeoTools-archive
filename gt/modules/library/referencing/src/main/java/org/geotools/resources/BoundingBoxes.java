@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  */
 public final class BoundingBoxes {
     /**
@@ -115,7 +115,7 @@ public final class BoundingBoxes {
      * pattern and locale. See {@link AngleFormat} for a description of angle patterns.
      *
      * @param box     The bounding box to format.
-     * @param pattern The angle pattern (e.g. {@code DD°MM'SS.s"}.
+     * @param pattern The angle pattern (e.g. {@code DDÂ°MM'SS.s"}.
      * @param locale  The locale, or {@code null} for the default one.
      */
     public static String toString(final GeographicBoundingBox box,

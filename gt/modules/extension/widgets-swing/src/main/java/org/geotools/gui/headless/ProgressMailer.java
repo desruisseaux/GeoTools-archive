@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -60,33 +60,33 @@ import org.opengis.util.InternationalString;
  */
 public class ProgressMailer implements ProgressListener {
     /**
-     * Nom de l'opération en cours. Le pourcentage sera écris à la droite de ce nom.
+     * Nom de l'opÃ©ration en cours. Le pourcentage sera Ã©cris Ã  la droite de ce nom.
      */
     private String description;
 
     /**
-     * Langue à utiliser pour le formattage.
+     * Langue Ã  utiliser pour le formattage.
      */
     private final Locale locale;
 
     /**
-     * Session à utiliser pour envoyer des courriels.
+     * Session Ã  utiliser pour envoyer des courriels.
      */
     private final Session session;
 
     /**
-     * Adresses des personnes à qui envoyer un rapport sur les progrès.
+     * Adresses des personnes Ã  qui envoyer un rapport sur les progrÃ¨s.
      */
     private final Address[] address;
 
     /**
-     * Laps de temps entre deux courriers électroniques informant des progrès.
-     * On attendra que ce laps de temps soit écoulés avant d'envoyer un nouveau courriel.
+     * Laps de temps entre deux courriers Ã©lectroniques informant des progrÃ¨s.
+     * On attendra que ce laps de temps soit Ã©coulÃ©s avant d'envoyer un nouveau courriel.
      */
     private long timeInterval = 3*60*60*1000L;
 
     /**
-     * Date et heure à laquelle envoyer le prochain courriel.
+     * Date et heure Ã  laquelle envoyer le prochain courriel.
      */
     private long nextTime;
 
@@ -121,9 +121,9 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Retourne un ensemble de propriétés nécessaires pour ouvrir une session.
+     * Retourne un ensemble de propriÃ©tÃ©s nÃ©cessaires pour ouvrir une session.
      *
-     * @param host Nom du serveur à utiliser pour envoyer des courriels.
+     * @param host Nom du serveur Ã  utiliser pour envoyer des courriels.
      */
     private static final Properties properties(final String host) {
         final Properties props = new Properties();
@@ -183,13 +183,13 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Envoie le message spécifié par courrier électronique.
+     * Envoie le message spÃ©cifiÃ© par courrier Ã©lectronique.
      *
-     * @param method Nom de la méthode qui appelle celle-ci. Cette information
-     *        est utilisée pour produire un message d'erreur en cas d'échec.
-     * @param subjectKey Clé du sujet: {@link ResourceKeys#PROGRESS},
+     * @param method Nom de la mÃ©thode qui appelle celle-ci. Cette information
+     *        est utilisÃ©e pour produire un message d'erreur en cas d'Ã©chec.
+     * @param subjectKey ClÃ© du sujet: {@link ResourceKeys#PROGRESS},
      *        {@link ResourceKeys#WARNING} ou {@link ResourceKeys#EXCEPTION}.
-     * @param messageText Message à envoyer par courriel.
+     * @param messageText Message Ã  envoyer par courriel.
      */
     private void send(final String method, final int subjectKey, final String messageText) {
         try {
@@ -211,11 +211,11 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Envoie par courrier électronique un rapport des progrès.
+     * Envoie par courrier Ã©lectronique un rapport des progrÃ¨s.
      *
-     * @param method Nom de la méthode qui appelle celle-ci. Cette information
-     *        est utilisée pour produire un message d'erreur en cas d'échec.
-     * @param percent Pourcentage effectué (entre 0 et 100).
+     * @param method Nom de la mÃ©thode qui appelle celle-ci. Cette information
+     *        est utilisÃ©e pour produire un message d'erreur en cas d'Ã©chec.
+     * @param percent Pourcentage effectuÃ© (entre 0 et 100).
      */
     private void send(final String method, final float percent) {
         final Runtime       system = Runtime.getRuntime();

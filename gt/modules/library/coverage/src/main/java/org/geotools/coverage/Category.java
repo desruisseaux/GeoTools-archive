@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Management Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -61,7 +61,7 @@ import org.geotools.util.NumberRange;
  * 
  * Some image mixes both qualitative and quantitative categories. For example,
  * images of Sea Surface Temperature  (SST)  may have a quantitative category
- * for temperature with values ranging from –2 to 35°C,  and three qualitative
+ * for temperature with values ranging from Â–2 to 35Â°C,  and three qualitative
  * categories for cloud, land and ice.
  * <p>
  * All categories must have a human readable name. In addition, quantitative
@@ -192,14 +192,14 @@ public class Category implements Serializable {
     final Category inverse;
 
     /**
-     * Codes ARGB des couleurs de la catégorie. Les couleurs par
-     * défaut seront un gradient allant du noir au blanc opaque.
+     * Codes ARGB des couleurs de la catÃ©gorie. Les couleurs par
+     * dÃ©faut seront un gradient allant du noir au blanc opaque.
      */
     private final int[] ARGB;
 
     /**
-     * Codes ARGB par défaut. On utilise un exemplaire unique
-     * pour toutes les création d'objets {@link Category}.
+     * Codes ARGB par dÃ©faut. On utilise un exemplaire unique
+     * pour toutes les crÃ©ation d'objets {@link Category}.
      */
     private static final int[] DEFAULT = {0xFF000000, 0xFFFFFFFF};
 

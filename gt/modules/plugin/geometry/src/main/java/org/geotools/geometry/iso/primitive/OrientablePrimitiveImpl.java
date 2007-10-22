@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,15 +43,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * determines whether this primitive agrees or disagrees with the orientation of
  * the referenced object.
  * 
- * NOTE There are several reasons for subclassing the “positive” primitives
+ * NOTE There are several reasons for subclassing the Â“positiveÂ” primitives
  * under the orientable primitives. First is a matter of the semantics of
- * subclassing. Subclassing is assumed to be a “is type of” hierarchy. In the
- * view used, the “positive” primitive is simply the orientable one with the
+ * subclassing. Subclassing is assumed to be a Â“is type ofÂ” hierarchy. In the
+ * view used, the Â“positiveÂ” primitive is simply the orientable one with the
  * positive orientation. If the opposite view were taken, and orientable
- * primitives were subclassed under the “positive” primitive, then by
- * subclassing logic, the “negative” primitive would have to hold the same sort
- * of geometric description that the “positive” primitive does. The only viable
- * solution would be to separate “negative” primitives under the geometric root
+ * primitives were subclassed under the Â“positiveÂ” primitive, then by
+ * subclassing logic, the Â“negativeÂ” primitive would have to hold the same sort
+ * of geometric description that the Â“positiveÂ” primitive does. The only viable
+ * solution would be to separate Â“negativeÂ” primitives under the geometric root
  * as being some sort of reference to their opposite. This adds a great deal of
  * complexity to the subclassing tree. To minimize the number of objects and to
  * bypass this logical complexity, positively oriented primitives are

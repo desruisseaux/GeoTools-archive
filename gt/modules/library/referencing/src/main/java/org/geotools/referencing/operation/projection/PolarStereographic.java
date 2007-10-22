@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   (C) 2000, Frank Warmerdam
  *   (C) 1999, Fisheries and Oceans Canada
  *
@@ -51,7 +51,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author André Gosselin
+ * @author AndrÃ© Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -122,9 +122,9 @@ public class PolarStereographic extends Stereographic {
          *   | Stereographic South Pole          | Standard Parallel  | South pole  |
          *   +-----------------------------------+--------------------+-------------+
          *
-         * "Standard Parallel" (a.k.a. "Latitude true scale") default to 90°N for every cases
+         * "Standard Parallel" (a.k.a. "Latitude true scale") default to 90Â°N for every cases
          * (including Polar A, but it is meanless in this case), except for "Stereographic South
-         * Pole" where it default to 90°S.
+         * Pole" where it default to 90Â°S.
          */
         final ParameterDescriptor trueScaleDescriptor = Boolean.TRUE.equals(forceSouthPole) ?
                 ProviderSouth.STANDARD_PARALLEL : ProviderNorth.STANDARD_PARALLEL;
@@ -140,7 +140,7 @@ public class PolarStereographic extends Stereographic {
         ensureLatitudeInRange(trueScaleDescriptor, latitudeTrueScale, true);
         /*
          * Forces the "standard_parallel_1" to the appropriate hemisphere,
-         * and forces the "latitude_of_origin" to ±90°.
+         * and forces the "latitude_of_origin" to Â±90Â°.
          */
         poleForced = (forceSouthPole != null);
         if (poleForced) {
@@ -587,8 +587,8 @@ public class PolarStereographic extends Stereographic {
     public static final class ProviderB extends Stereographic.Provider {
         /**
          * The operation parameter descriptor for the {@code standardParallel}
-         * parameter value. Valid values range is from -90 to 90°. The default
-         * value is 90°N.
+         * parameter value. Valid values range is from -90 to 90Â°. The default
+         * value is 90Â°N.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = ProviderNorth.STANDARD_PARALLEL;
 
@@ -645,8 +645,8 @@ public class PolarStereographic extends Stereographic {
     public static final class ProviderNorth extends Stereographic.Provider {
         /**
          * The operation parameter descriptor for the {@code standardParallel}
-         * parameter value. Valid values range is from -90 to 90°. The default
-         * value is 90°N.
+         * parameter value. Valid values range is from -90 to 90Â°. The default
+         * value is 90Â°N.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new NamedIdentifier[] {
@@ -707,8 +707,8 @@ public class PolarStereographic extends Stereographic {
     public static final class ProviderSouth extends Stereographic.Provider {
         /**
          * The operation parameter descriptor for the {@code standardParallel}
-         * parameter value. Valid values range is from -90 to 90°. The default
-         * value is 90°S.
+         * parameter value. Valid values range is from -90 to 90Â°. The default
+         * value is 90Â°S.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new NamedIdentifier[] {

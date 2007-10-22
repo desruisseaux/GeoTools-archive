@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -69,16 +69,16 @@ public final class DisjointSetTest extends TestCase {
         assertSame(t2.getTrash(), t3.getTrash());
 
         assertTrue(t1.add("alpha"));
-        assertTrue(t2.add("bêta"));
+        assertTrue(t2.add("bÃªta"));
         assertTrue(t3.add("gamma"));
         assertTrue(t2.add("delta"));
         assertTrue(t1.add("epsilon"));
         assertTrue(t2.add("alpha"));
-        assertTrue(t2.remove("bêta"));
+        assertTrue(t2.remove("bÃªta"));
 
         assertEquals(Collections.singleton("epsilon"), t1);
         assertEquals(new HashSet(Arrays.asList(new String[] {"alpha","delta"})), t2);
         assertEquals(Collections.singleton("gamma"), t3);
-        assertEquals(Collections.singleton("bêta"),  t1.getTrash());
+        assertEquals(Collections.singleton("bÃªta"),  t1.getTrash());
     }
 }

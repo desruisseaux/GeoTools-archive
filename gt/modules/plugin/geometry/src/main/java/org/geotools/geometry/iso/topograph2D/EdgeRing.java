@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    (C) 2001-2006  Vivid Solutions
  *    
  *    This library is free software; you can redistribute it and/or
@@ -152,7 +152,7 @@ public abstract class EdgeRing {
 	 * 
 	 * @return the created Surface
 	 */
-	// TODO don´t need the geomfactory parameter because it owns this parameter
+	// TODO donÂ´t need the geomfactory parameter because it owns this parameter
 	// as member variable
 	public SurfaceImpl toPolygon() {
 
@@ -193,13 +193,13 @@ public abstract class EdgeRing {
 			dpList.add(dp);
 		}
 		
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
 				dpList), 0.0);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
 		
-		// Create List of OrientableCurve´s (Curve´s)
+		// Create List of OrientableCurveÂ´s (CurveÂ´s)
 		OrientableCurve curve = new CurveImpl(crs, segments);
 		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
 		orientableCurves.add(curve);

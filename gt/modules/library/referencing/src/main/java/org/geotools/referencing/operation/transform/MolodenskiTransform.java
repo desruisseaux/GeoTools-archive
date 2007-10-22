@@ -135,7 +135,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     private final double daa, da_a;
     
     /**
-     * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
+     * The square of excentricity of the ellipsoid: eÂ² = (aÂ²-bÂ²)/aÂ² where
      * <var>a</var> is the semi-major axis length and
      * <var>b</var> is the semi-minor axis length.
      */

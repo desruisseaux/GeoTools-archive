@@ -106,7 +106,7 @@ public class DirectionAlongMeridianTest extends TestCase {
     }
 
     /**
-     * Tests if the following directions have an angle of 90° between each other.
+     * Tests if the following directions have an angle of 90Â° between each other.
      */
     private static void assertOrdered(final String dir1, final String dir2) {
         final DirectionAlongMeridian m1 = DirectionAlongMeridian.parse(dir1);

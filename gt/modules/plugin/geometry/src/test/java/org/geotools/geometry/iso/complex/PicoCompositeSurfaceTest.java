@@ -95,7 +95,7 @@ public class PicoCompositeSurfaceTest extends TestCase {
 		assertTrue(dp[0] == 20);
 		assertTrue(dp[1] == 10);
 		
-		// Boundary operation of CompositeSurface not implemented yet. Hence isCycle doesn´t work yet.
+		// Boundary operation of CompositeSurface not implemented yet. Hence isCycle doesnÂ´t work yet.
 		//assertTrue(comps1.isCycle() == false);
 		
 	}

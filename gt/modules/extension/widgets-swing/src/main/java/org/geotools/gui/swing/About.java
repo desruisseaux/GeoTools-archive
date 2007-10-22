@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2003, Institut de Recherche pour le Développement
+ *    (C) 2003, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -115,7 +115,7 @@ public class About extends JPanel {
     private static final String TIMESTAMP = "Implementation-Date";
 
     /**
-     * Thread qui aura la charge de faire des mises à jour en arrière-plan.
+     * Thread qui aura la charge de faire des mises Ã  jour en arriÃ¨re-plan.
      * Ce champ sera {@code null} s'il n'y en a pas.
      */
     private final ThreadList updater;
@@ -418,16 +418,16 @@ public class About extends JPanel {
     }
 
     /**
-     * Modèle représentant la liste des processus actif dans un {@link ThreadGroup}.
-     * Cette liste se mettre automatiquement à jour de façon périodique.
+     * ModÃ¨le reprÃ©sentant la liste des processus actif dans un {@link ThreadGroup}.
+     * Cette liste se mettre automatiquement Ã  jour de faÃ§on pÃ©riodique.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class ThreadList extends AbstractListModel implements Runnable {
         /**
-         * Processus qui met à jour {@code ThreadList}, ou {@code null} s'il n'y en a pas.
-         * On peut tuer le processus actif en donnant la valeur {@code null} à cette variable.
+         * Processus qui met Ã  jour {@code ThreadList}, ou {@code null} s'il n'y en a pas.
+         * On peut tuer le processus actif en donnant la valeur {@code null} Ã  cette variable.
          */
         public transient Thread worker;
 
@@ -437,17 +437,17 @@ public class About extends JPanel {
         private final ThreadGroup tasks;
 
         /**
-         * Liste des noms des processus en cours. Cette liste sera mises à jour périodiquement.
+         * Liste des noms des processus en cours. Cette liste sera mises Ã  jour pÃ©riodiquement.
          */
         private String[] names=new String[0];
 
         /**
-         * Texte dans lequel écrire la mémoire totale réservée.
+         * Texte dans lequel Ã©crire la mÃ©moire totale rÃ©servÃ©e.
          */
         private final JLabel totalMemory;
 
         /**
-         * Texte dans lequel écrire le pourcentage de mémoire utilisée.
+         * Texte dans lequel Ã©crire le pourcentage de mÃ©moire utilisÃ©e.
          */
         private final JLabel percentUsed;
 
@@ -457,7 +457,7 @@ public class About extends JPanel {
         private final Vocabulary resources;
 
         /**
-         * Construit une liste des processus actifs dans le groupe {@code tasks} spécifié.
+         * Construit une liste des processus actifs dans le groupe {@code tasks} spÃ©cifiÃ©.
          */
         public ThreadList(final ThreadGroup tasks,  final JLabel totalMemory,
                           final JLabel percentUsed, final Vocabulary resources)
@@ -469,29 +469,29 @@ public class About extends JPanel {
         }
 
         /**
-         * Retourne le nombre d'éléments dans la liste.
+         * Retourne le nombre d'Ã©lÃ©ments dans la liste.
          */
         public int getSize() { // NO synchronized here
             return names.length;
         }
 
         /**
-         * Retourne un des éléments de la liste.
+         * Retourne un des Ã©lÃ©ments de la liste.
          */
         public Object getElementAt(final int index) { // NO synchronized here
             return names[index];
         }
 
         /**
-         * Ajoute un objet à la liste des objets intéressés
-         * à être informé des changements apportés à la liste.
+         * Ajoute un objet Ã  la liste des objets intÃ©ressÃ©s
+         * Ã  Ãªtre informÃ© des changements apportÃ©s Ã  la liste.
          */
         public synchronized void addListDataListener(final ListDataListener listener) {
             super.addListDataListener(listener);
         }
 
         /**
-         * Démarre le thread.
+         * DÃ©marre le thread.
          */
         public synchronized void start() {
             if (worker == null) {
@@ -503,9 +503,9 @@ public class About extends JPanel {
         }
 
         /**
-         * Met à jour le contenu de la liste à interval régulier.
-         * Cette méthode est exécutée dans une boucle jusqu'à ce
-         * qu'elle soit interrompue en donnant la valeur nulle à
+         * Met Ã  jour le contenu de la liste Ã  interval rÃ©gulier.
+         * Cette mÃ©thode est exÃ©cutÃ©e dans une boucle jusqu'Ã  ce
+         * qu'elle soit interrompue en donnant la valeur nulle Ã 
          * {@link #tasks}.
          */
         public synchronized void run() {
@@ -555,15 +555,15 @@ public class About extends JPanel {
                 try {
                     wait(4000);
                 } catch (InterruptedException exception) {
-                    // Quelqu'un a réveillé ce thread. Retourne au travail.
+                    // Quelqu'un a rÃ©veillÃ© ce thread. Retourne au travail.
                 }
             }
             worker = null;
         }
 
         /**
-         * Met à jour le contenu de la liste. Cette méthode
-         * est appelée périodiquement dans le thread de Swing.
+         * Met Ã  jour le contenu de la liste. Cette mÃ©thode
+         * est appelÃ©e pÃ©riodiquement dans le thread de Swing.
          */
         private synchronized void update(final String[] newNames,
                                          final String totalMemory,
@@ -618,7 +618,7 @@ public class About extends JPanel {
         if (updater != null) {
             updater.worker = null; // Stop the thread.
         }
-        // Le thread avait une référence indirecte vers 'this' via 'ListDataListener'
+        // Le thread avait une rÃ©fÃ©rence indirecte vers 'this' via 'ListDataListener'
     }
 
     /**

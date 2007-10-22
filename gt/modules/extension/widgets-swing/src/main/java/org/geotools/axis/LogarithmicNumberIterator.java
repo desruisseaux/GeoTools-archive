@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2000, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2000, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,9 @@ import org.geotools.resources.XMath;
 
 
 /**
- * Itérateur balayant les barres et étiquettes de graduation d'un axe logarithmique.
- * Cet itérateur retourne les positions des graduations à partir de la valeur minimale
- * jusqu'à la valeur maximale.
+ * ItÃ©rateur balayant les barres et Ã©tiquettes de graduation d'un axe logarithmique.
+ * Cet itÃ©rateur retourne les positions des graduations Ã  partir de la valeur minimale
+ * jusqu'Ã  la valeur maximale.
  *
  * @source $URL$
  * @version $Id$
@@ -39,26 +39,26 @@ final class LogarithmicNumberIterator extends NumberIterator {
     private double scale, offset;
 
     /**
-     * Construit un itérateur par défaut. La méthode {@link #init}
-     * <u>doit</u> être appelée avant que cet itérateur ne soit
+     * Construit un itÃ©rateur par dÃ©faut. La mÃ©thode {@link #init}
+     * <u>doit</u> Ãªtre appelÃ©e avant que cet itÃ©rateur ne soit
      * utilisable.
      *
-     * @param locale Conventions à utiliser pour le formatage des nombres.
+     * @param locale Conventions Ã  utiliser pour le formatage des nombres.
      */
     protected LogarithmicNumberIterator(final Locale locale) {
         super(locale);
     }
 
     /**
-     * Initialise l'itérateur.
+     * Initialise l'itÃ©rateur.
      *
-     * @param minimum           Valeur minimale de la première graduation.
-     * @param maximum           Valeur limite des graduations. La dernière
-     *                          graduation n'aura pas nécessairement cette valeur.
+     * @param minimum           Valeur minimale de la premiÃ¨re graduation.
+     * @param maximum           Valeur limite des graduations. La derniÃ¨re
+     *                          graduation n'aura pas nÃ©cessairement cette valeur.
      * @param visualLength      Longueur visuelle de l'axe sur laquelle tracer la graduation.
-     *                          Cette longueur doit être exprimée en pixels ou en points.
-     * @param visualTickSpacing Espace à laisser visuellement entre deux marques de graduation.
-     *                          Cet espace doit être exprimé en pixels ou en points (1/72 de pouce).
+     *                          Cette longueur doit Ãªtre exprimÃ©e en pixels ou en points.
+     * @param visualTickSpacing Espace Ã  laisser visuellement entre deux marques de graduation.
+     *                          Cet espace doit Ãªtre exprimÃ© en pixels ou en points (1/72 de pouce).
      */
     protected void init(final double minimum,
                         final double maximum,
@@ -81,8 +81,8 @@ final class LogarithmicNumberIterator extends NumberIterator {
     }
 
     /**
-     * Retourne la valeur de la graduation courante. Cette méthode
-     * peut être appelée pour une graduation majeure ou mineure.
+     * Retourne la valeur de la graduation courante. Cette mÃ©thode
+     * peut Ãªtre appelÃ©e pour une graduation majeure ou mineure.
      */
     public double currentValue() {
         return XMath.pow10(super.currentValue());

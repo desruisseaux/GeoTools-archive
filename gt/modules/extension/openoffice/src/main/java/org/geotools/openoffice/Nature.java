@@ -102,7 +102,7 @@ public final class Nature extends Formulas implements XNature {
                 "time",       "A date that contains the month."
         }));
         methods.put("getSeaWaterDensity", new MethodInfo("Nature", "SEAWATER.DENSITY",
-            "Computes sea water density (kg/m³) as a function of salinity, temperature and pressure.",
+            "Computes sea water density (kg/mÂ³) as a function of salinity, temperature and pressure.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
                 "salinity",    "Salinity PSS-78.",
@@ -125,7 +125,7 @@ public final class Nature extends Formulas implements XNature {
                 "pressure",    "Pressure in decibars, not including atmospheric pressure."
         }));
         methods.put("getSeaWaterSaturationO2", new MethodInfo("Nature", "SEAWATER.OXYGEN.SATURATION",
-            "Computes the saturation in disolved oxygen (µmol/kg) as a function of salinity and temperature.",
+            "Computes the saturation in disolved oxygen (Âµmol/kg) as a function of salinity and temperature.",
             new String[] {
                 "xOptions",    "Provided by OpenOffice.",
                 "salinity",    "Salinity PSS-78.",

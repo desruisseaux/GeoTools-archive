@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -75,7 +75,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
     }
 
     /**
-     * The type of this vertical datum. Default is “geoidal”.
+     * The type of this vertical datum. Default is Â“geoidalÂ”.
      */
     private final VerticalDatumType type;
     
@@ -131,7 +131,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
     }
     
     /**
-     * The type of this vertical datum. Default is “geoidal”.
+     * The type of this vertical datum. Default is Â“geoidalÂ”.
      *
      * @return The type of this vertical datum.
      */

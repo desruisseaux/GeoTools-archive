@@ -413,7 +413,7 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
 
     /**
      * Method that claculates the parameters by iteration. The
-     * tolarance is set to 1  10<sub>-8</sub>  and max �number of steps is set
+     * tolarance is set to 1  10<sub>-8</sub>  and max ï¿½number of steps is set
      * to 20.
      *
      * @return Matrix of parameters (dx, dy, dz, ex, ey, ez, scale).

@@ -86,10 +86,10 @@ public interface XNature extends XInterface {
      * Computes sea water density as a function of salinity, temperature and pressure.
      *
      * @param  salinity    Salinity PSS-78 (0 to 42).
-     * @param  temperature Temperature ITS-68 (-2 to 40°C).
+     * @param  temperature Temperature ITS-68 (-2 to 40Â°C).
      * @param  pressure    Pressure in decibars (0 to 10<sup>5</sup> dbar),
      *                     not including atmospheric pressure.
-     * @return Density (kg/m³).
+     * @return Density (kg/mÂ³).
      */
     double getSeaWaterDensity(XPropertySet xOptions,
                               double       salinity,
@@ -119,7 +119,7 @@ public interface XNature extends XInterface {
                                     double       pressure);
 
     /**
-     * Computes the saturation in disolved oxygen (µmol/kg) as a function of salinity and
+     * Computes the saturation in disolved oxygen (Âµmol/kg) as a function of salinity and
      * temperature.
      *
      * @param  salinity    Salinity PSS-78.

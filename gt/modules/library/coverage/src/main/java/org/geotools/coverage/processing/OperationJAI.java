@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -795,8 +795,8 @@ public class OperationJAI extends Operation2D {
                  * Create a new sample dimension. Note that we use a null title, not the same
                  * title than the original sample dimension, because the new sample dimension
                  * may be quite different. For example the original sample dimension may be
-                 * about "Temperature" in °C units, and the new one about "Gradiant magnitude
-                 * of Temperature" in °C/km units. The GridSampleDimension constructor will
+                 * about "Temperature" in Â°C units, and the new one about "Gradiant magnitude
+                 * of Temperature" in Â°C/km units. The GridSampleDimension constructor will
                  * infers the title from what looks like the "main" category.
                  */
                 final CharSequence title = null;

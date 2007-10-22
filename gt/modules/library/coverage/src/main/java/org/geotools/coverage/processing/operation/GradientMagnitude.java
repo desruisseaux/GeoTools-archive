@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -62,8 +62,8 @@ import org.geotools.util.NumberRange;
  * <UL>
  *   <LI>For an image of elevation (meters) using a geographic coordinate system (degrees
  *       of latitude and longitude), the units are <strong>meters/degree</strong>.</LI>
- *   <LI>For an image of temperature (°C) using a projected coordinate system (kilometers),
- *       the units are <strong>°C/km</strong>.</LI>
+ *   <LI>For an image of temperature (Â°C) using a projected coordinate system (kilometers),
+ *       the units are <strong>Â°C/km</strong>.</LI>
  * </UL>
  * <p>
  * Kernels are normalized by dividing all their coefficients by the result of this test. In other
@@ -140,7 +140,7 @@ public class GradientMagnitude extends OperationJAI {
     /**
      * Set to {@code true} to enable automatic kernel normalization. Normalization modifies
      * kernel coefficients according the "grid to coordinate system" transform in order to get
-     * some meaningful engineering units (e.g. °C/km). The normalization factor is computed by
+     * some meaningful engineering units (e.g. Â°C/km). The normalization factor is computed by
      * testing the original kernels against synthetic horizontal and vertical gradients of
      * 1 sampleUnit/csUnit.
      */

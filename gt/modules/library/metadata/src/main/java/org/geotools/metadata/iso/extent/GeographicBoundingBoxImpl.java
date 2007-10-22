@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  */
 public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         implements GeographicBoundingBox
@@ -68,7 +68,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     private static Method toString;
 
     /**
-     * A bounding box ranging from 180°W to 180°E and 90°S to 90°N.
+     * A bounding box ranging from 180Â°W to 180Â°E and 90Â°S to 90Â°N.
      *
      * @since 2.2
      */
@@ -191,7 +191,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      *
-     * @return The western-most longitude between -180 and +180°.
+     * @return The western-most longitude between -180 and +180Â°.
      */
     public double getWestBoundLongitude() {
         return westBoundLongitude;
@@ -212,7 +212,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      *
-     * @return The eastern-most longitude between -180 and +180°.
+     * @return The eastern-most longitude between -180 and +180Â°.
      */
     public double getEastBoundLongitude() {
         return eastBoundLongitude;
@@ -233,7 +233,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      *
-     * @return The southern-most latitude between -90 and +90°.
+     * @return The southern-most latitude between -90 and +90Â°.
      */
     public double getSouthBoundLatitude()  {
         return southBoundLatitude;
@@ -254,7 +254,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      *
-     * @return The northern-most latitude between -90 and +90°.
+     * @return The northern-most latitude between -90 and +90Â°.
      */
     public double getNorthBoundLatitude()   {
         return northBoundLatitude;
@@ -363,7 +363,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Returns a string representation of this extent using a default angle pattern.
      */
     public String toString() {
-        return toString(this, "DD°MM'SS.s\"", null);
+        return toString(this, "DDÂ°MM'SS.s\"", null);
     }
 
     /**
@@ -371,7 +371,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * and locale. See {@link AngleFormat} for a description of angle patterns.
      *
      * @param box     The bounding box to format.
-     * @param pattern The angle pattern (e.g. {@code DD°MM'SS.s"}.
+     * @param pattern The angle pattern (e.g. {@code DDÂ°MM'SS.s"}.
      * @param locale  The locale, or {@code null} for the default one.
      *
      * @since 2.2

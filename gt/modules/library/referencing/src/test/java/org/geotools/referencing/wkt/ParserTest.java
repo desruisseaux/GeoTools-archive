@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2002, Institut de Recherche pour le Développement
+ *    (C) 2002, Institut de Recherche pour le DÃ©veloppement
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ import org.geotools.test.TestData;
  *
  * @source $URL$
  * @version $Id$
- * @author Yann Cézard
+ * @author Yann CÃ©zard
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import org.opengis.metadata.content.ImagingCondition;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  *
  * @since 2.1
  */
@@ -43,7 +43,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     
     /**
      * Illumination elevation measured in degrees clockwise from the target plane at
-     * intersection of the optical line of sight with the Earth’s surface. For images from a
+     * intersection of the optical line of sight with the EarthÂ’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     private Double illuminationElevationAngle;
@@ -70,7 +70,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     private Double cloudCoverPercentage;
     
     /**
-     * Image distributor’s code that identifies the level of radiometric and geometric
+     * Image distributorÂ’s code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     private Identifier processingLevelCode;
@@ -126,7 +126,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
 
     /**
      * Returns the illumination elevation measured in degrees clockwise from the target plane at
-     * intersection of the optical line of sight with the Earth’s surface. For images from a
+     * intersection of the optical line of sight with the EarthÂ’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     public Double getIlluminationElevationAngle() {
@@ -135,7 +135,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
 
     /**
      * Set the illumination elevation measured in degrees clockwise from the target plane at
-     * intersection of the optical line of sight with the Earth’s surface. For images from a
+     * intersection of the optical line of sight with the EarthÂ’s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     public synchronized void setIlluminationElevationAngle(final Double newValue) {
@@ -209,7 +209,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     }
 
     /**
-     * Returns the image distributor’s code that identifies the level of radiometric and geometric
+     * Returns the image distributorÂ’s code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     public Identifier getProcessingLevelCode() {
@@ -217,7 +217,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     }
 
     /**
-     * Set the image distributor’s code that identifies the level of radiometric and geometric
+     * Set the image distributorÂ’s code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     public synchronized void setProcessingLevelCode(final Identifier newValue) {

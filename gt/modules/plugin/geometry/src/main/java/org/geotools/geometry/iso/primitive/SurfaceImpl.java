@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * 
  * Surface (Figure 12) a subclass of Primitive and is the basis for
- * 2-dimensional geometry. Unorientable surfaces such as the Möbius band are not
+ * 2-dimensional geometry. Unorientable surfaces such as the MÃ¶bius band are not
  * allowed. The orientation of a surface chooses an "up" direction through the
  * choice of the upward normal, which, if the surface is not a cycle, is the
  * side of the surface from which the exterior boundary appears
@@ -83,10 +83,10 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * logical patch defined by linear interpolation from the boundary.
 	 * 
 	 * NOTE In this standard, surface patches do not appear except in the
-	 * context of a surface, and therefore the cardinality of the “surface” role
-	 * in this association could be “1” which would preclude the use of surface
+	 * context of a surface, and therefore the cardinality of the Â“surfaceÂ” role
+	 * in this association could be Â“1Â” which would preclude the use of surface
 	 * patches except in this manner. While this would not affect this Standard,
-	 * leaving the cardinality as “0..1” allows other standards based on this
+	 * leaving the cardinality as Â“0..1Â” allows other standards based on this
 	 * one to use surface patches in a more open-ended manner.
 	 */
 	protected ArrayList<? extends SurfacePatch> patch = null;
@@ -153,10 +153,10 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	/**
 	 * Initializes the Surface:
 	 * - Sets the surface patches
-	 * - Sets the Boundary, or calculates it if doesn´t exist
+	 * - Sets the Boundary, or calculates it if doesnÂ´t exist
 	 * 
 	 * @param patch
-	 *            List of SurfacePatch´s
+	 *            List of SurfacePatchÂ´s
 	 * @param surfaceBoundary
 	 *            SurfaceBoundary; will be calculated if this parameter is NULL
 	 */
@@ -329,7 +329,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// Test OK
 		// Test simplicity by building a topological graph and testing for self-intersection
 		// Is Simple, if the exterior ring and the interior rings does not have selfintersections
-		// and the exterior ring and the interior rings don´t touch or intersect each other. 
+		// and the exterior ring and the interior rings donÂ´t touch or intersect each other. 
 		IsSimpleOp simpleOp = new IsSimpleOp();
 		return simpleOp.isSimple(this);
 	}
@@ -420,7 +420,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getRepresentativePoint()
 	 */
 	public DirectPosition getRepresentativePoint() {
-		// Return the representative point of the surface´s boundary
+		// Return the representative point of the surfaceÂ´s boundary
 		// TODO Note: This solution is not correct, since the representative point of the surface boundary may not be on the surface
 		return this.getBoundary().getRepresentativePoint();
 	}

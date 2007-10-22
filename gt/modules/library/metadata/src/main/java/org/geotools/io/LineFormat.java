@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -78,44 +78,44 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class LineFormat extends Format {
     /**
-     * Nombre de données valides dans le tableau {@link #data}.
-     * Il s'agit du nombre de données lues lors du dernier appel
-     * de la méthode {@link #setLine(String)}.
+     * Nombre de donnÃ©es valides dans le tableau {@link #data}.
+     * Il s'agit du nombre de donnÃ©es lues lors du dernier appel
+     * de la mÃ©thode {@link #setLine(String)}.
      */
     private int count;
 
     /**
-     * Données lus lors du dernier appel de la méthode {@link #setLine(String)}.
-     * Ces données seront restitués par des appels à {@link #getValues(float[])}.
+     * DonnÃ©es lus lors du dernier appel de la mÃ©thode {@link #setLine(String)}.
+     * Ces donnÃ©es seront restituÃ©s par des appels Ã  {@link #getValues(float[])}.
      */
     private Object[] data;
 
     /**
-     * Tableau de formats à utiliser. Chaque format de ce tableau correspond à une
-     * colonne. Par exemple la donnée {@code data[4]} aura été lu avec le format
+     * Tableau de formats Ã  utiliser. Chaque format de ce tableau correspond Ã  une
+     * colonne. Par exemple la donnÃ©e {@code data[4]} aura Ã©tÃ© lu avec le format
      * {@code format[4]}. Il n'est toutefois pas obligatoire qu'il y ait autant
      * de format que de colonnes. Si {@link #data} et plus long que {@link #format},
-     * alors le dernier format sera réutilisé pour toutes les colonnes restantes.
+     * alors le dernier format sera rÃ©utilisÃ© pour toutes les colonnes restantes.
      */
     private final Format[] format;
 
     /**
-     * Objet {@link ParsePosition} utilisé lors de la lecture pour spécifier quelle
-     * partie de la chaîne doit être interprétée.
+     * Objet {@link ParsePosition} utilisÃ© lors de la lecture pour spÃ©cifier quelle
+     * partie de la chaÃ®ne doit Ãªtre interprÃ©tÃ©e.
      */
     private final ParsePosition position = new ParsePosition(0);
 
     /**
-     * Index du caractère auquel commençaient les éléments qui ont été lus. Par exemple
-     * {@code index[0]} contient l'index du premier caractère qui a été lu pour la
-     * donnée {@code data[0]}, et ainsi de suite. Ce tableau doit <u>toujours</u>
-     * avoir une longueur de <code>{@link #data}.length + 1</code>. Le dernier élément
+     * Index du caractÃ¨re auquel commenÃ§aient les Ã©lÃ©ments qui ont Ã©tÃ© lus. Par exemple
+     * {@code index[0]} contient l'index du premier caractÃ¨re qui a Ã©tÃ© lu pour la
+     * donnÃ©e {@code data[0]}, et ainsi de suite. Ce tableau doit <u>toujours</u>
+     * avoir une longueur de <code>{@link #data}.length + 1</code>. Le dernier Ã©lÃ©ment
      * de ce tableau sera la longueur de la ligne.
      */
     private int[] limits;
 
     /**
-     * Dernière ligne de texte à avoir été spécifiée à la méthode {@link #setLine(String)}.
+     * DerniÃ¨re ligne de texte Ã  avoir Ã©tÃ© spÃ©cifiÃ©e Ã  la mÃ©thode {@link #setLine(String)}.
      */
     private String line;
 
@@ -215,8 +215,8 @@ public class LineFormat extends Format {
         Arrays.fill(data, null);
         count = 0;
         /*
-         * Procède au balayage de toutes les valeurs qui se trouvent sur la ligne spécifiée.
-         * Le balayage s'arrêtera lorsque {@code lower} aura atteint {@code upper}.
+         * ProcÃ¨de au balayage de toutes les valeurs qui se trouvent sur la ligne spÃ©cifiÃ©e.
+         * Le balayage s'arrÃªtera lorsque {@code lower} aura atteint {@code upper}.
          */
   load: while (true) {
             while (true) {
@@ -227,8 +227,8 @@ public class LineFormat extends Format {
                 lower++;
             }
             /*
-             * Procède à la lecture de la donnée. Si la lecture échoue, on produira un message d'erreur
-             * qui apparaîtra éventuellement en HTML afin de pouvoir souligner la partie fautive.
+             * ProcÃ¨de Ã  la lecture de la donnÃ©e. Si la lecture Ã©choue, on produira un message d'erreur
+             * qui apparaÃ®tra Ã©ventuellement en HTML afin de pouvoir souligner la partie fautive.
              */
             position.setIndex(lower);
             final Object datum = format[Math.min(count, format.length-1)].parseObject(line, position);
@@ -242,8 +242,8 @@ public class LineFormat extends Format {
                           line.substring(error, Math.min(error+1, end))), error);
             }
             /*
-             * Mémorise la nouvelle donnée, en agrandissant
-             * l'espace réservée en mémoire si c'est nécessaire.
+             * MÃ©morise la nouvelle donnÃ©e, en agrandissant
+             * l'espace rÃ©servÃ©e en mÃ©moire si c'est nÃ©cessaire.
              */
             if (count >= data.length) {
                 data   = XArray.resize(data,   count+Math.min(count, 256));
@@ -335,10 +335,10 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Retourne sous forme de nombre la valeur à l'index {@code index}.
+     * Retourne sous forme de nombre la valeur Ã  l'index {@code index}.
      *
-     * @param  index Index de la valeur demandée.
-     * @return La valeur demandée sous forme d'objet {@link Number}.
+     * @param  index Index de la valeur demandÃ©e.
+     * @return La valeur demandÃ©e sous forme d'objet {@link Number}.
      * @throws ParseException si la valeur n'est pas convertible en objet {@link Number}.
      */
     private Number getNumber(final int index) throws ParseException {
@@ -522,10 +522,10 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Vérifie si le nombre de données lues correspond au nombre de données
-     * attendues. Si ce n'est pas le cas, une exception sera lancée.
+     * VÃ©rifie si le nombre de donnÃ©es lues correspond au nombre de donnÃ©es
+     * attendues. Si ce n'est pas le cas, une exception sera lancÃ©e.
      *
-     * @throws ParseException si le nombre de données lues ne correspond pas au nombre de données attendues.
+     * @throws ParseException si le nombre de donnÃ©es lues ne correspond pas au nombre de donnÃ©es attendues.
      */
     private void checkLength(final int expected) throws ParseException {
         if (count != expected) {

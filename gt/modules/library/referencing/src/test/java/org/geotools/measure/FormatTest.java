@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2002, Institut de Recherche pour le Développement
+ *    (C) 2002, Institut de Recherche pour le DÃ©veloppement
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -130,7 +130,7 @@ public final class FormatTest extends TestCase {
         final GeneralDirectPosition position = new GeneralDirectPosition(new double[] {
             23.78, -12.74, 127.9, 3.2
         });
-        assertEquals("23°46,8'E 12°44,4'S 127,9\u00A0m 4 janv. 2003", format.format(position));
+        assertEquals("23Â°46,8'E 12Â°44,4'S 127,9\u00A0m 4 janv. 2003", format.format(position));
         /*
          * Try a point with wrong dimension.
          */
@@ -155,6 +155,6 @@ public final class FormatTest extends TestCase {
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
         format.setSeparator("; ");
-        assertEquals("23°46,8'E; 12°44,4'S; 127,9\u00A0m; 4 janv. 2003", format.format(position));
+        assertEquals("23Â°46,8'E; 12Â°44,4'S; 127,9\u00A0m; 4 janv. 2003", format.format(position));
      }
 }

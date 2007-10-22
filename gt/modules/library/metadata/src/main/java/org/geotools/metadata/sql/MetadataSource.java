@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -67,7 +67,7 @@ import org.geotools.util.SimpleInternationalString;
  * where {@code id} is the primary key value for the desired record in the
  * {@code CI_Telephone} table.
  *
- * @author Touraïvane
+ * @author TouraÃ¯vane
  * @author Olivier Kartotaroeno
  * @author Martin Desruisseaux
  *

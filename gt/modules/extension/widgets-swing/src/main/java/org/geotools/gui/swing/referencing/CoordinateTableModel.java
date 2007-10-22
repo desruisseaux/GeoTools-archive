@@ -62,7 +62,7 @@ import org.geotools.geometry.TransformedDirectPosition;
  * @since 2.3
  * @version $Id$
  * @source $URL$
- * @author Cédric Briançon
+ * @author CÃ©dric BrianÃ§on
  * @author Hoa Nguyen
  * @author Martin Desruisseaux
  */
@@ -271,7 +271,7 @@ public class CoordinateTableModel extends AbstractTableModel {
      * @since 2.3
      * @version $Id$
      * @source $URL$
-     * @author Cédric Briançon
+     * @author CÃ©dric BrianÃ§on
      * @author Martin Desruisseaux
      */
     public static class CellRenderer extends DefaultTableCellRenderer {

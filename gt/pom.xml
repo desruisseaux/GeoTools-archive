@@ -992,7 +992,7 @@
           <source>1.5</source>  <!-- The -source argument for the Java compiler. -->
           <target>1.5</target>  <!-- The -target argument for the Java compiler. -->
           <debug>true</debug>   <!-- Whether to include debugging information.   -->
-          <encoding>ISO-8859-1</encoding> <!-- The -encoding argument for the Java compiler. -->
+          <encoding>UTF-8</encoding> <!-- The -encoding argument for the Java compiler. -->
         </configuration>
       </plugin>
 
@@ -1139,7 +1139,7 @@
             <!-- The maximum Java heap size to be used to run javadoc. -->
           <maxmemory>512M</maxmemory>
             <!-- Specifies the encoding name of the source files.-->
-          <encoding>ISO-8859-1</encoding>
+          <encoding>UTF-8</encoding>
             <!-- Whether to build an aggregated report at the root.-->
           <aggregate>true</aggregate>
           

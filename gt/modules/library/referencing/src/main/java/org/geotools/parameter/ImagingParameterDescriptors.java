@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -237,7 +237,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
 
     /**
      * Constructs a parameter descriptor wrapping the specified JAI descriptor.
-     * If {@code operation} is non-null, then {@code descriptor} should be derived from it.
+     * If {@code operation} is non-null, then {@code descriptor}Â should be derived from it.
      * This constructor is private in order to ensure this condition.
      */
     private ImagingParameterDescriptors(final Map properties,

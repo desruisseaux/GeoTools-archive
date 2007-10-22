@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   (C) 2000, Frank Warmerdam
  *   (C) 1999, Fisheries and Oceans Canada
  *
@@ -97,10 +97,10 @@ import org.geotools.resources.i18n.VocabularyKeys;
  *
  * If a {@link Stereographic.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} parameter is
  * supplied and is not consistent with the projection classification (for example a latitude
- * different from &plusmn;90° for the polar case), then the oblique or polar case will be
+ * different from &plusmn;90Â° for the polar case), then the oblique or polar case will be
  * automatically inferred from the latitude. In other words, the latitude of origin has
- * precedence on the projection classification. If ommited, then the default value is 90°N
- * for {@code "Polar_Stereographic"} and 0° for {@code "Oblique_Stereographic"}.
+ * precedence on the projection classification. If ommited, then the default value is 90Â°N
+ * for {@code "Polar_Stereographic"} and 0Â° for {@code "Oblique_Stereographic"}.
  * <p>
  *
  * Polar projections that use the series equations for the inverse calculation will
@@ -117,7 +117,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * scale factor. The {@code "Polar Stereographic (variant A)"} receives its
  * {@code "latitude_of_origin"} parameter value from the hemisphere of the
  * {@link StereographicPole.Provider#LATITUDE_OF_ORIGIN "latitude_of_origin"} value
- * (i.e. the value is forced to &plusmn;90°).
+ * (i.e. the value is forced to &plusmn;90Â°).
  * <p>
  *
  * <strong>References:</strong><ul>
@@ -144,7 +144,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @since 2.1
  * @source $URL$
  * @version $Id$
- * @author André Gosselin
+ * @author AndrÃ© Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */

@@ -918,7 +918,7 @@ public final class CRS {
      * have the same number of dimensions than the original envelope.
      * <p>
      * Note that this method can not handle the case where the envelope contains the North or
-     * South pole, or when it cross the &plusmn;180° longitude, because {@linkplain MathTransform
+     * South pole, or when it cross the &plusmn;180Â° longitude, because {@linkplain MathTransform
      * math transforms} do not carry suffisient informations. For a more robust envelope
      * transformation, use {@link #transform(CoordinateOperation, Envelope)} instead.
      *
@@ -1024,7 +1024,7 @@ public final class CRS {
      * same number of dimensions than the original envelope.
      * <p>
      * This method can handle the case where the envelope contains the North or South pole,
-     * or when it cross the &plusmn;180° longitude.
+     * or when it cross the &plusmn;180Â° longitude.
      *
      * @param  operation The operation to use. Source and target dimension must be 2.
      * @param  envelope Envelope to transform, or {@code null}. This envelope will not be modified.
@@ -1072,9 +1072,9 @@ public final class CRS {
          * 1) Inspect the target axis, looking if there is any bounds. If bounds are found, get
          *    the coordinates of singularity points and project them from target to source CRS.
          *
-         *    Example: if the transformed envelope above is (80°S to 85°S, 10°W to 50°W), and if
+         *    Example: if the transformed envelope above is (80Â°S to 85Â°S, 10Â°W to 50Â°W), and if
          *             target axis inspection reveal us that the latitude in target CRS is bounded
-         *             at 90°S, then project (90°S,30°W) to source CRS. Note that the longitude is
+         *             at 90Â°S, then project (90Â°S,30Â°W) to source CRS. Note that the longitude is
          *             set to the the center of the envelope longitude range (more on this later).
          *
          * 2) If the singularity point computed above is inside the source envelope, add that
@@ -1084,11 +1084,11 @@ public final class CRS {
          * points, or the (-180, centerY), (180, centerY), (centerX, -90), (centerX, 90) points
          * where (centerX, centerY) are transformed from the source envelope center. It make
          * no difference for polar projections because the longitude is irrelevant at pole, but
-         * may make a difference for the 180° longitude bounds.  Consider a Mercator projection
-         * where the transformed envelope is between 20°N and 40°N. If we try to project (-180,90),
+         * may make a difference for the 180Â° longitude bounds.  Consider a Mercator projection
+         * where the transformed envelope is between 20Â°N and 40Â°N. If we try to project (-180,90),
          * we will get a TransformException because the Mercator projection is not supported at
          * pole. If we try to project (-180, 30) instead, we will get a valid point. If this point
-         * is inside the source envelope because the later overlaps the 180° longitude, then the
+         * is inside the source envelope because the later overlaps the 180Â° longitude, then the
          * transformed envelope will be expanded to the full (-180 to 180) range. This is quite
          * large, but at least it is correct (while the envelope without expansion is not).
          */
@@ -1171,7 +1171,7 @@ public final class CRS {
      * <pre>transform(transform, new GeneralEnvelope(envelope)).toRectangle2D()</pre>
      * <p>
      * Note that this method can not handle the case where the rectangle contains the North or
-     * South pole, or when it cross the &plusmn;180° longitude, because {@linkplain MathTransform
+     * South pole, or when it cross the &plusmn;180Â° longitude, because {@linkplain MathTransform
      * math transforms} do not carry suffisient informations. For a more robust rectangle
      * transformation, use {@link #transform(CoordinateOperation, Rectangle2D, Rectangle2D)}
      * instead.
@@ -1258,7 +1258,7 @@ public final class CRS {
      * <pre>transform(operation, new GeneralEnvelope(envelope)).toRectangle2D()</pre>
      * <p>
      * This method can handle the case where the rectangle contains the North or South pole,
-     * or when it cross the &plusmn;180° longitude.
+     * or when it cross the &plusmn;180Â° longitude.
      *
      * @param  operation The operation to use. Source and target dimension must be 2.
      * @param  envelope The rectangle to transform (may be {@code null}).
@@ -1352,7 +1352,7 @@ public final class CRS {
      * Prints to the {@linkplain System#out standard output stream} some information about
      * {@linkplain CoordinateReferenceSystem coordinate reference systems} specified by their
      * authority codes. This method can be invoked from the command line in order to test the
-     * {@linkplain #getAuthorityFactory authority factory} content for some specific CRS.
+     * {@linkplain #getAuthorityFactory authority factory}Â content for some specific CRS.
      * <p>
      * By default, this method prints all enumerated objects as <cite>Well Known Text</cite>.
      * However this method can prints different kind of information if an option such as

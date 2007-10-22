@@ -81,7 +81,7 @@ public class ReprojectionTest extends TestCase {
 
 		// build projected envelope to work with (small one around the area of
 		// validity of utm zone 1, which being a Gauss projection is a vertical 
-		// slice parallel to the central meridian, -177°)
+		// slice parallel to the central meridian, -177Â°)
 		ReferencedEnvelope reWgs = new ReferencedEnvelope(new Envelope(-180,
 				-170, 20, 40), DefaultGeographicCRS.WGS84);
 		CoordinateReferenceSystem utm1N = CRS.decode("EPSG:32601");

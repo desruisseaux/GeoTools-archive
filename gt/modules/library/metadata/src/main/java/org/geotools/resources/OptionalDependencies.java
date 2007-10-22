@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ public final class OptionalDependencies {
     private static boolean noNamedTreeNode = false;
 
     /**
-     * Interdit la création d'objets de cette classe.
+     * Interdit la crÃ©ation d'objets de cette classe.
      */
     private OptionalDependencies() {
     }
@@ -128,15 +128,15 @@ public final class OptionalDependencies {
     }
 
     /**
-     * Construit une chaîne de caractères qui contiendra le
-     * noeud spécifié ainsi que tous les noeuds enfants.
+     * Construit une chaÃ®ne de caractÃ¨res qui contiendra le
+     * noeud spÃ©cifiÃ© ainsi que tous les noeuds enfants.
      *
-     * @param model  Arborescence à écrire.
-     * @param node   Noeud de l'arborescence à écrire.
-     * @param buffer Buffer dans lequel écrire le noeud.
-     * @param level  Niveau d'indentation (à partir de 0).
-     * @param last   Indique si les niveaux précédents sont en train d'écrire leurs derniers items.
-     * @return       Le tableau {@code last}, qui peut éventuellement avoir été agrandit.
+     * @param model  Arborescence Ã  Ã©crire.
+     * @param node   Noeud de l'arborescence Ã  Ã©crire.
+     * @param buffer Buffer dans lequel Ã©crire le noeud.
+     * @param level  Niveau d'indentation (Ã  partir de 0).
+     * @param last   Indique si les niveaux prÃ©cÃ©dents sont en train d'Ã©crire leurs derniers items.
+     * @return       Le tableau {@code last}, qui peut Ã©ventuellement avoir Ã©tÃ© agrandit.
      */
     private static boolean[] toString(final TreeModel model, final Object node,
                                       final StringBuffer buffer, final int level, boolean[] last,

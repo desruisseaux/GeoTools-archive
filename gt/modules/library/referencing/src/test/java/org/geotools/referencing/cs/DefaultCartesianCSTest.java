@@ -88,7 +88,7 @@ public class DefaultCartesianCSTest extends TestCase {
             // Expected exception: colinear axis.
         }
 
-        // Legal CS rotated 45°
+        // Legal CS rotated 45Â°
         cs = create(AxisDirection.NORTH_EAST, AxisDirection.SOUTH_EAST);
 
         try {

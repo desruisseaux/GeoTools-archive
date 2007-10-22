@@ -51,7 +51,7 @@ public final class ErrorKeys {
     public static final int ANTIPODE_LATITUDES_$2 = 2;
 
     /**
-     * Azimuth {0} is out of range (±180°).
+     * Azimuth {0} is out of range (Â±180Â°).
      */
     public static final int AZIMUTH_OUT_OF_RANGE_$1 = 3;
 
@@ -461,7 +461,7 @@ public final class ErrorKeys {
     public static final int IN_$1 = 58;
 
     /**
-     * Latitude {0} is out of range (±90°).
+     * Latitude {0} is out of range (Â±90Â°).
      */
     public static final int LATITUDE_OUT_OF_RANGE_$1 = 62;
 
@@ -477,7 +477,7 @@ public final class ErrorKeys {
     public static final int LINE_TOO_SHORT_$2 = 64;
 
     /**
-     * Longitude {0} is out of range (±180°).
+     * Longitude {0} is out of range (Â±180Â°).
      */
     public static final int LONGITUDE_OUT_OF_RANGE_$1 = 65;
 

@@ -86,7 +86,7 @@ public class RingImplUnsafe extends CompositeCurveImpl implements Ring {
 	 * @see org.geotools.geometry.featgeom.complex.CompositeCurveImpl#getBoundary()
 	 */
 	public CurveBoundary getBoundary() {
-		// A Ring does not have a Boundary since it´s start and end points are equal.
+		// A Ring does not have a Boundary since itÂ´s start and end points are equal.
 		return null;
 	}
 

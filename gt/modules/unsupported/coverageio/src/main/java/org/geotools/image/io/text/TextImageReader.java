@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -192,20 +192,20 @@ public abstract class TextImageReader extends StreamImageReader {
     }
 
     /**
-     * Retourne une approximation du nombre d'octets du flot occupés par les
-     * images {@code fromImage} inclusivement jusqu'à {@code toImage}
-     * exclusivement. L'implémentation par défaut calcule cette longueur en
+     * Retourne une approximation du nombre d'octets du flot occupÃ©s par les
+     * images {@code fromImage} inclusivement jusqu'Ã  {@code toImage}
+     * exclusivement. L'implÃ©mentation par dÃ©faut calcule cette longueur en
      * supposant que toutes les images se divisent la longueur totale du flot
-     * en parts égales.
+     * en parts Ã©gales.
      *
-     * @param fromImage Index de la première image à prendre en compte.
-     * @param   toImage Index suivant celui de la dernière image à prendre en
+     * @param fromImage Index de la premiÃ¨re image Ã  prendre en compte.
+     * @param   toImage Index suivant celui de la derniÃ¨re image Ã  prendre en
      *                  compte, ou -1 pour prendre en compte toutes les images
-     *                  restantes jusqu'à la fin du flot.
-     * @return Le nombre d'octets occupés par les images spécifiés, ou -1 si
-     *         cette longueur n'a pas pu être calculée. Si le calcul précis de
-     *         cette longueur serait prohibitif, cette méthode est autorisée à
-     *         retourner une simple approximation ou même à retourner la longueur
+     *                  restantes jusqu'Ã  la fin du flot.
+     * @return Le nombre d'octets occupÃ©s par les images spÃ©cifiÃ©s, ou -1 si
+     *         cette longueur n'a pas pu Ãªtre calculÃ©e. Si le calcul prÃ©cis de
+     *         cette longueur serait prohibitif, cette mÃ©thode est autorisÃ©e Ã 
+     *         retourner une simple approximation ou mÃªme Ã  retourner la longueur
      *         totale du flot.
      * @throws IOException si une erreur est survenue lors de la lecture du flot.
      */
@@ -233,14 +233,14 @@ public abstract class TextImageReader extends StreamImageReader {
     }
 
     /**
-     * Retourne la position du flot spécifié, ou {@code -1} si cette position est
-     * inconnue. Note: la position retournée est <strong>approximative</strong>.
-     * Elle est utile pour afficher un rapport des progrès, mais sans plus.
+     * Retourne la position du flot spÃ©cifiÃ©, ou {@code -1} si cette position est
+     * inconnue. Note: la position retournÃ©e est <strong>approximative</strong>.
+     * Elle est utile pour afficher un rapport des progrÃ¨s, mais sans plus.
      *
-     * @param  reader Flot dont on veut connaître la position.
+     * @param  reader Flot dont on veut connaÃ®tre la position.
      * @return Position approximative du flot, ou {@code -1}
-     *         si cette position n'a pas pu être obtenue.
-     * @throws IOException si l'opération a échouée.
+     *         si cette position n'a pas pu Ãªtre obtenue.
+     * @throws IOException si l'opÃ©ration a Ã©chouÃ©e.
      */
     static long getStreamPosition(final Reader reader) throws IOException {
         return (reader instanceof LineReader) ? ((LineReader) reader).getPosition() : -1;

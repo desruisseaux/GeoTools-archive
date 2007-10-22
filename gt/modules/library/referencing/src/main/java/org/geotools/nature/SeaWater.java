@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *  
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -41,10 +41,10 @@ package org.geotools.nature;
  */
 public final class SeaWater {
     /*
-     * Note: Les algorithmes originaux de l'UNESCO recevait en entrés
-     *       des pressions en décibars. Les algorithmes écrites par
-     *       Bernard Pelchat recevaient en entrés des pressions en
-     *       MegaPascal. La première ligne de code des algorithmes
+     * Note: Les algorithmes originaux de l'UNESCO recevait en entrÃ©s
+     *       des pressions en dÃ©cibars. Les algorithmes Ã©crites par
+     *       Bernard Pelchat recevaient en entrÃ©s des pressions en
+     *       MegaPascal. La premiÃ¨re ligne de code des algorithmes
      *       de Bernard Pelchat multipliait donc les pressions par
      *       100, afin de les convertir en decibars.
      */
@@ -56,8 +56,8 @@ public final class SeaWater {
     public static final double STANDARD_CONDUCTIVITY=42.914;
 
     /**
-     * Coéfficients de l'équation d'état EOS-80. La densité
-     * calculée par ces coéfficients est la densité Sigma-T.
+     * CoÃ©fficients de l'Ã©quation d'Ã©tat EOS-80. La densitÃ©
+     * calculÃ©e par ces coÃ©fficients est la densitÃ© Sigma-T.
      */
     private static final double
         EOS80_A[]  = { -28.263737E+0  ,  6.793952E-2  ,  -9.095290E-3  ,  1.001685E-4  ,  -1.120083E-6  ,  6.536332E-9 },
@@ -77,8 +77,8 @@ public final class SeaWater {
         DR_35_0_0  =  28.106331;
 
     /**
-     * Coéfficients de l'équation d'état EOS-80. La densité
-     * calculée par ces coéfficients est la densité "vrai".
+     * CoÃ©fficients de l'Ã©quation d'Ã©tat EOS-80. La densitÃ©
+     * calculÃ©e par ces coÃ©fficients est la densitÃ© "vrai".
      */
     private static final double
         EOS80_At[] = {999.842594  , 6.793952E-2 , -9.095290E-3 , 1.001685E-4 , -1.120083E-6 , 6.536332E-9 },
@@ -87,7 +87,7 @@ public final class SeaWater {
         EOS80_Kt[] = { 8.50935E-5 , -6.12293E-6 , 5.2787E-8 };
 
     /**
-     * Coéfficients de l'équation de la salinité PSS-78.
+     * CoÃ©fficients de l'Ã©quation de la salinitÃ© PSS-78.
      */
     private static final double
         PSS78_A[] = { 0.0080    , -0.1692     , 25.3851      , 14.0941    , -7.0261    ,  2.7081 },
@@ -100,7 +100,7 @@ public final class SeaWater {
         PSS78_K   = 0.0162;
 
     /**
-     * Coéfficients pour les salinités élevées,
+     * CoÃ©fficients pour les salinitÃ©s Ã©levÃ©es,
      */
     private static final double
         PSS78_AR[] = {7.737,        -9.819,     8.663,      -2.625},
@@ -108,7 +108,7 @@ public final class SeaWater {
         PSS78_CR[] = {-10.01E-2,    4.82E-2,    -6.682E-4         };
 
     /**
-     * Constantes nécessaires au calcul de la chaleur spécifique.
+     * Constantes nÃ©cessaires au calcul de la chaleur spÃ©cifique.
      *
      * @see #specificHeat
      */
@@ -127,7 +127,7 @@ public final class SeaWater {
         HEAT_J    =   -1.4300E-12;
 
     /**
-     * Constantes nécessaires au calcul de la température adiabétique.
+     * Constantes nÃ©cessaires au calcul de la tempÃ©rature adiabÃ©tique.
      *
      * @see #adiabeticTemperatureGradient
      */
@@ -139,7 +139,7 @@ public final class SeaWater {
         GRAD_E[] = {-4.6206E-13 ,  1.8676E-14 , -2.1687E-16 };
 
     /**
-     * Constantes nécessaires au calcul de la profondeur.
+     * Constantes nÃ©cessaires au calcul de la profondeur.
      *
      * @see #depth
      */
@@ -147,7 +147,7 @@ public final class SeaWater {
         DEPTH_C[] = {9.72659 , -2.2512E-5 , 2.279E-10 , -1.82E-15};
 
     /**
-     * Constantes nécessaires au calcul de la vitesse du son.
+     * Constantes nÃ©cessaires au calcul de la vitesse du son.
      *
      * @see #soundVelocity
      */
@@ -166,7 +166,7 @@ public final class SeaWater {
         SOUND_D1   =  -7.9836E-6;
 
     /**
-     * Constantes nécessaires au calcul de la saturation en oxygène dissous.
+     * Constantes nÃ©cessaires au calcul de la saturation en oxygÃ¨ne dissous.
      *
      * @see #saturationO2
      */
@@ -187,9 +187,9 @@ public final class SeaWater {
      * Computes density as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78 (0 to 42)
-     * @param T Temperature ITS-68 (-2 to 40°C)
+     * @param T Temperature ITS-68 (-2 to 40Â°C)
      * @param P Pressure in decibars (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
-     * @return  Density (kg/m³).
+     * @return  Density (kg/mÂ³).
      */
     public static double density(final double S, final double T, double P) {
         P /= 10.0;
@@ -210,14 +210,14 @@ public final class SeaWater {
 
     /**
      * Computes density sigma-T as a function of salinity, temperature and pressure.
-     * Density Sigma-T is equivalent to the true density minus 1000&nbsp;kg/m³, and
+     * Density Sigma-T is equivalent to the true density minus 1000&nbsp;kg/mÂ³, and
      * has typical values around 35. This computation avoid some rouding errors
      * occuring in the true density computation.
      *
      * @param S Salinity PSS-78 (0 to 42)
-     * @param T Temperature ITS-68 (-2 to 40°C)
+     * @param T Temperature ITS-68 (-2 to 40Â°C)
      * @param P Pressure in decibars (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
-     * @return  Density Sigma-T (kg/m³).
+     * @return  Density Sigma-T (kg/mÂ³).
      */
     public static double densitySigmaT(final double S, final double T, double P) {
         P /= 10.0;
@@ -254,9 +254,9 @@ public final class SeaWater {
      * to <code>1/{@link #density density}(S,T,P)</code>.
      *
      * @param S Salinity PSS-78 (0 to 42)
-     * @param T Temperature ITS-68 (-2 to 40°C)
+     * @param T Temperature ITS-68 (-2 to 40Â°C)
      * @param P Pressure in decibars (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
-     * @return  Volume (m³/kg).
+     * @return  Volume (mÂ³/kg).
      */
     public static double volume(final double S, final double T, double P) {
         P /= 10.0;
@@ -284,13 +284,13 @@ public final class SeaWater {
      * Computes volumic anomaly as a function of salinity, temperature and pressure.
      * Volumic anomaly is defined as the sea water sample's volume minus a standard
      * sample's volume, where the standard sample is a sample of salinity 35, temperature
-     * 0°C and the same pressure. In pseudo-code, {@code volumeAnomaly} is equivalent
+     * 0Â°C and the same pressure. In pseudo-code, {@code volumeAnomaly} is equivalent
      * to <code>{@link #volume volume}(S,T,P)-{@link #volume volume}(35,0,P)</code>.
      *
      * @param S Salinity PSS-78 (0 to 42)
-     * @param T Temperature ITS-68 (-2 to 40°C)
+     * @param T Temperature ITS-68 (-2 to 40Â°C)
      * @param P Pressure in decibars (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
-     * @return  Volumic anomaly (m³/kg).
+     * @return  Volumic anomaly (mÂ³/kg).
      */
     public static double volumeAnomaly(final double S, final double T, double P) {
         P /= 10.0;
@@ -337,7 +337,7 @@ public final class SeaWater {
      *          par {@link #STANDARD_CONDUCTIVITY} if {@code C} is not a
      *          real conductivity, but instead the ratio between the sample's
      *          conductivity and the standard sample's conductivity.
-     * @param T Temperature ITS-68 (-2 to 40°C)
+     * @param T Temperature ITS-68 (-2 to 40Â°C)
      * @param P Pressure in decibars (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
      * @return  Salinity PSS-78.
      *
@@ -351,9 +351,9 @@ public final class SeaWater {
             final double S  = sal(XR, T-15.0);  // Do not use an 'assert' statement invoking 'cond'.
             if (!(S>=42)) return S; // use '!' to accept NaN
             /*
-             * Calcule la salinité pour une eau de conductivité,
-             * de température et de pression données. Cet algorithme
-             * doit être utilisé lorsque l'on s'attend à une salinité
+             * Calcule la salinitÃ© pour une eau de conductivitÃ©,
+             * de tempÃ©rature et de pression donnÃ©es. Cet algorithme
+             * doit Ãªtre utilisÃ© lorsque l'on s'attend Ã  une salinitÃ©
              * entre 42 et 50.
              */
             return 35 * C + C * (C-1) * (polynome(C,PSS78_AR) + T * (polynome(T,PSS78_AT) + C *
@@ -368,7 +368,7 @@ public final class SeaWater {
      * Computes conductivity as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78 (0 to 42)
-     * @param T Temperature ITS-68 (-2 to 40°C)
+     * @param T Temperature ITS-68 (-2 to 40Â°C)
      * @param P Pressure (0 to 10<sup>5</sup> dbar), not including atmospheric pressure.
      * @return  Conductivity in mS/cm.
      */
@@ -399,9 +399,9 @@ public final class SeaWater {
      * Computes specific heat as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78.
-     * @param T Temperature (°C).
+     * @param T Temperature (Â°C).
      * @param P Pressure (dbar), not including atmospheric pressure.
-     * @return  Specific heat (J/(kg&times;°C)).
+     * @return  Specific heat (J/(kg&times;Â°C)).
      */
     public static double specificHeat(final double S, final double T, double P) {
         P /= 10.0;
@@ -417,7 +417,7 @@ public final class SeaWater {
      *
      * @param S Salinity PSS-78.
      * @param P Pressure (dbar), not including atmospheric pressure.
-     * @return  Melting point (°C).
+     * @return  Melting point (Â°C).
      */
     public static double fusionTemperature(final double S, final double P) {
         return (-0.0575 + 1.710523E-3*Math.sqrt(S) + -2.154996E-4*S)*S + -7.53E-4*P;
@@ -427,9 +427,9 @@ public final class SeaWater {
      * Computes adiabetic temperature gradient as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78.
-     * @param T Temperature (°C).
+     * @param T Temperature (Â°C).
      * @param P Pressure (dbar), not including atmospheric pressure.
-     * @return  Adiabetic temperature gradient (°C/dbar).
+     * @return  Adiabetic temperature gradient (Â°C/dbar).
      */
     public static double adiabeticTemperatureGradient(double S, final double T, final double P) {
         S -= 35.0;
@@ -441,7 +441,7 @@ public final class SeaWater {
      * Computes depth as a function of pressure and latitude.
      *
      * @param  P Pressure (dbar), not including atmospheric pressure.
-     * @param  lat Latitude in degrees (-90 to 90°)
+     * @param  lat Latitude in degrees (-90 to 90Â°)
      * @return Depth (m).
      */
     public static double depth(final double P, double lat) {
@@ -455,7 +455,7 @@ public final class SeaWater {
      * Computes sound velocity as a function of salinity, temperature and pressure.
      *
      * @param S Salinity PSS-78.
-     * @param T Temperature (°C).
+     * @param T Temperature (Â°C).
      * @param P Pressure (dbar), not including atmospheric pressure.
      * @return  Sound velocity (m/s).
      */
@@ -480,8 +480,8 @@ public final class SeaWater {
      * Computes saturation in disolved oxygen as a function of salinity and temperature.
      *
      * @param S Salinity PSS-78.
-     * @param T Temperature (°C).
-     * @return  Saturation in disolved oxygen (µmol/kg).
+     * @param T Temperature (Â°C).
+     * @return  Saturation in disolved oxygen (Âµmol/kg).
      */
     public static double saturationO2(final double S, double T) {
         T += 273.15;
@@ -489,20 +489,20 @@ public final class SeaWater {
     }
 
     /**
-     * Calcule la valeur d'un polynôme.
+     * Calcule la valeur d'un polynÃ´me.
      * Cette fonction calcule la valeur de:
      *
      * <blockquote><pre>
-     *    y = C[0] + C[1]*x + C[2]*x² + C[3]*x³
+     *    y = C[0] + C[1]*x + C[2]*xÂ² + C[3]*xÂ³
      * </pre></blockquote>
      *
-     * où C est un vecteur de coéfficients transmis en argument.
-     * Une exception sera levée si ce tableau ne contient pas
-     * au moins 1 élément.
+     * oÃ¹ C est un vecteur de coÃ©fficients transmis en argument.
+     * Une exception sera levÃ©e si ce tableau ne contient pas
+     * au moins 1 Ã©lÃ©ment.
      *
-     * @param x Valeur x à laquelle calculer le polynôme.
-     * @param c Coéfficients C du polynôme.
-     * @return  La valeur du polynôme au x spécifié.
+     * @param x Valeur x Ã  laquelle calculer le polynÃ´me.
+     * @param c CoÃ©fficients C du polynÃ´me.
+     * @return  La valeur du polynÃ´me au x spÃ©cifiÃ©.
      *
      * @see #poly_inv(double,double[])
      */
@@ -519,16 +519,16 @@ public final class SeaWater {
      * Calcule la valeur de:
      *
      * <blockquote><pre>
-     *    y = C[0] + C[1]/x + C[2]/x² + C[3]/x³
+     *    y = C[0] + C[1]/x + C[2]/xÂ² + C[3]/xÂ³
      * </pre></blockquote>
      *
-     * où C est un vecteur de coéfficients transmis en argument.
-     * Une exception sera levée si ce tableau ne contient pas
-     * au moins 1 élément.
+     * oÃ¹ C est un vecteur de coÃ©fficients transmis en argument.
+     * Une exception sera levÃ©e si ce tableau ne contient pas
+     * au moins 1 Ã©lÃ©ment.
      *
-     * @param x Valeur x à laquelle calculer le polynôme.
-     * @param C Coéfficients C du polynôme.
-     * @return  La valeur du polynôme au x spécifié.
+     * @param x Valeur x Ã  laquelle calculer le polynÃ´me.
+     * @param C CoÃ©fficients C du polynÃ´me.
+     * @return  La valeur du polynÃ´me au x spÃ©cifiÃ©.
      *
      * @see #polynome(double,double[])
      */

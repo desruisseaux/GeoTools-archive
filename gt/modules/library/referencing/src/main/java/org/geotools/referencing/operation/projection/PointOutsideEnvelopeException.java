@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ package org.geotools.referencing.operation.projection;
 
 /**
  * Thrown by {@link MapProjection} when a map projection failed because the point is
- * outside the envelope of validity. Bounds are usually 90°S to 90°N and 180°W to 180°E.
+ * outside the envelope of validity. Bounds are usually 90Â°S to 90Â°N and 180Â°W to 180Â°E.
  *
  * @since 2.0
  * @source $URL$

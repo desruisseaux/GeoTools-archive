@@ -200,7 +200,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
              * for the same name.   Strictly speaking, this synchronization is not suffisient since
              * it doesn't apply to the creation of axis directions from outside this class.  But it
              * okay if this code is the only place where we create axis directions with name of the
-             * kind "South among 90°E". This assumption holds for Geotools implementation.
+             * kind "South among 90Â°E". This assumption holds for Geotools implementation.
              */
             direction = findDirection(name);
             if (direction == null) {
@@ -212,12 +212,12 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
 
     /**
      * Returns the arithmetic (counterclockwise) angle from this direction to the specified
-     * direction, in decimal degrees. This method returns a value between -180° and +180°, or
+     * direction, in decimal degrees. This method returns a value between -180Â° and +180Â°, or
      * {@link Double#NaN NaN} if the {@linkplain #baseDirection base directions} don't match.
      * A positive angle denote a right-handed system.
      * <p>
      * Example: the angle from "<cite>North along 90 deg East</cite>" to
-     * "<cite>North along 0 deg</cite> is 90°.
+     * "<cite>North along 0 deg</cite> is 90Â°.
      */
     public double getAngle(final DirectionAlongMeridian other) {
         if (!baseDirection.equals(other.baseDirection)) {
@@ -225,12 +225,12 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
         }
         /*
          * We want the following pair of axis:
-         * (NORTH along 90°E, NORTH along 0°)
-         * to give a positive angle of 90°
+         * (NORTH along 90Â°E, NORTH along 0Â°)
+         * to give a positive angle of 90Â°
          */
         double angle = meridian - other.meridian;
         /*
-         * Forces to the [-180° .. +180°] range.
+         * Forces to the [-180Â° .. +180Â°] range.
          */
         if (angle < -180) {
             angle += 360;

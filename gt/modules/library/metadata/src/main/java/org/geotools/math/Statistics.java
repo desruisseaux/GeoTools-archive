@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -64,45 +64,45 @@ public class Statistics implements Cloneable, Serializable {
     private static final long serialVersionUID = -22884277805533726L;
 
     /**
-     * Valeur minimale qui aie été transmise à la méthode
+     * Valeur minimale qui aie Ã©tÃ© transmise Ã  la mÃ©thode
      * {@link #add(double)}. Lors de la construction, ce
-     * champs est initialisé à NaN.
+     * champs est initialisÃ© Ã  NaN.
      */
     private double min = Double.NaN;
 
     /**
-     * Valeur maximale qui aie été transmise à la méthode
+     * Valeur maximale qui aie Ã©tÃ© transmise Ã  la mÃ©thode
      * {@link #add(double)}. Lors de la construction, ce
-     * champs est initialisé à NaN.
+     * champs est initialisÃ© Ã  NaN.
      */
     private double max = Double.NaN;
 
     /**
-     * Somme de toutes les valeurs qui ont été transmises à
-     * la méthode {@link #add(double)}. Lors de la construction,
-     * ce champs est initialisé à 0.
+     * Somme de toutes les valeurs qui ont Ã©tÃ© transmises Ã 
+     * la mÃ©thode {@link #add(double)}. Lors de la construction,
+     * ce champs est initialisÃ© Ã  0.
      */
     private double sum = 0;
 
     /**
-     * Somme des carrés de toutes les valeurs qui ont été
-     * transmises à la méthode {@link #add(double)}. Lors
-     * de la construction, ce champs est initialisé à 0.
+     * Somme des carrÃ©s de toutes les valeurs qui ont Ã©tÃ©
+     * transmises Ã  la mÃ©thode {@link #add(double)}. Lors
+     * de la construction, ce champs est initialisÃ© Ã  0.
      */
     private double sum2 = 0;
 
     /**
-     * Nombre de données autres que NaN qui ont été transmises
-     * à la méthode {@link #add(double)}. Lors de la construction,
-     * ce champs est initialisé à 0.
+     * Nombre de donnÃ©es autres que NaN qui ont Ã©tÃ© transmises
+     * Ã  la mÃ©thode {@link #add(double)}. Lors de la construction,
+     * ce champs est initialisÃ© Ã  0.
      */
     private int n = 0;
 
     /**
-     * Nombre de données égales à NaN qui ont été transmises à
-     * la méthode {@link #add(double)}. Les NaN sont ingorés lors
-     * du calcul des statistiques, mais on les compte quand même
-     * au passage. Lors de la construction ce champs est initialisé à 0.
+     * Nombre de donnÃ©es Ã©gales Ã  NaN qui ont Ã©tÃ© transmises Ã 
+     * la mÃ©thode {@link #add(double)}. Les NaN sont ingorÃ©s lors
+     * du calcul des statistiques, mais on les compte quand mÃªme
+     * au passage. Lors de la construction ce champs est initialisÃ© Ã  0.
      */
     private int nNaN = 0;
 
@@ -178,7 +178,7 @@ public class Statistics implements Cloneable, Serializable {
      */
     public void add(final Statistics stats) {
         if (stats != null) {
-            // "if (a<b)" équivaut à "if (!isNaN(a) && a<b)".
+            // "if (a<b)" Ã©quivaut Ã  "if (!isNaN(a) && a<b)".
             if (Double.isNaN(min) || stats.min<min) min=stats.min;
             if (Double.isNaN(max) || stats.max>max) max=stats.max;
             sum2 += stats.sum2;
@@ -249,12 +249,12 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Retourne l'écart type des échantillons par rapport à la moyenne. Si les données
-     * fournies aux différentes méthodes {@code add(...)} se distribuent selon une
-     * loi normale, alors l'écart type est la distance de part et d'autre de la moyenne
-     * dans lequel se trouveraient environ 84% des données. Le tableau ci-dessous donne
-     * le pourcentage approximatif des données que l'on trouve de part et d'autre de la
-     * moyenne à des distances telles que 2 ou 3 fois l'écart-type.
+     * Retourne l'Ã©cart type des Ã©chantillons par rapport Ã  la moyenne. Si les donnÃ©es
+     * fournies aux diffÃ©rentes mÃ©thodes {@code add(...)} se distribuent selon une
+     * loi normale, alors l'Ã©cart type est la distance de part et d'autre de la moyenne
+     * dans lequel se trouveraient environ 84% des donnÃ©es. Le tableau ci-dessous donne
+     * le pourcentage approximatif des donnÃ©es que l'on trouve de part et d'autre de la
+     * moyenne Ã  des distances telles que 2 ou 3 fois l'Ã©cart-type.
      *
      * <table align=center>
      *   <tr><td>&nbsp;0.5&nbsp;</td><td>&nbsp;69.1%&nbsp;</td></tr>
@@ -264,12 +264,12 @@ public class Statistics implements Cloneable, Serializable {
      *   <tr><td>&nbsp;3.0&nbsp;</td><td>&nbsp;99.9%&nbsp;</td></tr>
      * </table>
      *
-     * @param allPopulation La valeur {@code true} indique que les données fournies
-     *        aux différentes méthodes {@code add(...)} représentent l'ensemble de
-     *        la polulation. La valeur {@code false} indique que ces données ne
-     *        représentent qu'un échantillon de la population, ce qui est généralement le
-     *        cas. Si le nombre de données est élevé, alors les valeurs {@code true}
-     *        et {@code false} donneront sensiblement les mêmes résultats.
+     * @param allPopulation La valeur {@code true} indique que les donnÃ©es fournies
+     *        aux diffÃ©rentes mÃ©thodes {@code add(...)} reprÃ©sentent l'ensemble de
+     *        la polulation. La valeur {@code false} indique que ces donnÃ©es ne
+     *        reprÃ©sentent qu'un Ã©chantillon de la population, ce qui est gÃ©nÃ©ralement le
+     *        cas. Si le nombre de donnÃ©es est Ã©levÃ©, alors les valeurs {@code true}
+     *        et {@code false} donneront sensiblement les mÃªmes rÃ©sultats.
      */
     public double standardDeviation(final boolean allPopulation) {
         return Math.sqrt((sum2 - sum*sum/n) / (allPopulation ? n : n-1));
@@ -332,7 +332,7 @@ public class Statistics implements Cloneable, Serializable {
      *     Maximum:    8.259
      *     Moyenne:    7.421
      *     RMS:        7.846
-     *     Écart-type: 6.489
+     *     Ã‰cart-type: 6.489
      * </pre></blockquote>
      *
      * If {@code tabulations} is true, then labels (e.g. "Minimum") and values

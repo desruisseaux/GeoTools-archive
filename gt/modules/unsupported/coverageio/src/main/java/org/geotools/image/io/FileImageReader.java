@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Institut de Recherche pour le Développement
+ *    (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *    (C) 2006, Geomatys
  *   
  *    This library is free software; you can redistribute it and/or

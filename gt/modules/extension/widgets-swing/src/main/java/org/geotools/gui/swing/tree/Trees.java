@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import org.geotools.resources.OptionalDependencies;
  */
 public final class Trees {
     /**
-     * Interdit la création d'objets de cette classe.
+     * Interdit la crÃ©ation d'objets de cette classe.
      */
     private Trees() {
     }
@@ -66,15 +66,15 @@ public final class Trees {
     }
 
     /**
-     * Implémentation de la recherche des chemins. Cette
-     * méthode s'appele elle-même d'une façon récursive.
+     * ImplÃ©mentation de la recherche des chemins. Cette
+     * mÃ©thode s'appele elle-mÃªme d'une faÃ§on rÃ©cursive.
      *
-     * @param  model  Modèle dans lequel rechercher le chemin.
-     * @param  value  Objet à rechercher dans
+     * @param  model  ModÃ¨le dans lequel rechercher le chemin.
+     * @param  value  Objet Ã  rechercher dans
      *                {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}.
-     * @param  path   Chemin parcouru jusqu'à maintenant.
+     * @param  path   Chemin parcouru jusqu'Ã  maintenant.
      * @param  length Longueur valide de {@code path}.
-     * @param  list   Liste dans laquelle ajouter les {@link TreePath} trouvés.
+     * @param  list   Liste dans laquelle ajouter les {@link TreePath} trouvÃ©s.
      * @return {@code path}, ou un nouveau tableau s'il a fallu l'agrandir.
      */
     private static Object[] getPathsToUserObject(final TreeModel model, final Object value,

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -358,7 +358,7 @@ public class TextMatrixImageReader extends TextImageReader {
      *     public MyCustomSpi() {
      *         {@link #names      names}      = new String[] {"myformat"};
      *         {@link #MIMETypes  MIMETypes}  = new String[] {"text/x-mytype"};
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le DÃ©veloppement";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
      *         {@link #charset    charset}    = Charset.forName("ISO-LATIN-1");
@@ -379,12 +379,12 @@ public class TextMatrixImageReader extends TextImageReader {
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * The format names for the default {@link TextMatrixImageReader} configuration.
+         * The format names for the default {@link TextMatrixImageReader}Â configuration.
          */
         private static final String[] NAMES = {"matrix"};
 
         /**
-         * The mime types for the default {@link TextMatrixImageReader} configuration.
+         * The mime types for the default {@link TextMatrixImageReader}Â configuration.
          */
         private static final String[] MIME_TYPES = {"text/x-matrix"};
 

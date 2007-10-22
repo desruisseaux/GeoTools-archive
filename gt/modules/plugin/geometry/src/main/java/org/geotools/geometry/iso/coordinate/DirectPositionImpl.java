@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -86,7 +86,7 @@ public class DirectPositionImpl implements DirectPosition, Serializable {
 		// (double Array) verwendet wurde; folglich wurde z.B. beim
 		// Envelope Min und Max Position auf die selben Koordinaten zugegriffen.
 		// this.coordinate=p.getCoordinates();
-		// Bitte um kenntnisnahme und berücksichtigung in sourcen: Arrays müssen
+		// Bitte um kenntnisnahme und berÃ¼cksichtigung in sourcen: Arrays mÃ¼ssen
 		// explizit kopiert werden, nur elementare Datentypen werden automatisch
 		// von Java neu erzeugt, alles andere sind nur Referenzen
 		// TODO Das Klonen sollte in die Factory verlagert werden
@@ -286,7 +286,7 @@ public class DirectPositionImpl implements DirectPosition, Serializable {
 	/**
 	 * Compares coodinates of DirectPosition Implementation Note: Parameter has
 	 * to be of Type DirectPosition (not DirectPositionImpl), so that the equals
-	 * method is found for DirectPosition´s and DirectPositionImpl´s
+	 * method is found for DirectPositionÂ´s and DirectPositionImplÂ´s
 	 * 
 	 * @param p
 	 *            DirectPosition

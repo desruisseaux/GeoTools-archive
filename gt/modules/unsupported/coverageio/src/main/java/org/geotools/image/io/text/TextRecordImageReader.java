@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -94,46 +94,46 @@ import org.geotools.image.io.metadata.GeographicMetadata;
  */
 public class TextRecordImageReader extends TextImageReader {
     /**
-     * Petit facteur de tolérance servant à tenir compte des erreurs d'arrondissement.
+     * Petit facteur de tolÃ©rance servant Ã  tenir compte des erreurs d'arrondissement.
      */
     private static final float EPS = 1E-5f;
 
     /**
-     * Intervalle (en nombre d'octets) entre les rapports de progrès.
+     * Intervalle (en nombre d'octets) entre les rapports de progrÃ¨s.
      */
     private static final int PROGRESS_INTERVAL = 4096;
 
     /**
      * Lorsque la lecture se fait par-dessus une image {@link BufferedReader} existante,
-     * indique s'il faut effacer la région dans laquelle sera placée l'image avant de la
+     * indique s'il faut effacer la rÃ©gion dans laquelle sera placÃ©e l'image avant de la
      * lire. La valeur {@code false} permettra de conserver les anciens pixels dans
-     * les régions ou le fichier ne définit pas de nouvelles valeurs.
+     * les rÃ©gions ou le fichier ne dÃ©finit pas de nouvelles valeurs.
      */
     private static final boolean CLEAR = true;
 
     /**
-     * Données des images, ou {@code null} si aucune lecture n'a encore été
-     * faite. Chaque élément contient les données de l'image à l'index correspondant
-     * (i.e. l'élément {@code data[0]} contient les données de l'image #0,
-     * {@code data[1]} contient les données de l'image #1, etc.). Des éléments
-     * de ce tableau peuvent être nuls si les données des images correspondantes
-     * ne sont pas retenues après chaque lecture (c'est-à-dire si
+     * DonnÃ©es des images, ou {@code null} si aucune lecture n'a encore Ã©tÃ©
+     * faite. Chaque Ã©lÃ©ment contient les donnÃ©es de l'image Ã  l'index correspondant
+     * (i.e. l'Ã©lÃ©ment {@code data[0]} contient les donnÃ©es de l'image #0,
+     * {@code data[1]} contient les donnÃ©es de l'image #1, etc.). Des Ã©lÃ©ments
+     * de ce tableau peuvent Ãªtre nuls si les donnÃ©es des images correspondantes
+     * ne sont pas retenues aprÃ¨s chaque lecture (c'est-Ã -dire si
      * <code>{@link #seekForwardOnly}==true</code>).
      */
     private RecordList[] data;
 
     /**
-     * Index de la prochaine image à lire. Cet index n'est pas nécessairement
-     * égal à la longueur du tableau {@link #data}. Il peut être aussi bien
+     * Index de la prochaine image Ã  lire. Cet index n'est pas nÃ©cessairement
+     * Ã©gal Ã  la longueur du tableau {@link #data}. Il peut Ãªtre aussi bien
      * plus petit que plus grand.
      */
     private int nextImageIndex;
 
     /**
-     * Nombre moyen de caractères par données (incluant les espaces et les codes
-     * de fin de ligne). Cette information n'est qu'à titre indicative, mais son
-     * exactitude peut aider à accelerer la lecture et rendre les rapport des
-     * progrès plus précis. Elle sera automatiquement mise à jour en fonction
+     * Nombre moyen de caractÃ¨res par donnÃ©es (incluant les espaces et les codes
+     * de fin de ligne). Cette information n'est qu'Ã  titre indicative, mais son
+     * exactitude peut aider Ã  accelerer la lecture et rendre les rapport des
+     * progrÃ¨s plus prÃ©cis. Elle sera automatiquement mise Ã  jour en fonction
      * des lignes lues.
      */
     private float expectedDatumLength = 10.4f;
@@ -203,18 +203,18 @@ public class TextRecordImageReader extends TextImageReader {
     }
 
     /**
-     * Retourne le numéro de colonne dans laquelle se trouvent les données de la
-     * bande spécifiée. L'implémentation par défaut retourne {@code band}+1
-     * ou 2 si la bande est plus grand ou égal à {@link #getColumnX} et/ou
-     * {@link #getColumnY}. Cette implémentation devrait convenir pour des données
-     * se trouvant aussi bien avant qu'après les colonnes <var>x</var>
-     * et <var>y</var>, même si ces dernières ne sont pas consécutives.
+     * Retourne le numÃ©ro de colonne dans laquelle se trouvent les donnÃ©es de la
+     * bande spÃ©cifiÃ©e. L'implÃ©mentation par dÃ©faut retourne {@code band}+1
+     * ou 2 si la bande est plus grand ou Ã©gal Ã  {@link #getColumnX} et/ou
+     * {@link #getColumnY}. Cette implÃ©mentation devrait convenir pour des donnÃ©es
+     * se trouvant aussi bien avant qu'aprÃ¨s les colonnes <var>x</var>
+     * et <var>y</var>, mÃªme si ces derniÃ¨res ne sont pas consÃ©cutives.
      *
-     * @param  imageIndex Index de l'image à lire.
-     * @param  band Bande de l'image à lire.
-     * @return Numéro de colonne des données de l'image.
-     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
+     * @param  imageIndex Index de l'image Ã  lire.
+     * @param  band Bande de l'image Ã  lire.
+     * @return NumÃ©ro de colonne des donnÃ©es de l'image.
+     * @throws IOException si l'opÃ©ration nÃ©cessitait une lecture du fichier (par exemple
+     *         des informations inscrites dans un en-tÃªte) et que cette lecture a Ã©chouÃ©e.
      */
     private int getColumn(final int imageIndex, int band) throws IOException {
         final int xColumn = getCheckedColumnX(imageIndex);
@@ -322,9 +322,9 @@ public class TextRecordImageReader extends TextImageReader {
     /**
      * Rounds the specified values. This method is invoked automatically by the {@link #read read}
      * method while reading an image. It provides a place where to fix rounding errors in latitude
-     * and longitude coordinates. For example if longitudes have a step 1/6° but are written with
+     * and longitude coordinates. For example if longitudes have a step 1/6Â° but are written with
      * only 3 decimal digits, then we get {@linkplain #getColumnX x} values like {@code 10.000},
-     * {@code 10.167}, {@code 10.333}, <cite>etc.</cite>, which can leads to an error of 0.001°
+     * {@code 10.167}, {@code 10.333}, <cite>etc.</cite>, which can leads to an error of 0.001Â°
      * in longitude. This error may cause {@code TextRecordImageReader} to fails validation tests
      * and throws an {@link javax.imageio.IIOException}: "<cite>Points dont seem to be distributed
      * on a regular grid</cite>". A work around is to multiply the <var>x</var> and <var>y</var>
@@ -338,17 +338,17 @@ public class TextRecordImageReader extends TextImageReader {
     }
 
     /**
-     * Retourne les données de l'image à l'index spécifié. Si cette image avait déjà été lue, ses
-     * données seront retournées immédiatement.  Sinon, cette image sera lue ainsi que toutes les
-     * images qui précèdent {@code imageIndex} et qui n'avaient pas encore été lues. Que ces
-     * images précédentes soient mémorisées ou oubliées dépend de {@link #seekForwardOnly}.
+     * Retourne les donnÃ©es de l'image Ã  l'index spÃ©cifiÃ©. Si cette image avait dÃ©jÃ  Ã©tÃ© lue, ses
+     * donnÃ©es seront retournÃ©es immÃ©diatement.  Sinon, cette image sera lue ainsi que toutes les
+     * images qui prÃ©cÃ¨dent {@code imageIndex} et qui n'avaient pas encore Ã©tÃ© lues. Que ces
+     * images prÃ©cÃ©dentes soient mÃ©morisÃ©es ou oubliÃ©es dÃ©pend de {@link #seekForwardOnly}.
      *
-     * @param  imageIndex Index de l'image à lire.
-     * @return Les données de l'image. Cette méthode ne retourne jamais {@code null}.
+     * @param  imageIndex Index de l'image Ã  lire.
+     * @return Les donnÃ©es de l'image. Cette mÃ©thode ne retourne jamais {@code null}.
      * @throws IOException si une erreur est survenue lors de la lecture du flot,
-     *         ou si des nombres n'étaient pas correctement formatés dans le flot.
-     * @throws IndexOutOfBoundsException si l'index spécifié est en dehors des
-     *         limites permises ou si aucune image n'a été conservée à cet index.
+     *         ou si des nombres n'Ã©taient pas correctement formatÃ©s dans le flot.
+     * @throws IndexOutOfBoundsException si l'index spÃ©cifiÃ© est en dehors des
+     *         limites permises ou si aucune image n'a Ã©tÃ© conservÃ©e Ã  cet index.
      */
     private RecordList getRecords(final int imageIndex) throws IOException {
         clearAbortRequest();
@@ -361,9 +361,9 @@ public class TextRecordImageReader extends TextImageReader {
             long   nextProgressPosition = (origine>=0 && length>0) ? 0 : Long.MAX_VALUE;
             for (; nextImageIndex<=imageIndex; nextImageIndex++) {
                 /*
-                 * Réduit la consommation de mémoire des images précédentes. On ne réduit
+                 * RÃ©duit la consommation de mÃ©moire des images prÃ©cÃ©dentes. On ne rÃ©duit
                  * pas celle de l'image courante,  puisque la plupart du temps le tableau
-                 * sera bientôt détruit de toute façon.
+                 * sera bientÃ´t dÃ©truit de toute faÃ§on.
                  */
                 if (seekForwardOnly) {
                     minIndex=nextImageIndex;
@@ -379,9 +379,9 @@ public class TextRecordImageReader extends TextImageReader {
                     }
                 }
                 /*
-                 * Procède à la lecture de chacune des lignes de données. Que ces lignes
-                 * soient mémorisées ou pas dépend de l'image que l'on est en train de
-                 * décoder ainsi que de la valeur de {@link #seekForwardOnly}.
+                 * ProcÃ¨de Ã  la lecture de chacune des lignes de donnÃ©es. Que ces lignes
+                 * soient mÃ©morisÃ©es ou pas dÃ©pend de l'image que l'on est en train de
+                 * dÃ©coder ainsi que de la valeur de {@link #seekForwardOnly}.
                  */
                 double[]    values = null;
                 RecordList records = null;
@@ -425,9 +425,9 @@ public class TextRecordImageReader extends TextImageReader {
                     throw new IIOException(getPositionString(exception.getLocalizedMessage()), exception);
                 }
                 /*
-                 * Après la lecture d'une image, vérifie s'il y avait un nombre suffisant de lignes.
-                 * Une exception sera lancée si l'image ne contenait pas au moins deux lignes. On
-                 * ajustera ensuite le nombre moyens de caractères par données.
+                 * AprÃ¨s la lecture d'une image, vÃ©rifie s'il y avait un nombre suffisant de lignes.
+                 * Une exception sera lancÃ©e si l'image ne contenait pas au moins deux lignes. On
+                 * ajustera ensuite le nombre moyens de caractÃ¨res par donnÃ©es.
                  */
                 if (records != null) {
                     final int lineCount = records.getLineCount();
@@ -448,9 +448,9 @@ public class TextRecordImageReader extends TextImageReader {
             processImageComplete();
         }
         /*
-         * Une fois les lectures terminées, retourne les données de l'image
-         * demandée. Une exception sera lancée si ces données n'ont pas été
-         * conservées.
+         * Une fois les lectures terminÃ©es, retourne les donnÃ©es de l'image
+         * demandÃ©e. Une exception sera lancÃ©e si ces donnÃ©es n'ont pas Ã©tÃ©
+         * conservÃ©es.
          */
         if (data != null && imageIndex < data.length) {
             final RecordList records = data[imageIndex];
@@ -563,9 +563,9 @@ public class TextRecordImageReader extends TextImageReader {
         }
         for (int i=0; i<dataCount; i+=columnCount) {
             /*
-             * On convertit maintenant la coordonnée (x,y) logique en coordonnée pixel. Cette
-             * coordonnée pixel se réfère à l'image "source";  elle ne se réfère pas encore à
-             * l'image destination. Elle doit obligatoirement être entière. Plus loin, nous
+             * On convertit maintenant la coordonnÃ©e (x,y) logique en coordonnÃ©e pixel. Cette
+             * coordonnÃ©e pixel se rÃ©fÃ¨re Ã  l'image "source";  elle ne se rÃ©fÃ¨re pas encore Ã 
+             * l'image destination. Elle doit obligatoirement Ãªtre entiÃ¨re. Plus loin, nous
              * tiendrons compte du "subsampling".
              */
             final double fx = (data[i+xColumn]-xmin)*scaleX; // (fx,fy) may be NaN: Use
@@ -592,9 +592,9 @@ public class TextRecordImageReader extends TextImageReader {
     }
 
     /**
-     * Prévient qu'une coordonnée est mauvaise. Cette méthode est appelée lors de la lecture
-     * s'il a été détecté qu'une coordonnée est en dehors des limites prévues, ou qu'elle ne
-     * correspond pas à des coordonnées pixels entières.
+     * PrÃ©vient qu'une coordonnÃ©e est mauvaise. Cette mÃ©thode est appelÃ©e lors de la lecture
+     * s'il a Ã©tÃ© dÃ©tectÃ© qu'une coordonnÃ©e est en dehors des limites prÃ©vues, ou qu'elle ne
+     * correspond pas Ã  des coordonnÃ©es pixels entiÃ¨res.
      */
     private void fireBadCoordinate(final float coordinate) {
         processWarningOccurred(getPositionString(Errors.format(
@@ -602,8 +602,8 @@ public class TextRecordImageReader extends TextImageReader {
     }
 
     /**
-     * Supprime les données de toutes les images
-     * qui avait été conservées en mémoire.
+     * Supprime les donnÃ©es de toutes les images
+     * qui avait Ã©tÃ© conservÃ©es en mÃ©moire.
      */
     private void clear() {
         data                = null;
@@ -634,7 +634,7 @@ public class TextRecordImageReader extends TextImageReader {
      *     public CLSImageReaderSpi() {
      *         {@link #names      names}      = new String[] {"CLS"};
      *         {@link #MIMETypes  MIMETypes}  = new String[] {"text/x-records-CLS"};
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le DÃ©veloppement";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
      *         {@link #charset    charset}    = Charset.forName("ISO-LATIN-1");
@@ -655,12 +655,12 @@ public class TextRecordImageReader extends TextImageReader {
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * The format names for the default {@link TextRecordImageReader} configuration.
+         * The format names for the default {@link TextRecordImageReader}Â configuration.
          */
         private static final String[] NAMES = {"records"};
 
         /**
-         * The mime types for the default {@link TextRecordImageReader} configuration.
+         * The mime types for the default {@link TextRecordImageReader}Â configuration.
          */
         private static final String[] MIME_TYPES = {"text/x-records"};
 

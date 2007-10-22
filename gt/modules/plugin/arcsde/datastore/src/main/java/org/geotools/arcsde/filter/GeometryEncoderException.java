@@ -20,7 +20,7 @@ package org.geotools.arcsde.filter;
  * Indicates a client class has attempted to encode a filter not supported by
  * the GeometryEncoderSDE being used.
  *
- * @author Gabriel Rold�n
+ * @author Gabriel Roldï¿½n
  * @source $URL$
  * @version $Id$
  */

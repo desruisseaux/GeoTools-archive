@@ -551,7 +551,7 @@ public final class VocabularyKeys {
     public static final int IMAGE_SIZE = 73;
 
     /**
-     * {0} × {1} pixels × {2} bands
+     * {0} Ã— {1} pixels Ã— {2} bands
      */
     public static final int IMAGE_SIZE_$3 = 74;
 
@@ -868,7 +868,7 @@ public final class VocabularyKeys {
     public static final int PIXELS = 194;
 
     /**
-     * {0} points on a {1} × {2} grid.
+     * {0} points on a {1} Ã— {2} grid.
      */
     public static final int POINT_COUNT_IN_GRID_$3 = 130;
 
@@ -993,7 +993,7 @@ public final class VocabularyKeys {
     public static final int SIZE = 151;
 
     /**
-     * {0} × {1}
+     * {0} Ã— {1}
      */
     public static final int SIZE_$2 = 152;
 
@@ -1088,7 +1088,7 @@ public final class VocabularyKeys {
     public static final int TILE_CACHE_CAPACITY_$1 = 164;
 
     /**
-     * {0}×{1} tiles of {2} × {3} pixels
+     * {0}Ã—{1} tiles of {2} Ã— {3} pixels
      */
     public static final int TILE_SIZE_$4 = 165;
 

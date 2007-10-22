@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2003, Institut de Recherche pour le Développement
- *    (C) 1998, Pêches et Océans Canada
+ *    (C) 2003, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1998, PÃªches et OcÃ©ans Canada
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public

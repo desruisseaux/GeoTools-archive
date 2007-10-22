@@ -77,7 +77,7 @@ public class GeometryFactoryFinder {
      * <p>
      * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
      * default hints} on a case-by-case basis instead of fetching all default hints at once.
-     * But it leads to significant complication in {@link FactoryRegistry} (hints comming from
+     * But it leads to significant complication in {@link FactoryRegistry}Â (hints comming from
      * two different sources, which introduced new bugs when "longitude first axis order" hint
      * is set). In addition, it may leads to synchronization issue if many hints are modified
      * one by one. It is safer to get all default hints in one synchronized snapshot and lets

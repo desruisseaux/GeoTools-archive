@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -352,7 +352,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      * coordinate (this is {@link MouseCoordinateFormat#format(GeoMouseEvent)} business). Instead,
      * it is invoked for formatting a value at the specified event position. For example a remote
      * sensing image of <cite>Sea Surface Temperature</cite> (SST) can format the temperature in
-     * geophysical units (e.g. "12°C"). The default implementation do nothing and returns
+     * geophysical units (e.g. "12Â°C"). The default implementation do nothing and returns
      * {@code false}.
      *
      * @param  event The event.

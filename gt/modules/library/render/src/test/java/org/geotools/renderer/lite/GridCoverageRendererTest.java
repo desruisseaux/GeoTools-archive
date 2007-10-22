@@ -88,11 +88,11 @@ public class GridCoverageRendererTest extends TestCase {
 		final String path;
 		final Rectangle2D bounds;
 
-		// unit = "캜";
+		// unit = "째C";
 		path = "TestGridCoverage.tif";
 		final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 
-		// 41캳 - 5캮 ; 35캞 - 80캞 (450 x 460 pixels)
+		// 41째S - 5째N ; 35째E - 80째E (450 x 460 pixels)
 		bounds = new Rectangle2D.Double(35, -41, 45, 46);
 		final Category values = new Category("values",
 				new Color[] { Color.BLACK }, new NumberRange(0, 255),

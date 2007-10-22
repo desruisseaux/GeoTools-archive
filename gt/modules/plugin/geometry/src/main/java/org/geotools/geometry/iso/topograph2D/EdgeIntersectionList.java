@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    (C) 2001-2006  Vivid Solutions
  *    
  *    This library is free software; you can redistribute it and/or
@@ -108,7 +108,7 @@ public class EdgeIntersectionList {
 		// Iterator of the Edge Intersections
 		Iterator it = iterator();
 		// there should always be at least two entries in the list
-		// SJ TODO The EdgeIntersection are ordered, that´s making the edge
+		// SJ TODO The EdgeIntersection are ordered, thatÂ´s making the edge
 		// generation easier - but how comes? where is the list of
 		// edgeIntersections generated in ordered sequence?
 		EdgeIntersection eiPrev = (EdgeIntersection) it.next();

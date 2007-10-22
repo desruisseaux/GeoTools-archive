@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -73,7 +73,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	 * @see org.geotools.geometry.featgeom.complex.ComplexImpl#createBoundary()
 	 */
 	public Set<Complex> createBoundary() {
-		// Return null, because a point doesn´t have a boundary
+		// Return null, because a point doesnÂ´t have a boundary
 		return null;
 	}
 
@@ -112,7 +112,7 @@ public class CompositePointImpl extends CompositeImpl<PointImpl> implements Comp
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getBoundary()
 	 */
 	public Boundary getBoundary() {
-		// a point doesn´t have a boundary
+		// a point doesnÂ´t have a boundary
 		return null;
 	}
 

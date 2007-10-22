@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    (C) 2001-2006  Vivid Solutions
  *    
  *    This library is free software; you can redistribute it and/or
@@ -173,7 +173,7 @@ public class GeometryGraph extends PlanarGraph {
 			Edge e = (Edge) i.next();
 			// SJ: Will add edges of intersections points to "edgelist" -
 			// without labeling in relation to the other geometry (the labeling
-			// in relation to it´s own geometry is applied)
+			// in relation to itÂ´s own geometry is applied)
 			e.eiList.addSplitEdges(edgelist);
 		}
 	}
@@ -297,7 +297,7 @@ public class GeometryGraph extends PlanarGraph {
 	}
 	
 	/**
-	 * Adds a Ring to the graph. The direction of the ring, i.e. whether it´s
+	 * Adds a Ring to the graph. The direction of the ring, i.e. whether itÂ´s
 	 * clockwise or counter clockwise oriented, will be calculated and
 	 * considered. Thus, the direction of the ring does not matter. The left and
 	 * right topological location arguments assume that the ring is oriented CW.

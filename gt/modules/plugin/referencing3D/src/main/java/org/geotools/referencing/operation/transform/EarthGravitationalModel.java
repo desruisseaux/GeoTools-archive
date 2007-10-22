@@ -92,7 +92,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
     /** WGS 84 semi-major axis. */
     private final double semiMajor;
 
-    /** The first Eccentricity Squared (e²) for WGS 84 ellipsoid. */
+    /** The first Eccentricity Squared (eÂ²) for WGS 84 ellipsoid. */
     private final double esq;
 
     /** Even zonal coefficient. */
@@ -146,7 +146,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
              *
              *     "We next need to consider the determination of GM, GM0, W0, U0. The value of GM0
              *      will be that adopted for the updated GM of the WGS84 ellipsoid. This value is
-             *      3.986004418e+14 m³/s², which is identical to that given in the IERS Numerical
+             *      3.986004418e+14 mÂ³/sÂ², which is identical to that given in the IERS Numerical
              *      Standards [McCarthy, 1996, Table 4.1]. The best estimate of GM can be taken as
              *      the same value based on the recommendations of the IAG Special Commission SC3,
              *      Fundamental Constants [Bursa, 1995b, p. 381]."
@@ -305,7 +305,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
             throws TransformException
     {
         /*
-         * Note: no need to ensure that longitude is in [-180..+180°] range, because its value
+         * Note: no need to ensure that longitude is in [-180..+180Â°] range, because its value
          * is used only in trigonometric functions (sin / cos), which roll it as we would expect.
          * Latitude is used only in trigonometric functions as well.
          */

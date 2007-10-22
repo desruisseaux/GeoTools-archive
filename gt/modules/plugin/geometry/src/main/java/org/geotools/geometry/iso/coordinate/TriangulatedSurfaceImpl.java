@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -71,7 +71,7 @@ public class TriangulatedSurfaceImpl extends PolyhedralSurfaceImpl implements
 	 */
 	public void setTriangles(ArrayList<TriangleImpl> triangles) {
 		super.setPatches(triangles);
-		// JR eingefügt und aus den TIN Konstruktoren entfernt
+		// JR eingefÃ¼gt und aus den TIN Konstruktoren entfernt
 		for (TriangleImpl triangle : triangles) {
 			triangle.setAssociatedSurface(this);
 		}

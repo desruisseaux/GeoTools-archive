@@ -94,7 +94,7 @@ public final class XAffineTransformTest extends TestCase {
         assertEquals( f, XAffineTransform.getFlip    (tr));
         assertEquals( f, getFlipFromType             (tr));
 
-        // Tests rotation (< 45°)
+        // Tests rotation (< 45Â°)
         double r = Math.toRadians(25);
         tr.rotate(r);
         assertEquals( 1, XAffineTransform.getScaleX0 (tr), EPS);
@@ -104,7 +104,7 @@ public final class XAffineTransformTest extends TestCase {
         assertEquals( f, XAffineTransform.getFlip    (tr));
         assertEquals( f, getFlipFromType             (tr));
 
-        // Tests more rotation (> 45°)
+        // Tests more rotation (> 45Â°)
         r = Math.toRadians(65);
         tr.rotate(Math.toRadians(40));
         assertEquals( 1, XAffineTransform.getScaleX0 (tr), EPS);

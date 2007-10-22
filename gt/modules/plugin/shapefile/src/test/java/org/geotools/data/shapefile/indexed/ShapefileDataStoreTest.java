@@ -122,7 +122,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     public void testLoadDanishChars() throws Exception {
         FeatureCollection fc = loadFeatures(DANISH, null);
         SimpleFeature first = fc.features().next();
-        // Charl�tte, if you can read it with your OS charset
+        // Charlï¿½tte, if you can read it with your OS charset
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
     }
 

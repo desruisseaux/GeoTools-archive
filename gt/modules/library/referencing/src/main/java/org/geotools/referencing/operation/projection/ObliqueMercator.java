@@ -373,7 +373,7 @@ public class ObliqueMercator extends MapProjection {
             longitudeOf2ndPoint = doubleValue(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, parameters);
             ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_2ND_POINT, longitudeOf2ndPoint, true);
             /*
-             * Ensures that (phi1 != phi2), (phi1 != 0°) and (phi2 != -90°),
+             * Ensures that (phi1 != phi2), (phi1 != 0Â°) and (phi2 != -90Â°),
              * as specified in class javadoc.
              */
             ParameterDescriptor desc = null;
@@ -667,7 +667,7 @@ public class ObliqueMercator extends MapProjection {
     public static class Provider extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@link #latitudeOfCentre latitudeOfCentre}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90Â°. Default value is 0.
          */
         public static final ParameterDescriptor LATITUDE_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
@@ -685,7 +685,7 @@ public class ObliqueMercator extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@link #longitudeOfCentre longitudeOfCentre}
-         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180Â°. Default value is 0.
          */
         public static final ParameterDescriptor LONGITUDE_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
@@ -718,7 +718,7 @@ public class ObliqueMercator extends MapProjection {
         /**
          * The operation parameter descriptor for the {@link #rectifiedGridAngle
          * rectifiedGridAngle} parameter value. It is an optional parameter with
-         * valid values ranging from -360 to 360°. Default value is {@link #azimuth azimuth}.
+         * valid values ranging from -360 to 360Â°. Default value is {@link #azimuth azimuth}.
          */
         public static final ParameterDescriptor RECTIFIED_GRID_ANGLE = createOptionalDescriptor(
                 new NamedIdentifier[] {
@@ -805,7 +805,7 @@ public class ObliqueMercator extends MapProjection {
     public static class Provider_TwoPoint extends Provider {
         /**
          * The operation parameter descriptor for the {@code latitudeOf1stPoint}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90Â°. Default value is 0.
          */
         public static final ParameterDescriptor LAT_OF_1ST_POINT = createDescriptor(
                 new NamedIdentifier[] {
@@ -815,7 +815,7 @@ public class ObliqueMercator extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@code longitudeOf1stPoint}
-         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180Â°. Default value is 0.
          */
         public static final ParameterDescriptor LONG_OF_1ST_POINT = createDescriptor(
                 new NamedIdentifier[] {
@@ -825,7 +825,7 @@ public class ObliqueMercator extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@code latitudeOf2ndPoint}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90Â°. Default value is 0.
          */
         public static final ParameterDescriptor LAT_OF_2ND_POINT = createDescriptor(
                 new NamedIdentifier[] {
@@ -835,7 +835,7 @@ public class ObliqueMercator extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@code longitudeOf2ndPoint}
-         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180Â°. Default value is 0.
          */
         public static final ParameterDescriptor LONG_OF_2ND_POINT = createDescriptor(
                 new NamedIdentifier[] {

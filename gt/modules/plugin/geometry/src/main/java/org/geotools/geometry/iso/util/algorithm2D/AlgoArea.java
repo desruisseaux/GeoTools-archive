@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -64,8 +64,8 @@ public class AlgoArea {
 						 * must be equal the last
 						 */
 						// Jr hier gibt es probleme: mit teresapolygon ist
-						// p0==pStart, für HunderMalHundertQuadrat ist p0 der
-						// punkt davor. Zwischenlösung, bis das erklärt wird:
+						// p0==pStart, fÃ¼r HunderMalHundertQuadrat ist p0 der
+						// punkt davor. ZwischenlÃ¶sung, bis das erklÃ¤rt wird:
 						if (!AlgoPoint2D.equalsTol(p0, pStart)) {
 							lines.add(new Line2D.Double(p0, pStart));
 						}

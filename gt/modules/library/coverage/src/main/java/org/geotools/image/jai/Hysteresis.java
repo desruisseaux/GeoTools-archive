@@ -32,16 +32,16 @@ import javax.media.jai.iterator.RandomIterFactory;
 
 /**
  * Effectue un seuillage par hysteresis sur une image.
- * L'opération de seuillage s'effectue de la manière suivante:
+ * L'opÃ©ration de seuillage s'effectue de la maniÃ¨re suivante:
  * <p>
  * On dispose d'un seuil haut, <var>sh</var>, et d'un seuil bas, <var>sb</var>.
- * Si la valeur d'un pixel est supérieur à <var>sh</var>, on la conserve, elle
- * nous interesse. Si cette valeur est inférieure à <var>sb</var>, on la supprime.
- * Si elle est entre les deux on dit le pixel indeterminé et on ne le conserve que
+ * Si la valeur d'un pixel est supÃ©rieur Ã  <var>sh</var>, on la conserve, elle
+ * nous interesse. Si cette valeur est infÃ©rieure Ã  <var>sb</var>, on la supprime.
+ * Si elle est entre les deux on dit le pixel indeterminÃ© et on ne le conserve que
  * s'il est proche d'un pixel dont la valeur est au dessus de <var>sh</var>, ou
- * proche d'un pixel indéterminé que l'on a précédement trouvé proche d'un pixel
- * de valeur supérieure à <var>sh</var>. Cette recherche se fait de manière itérative,
- * jusqu'à ce que le point indéterminé n'est plus de voisins satisfaisants.
+ * proche d'un pixel indÃ©terminÃ© que l'on a prÃ©cÃ©dement trouvÃ© proche d'un pixel
+ * de valeur supÃ©rieure Ã  <var>sh</var>. Cette recherche se fait de maniÃ¨re itÃ©rative,
+ * jusqu'Ã  ce que le point indÃ©terminÃ© n'est plus de voisins satisfaisants.
  * 
  * @since 2.1
  * @source $URL$

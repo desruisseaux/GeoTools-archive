@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *    (C) 1999, Fisheries and Oceans Canada
  *   
  *    This library is free software; you can redistribute it and/or
@@ -36,12 +36,12 @@ public final class Longitude extends Angle {
     private static final long serialVersionUID = -8614900608052762636L;
     
     /**
-     * Minimum legal value for longitude (-180°).
+     * Minimum legal value for longitude (-180Â°).
      */
     public static final double MIN_VALUE = -180;
     
     /**
-     * Maximum legal value for longitude (+180°).
+     * Maximum legal value for longitude (+180Â°).
      */
     public static final double MAX_VALUE = +180;
     
@@ -58,7 +58,7 @@ public final class Longitude extends Angle {
      * Constructs a newly allocated {@code Longitude} object that
      * represents the longitude value represented by the string.   The
      * string should represents an angle in either fractional degrees
-     * (e.g. 45.5°) or degrees with minutes and seconds (e.g. 45°30').
+     * (e.g. 45.5Â°) or degrees with minutes and seconds (e.g. 45Â°30').
      * The hemisphere (E or W) is optional (default to East).
      *
      * @param  theta A string to be converted to a {@code Longitude}.

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -92,8 +92,8 @@ final class Spheroid extends DefaultEllipsoid {
                                                                < getSemiMajorAxis()/1E+9 : delta;
         } catch (ArithmeticException exception) {
             // The ellipsoidal model do not converge. Give up the assertion test.
-            // Note: the assertion fails for illegal latitudes (i.e. abs(y1)>90°
-            //       or abs(y2)>90°).
+            // Note: the assertion fails for illegal latitudes (i.e. abs(y1)>90Â°
+            //       or abs(y2)>90Â°).
         }
         return distance;
     }

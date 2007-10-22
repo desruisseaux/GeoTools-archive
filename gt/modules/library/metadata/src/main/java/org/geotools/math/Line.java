@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2003, Institut de Recherche pour le Développement
- *    (C) 1998, Pêches et Océans Canada
+ *    (C) 2003, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1998, PÃªches et OcÃ©ans Canada
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -205,13 +205,13 @@ public class Line implements Cloneable, Serializable {
          * We have to solve two equations with two unknows:
          *
          *   1)    mean(y)  = b + m*mean(x)
-         *   2)    mean(xy) = b*mean(x) + m*mean(x²)
+         *   2)    mean(xy) = b*mean(x) + m*mean(xÂ²)
          *
          * Those formulas lead to a quadratic equation. However,
          * the formulas become very simples if we set 'mean(x)=0'.
          * We can achieve this result by computing instead of (2):
          *
-         *   2b)   mean(dx y) = m*mean(dx²)
+         *   2b)   mean(dx y) = m*mean(dxÂ²)
          *
          * where dx=x-mean(x). In this case mean(dx)==0.
          */
@@ -235,7 +235,7 @@ public class Line implements Cloneable, Serializable {
          * Assuming that 'mean(x)==0', then the correlation
          * coefficient can be approximate by:
          *
-         * R = mean(xy) / sqrt( mean(x²) * (mean(y²) - mean(y)²) )
+         * R = mean(xy) / sqrt( mean(xÂ²) * (mean(yÂ²) - mean(y)Â²) )
          */
         slope = mean_xy/mean_x2;
         y0 = mean_y-mean_x*slope;

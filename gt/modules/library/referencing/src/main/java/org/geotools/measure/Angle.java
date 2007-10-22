@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *    (C) 1999, Fisheries and Oceans Canada
  *   
  *    This library is free software; you can redistribute it and/or
@@ -85,7 +85,7 @@ public class Angle implements Comparable, Serializable {
     /**
      * Constructs a newly allocated {@code Angle} object that represents the angle value
      * represented by the string. The string should represents an angle in either fractional
-     * degrees (e.g. 45.5°) or degrees with minutes and seconds (e.g. 45°30').
+     * degrees (e.g. 45.5Â°) or degrees with minutes and seconds (e.g. 45Â°30').
      *
      * @param  string A string to be converted to an {@code Angle}.
      * @throws NumberFormatException if the string does not contain a parsable angle.
@@ -170,7 +170,7 @@ public class Angle implements Comparable, Serializable {
                 return angleFormat;
             }
         }
-        final Format newFormat = new AngleFormat("D°MM.m'", Locale.US);
+        final Format newFormat = new AngleFormat("DÂ°MM.m'", Locale.US);
         format = new SoftReference(newFormat);
         return newFormat;
     }

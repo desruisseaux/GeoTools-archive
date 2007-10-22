@@ -350,7 +350,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *       a {@linkplain PaletteFactory#getContinuousPalette continuous palette} suitable for
      *       the range fetched at step 1. The data are assumed <cite>geophysics</cite> values
      *       rather than some packed values. Consequently, the {@linkplain SampleConverter sample
-     *       converters} will replace no-data values by {@linkplain Float#NaN NaN} with no other
+     *       converters}Â will replace no-data values by {@linkplain Float#NaN NaN} with no other
      *       changes.</p></li>
      *
      *   <li><p>Otherwise, if the {@linkplain #getRawDataType raw data type} is a unsigned integer type
@@ -772,7 +772,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *
      * @return An {@code ImageReadParam} object which may be used.
      *
-     * @todo Replace the return type by {@link GeographicImageReadParam} when we will
+     * @todo Replace the return type by {@link GeographicImageReadParam}Â when we will
      *       be allowed to compile for J2SE 1.5.
      */
     //@Override

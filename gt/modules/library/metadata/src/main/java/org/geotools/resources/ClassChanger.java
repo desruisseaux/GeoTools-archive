@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -51,12 +51,12 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     };
 
     /**
-     * Liste des classes d'objets pouvant être convertis en nombres. Cette liste
-     * contiendra par défaut quelques instances de {@link ClassChanger} pour
+     * Liste des classes d'objets pouvant Ãªtre convertis en nombres. Cette liste
+     * contiendra par dÃ©faut quelques instances de {@link ClassChanger} pour
      * quelques classes standards du Java, telle que {@link Date}. Toutefois,
-     * d'autres objets pourront être ajoutés par la suite. Cette liste est
-     * <u>ordonnée</u>. Les classe le plus hautes dans la hierarchie (les
-     * classes parentes) doivent apparaître à la fin.
+     * d'autres objets pourront Ãªtre ajoutÃ©s par la suite. Cette liste est
+     * <u>ordonnÃ©e</u>. Les classe le plus hautes dans la hierarchie (les
+     * classes parentes) doivent apparaÃ®tre Ã  la fin.
      */
     private static ClassChanger<?,?>[] list = new ClassChanger[] {
         new ClassChanger<Date,Long>(Date.class, Long.class) {
@@ -150,10 +150,10 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
         for (i=0; i<list.length; i++) {
             if (list[i].source.isAssignableFrom(converter.source)) {
                 /*
-                 * On a trouvé un convertisseur qui utilisait
+                 * On a trouvÃ© un convertisseur qui utilisait
                  * une classe parente. Le nouveau convertisseur
-                 * devra s'insérer avant son parent. Mais on va
-                 * d'abord s'assurer qu'il n'existait pas déjà
+                 * devra s'insÃ©rer avant son parent. Mais on va
+                 * d'abord s'assurer qu'il n'existait pas dÃ©jÃ 
                  * un convertisseur pour cette classe.
                  */
                 for (int j=i; j<list.length; j++) {

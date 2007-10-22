@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -134,7 +134,7 @@ public class ReferencingFactoryFinder {
      * <p>
      * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
      * default hints} on a case-by-case basis instead of fetching all default hints at once.
-     * But it leads to significant complication in {@link FactoryRegistry} (hints comming from
+     * But it leads to significant complication in {@link FactoryRegistry}Â (hints comming from
      * two different sources, which introduced new bugs when "longitude first axis order" hint
      * is set). In addition, it may leads to synchronization issue if many hints are modified
      * one by one. It is safer to get all default hints in one synchronized snapshot and lets

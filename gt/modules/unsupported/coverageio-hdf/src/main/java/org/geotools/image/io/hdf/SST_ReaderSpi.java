@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Institut de Recherche pour le Développement
+ *    (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *    (C) 2006, Geomatys
  *   
  *    This library is free software; you can redistribute it and/or
@@ -28,43 +28,43 @@ import org.geotools.image.Palette;
 
 
 /**
- * Fournisseurs de décodeur d'images HDF contenant des données de température de surface.
+ * Fournisseurs de dÃ©codeur d'images HDF contenant des donnÃ©es de tempÃ©rature de surface.
  *
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  *
- * @deprecated Ce décodeur n'est pas encore fonctionnel. La palette de couleur doit être ajustée
- *             pour les images de type "best SST" (sans indicateur de qualité, pour l'instant).
+ * @deprecated Ce dÃ©codeur n'est pas encore fonctionnel. La palette de couleur doit Ãªtre ajustÃ©e
+ *             pour les images de type "best SST" (sans indicateur de qualitÃ©, pour l'instant).
  */
 public abstract class SST_ReaderSpi extends AbstractReaderSpi {
     /**
-     * Nombre de bits utilisés pour coder la température.
+     * Nombre de bits utilisÃ©s pour coder la tempÃ©rature.
      */
     private static final int DATA_BITS_COUNT = 10;
 
     /**
-     * Nombre de bits utilisés pour coder la qualité de la mesure.
+     * Nombre de bits utilisÃ©s pour coder la qualitÃ© de la mesure.
      */
     private static final int QUALITY_BITS_COUNT = 3;
 
     /**
-     * Nom d'un dataset "température".
+     * Nom d'un dataset "tempÃ©rature".
      */
     private static final String DATASET_NAME = "sst";
 
     /**
-     * Nom d'un dataset "qualité".
+     * Nom d'un dataset "qualitÃ©".
      */
     private static final String QUALITY_DATASET_NAME = "QUAL";
 
     /**
-     * Nom de la palette de couleur pour la température.
+     * Nom de la palette de couleur pour la tempÃ©rature.
      */
     private static final String PALETTE_NAME = "SST-Nasa";
 
     /**
-     * Taille du modèle de couleurs pour la SST, sans compter les répétitions.
+     * Taille du modÃ¨le de couleurs pour la SST, sans compter les rÃ©pÃ©titions.
      */
     private static final int PALETTE_SIZE = 512;
 
@@ -82,7 +82,7 @@ public abstract class SST_ReaderSpi extends AbstractReaderSpi {
     }
 
     /**
-     * Construit un décodeur d'image HDF.
+     * Construit un dÃ©codeur d'image HDF.
      */
     public ImageReader createReaderInstance(final Object extension) throws IOException {
         final DefaultReader reader = new DefaultReader(this);
@@ -91,7 +91,7 @@ public abstract class SST_ReaderSpi extends AbstractReaderSpi {
     }
 
     /**
-     * Retourne le type d'image que créeront les décodeurs HDF.
+     * Retourne le type d'image que crÃ©eront les dÃ©codeurs HDF.
      */
     protected ImageTypeSpecifier getRawImageType() throws IOException {
         return Palette.forRepeated(PALETTE_NAME, 1 << DATA_BITS_COUNT,
@@ -99,12 +99,12 @@ public abstract class SST_ReaderSpi extends AbstractReaderSpi {
     }
 
     /**
-     * Retourne le nom du fichier de qualité à partir du nom de fichier de données spécifié.
+     * Retourne le nom du fichier de qualitÃ© Ã  partir du nom de fichier de donnÃ©es spÃ©cifiÃ©.
      */
     @Override
     protected File getQualityFile(final File input) {
         if (true) {
-            // TODO: La prise en compte de fichiers de qualité est désactivée pour l'instant.
+            // TODO: La prise en compte de fichiers de qualitÃ© est dÃ©sactivÃ©e pour l'instant.
             return super.getQualityFile(input);
         }
         final String filename  = input.getName();

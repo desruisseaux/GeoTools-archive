@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2000, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2000, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -108,7 +108,7 @@ public interface Graduation {
 
     /**
      * Returns the axis title. If {@code includeUnits} is {@code true}, then the returned string
-     * will includes units as in "Temperature (°C)", or time zone as in "Start time (UTC)". The
+     * will includes units as in "Temperature (Â°C)", or time zone as in "Start time (UTC)". The
      * exact formatting is local-dependent.
      *
      * @param  includeSymbol {@code true} to format the unit or timezone symbol after the name.

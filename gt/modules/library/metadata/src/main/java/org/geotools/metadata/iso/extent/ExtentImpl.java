@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  *
  * @since 2.1
  */
@@ -59,7 +59,7 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     private static final long serialVersionUID = 7812213837337326257L;
 
     /**
-     * A geographic extent ranging from 180°W to 180°E and 90°S to 90°N.
+     * A geographic extent ranging from 180Â°W to 180Â°E and 90Â°S to 90Â°N.
      *
      * @since 2.2
      */

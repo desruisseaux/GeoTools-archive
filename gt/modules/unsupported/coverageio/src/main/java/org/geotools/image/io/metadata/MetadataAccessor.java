@@ -793,7 +793,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * if the former failed. In such case, the warnings should be disabled for the integer parsing,
      * but not for the floating point parsing.
      *
-     * @param  enabled {@code true} for enabling warnings, or {@code false} for disabling.
+     * @param  enabled {@code true} for enabling warnings, or {@code false}Â for disabling.
      * @return The previous state before this method has been invoked.
      */
     protected boolean setWarningsEnabled(final boolean enabled) {

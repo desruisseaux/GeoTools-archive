@@ -34,7 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *expecting the definition in the spec to be a bit "nicer".  Right now
  *its just:
  *
- *<element name=�InlineFeature�>
+ *<element name=ï¿½InlineFeatureï¿½>
  *  <complexType>
  *    <sequence>
  *      <element ref="gml:_Feature"

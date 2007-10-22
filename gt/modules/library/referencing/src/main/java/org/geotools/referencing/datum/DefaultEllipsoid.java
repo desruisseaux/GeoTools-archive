@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -338,7 +338,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     /**
      * The ratio of the distance between the center and a focus of the ellipse
      * to the length of its semimajor axis. The eccentricity can alternately be
-     * computed from the equation: <code>e=sqrt(2f-f²)</code>.
+     * computed from the equation: <code>e=sqrt(2f-fÂ²)</code>.
      */
     public double getEccentricity() {
         final double f = 1-getSemiMinorAxis()/getSemiMajorAxis();

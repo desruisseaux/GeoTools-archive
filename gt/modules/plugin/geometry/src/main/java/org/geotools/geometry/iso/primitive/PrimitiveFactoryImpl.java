@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -285,7 +285,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		// test OK
 		for (OrientableCurve orientableCurve : orientableCurves) {
 			// Comment by Sanjay
-			// TODO JR: Zur Kenntnisnahme und Berücksichtigung in Sourcen: Für
+			// TODO JR: Zur Kenntnisnahme und BerÃ¼cksichtigung in Sourcen: FÃ¼r
 			// alle
 			// Primitives gilt, dass getDimension die Dimension des Objektes,
 			// und getCoordinateDimension die Dimension des Koordinatensystems,
@@ -560,7 +560,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 	public Ring createRingByDirectPositions(List<DirectPosition> directPositions) {
 		// Test ok
 
-		// Create List of OrientableCurve´s (Curve´s)
+		// Create List of OrientableCurveÂ´s (CurveÂ´s)
 		OrientableCurve curve = this
 				.createCurveByDirectPositions(directPositions);
 		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
@@ -577,7 +577,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 	 */
 	public Ring createRingByPositions(List<Position> aPositions) {
 
-		// Create List of OrientableCurve´s (Curve´s)
+		// Create List of OrientableCurveÂ´s (CurveÂ´s)
 		OrientableCurve curve = this.createCurveByPositions(aPositions);
 		List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
 		orientableCurves.add(curve);
@@ -599,12 +599,12 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		// GeometryFactoryImpl coordFactory =
 		// this.geometryFactory.getGeometryFactoryImpl();
 
-		// Create List of Position´s
+		// Create List of PositionÂ´s
 		List<Position> positionList = createPositions(aDirectPositions);
 		// List<Position> positionList =
 		// coordFactory.createPositions(aDirectPositions);
 
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
 				positionList), 0.0);
 		// LineStringImpl lineString =
@@ -612,7 +612,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
 		
-		// Create List of OrientableCurve´s (Curve´s)
+		// Create List of OrientableCurveÂ´s (CurveÂ´s)
 		return this.createCurve(segments);
 	}
 
@@ -643,7 +643,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		// GeometryFactoryImpl coordFactory =
 		// this.geometryFactory.getGeometryFactoryImpl();
 
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
 				aPositions), 0.0);
 		// LineStringImpl lineString =
@@ -651,7 +651,7 @@ public class PrimitiveFactoryImpl implements Serializable, Factory, PrimitiveFac
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
 
-		// Create List of OrientableCurve´s (Curve´s)
+		// Create List of OrientableCurveÂ´s (CurveÂ´s)
 		return this.createCurve(segments);
 	}
 

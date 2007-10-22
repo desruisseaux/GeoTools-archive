@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -230,7 +230,7 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 		// GM_Triangle[] triangles = dTr.getTriangles();
 
 		/* Set Triangles for Triangulated Surface (Super class) */
-		// JR: SJ, ich habe das übeprüft, es fast alles richtig, nur
+		// JR: SJ, ich habe das Ã¼beprÃ¼ft, es fast alles richtig, nur
 		// this.setBoundary(new GM_SurfaceBoundary(patch)) hat Fehler.
 		// Man muss aus allen Dreiecken die Boundary ermitteln
 		// GM_TriangulatedSurface:setTriangles(GM_Triangle[] triangles)
@@ -240,7 +240,7 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 		// ArrayList<GM_Triangle>(triangles.length);
 		// for (GM_Triangle tri : tris) tris.add(tri);
 		// super.setTriangles(tris,null);
-		// JR gelöscht: erledigt in setTriangles.
+		// JR gelÃ¶scht: erledigt in setTriangles.
 		// /* Set this TIN as Associated Surface for each Surface Patch
 		// (=Triangle) */
 		// for (int i=0; i<triangles.length; i++) {
@@ -270,7 +270,7 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 	}
 
 	/**
-	 * Returns an Array of the surface patches as GM_Triangle´s
+	 * Returns an Array of the surface patches as GM_TriangleÂ´s
 	 * 
 	 * @return ArrayList<TriangleImpl>
 	 */

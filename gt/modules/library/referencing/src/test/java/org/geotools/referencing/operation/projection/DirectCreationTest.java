@@ -545,7 +545,7 @@ public final class DirectCreationTest extends TestCase {
         if (VERBOSE) {
             System.out.println(transform);
         }
-        doTransform(new DirectPosition2D(-121.33955, 39.1012523), // 121°20'22.38"W 39°6'4.508"N
+        doTransform(new DirectPosition2D(-121.33955, 39.1012523), // 121Â°20'22.38"W 39Â°6'4.508"N
                     new DirectPosition2D(-2529570, -5341800), transform);
 
         //

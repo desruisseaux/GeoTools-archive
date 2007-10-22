@@ -39,7 +39,7 @@ import org.opengis.filter.expression.Expression;
 
 
 /** cette classe s'apparente a un JSpinner.
- * Elle est parfaitement adaptée pour gérer un interval de nombre entier.
+ * Elle est parfaitement adaptÃ©e pour gÃ©rer un interval de nombre entier.
  * @author Johann Sorel
  *
  */

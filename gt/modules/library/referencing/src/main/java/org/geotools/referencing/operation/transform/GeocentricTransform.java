@@ -3,7 +3,7 @@
  *    http://geotools.org
  *   
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -99,12 +99,12 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     private final double b;
     
     /**
-     * Square of semi-major axis (<var>a</var>²).
+     * Square of semi-major axis (<var>a</var>Â²).
      */
     private final double a2;
     
     /**
-     * Square of semi-minor axis (<var>b</var>²).
+     * Square of semi-minor axis (<var>b</var>Â²).
      */
     private final double b2;
     

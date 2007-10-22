@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -117,10 +117,10 @@ public abstract class CurveSegmentImpl implements CurveSegment, Serializable {
 	 * (curve.parameterization(s) = self.parameterization(s))};
 	 * 
 	 * NOTE In this standard, curve segments do not appear except in the context
-	 * of a curve, and therefore the cardinality of the “curve” role in this
-	 * association could be “1” which would preclude the use of curve segments
+	 * of a curve, and therefore the cardinality of the Â“curveÂ” role in this
+	 * association could be Â“1Â” which would preclude the use of curve segments
 	 * except in this manner. While this would not affect this Standard, leaving
-	 * the cardinality as “0..1” allows other standards based on this one to use
+	 * the cardinality as Â“0..1Â” allows other standards based on this one to use
 	 * curve segments in a more open-ended manner.
 	 */
 	private CurveImpl curve;

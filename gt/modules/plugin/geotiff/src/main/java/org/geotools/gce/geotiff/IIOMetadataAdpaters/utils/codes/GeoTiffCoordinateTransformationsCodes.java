@@ -22,7 +22,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * Type = SHORT (code)<br>
  * Values: Section 6.3.3.3 codes<br>
  * Allows specification of the coordinate transformation method used. Note: this
- * does not include the definition of the correspondingì Geographic Coordinate
+ * does not include the definition of the correspondingÃ¬ Geographic Coordinate
  * System to which the projected CS is related; only the transformation method
  * is defined here.<br>
  * <br>

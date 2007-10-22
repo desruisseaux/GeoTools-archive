@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -921,7 +921,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * Relative tolerance value (as opposed to absolute tolerance value) help to workaround the
      * fact that tolerance value are CRS dependent. For example the tolerance value need to be
      * smaller for geographic CRS than for UTM projections, because the former typically has a
-     * range of -180 to 180° while the later can have a range of thousands of meters.
+     * range of -180 to 180Â° while the later can have a range of thousands of meters.
      * <p>
      * This method assumes that the specified envelope uses the same CRS than this envelope.
      * For performance reason, it will no be verified unless J2SE assertions are enabled.
@@ -954,7 +954,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      * Relative tolerance value (as opposed to absolute tolerance value) help to workaround the
      * fact that tolerance value are CRS dependent. For example the tolerance value need to be
      * smaller for geographic CRS than for UTM projections, because the former typically has a
-     * range of -180 to 180° while the later can have a range of thousands of meters.
+     * range of -180 to 180Â° while the later can have a range of thousands of meters.
      * <p>
      * This method assumes that the specified envelope uses the same CRS than this envelope.
      * For performance reason, it will no be verified unless J2SE assertions are enabled.

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -72,7 +72,7 @@ public final class XMath {
     }
 
     /**
-     * Compute the hypotenuse (<code>sqrt(x²+y²)</code>).
+     * Compute the hypotenuse (<code>sqrt(xÂ²+yÂ²)</code>).
      *
      * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */

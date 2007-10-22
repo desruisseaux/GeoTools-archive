@@ -70,7 +70,7 @@ public class FastFile {
         return str;
     }
 
-    /** Permet de recupérer un objet sérializé.
+    /** Permet de recupÃ©rer un objet sÃ©rializÃ©.
      * @param adresse : chemin du fichier
      * @return retourne l'objet contenu dans le fichier
      * @throws FileNotFoundException
@@ -86,7 +86,7 @@ public class FastFile {
         return o;
     }
 
-    /** Permet de recupérer la chaine equivalante dans un fichier.
+    /** Permet de recupÃ©rer la chaine equivalante dans un fichier.
      *
      * exemple de ligne dans le fichier : nom=Robert
      * FastFile.ReadValue("x.txt","nom"); retourne "Robert"
@@ -125,7 +125,7 @@ public class FastFile {
         return str;
     }
 
-    /** Permet de recupérer la chaine equivalante dans un fichier.
+    /** Permet de recupÃ©rer la chaine equivalante dans un fichier.
      *
      * exemple de ligne dans le fichier : nom=Robert
      * FastFile.ReadValue("x.txt","nom"); retourne "Robert"

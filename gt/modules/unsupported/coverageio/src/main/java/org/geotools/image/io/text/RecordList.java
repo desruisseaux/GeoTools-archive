@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -57,55 +57,55 @@ final class RecordList {
     /**
      * Valeurs minimales des colonnes, ou {@code null} si
      * ces valeurs ne sont pas encore connues.  La longueur de
-     * de ce tableau est égale à {@link #dataColumnCount}.
+     * de ce tableau est Ã©gale Ã  {@link #dataColumnCount}.
      */
     private double[] min;
     
     /**
      * Valeurs maximales des colonnes, ou {@code null} si
      * ces valeurs ne sont pas encore connues.  La longueur de
-     * de ce tableau est égale à {@link #dataColumnCount}.
+     * de ce tableau est Ã©gale Ã  {@link #dataColumnCount}.
      */
     private double[] max;
     
     /**
-     * Intervals entre les données, ou {@code null} si ces valeurs
-     * n'ont pas encore été calculées. La valeur 0 signifie que l'interval
-     * pour une colonne en particulier n'a pas encore été calculée.
+     * Intervals entre les donnÃ©es, ou {@code null} si ces valeurs
+     * n'ont pas encore Ã©tÃ© calculÃ©es. La valeur 0 signifie que l'interval
+     * pour une colonne en particulier n'a pas encore Ã©tÃ© calculÃ©e.
      */
     private float[] interval;
     
     /**
      * Tableau des valeurs lues,  ou {@code null} si les
-     * valeurs n'ont pas encore été lues. Ce tableau contient
+     * valeurs n'ont pas encore Ã©tÃ© lues. Ce tableau contient
      * une suite de lignes qui ont chacun un nombre de colonnes
-     * égal à {@link #dataColumnCount}.
+     * Ã©gal Ã  {@link #dataColumnCount}.
      */
     private float[] data;
     
     /**
      * Nombre de colonnes retenues lors de la lecture, ou -1 si ce nombre
-     * n'est pas encore connu. Ce nombre de colonnes peut être égal ou
-     * inférieur à {@code min.length} et {@code max.length}.
+     * n'est pas encore connu. Ce nombre de colonnes peut Ãªtre Ã©gal ou
+     * infÃ©rieur Ã  {@code min.length} et {@code max.length}.
      */
     private int columnCount = -1;
     
     /**
-     * Index suivant celui du dernier élément valide de {@link #data}.
-     * Ce champ sera augmenté à chaque ajout d'une nouvelle ligne. Sa
-     * valeur doit être un multiple entier de {@link #dataColumnCount}.
+     * Index suivant celui du dernier Ã©lÃ©ment valide de {@link #data}.
+     * Ce champ sera augmentÃ© Ã  chaque ajout d'une nouvelle ligne. Sa
+     * valeur doit Ãªtre un multiple entier de {@link #dataColumnCount}.
      */
     private int upper;
     
     /**
-     * Nombre de lignes attendues. Cette information n'est qu'à titre
+     * Nombre de lignes attendues. Cette information n'est qu'Ã  titre
      * indicative, mais accelerera la lecture si elle est exacte.
      */
     private int expectedLineCount = 1024;
     
     /**
      * Construit un {@code ImageData} initiallement vide.
-     * La première ligne de données lue déterminera le nombre
+     * La premiÃ¨re ligne de donnÃ©es lue dÃ©terminera le nombre
      * de colonnes qui seront retenus pour toutes les lignes
      * suivantes.
      */
@@ -115,11 +115,11 @@ final class RecordList {
     /**
      * Construit un {@code ImageData} initiallement vide.
      * Pour chaque ligne lue, seule les {@code columnCount}
-     * premières colonnes seront retenus.
+     * premiÃ¨res colonnes seront retenus.
      *
-     * @param columnCount Nombre de colonnes à retenir lors de la lecture.
+     * @param columnCount Nombre de colonnes Ã  retenir lors de la lecture.
      * @param expectedLineCount Nombre de lignes attendues. Cette information
-     *        n'est qu'à titre indicative, mais accelerera la lecture si elle
+     *        n'est qu'Ã  titre indicative, mais accelerera la lecture si elle
      *        est exacte.
      */
     public RecordList(final int columnCount, final int expectedLineCount) {
@@ -128,10 +128,10 @@ final class RecordList {
     }
     
     /**
-     * Ajoute une ligne de données.  Si la ligne est plus courte que la longueur
-     * attendues, les colonnes manquantes seront considérées comme contenant des
+     * Ajoute une ligne de donnÃ©es.  Si la ligne est plus courte que la longueur
+     * attendues, les colonnes manquantes seront considÃ©rÃ©es comme contenant des
      * {@code NaN}.   Si elle est plus longue que la longueur attendue, les
-     * colonnes en trop seront ignorées.
+     * colonnes en trop seront ignorÃ©es.
      */
     public void add(final double[] line) {
         if (data==null) {
@@ -156,9 +156,9 @@ final class RecordList {
     }
     
     /**
-     * Libère la mémoire réservée en trop. Cette méthode peut être appelée
-     * lorsqu'on a terminé de lire les données et qu'on veut les conserver
-     * en mémoire pendant encore quelque temps.
+     * LibÃ¨re la mÃ©moire rÃ©servÃ©e en trop. Cette mÃ©thode peut Ãªtre appelÃ©e
+     * lorsqu'on a terminÃ© de lire les donnÃ©es et qu'on veut les conserver
+     * en mÃ©moire pendant encore quelque temps.
      */
     public void trimToSize() {
         if (data != null) {
@@ -167,23 +167,23 @@ final class RecordList {
     }
     
     /**
-     * Retourne une référence directe vers les données mémorisées par cet objet.
+     * Retourne une rÃ©fÃ©rence directe vers les donnÃ©es mÃ©morisÃ©es par cet objet.
      * NE PAS MODIFIER CES DONNEES! Les index valides vont de 0 inclusivement
-     * jusqu'à {@link #getDataCount} exclusivement.
+     * jusqu'Ã  {@link #getDataCount} exclusivement.
      */
     final float[] getData() {
         return data;
     }
     
     /**
-     * Retourne le nombre de données qui ont été mémorisées.
+     * Retourne le nombre de donnÃ©es qui ont Ã©tÃ© mÃ©morisÃ©es.
      */
     final int getDataCount() {
         return upper;
     }
     
     /**
-     * Retourne le nombre de lignes qui ont été mémorisées.
+     * Retourne le nombre de lignes qui ont Ã©tÃ© mÃ©morisÃ©es.
      */
     public int getLineCount() {
         if (columnCount <= 0) {
@@ -202,7 +202,7 @@ final class RecordList {
     }
     
     /**
-     * Retourne la valeur minimale de la colonne spécifiée,
+     * Retourne la valeur minimale de la colonne spÃ©cifiÃ©e,
      * ou {@link Double#NaN} si cette valeur n'est pas connue.
      */
     public double getMinimum(final int column) {
@@ -210,7 +210,7 @@ final class RecordList {
     }
     
     /**
-     * Retourne la valeur maximale de la colonne spécifiée,
+     * Retourne la valeur maximale de la colonne spÃ©cifiÃ©e,
      * ou {@link Double#NaN} si cette valeur n'est pas connue.
      */
     public double getMaximum(final int column) {
@@ -218,14 +218,14 @@ final class RecordList {
     }
     
     /**
-     * Retourne l'interval entre les points de la colonne spécifiée, en supposant que les
-     * points se trouvent à un interval régulier. Si ce n'est pas le cas, une exception
-     * sera lancée.
+     * Retourne l'interval entre les points de la colonne spÃ©cifiÃ©e, en supposant que les
+     * points se trouvent Ã  un interval rÃ©gulier. Si ce n'est pas le cas, une exception
+     * sera lancÃ©e.
      *
      * @param  column Colonne dont on veut l'interval entre les points.
-     * @param  eps Petit facteur de tolérance (par exemple 1E-6).
-     * @throws IIOException si les points de la colonne spécifiée
-     *         ne sont pas distribués à un interval régulier.
+     * @param  eps Petit facteur de tolÃ©rance (par exemple 1E-6).
+     * @throws IIOException si les points de la colonne spÃ©cifiÃ©e
+     *         ne sont pas distribuÃ©s Ã  un interval rÃ©gulier.
      */
     private float getInterval(final int column, final float eps) throws IIOException {
         if (interval == null) {
@@ -239,7 +239,7 @@ final class RecordList {
         }
         /*
          * Obtient toutes les valeurs de la colonne
-         * spécifiée en ordre croissant.
+         * spÃ©cifiÃ©e en ordre croissant.
          */
         int count=0;
         final float[] array = new float[getLineCount()];
@@ -249,8 +249,8 @@ final class RecordList {
         assert count == array.length;
         Arrays.sort(array);
         /*
-         * Elimine les doublons. Lorsque des doublons seront trouvés, ils iront de
-         * {@code lower} à {@code upper} <strong>inclusivement</strong>.
+         * Elimine les doublons. Lorsque des doublons seront trouvÃ©s, ils iront de
+         * {@code lower} Ã  {@code upper} <strong>inclusivement</strong>.
          */
         int upper = count-1;
         int lower = count;
@@ -272,9 +272,9 @@ final class RecordList {
             Arrays.fill(array, count, oldCount, Float.NaN); // Par prudence.
         }
         /*
-         * Recherche le plus petit interval entre deux points. Vérifie ensuite que
+         * Recherche le plus petit interval entre deux points. VÃ©rifie ensuite que
          * l'interval entre tous les points est un multiple entier de cet interval
-         * minimal (on tient compte ainsi des éventuels données manquantes).
+         * minimal (on tient compte ainsi des Ã©ventuels donnÃ©es manquantes).
          */
         float delta = Float.POSITIVE_INFINITY;
         for (int i=1; i<count; i++) {
@@ -294,29 +294,29 @@ final class RecordList {
     }
     
     /**
-     * Retourne le nombre de points distincts dans la colonne spécifiée. Cette méthode
-     * élimine d'abord tous les doublons avant d'effectuer le comptage. Elle vérifie
-     * aussi que les points restants sont espacés à un interval régulier, et lancera
-     * une exception si ce n'est pas le cas. S'il y a des trous dans les données, il
-     * seront pris en compte comme si un point s'y était trouvé.
+     * Retourne le nombre de points distincts dans la colonne spÃ©cifiÃ©e. Cette mÃ©thode
+     * Ã©limine d'abord tous les doublons avant d'effectuer le comptage. Elle vÃ©rifie
+     * aussi que les points restants sont espacÃ©s Ã  un interval rÃ©gulier, et lancera
+     * une exception si ce n'est pas le cas. S'il y a des trous dans les donnÃ©es, il
+     * seront pris en compte comme si un point s'y Ã©tait trouvÃ©.
      *
      * @param  column Colonne dont on veut le nombre de points distincts.
-     * @param  eps Petit facteur de tolérance (par exemple 1E-6).
-     * @throws IIOException si les points de la colonne spécifiée
-     *         ne sont pas distribués à un interval régulier.
+     * @param  eps Petit facteur de tolÃ©rance (par exemple 1E-6).
+     * @throws IIOException si les points de la colonne spÃ©cifiÃ©e
+     *         ne sont pas distribuÃ©s Ã  un interval rÃ©gulier.
      */
     public int getPointCount(final int column, final float eps) throws IIOException {
         return (int)Math.round((getMaximum(column) - getMinimum(column)) / getInterval(column, eps)) +1;
     }
     
     /**
-     * Retourne un résumé des informations que contient cet objet. Le résumé contiendra
+     * Retourne un rÃ©sumÃ© des informations que contient cet objet. Le rÃ©sumÃ© contiendra
      * notamment les valeurs minimales et maximales de chaque colonnes.
      *
      * @param  xColumn Colonne des <var>x</var>, ou -1 s'il n'est pas connu.
      * @param  yColumn Colonne des <var>y</var>, ou -1 s'il n'est pas connu.
-     * @param  eps Petit facteur de tolérance (par exemple 1E-6).
-     * @return Chaîne de caractères résumant l'état des données.
+     * @param  eps Petit facteur de tolÃ©rance (par exemple 1E-6).
+     * @return ChaÃ®ne de caractÃ¨res rÃ©sumant l'Ã©tat des donnÃ©es.
      */
     public String toString(final int xColumn, final int yColumn, final float eps) {
         float xCount = Float.NaN;
@@ -336,9 +336,9 @@ final class RecordList {
     }
     
     /**
-     * Retourne une chaîne de caractères représentant cet objet.
-     * Cette chaîne indiquera le nombre de lignes et de colonnes
-     * mémorisées.
+     * Retourne une chaÃ®ne de caractÃ¨res reprÃ©sentant cet objet.
+     * Cette chaÃ®ne indiquera le nombre de lignes et de colonnes
+     * mÃ©morisÃ©es.
      */
     public String toString() {
         return Utilities.getShortClassName(this) +

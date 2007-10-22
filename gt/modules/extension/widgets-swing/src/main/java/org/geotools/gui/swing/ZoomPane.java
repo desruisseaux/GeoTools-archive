@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -114,7 +114,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <ul>
  *   <li>{@link #getArea()}, which must return a bounding box for the content to paint. This
  *       area can be expressed in arbitrary units. For example, an object wanting to display a
- *       geographic map with a content ranging from 10° to 15°E and 40° to 45°N should override
+ *       geographic map with a content ranging from 10Â° to 15Â°E and 40Â° to 45Â°N should override
  *       this method as follows:
  *
  *       <pre>

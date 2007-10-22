@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -74,7 +74,7 @@ public class Merger {
 	
 	/**
 	 * Merges a set of curves into a new single curve.
-	 * This method trys all combinations of curve´s start and end points.
+	 * This method trys all combinations of curveÂ´s start and end points.
 	 * 
 	 * @param curves
 	 * @return null
@@ -134,14 +134,14 @@ public class Merger {
 		}		
 		positionList.add(curves.get(curves.size()-1).getEndPoint());
 		
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(positionList), 0.0);
 		// LineStringImpl lineString =
 		// coordFactory.createLineString(aPositions);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
 		
-		// Create List of OrientableCurve´s (Curve´s)
+		// Create List of OrientableCurveÂ´s (CurveÂ´s)
 		// test OK
 		if (segments == null)
 			throw new NullPointerException();

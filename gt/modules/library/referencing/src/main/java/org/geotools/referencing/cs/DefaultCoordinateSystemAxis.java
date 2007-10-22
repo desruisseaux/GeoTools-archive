@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -731,14 +731,14 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
                 final double range = Math.abs(fromDegrees.convert(90));
                 minimum = -range;
                 maximum = +range;
-                rangeMeaning = RangeMeaning.EXACT; // 90°N do not wraps to 90°S
+                rangeMeaning = RangeMeaning.EXACT; // 90Â°N do not wraps to 90Â°S
                 return;
             }
             if (dir.equals(AxisDirection.EAST)) {
                 final double range = Math.abs(fromDegrees.convert(180));
                 minimum = -range;
                 maximum = +range;
-                rangeMeaning = RangeMeaning.WRAPAROUND; // 180°E wraps to 180°W
+                rangeMeaning = RangeMeaning.WRAPAROUND; // 180Â°E wraps to 180Â°W
                 return;
             }
         }
@@ -1040,18 +1040,18 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
     /**
      * Returns the arithmetic (counterclockwise) angle from the first direction to the second
      * direction, in decimal <strong>degrees</strong>. This method returns a value between
-     * -180° and +180°, or {@link Double#NaN NaN} if no angle can be computed.
+     * -180Â° and +180Â°, or {@link Double#NaN NaN} if no angle can be computed.
      * <p>
      * A positive angle denotes a right-handed system, while a negative angle denotes
      * a left-handed system. Example:
      * <p>
      * <ul>
      *   <li>The angle from {@linkplain AxisDirection#EAST EAST} to
-     *       {@linkplain AxisDirection#NORTH NORTH} is 90°</li>
+     *       {@linkplain AxisDirection#NORTH NORTH} is 90Â°</li>
      *   <li>The angle from {@linkplain AxisDirection#SOUTH SOUTH} to
-     *       {@linkplain AxisDirection#WEST WEST} is -90°</li>
+     *       {@linkplain AxisDirection#WEST WEST} is -90Â°</li>
      *   <li>The angle from "<cite>North along 90 deg East</cite>" to
-     *       "<cite>North along 0 deg</cite>" is 90°.</li>
+     *       "<cite>North along 0 deg</cite>" is 90Â°.</li>
      * </ul>
      *
      * @since 2.4

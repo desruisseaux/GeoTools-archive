@@ -329,7 +329,7 @@ public class ImageWorker {
 
     /**
      * Set the <cite>region of interest</cite> (ROI). A {@code null} set the ROI to the whole
-     * {@linkplain #image}. The ROI is used by statistical m�thods like {@link #getMinimums}
+     * {@linkplain #image}. The ROI is used by statistical mï¿½thods like {@link #getMinimums}
      * and {@link #getMaximums}.
      * 
      * @return This ImageWorker

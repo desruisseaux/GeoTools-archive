@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -88,7 +88,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Constructs a {@code RangeSpecifier} initialised to the spécified range.
+     * Constructs a {@code RangeSpecifier} initialised to the spÃ©cified range.
      */
     public RangeSpecifier(final NumberRange range) {
         this.range = range;

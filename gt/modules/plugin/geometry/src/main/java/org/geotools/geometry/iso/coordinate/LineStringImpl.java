@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -430,7 +430,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
         // substituted by controlPoint.clone()
 
         /* If parameters of method are zero, return this object itself (with
-        same controlPòints) */
+        same controlPÃ²ints) */
         if (maxSpacing == 0 && maxOffset == 0)
         return this;
         
@@ -558,7 +558,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
 	        //positions.add(cf.createPosition(this.forParam(actualParam)));
         }
 
-        // /* Transform Arraylist to Array of Position´s */
+        // /* Transform Arraylist to Array of PositionÂ´s */
         // Position posArray[] = new Position[positions.size()];
         // for (int i=0; i<positions.size(); i++) {
         // posArray[i] = (Position)positions.get(i);

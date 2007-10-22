@@ -102,7 +102,7 @@ public final class SDO {
      * </ul>
      * 
      * <p>
-     * Definition provided by Oracle Spatial User�s Guide and Reference.
+     * Definition provided by Oracle Spatial Userï¿½s Guide and Reference.
      * </p>
      *
      * @param geom

@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,71 +45,71 @@ import org.opengis.util.InternationalString;
  */
 public class ProgressPrinter implements ProgressListener {
     /**
-     * Nom de l'opération en cours. Le pourcentage sera écris à la droite de ce nom.
+     * Nom de l'opÃ©ration en cours. Le pourcentage sera Ã©cris Ã  la droite de ce nom.
      */
     private String description;
 
     /**
-     * Flot utilisé pour l'écriture de l'état d'avancement d'un
-     * processus ainsi que pour les écritures des commentaires.
+     * Flot utilisÃ© pour l'Ã©criture de l'Ã©tat d'avancement d'un
+     * processus ainsi que pour les Ã©critures des commentaires.
      */
     private final PrintWriter out;
 
     /**
-     * Indique si le caractère '\r' ramène au début de la ligne courante sur
-     * ce système. On supposera que ce sera le cas si le système n'utilise
+     * Indique si le caractÃ¨re '\r' ramÃ¨ne au dÃ©but de la ligne courante sur
+     * ce systÃ¨me. On supposera que ce sera le cas si le systÃ¨me n'utilise
      * pas la paire "\r\n" pour changer de ligne (comme le system VAX-VMS).
      */
     private final boolean CR_supported;
 
     /**
      * Longueur maximale des lignes. L'espace utilisable sera un peu
-     * moindre car quelques espaces seront laissés en début de ligne.
+     * moindre car quelques espaces seront laissÃ©s en dÃ©but de ligne.
      */
     private final int maxLength;
 
     /**
-     * Nombre de caractères utilisés lors de l'écriture de la dernière ligne.
-     * Ce champ est mis à jour par la méthode {@link #carriageReturn} chaque
-     * fois que l'on déclare que l'on vient de terminer l'écriture d'une ligne.
+     * Nombre de caractÃ¨res utilisÃ©s lors de l'Ã©criture de la derniÃ¨re ligne.
+     * Ce champ est mis Ã  jour par la mÃ©thode {@link #carriageReturn} chaque
+     * fois que l'on dÃ©clare que l'on vient de terminer l'Ã©criture d'une ligne.
      */
     private int lastLength;
 
     /**
-     * Position à laquelle commencer à écrire le pourcentage. Cette information
-     * est gérée automatiquement par la méthode {@link #progress}. La valeur -1
-     * signifie que ni le pourcentage ni la description n'ont encore été écrits.
+     * Position Ã  laquelle commencer Ã  Ã©crire le pourcentage. Cette information
+     * est gÃ©rÃ©e automatiquement par la mÃ©thode {@link #progress}. La valeur -1
+     * signifie que ni le pourcentage ni la description n'ont encore Ã©tÃ© Ã©crits.
      */
     private int percentPosition = -1;
 
     /**
-     * Dernier pourcentage écrit. Cette information est utilisée
-     * afin d'éviter d'écrire deux fois le même pourcentage, ce
-     * qui ralentirait inutilement le système. La valeur -1 signifie
-     * qu'on n'a pas encore écrit de pourcentage.
+     * Dernier pourcentage Ã©crit. Cette information est utilisÃ©e
+     * afin d'Ã©viter d'Ã©crire deux fois le mÃªme pourcentage, ce
+     * qui ralentirait inutilement le systÃ¨me. La valeur -1 signifie
+     * qu'on n'a pas encore Ã©crit de pourcentage.
      */
     private float lastPercent = -1;
 
     /**
-     * Format à utiliser pour écrire les pourcentages.
+     * Format Ã  utiliser pour Ã©crire les pourcentages.
      */
     private NumberFormat format;
 
     /**
-     * Objet utilisé pour couper les lignes correctements lors de l'affichage
+     * Objet utilisÃ© pour couper les lignes correctements lors de l'affichage
      * de messages d'erreurs qui peuvent prendre plusieurs lignes.
      */
     private BreakIterator breaker;
 
     /**
-     * Indique si cet objet a déjà écrit des avertissements. Si
-     * oui, on ne réécrira pas le gros titre "avertissements".
+     * Indique si cet objet a dÃ©jÃ  Ã©crit des avertissements. Si
+     * oui, on ne rÃ©Ã©crira pas le gros titre "avertissements".
      */
     private boolean hasPrintedWarning;
 
     /**
      * Source du dernier message d'avertissement. Cette information est
-     * conservée afin d'éviter de répéter la source lors d'éventuels
+     * conservÃ©e afin d'Ã©viter de rÃ©pÃ©ter la source lors d'Ã©ventuels
      * autres messages d'avertissements.
      */
     private String lastSource;
@@ -151,15 +151,15 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Efface le reste de la ligne (si nécessaire) puis repositionne le curseur au début
-     * de la ligne. Si les retours chariot ne sont pas supportés, alors cette méthode va
-     * plutôt passer à la ligne suivante. Dans tous les cas, le curseur se trouvera au
-     * début d'une ligne et la valeur {@code length} sera affecté au champ
+     * Efface le reste de la ligne (si nÃ©cessaire) puis repositionne le curseur au dÃ©but
+     * de la ligne. Si les retours chariot ne sont pas supportÃ©s, alors cette mÃ©thode va
+     * plutÃ´t passer Ã  la ligne suivante. Dans tous les cas, le curseur se trouvera au
+     * dÃ©but d'une ligne et la valeur {@code length} sera affectÃ© au champ
      * {@link #lastLength}.
      *
-     * @param length Nombre de caractères qui ont été écrit jusqu'à maintenant sur cette ligne.
-     *        Cette information est utilisée pour ne mettre que le nombre d'espaces nécessaires
-     *        à la fin de la ligne.
+     * @param length Nombre de caractÃ¨res qui ont Ã©tÃ© Ã©crit jusqu'Ã  maintenant sur cette ligne.
+     *        Cette information est utilisÃ©e pour ne mettre que le nombre d'espaces nÃ©cessaires
+     *        Ã  la fin de la ligne.
      */
     private void carriageReturn(final int length) {
         if (CR_supported && length<maxLength) {
@@ -175,14 +175,14 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Ajoute des points à la fin de la ligne jusqu'à représenter
-     * le pourcentage spécifié. Cette méthode est utilisée pour
-     * représenter les progrès sur un terminal qui ne supporte
+     * Ajoute des points Ã  la fin de la ligne jusqu'Ã  reprÃ©senter
+     * le pourcentage spÃ©cifiÃ©. Cette mÃ©thode est utilisÃ©e pour
+     * reprÃ©senter les progrÃ¨s sur un terminal qui ne supporte
      * pas les retours chariots.
      *
-     * @param percent Pourcentage accompli de l'opération. Cette
+     * @param percent Pourcentage accompli de l'opÃ©ration. Cette
      *        valeur doit obligatoirement se trouver entre 0 et
-     *        100 (ça ne sera pas vérifié).
+     *        100 (Ã§a ne sera pas vÃ©rifiÃ©).
      */
     private void completeBar(final float percent) {
         final int end = (int) ((percent/100)*((maxLength-2)-percentPosition)); // Round toward 0.
@@ -233,9 +233,9 @@ public class ProgressPrinter implements ProgressListener {
         if (percent>100) percent=100;
         if (CR_supported) {
             /*
-             * Si le périphérique de sortie supporte les retours chariot,
-             * on écrira l'état d'avancement comme un pourcentage après
-             * la description, comme dans "Lecture des données (38%)".
+             * Si le pÃ©riphÃ©rique de sortie supporte les retours chariot,
+             * on Ã©crira l'Ã©tat d'avancement comme un pourcentage aprÃ¨s
+             * la description, comme dans "Lecture des donnÃ©es (38%)".
              */
             if (percent != lastPercent) {
                 if (format == null) {
@@ -258,9 +258,9 @@ public class ProgressPrinter implements ProgressListener {
             }
         } else {
             /*
-             * Si le périphérique ne supporte par les retours chariots, on
-             * écrira l'état d'avancement comme une série de points placés
-             * après la description, comme dans "Lecture des données......"
+             * Si le pÃ©riphÃ©rique ne supporte par les retours chariots, on
+             * Ã©crira l'Ã©tat d'avancement comme une sÃ©rie de points placÃ©s
+             * aprÃ¨s la description, comme dans "Lecture des donnÃ©es......"
              */
             completeBar(percent);
             lastPercent=percent;
@@ -328,8 +328,8 @@ public class ProgressPrinter implements ProgressListener {
             lastSource=source;
         }
         /*
-         * Procède à l'écriture de l'avertissement avec (de façon optionnelle)
-         * quelque chose dans la marge (le plus souvent un numéro de ligne).
+         * ProcÃ¨de Ã  l'Ã©criture de l'avertissement avec (de faÃ§on optionnelle)
+         * quelque chose dans la marge (le plus souvent un numÃ©ro de ligne).
          */
         String prefix="    ";
         String second=prefix;
@@ -386,8 +386,8 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Retourne la chaîne {@code margin} sans les
-     * éventuelles parenthèses qu'elle pourrait avoir
+     * Retourne la chaÃ®ne {@code margin} sans les
+     * Ã©ventuelles parenthÃ¨ses qu'elle pourrait avoir
      * de part et d'autre.
      */
     private static String trim(String margin) {
@@ -400,10 +400,10 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Écrit dans une boîte entouré d'astérix le texte spécifié en argument.
-     * Ce texte doit être sur une seule ligne et ne pas comporter de retour
-     * chariot. Les dimensions de la boîte seront automatiquement ajustées.
-     * @param text Texte à écrire (une seule ligne).
+     * Ã‰crit dans une boÃ®te entourÃ© d'astÃ©rix le texte spÃ©cifiÃ© en argument.
+     * Ce texte doit Ãªtre sur une seule ligne et ne pas comporter de retour
+     * chariot. Les dimensions de la boÃ®te seront automatiquement ajustÃ©es.
+     * @param text Texte Ã  Ã©crire (une seule ligne).
      */
     private void printInBox(String text) {
         int length = text.length();

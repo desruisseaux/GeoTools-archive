@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
- *    (C) 1998, Pêches et Océans Canada
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1998, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 
 
 /**
- * Arrow oriented toward positives <var>x</var> values (0° arithmetic). This shape doesn't
+ * Arrow oriented toward positives <var>x</var> values (0Â° arithmetic). This shape doesn't
  * have direct support for rotation. To rotate the arrow toward an other direction, use
  * {@link java.awt.geom.AffineTransform}.
  *
@@ -47,14 +47,14 @@ public class Arrow2D extends RectangularShape {
     private double minX, minY;
 
     /**
-     * Longueur de la flèche. Cette longueur est mesurée horizontalement (selon
-     * l'axe des <var>x</var>) de la queue jusqu'à la pointe de la flèche.
+     * Longueur de la flÃ¨che. Cette longueur est mesurÃ©e horizontalement (selon
+     * l'axe des <var>x</var>) de la queue jusqu'Ã  la pointe de la flÃ¨che.
      */
     private double length;
 
     /**
-     * Largeur de la flèche. Cette largeur est mesurée verticalement (selon l'axe
-     * des <var>y</var>) le long de la partie la plus large de cette flèche.
+     * Largeur de la flÃ¨che. Cette largeur est mesurÃ©e verticalement (selon l'axe
+     * des <var>y</var>) le long de la partie la plus large de cette flÃ¨che.
      */
     private double thickness;
 
@@ -97,16 +97,16 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Modifie la largeur et hauteur de la queue de la flèche, en proportion avec les dimensions
-     * totales de cette flèche. Ces facteurs doivent être compris entre 0 et 1. Les valeurs par
-     * défaut sont de 1/3 selon <var>y</var> et 2/3 selon <var>x</var>, ce qui signifie que la
-     * queue de la flèche aura le tiers de la largeur totale disponible et les deux tiers de la
-     * longueur disponible. La pointe de la flèche aura le reste. Ces proportions donnent d'assez
-     * bons résultats lorsque la flèche est deux fois plus longue que large.
+     * Modifie la largeur et hauteur de la queue de la flÃ¨che, en proportion avec les dimensions
+     * totales de cette flÃ¨che. Ces facteurs doivent Ãªtre compris entre 0 et 1. Les valeurs par
+     * dÃ©faut sont de 1/3 selon <var>y</var> et 2/3 selon <var>x</var>, ce qui signifie que la
+     * queue de la flÃ¨che aura le tiers de la largeur totale disponible et les deux tiers de la
+     * longueur disponible. La pointe de la flÃ¨che aura le reste. Ces proportions donnent d'assez
+     * bons rÃ©sultats lorsque la flÃ¨che est deux fois plus longue que large.
      *
-     * @param sx  Proportion de la longueur occupée par la queue de la flèche, entre 0 et 1.
-     * @param sy1 Proportion de la largeur occupée par la queue de la flèche près de la base, entre 0 et 1.
-     * @param sy0 Proportion de la largeur occupée par le bout de la queue de la flèche, entre 0 et 1.
+     * @param sx  Proportion de la longueur occupÃ©e par la queue de la flÃ¨che, entre 0 et 1.
+     * @param sy1 Proportion de la largeur occupÃ©e par la queue de la flÃ¨che prÃ¨s de la base, entre 0 et 1.
+     * @param sy0 Proportion de la largeur occupÃ©e par le bout de la queue de la flÃ¨che, entre 0 et 1.
      *
      * @todo Need translation to English.
      */
@@ -123,9 +123,9 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Renvoie la longueur de la queue de la flèche,
+     * Renvoie la longueur de la queue de la flÃ¨che,
      *
-     * @return La longueur de la queue, compris de 0 à <code>getWidth</code>.
+     * @return La longueur de la queue, compris de 0 Ã  <code>getWidth</code>.
      *
      * @todo Need translation to English.
      */
@@ -166,12 +166,12 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Renvoie la largeur de la flèche à la position <var>x</var>. Si cette position n'est pas
-     * comprise de <code>getMinX()</code> à <code>getMaxX()</code>, alors cette méthode retourne 0.
-     * Sinon elle retourne la largeur de la flèche à la position spécifiée.
+     * Renvoie la largeur de la flÃ¨che Ã  la position <var>x</var>. Si cette position n'est pas
+     * comprise de <code>getMinX()</code> Ã  <code>getMaxX()</code>, alors cette mÃ©thode retourne 0.
+     * Sinon elle retourne la largeur de la flÃ¨che Ã  la position spÃ©cifiÃ©e.
      *
-     * @param x Coordonnée <var>x</var> à laquelle on veut la largeur.
-     * @return La largeur de la flèche, comprise entre 0 et <code>getHeight</code>.
+     * @param x CoordonnÃ©e <var>x</var> Ã  laquelle on veut la largeur.
+     * @return La largeur de la flÃ¨che, comprise entre 0 et <code>getHeight</code>.
      *
      * @todo Need translation to English.
      */
@@ -230,7 +230,7 @@ public class Arrow2D extends RectangularShape {
         final double base = minX + sx*length;
         if (x <= base) {
             /*
-             * Point dans la queue. Vérifie s'il se trouve dans le triangle...
+             * Point dans la queue. VÃ©rifie s'il se trouve dans le triangle...
              */
             double yMaxAtX = 0.5*thickness;
             y -= (minY + yMaxAtX);
@@ -238,7 +238,7 @@ public class Arrow2D extends RectangularShape {
             return (Math.abs(y) <= yMaxAtX);
         } else {
             /*
-             * Point dans la pointe. Vérifie s'il se trouve dans le triangle.
+             * Point dans la pointe. VÃ©rifie s'il se trouve dans le triangle.
              */
             final double maxX = minX + length;
             if (x > maxX) {

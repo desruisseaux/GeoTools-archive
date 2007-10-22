@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Management Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -323,9 +323,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Compare deux valeurs de type {@code double}. Cette méthode
-     * est similaire à {@link Double#compare(double,double)}, excepté
-     * qu'elle ordonne aussi les différentes valeurs NaN.
+     * Compare deux valeurs de type {@code double}. Cette mÃ©thode
+     * est similaire Ã  {@link Double#compare(double,double)}, exceptÃ©
+     * qu'elle ordonne aussi les diffÃ©rentes valeurs NaN.
      */
     private static int compare(final double v1, final double v2) {
         if (Double.isNaN(v1) && Double.isNaN(v2)) {
@@ -338,9 +338,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Vérifie si le tableau de catégories spécifié est bien en ordre croissant.
+     * VÃ©rifie si le tableau de catÃ©gories spÃ©cifiÃ© est bien en ordre croissant.
      * La comparaison ne tient pas compte des valeurs {@code NaN}. Cette
-     * méthode n'est utilisée que pour les {@code assert}.
+     * mÃ©thode n'est utilisÃ©e que pour les {@code assert}.
      */
     static boolean isSorted(final Category[] categories) {
         for (int i=1; i<categories.length; i++) {
@@ -355,9 +355,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Effectue une recherche bi-linéaire de la valeur spécifiée. Cette
-     * méthode est semblable à {@link Arrays#binarySearch(double[],double)},
-     * excepté qu'elle peut distinguer différentes valeurs de NaN.
+     * Effectue une recherche bi-linÃ©aire de la valeur spÃ©cifiÃ©e. Cette
+     * mÃ©thode est semblable Ã  {@link Arrays#binarySearch(double[],double)},
+     * exceptÃ© qu'elle peut distinguer diffÃ©rentes valeurs de NaN.
      *
      * Note: This method is not private in order to allows testing by {@link CategoryTest}.
      */
@@ -641,12 +641,12 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      */
     public final Category getCategory(final double sample) {
         /*
-         * Recherche à quelle catégorie pourrait appartenir la valeur.
-         * Note: Les valeurs 'NaN' sont à la fin du tableau 'values'. Donc:
+         * Recherche Ã  quelle catÃ©gorie pourrait appartenir la valeur.
+         * Note: Les valeurs 'NaN' sont Ã  la fin du tableau 'values'. Donc:
          *
-         * 1) Si 'value' est NaN,  alors 'i' pointera forcément sur une catégorie NaN.
-         * 2) Si 'value' est réel, alors 'i' peut pointer sur une des catégories de
-         *    valeurs réels ou sur la première catégorie de NaN.
+         * 1) Si 'value' est NaN,  alors 'i' pointera forcÃ©ment sur une catÃ©gorie NaN.
+         * 2) Si 'value' est rÃ©el, alors 'i' peut pointer sur une des catÃ©gories de
+         *    valeurs rÃ©els ou sur la premiÃ¨re catÃ©gorie de NaN.
          */
         int i = binarySearch(minimums, sample); // Special 'binarySearch' for NaN
         if (i >= 0) {
@@ -771,7 +771,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         buffer.append(lineSeparator);
         /*
-         * Ecrit la liste des catégories en dessous.
+         * Ecrit la liste des catÃ©gories en dessous.
          */
         for (int i=0; i<categories.length; i++) {
             buffer.append("   ");

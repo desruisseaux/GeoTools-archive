@@ -1032,7 +1032,7 @@ public class CQLTest extends TestCase {
         // TODO not implement it
         // (Mauricio Comments) This case is not implemented because the filter
         // model has not a
-        // Routine (Like functions in Expresión). We could develop easily the
+        // Routine (Like functions in ExpresiÃ³n). We could develop easily the
         // parser
         // but we can not build a filter for CQL <Routine invocation>.
     }

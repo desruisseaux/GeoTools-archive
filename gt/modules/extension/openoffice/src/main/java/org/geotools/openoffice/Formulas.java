@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -284,7 +284,7 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
         try {
             date = (Date) AnyConverter.toObject(Date.class, xOptions.getPropertyValue("NullDate"));
         } catch (Exception e) {
-            // Les exception lancées par la ligne ci-dessus sont nombreuses...
+            // Les exception lancÃ©es par la ligne ci-dessus sont nombreuses...
             reportException("getEpoch", e);
             return null;
         }

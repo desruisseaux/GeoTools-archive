@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ public class AlgoRectangleND {
 	 * 
 	 * @param minCoord Lower Corner of the envelope
 	 * @param maxCoord Upper Corner of the envelope
-	 * @param coord Coordinate which has to be tested whether it´s within the envelope or not
+	 * @param coord Coordinate which has to be tested whether itÂ´s within the envelope or not
 	 * 
 	 * @return TRUE, if the Coordinate lays within the envelope
 	 */

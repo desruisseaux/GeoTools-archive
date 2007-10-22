@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -72,7 +72,7 @@ public class ReferencingFactory extends AbstractFactory implements Factory {
 
     /**
      * A citation which contains only the title "All" in localized language. Used
-     * as a pseudoèauthority name for {@link AllAuthoritiesFactory}. Declared here
+     * as a pseudoÃ¨authority name for {@link AllAuthoritiesFactory}. Declared here
      * because processed specially by {@link IdentifiedObjectFinder}, since it is
      * not a valid authority name (not declared in {@link AllAuthoritiesFactory}
      * because we want to avoid this dependency in {@link IdentifiedObjectFinder}).

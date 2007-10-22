@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -117,10 +117,10 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	 * 
 	 * 
 	 * NOTE: In the standard, curve segments do not appear except in the context
-	 * of a curve, and therefore the cardinality of the “curve” role in this
-	 * association could be “1” which would preclude the use of curve segments
+	 * of a curve, and therefore the cardinality of the Â“curveÂ” role in this
+	 * association could be Â“1Â” which would preclude the use of curve segments
 	 * except in this manner. While this would not affect this Standard, leaving
-	 * the cardinality as “0..1” allows other standards based on this one to use
+	 * the cardinality as Â“0..1Â” allows other standards based on this one to use
 	 * curve segments in a more open-ended manner.
 	 * 
 	 * The field type AbstractSequentialList<CurveSegmentImpl> is implemented
@@ -217,8 +217,8 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 
 		Position p0 = cs0.getStartPosition();
 
-		// Änderung durch Sanjay, da in bisheriger Version nicht der Fall
-		// berücksichtigt wurde, dass nur 1 CurveSegment existiert
+		// Ã„nderung durch Sanjay, da in bisheriger Version nicht der Fall
+		// berÃ¼cksichtigt wurde, dass nur 1 CurveSegment existiert
 		CurveSegmentImpl cs1 = null;
 		while (it.hasNext()) {
 			cs1 = (CurveSegmentImpl) it.next();
@@ -297,10 +297,10 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		for (int i = 0; i < newDPList.size(); i++) {
 			rPositions.add(new PositionImpl(newDPList.get(i)));
 		}
-		// Create List of Position´s
+		// Create List of PositionÂ´s
 		List<Position> positionList = rPositions;
 		
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
 				positionList), 0.0);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
@@ -674,7 +674,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 //		LineStringImpl tmpLineString = null;
 //		for (int i = 0; i < this.curveSegments.size(); i++) {
 //			tmpLineString = (LineStringImpl) this.curveSegments.get(i);
-//			// JR gelöscht
+//			// JR gelÃ¶scht
 //		}
 
 	}

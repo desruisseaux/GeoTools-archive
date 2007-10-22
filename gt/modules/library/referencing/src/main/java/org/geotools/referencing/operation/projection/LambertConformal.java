@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2003, 2004 Geotools Project Managment Committee (PMC)
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   (C) 2000, Frank Warmerdam
  *   (C) 1999, Fisheries and Oceans Canada
  *
@@ -75,7 +75,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @since 2.1
  * @source $URL$
  * @version $Id$
- * @author André Gosselin
+ * @author AndrÃ© Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */

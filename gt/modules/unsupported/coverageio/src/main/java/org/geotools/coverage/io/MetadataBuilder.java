@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2005, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -163,7 +163,7 @@ public class MetadataBuilder {
      * @todo Needs a more general way to set unit symbols once the Unit API is completed.
      */
     private static final String[] DEGREES = {
-        "degree", "degrees", "deg", "°"
+        "degree", "degrees", "deg", "Â°"
     };
 
     /**
@@ -2059,7 +2059,7 @@ public class MetadataBuilder {
         buffer.write(lineSeparator);
         try {
             final GeographicBoundingBox box = getGeographicBoundingBox();
-            buffer.write(GeographicBoundingBoxImpl.toString(box, "DD°MM'SS\"", null));
+            buffer.write(GeographicBoundingBoxImpl.toString(box, "DDÂ°MM'SS\"", null));
             buffer.write(lineSeparator);
         } catch (MetadataException exception) {
             // Ignore.

@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -547,7 +547,7 @@ public class ProgressWindow implements ProgressListener {
                     }
                 }
                 /*
-                 * Si la tâche spécifiée n'est aucune des tâches énumérées ci-haut,
+                 * Si la tÃ¢che spÃ©cifiÃ©e n'est aucune des tÃ¢ches Ã©numÃ©rÃ©es ci-haut,
                  * on supposera que l'on voulait afficher un message d'avertissement.
                  */
                 if (warningArea == null) {

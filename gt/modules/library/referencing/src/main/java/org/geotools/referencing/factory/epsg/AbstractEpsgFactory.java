@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -166,7 +166,7 @@ import org.opengis.util.InternationalString;
  * @since 2.4
  * @source $URL$
  * @version $Id$
- * @author Yann Cézard
+ * @author Yann CÃ©zard
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  * @author Matthias Basler

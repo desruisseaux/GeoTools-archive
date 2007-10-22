@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Management Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -58,16 +58,16 @@ final class GeophysicsCategoryList extends CategoryList {
     private static final int MAX_DIGITS = 6;
     
     /**
-     * Unités des mesures géophysiques représentées par les catégories.
-     * Ce champ peut être nul s'il ne s'applique pas ou si les unités
+     * UnitÃ©s des mesures gÃ©ophysiques reprÃ©sentÃ©es par les catÃ©gories.
+     * Ce champ peut Ãªtre nul s'il ne s'applique pas ou si les unitÃ©s
      * ne sont pas connues.
      */
     private final Unit unit;
     
     /**
-     * Nombre de chiffres significatifs après la virgule.
-     * Cette information est utilisée pour les écritures
-     * des valeurs géophysiques des catégories.
+     * Nombre de chiffres significatifs aprÃ¨s la virgule.
+     * Cette information est utilisÃ©e pour les Ã©critures
+     * des valeurs gÃ©ophysiques des catÃ©gories.
      */
     private final int ndigits;
     
@@ -78,8 +78,8 @@ final class GeophysicsCategoryList extends CategoryList {
     private transient Locale locale;
     
     /**
-     * Format à utiliser pour écrire les
-     * valeurs géophysiques des thèmes.
+     * Format Ã  utiliser pour Ã©crire les
+     * valeurs gÃ©ophysiques des thÃ¨mes.
      */
     private transient NumberFormat format;
     
@@ -156,18 +156,18 @@ final class GeophysicsCategoryList extends CategoryList {
     }
     
     /**
-     * Formatte la valeur spécifiée selon les conventions locales. Le nombre sera
-     * écrit avec un nombre de chiffres après la virgule approprié pour la catégorie.
-     * Le symbole des unités sera ajouté après le nombre si {@code writeUnit}
+     * Formatte la valeur spÃ©cifiÃ©e selon les conventions locales. Le nombre sera
+     * Ã©crit avec un nombre de chiffres aprÃ¨s la virgule appropriÃ© pour la catÃ©gorie.
+     * Le symbole des unitÃ©s sera ajoutÃ© aprÃ¨s le nombre si {@code writeUnit}
      * est {@code true}.
      *
-     * @param  value Valeur du paramètre géophysique à formatter.
-     * @param  writeUnit Indique s'il faut écrire le symbole des unités après le nombre.
-     *         Cet argument sera ignoré si aucune unité n'avait été spécifiée au constructeur.
-     * @param  locale Conventions locales à utiliser, ou {@code null} pour les conventions par
-     *         défaut.
-     * @param  buffer Le buffer dans lequel écrire la valeur.
-     * @return Le buffer {@code buffer} dans lequel auront été écrit la valeur et les unités.
+     * @param  value Valeur du paramÃ¨tre gÃ©ophysique Ã  formatter.
+     * @param  writeUnit Indique s'il faut Ã©crire le symbole des unitÃ©s aprÃ¨s le nombre.
+     *         Cet argument sera ignorÃ© si aucune unitÃ© n'avait Ã©tÃ© spÃ©cifiÃ©e au constructeur.
+     * @param  locale Conventions locales Ã  utiliser, ou {@code null} pour les conventions par
+     *         dÃ©faut.
+     * @param  buffer Le buffer dans lequel Ã©crire la valeur.
+     * @return Le buffer {@code buffer} dans lequel auront Ã©tÃ© Ã©crit la valeur et les unitÃ©s.
      */
     synchronized StringBuffer format(final double value, final boolean writeUnits,
                                      final Locale locale, StringBuffer buffer)

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -384,7 +384,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
                  * of 1849.10 metres. The average of semi-major and semi-minor axis results in a
                  * nautical mile of 1852.21 metres, which is pretty close to the internationaly
                  * agreed length (1852 metres). This is consistent with the definition of nautical
-                 * mile, which is the length of an angle of 1 minute along the meridian at 45° of
+                 * mile, which is the length of an angle of 1 minute along the meridian at 45Â° of
                  * latitude.
                  */
                 m = unit.getConverterTo(SI.RADIAN).convert(m) *

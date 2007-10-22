@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2003, Institut de Recherche pour le Développement
+ *    (C) 2003, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -247,23 +247,23 @@ public class GradientKernelEditor extends JComponent {
         }
 
         /**
-         * Retourne une extension de l'opérateur de Sobel. Pour chaque élément dont la position
-         * par rapport à l'élément central est (x,y), on calcule la composante horizontale avec
-         * le cosinus de l'angle divisé par la distance. On peut l'écrire comme suit:
+         * Retourne une extension de l'opÃ©rateur de Sobel. Pour chaque Ã©lÃ©ment dont la position
+         * par rapport Ã  l'Ã©lÃ©ment central est (x,y), on calcule la composante horizontale avec
+         * le cosinus de l'angle divisÃ© par la distance. On peut l'Ã©crire comme suit:
          *
          * <blockquote><pre>
-         *     cos(atan(y/x)) / sqrt(x²+y²)
+         *     cos(atan(y/x)) / sqrt(xÂ²+yÂ²)
          * </pre></blockquote>
          *
-         * En utilisant l'identité 1/cos² = (1+tan²), on peut réécrire l'équation comme suit:
+         * En utilisant l'identitÃ© 1/cosÂ² = (1+tanÂ²), on peut rÃ©Ã©crire l'Ã©quation comme suit:
          *
          * <blockquote><pre>
-         *     x / (x²+y²)
+         *     x / (xÂ²+yÂ²)
          * </pre></blockquote>
          *
-         * @param size Taille de la matrice. Doit être un nombre positif et impair.
-         * @param horizontal {@code true} pour l'opérateur horizontal,
-         *        or {@code false} pour l'opérateur vertical.
+         * @param size Taille de la matrice. Doit Ãªtre un nombre positif et impair.
+         * @param horizontal {@code true} pour l'opÃ©rateur horizontal,
+         *        or {@code false} pour l'opÃ©rateur vertical.
          */
         private static KernelJAI getSobel(final int size, final boolean horizontal) {
             final int key = size/2;

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -317,7 +317,7 @@ public final class TypeMap {
     /**
      * Returns the sample dimension type name as an international string. For example, the localized
      * name for {@link SampleDimensionType#UNSIGNED_16BITS} is "<cite>16 bits unsigned integer</cite>"
-     * in English and "<cite>Entier non-signé sur 16 bits</cite>" in French.
+     * in English and "<cite>Entier non-signÃ© sur 16 bits</cite>" in French.
      */
     public static InternationalString getName(final SampleDimensionType type) {
         final int ordinal = type.ordinal();

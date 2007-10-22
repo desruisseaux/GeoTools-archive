@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Institut de Recherche pour le Développement
+ *    (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *    (C) 2006, Geomatys
  *   
  *    This library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@ import org.geotools.image.Palette;
 
 
 /**
- * Fournisseurs de décodeur d'images HDF contenant des données de concentrations en chlorophylle-a.
+ * Fournisseurs de dÃ©codeur d'images HDF contenant des donnÃ©es de concentrations en chlorophylle-a.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -68,7 +68,7 @@ public class CHL_ReaderSpi extends AbstractReaderSpi {
     }
 
     /**
-     * Construit un décodeur d'image HDF.
+     * Construit un dÃ©codeur d'image HDF.
      */
     public ImageReader createReaderInstance(final Object extension) throws IOException {
         final DefaultReader reader = new DefaultReader(this);
@@ -77,7 +77,7 @@ public class CHL_ReaderSpi extends AbstractReaderSpi {
     }
 
     /**
-     * Retourne le type d'image que créeront les décodeurs HDF.
+     * Retourne le type d'image que crÃ©eront les dÃ©codeurs HDF.
      */
     protected ImageTypeSpecifier getRawImageType() throws IOException {
         return Palette.forNodataLast(PALETTE_NAME, PALETTE_SIZE);

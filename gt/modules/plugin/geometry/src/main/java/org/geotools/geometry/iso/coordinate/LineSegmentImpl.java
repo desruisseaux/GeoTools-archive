@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * 
  * Thus its interpolation attribute shall be "linear". The default
- * GenericCurve::parameterization = c(s) is: (L : Distance) = endParam –
+ * GenericCurve::parameterization = c(s) is: (L : Distance) = endParam Â–
  * startParam c(s) =
  * ControlPoint[1]+((s-startParam)/L)*(ControlPoint[2]-ControlPoint[1]) Any
  * other point in the controlPoint array must fall on this line. The control

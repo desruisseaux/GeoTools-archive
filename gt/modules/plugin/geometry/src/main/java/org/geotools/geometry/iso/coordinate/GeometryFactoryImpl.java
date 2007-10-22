@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -498,7 +498,7 @@ public class GeometryFactoryImpl implements Factory, GeometryFactory {
 
 		//Ring exterior = primFactory.createRingByDirectPositions(positionList);
 
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineStringImpl lineString = new LineStringImpl(new PointArrayImpl(
 				positionList), 0.0);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
@@ -517,7 +517,7 @@ public class GeometryFactoryImpl implements Factory, GeometryFactory {
 				new PositionImpl(p2), new PositionImpl(p3));
 	}
 
-	// TODO Jackson: geändert durch Sanjay; bitte korrektheit prüfen
+	// TODO Jackson: geÃ¤ndert durch Sanjay; bitte korrektheit prÃ¼fen
 	// TODO SJ: folgende aussage pruefen:
 	// Parameter TriangulatedSurface wurde hinzufgefuegt: Ein Triangle sollte
 	// nicht erzeugt werden, ohne eine Referenz auf das zugehoerige Surface zu

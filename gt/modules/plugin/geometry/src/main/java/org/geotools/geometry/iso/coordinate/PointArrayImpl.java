@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -81,7 +81,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 //				.getDefaultCoordinateFactory(coordDim);
 
 		// TODO JR: Zur kenntnisnahme:
-		// Wie in deinem Vorschlag von unserem Telefonat am 04/10 hole ich die CoordFactory über ein DP
+		// Wie in deinem Vorschlag von unserem Telefonat am 04/10 hole ich die CoordFactory Ã¼ber ein DP
         
 		//CoordinateFactoryImpl coordFactory = this.getFeatGeomFactory().getCoordinateFactory();		
 		for (int i = 0; i < aPointArray.size(); i++) {
@@ -109,7 +109,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	
 	
 	// TODO JR: Zur kenntnisnahme:
-	// Wie in deinem Vorschlag von unserem Telefonat am 04/10 hole ich die CoordFactory über ein DP
+	// Wie in deinem Vorschlag von unserem Telefonat am 04/10 hole ich die CoordFactory Ã¼ber ein DP
 	/**
 	 * Returns the Feature Geometry Factory Instance based on the reference of the DirectPositions of this PointArray
 	 * @return Factory instance
@@ -142,9 +142,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 		Position pos = getPosition(index);
 		return pos.getPosition().getCoordinates();
 
-		// Auskommentiert und geändert durch Sanjay am 21.08.2006
+		// Auskommentiert und geÃ¤ndert durch Sanjay am 21.08.2006
 		// der komplette code hat nicht soviel sinn gemacht, wurde nicht getestet
-		// Position nicht berücksichtigt wurde
+		// Position nicht berÃ¼cksichtigt wurde
 		// OLD CODE:
 		// return (obj instanceof PointImpl)
 		// (PointImpl)obj).getPosition().getCoordinates();

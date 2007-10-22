@@ -129,7 +129,7 @@ public class Krovak extends MapProjection {
     private final double sinAzim, cosAzim, n, tanS2, alfa, hae, k1, ka, ro0, rop;
 
     /**
-     * Useful constant - 45� in radians.
+     * Useful constant - 45° in radians.
      */
     private static final double s45 = 0.785398163397448;
 
@@ -305,7 +305,7 @@ public class Krovak extends MapProjection {
         /**
          * The operation parameter descriptor for the {@linkplain #centralMeridian central
          * meridian} parameter value. Valid values range is from -180 to 180. Default value
-         * is 24�50' (= 42�50' from Ferro prime meridian).
+         * is 24ï¿½50' (= 42ï¿½50' from Ferro prime meridian).
          */
         public static final ParameterDescriptor LONGITUDE_OF_CENTER = createDescriptor(
                 new NamedIdentifier[] {

@@ -70,7 +70,7 @@ public class ArcSDEConnectionPoolFactory {
      * connection params.
      * 
      * @param config
-     *             contains the connection parameters and pool preferences
+     *            Â contains the connection parameters and pool preferences
      * 
      * @return a pool for the given connection parameters, wether it already
      *         existed or had to be created.

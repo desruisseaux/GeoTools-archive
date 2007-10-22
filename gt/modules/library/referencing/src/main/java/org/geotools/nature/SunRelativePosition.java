@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,31 +28,31 @@ import java.util.TimeZone;
 
 
 /**
- * Calcule la position du soleil relativement à la position de l'observateur.
- * Cette classe reçoit en entrés les coordonnées spatio-temporelles de
+ * Calcule la position du soleil relativement Ã  la position de l'observateur.
+ * Cette classe reÃ§oit en entrÃ©s les coordonnÃ©es spatio-temporelles de
  * l'observateur, soit:
  *
  * <TABLE border='0'><TR><TD valign="top">
  * &nbsp;<BR>
  * <UL>
- *   <LI>La longitude (en degrées) de l'observateur;</LI>
- *   <LI>La latitude (en degrées) de l'observateur;</LI>
+ *   <LI>La longitude (en degrÃ©es) de l'observateur;</LI>
+ *   <LI>La latitude (en degrÃ©es) de l'observateur;</LI>
  *   <LI>La date et heure en heure universelle (GMT).</LI>
  * </UL>
  *
- * La position du soleil calculée en sortie comprend les valeurs suivantes:
+ * La position du soleil calculÃ©e en sortie comprend les valeurs suivantes:
  *
  * <UL>
- *   <LI>L'azimuth du soleil (en degrés dans le sens des aiguilles d'une montre depuis le nord);</LI>
- *   <LI>L'élévation du soleil (en degrés par rapport a l'horizon).</LI>
+ *   <LI>L'azimuth du soleil (en degrÃ©s dans le sens des aiguilles d'une montre depuis le nord);</LI>
+ *   <LI>L'Ã©lÃ©vation du soleil (en degrÃ©s par rapport a l'horizon).</LI>
  * </UL>
  * </TD>
  *
  * <TD><img src="doc-files/CelestialSphere.png"></TD>
  * </TR></TABLE>
  *
- * Les algorithmes utilisés dans cette classe sont des adaptations des algorithmes
- * en javascript écrit par le "National Oceanic and Atmospheric Administration,
+ * Les algorithmes utilisÃ©s dans cette classe sont des adaptations des algorithmes
+ * en javascript Ã©crit par le "National Oceanic and Atmospheric Administration,
  * Surface Radiation Research Branch". L'application original est le
  *
  * <a href="http://www.srrb.noaa.gov/highlights/sunrise/azel.html">Solar Position Calculator</a>.
@@ -76,7 +76,7 @@ public class SunRelativePosition {
     private static final int DAY_MILLIS = 24*60*60*1000;
 
     /**
-     * Valeur affectée lorsque un resultat n'est pas calculable du
+     * Valeur affectÃ©e lorsque un resultat n'est pas calculable du
      * fait de la nuit. Cette valeur concerne les valeurs de sorties
      * {@link #elevation} et {@link #azimuth}.
      */
@@ -84,31 +84,31 @@ public class SunRelativePosition {
 
     /**
      * {@linkplain #getElevation Elevation angle} of astronomical twilight, in degrees.
-     * Astronomical twilight is the time of morning or evening when the sun is 18° below
-     * the horizon (solar elevation angle of -18°).
+     * Astronomical twilight is the time of morning or evening when the sun is 18Â° below
+     * the horizon (solar elevation angle of -18Â°).
      */
     public static final double ASTRONOMICAL_TWILIGHT = -18;
 
     /**
      * {@linkplain #getElevation Elevation angle} of nautical twilight, in degrees.
-     * Nautical twilight is the time of morning or evening when the sun is 12° below
-     * the horizon (solar elevation angle of -12°).
+     * Nautical twilight is the time of morning or evening when the sun is 12Â° below
+     * the horizon (solar elevation angle of -12Â°).
      */
     public static final double NAUTICAL_TWILIGHT = -12;
 
     /**
      * {@linkplain #getElevation Elevation angle} of civil twilight, in degrees. Civil
-     * twilight is the time of morning or evening when the sun is 6° below the horizon
-     * (solar elevation angle of -6°).
+     * twilight is the time of morning or evening when the sun is 6Â° below the horizon
+     * (solar elevation angle of -6Â°).
      */
     public static final double CIVIL_TWILIGHT = -6;
 
     /**
      * Sun's {@linkplain #getElevation elevation angle} at twilight, in degrees.
      * Common values are defined for the
-     * {@linkplain #ASTRONOMICAL_TWILIGHT astronomical twilight} (-18°),
-     * {@linkplain #NAUTICAL_TWILIGHT nautical twilight} (-12°) and
-     * {@linkplain #CIVIL_TWILIGHT civil twilight} (-6°).
+     * {@linkplain #ASTRONOMICAL_TWILIGHT astronomical twilight} (-18Â°),
+     * {@linkplain #NAUTICAL_TWILIGHT nautical twilight} (-12Â°) and
+     * {@linkplain #CIVIL_TWILIGHT civil twilight} (-6Â°).
      * If no twilight are defined, then this value is {@linkplain Double#NaN NaN}.
      * The {@linkplain #getElevation elevation} and {@linkplain #getAzimuth azimuth} are
      * set to {@linkplain Double#NaN NaN} when the sun elevation is below the twilight
@@ -117,19 +117,19 @@ public class SunRelativePosition {
     private double twilight = CIVIL_TWILIGHT;
 
     /**
-     * Heure à laquelle le soleil est au plus haut dans la journée en millisecondes
-     * écoulées depuis le 1er janvier 1970.
+     * Heure Ã  laquelle le soleil est au plus haut dans la journÃ©e en millisecondes
+     * Ã©coulÃ©es depuis le 1er janvier 1970.
      */
     private long noonTime;
     
     /**
-     * Azimuth du soleil, en degrés dans le sens des
+     * Azimuth du soleil, en degrÃ©s dans le sens des
      * aiguilles d'une montre depuis le nord.
      */
     private double azimuth;
 
     /**
-     * Elévation du soleil, en degrés par rapport a l'horizon.
+     * ElÃ©vation du soleil, en degrÃ©s par rapport a l'horizon.
      */
     private double elevation;
 
@@ -169,13 +169,13 @@ public class SunRelativePosition {
 
     /**
      * Calculate the Geometric Mean Longitude of the Sun.
-     * This value is close to 0° at the spring equinox,
-     * 90° at the summer solstice, 180° at the automne equinox
-     * and 270° at the winter solstice.
+     * This value is close to 0Â° at the spring equinox,
+     * 90Â° at the summer solstice, 180Â° at the automne equinox
+     * and 270Â° at the winter solstice.
      *
      * @param  t number of Julian centuries since J2000.
      * @return Geometric Mean Longitude of the Sun in degrees,
-     *         in the range 0° (inclusive) to 360° (exclusive).
+     *         in the range 0Â° (inclusive) to 360Â° (exclusive).
      */
     private static double sunGeometricMeanLongitude(final double t) {
         double L0 = 280.46646 + t*(36000.76983 + 0.0003032*t);
@@ -554,9 +554,9 @@ public class SunRelativePosition {
     /**
      * Set the sun's {@linkplain #getElevation elevation angle} at twilight, in degrees.
      * Common values are defined for the
-     * {@linkplain #ASTRONOMICAL_TWILIGHT astronomical twilight} (-18°),
-     * {@linkplain #NAUTICAL_TWILIGHT nautical twilight} (-12°) and
-     * {@linkplain #CIVIL_TWILIGHT civil twilight} (-6°).
+     * {@linkplain #ASTRONOMICAL_TWILIGHT astronomical twilight} (-18Â°),
+     * {@linkplain #NAUTICAL_TWILIGHT nautical twilight} (-12Â°) and
+     * {@linkplain #CIVIL_TWILIGHT civil twilight} (-6Â°).
      * The {@linkplain #getElevation elevation} and {@linkplain #getAzimuth azimuth} are
      * set to {@linkplain Double#NaN NaN} when the sun elevation is below the twilight
      * value (i.e. during night). The default value is {@link #CIVIL_TWILIGHT}.
@@ -583,9 +583,9 @@ public class SunRelativePosition {
     }
 
     /**
-     * Retourne l'azimuth en degrés.
+     * Retourne l'azimuth en degrÃ©s.
      *
-     * @return L'azimuth en degrés.
+     * @return L'azimuth en degrÃ©s.
      */
     public double getAzimuth() {
         if (!updated) {
@@ -595,9 +595,9 @@ public class SunRelativePosition {
     }
 
     /**
-     * Retourne l'élévation en degrés.
+     * Retourne l'Ã©lÃ©vation en degrÃ©s.
      *
-     * @return L'élévation en degrés.
+     * @return L'Ã©lÃ©vation en degrÃ©s.
      */
     public double getElevation() {
         if (!updated) {
@@ -607,9 +607,9 @@ public class SunRelativePosition {
     }
 
     /**
-     * Retourne l'heure à laquelle le soleil est au plus haut. L'heure est
-     * retournée en nombre de millisecondes écoulées depuis le debut de la
-     * journée (minuit) en heure UTC.
+     * Retourne l'heure Ã  laquelle le soleil est au plus haut. L'heure est
+     * retournÃ©e en nombre de millisecondes Ã©coulÃ©es depuis le debut de la
+     * journÃ©e (minuit) en heure UTC.
      */
     public long getNoonTime() {
         if (!updated) {
@@ -619,9 +619,9 @@ public class SunRelativePosition {
     }
 
     /**
-     * Retourne la date à laquelle le soleil est au plus haut dans la journée.
-     * Cette méthode est équivalente à {@link #getNoonTime} mais inclue le jour
-     * de la date qui avait été spécifiée à la méthode {@link #compute}.
+     * Retourne la date Ã  laquelle le soleil est au plus haut dans la journÃ©e.
+     * Cette mÃ©thode est Ã©quivalente Ã  {@link #getNoonTime} mais inclue le jour
+     * de la date qui avait Ã©tÃ© spÃ©cifiÃ©e Ã  la mÃ©thode {@link #compute}.
      */
     public Date getNoonDate() {
         if (!updated) {
@@ -631,13 +631,13 @@ public class SunRelativePosition {
     }
 
     /**
-     * Affiche la position du soleil à la date et coordonnées spécifiée.
-     * Cette application peut être lancée avec la syntaxe suivante:
+     * Affiche la position du soleil Ã  la date et coordonnÃ©es spÃ©cifiÃ©e.
+     * Cette application peut Ãªtre lancÃ©e avec la syntaxe suivante:
      *
      * <pre>SunRelativePosition <var>[longitude]</var> <var>[latitude]</var> <var>[date]</var></pre>
      *
-     * où <var>date</var> est un argument optionel spécifiant la date et l'heure.
-     * Si cet argument est omis, la date et heure actuelles seront utilisées.
+     * oÃ¹ <var>date</var> est un argument optionel spÃ©cifiant la date et l'heure.
+     * Si cet argument est omis, la date et heure actuelles seront utilisÃ©es.
      */
     public static void main(final String[] args) throws ParseException {
         final DateFormat format=DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);

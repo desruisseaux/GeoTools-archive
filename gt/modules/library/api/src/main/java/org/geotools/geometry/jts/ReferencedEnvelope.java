@@ -447,7 +447,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * Transforms the referenced envelope to the specified coordinate reference system.
      * <p>
      * This method can handle the case where the envelope contains the North or South pole,
-     * or when it cross the &plusmn;180� longitude.
+     * or when it cross the &plusmn;180ï¿½ longitude.
      *
      * @param targetCRS The target coordinate reference system.
      * @param lenient   {@code true} if datum shift should be applied even if there is
@@ -469,7 +469,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * using the specified amount of points.
      * <p>
      * This method can handle the case where the envelope contains the North or South pole,
-     * or when it cross the &plusmn;180� longitude.
+     * or when it cross the &plusmn;180ï¿½ longitude.
      *
      * @param targetCRS The target coordinate reference system.
      * @param lenient   {@code true} if datum shift should be applied even if there is
@@ -489,7 +489,7 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         throws TransformException, FactoryException {
         /*
          * Gets a first estimation using an algorithm capable to take singularity in account
-         * (North pole, South pole, 180� longitude). We will expand this initial box later.
+         * (North pole, South pole, 180ï¿½ longitude). We will expand this initial box later.
          */
         final CoordinateOperation operation = CRS.getCoordinateOperationFactory(lenient)
                                                  .createOperation(crs, targetCRS);

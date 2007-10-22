@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2002, Institut de Recherche pour le Développement
+ *    (C) 2002, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -108,7 +108,7 @@ public final class GridCoverageExamples extends Assert {
         /*
          * Constructs the grid coverage. We will assume that the grid coverage use
          * (longitude,latitude) coordinates, pixels of 0.25 degrees and a lower
-         * left corner at 10°W 30°N.
+         * left corner at 10Â°W 30Â°N.
          */
         final GridCoverage2D  coverage;  // The final grid coverage.
         final BufferedImage      image;  // The GridCoverage's data.
@@ -215,7 +215,7 @@ public final class GridCoverageExamples extends Assert {
                 throw new IllegalArgumentException(String.valueOf(number));
             }
             case 0: {
-                //unit = "°C";
+                //unit = "Â°C";
                 path = "QL95209.png";
                 crs  = DefaultGeographicCRS.WGS84;
                 categories = new Category[] {
@@ -227,7 +227,7 @@ public final class GridCoverageExamples extends Assert {
                     new Category("Land",       Color.decode("#D2C8A0"), new NumberRange(240, 254)),
                     new Category("No data",    Color.decode("#FFFFFF"), new NumberRange(255, 255)),
                 };
-                // 41°S - 5°N ; 35°E - 80°E  (450 x 460 pixels)
+                // 41Â°S - 5Â°N ; 35Â°E - 80Â°E  (450 x 460 pixels)
                 bounds = new Rectangle2D.Double(35, -41, 45, 46);
                 bands = new GridSampleDimension[] {
                         new GridSampleDimension("Measure", categories, null)
@@ -235,7 +235,7 @@ public final class GridCoverageExamples extends Assert {
                 break;
             }
             case 1: {
-                //unit = "mg/m³";
+                //unit = "mg/mÂ³";
                 path = "CHL01195.png";
                 crs  = DefaultGeographicCRS.WGS84;
                 categories = new Category[] {
@@ -243,7 +243,7 @@ public final class GridCoverageExamples extends Assert {
                     new Category("No data",    Color.decode("#FFFFFF"), new NumberRange(  0,   0)),
                     new Category("Log chl-a",  null,                    new NumberRange(  1, 254), 0.015, -1.985)
                 };
-                // 34°N - 45°N ; 07°W - 12°E  (1200 x 700 pixels)
+                // 34Â°N - 45Â°N ; 07Â°W - 12Â°E  (1200 x 700 pixels)
                 bounds = new Rectangle2D.Double(-7, 34, 19, 11);
                 bands = new GridSampleDimension[] {
                         new GridSampleDimension("Measure", categories, null).geophysics(false)

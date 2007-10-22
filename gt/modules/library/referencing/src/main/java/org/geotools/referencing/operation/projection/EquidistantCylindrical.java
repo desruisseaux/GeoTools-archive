@@ -41,7 +41,7 @@ import org.geotools.resources.i18n.Errors;
 
 /**
  * Equidistant cylindrical projection (EPSG code 9823).  In the particular case where the
- * {@code standard_parallel_1} is 0°, this projection is also called
+ * {@code standard_parallel_1} is 0Â°, this projection is also called
  * {@linkplain PlateCarree Plate Carree} or Equirectangular.
  *
  * This is used in, for example, <cite>WGS84 / Plate Carree</cite> (EPSG:32662).
@@ -70,7 +70,7 @@ public class EquidistantCylindrical extends MapProjection {
 
     /**
      * {@linkplain Provider#STANDARD_PARALLEL_1 Standard parallel} parameter.
-     * Set to 0° for the {@link PlateCarree} case.
+     * Set to 0Â° for the {@link PlateCarree} case.
      */
     protected final double standardParallel;
 
@@ -197,7 +197,7 @@ public class EquidistantCylindrical extends MapProjection {
     public static class Provider extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@linkplain #standardParallel standard parallel}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90Â°. Default value is 0.
          * <p>
          * <b>Note:</b> EPSG includes a "<cite>Latitude of natural origin</cite>" parameter
          * instead of {@code "standard_parallel_1"}. The EPSG name is declared as an alias.

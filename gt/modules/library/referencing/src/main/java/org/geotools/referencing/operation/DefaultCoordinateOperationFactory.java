@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -564,7 +564,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                  * WEST). Compute the amount of angle to add to the source longitude in order to
                  * get the destination longitude. This amount is measured in units of the target
                  * axis.  The affine transform is then updated in order to take this rotation in
-                 * account. Note that the resulting longitude may be outside the usual [-180..180°]
+                 * account. Note that the resulting longitude may be outside the usual [-180..180Â°]
                  * range.
                  */
                 final Unit              unit = axis.getUnit();
@@ -757,7 +757,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo When rotating the prime meridian, we should ensure that
-     *       transformed longitudes stay in the range [-180..+180°].
+     *       transformed longitudes stay in the range [-180..+180Â°].
      */
     protected CoordinateOperation createOperationStep(final GeographicCRS sourceCRS,
                                                       final GeographicCRS targetCRS)
@@ -777,7 +777,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
              * different. Note: this special block is mandatory for avoiding never-ending loop,
              * since it is invoked by 'createOperationStep(GeocentricCRS...)'.
              *
-             * TODO: We should ensure that longitude is in range [-180..+180°].
+             * TODO: We should ensure that longitude is in range [-180..+180Â°].
              */
             final Matrix matrix = swapAndScaleAxis(sourceCS, targetCS, sourcePM, targetPM);
             return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);

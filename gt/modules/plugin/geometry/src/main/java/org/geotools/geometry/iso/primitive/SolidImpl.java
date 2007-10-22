@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -97,7 +97,7 @@ public class SolidImpl extends PrimitiveImpl implements Solid {
 	 * bounded 3-dimensional manifold has no distinguished exterior boundary. In
 	 * cases where "exterior" boundary is not well defined, all the shells of
 	 * the SolidBoundary shall be listed as "interior". The OrientableSurfaces
-	 * that bound a solid shall be oriented outward – that is, the "top" of each
+	 * that bound a solid shall be oriented outward Â– that is, the "top" of each
 	 * Surface as defined by its orientation shall face away from the interior
 	 * of the solid. Each Shell, when viewed as a composite surface, shall be a
 	 * cycle (see 6.2.2.6).

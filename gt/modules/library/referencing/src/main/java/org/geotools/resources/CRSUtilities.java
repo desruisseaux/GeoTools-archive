@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -420,7 +420,7 @@ public final class CRSUtilities {
     
     /**
      * Returns a character string for the specified geographic area. The string will have the
-     * form "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". If a map projection is required in
+     * form "45Â°00.00'N-50Â°00.00'N 30Â°00.00'E-40Â°00.00'E". If a map projection is required in
      * order to obtain this representation, it will be automatically applied.  This string is
      * mostly used for debugging purpose.
      *
@@ -439,7 +439,7 @@ public final class CRSUtilities {
                         .createOperation(crs, DefaultGeographicCRS.WGS84);
                 bounds = CRS.transform(op, bounds, null);
             }
-            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
+            final AngleFormat fmt = new AngleFormat("DDÂ°MM.m'");
             buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
             buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
             buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');

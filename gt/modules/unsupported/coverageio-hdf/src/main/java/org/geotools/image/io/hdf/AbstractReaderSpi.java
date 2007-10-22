@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Institut de Recherche pour le Développement
+ *    (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *    (C) 2006, Geomatys
  *   
  *    This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@ import org.geotools.image.io.FileBasedReaderSpi;
 
 
 /**
- * Classe de base des fournisseurs de décodeurs d'images HDF.
+ * Classe de base des fournisseurs de dÃ©codeurs d'images HDF.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -49,21 +49,21 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi {
     private static final String[] SUFFIXES = new String[] {"hdf", "HDF"};
 
     /**
-     * Le nom du "dataset" des données. Actuellement, pour la température ce nom
+     * Le nom du "dataset" des donnÃ©es. Actuellement, pour la tempÃ©rature ce nom
      * est {@code "sst"} et pour la chlorophylle le nom est {@code "l3m_data"}.
      */
     final String dataName;
 
     /**
-     * Le nom du "dataset" des indicateurs de qualité, ou {@code null} si aucun.
+     * Le nom du "dataset" des indicateurs de qualitÃ©, ou {@code null} si aucun.
      */
     final String qualityName;
 
     /**
      * Construit une nouvelle instance de ce fournisseur de service.
      *
-     * @param dataName     Le nom du "dataset" des données.
-     * @param qualityName  Le nom du "dataset" des indicateurs de qualité, ou {@code null} si aucun.
+     * @param dataName     Le nom du "dataset" des donnÃ©es.
+     * @param qualityName  Le nom du "dataset" des indicateurs de qualitÃ©, ou {@code null} si aucun.
      */
     public AbstractReaderSpi(final String dataName, final String qualityName) {
         names            = NAMES;
@@ -84,37 +84,37 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi {
     }
 
     /**
-     * Retourne le nom du fichier de qualité à partir du nom de fichier de données spécifié.
-     * L'implémentation par défaut retourne toujours {@code null}, ce qui signifie qu'il n'y
-     * a pas d'information sur la qualité des données. Les classes dérivées devraient redéfinir
-     * cette méthode si un fichier d'indicateurs de qualité est associé à chaque image.
+     * Retourne le nom du fichier de qualitÃ© Ã  partir du nom de fichier de donnÃ©es spÃ©cifiÃ©.
+     * L'implÃ©mentation par dÃ©faut retourne toujours {@code null}, ce qui signifie qu'il n'y
+     * a pas d'information sur la qualitÃ© des donnÃ©es. Les classes dÃ©rivÃ©es devraient redÃ©finir
+     * cette mÃ©thode si un fichier d'indicateurs de qualitÃ© est associÃ© Ã  chaque image.
      *
-     * @param  input Le nom du fichier de données.
-     * @return Le nom du fichier d'indicateurs de qualité, ou {@code null} s'il n'y en a pas.
+     * @param  input Le nom du fichier de donnÃ©es.
+     * @return Le nom du fichier d'indicateurs de qualitÃ©, ou {@code null} s'il n'y en a pas.
      */
     protected File getQualityFile(final File input) {
         return null;
     }
 
     /**
-     * Retourne le type d'image que créera le décodeur HDF. Ce type d'image comprend généralement
-     * une palette de couleurs qui dépend du type de données (SST, CHL...), et donc de la classe
-     * dérivée.
+     * Retourne le type d'image que crÃ©era le dÃ©codeur HDF. Ce type d'image comprend gÃ©nÃ©ralement
+     * une palette de couleurs qui dÃ©pend du type de donnÃ©es (SST, CHL...), et donc de la classe
+     * dÃ©rivÃ©e.
      *
-     * @throws IOException si la palette de couleur n'a pas pu être obtenue.
+     * @throws IOException si la palette de couleur n'a pas pu Ãªtre obtenue.
      */
     protected abstract ImageTypeSpecifier getRawImageType() throws IOException;
 
     /**
-     * Vérifie si le flot spécifié semble être un fichier HDF lisible.
-     * Cette méthode tente simplement de lire les premiers octets du fichier.
-     * La valeur retournée par cette méthode n'est qu'à titre indicative.
-     * {@code true} n'implique pas que la lecture va forcément réussir,
+     * VÃ©rifie si le flot spÃ©cifiÃ© semble Ãªtre un fichier HDF lisible.
+     * Cette mÃ©thode tente simplement de lire les premiers octets du fichier.
+     * La valeur retournÃ©e par cette mÃ©thode n'est qu'Ã  titre indicative.
+     * {@code true} n'implique pas que la lecture va forcÃ©ment rÃ©ussir,
      * et {@code false} n'implique pas que la lecture va obligatoirement
-     * échouer.
+     * Ã©chouer.
      *
-     * @param  source Source dont on veut tester la lisibilité.
-     * @return {@code true} si la source <u>semble</u> être lisible.
+     * @param  source Source dont on veut tester la lisibilitÃ©.
+     * @return {@code true} si la source <u>semble</u> Ãªtre lisible.
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
     public boolean canDecodeInput(final Object source) throws IOException {
@@ -125,7 +125,7 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi {
                 final FileFormat testFile = fileFormat.open(filepath, FileFormat.READ);
                 if (testFile != null) {
                     if (testFile.open() >= 0) {
-                        // TODO: obtenir un Dataset et vérifier son nom ici.
+                        // TODO: obtenir un Dataset et vÃ©rifier son nom ici.
                         testFile.close();
                         return true;
                     }
@@ -134,8 +134,8 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi {
                 throw e;
             } catch (Exception e) {
                 /*
-                 * Si la une opération a échouée, on considèrera que le fichier n'est pas lisible.
-                 * Le contrat de cette méthode stipule que l'on doit retourner 'false' dans cette
+                 * Si la une opÃ©ration a Ã©chouÃ©e, on considÃ¨rera que le fichier n'est pas lisible.
+                 * Le contrat de cette mÃ©thode stipule que l'on doit retourner 'false' dans cette
                  * situation, et non pas faire suivre l'exception (sauf si elle est du type I/O).
                  */
             }

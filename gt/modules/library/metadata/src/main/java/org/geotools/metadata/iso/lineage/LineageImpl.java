@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ import org.geotools.metadata.iso.quality.ScopeImpl;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  *
  * @since 2.1
  */
@@ -55,7 +55,7 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     private static final long serialVersionUID = 3351230301999744987L;
     
     /**
-     * General explanation of the data producer’s knowledge about the lineage of a dataset.
+     * General explanation of the data producerÂ’s knowledge about the lineage of a dataset.
      * Should be provided only if {@linkplain ScopeImpl#getLevel scope level} is
      * {@linkplain ScopeCode#DATASET dataset} or {@linkplain ScopeCode#SERIES series}.
      */
@@ -87,7 +87,7 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     }
 
     /**
-     * Returns the general explanation of the data producer’s knowledge about the lineage
+     * Returns the general explanation of the data producerÂ’s knowledge about the lineage
      * of a dataset. Should be provided only if {@linkplain ScopeImpl#getLevel scope level}
      * is {@linkplain ScopeCode#DATASET dataset} or {@linkplain ScopeCode#SERIES series}.
      */
@@ -96,7 +96,7 @@ public class LineageImpl extends MetadataEntity implements Lineage {
     }
     
     /**
-     * Set the general explanation of the data producer’s knowledge about the lineage
+     * Set the general explanation of the data producerÂ’s knowledge about the lineage
      * of a dataset.
      */
     public synchronized void setStatement(final InternationalString newValue) {

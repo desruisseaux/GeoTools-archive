@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -100,23 +100,23 @@ public class RangeSet extends AbstractSet<Range>
                               OTHER = -1;
 
     /**
-     * Le type des données de l'intervalle.  Il s'agit du type
-     * qui sera spécifié aux objets {@link Range} représentant
+     * Le type des donnÃ©es de l'intervalle.  Il s'agit du type
+     * qui sera spÃ©cifiÃ© aux objets {@link Range} reprÃ©sentant
      * un intervalle.
      */
     private final Class<?> type;
 
     /**
-     * Ce champ a une valeur identique à {@code type}, sauf
+     * Ce champ a une valeur identique Ã  {@code type}, sauf
      * si {@code elementType} est un type primitif. Dans ce
      * cas, il sera <code>{@link Number}.class</code>.
      */
     private final Class<?> relaxedType;
 
     /**
-     * Le type des données utilisé dans le tableau {@code array}.
-     * Il s'agira souvent du même type que {@code type}, sauf si
-     * ce dernier était le "wrapper" d'un des types primitifs du Java.
+     * Le type des donnÃ©es utilisÃ© dans le tableau {@code array}.
+     * Il s'agira souvent du mÃªme type que {@code type}, sauf si
+     * ce dernier Ã©tait le "wrapper" d'un des types primitifs du Java.
      * Dans ce cas, {@code elementType} sera ce type primitif.
      */
     private final Class<?> elementType;
@@ -131,22 +131,22 @@ public class RangeSet extends AbstractSet<Range>
     /**
      * Tableau d'intervalles.   Il peut s'agir d'un tableau d'un des types primitifs
      * du Java   (par exemple {@code int[]} ou {@code float[]}),   ou d'un
-     * tableau de type {@code Comparable[]}. Les éléments de ce tableau doivent
-     * obligatoirement être en ordre strictement croissant et sans doublon.
+     * tableau de type {@code Comparable[]}. Les Ã©lÃ©ments de ce tableau doivent
+     * obligatoirement Ãªtre en ordre strictement croissant et sans doublon.
      * <br><br>
      * La longueur de ce tableau est le double du nombre d'intervalles.  Il aurait
-     * été plus efficace d'utiliser une variable séparée  (pour ne pas être obligé
-     * d'agrandir ce tableau à chaque ajout d'un intervalle), mais malheureusement
-     * le J2SE 1.4 ne nous fournit pas de méthode {@code Arrays.binarySearch}
-     * qui nous permettent de spécifier les limites du tableau  (voir RFE #4306897
-     * à http://developer.java.sun.com/developer/bugParade/bugs/4306897.html).
+     * Ã©tÃ© plus efficace d'utiliser une variable sÃ©parÃ©e  (pour ne pas Ãªtre obligÃ©
+     * d'agrandir ce tableau Ã  chaque ajout d'un intervalle), mais malheureusement
+     * le J2SE 1.4 ne nous fournit pas de mÃ©thode {@code Arrays.binarySearch}
+     * qui nous permettent de spÃ©cifier les limites du tableau  (voir RFE #4306897
+     * Ã  http://developer.java.sun.com/developer/bugParade/bugs/4306897.html).
      */
     private Object array;
 
     /**
-     * Compte le nombre de modifications apportées au tableau des intervalles.
-     * Ce comptage sert à vérifier si une modification survient pendant qu'un
-     * itérateur balayait les intervalles.
+     * Compte le nombre de modifications apportÃ©es au tableau des intervalles.
+     * Ce comptage sert Ã  vÃ©rifier si une modification survient pendant qu'un
+     * itÃ©rateur balayait les intervalles.
      */
     private int modCount;
 
@@ -324,11 +324,11 @@ public class RangeSet extends AbstractSet<Range>
         int i1;
         if (i0 < 0) {
             /*
-             * Si le début de la plage ne correspond pas à une des dates en
-             * mémoire, il faudra l'insérer à quelque part dans le tableau.
-             * Si la date tombe dans une des plages déjà existantes (si son
-             * index est impair), on étend la date de début pour prendre le
-             * début de la plage. Visuellement, on fait:
+             * Si le dÃ©but de la plage ne correspond pas Ã  une des dates en
+             * mÃ©moire, il faudra l'insÃ©rer Ã  quelque part dans le tableau.
+             * Si la date tombe dans une des plages dÃ©jÃ  existantes (si son
+             * index est impair), on Ã©tend la date de dÃ©but pour prendre le
+             * dÃ©but de la plage. Visuellement, on fait:
              *
              *   0   1     2      3     4   5    6     7
              *   #####     ########     #####    #######
@@ -340,8 +340,8 @@ public class RangeSet extends AbstractSet<Range>
                 i1 = binarySearch(upper);
             } else {
                 /*
-                 * Si la date de début ne tombe pas dans une plage déjà
-                 * existante, il faut étendre la valeur de début qui se
+                 * Si la date de dÃ©but ne tombe pas dans une plage dÃ©jÃ 
+                 * existante, il faut Ã©tendre la valeur de dÃ©but qui se
                  * trouve dans le tableau. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
@@ -355,14 +355,14 @@ public class RangeSet extends AbstractSet<Range>
                 } else {
                     /*
                      * Un cas particulier se produit si la nouvelle plage
-                     * est à insérer à la fin du tableau. Dans ce cas, on
-                     * n'a qu'à agrandir le tableau et écrire les valeurs
-                     * directement à la fin. Ce traitement est nécessaire
+                     * est Ã  insÃ©rer Ã  la fin du tableau. Dans ce cas, on
+                     * n'a qu'Ã  agrandir le tableau et Ã©crire les valeurs
+                     * directement Ã  la fin. Ce traitement est nÃ©cessaire
                      * pour eviter les 'ArrayIndexOutOfBoundsException'.
                      * Un autre cas particulier se produit si la nouvelle
-                     * plage est  entièrement  comprise entre deux plages
-                     * déjà existantes.  Le même code ci-dessous insèrera
-                     * la nouvelle plage à l'index 'i0'.
+                     * plage est  entiÃ¨rement  comprise entre deux plages
+                     * dÃ©jÃ  existantes.  Le mÃªme code ci-dessous insÃ¨rera
+                     * la nouvelle plage Ã  l'index 'i0'.
                      */
                     modCount++;
                     final Object old = array;
@@ -380,14 +380,14 @@ public class RangeSet extends AbstractSet<Range>
             i1 = binarySearch(upper);
         }
         /*
-         * A ce stade, on est certain que 'i0' est pair et pointe vers le début
+         * A ce stade, on est certain que 'i0' est pair et pointe vers le dÃ©but
          * de la plage dans le tableau. Fait maintenant le traitement pour 'i1'.
          */
         if (i1 < 0) {
             /*
-             * Si la date de fin tombe dans une des plages déjà existantes
-             * (si son index est impair), on l'étend pour pendre la fin de
-             * la plage trouvée dans le tableau. Visuellement, on fait:
+             * Si la date de fin tombe dans une des plages dÃ©jÃ  existantes
+             * (si son index est impair), on l'Ã©tend pour pendre la fin de
+             * la plage trouvÃ©e dans le tableau. Visuellement, on fait:
              *
              *   0   1     2      3     4   5    6     7
              *   #####     ########     #####    #######
@@ -398,8 +398,8 @@ public class RangeSet extends AbstractSet<Range>
                 upper = (Comparable)Array.get(array, i1);
             } else {
                 /*
-                 * Si la date de fin ne tombe pas dans une plage déjà
-                 * existante, il faut étendre la valeur de fin qui se
+                 * Si la date de fin ne tombe pas dans une plage dÃ©jÃ 
+                 * existante, il faut Ã©tendre la valeur de fin qui se
                  * trouve dans le tableau. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
@@ -416,7 +416,7 @@ public class RangeSet extends AbstractSet<Range>
         /*
          * A ce stade, on est certain que 'i1' est impair et pointe vers la fin
          * de la plage dans le tableau. On va maintenant supprimer tout ce qui
-         * se trouve entre 'i0' et 'i1', à l'exclusion de 'i0' et 'i1'.
+         * se trouve entre 'i0' et 'i1', Ã  l'exclusion de 'i0' et 'i1'.
          */
         assert (i0 & 1)==0 : i0;
         assert (i1 & 1)!=0 : i1;
@@ -558,9 +558,9 @@ public class RangeSet extends AbstractSet<Range>
         if (i0 < 0) {
             if (((i0 = ~i0) & 1) != 0) { // Attention: c'est ~ et non -
                 /*
-                 * Si le début de la plage ne correspond pas à une des dates en mémoire,
-                 * il faudra faire un trou à quelque part dans le tableau. Si la date tombe
-                 * dans une des plages déjà existantes (si son index est impair), on change
+                 * Si le dÃ©but de la plage ne correspond pas Ã  une des dates en mÃ©moire,
+                 * il faudra faire un trou Ã  quelque part dans le tableau. Si la date tombe
+                 * dans une des plages dÃ©jÃ  existantes (si son index est impair), on change
                  * la date de fin de la plage existante. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
@@ -591,9 +591,9 @@ public class RangeSet extends AbstractSet<Range>
                 }
             } else {
                 /*
-                 * Si la date de début ne tombe pas dans une plage déjà
+                 * Si la date de dÃ©but ne tombe pas dans une plage dÃ©jÃ 
                  * existante, il faut prendre la date de fin de la plage
-                 * précédente. Visuellement, on fait:
+                 * prÃ©cÃ©dente. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
                  *   #####     ########     #####    #######
@@ -613,8 +613,8 @@ public class RangeSet extends AbstractSet<Range>
          */
         if (i1 < 0) {
             /*
-             * Si la date de fin tombe dans une des plages déjà existantes
-             * (si son index est impair), on change la date de début de la
+             * Si la date de fin tombe dans une des plages dÃ©jÃ  existantes
+             * (si son index est impair), on change la date de dÃ©but de la
              * plage existante. Visuellement, on fait:
              *
              *   0   1     2      3     4   5    6     7
@@ -627,8 +627,8 @@ public class RangeSet extends AbstractSet<Range>
                 Array.set(array, --i1, upper);
             } else {
                 /*
-                 * Si la date de fin ne tombe pas dans une plage déjà existante, il
-                 * faudra (plus tard) supprimer les éventuelles plages qui le précède.
+                 * Si la date de fin ne tombe pas dans une plage dÃ©jÃ  existante, il
+                 * faudra (plus tard) supprimer les Ã©ventuelles plages qui le prÃ©cÃ¨de.
                  *
                  *   0   1     2      3        4     5        6         7
                  *   #####     ########        #######        ###########
@@ -641,9 +641,9 @@ public class RangeSet extends AbstractSet<Range>
             i1 &= ~1;
         }
         /*
-         * A ce stade, on est certain que 'i1' est pair et pointe vers la début
+         * A ce stade, on est certain que 'i1' est pair et pointe vers la dÃ©but
          * de la plage dans le tableau. On va maintenant supprimer tout ce qui
-         * se trouve entre 'i0' et 'i1', à l'exclusion de 'i0' et 'i1'.
+         * se trouve entre 'i0' et 'i1', Ã  l'exclusion de 'i0' et 'i1'.
          */
         assert (i0 & 1) != 0 : i0;
         assert (i1 & 1) == 0 : i1;
@@ -733,9 +733,9 @@ public class RangeSet extends AbstractSet<Range>
     }
 
     /**
-     * Retourne l'index de l'élément {@code value} dans le tableau {@code array}.
-     * Cette méthode interprète le tableau {@code array} comme un tableau d'un des types
-     * intrinsèques du Java, et appelle la méthode {@code Arrays.binarySearch} appropriée.
+     * Retourne l'index de l'Ã©lÃ©ment {@code value} dans le tableau {@code array}.
+     * Cette mÃ©thode interprÃ¨te le tableau {@code array} comme un tableau d'un des types
+     * intrinsÃ¨ques du Java, et appelle la mÃ©thode {@code Arrays.binarySearch} appropriÃ©e.
      *
      * @param value The value to search. This value must have been converted with
      *        {@link #toNumber} prior to call this method.

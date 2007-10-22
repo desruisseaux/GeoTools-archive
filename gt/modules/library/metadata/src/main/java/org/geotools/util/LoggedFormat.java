@@ -116,7 +116,7 @@ public class LoggedFormat<T> extends Format {
     }
 
     /**
-     * Sets the {@linkplain LogRecord#setSourceClassName source class name} and
+     * Sets the {@linkplain LogRecord#setSourceClassName source class name}Â and
      * {@linkplain LogRecord#setSourceMethodName source method name} for the warnings
      * eventually emitted by the {@link #parse} method.
      *
@@ -138,7 +138,7 @@ public class LoggedFormat<T> extends Format {
      * a {@linkplain LogRecord log record} is prepared and logged.
      *
      * @param  text The text to parse, or {@code null}.
-     * @return The parsed object, or {@code null} if {@code text} was null or can't be parsed.
+     * @return The parsed object, or {@code null} if {@code text}Â was null or can't be parsed.
      */
     public T parse(String text) {
         if (text == null || (text=text.trim()).length() == 0) {

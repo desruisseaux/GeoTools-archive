@@ -42,7 +42,7 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param text The text to be converted to an angle.
-     * @param pattern The text that describes the format (example: "D캫M.m'").
+     * @param pattern The text that describes the format (example: "D째MM.m'").
      * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
     double getValueAngle(XPropertySet xOptions, String text, Object pattern)
@@ -53,7 +53,7 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param value The angle value (in decimal degrees) to be converted.
-     * @param pattern The text that describes the format (example: "D캫M.m'").
+     * @param pattern The text that describes the format (example: "D째MM.m'").
      * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
     String getTextAngle(XPropertySet xOptions, double value, Object pattern)
@@ -64,7 +64,7 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param value The longitude value (in decimal degrees) to be converted.
-     * @param pattern The text that describes the format (example: "D캫M.m'").
+     * @param pattern The text that describes the format (example: "D째MM.m'").
      * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
     String getTextLongitude(XPropertySet xOptions, double value, Object pattern)
@@ -75,7 +75,7 @@ public interface XReferencing extends XInterface {
      *
      * @param xOptions Provided by OpenOffice.
      * @param value The latitude value (in decimal degrees) to be converted.
-     * @param pattern The text that describes the format (example: "D캫M.m'").
+     * @param pattern The text that describes the format (example: "D째MM.m'").
      * @throws IllegalArgumentException if {@code pattern} is illegal.
      */
     String getTextLatitude(XPropertySet xOptions, double value, Object pattern)

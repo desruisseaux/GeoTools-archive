@@ -164,28 +164,28 @@ public final class Referencing extends Formulas implements XReferencing {
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
                 "text",       "The text to be converted to an angle.",
-                "pattern",    "The text that describes the format (example: \"D캫M.m'\")."
+                "pattern",    "The text that describes the format (example: \"D째MM.m'\")."
         }));
         methods.put("getTextAngle", new MethodInfo("Text", "TEXT.ANGLE",
             "Converts an angle to text according to a given format.",
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
                 "value",      "The angle value (in decimal degrees) to be converted.",
-                "pattern",    "The text that describes the format (example: \"D캫M.m'\")."
+                "pattern",    "The text that describes the format (example: \"D째MM.m'\")."
         }));
         methods.put("getTextLongitude", new MethodInfo("Text", "TEXT.LONGITUDE",
             "Converts a longitude to text according to a given format.",
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
                 "value",      "The longitude value (in decimal degrees) to be converted.",
-                "pattern",    "The text that describes the format (example: \"D캫M.m'\")."
+                "pattern",    "The text that describes the format (example: \"D째MM.m'\")."
         }));
         methods.put("getTextLatitude", new MethodInfo("Text", "TEXT.LATITUDE",
             "Converts a latitude to text according to a given format.",
             new String[] {
                 "xOptions",   "Provided by OpenOffice.",
                 "value",      "The latitude value (in decimal degrees) to be converted.",
-                "pattern",    "The text that describes the format (example: \"D캫M.m'\")."
+                "pattern",    "The text that describes the format (example: \"D째MM.m'\")."
         }));
         methods.put("getDescription", new MethodInfo("Referencing", "CRS.DESCRIPTION",
             "Returns a description for an object identified by the given authority code.",
@@ -484,7 +484,7 @@ public final class Referencing extends Formulas implements XReferencing {
     /**
      * Returns the angle format to use for the specified pattern.
      *
-     * @param  pattern he text that describes the format (example: "D캫M.m'").
+     * @param  pattern he text that describes the format (example: "D째MM.m'").
      * @return The angle format, as a {@link Format} object (instead of {@link AngleFormat}
      *         in order to avoid too early class loading.
      * @throws IllegalArgumentException if {@code pattern} is not a string value or void.
@@ -492,7 +492,7 @@ public final class Referencing extends Formulas implements XReferencing {
     private Format getAngleFormat(final Object pattern) throws IllegalArgumentException {
         final String patternString;
         if (AnyConverter.isVoid(pattern)) {
-            patternString = "D캫M'SS.s\"";
+            patternString = "D째MM'SS.s\"";
         } else {
             patternString = AnyConverter.toString(pattern);
         }

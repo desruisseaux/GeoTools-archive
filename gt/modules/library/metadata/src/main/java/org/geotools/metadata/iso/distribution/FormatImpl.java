@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2004, Institut de Recherche pour le Développement
+ *    (C) 2004, Institut de Recherche pour le DÃ©veloppement
  *   
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import org.geotools.metadata.iso.MetadataEntity;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  *
  * @since 2.1
  */
@@ -75,7 +75,7 @@ public class FormatImpl extends MetadataEntity implements Format {
     private InternationalString fileDecompressionTechnique;
 
     /**
-     * Provides information about the distributor’s format.
+     * Provides information about the distributorÂ’s format.
      */
     private Collection formatDistributors;
     
@@ -180,14 +180,14 @@ public class FormatImpl extends MetadataEntity implements Format {
     }
 
     /**
-     * Provides information about the distributor’s format.
+     * Provides information about the distributorÂ’s format.
      */
     public synchronized Collection getFormatDistributors() {
         return formatDistributors = nonNullCollection(formatDistributors, Distributor.class);
     }
     
     /**
-     * Set information about the distributor’s format.
+     * Set information about the distributorÂ’s format.
      */
     public synchronized void setFormatDistributors(final Collection newValues) {
         formatDistributors = copyCollection(newValues, formatDistributors, Distributor.class);

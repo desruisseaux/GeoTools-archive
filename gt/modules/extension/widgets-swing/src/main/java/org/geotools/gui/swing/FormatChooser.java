@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2003, Institut de Recherche pour le Développement
+ *    (C) 2003, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -88,15 +88,15 @@ public class FormatChooser extends JPanel {
      * A set of default pattern for {@link AngleFormat}.
      */
     private static final String[] ANGLE_PATTERNS = new String[] {
-        "D.d°",
-        "D.dd°",
-        "D.ddd°",
-        "D°MM'",
-        "D°MM.m'",
-        "D°MM.mm'",
-        "D°MM.mmm'",
-        "D°MM'SS\"",
-        "D°MM'SS.s\""
+        "D.dÂ°",
+        "D.ddÂ°",
+        "D.dddÂ°",
+        "DÂ°MM'",
+        "DÂ°MM.m'",
+        "DÂ°MM.mm'",
+        "DÂ°MM.mmm'",
+        "DÂ°MM'SS\"",
+        "DÂ°MM'SS.s\""
     };
 
     /**

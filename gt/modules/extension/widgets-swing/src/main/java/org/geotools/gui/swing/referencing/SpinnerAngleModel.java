@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -74,9 +74,9 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
      * Initial minimum and maximum values are choosen according the {@code value} type:
      *
      * <table>
-     *   <tr><td>{@link Longitude}&nbsp;</td> <td>-180° to 180°</td></tr>
-     *   <tr><td>{@link Latitude}&nbsp;</td>  <td>-90° to 90°</td>  </tr>
-     *   <tr><td>{@link Angle}&nbsp;</td>     <td>0° to 360°</td>   </tr>
+     *   <tr><td>{@link Longitude}&nbsp;</td> <td>-180Â° to 180Â°</td></tr>
+     *   <tr><td>{@link Latitude}&nbsp;</td>  <td>-90Â° to 90Â°</td>  </tr>
+     *   <tr><td>{@link Angle}&nbsp;</td>     <td>0Â° to 360Â°</td>   </tr>
      * </table>
      *
      * @param  value the current (non {@code null}) value of the model

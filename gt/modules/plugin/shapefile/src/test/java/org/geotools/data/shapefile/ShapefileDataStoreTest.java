@@ -120,7 +120,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection fc = loadFeatures(DANISH, Query.ALL);
         SimpleFeature first = fc.features().next();
         
-        // Charl�tte, if you can read it with your OS charset
+        // Charlï¿½tte, if you can read it with your OS charset
         assertEquals("Charl\u00F8tte", first.getAttribute("TEKST1"));
     }
     

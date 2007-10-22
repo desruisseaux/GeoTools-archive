@@ -4,7 +4,7 @@
  *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Centre for Computational Geography
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *   (C) 2000, Frank Warmerdam
  *   (C) 1999, Fisheries and Oceans Canada
  *
@@ -51,7 +51,7 @@ import org.geotools.resources.i18n.Errors;
 
 /**
  * Transverse Mercator Projection (EPSG code 9807). This
- * is a cylindrical projection, in which the cylinder has been rotated 90°.
+ * is a cylindrical projection, in which the cylinder has been rotated 90Â°.
  * Instead of being tangent to the equator (or to an other standard latitude),
  * it is tangent to a central meridian. Deformation are more important as we
  * are going futher from the central meridian. The Transverse Mercator
@@ -99,7 +99,7 @@ import org.geotools.resources.i18n.Errors;
  * @since 2.1
  * @source $URL$
  * @version $Id$
- * @author André Gosselin
+ * @author AndrÃ© Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -126,7 +126,7 @@ public class TransverseMercator extends MapProjection {
     private static final double EPSILON_LATITUDE = 1E-10;
     
     /**
-     * A derived quantity of excentricity, computed by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
+     * A derived quantity of excentricity, computed by <code>e'Â² = (aÂ²-bÂ²)/bÂ² = es/(1-es)</code>
      * where <var>a</var> is the semi-major axis length and <var>b</bar> is the semi-minor axis
      * length.
      */
@@ -308,7 +308,7 @@ public class TransverseMercator extends MapProjection {
      * TransverseMercator projection.
      * 
      * @version $Id$
-     * @author André Gosselin
+     * @author AndrÃ© Gosselin
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */

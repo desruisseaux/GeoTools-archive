@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Institut de Recherche pour le Développement
+ *    (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *    (C) 2006, Geomatys
  *   
  *    This library is free software; you can redistribute it and/or
@@ -46,8 +46,8 @@ import org.geotools.image.io.FileBasedReaderSpi;
 
 
 /**
- * Implémentation par défaut des décodeurs d'images au format HDF. Dans la plupart des
- * cas, il ne sera pas nécessaire de créer des classes dérivées. Des classes dérivées
+ * ImplÃ©mentation par dÃ©faut des dÃ©codeurs d'images au format HDF. Dans la plupart des
+ * cas, il ne sera pas nÃ©cessaire de crÃ©er des classes dÃ©rivÃ©es. Des classes dÃ©rivÃ©es
  * de {@link AbstractReaderSpi} suffisent.
  * 
  * @version $Id$
@@ -56,15 +56,15 @@ import org.geotools.image.io.FileBasedReaderSpi;
  */
 final class DefaultReader extends FileBasedReader {
     /**
-     * Le format des données à lire.
+     * Le format des donnÃ©es Ã  lire.
      */
     private FileFormat format;
 
     /**
-     * L'ensemble des données du phénomène étudié.
+     * L'ensemble des donnÃ©es du phÃ©nomÃ¨ne Ã©tudiÃ©.
      * <p>
-     * <b>Note:</b> Ne pas appeler {@link Dataset#init} explicitement. C'est sensé être fait
-     * automatiquement par la bibliothèque HDF. L'expérience montre qu'un appel explicite à
+     * <b>Note:</b> Ne pas appeler {@link Dataset#init} explicitement. C'est sensÃ© Ãªtre fait
+     * automatiquement par la bibliothÃ¨que HDF. L'expÃ©rience montre qu'un appel explicite Ã 
      * {@code init()} fonctionne sous Windows, mais cause un crash de la JVM sous Linux Gentoo.
      *
      * @see #prepareDataset
@@ -72,46 +72,46 @@ final class DefaultReader extends FileBasedReader {
     private Dataset dataset;
 
     /**
-     * Les indicateurs de qualité pour chaque donnée, ou {@code null} s'il n'y en a pas.
+     * Les indicateurs de qualitÃ© pour chaque donnÃ©e, ou {@code null} s'il n'y en a pas.
      *
      * @see #prepareDataset
      */
     private Dataset qualityDataset;
 
     /**
-     * Indique le nombre de bits sur lequel est codée l'information sans la qualité.
-     * La valeur par défaut est 8.
+     * Indique le nombre de bits sur lequel est codÃ©e l'information sans la qualitÃ©.
+     * La valeur par dÃ©faut est 8.
      *
      * @see #setBitCount
      */
     private int dataBitCount = 8;
 
     /**
-     * Indique le nombre de bits sur lequel est codé la qualité. La valeur par défaut est 0,
-     * c'est à dire une absence d'informations concernant la qualité des données.
+     * Indique le nombre de bits sur lequel est codÃ© la qualitÃ©. La valeur par dÃ©faut est 0,
+     * c'est Ã  dire une absence d'informations concernant la qualitÃ© des donnÃ©es.
      *
      * @see #setBitCount
      */
     private int qualityBitCount = 0;
 
     /** 
-     * Construit un nouveau décodeur HDF. Les classes dérivées devraient appeler {@link #setBitCount
-     * setBitCount} après la construction, ou au moins avant le premier appel de {@link #read read}.
+     * Construit un nouveau dÃ©codeur HDF. Les classes dÃ©rivÃ©es devraient appeler {@link #setBitCount
+     * setBitCount} aprÃ¨s la construction, ou au moins avant le premier appel de {@link #read read}.
      *
-     * @param spi Une description du service fournit par ce décodeur.
+     * @param spi Une description du service fournit par ce dÃ©codeur.
      */
     public DefaultReader(final AbstractReaderSpi spi) {
         super(spi);
     }
 
     /**
-     * Spécifie le nombre de bits sur lesquels sont codés les données. Si cette méthode n'est
-     * jamais appelée, alors la valeur par défaut est de 8 bits pour les données et 0 bits pour
-     * la qualité.
+     * SpÃ©cifie le nombre de bits sur lesquels sont codÃ©s les donnÃ©es. Si cette mÃ©thode n'est
+     * jamais appelÃ©e, alors la valeur par dÃ©faut est de 8 bits pour les donnÃ©es et 0 bits pour
+     * la qualitÃ©.
      *
-     * @param  data      Nombre de bits sur lequel est codée l'information sans la qualité.
-     * @param  quality   Nombre de bits sur lequel est codé la qualité.
-     * @throws IllegalArgumentException si un des arguments spécifié est négatif.
+     * @param  data      Nombre de bits sur lequel est codÃ©e l'information sans la qualitÃ©.
+     * @param  quality   Nombre de bits sur lequel est codÃ© la qualitÃ©.
+     * @throws IllegalArgumentException si un des arguments spÃ©cifiÃ© est nÃ©gatif.
      */
     protected final void setBitCount(final int data, final int quality) throws IllegalArgumentException {
         if (data < 0 || data >= Integer.SIZE) {
@@ -125,7 +125,7 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Spécifie la source des données à utiliser en entrée. Cette source doit être un objet de
+     * SpÃ©cifie la source des donnÃ©es Ã  utiliser en entrÃ©e. Cette source doit Ãªtre un objet de
      * type {@link File}.
      */
     @Override
@@ -152,9 +152,9 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Construit une image à partir des paramètre de lecture spécifiés.
+     * Construit une image Ã  partir des paramÃ¨tre de lecture spÃ©cifiÃ©s.
      *
-     * @throws  IOException Si la lecture de l'image a échouée.
+     * @throws  IOException Si la lecture de l'image a Ã©chouÃ©e.
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
@@ -177,13 +177,13 @@ final class DefaultReader extends FileBasedReader {
         computeRegions(param, width, height, image, srcRegion, destRegion);
         processImageStarted(imageIndex);
         /*
-         * Ici on fixe les parmatères tels qu'au prochain appel de dataset.getData(),
-         * l'API HDF va nous permettre de récupérer les sizes[0] x sizes[1] valeurs entières 
-         * de la sous région dont le point haut gauche a pour coordonnées start[0], start[1] 
+         * Ici on fixe les parmatÃ¨res tels qu'au prochain appel de dataset.getData(),
+         * l'API HDF va nous permettre de rÃ©cupÃ©rer les sizes[0] x sizes[1] valeurs entiÃ¨res 
+         * de la sous rÃ©gion dont le point haut gauche a pour coordonnÃ©es start[0], start[1] 
          * et dont les largeur et hauteur sont respectivement size[0], size[1]
          * 
          * ATTENTION - ATTENTION : Il faut prendre la convention matricielle ligne colonne 
-         *                         c'est à dire start[0] = y et start[1] = x !!!!!
+         *                         c'est Ã  dire start[0] = y et start[1] = x !!!!!
          */
         final long[] start  = dataset.getStartDims();
         final long[] stride = dataset.getStride();
@@ -208,10 +208,10 @@ final class DefaultReader extends FileBasedReader {
         final int targetDataMask    = ~((1 << dataBitCount) - 1);
         final int targetQualityMask = ~((1 << qualityBitCount) - 1);
         /*
-         * Maintenant que l'ensemble des données ont été obtenues, prépare la copie vers le raster.
-         * Si les entiers sont non-signés, on utilisera un masque pour supprimer le signe. Note: on
-         * n'utilise pas Dataset.convertFromUnsignedC(Object) afin d'éviter la création d'un tableau
-         * temporaire qui peut être volumineux.
+         * Maintenant que l'ensemble des donnÃ©es ont Ã©tÃ© obtenues, prÃ©pare la copie vers le raster.
+         * Si les entiers sont non-signÃ©s, on utilisera un masque pour supprimer le signe. Note: on
+         * n'utilise pas Dataset.convertFromUnsignedC(Object) afin d'Ã©viter la crÃ©ation d'un tableau
+         * temporaire qui peut Ãªtre volumineux.
          */
         int index = 0;
         final float toPercent = 100f / Array.getLength(data);
@@ -222,13 +222,13 @@ final class DefaultReader extends FileBasedReader {
                 int value = Array.getInt(data, index) & dataMask;
                 if (quality != null) {
                     if ((value & targetDataMask) != 0) {
-                        throw new IIOException("La valeur " + value + " à la position (" + x + ',' + y +
-                                               ") n'est pas un entier non-signé sur " + dataBitCount + " bits.");
+                        throw new IIOException("La valeur " + value + " Ã  la position (" + x + ',' + y +
+                                               ") n'est pas un entier non-signÃ© sur " + dataBitCount + " bits.");
                     }
                     final int q = Array.getInt(quality, index) & qualityMask;
                     if ((q & targetQualityMask) != 0) {
-                        throw new IIOException("L'indicateur de qualité " + q + " à la position (" + x + ',' + y +
-                                               ") n'est pas un entier non-signé sur " + qualityBitCount + " bits.");
+                        throw new IIOException("L'indicateur de qualitÃ© " + q + " Ã  la position (" + x + ',' + y +
+                                               ") n'est pas un entier non-signÃ© sur " + qualityBitCount + " bits.");
                     }
                     value |= (q << dataBitCount);
                 }
@@ -247,22 +247,22 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Vérifie que les données ont bien été chargée dans {@link #dataset} pour l'image spécifiée.
-     * Si les données ont déjà été chargée lors d'un appel précédent, alors cette méthode ne fait
+     * VÃ©rifie que les donnÃ©es ont bien Ã©tÃ© chargÃ©e dans {@link #dataset} pour l'image spÃ©cifiÃ©e.
+     * Si les donnÃ©es ont dÃ©jÃ  Ã©tÃ© chargÃ©e lors d'un appel prÃ©cÃ©dent, alors cette mÃ©thode ne fait
      * rien.
      * <p>
-     * Certaines données enregistrent dans un fichier séparé des indicateurs de qualité pour chaque
-     * pixel. Si ces informations existent, alors le paramètre {@code includeQuality} indique s'il
-     * faut procéder à leur chargement ou pas.
+     * Certaines donnÃ©es enregistrent dans un fichier sÃ©parÃ© des indicateurs de qualitÃ© pour chaque
+     * pixel. Si ces informations existent, alors le paramÃ¨tre {@code includeQuality} indique s'il
+     * faut procÃ©der Ã  leur chargement ou pas.
      * 
-     * @param   imageIndex L'index de l'image à traiter.
-     * @param   {@code true} pour procéder aussi au chargement des indicateurs de qualité.
-     * @throws  IndexOutOfBoundsException Si {@code indexImage} est différent de 0,
-     *          car on considère qu'il n'y a qu'une image par fichier HDF.
-     * @throws  IllegalStateException Si le champ {@link #input} n'a pas été initialisé via
+     * @param   imageIndex L'index de l'image Ã  traiter.
+     * @param   {@code true} pour procÃ©der aussi au chargement des indicateurs de qualitÃ©.
+     * @throws  IndexOutOfBoundsException Si {@code indexImage} est diffÃ©rent de 0,
+     *          car on considÃ¨re qu'il n'y a qu'une image par fichier HDF.
+     * @throws  IllegalStateException Si le champ {@link #input} n'a pas Ã©tÃ© initialisÃ© via
      *          {@link #setInput setInput(...)}.
      * @throws  IIOException Si le fichier HDF ne semble pas correct.
-     * @throws  IOException Si la lecture a échouée pour une autre raison.
+     * @throws  IOException Si la lecture a Ã©chouÃ©e pour une autre raison.
      */
     private void prepareDataset(final int imageIndex, final boolean includeQuality) throws IOException {
         if (imageIndex != 0) {
@@ -272,29 +272,29 @@ final class DefaultReader extends FileBasedReader {
             final File inputFile = getInputFile();
             dataset = open(inputFile.getPath());
             if (dataset == null) {
-                throw new IOException("Aucune donnée n'a été trouvée dans le fichier HDF.");
+                throw new IOException("Aucune donnÃ©e n'a Ã©tÃ© trouvÃ©e dans le fichier HDF.");
             }
             if (originatingProvider instanceof AbstractReaderSpi) {
                 checkName(inputFile, dataset, ((AbstractReaderSpi) originatingProvider).dataName);
             }
         }
         /*
-         * Procède au chargement des indicateurs de qualités, s'ils ont été demandés.
-         * Le nom de l'objet 'Dataset' obtenu sera comparé avec celui qui était attendu,
-         * et les indicateurs de qualités rejetés s'ils ne correspondent pas.
+         * ProcÃ¨de au chargement des indicateurs de qualitÃ©s, s'ils ont Ã©tÃ© demandÃ©s.
+         * Le nom de l'objet 'Dataset' obtenu sera comparÃ© avec celui qui Ã©tait attendu,
+         * et les indicateurs de qualitÃ©s rejetÃ©s s'ils ne correspondent pas.
          */
         if (includeQuality && qualityDataset==null && originatingProvider instanceof AbstractReaderSpi) {
             final File inputFile = getInputFile();
             final File qualityFile;
             if (isTemporaryFile()) {
-                qualityFile = null; // TODO: prendre en compte les indicateurs de qualité.
+                qualityFile = null; // TODO: prendre en compte les indicateurs de qualitÃ©.
             } else {
                 qualityFile = ((AbstractReaderSpi) originatingProvider).getQualityFile(inputFile);
             }
             if (qualityFile != null) {
                 if (!qualityFile.isFile()) {
-                    processWarningOccurred("Le fichier d'indicateurs de qualité \"" +
-                                           qualityFile.getName() + "\" n'a pas été trouvé.");
+                    processWarningOccurred("Le fichier d'indicateurs de qualitÃ© \"" +
+                                           qualityFile.getName() + "\" n'a pas Ã©tÃ© trouvÃ©.");
                 } else {
                     qualityDataset = open(qualityFile.getPath());
                     if (originatingProvider instanceof AbstractReaderSpi) {
@@ -306,11 +306,11 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Renvoie un objet {@link Dataset} à partir d'un objet {@link HObject}.
+     * Renvoie un objet {@link Dataset} Ã  partir d'un objet {@link HObject}.
      *
-     * @param   hobject L'objet {@link HObject} à parcourir.
+     * @param   hobject L'objet {@link HObject} Ã  parcourir.
      * @return  L'objet {@link Dataset} contenu dans l'objet {@link HObject}, ou {@code null}
-     *          si aucun n'a été trouvé.
+     *          si aucun n'a Ã©tÃ© trouvÃ©.
      * @throws  IIOException si une erreur est survenu lors de l'examen de {@code object}.
      */
     private static Dataset getDataset(final HObject object) throws IIOException {
@@ -333,19 +333,19 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Retourne le masque à appliquer sur les données lues pour éviter que le Java ne transforme
-     * certains entiers non-signés en valeurs négatives.
+     * Retourne le masque Ã  appliquer sur les donnÃ©es lues pour Ã©viter que le Java ne transforme
+     * certains entiers non-signÃ©s en valeurs nÃ©gatives.
      */
     private static int getMask(final Dataset dataset) throws IIOException {
         if (dataset != null) {
             final Datatype type = dataset.getDatatype();
             final int      size = type.getDatatypeSize() * Byte.SIZE;
             if (size<1 || size>Integer.SIZE) {
-                throw new IIOException("Les entiers sur " + size + " bits ne sont pas supportées.");
+                throw new IIOException("Les entiers sur " + size + " bits ne sont pas supportÃ©es.");
             }
             if (type.isUnsigned()) {
                 if (size == Integer.SIZE) {
-                    throw new IIOException("Les entiers non-signés sur " + size + " bits ne sont pas supportées.");
+                    throw new IIOException("Les entiers non-signÃ©s sur " + size + " bits ne sont pas supportÃ©es.");
                 }
                 return (1 << size) - 1;
             }
@@ -354,11 +354,11 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Vérifie que le nom du {@code dataset} est bien celui que l'on attend ({@code expected}).
+     * VÃ©rifie que le nom du {@code dataset} est bien celui que l'on attend ({@code expected}).
      * 
-     * @param   file         Le nom du fichier HDF traité.
-     * @param   dataset      Les données obtenues.
-     * @param   datasetName  Le nom du dataset attendu. Actuellement, pour la température ce nom est 
+     * @param   file         Le nom du fichier HDF traitÃ©.
+     * @param   dataset      Les donnÃ©es obtenues.
+     * @param   datasetName  Le nom du dataset attendu. Actuellement, pour la tempÃ©rature ce nom est 
      *                       {@code sst} et pour la chlorophylle le nom est {@code l3m_data}.
      * @throws  IIOException Si le nom du dataset n'est pas celui que l'on attendait.
      */
@@ -369,8 +369,8 @@ final class DefaultReader extends FileBasedReader {
                 expected = expected.trim();
                 if (!name.equalsIgnoreCase(expected)) {
                     throw new IIOException("Le fichier \"" + file.getName() +
-                            "\" ne semble par contenir les données attendues. " +
-                            "Ses données portent le nom \"" + name +
+                            "\" ne semble par contenir les donnÃ©es attendues. " +
+                            "Ses donnÃ©es portent le nom \"" + name +
                             "\" alors que l'on attendait \"" + expected + "\".");
                 }
             }
@@ -386,10 +386,10 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Ouvre le fichier spécifié et retourne les données qu'il contient, ou {@code null} si aucune
-     * donnée n'a été trouvée.
+     * Ouvre le fichier spÃ©cifiÃ© et retourne les donnÃ©es qu'il contient, ou {@code null} si aucune
+     * donnÃ©e n'a Ã©tÃ© trouvÃ©e.
      *
-     * @throws IOException si l'ouverture et la lecture du fichier a échoué.
+     * @throws IOException si l'ouverture et la lecture du fichier a Ã©chouÃ©.
      */
     private Dataset open(final String filename) throws IOException {
         if (format == null) {
@@ -414,7 +414,7 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Ferme le fichier associé au dataset spécifié.
+     * Ferme le fichier associÃ© au dataset spÃ©cifiÃ©.
      */
     private static void close(final Dataset dataset) {
         if (dataset != null) {
@@ -423,8 +423,8 @@ final class DefaultReader extends FileBasedReader {
                 format.close();
             } catch (Exception e) {
                 /*
-                 * Ignore cette erreur (excepté pour l'écriture dans le journal), étant
-                 * donné que l'on ferme ce fichier dans l'intention d'en ouvrir un autre.
+                 * Ignore cette erreur (exceptÃ© pour l'Ã©criture dans le journal), Ã©tant
+                 * donnÃ© que l'on ferme ce fichier dans l'intention d'en ouvrir un autre.
                  */
                 Utilities.unexpectedException("net.sicade.image.io.hdf", "DefaultReader", "setInput", e);
             }
@@ -432,7 +432,7 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Libère toutes les ressources utilisées par cet objet.
+     * LibÃ¨re toutes les ressources utilisÃ©es par cet objet.
      */
     @Override
     public void dispose() {

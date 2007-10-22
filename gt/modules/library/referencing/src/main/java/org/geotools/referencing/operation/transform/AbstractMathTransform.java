@@ -3,7 +3,7 @@
  *    http://geotools.org
  *   
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *   (C) 2001, Institut de Recherche pour le Développement
+ *   (C) 2001, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -385,16 +385,16 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                      * There is no need to keep the old control point because it was not lying
                      * on the curve.
                      *
-                     * NOTE: Le point calculé est bien sur la courbe, mais n'est pas
-                     *       nécessairement représentatif. Cet algorithme remplace les
-                     *       deux points de contrôles par un seul, ce qui se traduit par
-                     *       une perte de souplesse qui peut donner de mauvais résultats
-                     *       si la courbe cubique était bien tordue. Projeter une courbe
-                     *       cubique ne me semble pas être un problème simple, mais ce
-                     *       cas devrait être assez rare. Il se produira le plus souvent
+                     * NOTE: Le point calculÃ© est bien sur la courbe, mais n'est pas
+                     *       nÃ©cessairement reprÃ©sentatif. Cet algorithme remplace les
+                     *       deux points de contrÃ´les par un seul, ce qui se traduit par
+                     *       une perte de souplesse qui peut donner de mauvais rÃ©sultats
+                     *       si la courbe cubique Ã©tait bien tordue. Projeter une courbe
+                     *       cubique ne me semble pas Ãªtre un problÃ¨me simple, mais ce
+                     *       cas devrait Ãªtre assez rare. Il se produira le plus souvent
                      *       si on essaye de projeter un cercle ou une ellipse, auxquels
-                     *       cas l'algorithme actuel donnera quand même des résultats
-                     *       tolérables.
+                     *       cas l'algorithme actuel donnera quand mÃªme des rÃ©sultats
+                     *       tolÃ©rables.
                      */
                     buffer[0] = 0.25*(1.5*(buffer[0]+buffer[2]) + 0.5*(ax + (ax=buffer[4])));
                     buffer[1] = 0.25*(1.5*(buffer[1]+buffer[3]) + 0.5*(ay + (ay=buffer[5])));
@@ -423,9 +423,9 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             }
         }
         /*
-         * La projection de la forme géométrique est terminée. Applique
-         * une transformation affine si c'était demandée, puis retourne
-         * une version si possible simplifiée de la forme géométrique.
+         * La projection de la forme gÃ©omÃ©trique est terminÃ©e. Applique
+         * une transformation affine si c'Ã©tait demandÃ©e, puis retourne
+         * une version si possible simplifiÃ©e de la forme gÃ©omÃ©trique.
          */
         if (postTransform != null) {
             path.transform(postTransform);

@@ -529,7 +529,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
     public static class Provider extends AbstractProvider {
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90Â°. Default value is 0.
          */
         public static final ParameterDescriptor LATITUDE_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
@@ -542,7 +542,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@link #centralMeridian}
-         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180Â°. Default value is 0.
          */
         public static final ParameterDescriptor LONGITUDE_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {

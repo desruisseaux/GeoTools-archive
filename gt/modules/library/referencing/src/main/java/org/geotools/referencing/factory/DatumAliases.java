@@ -78,7 +78,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * softwares often use different names for the same datum,
  * which result in {@link OperationNotFoundException} when attempting to convert coordinates from
  * one {@linkplain CoordinateReferenceSystem coordinate reference system} to an other one. For
- * example "<cite>Nouvelle Triangulation Française (Paris)</cite>" and
+ * example "<cite>Nouvelle Triangulation FranÃ§aise (Paris)</cite>" and
  * "<cite>NTF (Paris meridian)</cite>" are actually the same datum. This {@code DatumAliases}
  * class provides a way to handle that.
  * <p>
@@ -539,7 +539,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
      * Creates a vertical datum from an enumerated type value.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  type The type of this vertical datum (often “geoidal”).
+     * @param  type The type of this vertical datum (often Â“geoidalÂ”).
      * @throws FactoryException if the object creation failed.
      */
     public synchronized VerticalDatum createVerticalDatum(final Map properties,

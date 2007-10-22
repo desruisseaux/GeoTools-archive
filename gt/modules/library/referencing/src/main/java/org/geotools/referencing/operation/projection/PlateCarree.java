@@ -38,7 +38,7 @@ import org.geotools.resources.i18n.Errors;
 /**
  * Plate Carree (or Equirectangular) projection. This is a particular case of
  * {@linkplain EquidistantCylindrical Equidistant Cylindrical} projection where the
- * {@code standard_parallel_1} is 0°.
+ * {@code standard_parallel_1} is 0Â°.
  *
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on RemoteSensing.org</A>
  *

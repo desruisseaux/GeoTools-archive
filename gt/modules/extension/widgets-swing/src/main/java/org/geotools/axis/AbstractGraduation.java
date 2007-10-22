@@ -2,8 +2,8 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2000, Institut de Recherche pour le Développement
- *    (C) 1999, Pêches et Océans Canada
+ *    (C) 2000, Institut de Recherche pour le DÃ©veloppement
+ *    (C) 1999, PÃªches et OcÃ©ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -109,7 +109,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     
     /**
      * Returns the axis title. If {@code includeUnits} is {@code true}, then the returned string
-     * will includes units as in "Temperature (°C)". The exact formatting is local-dependent.
+     * will includes units as in "Temperature (Â°C)". The exact formatting is local-dependent.
      *
      * @param  includeSymbol {@code true} to format unit symbol after the name.
      * @return The graduation name (also to be use as axis title).
@@ -220,9 +220,9 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Retourne l'espace approximatif (en pixels ou en points) à laisser entre les
-     * graduations principales. L'espace réel entre les graduations peut être légèrement
-     * différent, par exemple pour avoir des étiquettes qui correspondent à des valeurs
+     * Retourne l'espace approximatif (en pixels ou en points) Ã  laisser entre les
+     * graduations principales. L'espace rÃ©el entre les graduations peut Ãªtre lÃ©gÃ¨rement
+     * diffÃ©rent, par exemple pour avoir des Ã©tiquettes qui correspondent Ã  des valeurs
      * arrondies.
      */
     static float getVisualTickSpacing(final RenderingHints hints) {
@@ -230,7 +230,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Retourne une valeur sous forme de nombre réel.
+     * Retourne une valeur sous forme de nombre rÃ©el.
      */
     private static float getValue(final RenderingHints   hints,
                                   final RenderingHints.Key key,
@@ -249,11 +249,11 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
     
     /**
-     * Vérifie que le nombre spécifié est non-nul. S'il
-     * est 0, NaN ou infini, une exception sera lancée.
+     * VÃ©rifie que le nombre spÃ©cifiÃ© est non-nul. S'il
+     * est 0, NaN ou infini, une exception sera lancÃ©e.
      *
      * @param  name Nom de l'argument.
-     * @param  n Nombre à vérifier.
+     * @param  n Nombre Ã  vÃ©rifier.
      * @throws IllegalArgumentException Si <var>n</var> est NaN ou infini.
      */
     static void ensureNonNull(final String name, final double n) throws IllegalArgumentException {
@@ -264,10 +264,10 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
     
     /**
-     * Vérifie que le nombre spécifié est réel. S'il est NaN ou infini, une exception sera lancée.
+     * VÃ©rifie que le nombre spÃ©cifiÃ© est rÃ©el. S'il est NaN ou infini, une exception sera lancÃ©e.
      *
      * @param  name Nom de l'argument.
-     * @param  n Nombre à vérifier.
+     * @param  n Nombre Ã  vÃ©rifier.
      * @throws IllegalArgumentException Si <var>n</var> est NaN ou infini.
      */
     static void ensureFinite(final String name, final double n) throws IllegalArgumentException {
@@ -278,10 +278,10 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Vérifie que le nombre spécifié est réel. S'il est NaN ou infini, une exception sera lancée.
+     * VÃ©rifie que le nombre spÃ©cifiÃ© est rÃ©el. S'il est NaN ou infini, une exception sera lancÃ©e.
      *
      * @param  name Nom de l'argument.
-     * @param  n Nombre à vérifier.
+     * @param  n Nombre Ã  vÃ©rifier.
      * @throws IllegalArgumentException Si <var>n</var> est NaN ou infini.
      */
     static void ensureFinite(final String name, final float n) throws IllegalArgumentException {

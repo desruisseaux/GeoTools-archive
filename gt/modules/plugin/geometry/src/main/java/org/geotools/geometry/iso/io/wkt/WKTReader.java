@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006-2007, GeoTools Project Management Committee (PMC)
- *    (C) 2006       University of Applied Sciences Köln (Fachhochschule Köln)
+ *    (C) 2006       University of Applied Sciences KÃ¶ln (Fachhochschule KÃ¶ln)
  *    (C) 2001-2006  Vivid Solutions
  *    
  *    This library is free software; you can redistribute it and/or
@@ -490,7 +490,7 @@ public class WKTReader {
 									.createDirectPosition((aCoords[i]
 											.getCoordinates()))));
 		}
-		// Create List of CurveSegment´s (LineString´s)
+		// Create List of CurveSegmentÂ´s (LineStringÂ´s)
 		LineString lineString = new LineStringImpl(new PointArrayImpl( points ), 0.0); //this.geometryFactory.createLineString(points);
 		List<CurveSegment> segments = new ArrayList<CurveSegment>();
 		segments.add(lineString);
