@@ -659,6 +659,10 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("Abstract")) {
 				style.setAbstract(child.getFirstChild().getNodeValue());
 			}
+			
+			if (childName.equalsIgnoreCase("IsDefault")) {
+                style.setDefault(Boolean.valueOf(child.getFirstChild().getNodeValue()).booleanValue());
+            }
 
 			if (childName.equalsIgnoreCase("FeatureTypeStyle")) {
 				style.addFeatureTypeStyle(parseFeatureTypeStyle(child));

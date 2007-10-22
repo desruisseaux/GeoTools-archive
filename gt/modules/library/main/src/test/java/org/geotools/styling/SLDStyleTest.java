@@ -105,6 +105,7 @@ public class SLDStyleTest extends TestCase {
         assertEquals("My User Style", style.getName());
         assertEquals("A style by me", style.getTitle());
         assertEquals("this is a sample style", style.getAbstract());
+        assertTrue(style.isDefault());
 
         FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
         Rule rule = fts.getRules()[0];

@@ -14,6 +14,7 @@ F:\projects\schema\sld\1.0.0\StyledLayerDescriptor.xsd" version="1.0.0">
 		       <Name>My User Style</Name>
 			<Title>A style by me</Title>
 			<Abstract>this is a sample style</Abstract>
+            <IsDefault>true</IsDefault>
 			<FeatureTypeStyle>
 				<Rule>
 					<LineSymbolizer>
