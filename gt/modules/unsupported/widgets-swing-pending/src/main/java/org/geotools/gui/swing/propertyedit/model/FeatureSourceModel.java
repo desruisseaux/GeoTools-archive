@@ -13,25 +13,31 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.propertyedit.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTable;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
-import org.opengis.feature.FeatureStore;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 /**
  *
@@ -41,46 +47,47 @@ public class FeatureSourceModel implements TableModel {
 
     private ArrayList<PropertyDescriptor> columns = new ArrayList<PropertyDescriptor>();
     private ArrayList<Feature> features = new ArrayList<Feature>();
-    private FeatureSource source;
-    private FeatureCollection collection;
+    private MapLayer layer;
     private JXTable tab;
+    private Query query = Query.ALL; 
 
     /** Creates a new instance of BasicTableModel
      * @param tab
-     * @param collection
-     * @param source
+     * @param layer 
      */
-    public FeatureSourceModel(JXTable tab, FeatureSource source) {
+    public FeatureSourceModel(JXTable tab, MapLayer layer) {
         super();
         this.tab = tab;
-        this.source = source;
+        this.layer = layer;
 
-        init();
+        setQuery(layer.getQuery());
     }
 
-    private void init() {
-
+    public void setQuery(Query query) {
+        this.query = query;
+        
         columns.clear();
         features.clear();
 
-        FeatureType ft = source.getSchema();
+        FeatureType ft = layer.getFeatureSource().getSchema();
 
         Collection<PropertyDescriptor> cols = ft.getProperties();
         Iterator<PropertyDescriptor> ite = cols.iterator();
 
-        PropertyDescriptor desc;
         while (ite.hasNext()) {
             columns.add(ite.next());
         }
-
+        
         try {
-            FeatureIterator fi = source.getFeatures().features();
+            FeatureIterator fi = layer.getFeatureSource().getFeatures(query.getFilter()).features();            
             while (fi.hasNext()) {
                 features.add(fi.next());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+
     }
 
     public int getColumnCount() {
@@ -110,38 +117,33 @@ public class FeatureSourceModel implements TableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
         FeatureStore store;
-        if (source instanceof FeatureStore) {
+        if (layer.getFeatureSource() instanceof FeatureStore) {
 
-            System.out.println("la");
-            /*try {
-            Feature feature = features[rowIndex];
-            feature.getProperty(columns.get(columnIndex).getName()).setValue(aValue);
-            //features.get(rowIndex).setAttribute(columnIndex, aValue);
-            } catch (Exception ex) {
-            ex.printStackTrace();
-            }*/
-
-            store = (FeatureStore) source;
+            store = (FeatureStore) layer.getFeatureSource();
             DefaultTransaction transaction = new DefaultTransaction("trans_maj");
 
-            //transaction.
-            //store.
-            /*store.setTransaction(transaction);
+
+            store.setTransaction(transaction);
             FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
-            Filter filter = ff.id(Collections.singleton(ff.featureId(features.get(rowIndex).getID())));
-            FeatureType featureType = store.getSchema();
-            AttributeType attributeType = featureType.getAttributeType(collection.getSchema().getAttributeType(columnIndex).getName());
+            Filter filter = ff.id(Collections.singleton(ff.featureId(features.get(rowIndex).getID())));            
+            FeatureType schema = store.getSchema();
+            
+            AttributeDescriptor NAME = (AttributeDescriptor) schema.getProperty(getColumnName(columnIndex));
+                        
             try {
-            store.modifyFeatures(attributeType, aValue, filter);
-            transaction.commit();
+                store.modifyFeatures(NAME, aValue, filter);
+                transaction.commit();
             } catch (IOException ex) {
-            ex.printStackTrace();
-            try {
-            transaction.rollback();
-            } catch (IOException e) {
-            e.printStackTrace();
+                ex.printStackTrace();
+                try {
+                    transaction.rollback();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            }*/
+
+            setQuery(query);
+
         }
     }
 

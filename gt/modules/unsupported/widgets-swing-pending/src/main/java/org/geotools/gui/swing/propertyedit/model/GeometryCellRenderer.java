@@ -49,7 +49,7 @@ public class GeometryCellRenderer extends JPanel implements TableCellRenderer{
      */
     public GeometryCellRenderer() {
         icon = IconBundle.getResource().getIcon("edit_geom");
-        JLabel lbl = new JLabel( TextBundle.getResource().getString("edit"),icon,SwingConstants.LEFT);
+        JLabel lbl = new JLabel( );
         lbl.setBorder(null);        
         setLayout(new GridLayout(1,1));
         

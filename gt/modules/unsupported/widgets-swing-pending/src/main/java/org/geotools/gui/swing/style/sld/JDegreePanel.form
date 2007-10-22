@@ -45,7 +45,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="org.geotools.gui.swing.extended.DegreeClock" name="clock">
+    <Container class="org.geotools.gui.swing.style.sld.DegreeClock" name="clock">
 
       <Layout>
         <DimensionLayout dim="0">

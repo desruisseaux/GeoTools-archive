@@ -197,7 +197,7 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
         jPanel7 = new javax.swing.JPanel();
         gui_stroke = new org.geotools.gui.swing.style.sld.JStrokePanel();
         jPanel6 = new javax.swing.JPanel();
-        gui_orientation = new org.geotools.gui.swing.extended.JDegreePanel();
+        gui_orientation = new org.geotools.gui.swing.style.sld.JDegreePanel();
         lbl_gen_size = new javax.swing.JLabel();
         gui_size = new org.geotools.gui.swing.style.sld.JExpressionPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -370,7 +370,7 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
     private org.geotools.gui.swing.style.sld.JExpressionPanel gui_color;
     private javax.swing.JComboBox gui_jcb_forme;
     private org.geotools.gui.swing.style.sld.JExpressionPanel gui_opacity;
-    private org.geotools.gui.swing.extended.JDegreePanel gui_orientation;
+    private org.geotools.gui.swing.style.sld.JDegreePanel gui_orientation;
     private org.geotools.gui.swing.style.sld.JExpressionPanel gui_size;
     private org.geotools.gui.swing.style.sld.JStrokePanel gui_stroke;
     private javax.swing.JButton jButton1;

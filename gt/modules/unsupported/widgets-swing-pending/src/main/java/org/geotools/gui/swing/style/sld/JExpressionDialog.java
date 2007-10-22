@@ -9,8 +9,12 @@ package org.geotools.gui.swing.style.sld;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
@@ -96,7 +100,14 @@ public class JExpressionDialog extends javax.swing.JDialog {
     }
     
     public Expression getExpression(){
-        StyleBuilder sb = new StyleBuilder();        
+        try {
+            Expression expr = CQL.toExpression(jta.getText());           
+            return expr;
+        } catch (CQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        StyleBuilder sb = new StyleBuilder();
         return sb.literalExpression(jta.getText());
     }
     

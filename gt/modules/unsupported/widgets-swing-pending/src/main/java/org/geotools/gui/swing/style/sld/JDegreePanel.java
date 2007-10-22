@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.extended;
+package org.geotools.gui.swing.style.sld;
 
 import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
@@ -71,7 +71,7 @@ public class JDegreePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        clock = new org.geotools.gui.swing.extended.DegreeClock();
+        clock = new org.geotools.gui.swing.style.sld.DegreeClock();
         exptxt = new org.geotools.gui.swing.style.sld.JExpressionPanel();
 
         setMaximumSize(new java.awt.Dimension(100, 40));
@@ -108,7 +108,7 @@ public class JDegreePanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.geotools.gui.swing.extended.DegreeClock clock;
+    private org.geotools.gui.swing.style.sld.DegreeClock clock;
     private org.geotools.gui.swing.style.sld.JExpressionPanel exptxt;
     // End of variables declaration//GEN-END:variables
 }

@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.extended;
+package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
 import java.awt.Graphics;

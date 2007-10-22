@@ -60,6 +60,12 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         initComponents();
        
         but_nouveau.setText(TextBundle.getResource().getString("new"));
+        
+        
+        gui_choose.addChoosableFileFilter(new FiltreShape());
+        gui_choose.addChoosableFileFilter(new FiltreTIF());
+        gui_choose.setMultiSelectionEnabled(true);
+        
     }
 
     /** This method is called from within the constructor to
@@ -72,8 +78,9 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
         but_nouveau = new javax.swing.JButton();
         jtf_error = new javax.swing.JTextField();
+        gui_choose = new javax.swing.JFileChooser();
 
-        but_nouveau.setText("Nouveau");
+        but_nouveau.setText(TextBundle.getResource().getString("add"));
         but_nouveau.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionNouveau(evt);
@@ -82,45 +89,36 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
         jtf_error.setEditable(false);
 
+        gui_choose.setControlButtonsAreShown(false);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_nouveau)
                 .addContainerGap())
+            .add(gui_choose, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(gui_choose, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(but_nouveau)
                     .add(jtf_error, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void actionNouveau(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionNouveau
         ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
         
-        JFileChooser jfc = new JFileChooser();
-        jfc.setCurrentDirectory(LASTPATH);
-        //Filtres vecteurs
-        jfc.addChoosableFileFilter(new FiltreShape());
-
-        //Filtres rasters
-        jfc.addChoosableFileFilter(new FiltreTIF());
-
-        jfc.setMultiSelectionEnabled(true);
-
-        int retour = jfc.showOpenDialog(this);
-
-        if (retour == JFileChooser.APPROVE_OPTION) {
-            File[] files = jfc.getSelectedFiles();
+        File[] files = gui_choose.getSelectedFiles();
             for (File f : files) {
 
                 Object source = getDataStore(f);
@@ -166,8 +164,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                 }
                 fireEvent( lys );
             }
-            
-        }
+        
     }//GEN-LAST:event_actionNouveau
 
     public ImageIcon getIcon16() {
@@ -229,6 +226,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_nouveau;
+    private javax.swing.JFileChooser gui_choose;
     private javax.swing.JTextField jtf_error;
     // End of variables declaration//GEN-END:variables
 

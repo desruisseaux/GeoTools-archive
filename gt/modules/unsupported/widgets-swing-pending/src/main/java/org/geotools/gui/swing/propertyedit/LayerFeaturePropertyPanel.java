@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.propertyedit;
 
 import java.awt.Color;
@@ -35,6 +34,8 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import org.geotools.data.Query;
 
 /**
  *
@@ -66,10 +67,10 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
 
         SwingUtilities.invokeLater(new Runnable() {
 
-            public void run() {
-                tab_data.packAll();
-            }
-        });
+                    public void run() {
+                        tab_data.packAll();
+                    }
+                });
 
 
         jcb_collection.addItem(TextBundle.getResource().getString("filter"));
@@ -89,6 +90,8 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         jcb_edit = new javax.swing.JCheckBox();
         jbu_action = new javax.swing.JButton();
         jcb_collection = new javax.swing.JComboBox();
+
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
         tab_data.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -113,7 +116,6 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         jbu_action.setText("Action");
         jbu_action.setEnabled(false);
 
-        jcb_collection.setEnabled(false);
         jcb_collection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionCollection(evt);
@@ -146,20 +148,19 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
     private void actionCollection(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionCollection
-        /*if(layer != null){
-        FeatureSource fs = layer.getFeatureSource();
-        try {
-        if(jcb_collection.getSelectedIndex() == 0){
-        ((FeatureSourceModel)tab_data.getModel()).reset(fs.getFeatures(layer.getQuery()));
-        } else if (jcb_collection.getSelectedIndex() == 1){
-        ((FeatureSourceModel)tab_data.getModel()).reset(fs.getFeatures(Query.ALL));
+        if (layer != null) {
+            FeatureSource fs = layer.getFeatureSource();
+
+            if (jcb_collection.getSelectedIndex() == 0) {
+                ((FeatureSourceModel) tab_data.getModel()).setQuery(layer.getQuery());
+            } else if (jcb_collection.getSelectedIndex() == 1) {
+                ((FeatureSourceModel) tab_data.getModel()).setQuery(Query.ALL);
+            }
+            
+            tab_data.setModel(tab_data.getModel());
+
         }
-        } catch (IOException ex) {
-        ex.printStackTrace();
-        }
-        }*/
     }//GEN-LAST:event_actionCollection
 
     private void actionEditer(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionEditer
@@ -172,7 +173,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     private javax.swing.JCheckBox jcb_edit;
     private org.jdesktop.swingx.JXTable tab_data;
     // End of variables declaration//GEN-END:variables
-
+    
     public void setTarget(Object target) {
 
         if (target instanceof MapLayer) {
@@ -188,16 +189,14 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
                 editable = false;
             }
             setEditable(editable);
-            
-            tab_data.setModel(new FeatureSourceModel(tab_data,source));
+
+            tab_data.setModel(new FeatureSourceModel(tab_data, layer));
         }
 
-            
-        
     }
 
     public void apply() {
-//        DefaultTransaction transaction = new DefaultTransaction("Example1");
+    //        DefaultTransaction transaction = new DefaultTransaction("Example1");
 //        FeatureStore store = (FeatureStore) source.getFeatureSource();
 //        store.setTransaction( transaction );
 //        try {
@@ -225,9 +224,8 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }
 
     private void setEditable(boolean editable) {
-        /*jcb_collection.setEnabled(editable);
         jcb_edit.setEnabled(editable);
-        jbu_action.setEnabled(editable);*/
+        jbu_action.setEnabled(editable);
     }
 
     public void revert() {
