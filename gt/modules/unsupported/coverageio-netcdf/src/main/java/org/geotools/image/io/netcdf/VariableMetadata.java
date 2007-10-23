@@ -15,11 +15,14 @@
  */
 package org.geotools.image.io.netcdf;
 
+import java.awt.image.DataBuffer;
+
 // NetCDF dependencies
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
-import ucar.nc2.dataset.EnhanceScaleMissing; // For javadoc
+import ucar.nc2.VariableIF;
+import ucar.nc2.dataset.VariableEnhanced;
 
 // Geotools dependencies
 import org.geotools.resources.XArray;
@@ -32,10 +35,10 @@ import org.geotools.image.io.metadata.Band;
  * <p>
  * <ul>
  *   <li>I have not been able to find any method giving me directly the offset and scale factor.
- *       We can use some trick with {@link EnhanceScaleMissing#convertScaleOffsetMissing}, but
+ *       We can use some trick with {@link VariableEnhanced#convertScaleOffsetMissing}, but
  *       they are subject to rounding errors and there is no efficient way I can see to take
  *       missing values in account.</li>
- *   <li>The {@link EnhanceScaleMissing} methods are available only if the variable is enhanced.
+ *   <li>The {@link VariableEnhanced} methods are available only if the variable is enhanced.
  *       Our variable is not, because we want raw (packed) data.</li>
  *   <li>We want minimum, maximum and fill values in packed units (as opposed to the geophysics
  *       values provided by the UCAR's API), because we check for missing values before to
@@ -47,6 +50,11 @@ import org.geotools.image.io.metadata.Band;
  * @author Martin Desruisseaux
  */
 final class VariableMetadata {
+    /**
+     * Raw image type as one of {@link DataBuffer} constants.
+     */
+    private final int imageType;
+
     /**
      * The scale and and offset values, or {@link Double#NaN NaN} if none.
      */
@@ -76,13 +84,14 @@ final class VariableMetadata {
     /**
      * Extracts metadata from the specified variable using UCAR's API. This approach suffers
      * from rounding errors and is unable to get the missing values. Use this constructor
-     * only for checking the result from our own code with result from the UCAR's API.
+     * only for comparing our own results with the results from the UCAR's API.
      */
-    public VariableMetadata(final EnhanceScaleMissing variable) {
-        offset  =  variable.convertScaleOffsetMissing(0.0);
-        scale   =  variable.convertScaleOffsetMissing(1.0) - offset;
-        minimum = (variable.getValidMin() - offset) / scale;
-        maximum = (variable.getValidMax() - offset) / scale;
+    public VariableMetadata(final VariableEnhanced variable) {
+        imageType = getRawDataType(variable);
+        offset    =  variable.convertScaleOffsetMissing(0.0);
+        scale     =  variable.convertScaleOffsetMissing(1.0) - offset;
+        minimum   = (variable.getValidMin() - offset) / scale;
+        maximum   = (variable.getValidMax() - offset) / scale;
         missingValues = null; // No way to get this information.
     }
 
@@ -100,6 +109,7 @@ final class VariableMetadata {
          * Gets the scale factors, if present. Also remember its type
          * for the heuristic rule to be applied later on the valid range.
          */
+        imageType  = getRawDataType(variable);
         dataType   = widestType = variable.getDataType();
         scale      = attribute(variable, "scale_factor");
         offset     = attribute(variable, "add_offset");
@@ -150,8 +160,10 @@ final class VariableMetadata {
                 }
             }
         }
-        this.minimum = Double.isNaN(minimum) ? Double.NEGATIVE_INFINITY : minimum;
-        this.maximum = Double.isNaN(maximum) ? Double.POSITIVE_INFINITY : maximum;
+        if (Double.isNaN(minimum)) minimum = Double.NEGATIVE_INFINITY;
+        if (Double.isNaN(maximum)) maximum = Double.POSITIVE_INFINITY;
+        this.minimum = minimum;
+        this.maximum = maximum;
         /*
          * Gets fill and missing values. According UCAR documentation, they are
          * always in packed units. We keep them "as-is" (as opposed to UCAR who
@@ -223,12 +235,44 @@ scan:   for (int i=0; i<missingCount; i++) {
     }
 
     /**
+     * Returns the data type which most closely represents the "raw" internal data
+     * of the variable. This is the value returned by the default implementation of
+     * {@link NetcdfImageReader#getRawDataType}.
+     *
+     * @param  variable The variable.
+     * @return The data type, or {@link DataBuffer#TYPE_UNDEFINED} if unknown.
+     *
+     * @see NetcdfImageReader#getRawDataType
+     */
+    static int getRawDataType(final VariableIF variable) {
+        final DataType type = variable.getDataType();
+        if (DataType.BOOLEAN.equals(type) || DataType.BYTE.equals(type)) {
+            return DataBuffer.TYPE_BYTE;
+        }
+        if (DataType.CHAR.equals(type)) {
+            return DataBuffer.TYPE_USHORT;
+        }
+        if (DataType.SHORT.equals(type)) {
+            return variable.isUnsigned() ? DataBuffer.TYPE_USHORT : DataBuffer.TYPE_SHORT;
+        }
+        if (DataType.INT.equals(type)) {
+            return DataBuffer.TYPE_INT;
+        }
+        if (DataType.FLOAT.equals(type)) {
+            return DataBuffer.TYPE_FLOAT;
+        }
+        if (DataType.LONG.equals(type) || DataType.DOUBLE.equals(type)) {
+            return DataBuffer.TYPE_DOUBLE;
+        }
+        return DataBuffer.TYPE_UNDEFINED;
+    }
+
+    /**
      * Copies the value in this variable metadata into the specified band.
      */
     public void copyTo(final Band band) {
         band.setScale(scale);
         band.setOffset(offset);
-        band.setValidRange(minimum, maximum);
-        band.setNoDataValues(missingValues);
+        band.setPackedValues(minimum, maximum, missingValues, imageType);
     }
 }

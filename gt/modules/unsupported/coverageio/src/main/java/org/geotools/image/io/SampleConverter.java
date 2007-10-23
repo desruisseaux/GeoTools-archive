@@ -19,6 +19,7 @@ package org.geotools.image.io;
 // J2SE dependencies
 import java.awt.image.Raster;  // For javadoc
 import org.geotools.resources.XMath;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -160,6 +161,14 @@ public abstract class SampleConverter {
      */
     public double getOffset() {
         return 0;
+    }
+
+    /**
+     * Returns a string representation of this sample converter.
+     * This is mostly for debugging purpose and may change in any future version.
+     */
+    public String toString() {
+        return Utilities.getShortClassName(this) + "[offset=" + getOffset() + ']';
     }
 
     /**

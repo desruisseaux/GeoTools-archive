@@ -17,7 +17,6 @@
  */
 package org.geotools.axis;
 
-// J2SE dependencies and extensions
 import java.awt.Font;
 import java.awt.RenderingHints;
 import java.beans.PropertyChangeListener;
@@ -30,7 +29,7 @@ import javax.units.Unit;
  * An axis's graduation. A {@code Graduation} object encompass minimal
  * and maximal values for an axis in arbitrary units, and allow access to
  * tick locations and labels through a {@link TickIterator} object.
- *
+ * <p>
  * Different implementations may compute tick locations in different ways.
  * For example a graduation for dates is handled in a different way than a
  * graduation for numbers.
@@ -87,7 +86,7 @@ public interface Graduation {
      * @see #getMaximum
      * @see #getRange
      */
-    public abstract double getMinimum();
+    double getMinimum();
 
     /**
      * Returns the maximal value for this graduation.
@@ -97,14 +96,14 @@ public interface Graduation {
      * @see #getMinimum
      * @see #getRange
      */
-    public abstract double getMaximum();
+    double getMaximum();
 
     /**
      * Returns the graduation's range. This is equivalents to computing
      * <code>{@link #getMaximum}-{@link #getMinimum}</code>. However, some
      * implementation may optimize this computation in order to avoid rounding errors.
      */
-    public abstract double getRange();
+    double getRange();
 
     /**
      * Returns the axis title. If {@code includeUnits} is {@code true}, then the returned string
@@ -114,24 +113,24 @@ public interface Graduation {
      * @param  includeSymbol {@code true} to format the unit or timezone symbol after the name.
      * @return The graduation name (also to be use as axis title).
      */
-    public abstract String getTitle(final boolean includeSymbol);
+    String getTitle(final boolean includeSymbol);
 
     /**
      * Returns the graduation's units, or {@code null} if unknow.
      */
-    public abstract Unit getUnit();
+    Unit getUnit();
 
     /**
      * Returns the locale to use for formatting title and labels.
      */
-    public abstract Locale getLocale();
+    Locale getLocale();
 
     /**
      * Returns the format to use for formatting labels. The format really used by
      * {@link TickIterator#currentLabel} may not be the same. For example, some
      * iterators may adjust automatically the number of fraction digits.
      */
-    public abstract Format getFormat();
+    Format getFormat();
 
     /**
      * Returns an iterator object that iterates along the graduation ticks and provides access to
@@ -146,17 +145,17 @@ public interface Graduation {
      * @return A iterator to use for iterating through the graduation. This
      *         iterator may or may not be the {@code reuse} object.
      */
-    public abstract TickIterator getTickIterator(RenderingHints hints, TickIterator reuse);
+    TickIterator getTickIterator(RenderingHints hints, TickIterator reuse);
 
     /**
      * Adds a {@link PropertyChangeListener} to the listener list.
      * The listener is registered for all properties, such as "label"
      * and "locale".
      */
-    public abstract void addPropertyChangeListener(PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
     /**
      * Removes a {@link PropertyChangeListener} from the listener list.
      */
-    public abstract void removePropertyChangeListener(PropertyChangeListener listener);
+    void removePropertyChangeListener(PropertyChangeListener listener);
 }

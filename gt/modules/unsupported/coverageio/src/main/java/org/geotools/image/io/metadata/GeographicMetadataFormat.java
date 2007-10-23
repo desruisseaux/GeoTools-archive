@@ -177,7 +177,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * Enumeration of valid axis directions. We do not declare {@link String} constants for them
      * since they are already available as {@linkplain org.opengis.referencing.cs.AxisDirection
-     * axis direction} code list.
+     * axis direction} code list.
      */
     static final List/*<String>*/ DIRECTIONS = new UnmodifiableArrayList(new String[] {
         "north", "east", "south", "west", "up", "down"
@@ -186,7 +186,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * Enumeration of valid pixel orientation. We do not declare {@link String} constants for them
      * since they are already available as {@linkplain org.opengis.metadata.spatial.PixelOrientation
-     * pixel orientation} code list.
+     * pixel orientation} code list.
      */
     static final List/*<String>*/ PIXEL_ORIENTATIONS = new UnmodifiableArrayList(new String[] {
         "center", "lower left", "lower right", "upper right", "upper left"

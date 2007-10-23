@@ -70,7 +70,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     protected final PropertyChangeSupport listenerList;
 
     /**
-     * Construct a graduation with the supplied units.
+     * Constructs a graduation with the supplied units.
      *
      * @param unit The axis's units, or {@code null} if unknow.
      */
@@ -80,7 +80,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Set the minimum value for this graduation. If the new minimum is greater than the current
+     * Sets the minimum value for this graduation. If the new minimum is greater than the current
      * maximum, then the maximum will also be set to a value greater than or equals to the minimum.
      *
      * @param  value The new minimum in {@link #getUnit} units.
@@ -94,7 +94,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     public abstract boolean setMinimum(final double value) throws IllegalArgumentException;
 
     /**
-     * Set the maximum value for this graduation. If the new maximum is less than the current
+     * Sets the maximum value for this graduation. If the new maximum is less than the current
      * minimum, then the minimum will also be set to a value less than or equals to the maximum.
      *
      * @param  value The new maximum in {@link #getUnit} units.
@@ -106,7 +106,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
      * @see #setMinimum(double)
      */
     public abstract boolean setMaximum(final double value) throws IllegalArgumentException;
-    
+
     /**
      * Returns the axis title. If {@code includeUnits} is {@code true}, then the returned string
      * will includes units as in "Temperature (°C)". The exact formatting is local-dependent.
@@ -126,7 +126,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Set the axis title, not including unit symbol. This method will fire a
+     * Sets the axis title, not including unit symbol. This method will fire a
      * property change event with the {@code "title"} property name.
      *
      * @param title New axis title, or {@code null} to remove any previous setting.
@@ -184,7 +184,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Set the locale to use for formatting labels.
+     * Sets the locale to use for formatting labels.
      * This will fire a property change event with the {@code "locale"} property name.
      */
     public synchronized void setLocale(final Locale locale) {
@@ -247,7 +247,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
         }
         return defaultValue;
     }
-    
+
     /**
      * Vérifie que le nombre spécifié est non-nul. S'il
      * est 0, NaN ou infini, une exception sera lancée.
@@ -262,7 +262,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
                         ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Double(n)));
         }
     }
-    
+
     /**
      * Vérifie que le nombre spécifié est réel. S'il est NaN ou infini, une exception sera lancée.
      *

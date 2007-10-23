@@ -16,7 +16,7 @@
  */
 package org.geotools.image.io.metadata;
 
-// Geotools dependencies
+import java.awt.image.DataBuffer;
 import org.geotools.util.NumberRange;
 
 
@@ -101,14 +101,20 @@ public class Band extends MetadataAccessor {
     }
 
     /**
-     * Set the range of valid values. The values should be integers most of the time since
+     * Sets the range of valid values. The values should be integers most of the time since
      * they are packed values (often index in a color palette). But floating point values
      * are allowed too.
+     * <p>
+     * If the minimal or maximal value may be unknown, consider invoking
+     * <code>{@link #setPackedValues setPackedValues}(minValue, maxValue, &hellip;)</code>
+     * instead. The later can infers default bounds according a given data type.
      *
      * @param minValue  The minimal valid <em>packed</em> value,
      *                  or {@link Double#NEGATIVE_INFINITY} if none.
      * @param maxValue  The maximal valid <em>packed</em> value,
      *                  or {@link Double#POSITIVE_INFINITY} if none.
+     *
+     * @see #setPackedValues
      */
     public void setValidRange(final double minValue, final double maxValue) {
         final int minIndex = (int) minValue;
@@ -135,6 +141,8 @@ public class Band extends MetadataAccessor {
      * rule for consistency.
      *
      * @param fillValues The packed values used for missing data, or {@code null} if none.
+     *
+     * @see #setPackedValues
      */
     public void setNoDataValues(final double[] fillValues) {
         if (fillValues != null) {
@@ -152,6 +160,105 @@ public class Band extends MetadataAccessor {
             }
         }
         setDoubles("fillValues", fillValues);
+    }
+
+    /**
+     * Defines valid and fill <em>packed</em> values as a combinaison of
+     * <code>{@linkplain #setValidRange(double,double) setValidRange}(minValue, maxValue)</code>
+     * and <code>{linkplain #setNoDataValues(double[]) setNoDataValues}(fillValues)</code>.
+     * <p>
+     * If the minimal or maximal value is {@linkplain Double#isInfinite infinite} and the data
+     * type is an integer type, then this method replaces the infinite values by default bounds
+     * inferred from the data type and the fill values.
+     *
+     * @param minValue   The minimal valid <em>packed</em> value,
+     *                   or {@link Double#NEGATIVE_INFINITY} if unknown.
+     * @param maxValue   The maximal valid <em>packed</em> value,
+     *                   or {@link Double#POSITIVE_INFINITY} if unknown.
+     * @param fillValues The packed values used for missing data, or {@code null} if none.
+     * @param dataType   The raw data type as one of {@link DataBuffer} constants, or
+     *                   {@link DataBuffer#TYPE_UNDEFINED} if unknown.
+     *
+     * @see #setValidRange
+     * @see #setNoDataValues
+     */
+    public void setPackedValues(double minValue, double maxValue, final double[] fillValues,
+            final int dataType)
+    {
+        minValue = replaceInfinity(minValue, fillValues, dataType);
+        maxValue = replaceInfinity(maxValue, fillValues, dataType);
+        setValidRange(minValue, maxValue);
+        setNoDataValues(fillValues);
+    }
+
+    /**
+     * If the specified value is infinity, then replace that values by a bounds inferred
+     * from the specified fill values and data type.
+     *
+     * @param value      The value.
+     * @param fillValues The packed values used for missing data, or {@code null} if none.
+     * @param dataType   The raw data type as one of {@link DataBuffer} constants, or
+     *                   {@link DataBuffer#TYPE_UNDEFINED} if unknown.
+     */
+    private static double replaceInfinity(double value, final double[] fillValues, final int dataType) {
+        final boolean negative;
+        if (value == Double.NEGATIVE_INFINITY) {
+            negative = true;
+        } else if (value == Double.POSITIVE_INFINITY) {
+            negative = false;
+        } else {
+            return value;
+        }
+        final double midValue;
+        switch (dataType) {
+            default: {
+                // Unsigned integer: computes the upper bound according the data length.
+                final long range = 1L << DataBuffer.getDataTypeSize(dataType);
+                value = negative ? 0 : range - 1;
+                midValue = range >>> 1;
+                break;
+            }
+            case DataBuffer.TYPE_SHORT: {
+                value = negative ? Short.MIN_VALUE : Short.MAX_VALUE;
+                midValue = 0;
+                break;
+            }
+            case DataBuffer.TYPE_INT: {
+                value = negative ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+                midValue = 0;
+                break;
+            }
+            case DataBuffer.TYPE_FLOAT:
+            case DataBuffer.TYPE_DOUBLE:
+            case DataBuffer.TYPE_UNDEFINED: {
+                // Unbounded or undefined type: nothing to do.
+                return value;
+            }
+        }
+        /*
+         * Considers only the fill values that are close to the bounds we just computed. We use
+         * the middle value (always 0 for signed data type) as the threshold for choosing which
+         * bounds is close to that value. In other words, for signed data type we consider only
+         * positive or negative fill values (depending the 'value' sign), not both in same time.
+         *
+         * For each fill value to consider, reduces the range of valid values in such a way that
+         * it doesn't include that fill value. The exclusion is performed by substracting 1, which
+         * should be okay since we known at this stage that the data type is integer.
+         */
+        if (fillValues != null) {
+            double valueDistance = Math.abs(value - midValue);
+            for (int i=0; i<fillValues.length; i++) {
+                final double fillValue = fillValues[i];
+                if ((fillValue < midValue) == negative) {
+                    final double fillDistance = Math.abs(fillValue - midValue);
+                    if (fillDistance <= valueDistance) {
+                        valueDistance = fillDistance;
+                        value         = fillValue - 1; // Value must be exclusive.
+                    }
+                }
+            }
+        }
+        return value;
     }
 
     /**

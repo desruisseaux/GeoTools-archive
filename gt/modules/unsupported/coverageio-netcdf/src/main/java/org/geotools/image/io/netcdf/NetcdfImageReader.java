@@ -16,8 +16,10 @@
  */
 package org.geotools.image.io.netcdf;
 
+import java.util.Set;
 import java.util.List;
 import java.util.Locale;
+import java.util.HashSet;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -49,6 +51,7 @@ import ucar.nc2.VariableIF;
 
 import org.geotools.image.io.FileImageReader;
 import org.geotools.image.io.SampleConverter;
+import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.math.Statistics;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
@@ -111,6 +114,21 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * order to provide a different value.
      */
     private static final int Z_DIMENSION = 3;
+
+    /**
+     * The data type to accept in images. Used for automatic detection of which variables
+     * to assign to images.
+     */
+    private static final Set/*<DataType>*/ VALID_TYPES = new HashSet(12);
+    static {
+        VALID_TYPES.add(DataType.BOOLEAN);
+        VALID_TYPES.add(DataType.BYTE);
+        VALID_TYPES.add(DataType.SHORT);
+        VALID_TYPES.add(DataType.INT);
+        VALID_TYPES.add(DataType.LONG);
+        VALID_TYPES.add(DataType.FLOAT);
+        VALID_TYPES.add(DataType.DOUBLE);
+    }
 
     /**
      * The NetCDF dataset, or {@code null} if not yet open. The NetCDF file is open by
@@ -233,29 +251,41 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @throws IOException if an I/O error occured while reading the sample values.
      */
     public Statistics getStatistics(final int imageIndex) throws IOException {
-        final SampleConverter[] converters = new SampleConverter[1];
-        prepareVariable(imageIndex);
-        getRawImageType(imageIndex, null, converters);
-        final SampleConverter converter = first(converters);
-        final DataType    type = variable.getDataType();
+        final double[] fillValues;
+        final GeographicMetadata metadata = getGeographicMetadata(imageIndex);
+        if (metadata != null && metadata.getNumBands() >= 1) {
+            fillValues = metadata.getBand(0).getNoDataValues();
+            // TODO: What should we do with other bands? For now we assume that
+            //       every bands have the same fill values.
+        } else {
+            fillValues = null;
+        }
         final Array      array = variable.read();
         final IndexIterator it = array.getIndexIterator();
         final Statistics stats = new Statistics();
-        /*
-         * The SampleConverter.convert(...) method is overloaded with int, float and double
-         * argument types. Selects the most appropriate method according the NetCDF data type.
-         */
-        if (type.equals(DataType.LONG) || type.equals(DataType.DOUBLE)) {
+        if (fillValues == null || fillValues.length == 0) {
             while (it.hasNext()) {
-                stats.add(converter.convert(it.getDoubleNext()));
+                stats.add(it.getDoubleNext());
             }
-        } else if (type.equals(DataType.FLOAT)) {
+        } else if (fillValues.length == 1) {
+            final double fillValue = fillValues[0];
             while (it.hasNext()) {
-                stats.add(converter.convert(it.getFloatNext()));
+                final double value = it.getDoubleNext();
+                if (value != fillValue) {
+                    stats.add(value);
+                }
             }
         } else {
-            while (it.hasNext()) {
-                stats.add(converter.convert(it.getIntNext()));
+scan:       while (it.hasNext()) {
+                final double value = it.getDoubleNext();
+                if (fillValues != null) {
+                    for (int i=0; i<fillValues.length; i++) {
+                        if (fillValues[i] == value) {
+                            continue scan;
+                        }
+                    }
+                }
+                stats.add(value);
             }
         }
         return stats;
@@ -339,32 +369,13 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * Returns the data type which most closely represents the "raw" internal data of the image.
      *
      * @param  imageIndex The index of the image to be queried.
-     * @return The data type.
+     * @return The data type, or {@link DataBuffer#TYPE_UNDEFINED} if unknown.
      * @throws IOException If an error occurs reading the format information from the input source.
      */
     //@Override
     protected int getRawDataType(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
-        final DataType type = variable.getDataType();
-        if (DataType.BOOLEAN.equals(type) || DataType.BYTE.equals(type)) {
-            return DataBuffer.TYPE_BYTE;
-        }
-        if (DataType.CHAR.equals(type)) {
-            return DataBuffer.TYPE_USHORT;
-        }
-        if (DataType.SHORT.equals(type)) {
-            return variable.isUnsigned() ? DataBuffer.TYPE_USHORT : DataBuffer.TYPE_SHORT;
-        }
-        if (DataType.INT.equals(type)) {
-            return DataBuffer.TYPE_INT;
-        }
-        if (DataType.FLOAT.equals(type)) {
-            return DataBuffer.TYPE_FLOAT;
-        }
-        if (DataType.LONG.equals(type) || DataType.DOUBLE.equals(type)) {
-            return DataBuffer.TYPE_DOUBLE;
-        }
-        return DataBuffer.TYPE_UNDEFINED;
+        return VariableMetadata.getRawDataType(variable);
     }
 
     /**
@@ -479,7 +490,22 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
                 int count = 0;
                 for (int i=0; i<filtered.length; i++) {
                     final VariableIF candidate = (VariableIF) variables.get(i);
-                    if (!isAxis(candidate, variables)) {
+                    /*
+                     * - Images require at least 2 dimensions. They may have more dimensions,
+                     *   in which case a slice will be taken later.
+                     *
+                     * - Excludes characters, strings and structures, which can not be easily
+                     *   mapped to an image type. In addition, 2-dimensional character arrays
+                     *   are often used for annotations and we don't wan't to confuse them
+                     *   with images.
+                     *
+                     * - Excludes axis. They are often already excluded by the first condition
+                     *   because axis are usually 1-dimensional, but some are 2-dimensional,
+                     *   e.g. a localization grid.
+                     */
+                    if (candidate.getRank()>=2 && VALID_TYPES.contains(candidate.getDataType()) &&
+                            !isAxis(candidate, variables))
+                    {
                         filtered[count++] = candidate.getName();
                     }
                 }

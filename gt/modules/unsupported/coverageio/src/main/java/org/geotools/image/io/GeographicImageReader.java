@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 import java.awt.Rectangle;
-import java.awt.image.ColorModel;
+import java.awt.image.ColorModel;      // For javadoc
 import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
+import java.awt.image.SampleModel;     // For javadoc
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel; // For javadoc
 
@@ -37,7 +37,7 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.event.IIOReadWarningListener;
+import javax.imageio.event.IIOReadWarningListener; // For javadoc
 
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XArray;
@@ -350,7 +350,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *       a {@linkplain PaletteFactory#getContinuousPalette continuous palette} suitable for
      *       the range fetched at step 1. The data are assumed <cite>geophysics</cite> values
      *       rather than some packed values. Consequently, the {@linkplain SampleConverter sample
-     *       converters} will replace no-data values by {@linkplain Float#NaN NaN} with no other
+     *       converters} will replace no-data values by {@linkplain Float#NaN NaN} with no other
      *       changes.</p></li>
      *
      *   <li><p>Otherwise, if the {@linkplain #getRawDataType raw data type} is a unsigned integer type
@@ -527,10 +527,16 @@ public abstract class GeographicImageReader extends ImageReader {
                 final Band band = metadata.getBand(bandIndex);
                 final double[] nodataValues = band.getNoDataValues();
                 final NumberRange range = band.getValidRange();
-                final double minimum, maximum;
+                double minimum, maximum;
                 if (range != null) {
                     minimum = range.getMinimum();
                     maximum = range.getMaximum();
+                    if (!isFloat) {
+                        // If the metadata do not contain any information about the range,
+                        // treat as if we use the maximal range allowed by the data type.
+                        if (minimum == Double.NEGATIVE_INFINITY) minimum = floor;
+                        if (maximum == Double.POSITIVE_INFINITY) maximum = ceil;
+                    }
                     final double extent = maximum - minimum;
                     if (extent >= 0 && (isFloat || extent <= (ceil - floor))) {
                         allRanges = (allRanges != null) ? (NumberRange) allRanges.union(range) : range;
@@ -600,7 +606,7 @@ public abstract class GeographicImageReader extends ImageReader {
                                         unusedSpace += delta;
                                     }
                                 }
-                                final int unused = (int) Math.round(unusedSpace);
+                                final int unused = (int) Math.min(Math.round(unusedSpace), Integer.MAX_VALUE);
                                 if (unused >= 1) {
                                     collapsePadValues = collapseNoDataValues(sorted, unused);
                                 }
@@ -620,6 +626,13 @@ public abstract class GeographicImageReader extends ImageReader {
                             converter = SampleConverter.createPadValuesMask(nodataValues);
                         }
                     } else {
+                        /*
+                         * Do NOT take 'nodataValues' in account if there is no need to collapse
+                         * them. This is not the converter's job to transform "packed" values to
+                         * "geophysics" values. We just want them to fit in the IndexColorModel,
+                         * and they already fit. So the identity converter is appropriate even
+                         * in presence of pad values.
+                         */
                         converter = SampleConverter.IDENTITY;
                     }
                 }
@@ -650,17 +663,41 @@ public abstract class GeographicImageReader extends ImageReader {
             palette = factory.getContinuousPalette(paletteName, (float) visibleRange.getMinimum(),
                     (float) visibleRange.getMaximum(), dataType, numBands, visibleBand);
         } else {
-            final double offset = visibleConverter.getOffset();
-            int lower = (int) Math.round(visibleRange.getMinimum() + offset);
-            int upper = (int) Math.round(visibleRange.getMaximum() + offset);
-            if (!visibleRange.isMinIncluded()) {
-                lower++; // Must be inclusive
+            final double offset  = visibleConverter.getOffset();
+            final double minimum = visibleRange.getMinimum();
+            final double maximum = visibleRange.getMaximum();
+            long lower, upper;
+            if (minimum == Double.NEGATIVE_INFINITY) {
+                lower = floor;
+            } else {
+                lower = Math.round(minimum + offset);
+                if (!visibleRange.isMinIncluded()) {
+                    lower++; // Must be inclusive
+                }
             }
-            if (visibleRange.isMaxIncluded()) {
-                upper++; // Must be exclusive
+            if (maximum == Double.POSITIVE_INFINITY) {
+                upper = ceil;
+            } else {
+                upper = Math.round(maximum + offset);
+                if (visibleRange.isMaxIncluded()) {
+                    upper++; // Must be exclusive
+                }
             }
-            final int size = Math.max(upper, (int) Math.round(maximumFillValue) + 1);
-            palette = factory.getPalette(paletteName, lower, upper, size, numBands, visibleBand);
+            final long size = Math.max(upper, Math.round(maximumFillValue) + 1);
+            /*
+             * The target lower, upper and size parameters are usually in the range of SHORT
+             * or USHORT data type. The Palette class will performs the necessary checks and
+             * throws an exception if those variables are out of range.  However, because we
+             * need to cast to int before passing the parameter values,  we restrict them to
+             * the 'int' range as a safety in order to avoid results that accidently fall in
+             * the SHORT or USHORT range.  Because Integer.MIN_VALUE or MAX_VALUE are out of
+             * range,  it doesn't matter if those values are inaccurate since we will get an
+             * exception anyway.
+             */
+            palette = factory.getPalette(paletteName,
+                    (int) Math.max(lower, Integer.MIN_VALUE),
+                    (int) Math.min(upper, Integer.MAX_VALUE),
+                    (int) Math.min(size,  Integer.MAX_VALUE), numBands, visibleBand);
         }
         return palette.getImageTypeSpecifier();
     }
@@ -772,7 +809,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *
      * @return An {@code ImageReadParam} object which may be used.
      *
-     * @todo Replace the return type by {@link GeographicImageReadParam} when we will
+     * @todo Replace the return type by {@link GeographicImageReadParam} when we will
      *       be allowed to compile for J2SE 1.5.
      */
     //@Override
