@@ -1419,4 +1419,11 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         String[] columns;
     }
 
+    
+    public void dispose() {
+        if(wrapped != null) {
+            wrapped.dispose();
+            wrapped = null;
+        }
+    }
 }

@@ -393,7 +393,7 @@ public abstract class ContentDataStore implements DataStore {
 
   
     
-    public final void dispose() throws IOException {
+    public final void dispose() {
         for ( ContentEntry entry :  entries.values() ) {
             entry.dispose();
         }

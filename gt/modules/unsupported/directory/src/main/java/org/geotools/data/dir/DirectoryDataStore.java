@@ -344,4 +344,18 @@ public class DirectoryDataStore implements DataStore, LockingManager {
                 transaction, featureLock);
         }
     }
+    
+    /**
+     * Will dispose all child datastores. After this call the {@link DirectoryDataStore} will
+     * be unusable.
+     */
+    public void dispose() {
+        if(dataStores != null) {
+            for (Iterator it = dataStores.values().iterator(); it.hasNext();) {
+                DataStore ds = (DataStore) it.next();
+                ds.dispose();
+            }
+            dataStores = null;
+        }
+    }
 }

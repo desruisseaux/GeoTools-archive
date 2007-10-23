@@ -93,6 +93,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         properties.load(this.getClass().getResourceAsStream("remote.properties"));
         schemaName = properties.getProperty("schema");
         properties.put("dbtype", "oracle");
+        properties.put("min connections", "1");
         
         dstore =  (OracleDataStore) DataStoreFinder.getDataStore(properties);
         conn = dstore.getConnection(Transaction.AUTO_COMMIT);
@@ -107,8 +108,10 @@ public class OracleDataStoreOnlineTest extends TestCase {
      */
     protected void tearDown() throws Exception {    	
     	//reset();
-        ConnectionPoolManager manager = ConnectionPoolManager.getInstance();
-        manager.closeAll();    	
+        if(conn != null) 
+            conn.close();
+        if(dstore != null)
+            dstore.dispose();
     }
     static boolean first  = false;
     

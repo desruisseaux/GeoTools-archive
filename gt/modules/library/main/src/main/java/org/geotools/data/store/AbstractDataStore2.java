@@ -315,4 +315,12 @@ public class AbstractDataStore2 implements DataStore {
     public LockingManager getLockingManager() {
         return lockingManager;
     }
+    
+    /**
+     * Dummy implementation, it's a no-op. Subclasses holding to system resources must
+     * override this method and release them.
+     */
+    public void dispose() {
+        // nothing to do
+    }
 }

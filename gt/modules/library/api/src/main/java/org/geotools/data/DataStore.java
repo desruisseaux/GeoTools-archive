@@ -18,6 +18,7 @@ package org.geotools.data;
 import java.io.IOException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
 
 
@@ -57,11 +58,6 @@ import org.geotools.feature.SchemaException;
  * Suggestions:
  *
  * <ul>
- * <li>Aadrea - Support for a reprojection based FeautreSource. Needs to be added
- *               to DataStore (rather than a wrapper based) to allow for DataStores
- * <br>Jody - You can see it as part of Query now.
- * <br>OGC - apparenty they agree as well - it is part of WFS 1.1.
- * </li>
  * <li>GeoAPI - has reduced this to api to the FeatureStore construct
  *     Jody - since we are no longer using the FeatureReader/ReaderWriter in client
  *            code this would not be a bad idea.
@@ -431,4 +427,19 @@ public interface DataStore {
      *         in another fashion.
      */
     LockingManager getLockingManager();
+
+    /**
+     * Disposes of this data store and releases any resource that it is using.
+     * <p>
+     * A <code>DataStore</code> cannot be used after <code>dispose</code> has
+     * been called, neither can any data access object it helped create, such
+     * as {@link FeatureReader}, {@link FeatureSource} or {@link FeatureCollection}.
+     * <p>
+     * This operation can be called more than once without side effects.
+     * <p>
+     * There is no thread safety assurance associated with this method. For example,
+     * client code will have to make sure this method is not called while retrieving/saving data
+     * from/to the storage, or be prepared for the consequences.
+     */
+    void dispose();
 }

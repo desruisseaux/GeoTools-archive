@@ -606,4 +606,12 @@ public abstract class AbstractDataStore implements DataStore {
     protected Set getSupportedHints() {
         return Collections.EMPTY_SET;
     }
+    
+    /**
+     * Dummy implementation, it's a no-op. Subclasses holding to system resources must
+     * override this method and release them.
+     */
+    public void dispose() {
+        // nothing to do
+    }
 }

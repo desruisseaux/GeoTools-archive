@@ -92,8 +92,8 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
     
     
     protected void tearDown() throws Exception {
+        data.dispose();
         data = null;
-        pool.close();
         super.tearDown();
     }
     

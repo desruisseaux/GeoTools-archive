@@ -134,9 +134,22 @@ public abstract class JDBC2DataStore extends JDBC1DataStore {
     }
     
     protected void finalize() throws Throwable {
+        if(dataSource != null) {
+            LOGGER.severe("There's code using JDBC based datastore and " +
+            		"not disposing them. This may lead to temporary loss of database connections. " +
+            		"Please make sure all data access code calls DataStore.dispose() " +
+            		"before freeing all references to it");
+            dispose();
+        }
+        
+    }
+    
+    public void dispose() {
         if(dataSource != null && dataSource instanceof ManageableDataSource) {
             try {
-                ((ManageableDataSource) dataSource).close();
+                ManageableDataSource mds = (ManageableDataSource) dataSource; 
+                dataSource = null;
+                mds.close();
             } catch(SQLException e) {
                 // it's ok, we did our best..
                 LOGGER.log(Level.FINE, "Could not close dataSource", e);
