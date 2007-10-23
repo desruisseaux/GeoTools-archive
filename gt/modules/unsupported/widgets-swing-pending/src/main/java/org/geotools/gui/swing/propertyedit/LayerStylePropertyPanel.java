@@ -161,7 +161,7 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
         jScrollPane1.setMinimumSize(new java.awt.Dimension(152, 202));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(152, 202));
 
-        tree.setBorder(javax.swing.BorderFactory.createCompoundBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED), javax.swing.BorderFactory.createTitledBorder("")));
+        tree.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         tree.setMinimumSize(new java.awt.Dimension(150, 200));
         tree.setPreferredSize(new java.awt.Dimension(150, 200));
         jScrollPane1.setViewportView(tree);

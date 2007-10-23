@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.propertyedit;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
@@ -26,9 +27,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.misc.FilterToCQL;
 import org.geotools.map.MapLayer;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
@@ -235,6 +238,14 @@ public class LayerFilterPropertyPanel extends javax.swing.JPanel implements Prop
                 vec.add(desc.getName().toString());
             }
 
+            FilterToCQL visitor = new FilterToCQL();
+            
+            try{
+                txt_cql.setText( visitor.encodeToString(layer.getQuery().getFilter()));
+            }catch(FilterToSQLException e){
+                
+            }
+            
             lst_field.setListData(vec);
         }
     }
