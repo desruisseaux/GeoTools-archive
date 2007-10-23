@@ -35,6 +35,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.NamespaceSupport;
 import java.io.IOException;
@@ -134,7 +135,7 @@ public class Encoder {
     private NamespaceSupport namespaces;
 
     /** document serializer **/
-    private XMLSerializer serializer;
+    private ContentHandler serializer;
 
     /** schema location */
     private HashMap schemaLocations;
@@ -308,13 +309,21 @@ public class Encoder {
     public void encode(Object object, QName name, OutputStream out)
         throws IOException, SAXException {
         //create the document seriaizer
+        XMLSerializer xmls = null;
+
         if (outputFormat != null) {
-            serializer = new XMLSerializer(out, outputFormat);
+            xmls = new XMLSerializer(out, outputFormat);
         } else {
-            serializer = new XMLSerializer(out, new OutputFormat());
+            xmls = new XMLSerializer(out, new OutputFormat());
         }
 
-        serializer.setNamespaces(namespaceAware);
+        xmls.setNamespaces(namespaceAware);
+        encode(object, name, xmls);
+    }
+
+    public void encode(Object object, QName name, ContentHandler handler)
+        throws IOException, SAXException {
+        serializer = handler;
         serializer.startDocument();
 
         if (namespaceAware) {
