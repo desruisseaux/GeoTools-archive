@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +35,8 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.test.TestData;
+import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -183,5 +186,24 @@ public class UserLayerTest extends TestCase {
         final String fName = ft.getTypeName();
         assertEquals("Read feature type name MUST match", MY_FEATURE, fName);
         assertEquals(CRS.decode("EPSG:4326"), ft.getDefaultGeometry().getCRS());
+    }
+    
+    public void testUserLayerWithRemoteOWS() throws Exception {
+        URL sldUrl = TestData.getResource(this, "remoteOws.sld");
+        StyleFactory factory = CommonFactoryFinder.getStyleFactory(null);
+        SLDParser stylereader = new SLDParser(factory, sldUrl);
+        StyledLayerDescriptor sld = stylereader.parseSLD();
+        assertEquals(1, sld.getStyledLayers().length);
+        assertTrue(sld.getStyledLayers()[0] instanceof UserLayer);
+        UserLayer layer = (UserLayer) sld.getStyledLayers()[0];
+        assertEquals("LayerWithRemoteOWS", layer.getName());
+        assertNotNull(layer.getRemoteOWS());
+        assertEquals("WFS", layer.getRemoteOWS().getService());
+        assertEquals("http://sigma.openplans.org:8080/geoserver/wfs?", layer.getRemoteOWS().getOnlineResource());
+        assertEquals(1, layer.getLayerFeatureConstraints().length);
+        FeatureTypeConstraint ftc = layer.getLayerFeatureConstraints()[0];
+        assertEquals("topp:states", ftc.getFeatureTypeName());
+        assertNotNull(ftc.getFilter());
+        assertTrue(ftc.getFilter() instanceof PropertyIsLessThan);
     }
 }

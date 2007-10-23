@@ -383,7 +383,7 @@ public class SLDParser {
 		// LineSymbolizer symbol = factory.createLineSymbolizer();
 
 		NodeList children = root.getChildNodes();
-
+		List layerFeatureConstraints = new ArrayList();
 		for (int i = 0; i < children.getLength(); i++) 
 		{
 			Node child = children.item(i);
@@ -411,21 +411,90 @@ public class SLDParser {
 				layer.setName(layerName);
 				LOGGER.info("layer name: " + layer.getName());
 			}
+			
+			if(childName.equalsIgnoreCase("RemoteOWS")) {
+			    RemoteOWS remoteOws = parseRemoteOWS(child);
+			    layer.setRemoteOWS(remoteOws);
+			}
 
 			if (childName.equalsIgnoreCase("LayerFeatureConstraints")) 
 			{
-				 //DJB: better to throw an exeception than to screw up (old version killed layer)
-				//throw new UnsupportedOperationException("LayerFeatureConstraints pending of implementation");
-				//LayerFeatureConstraints is required, so we dont do anything
-				
+				 layer.setLayerFeatureConstraints(parseLayerFeatureConstraints(child));
 			}
 
 		}
-
+		
 		return layer;
 	}
 
-	/**
+	private FeatureTypeConstraint[] parseLayerFeatureConstraints(Node root) {
+        List featureTypeConstraints = new ArrayList();
+        
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) 
+        {
+            Node child = children.item(i);
+            if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) 
+            {
+                continue;
+            }
+            String childName = child.getLocalName();
+            if(childName.equalsIgnoreCase("FeatureTypeConstraint")) {
+                final FeatureTypeConstraint ftc = parseFeatureTypeConstraint(child);
+                if(ftc != null)
+                    featureTypeConstraints.add(ftc);
+            }
+        }
+        return (FeatureTypeConstraint[]) featureTypeConstraints.toArray(new FeatureTypeConstraint[featureTypeConstraints.size()]);
+    }
+
+    private FeatureTypeConstraint parseFeatureTypeConstraint(Node root) {
+        FeatureTypeConstraint ftc = new FeatureTypeConstraintImpl();
+        
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) 
+        {
+            Node child = children.item(i);
+            if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) 
+            {
+                continue;
+            }
+            String childName = child.getLocalName();
+            if(childName.equalsIgnoreCase("FeatureTypeName")) {
+                ftc.setFeatureTypeName(child.getFirstChild().getNodeValue());
+            } else if(childName.equalsIgnoreCase("Filter")) {
+                ftc.setFilter(parseFilter(child));
+            }
+        }
+        ftc.setExtents(new Extent[0]);
+        if(ftc.getFeatureTypeName() == null)
+            return null;
+        else
+            return ftc;
+    }
+
+    private RemoteOWS parseRemoteOWS(Node root) {
+	    RemoteOWS ows = new RemoteOWSImpl();
+
+        NodeList children = root.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) 
+            {
+                continue;
+            }
+            String childName = child.getLocalName();
+            
+            if(childName.equalsIgnoreCase("Service")) {
+                ows.setService(child.getFirstChild().getNodeValue());
+            } else if(childName.equalsIgnoreCase("OnlineResource")) {
+                ows.setOnlineResource(parseOnlineResource(child));
+            }
+        }
+        return ows;
+    }
+
+    /**
 	 * 
 	 * @param child
 	 * @param layer
@@ -783,15 +852,7 @@ public class SLDParser {
 			}
 
 			if (childName.equalsIgnoreCase("Filter")) {
-                // this sounds stark raving mad, but this is actually how the dom parser works...
-                // instead of passing in the parent element, pass in the first child and its
-                // siblings will also be parsed
-                Node firstChild = child.getFirstChild();
-                while (firstChild != null && firstChild.getNodeType() != Node.ELEMENT_NODE) {
-                    //advance to the first actual element (rather than whitespace)
-                    firstChild = firstChild.getNextSibling();
-                }
-                Filter filter = org.geotools.filter.FilterDOMParser.parseFilter(firstChild);
+                Filter filter = parseFilter(child);
                 rule.setFilter(filter);
 			}
 
@@ -838,6 +899,19 @@ public class SLDParser {
 
 		return rule;
 	}
+
+    private Filter parseFilter(Node child) {
+        // this sounds stark raving mad, but this is actually how the dom parser works...
+        // instead of passing in the parent element, pass in the first child and its
+        // siblings will also be parsed
+        Node firstChild = child.getFirstChild();
+        while (firstChild != null && firstChild.getNodeType() != Node.ELEMENT_NODE) {
+            //advance to the first actual element (rather than whitespace)
+            firstChild = firstChild.getNextSibling();
+        }
+        Filter filter = org.geotools.filter.FilterDOMParser.parseFilter(firstChild);
+        return filter;
+    }
 
 	/**
 	 * parses the SLD for a linesymbolizer
@@ -1459,28 +1533,7 @@ public class SLDParser {
 				childName = child.getNodeName();
 			}
 			if (childName.equalsIgnoreCase("OnLineResource")) {
-				Element param = (Element) child;
-				org.w3c.dom.NamedNodeMap map = param.getAttributes();
-
-				LOGGER.finest("attributes " + map.toString());
-
-				for (int k = 0; k < map.getLength(); k++) {
-					String res = map.item(k).getNodeValue();
-					String name = map.item(k).getNodeName();
-					// if(name == null){
-					// name = map.item(k).getNodeName();
-					// }
-					if (LOGGER.isLoggable(Level.FINEST)) {
-						LOGGER.finest("processing attribute " + name + "="
-								+ res);
-					}
-
-					// TODO: process the name space properly
-					if (name.equalsIgnoreCase("xlink:href")) {
-						LOGGER.finest("seting ExtGraph uri " + res);
-						uri = res;
-					}
-				}
+				uri = parseOnlineResource(child);
 			}
 
 			if (childName.equalsIgnoreCase("format")) {
@@ -1525,6 +1578,32 @@ public class SLDParser {
 		extgraph.setCustomProperties(paramList);
 		return extgraph;
 	}
+
+    private String parseOnlineResource(Node root) {
+        Element param = (Element) root;
+        org.w3c.dom.NamedNodeMap map = param.getAttributes();
+
+        LOGGER.finest("attributes " + map.toString());
+
+        for (int k = 0; k < map.getLength(); k++) {
+        	String res = map.item(k).getNodeValue();
+        	String name = map.item(k).getNodeName();
+        	// if(name == null){
+        	// name = map.item(k).getNodeName();
+        	// }
+        	if (LOGGER.isLoggable(Level.FINEST)) {
+        		LOGGER.finest("processing attribute " + name + "="
+        				+ res);
+        	}
+
+        	// TODO: process the name space properly
+        	if (name.equalsIgnoreCase("xlink:href")) {
+        		LOGGER.finest("seting ExtGraph uri " + res);
+        		return res;
+        	}
+        }
+        return null;
+    }
 
 	private Stroke parseStroke(Node root) {
 		Stroke stroke = factory.getDefaultStroke();
