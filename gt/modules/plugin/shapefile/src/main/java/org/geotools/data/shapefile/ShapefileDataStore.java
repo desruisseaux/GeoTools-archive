@@ -699,6 +699,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             
             GeometryType geometryType = build.buildGeometryType();
             attributes.add( build.buildDescriptor( BasicFeatureTypes.GEOMETRY_ATTRIBUTE_NAME, geometryType ) );
+            Set<String> usedNames = new HashSet<String>(); // record names in case of duplicates
+            usedNames.add( BasicFeatureTypes.GEOMETRY_ATTRIBUTE_NAME );
             
             // take care of the case where no dbf and query wants all => geometry only
             if (dbf != null) {
@@ -706,6 +708,16 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
                     Class attributeClass = header.getFieldClass(i);
                     String name = header.getFieldName(i);
+                    if( usedNames.contains(name)){
+                        String origional = name;
+                        int count = 1;
+                        name =  name+count;
+                        while( usedNames.contains(name)){
+                            count++;
+                            name = origional+count;
+                        }
+                    }
+                    usedNames.add( name );
                     int length = header.getFieldLength(i);
                     
                     build.setNillable(true);

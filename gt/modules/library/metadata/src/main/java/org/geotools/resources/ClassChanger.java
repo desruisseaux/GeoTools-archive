@@ -225,7 +225,8 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
             if (object instanceof Number) {
                 return (Number) object;
             }
-            return getClassChanger(object.getClass()).convert(object);
+            ClassChanger changer = getClassChanger(object.getClass());
+            return changer.convert(object);
         }
         return null;
     }
@@ -242,6 +243,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      * @param  classe The desired classe for return value.
      * @throws ClassNotFoundException if {@code classe} is not a registered class.
      */
+    @SuppressWarnings("unchecked")
     public static <C extends Comparable> C toComparable(final Number value, final Class<C> classe)
             throws ClassNotFoundException
     {
@@ -249,8 +251,8 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
             if (Number.class.isAssignableFrom(classe)) {
                 return classe.cast(value);
             }
-            @SuppressWarnings("unchecked")
-            final Comparable<?> c = getClassChanger(classe).inverseConvert(value);
+            ClassChanger changer = getClassChanger(classe);
+            final Comparable c = changer.inverseConvert(value);
             return classe.cast(c);
         }
         return null;

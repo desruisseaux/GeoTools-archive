@@ -26,6 +26,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.feature.FeatureCollection;
@@ -173,6 +174,15 @@ public class ShapefileTest extends TestCaseSupport {
     assertEquals(49,idx);
     r.close();
     c.close();
+  }
+  
+  public void testDuplicateColumnNames() throws Exception {
+      File file = TestData.file(this,"bad/state.shp");
+      ShapefileDataStore dataStore = new ShapefileDataStore( file.toURL() );
+      FeatureSource states = dataStore.getFeatureSource();
+      SimpleFeatureType schema = states.getSchema();
+      assertEquals( 6, schema.getAttributeCount() );
+      assertTrue(states.getCount(Query.ALL) > 0 );
   }
   
   public void testShapefileReaderRecord() throws Exception {
