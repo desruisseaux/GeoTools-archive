@@ -7,16 +7,12 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Vector;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
-import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -27,6 +23,7 @@ public class JExpressionPanel extends javax.swing.JPanel {
 
     private MapLayer layer;
     private JExpressionDialog dialog = new JExpressionDialog();
+    Expression exp = null;
 
     /** Creates new form JExpressionPanel */
     public JExpressionPanel() {
@@ -79,6 +76,16 @@ public class JExpressionPanel extends javax.swing.JPanel {
     }
 
     public Expression getExpression() {
+        
+//        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+//        Expression expr = ff.property(txt.getText());
+//        
+//        return expr;
+        
+        if(exp != null){
+            return exp;
+        }
+        
         StyleBuilder sb = new StyleBuilder();
         return sb.literalExpression(txt.getText());
     }
@@ -93,6 +100,17 @@ public class JExpressionPanel extends javax.swing.JPanel {
 
         txt = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+
+        txt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtActionPerformed(evt);
+            }
+        });
+        txt.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtFocusLost(evt);
+            }
+        });
 
         jButton1.setText(TextBundle.getResource().getString("shortexpression"));
         jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
@@ -130,7 +148,19 @@ public class JExpressionPanel extends javax.swing.JPanel {
         dialog.setVisible(true);
 
         setExpression(dialog.getExpression());
+        exp = dialog.getExpression();
     }//GEN-LAST:event_actionDialog
+
+    private void txtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtActionPerformed
+        StyleBuilder sb = new StyleBuilder();
+        exp = sb.literalExpression(txt.getText());
+    }//GEN-LAST:event_txtActionPerformed
+
+    private void txtFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFocusLost
+        StyleBuilder sb = new StyleBuilder();
+        exp = sb.literalExpression(txt.getText());
+    }//GEN-LAST:event_txtFocusLost
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JTextField txt;

@@ -3,7 +3,6 @@
  *
  * Created on 19 octobre 2007, 15:40
  */
-
 package org.geotools.gui.swing.style.sld;
 
 import java.util.Collection;
@@ -13,12 +12,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -26,34 +27,35 @@ import org.opengis.filter.expression.Expression;
  * @author  Administrateur
  */
 public class JExpressionDialog extends javax.swing.JDialog {
-    
+
     /** Creates new form JExpressionDialog */
-    public JExpressionDialog(){
-        this(null,null);
+    public JExpressionDialog() {
+        this(null, null);
     }
-    
-    public JExpressionDialog(MapLayer layer){
-        this(layer,null);
+
+    public JExpressionDialog(MapLayer layer) {
+        this(layer, null);
     }
-    
-    public JExpressionDialog(Expression exp){
-        this(null,exp);
+
+    public JExpressionDialog(Expression exp) {
+        this(null, exp);
     }
-    
+
     public JExpressionDialog(MapLayer layer, Expression exp) {
         initComponents();
 
         setLayer(layer);
         setExpression(exp);
-        
+
         lst_field.addListSelectionListener(new ListSelectionListener() {
 
-            public void valueChanged(ListSelectionEvent e) {
-                
-                if( lst_field.getSelectedValue() != null)
-                append(lst_field.getSelectedValue().toString());
-            }
-        });
+                    public void valueChanged(ListSelectionEvent e) {
+
+                        if (lst_field.getSelectedValue() != null) {
+                            append(lst_field.getSelectedValue().toString());
+                        }
+                    }
+                });
     }
 
     private void append(String val) {
@@ -66,9 +68,9 @@ public class JExpressionDialog extends javax.swing.JDialog {
         }
     }
 
-    public void setLayer(MapLayer layer){
+    public void setLayer(MapLayer layer) {
         lst_field.removeAll();
-        
+
         if (layer != null) {
 
             lst_field.removeAll();
@@ -85,32 +87,36 @@ public class JExpressionDialog extends javax.swing.JDialog {
 
             lst_field.setListData(vec);
         }
-        
+
     }
-    
-    
-    public void setExpression(Expression exp){
-        
-        if(exp != null){
-            if(exp != Expression.NIL){
+
+    public void setExpression(Expression exp) {
+
+        if (exp != null) {
+            if (exp != Expression.NIL) {
                 jta.setText(exp.toString());
             }
         }
-        
+
     }
-    
-    public Expression getExpression(){
-        try {
-            Expression expr = CQL.toExpression(jta.getText());           
-            return expr;
-        } catch (CQLException ex) {
-            ex.printStackTrace();
-        }
-        
-        StyleBuilder sb = new StyleBuilder();
-        return sb.literalExpression(jta.getText());
+
+    public Expression getExpression() {
+
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        Expression expr = ff.property(jta.getText());
+
+        return expr;
+    //        try {
+//            Expression expr = CQL.toExpression(jta.getText());           
+//            return expr;
+//        } catch (CQLException ex) {
+//            ex.printStackTrace();
+//        }
+//        
+//        StyleBuilder sb = new StyleBuilder();
+//        return sb.literalExpression(jta.getText());
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -219,7 +225,6 @@ public class JExpressionDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     private void jButton2actionPlus(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2actionPlus
         append("+");
     }//GEN-LAST:event_jButton2actionPlus
@@ -239,9 +244,6 @@ public class JExpressionDialog extends javax.swing.JDialog {
     private void actionClose(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionClose
         dispose();
     }//GEN-LAST:event_actionClose
-    
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -253,5 +255,4 @@ public class JExpressionDialog extends javax.swing.JDialog {
     private javax.swing.JTextArea jta;
     private javax.swing.JList lst_field;
     // End of variables declaration//GEN-END:variables
-    
 }

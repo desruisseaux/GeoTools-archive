@@ -34,7 +34,8 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.io.IOException;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import org.geotools.data.Query;
 
 /**
@@ -45,7 +46,6 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
 
     private MapLayer layer = null;
     private FeatureSource source = null;
-    private FeatureStore store = null;
     private boolean editable = false;
 
     /** Creates new form DefaultMapLayerTablePanel */
@@ -115,6 +115,11 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
 
         jbu_action.setText("Action");
         jbu_action.setEnabled(false);
+        jbu_action.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionMenu(evt);
+            }
+        });
 
         jcb_collection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -150,8 +155,7 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }// </editor-fold>//GEN-END:initComponents
     private void actionCollection(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionCollection
         if (layer != null) {
-            FeatureSource fs = layer.getFeatureSource();
-
+           
             if (jcb_collection.getSelectedIndex() == 0) {
                 ((FeatureSourceModel) tab_data.getModel()).setQuery(layer.getQuery());
             } else if (jcb_collection.getSelectedIndex() == 1) {
@@ -166,6 +170,18 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     private void actionEditer(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionEditer
         tab_data.setEditable(((JCheckBox) evt.getSource()).isSelected());
     }//GEN-LAST:event_actionEditer
+
+    private void actionMenu(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionMenu
+        JPopupMenu menu = new JPopupMenu();
+        menu.setLocation( jbu_action.getLocationOnScreen().x, jbu_action.getLocationOnScreen().y);
+        
+        JMenuItem mi = new JMenuItem("test");
+        menu.add(mi);
+        
+        //menu.setVisible(true);
+                
+    }//GEN-LAST:event_actionMenu
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbu_action;
@@ -177,13 +193,11 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     public void setTarget(Object target) {
 
         if (target instanceof MapLayer) {
-            store = null;
             source = null;
             layer = (MapLayer) target;
             source = layer.getFeatureSource();
 
             if (source instanceof FeatureStore) {
-                store = (FeatureStore) source;
                 editable = true;
             } else {
                 editable = false;
@@ -196,19 +210,10 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }
 
     public void apply() {
-    //        DefaultTransaction transaction = new DefaultTransaction("Example1");
-//        FeatureStore store = (FeatureStore) source.getFeatureSource();
-//        store.setTransaction( transaction );
-//        try {
-//            // perform edits here!
-//            transaction.commit();
-//        } catch( Exception eek){
-//            transaction.rollback();
-//        }
     }
 
     public String getTitle() {
-        return "FeatureTable (In Work)";
+        return "FeatureTable";
     }
 
     public ImageIcon getIcon() {
