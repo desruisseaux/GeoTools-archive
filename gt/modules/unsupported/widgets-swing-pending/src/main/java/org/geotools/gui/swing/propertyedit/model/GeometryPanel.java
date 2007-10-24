@@ -56,7 +56,7 @@ public class GeometryPanel extends javax.swing.JPanel implements PropertyPanel {
         return this;
     }
     
-    public void revert(){
+    public void reset(){
         
     }
     

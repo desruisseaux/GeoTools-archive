@@ -77,7 +77,7 @@ public class JPropertyDialog extends JDialog{
         revert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(activePanel != null)
-                    activePanel.revert();
+                    activePanel.reset();
             }
         });
         

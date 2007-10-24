@@ -112,7 +112,7 @@ public class ContextCRSPropertyPanel extends javax.swing.JPanel implements Prope
         //jtf_epsg.setText(context.getCoordinateReferenceSystem().getName().getCode());
     }
 
-    public void revert() {
+    public void reset() {
     }
     
 }

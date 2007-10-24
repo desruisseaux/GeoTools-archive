@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.propertyedit.styleproperty;
+package org.geotools.gui.swing.propertyedit.model;
 
 import java.awt.Component;
 
@@ -25,10 +25,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  *
  * @author johann sorel
  */
-public class StyleTreeRenderer extends DefaultTreeCellRenderer{
+public class MultiTreeRenderer extends DefaultTreeCellRenderer{
     
-    /** Creates a new instance of StyleTreeRenderer */
-    public StyleTreeRenderer() {
+    /** Creates a new instance of MultiTreeRenderer */
+    public MultiTreeRenderer() {
         super();
     }
     
@@ -36,9 +36,9 @@ public class StyleTreeRenderer extends DefaultTreeCellRenderer{
     public Component getTreeCellRendererComponent(JTree tree,Object value,boolean sel,boolean expanded,boolean leaf, int row,boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel,expanded, leaf, row,hasFocus);
         
-        if( value instanceof StyleNode){
-            setIcon(((StyleNode)value).getIcon());
-            setText(((StyleNode)value).getTitle());
+        if( value instanceof MultiTreeNode){
+            setIcon(((MultiTreeNode)value).getIcon());
+            setText(((MultiTreeNode)value).getTitle());
         }
         
         return this;

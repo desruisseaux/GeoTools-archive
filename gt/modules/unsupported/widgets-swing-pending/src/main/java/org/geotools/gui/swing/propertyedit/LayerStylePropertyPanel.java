@@ -16,94 +16,29 @@
 
 package org.geotools.gui.swing.propertyedit;
 
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
-import org.geotools.gui.swing.propertyedit.styleproperty.JScaleStylePanel;
+import org.geotools.gui.swing.i18n.TextBundle;
 
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
-import org.geotools.gui.swing.propertyedit.styleproperty.JUniqueStylePanel;
 import org.geotools.gui.swing.propertyedit.styleproperty.JXMLStylePanel;
-import org.geotools.gui.swing.propertyedit.styleproperty.StyleNode;
-import org.geotools.gui.swing.propertyedit.styleproperty.StylePanel;
-import org.geotools.gui.swing.propertyedit.styleproperty.StyleTreeRenderer;
-import org.geotools.map.MapLayer;
 
 /**
  *
  * @author  johann sorel
  */
-public class LayerStylePropertyPanel extends javax.swing.JPanel implements PropertyPanel {
+public class LayerStylePropertyPanel extends MultiPropertyPanel {
 
-    private ArrayList<StylePanel> types = new ArrayList<StylePanel>();
-    private StylePanel activePanel;
-    private MapLayer layer;
-    private DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode("Styles"));
 
     /** Creates new form DefaultMapContextCRSEditPanel */
     public LayerStylePropertyPanel() {
-        initComponents();
+        super();
 
-        pan_style.setLayout(new GridLayout(1, 1));
-
-        tree.setModel(model);
-        tree.setRootVisible(false);
-        tree.setCellRenderer(new StyleTreeRenderer());
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-        addStylePanel(new JSimpleStylePanel());
-        addStylePanel(new JScaleStylePanel());
-        addStylePanel(new JUniqueStylePanel());
-        addStylePanel(new JXMLStylePanel());
-
-
-        tree.addTreeSelectionListener(new TreeSelectionListener() {
-
-            public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
-                final Object obj = node.getUserObject();
-
-                if (obj != null) {
-                    if (obj instanceof StylePanel) {
-                        activeStylePanel((StylePanel) obj);
-                    }
-                }
-            }
-        });
-    }
-
-    private void activeStylePanel(final StylePanel pan) {
-        activePanel = pan;
-        lbl_title.setTitle(pan.getTitle());
-        lbl_title.setIcon(pan.getIcon());
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                pan_style.removeAll();
-                pan_style.add(pan.getPanel());
-                pan_style.revalidate();
-                pan_style.repaint();
-            }
-        });
-    }
-
-    public void addStylePanel(StylePanel pan) {
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        StyleNode node = new StyleNode(pan);
-        root.add(node);
-
-        model.reload();
-        tree.expandAll();
-        types.add(pan);
+        addPropertyPanel(new JSimpleStylePanel());
+        //addPropertyPanel(new JScaleStylePanel());
+        //addPropertyPanel(new JUniqueStylePanel());
+        addPropertyPanel(new JXMLStylePanel());
     }
 
     /** This method is called from within the constructor to
@@ -114,117 +49,33 @@ public class LayerStylePropertyPanel extends javax.swing.JPanel implements Prope
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jpanel0 = new javax.swing.JPanel();
-        pan_style = new javax.swing.JPanel();
-        lbl_title = new org.jdesktop.swingx.JXTitledSeparator();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tree = new org.jdesktop.swingx.JXTree();
-
-        jSplitPane1.setBorder(null);
-        jSplitPane1.setDividerLocation(152);
-        jSplitPane1.setDividerSize(0);
-
-        org.jdesktop.layout.GroupLayout pan_styleLayout = new org.jdesktop.layout.GroupLayout(pan_style);
-        pan_style.setLayout(pan_styleLayout);
-        pan_styleLayout.setHorizontalGroup(
-            pan_styleLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 335, Short.MAX_VALUE)
-        );
-        pan_styleLayout.setVerticalGroup(
-            pan_styleLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 295, Short.MAX_VALUE)
-        );
-
-        lbl_title.setTitle("Style");
-
-        org.jdesktop.layout.GroupLayout jpanel0Layout = new org.jdesktop.layout.GroupLayout(jpanel0);
-        jpanel0.setLayout(jpanel0Layout);
-        jpanel0Layout.setHorizontalGroup(
-            jpanel0Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jpanel0Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lbl_title, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
-            .add(pan_style, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jpanel0Layout.setVerticalGroup(
-            jpanel0Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jpanel0Layout.createSequentialGroup()
-                .add(lbl_title, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 21, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pan_style, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jSplitPane1.setRightComponent(jpanel0);
-
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(152, 202));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(152, 202));
-
-        tree.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        tree.setMinimumSize(new java.awt.Dimension(150, 200));
-        tree.setPreferredSize(new java.awt.Dimension(150, 200));
-        jScrollPane1.setViewportView(tree);
-
-        jSplitPane1.setLeftComponent(jScrollPane1);
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
+            .add(0, 487, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane1)
+            .add(0, 322, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JPanel jpanel0;
-    private org.jdesktop.swingx.JXTitledSeparator lbl_title;
-    private javax.swing.JPanel pan_style;
-    private org.jdesktop.swingx.JXTree tree;
     // End of variables declaration//GEN-END:variables
 
-    public void setTarget(Object target) {
-        layer = (MapLayer) target;
-        init();
-    }
-
-    public void apply() {
-        if (activePanel != null) {
-            activePanel.apply();
-        }
-    }
-
+    @Override
     public String getTitle() {
-        return "Symbologie";
+        return TextBundle.getResource().getString("style");
     }
 
+    @Override
     public ImageIcon getIcon() {
-        return null;
+        return IconBundle.getResource().getIcon("16_style");
     }
 
+    @Override
     public String getToolTip() {
-        return "Symbologie";
+        return TextBundle.getResource().getString("style");
     }
 
-    public Component getPanel() {
-        return this;
-    }
-
-    private void init() {
-        for (StylePanel pan : types) {
-            pan.setTarget(layer);
-        }
-
-        if (types.size() > 0) {
-            activeStylePanel(types.get(0));
-        }
-    }
-
-    public void revert() {
-    }
 }

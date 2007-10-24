@@ -41,6 +41,7 @@ import javax.xml.transform.TransformerException;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.filtre.FiltreSLD;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.sld.SLDConfiguration;
 import org.geotools.styling.SLDTransformer;
@@ -48,11 +49,14 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 
+
+
+
 /**
  *
  * @author  johann sorel
  */
-public class JXMLStylePanel extends javax.swing.JPanel implements StylePanel {
+public class JXMLStylePanel extends javax.swing.JPanel implements PropertyPanel {
 
     private MapLayer layer;
 
@@ -218,17 +222,24 @@ public class JXMLStylePanel extends javax.swing.JPanel implements StylePanel {
         return TextBundle.getResource().getString("xml");
     }
 
-    public void setTarget(MapLayer layer) {
-        this.layer = layer;
-
+    public void setTarget(Object layer) {
+        
+        if(layer instanceof MapLayer){
+            this.layer = (MapLayer) layer;
+            parse();
+            
+        }
+    }
+    
+    private void parse(){
         SLDTransformer st = new SLDTransformer();
 
-        try {
-            String xml = st.transform(layer.getStyle());            
-            editpane.setText(xml);
-        } catch (TransformerException ex) {
-            ex.printStackTrace();
-        }
+            try {
+                String xml = st.transform(this.layer.getStyle());            
+                editpane.setText(xml);
+            } catch (TransformerException ex) {
+                ex.printStackTrace();
+            }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_check;
@@ -238,10 +249,16 @@ public class JXMLStylePanel extends javax.swing.JPanel implements StylePanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_check;
     // End of variables declaration//GEN-END:variables
+
+
+    public void reset() {
+        parse();
+    }
+
+    public String getToolTip() {
+        return "";
+    }
 }
-
-
-
 /** 
  * Utility class for file operations. Made for
  * quick needs, this class is not optimised.

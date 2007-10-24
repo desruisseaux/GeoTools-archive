@@ -16,6 +16,7 @@
 
 package org.geotools.gui.swing.propertyedit.styleproperty;
 
+import org.geotools.gui.swing.style.SymbolizerPanel;
 import java.awt.BorderLayout;
 
 import javax.swing.ImageIcon;
@@ -36,12 +37,13 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
 
 /**
  *
  * @author  johann sorel
  */
-public class JSimpleStylePanel extends javax.swing.JPanel implements StylePanel {
+public class JSimpleStylePanel extends javax.swing.JPanel implements PropertyPanel {
 
     private MapLayer layer;
     private SymbolizerPanel detail = null;
@@ -90,9 +92,12 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements StylePanel 
         return TextBundle.getResource().getString("simple");
     }
 
-    public void setTarget(MapLayer layer) {
-        this.layer = layer;
-        parse();
+    public void setTarget(Object layer) {
+        
+        if(layer instanceof MapLayer){
+            this.layer = (MapLayer) layer;
+            parse();
+            }
     }
 
     private void parse() {
@@ -121,6 +126,16 @@ public class JSimpleStylePanel extends javax.swing.JPanel implements StylePanel 
                 }
             }
         }
+    }
+
+    
+
+    public void reset() {
+        parse();
+    }
+
+    public String getToolTip() {
+        return "";
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

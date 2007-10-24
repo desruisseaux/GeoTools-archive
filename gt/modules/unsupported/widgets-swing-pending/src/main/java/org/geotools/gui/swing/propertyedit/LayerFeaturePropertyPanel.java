@@ -37,6 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.geotools.data.Query;
+import org.geotools.gui.swing.icon.IconBundle;
 
 /**
  *
@@ -213,11 +214,11 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
     }
 
     public String getTitle() {
-        return "FeatureTable";
+        return TextBundle.getResource().getString("featuretable");
     }
 
     public ImageIcon getIcon() {
-        return null;
+        return IconBundle.getResource().getIcon("16_feature_table");
     }
 
     public String getToolTip() {
@@ -233,6 +234,6 @@ public class LayerFeaturePropertyPanel extends javax.swing.JPanel implements Pro
         jbu_action.setEnabled(editable);
     }
 
-    public void revert() {
+    public void reset() {
     }
 }

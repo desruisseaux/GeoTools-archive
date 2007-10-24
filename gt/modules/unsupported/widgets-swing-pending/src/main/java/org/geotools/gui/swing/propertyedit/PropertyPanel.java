@@ -30,7 +30,7 @@ public interface PropertyPanel {
     
     public void apply();
     
-    public void revert();
+    public void reset();
     
     public String getTitle();
     

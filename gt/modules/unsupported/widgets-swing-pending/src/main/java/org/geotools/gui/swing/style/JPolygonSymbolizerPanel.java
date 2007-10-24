@@ -23,7 +23,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JComponent;
 
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.gui.swing.propertyedit.styleproperty.SymbolizerPanel;
+import org.geotools.gui.swing.style.SymbolizerPanel;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.PolygonSymbolizer;

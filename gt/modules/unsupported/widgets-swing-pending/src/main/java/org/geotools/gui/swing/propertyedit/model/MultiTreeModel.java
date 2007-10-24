@@ -14,28 +14,24 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.propertyedit.styleproperty;
+package org.geotools.gui.swing.propertyedit.model;
 
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-
-import org.geotools.map.MapLayer;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 /**
  *
  * @author johann sorel
  */
-public interface StylePanel {
-    
-    public JComponent getPanel();
-    
-    public ImageIcon getIcon();
-    
-    public String getTitle();
-    
-    public void setTarget(MapLayer layer);
-    
-    public void apply();
-    
+public class MultiTreeModel extends DefaultTreeModel implements TreeModel{
+        
+    /** Creates a new instance of MultiTreeModel */
+    public MultiTreeModel() {
+        super(new DefaultMutableTreeNode());
+        
+    }
+
+
     
 }

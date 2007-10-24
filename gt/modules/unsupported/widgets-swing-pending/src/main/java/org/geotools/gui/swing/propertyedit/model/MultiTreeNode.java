@@ -14,24 +14,35 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.propertyedit.styleproperty;
+package org.geotools.gui.swing.propertyedit.model;
 
+import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
 
 /**
  *
  * @author johann sorel
  */
-public class StyleTreeModel extends DefaultTreeModel implements TreeModel{
-        
-    /** Creates a new instance of StyleTreeModel */
-    public StyleTreeModel() {
-        super(new DefaultMutableTreeNode());
-        
+public class MultiTreeNode extends DefaultMutableTreeNode{
+    
+    private PropertyPanel pan;
+    
+    /** Creates a new instance of MultiTreeNode 
+     * @param panel 
+     */
+    public MultiTreeNode(PropertyPanel panel) {
+        super(panel);
+        pan = panel;
+    }
+    
+    public  ImageIcon getIcon(){
+        return pan.getIcon();
     }
 
+    public String getTitle() {
+        return pan.getTitle();
+    }
 
-    
+        
 }

@@ -10,13 +10,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
 
 /**
  *
  * @author  Administrateur
  */
-public class JScaleStylePanel extends javax.swing.JPanel implements StylePanel{
+public class JScaleStylePanel extends javax.swing.JPanel implements PropertyPanel{
     
     /** Creates new form JScaleStylePanel */
     public JScaleStylePanel() {
@@ -35,9 +36,7 @@ public class JScaleStylePanel extends javax.swing.JPanel implements StylePanel{
         return TextBundle.getResource().getString("scalestyle");
     }
 
-    public void setTarget(MapLayer layer) {
-        
-    }
+    
 
     public void apply() {
         
@@ -65,6 +64,18 @@ public class JScaleStylePanel extends javax.swing.JPanel implements StylePanel{
             .add(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    public void setTarget(Object target) {
+        
+    }
+
+    public void reset() {
+        
+    }
+
+    public String getToolTip() {
+        return "";
+    }
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

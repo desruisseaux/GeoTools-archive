@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.propertyedit.styleproperty;
+package org.geotools.gui.swing.style;
 
 import javax.swing.JComponent;
 
