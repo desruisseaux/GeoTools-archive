@@ -17,15 +17,15 @@ public class FilteringFeatureIterator implements FeatureIterator {
     /**
      * delegate iterator
      */
-    FeatureIterator delegate;
+    protected FeatureIterator delegate;
     /**
      * The Filter
      */
-    Filter filter;
+    protected Filter filter;
     /**
      * Next feature
      */
-    SimpleFeature next;
+    protected SimpleFeature next;
     
     public FilteringFeatureIterator( FeatureIterator delegate, Filter filter ) {
         this.delegate = delegate;
