@@ -564,8 +564,10 @@ scan:       while (it.hasNext()) {
      * @param  name The name of the variable to search.
      * @return The variable for the given name.
      * @throws IIOException if no variable has been found for the given name.
+     * @throws IOException If the operation failed because of an I/O error.
      */
-    private Variable findVariable(final String name) throws IIOException {
+    protected Variable findVariable(final String name) throws IOException {
+        ensureFileOpen();
         /*
          * First tries a case-sensitive search. Case matter since the same letter in different
          * case may represent different variables. For example "t" and "T" are typically "time"

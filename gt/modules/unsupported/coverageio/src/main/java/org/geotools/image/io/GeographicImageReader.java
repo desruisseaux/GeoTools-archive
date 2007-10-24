@@ -569,7 +569,7 @@ public abstract class GeographicImageReader extends ImageReader {
                 if (isFloat) {
                     converter = SampleConverter.createPadValuesMask(nodataValues);
                 } else {
-                    final boolean rangeContainsZero = (minimum <= 0 && maximum >= 0);
+                    final boolean isZeroValid = (minimum <= 0 && maximum >= 0);
                     boolean collapsePadValues = false;
                     if (nodataValues != null && nodataValues.length != 0) {
                         final double[] sorted = (double[]) nodataValues.clone();
@@ -607,9 +607,10 @@ public abstract class GeographicImageReader extends ImageReader {
                                     }
                                 }
                                 final int unused = (int) Math.min(Math.round(unusedSpace), Integer.MAX_VALUE);
-                                if (unused >= 1) {
-                                    collapsePadValues = collapseNoDataValues(sorted, unused);
-                                }
+                                collapsePadValues = collapseNoDataValues(isZeroValid, sorted, unused);
+                                // We invoked 'collapseNoDataValues' inconditionnaly even if
+                                // 'unused' is zero because the user may decide on the basis
+                                // of other criterions, like 'isZeroValid'.
                             }
                         }
                     }
@@ -617,7 +618,7 @@ public abstract class GeographicImageReader extends ImageReader {
                         // The range of valid values is outside the range allowed by raw data type.
                         converter = SampleConverter.createOffset(1 - minimum, nodataValues);
                     } else if (collapsePadValues) {
-                        if (rangeContainsZero) {
+                        if (isZeroValid) {
                             // We need to collapse the no-data values to 0, but it causes a clash
                             // with the range of valid values. So we also shift the later.
                             converter = SampleConverter.createOffset(1 - minimum, nodataValues);
@@ -762,13 +763,21 @@ public abstract class GeographicImageReader extends ImageReader {
      * return unusedSpace >= 1024;
      * </pre></blockquote>
      *
+     * @param isZeroValid
+     *          {@code true} if 0 is a valid value. If this method returns {@code true} while
+     *          {@code isZeroValid} is {@code true}, then the {@linkplain SampleConverter sample
+     *          converter} to be returned by {@link #getRawImageType(int, ImageReadParam,
+     *          SampleConverter[]) getRawImageType} will offset all valid values by 1.
      * @param nodataValues
-     *              The {@linkplain Arrays#sort(double[]) sorted}
-     *              {@linkplain Band#getNoDataValues no-data values} (never null and never empty).
+     *          The {@linkplain Arrays#sort(double[]) sorted}
+     *          {@linkplain Band#getNoDataValues no-data values} (never null and never empty).
      * @param unusedSpace
-     *              The largest amount of unused space outside the range of valid values.
+     *          The largest amount of unused space outside the range of valid values.
      */
-    protected boolean collapseNoDataValues(final double[] nodataValues, final int unusedSpace) {
+    protected boolean collapseNoDataValues(final boolean  isZeroValid,
+                                           final double[] nodataValues,
+                                           final int      unusedSpace)
+    {
         return false;
     }
 

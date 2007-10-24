@@ -41,7 +41,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      * Wrapper classes sorted by their wide.
      */
     @SuppressWarnings("unchecked")
-    private static final Class<? extends Number>[] CLASS_RANK = new Class[] {
+    private static final Class<? extends Number>[] TYPES_BY_SIZE = new Class[] {
         Byte   .class,
         Short  .class,
         Integer.class,
@@ -51,14 +51,12 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     };
 
     /**
-     * Liste des classes d'objets pouvant être convertis en nombres. Cette liste
-     * contiendra par défaut quelques instances de {@link ClassChanger} pour
-     * quelques classes standards du Java, telle que {@link Date}. Toutefois,
-     * d'autres objets pourront être ajoutés par la suite. Cette liste est
-     * <u>ordonnée</u>. Les classe le plus hautes dans la hierarchie (les
-     * classes parentes) doivent apparaître à la fin.
+     * A list of class objects that can be converted to numbers. This list is initialized
+     * to a few commons {@link ClassChanger} instances for some standard Java classes like
+     * {@link Date}. More objects can be added dynamically. This list must be <u>ordered</u>:
+     * subclasses must be listed before parent classes.
      */
-    private static ClassChanger<?,?>[] list = new ClassChanger[] {
+    private static ClassChanger<?,?>[] changers = new ClassChanger[] {
         new ClassChanger<Date,Long>(Date.class, Long.class) {
             protected Long convert(final Date object) {
                 return new Long(object.getTime());
@@ -123,9 +121,9 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     }
 
     /**
-     * Registers a new transformation. All registered {@link ClassChanger} will
+     * Registers a new converter. All registered {@link ClassChanger} will
      * be taken in account by the {@link #toNumber} method. The example below
-     * register a transformation for the {@link Date} class:
+     * register a conversion for the {@link Date} class:
      *
      * <blockquote><pre>
      * &nbsp;ClassChanger.register(new ClassChanger(Date.class, Long.class) {
@@ -147,25 +145,23 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      */
     public static synchronized void register(final ClassChanger<?,?> converter) throws IllegalStateException {
         int i;
-        for (i=0; i<list.length; i++) {
-            if (list[i].source.isAssignableFrom(converter.source)) {
+        for (i=0; i<changers.length; i++) {
+            if (changers[i].source.isAssignableFrom(converter.source)) {
                 /*
-                 * On a trouvé un convertisseur qui utilisait
-                 * une classe parente. Le nouveau convertisseur
-                 * devra s'insérer avant son parent. Mais on va
-                 * d'abord s'assurer qu'il n'existait pas déjà
-                 * un convertisseur pour cette classe.
+                 * We found a converter for a parent class. The new converter should be
+                 * inserted before its parent.  But before the insertion, we will check
+                 * if this converter was not already registered later in the array.
                  */
-                for (int j=i; j<list.length; j++) {
-                    if (list[j].source.equals(converter.source)) {
-                        throw new IllegalStateException(list[j].toString());
+                for (int j=i; j<changers.length; j++) {
+                    if (changers[j].source.equals(converter.source)) {
+                        throw new IllegalStateException(changers[j].toString());
                     }
                 }
                 break;
             }
         }
-        list = XArray.insert(list, i, 1);
-        list[i] = converter;
+        changers = XArray.insert(changers, i, 1);
+        changers[i] = converter;
     }
 
     /**
@@ -178,8 +174,8 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     private static synchronized <S extends Comparable<S>> ClassChanger<S,?> getClassChanger(final Class<S> source)
             throws ClassNotFoundException
     {
-        for (int i=0; i<list.length; i++) {
-            final ClassChanger<?,?> candidate = list[i];
+        for (int i=0; i<changers.length; i++) {
+            final ClassChanger<?,?> candidate = changers[i];
             if (candidate.source.isAssignableFrom(source)) {
                 @SuppressWarnings("unchecked")
                 final ClassChanger<S,?> c = (ClassChanger<S,?>) candidate;
@@ -198,9 +194,9 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      */
     public static synchronized Class<?> getTransformedClass(final Class<?> source) {
         if (source != null) {
-            for (int i=0; i<list.length; i++) {
-                if (list[i].source.isAssignableFrom(source)) {
-                    return list[i].target;
+            for (int i=0; i<changers.length; i++) {
+                if (changers[i].source.isAssignableFrom(source)) {
+                    return changers[i].target;
                 }
             }
         }
@@ -252,7 +248,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
                 return classe.cast(value);
             }
             ClassChanger changer = getClassChanger(classe);
-            final Comparable c = changer.inverseConvert(value);
+            final Comparable<?> c = changer.inverseConvert(value);
             return classe.cast(c);
         }
         return null;
@@ -336,7 +332,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     {
         if (c1 == null) return c2;
         if (c2 == null) return c1;
-        return CLASS_RANK[Math.max(getRank(c1), getRank(c2))];
+        return TYPES_BY_SIZE[Math.max(getRank(c1), getRank(c2))];
     }
 
     /**
@@ -349,7 +345,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     {
         if (c1 == null) return c2;
         if (c2 == null) return c1;
-        return CLASS_RANK[Math.min(getRank(c1), getRank(c2))];
+        return TYPES_BY_SIZE[Math.min(getRank(c1), getRank(c2))];
     }
 
     /**
@@ -371,11 +367,11 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     }
 
     /**
-     * Returns the rank (in the {@link #CLASS_RANK} array) of the specified class.
+     * Returns the rank (in the {@link #TYPES_BY_SIZE} array) of the specified class.
      */
     private static int getRank(final Class<? extends Number> c) {
-        for (int i=0; i<CLASS_RANK.length; i++) {
-            if (CLASS_RANK[i].isAssignableFrom(c)) {
+        for (int i=0; i<TYPES_BY_SIZE.length; i++) {
+            if (TYPES_BY_SIZE[i].isAssignableFrom(c)) {
                 return i;
             }
         }
