@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -285,7 +286,11 @@ public class ParserHandler extends DefaultHandler {
                         } catch (Exception e) {
                             String msg = "Error parsing: " + location;
                             logger.warning(msg);
-                            throw (SAXException) new SAXException(msg).initCause(e);
+
+                            if (isStrict()) {
+                                //strict mode, throw exception
+                                throw (SAXException) new SAXException(msg).initCause(e);
+                            }
                         }
                     }
                 }
@@ -303,11 +308,46 @@ public class ParserHandler extends DefaultHandler {
                 }
             }
 
-            if (schemas == null) {
-                //crap out
-                String msg = "Could not find a schemaLocation attribute or "
-                    + "appropriate locator";
-                throw new SAXException(msg);
+            //strip out any null schemas
+            int n = 0;
+
+            for (int i = 0; i < schemas.length; i++) {
+                if (schemas[i] != null) {
+                    n++;
+                }
+            }
+
+            if (n != schemas.length) {
+                XSDSchema[] nschemas = new XSDSchema[n];
+                int j = 0;
+
+                for (int i = 0; i < schemas.length; i++) {
+                    if (schemas[i] == null) {
+                        continue;
+                    }
+
+                    nschemas[j++] = schemas[i];
+                }
+
+                schemas = nschemas;
+            }
+
+            if ((schemas == null) || (schemas.length == 0)) {
+                logger.warning("Could not find a schema");
+
+                if (isStrict()) {
+                    //crap out
+                    String msg = "Could not find a schemaLocation attribute or "
+                        + "appropriate locator";
+                    throw new SAXException(msg);
+                } else {
+                    //just use the schema from configuration
+                    try {
+                        schemas = new XSDSchema[] { config.getXSD().getSchema() };
+                    } catch (IOException e) {
+                        throw (SAXException) new SAXException().initCause(e);
+                    }
+                }
             }
 
             //check to make sure that the schemas that were created include
