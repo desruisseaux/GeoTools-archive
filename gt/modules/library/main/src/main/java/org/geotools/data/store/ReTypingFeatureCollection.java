@@ -1,9 +1,7 @@
 package org.geotools.data.store;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
@@ -12,8 +10,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.collection.DecoratingFeatureCollection;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 
 /**
  * FeatureCollection decorator which decorates a feature collection "re-typing" 
@@ -30,6 +26,10 @@ public class ReTypingFeatureCollection extends DecoratingFeatureCollection
 	public ReTypingFeatureCollection ( FeatureCollection delegate, SimpleFeatureType featureType ) {
 		super(delegate);
 		this.featureType = featureType;
+	}
+	
+	public SimpleFeatureType getSchema() {
+	    return featureType;
 	}
 	
 	public FeatureReader reader() throws IOException {
