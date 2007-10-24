@@ -15,27 +15,33 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.GetCapabilitiesType;
+import net.opengis.wfs.DescribeFeatureTypeType;
 import org.w3c.dom.Document;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
 
 
-public class GetCapabilitiesTypeBindingTest extends WFSTestSupport {
+public class DescribeFeatureTypeTypeBindingTest extends WFSTestSupport {
     public void testType() throws Exception {
-        assertEquals(GetCapabilitiesType.class, binding(WFS.GetCapabilitiesType).getType());
+        assertEquals(DescribeFeatureTypeType.class, binding(WFS.DescribeFeatureTypeType).getType());
     }
 
     public void testExecutionMode() throws Exception {
-        assertEquals(Binding.OVERRIDE, binding(WFS.GetCapabilitiesType).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(WFS.DescribeFeatureTypeType).getExecutionMode());
     }
 
     public void testEncode() throws Exception {
-        GetCapabilitiesType getCaps = factory.createGetCapabilitiesType();
-        Document dom = encode(getCaps, WFS.GetCapabilities);
+        DescribeFeatureTypeType dft = factory.createDescribeFeatureTypeType();
+        dft.setService("WFS");
+        dft.setVersion("1.1.0");
+        dft.setOutputFormat("foo");
+        dft.setHandle("bar");
 
-        assertEquals("wfs:GetCapabilities", dom.getDocumentElement().getNodeName());
+        Document dom = encode(dft, WFS.DescribeFeatureType);
         assertEquals("WFS", dom.getDocumentElement().getAttribute("service"));
+        assertEquals("1.1.0", dom.getDocumentElement().getAttribute("version"));
+        assertEquals("foo", dom.getDocumentElement().getAttribute("outputFormat"));
+        assertEquals("bar", dom.getDocumentElement().getAttribute("handle"));
     }
 }
