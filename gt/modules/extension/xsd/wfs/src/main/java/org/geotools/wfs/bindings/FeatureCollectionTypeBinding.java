@@ -15,8 +15,12 @@
  */
 package org.geotools.wfs.bindings;
 
+import net.opengis.wfs.FeatureCollectionType;
 import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
+import org.opengis.feature.simple.SimpleFeature;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.*;
 
@@ -92,25 +96,23 @@ public class FeatureCollectionTypeBinding extends AbstractComplexEMFBinding {
         return WFS.FeatureCollectionType;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Class getType() {
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, node, value);
+        FeatureCollectionType fct = (FeatureCollectionType) super.parse(instance, node, value);
+
+        SimpleFeature[] features = (SimpleFeature[]) node.getChildValue(SimpleFeature[].class);
+
+        if (features != null) {
+            FeatureCollection fc = new DefaultFeatureCollection(null, null) {
+                };
+
+            for (int i = 0; i < features.length; i++) {
+                fc.add(features[i]);
+            }
+
+            fct.getFeature().add(fc);
+        }
+
+        return fct;
     }
 }
