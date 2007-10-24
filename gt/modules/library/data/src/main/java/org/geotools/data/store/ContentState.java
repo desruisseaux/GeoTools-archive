@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.data.FeatureListener;
+import org.geotools.data.Transaction;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -69,6 +70,10 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 public class ContentState {
 	
+    /**
+     * Transaction the state works from.
+     */
+    protected Transaction tx;
 	/**
 	 * cached feature type
 	 */
@@ -123,6 +128,20 @@ public class ContentState {
      */
     public ContentEntry getEntry() {
         return entry;
+    }
+    
+    /**
+     * The transaction associated with the state.
+     */
+    public Transaction getTransaction() {
+        return tx;
+    }
+    
+    /**
+     * Sets the transaction associatred with the state.
+     */
+    public void setTransaction(Transaction tx) {
+        this.tx = tx;
     }
     
     /**

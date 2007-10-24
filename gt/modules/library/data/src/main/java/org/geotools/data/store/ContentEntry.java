@@ -79,6 +79,7 @@ public final class ContentEntry {
 
         //create a state for the auto commit transaction
         ContentState autoState = dataStore.createContentState(null);
+        autoState.setTransaction(Transaction.AUTO_COMMIT);
         this.state.put(Transaction.AUTO_COMMIT, autoState);
     }
 
@@ -122,6 +123,7 @@ public final class ContentEntry {
         } else {
             ContentState auto = (ContentState) state.get(Transaction.AUTO_COMMIT);
             ContentState copy = (ContentState) auto.copy();
+            copy.setTransaction(transaction);
             state.put(transaction, copy);
 
             return copy;

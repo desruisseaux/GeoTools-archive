@@ -17,17 +17,24 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.geotools.data.ContentFeatureCollection;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.ReTypingFeatureCollection;
 import org.geotools.data.Transaction;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -64,12 +71,28 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * The transaction to work from
      */
     protected Transaction transaction;
-
+    /**
+     * hints
+     */
+    protected Set<Hints.ClassKey> hints;
+    
     /**
      * Creates the new feature source from an entry.
      */
     public ContentFeatureSource(ContentEntry entry) {
         this.entry = entry;
+        
+        //set up hints
+        hints = new HashSet<Hints.ClassKey>();
+        hints.add( Hints.JTS_GEOMETRY_FACTORY );
+        hints.add( Hints.JTS_COORDINATE_SEQUENCE_FACTORY );
+        
+        //add subclass specific hints
+        addHints( hints );
+        
+        //make hints unmodifiable
+        hints = Collections.unmodifiableSet( hints );
+        
     }
 
     /**
@@ -195,7 +218,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * implemented by subclasses.
      * </p>
      */
-    public final FeatureCollection getFeatures() throws IOException {
+    public final ContentFeatureCollection getFeatures() throws IOException {
         return getFeatures(Query.ALL);
     }
 
@@ -203,10 +226,11 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * Returns the feature collection if the features of the feature source which 
      * meet the specified query criteria.
      */
-    public final FeatureCollection getFeatures(Query query)
+    public final ContentFeatureCollection getFeatures(Query query)
         throws IOException {
-        FeatureCollection features = getFeatures(query.getFilter());
-
+        ContentFeatureCollection features = getFeatures(query.getFilter());
+        features.setHints( query.getHints() );
+        
         if (query.getCoordinateSystemReproject() != null) {
             // features = features.reproject( query.getCoordinateSystemReproject() );
         }
@@ -228,7 +252,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
             SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
             features = new ReTypingFeatureCollection( features, retyped );
         }
-
+        
         return features;
     }
 
@@ -241,7 +265,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * reduced to {@link #filtered(ContentState, Filter)}.
      * </p>
      */
-    public final FeatureCollection getFeatures(Filter filter)
+    public final ContentFeatureCollection getFeatures(Filter filter)
         throws IOException {
         if ((filter == null) || (filter == Filter.INCLUDE)) {
             return all(entry.getState(transaction));
@@ -268,14 +292,33 @@ public abstract class ContentFeatureSource implements FeatureSource {
     }
 
     /**
-     * Returns an empty set, subclasses should override if need be.
+     * The hints provided by the feature store.
+     * <p>
+     * Subclasses should implement {@link #addHints(Set)} to provide additional
+     * hints.
+     * </p>
      * 
      * @see FeatureSource#getSupportedHints()
      */
-    public Set getSupportedHints() {
-        return Collections.EMPTY_SET;
+    public final Set getSupportedHints() {
+        return hints;
     }
     
+    /**
+     * Subclass hook too add additional hints.
+     * <p>
+     * By default, the followings are already present:
+     * <ul>
+     *   <li>{@link Hints#JTS_COORDINATE_SEQUENCE_FACTORY}
+     *   <li>{@link Hints#JTS_GEOMETRY_FACTORY}
+     * </ul>
+     * 
+     * </p>
+     * @param hints The set of hints supported by the feature source.
+     */
+    protected void addHints( Set<Hints.ClassKey> hints ) {
+        
+    }
     //
     // Internal API
     //
@@ -307,7 +350,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      *
      * @param state The state the feature collection must work from.
      */
-    protected abstract FeatureCollection all(ContentState state);
+    protected abstract ContentFeatureCollection all(ContentState state);
 
     /**
      * Returns a new feature collection containing all the features of the 
@@ -320,7 +363,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      * @param filter The constraint filtering the data to return.
      * 
      */
-    protected abstract FeatureCollection filtered(ContentState state, Filter filter);
+    protected abstract ContentFeatureCollection filtered(ContentState state, Filter filter);
 
     /**
      * FeatureList representing sorted content.

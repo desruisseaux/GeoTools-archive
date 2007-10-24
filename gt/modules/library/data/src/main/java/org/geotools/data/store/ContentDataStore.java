@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.geotools.data.ContentFeatureCollection;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -307,6 +308,15 @@ public abstract class ContentDataStore implements DataStore {
         ContentFeatureSource featureSource = createFeatureSource(entry);
         featureSource.setTransaction(tx);
         
+        if ( tx != Transaction.AUTO_COMMIT ) {
+            //setup the transaction state
+            synchronized (tx) {
+                if ( tx.getState( typeName ) == null ) {
+                    tx.putState( typeName, createTransactionState(featureSource) );
+                }
+            }
+        }
+        
         return featureSource;
     }
 
@@ -339,14 +349,12 @@ public abstract class ContentDataStore implements DataStore {
      * in a {@link FeatureWriter}.
      * </p>
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+    public final FeatureWriter getFeatureWriter(String typeName, Filter filter,
         Transaction tx) throws IOException {
         
-        //TODO: implement and make final when feature collection api is fixed
-        // for now subclasses must implement
-        //FeatureCollection collection = getFeatureSource(typeName,tx).getFeatures( filter );
-        //return new DelegateFeatureWriter( collection.getSchema(), collection.writer() );
-        return null;
+        ContentFeatureCollection collection = getFeatureSource(typeName,tx).getFeatures( filter );
+        return new DelegateFeatureWriter( collection.getSchema(), collection.writer() );
+        
     }
  
     /**
@@ -370,13 +378,11 @@ public abstract class ContentDataStore implements DataStore {
      * in a {@link FeatureWriter}.
      * </p>
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+    public final FeatureWriter getFeatureWriterAppend(String typeName, Transaction tx)
         throws IOException {
-        //TODO: implement and make final when feature collection api is fixed
-        // for now subclasses must implement
-        //FeatureCollection collection = getFeatureSource(typeName,tx).getFeatures( filter );
-        //return new DelegateFeatureWriter( collection.getSchema(), collection.inserter() );
-        return null;
+        
+        ContentFeatureCollection collection = getFeatureSource(typeName,tx).getFeatures();
+        return new DelegateFeatureWriter( collection.getSchema(), collection.inserter() );
     }
 
     public final LockingManager getLockingManager() {
@@ -521,5 +527,17 @@ public abstract class ContentDataStore implements DataStore {
      * @return An new instance of {@link ContentFeatureSource} for the entry.
      */
     protected abstract ContentFeatureSource createFeatureSource(ContentEntry entry)
+        throws IOException;
+    
+    /**
+     * Instantiates a new transaction state object.
+     * <p>
+     * Subclasses should override method to return a specific instance of 
+     * {@link Transaction.State}.
+     * </p>
+     * @param featureSource The feature source / store for the new transaction
+     * state.
+     */
+    protected abstract Transaction.State createTransactionState(ContentFeatureSource featureSource)
         throws IOException;
 }
