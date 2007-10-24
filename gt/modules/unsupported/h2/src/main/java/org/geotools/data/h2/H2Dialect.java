@@ -8,10 +8,9 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.Map;
 
-import org.geotools.data.jdbc.JDBCDataStore;
-import org.geotools.data.jdbc.SQLDialect;
+import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.SQLDialect;
 import org.opengis.feature.type.GeometryDescriptor;
-import org.openplans.spatialdbbox.JTS;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -21,7 +20,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
-import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTWriter;
 
 public class H2Dialect extends SQLDialect {

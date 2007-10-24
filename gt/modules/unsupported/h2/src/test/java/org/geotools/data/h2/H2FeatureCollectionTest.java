@@ -1,7 +1,7 @@
 package org.geotools.data.h2;
 
-import org.geotools.data.jdbc.JDBCFeatureCollectionTest;
-import org.geotools.data.jdbc.JDBCTestSetup;
+import org.geotools.jdbc.JDBCFeatureCollectionTest;
+import org.geotools.jdbc.JDBCTestSetup;
 
 /**
  * FeatureCollection test for H2.

@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc;
+package org.geotools.jdbc;
 
 import java.io.IOException;
 import java.sql.ResultSet;

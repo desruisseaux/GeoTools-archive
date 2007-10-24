@@ -1,7 +1,7 @@
 package org.geotools.data.mysql;
 
-import org.geotools.data.jdbc.JDBCTestSetup;
-import org.geotools.data.jdbc.JDBCTransactionTest;
+import org.geotools.jdbc.JDBCTestSetup;
+import org.geotools.jdbc.JDBCTransactionTest;
 
 /**
  * Transation test for MySQL.

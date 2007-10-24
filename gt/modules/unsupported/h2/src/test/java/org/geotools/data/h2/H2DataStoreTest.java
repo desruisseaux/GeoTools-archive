@@ -1,7 +1,7 @@
 package org.geotools.data.h2;
 
-import org.geotools.data.jdbc.JDBCDataStoreTest;
-import org.geotools.data.jdbc.JDBCTestSetup;
+import org.geotools.jdbc.JDBCDataStoreTest;
+import org.geotools.jdbc.JDBCTestSetup;
 
 /**
  * Datastore test for H2.

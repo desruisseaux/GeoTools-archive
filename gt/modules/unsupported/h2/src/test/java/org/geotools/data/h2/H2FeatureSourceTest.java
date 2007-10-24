@@ -1,7 +1,7 @@
 package org.geotools.data.h2;
 
-import org.geotools.data.jdbc.JDBCFeatureSourceTest;
-import org.geotools.data.jdbc.JDBCTestSetup;
+import org.geotools.jdbc.JDBCFeatureSourceTest;
+import org.geotools.jdbc.JDBCTestSetup;
 
 /**
  * FeatureSource test for H2.

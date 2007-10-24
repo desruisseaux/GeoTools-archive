@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc;
+package org.geotools.jdbc;
 
 import java.sql.Connection;
 import java.util.logging.ConsoleHandler;

@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc;
+package org.geotools.jdbc;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -22,6 +22,8 @@ import javax.sql.DataSource;
 import org.geotools.data.DataStore;
 import org.geotools.data.Transaction;
 import org.geotools.data.Transaction.State;
+import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;

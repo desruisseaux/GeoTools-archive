@@ -3,8 +3,8 @@ package org.geotools.data.mysql;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.geotools.data.jdbc.JDBCTestSetup;
-import org.geotools.data.jdbc.SQLDialect;
+import org.geotools.jdbc.JDBCTestSetup;
+import org.geotools.jdbc.SQLDialect;
 
 /**
  * Test harness for mysql.

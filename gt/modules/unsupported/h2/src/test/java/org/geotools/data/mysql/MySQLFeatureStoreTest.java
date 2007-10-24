@@ -1,7 +1,7 @@
 package org.geotools.data.mysql;
 
-import org.geotools.data.jdbc.JDBCFeatureStoreTest;
-import org.geotools.data.jdbc.JDBCTestSetup;
+import org.geotools.jdbc.JDBCFeatureStoreTest;
+import org.geotools.jdbc.JDBCTestSetup;
 
 /**
  * FeatureStore test for MySQL.

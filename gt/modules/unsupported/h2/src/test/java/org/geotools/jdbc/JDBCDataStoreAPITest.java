@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc;
+package org.geotools.jdbc;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-public abstract class JDBCDataStoreAPITestSupport extends JDBCTestSupport {
+public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
 
     TestData td;
     

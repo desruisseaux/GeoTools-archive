@@ -1,6 +1,6 @@
 package org.geotools.data.mysql;
 
-import org.geotools.data.jdbc.JDBCDataStoreAPITestSetup;
+import org.geotools.jdbc.JDBCDataStoreAPITestSetup;
 
 public class MySQLDataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
 

@@ -1,6 +1,6 @@
 package org.geotools.data.h2;
 
-import org.geotools.data.jdbc.JDBCDataStoreAPITestSetup;
+import org.geotools.jdbc.JDBCDataStoreAPITestSetup;
 
 public class H2DataStoreAPITestSetup extends JDBCDataStoreAPITestSetup {
 

@@ -20,8 +20,9 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.jdbc.ConnectionManager;
 import org.geotools.data.jdbc.DataSourceManager;
-import org.geotools.data.jdbc.JDBCDataStore;
+
 import org.geotools.factory.GeoTools;
+import org.geotools.jdbc.JDBCDataStore;
 
 /**
  * Factory will connect to the H2 database using a DataSource you provide.

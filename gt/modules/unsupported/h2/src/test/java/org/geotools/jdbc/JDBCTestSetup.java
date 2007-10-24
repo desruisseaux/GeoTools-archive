@@ -1,4 +1,4 @@
-package org.geotools.data.jdbc;
+package org.geotools.jdbc;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
