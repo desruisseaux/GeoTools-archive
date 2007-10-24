@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -27,7 +29,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
 
    public void testGetNames() throws IOException {
 		String[] typeNames = dataStore.getTypeNames();
-		assertEquals( 1, typeNames.length );
+		assertTrue( new HashSet( Arrays.asList(typeNames) ).contains("ft1"));
 	}
 	
 	public void testGetSchema() throws Exception {
