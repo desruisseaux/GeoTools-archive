@@ -8,10 +8,13 @@ import java.util.List;
 import org.geotools.feature.FeatureImpl;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.feature.Attribute;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 
 /**
  * An implementation of the SimpleFeature convience methods ontop of
@@ -113,8 +116,25 @@ public class SimpleFeatureImpl extends FeatureImpl implements SimpleFeature {
     }
     
     public Object getDefaultGeometry() {
-        return getDefaultGeometryProperty() != null ? 
-            getDefaultGeometryProperty().getValue() : null;
+        //first try the default geometry as described by the type
+        if ( getDefaultGeometryProperty() != null ) {
+            Object defaultGeometry = getDefaultGeometryProperty().getValue();
+            if ( defaultGeometry != null ) {
+                return defaultGeometry;
+            }
+            
+            //default was null, look for another geometry property that does 
+            // not have a null value
+            for ( Property p : getProperties() ) {
+                if ( p instanceof GeometryAttribute ) {
+                    GeometryAttribute ga = (GeometryAttribute) p;
+                    if ( ga.getValue() != null ) {
+                        return ga.getValue();
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     public void setDefaultGeometry(Object geometry) {
