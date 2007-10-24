@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
+import org.geotools.data.FeatureStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
@@ -20,32 +21,59 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * FeatureStore implementation for jdbc based relational database tables.
  * <p>
+ * All the operations of this class are delegated to {@link JDBCFeatureCollection}
+ * via the {@link #all(ContentState)} and {@link #filtered(ContentState, Filter)}
+ * methods.
  * 
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
  */
 public final class JDBCFeatureStore extends ContentFeatureStore {
 
+    /**
+     * primary key of the table
+     */
     PrimaryKey primaryKey;
     
+    /**
+     * Creates the new feature store.
+     * @param entry The datastore entry.
+     */
     public JDBCFeatureStore(ContentEntry entry) throws IOException {
         super(entry);
         
         //TODO: cache this
         primaryKey =  ((JDBCDataStore) entry.getDataStore()).getPrimaryKey(entry);
     }
+    
+    /**
+     * Type narrow to {@link JDBCDataStore}.
+     */
     public JDBCDataStore getDataStore() {
         return (JDBCDataStore) super.getDataStore();
     }
-    
+    /**
+     * Type narrow to {@link JDBCState}.
+     */
     public JDBCState getState() {
         return (JDBCState) super.getState();
     }
     
+    /**
+     * Returns the primary key of the table backed by feature store.
+     */
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
     
+    /**
+     * This method operates by delegating to the 
+     * {@link JDBCFeatureCollection#update(AttributeDescriptor[], Object[])}
+     * method provided by the feature collection resulting from 
+     * {@link #filtered(ContentState, Filter)}.
+     * 
+     * @see FeatureStore#modifyFeatures(AttributeDescriptor[], Object[], Filter)
+     */
     public void modifyFeatures(AttributeDescriptor[] type, Object[] value,
             Filter filter) throws IOException {
         
@@ -59,6 +87,9 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         features.update(type, value);
     }
     
+    /**
+     * Builds the feature type from database metadata.
+     */
     protected SimpleFeatureType buildFeatureType() throws IOException {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder( );
         
@@ -79,7 +110,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
         String databaseSchema = getDataStore().getDatabaseSchema();
         
         //ensure we have a connection
-        Connection cx = getDataStore().getConnection( this );
+        Connection cx = getDataStore().getConnection( getState() );
         
         //get metadata about columns from database
         try {
@@ -154,6 +185,10 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         //not found, try getting from the data type name
                         binding = getDataStore().getMapping( typeName );
                         
+                        if ( binding == null ) {
+                            //not found, one last try, ask the dialect
+                            binding = dialect.getMapping( databaseSchema, tableName, name, dataType, cx);
+                        }
                     }
                     
                     //if still not found, resort to Object

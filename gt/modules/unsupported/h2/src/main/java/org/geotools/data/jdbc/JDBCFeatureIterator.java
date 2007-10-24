@@ -6,25 +6,39 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
 
+import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.util.Converters;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
+/**
+ * Iterator for read only access to a dataset.
+ * 
+ * @author Justin Deoliveira, The Open Planning Project
+ *
+ */
 public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 
 	/**
 	 * flag indicating if the iterator has another feature
 	 */
 	Boolean next;
+	/**
+     * geometry factory used to create geometry objects
+	 */
+	GeometryFactory geometryFactory;
 	
-	public JDBCFeatureIterator( Statement st, SimpleFeatureType featureType, JDBCDataStore dataStore ) {
-		super( st, featureType, dataStore );
+	public JDBCFeatureIterator( Statement st, SimpleFeatureType featureType, JDBCFeatureCollection collection ) {
+		super( st, featureType, collection );
 		
 		try {
             rs.beforeFirst();
@@ -32,6 +46,22 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 		catch (SQLException e) {
 		    throw new RuntimeException( e );
         }
+		
+		//set a geometry factory, use the hints on the collection first
+		geometryFactory = (GeometryFactory) collection.getHints().get( Hints.JTS_GEOMETRY_FACTORY );
+		if ( geometryFactory == null ) {
+		    //look for a coordinate sequence factory
+		    CoordinateSequenceFactory csFactory = 
+		        (CoordinateSequenceFactory) collection.getHints().get( Hints.JTS_COORDINATE_SEQUENCE_FACTORY );
+		    if ( csFactory != null ) {
+		        geometryFactory = new GeometryFactory( csFactory);
+		    }
+		}
+		
+		if ( geometryFactory == null ) {
+		    //use the datastore provided one
+	        geometryFactory = dataStore.getGeometryFactory();    
+		}
 	}
 	
 	public boolean hasNext() {
@@ -61,22 +91,44 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 				//is this a geometry?
 				if ( type instanceof GeometryDescriptor ) {
 				    GeometryDescriptor gatt = (GeometryDescriptor) type;
-				    //if the value is not of type Geometry, try to decode it
-				    if ( value != null && !( value instanceof Geometry ) ) {
-				        Object decoded;
-                        try {
-                            decoded = dataStore.getSQLDialect().decodeGeometryValue(value, gatt);
-                        } 
-                        catch (IOException e) {
-                            throw new RuntimeException( e );
-                        }
-                        
-				        if ( decoded != null ) {
-				            value = decoded;
-				        }
+				    try {
+				        value = dataStore.getSQLDialect()
+			               .decodeGeometryValue(gatt,rs,type.getLocalName(),geometryFactory);
+				    }
+				    catch (IOException e) {
+                        throw new RuntimeException( e );
+                    }
+				    
+//				    //if the value is not of type Geometry, try to decode it
+//				    if ( value != null && !( value instanceof Geometry ) ) {
+//				        Object decoded;
+//                        try {
+//                            decoded = 
+//                        } 
+//                    
+//                        
+//				        if ( decoded != null ) {
+//				            value = decoded;
+//				        }
+//				    }
+				}
+				
+				//if the value is not of the type of the binding, try to convert
+				Class binding = type.getType().getBinding();
+				if ( value != null && 
+				        !(type.getType().getBinding().isAssignableFrom(binding))) {
+				    if ( JDBCDataStore.LOGGER.isLoggable(Level.FINER)) {
+				        String msg = value + " is not of type " + 
+				            binding.getName() + ", attempting conversion";
+				        JDBCDataStore.LOGGER.finer( msg );
 				    }
 				    
+				    Object converted = Converters.convert(value, binding);
+				    if ( converted != null ) {
+				        value = converted;
+				    }
 				}
+				
 				attributes.add( value );
 			}
 			catch( SQLException e ) {
@@ -97,6 +149,9 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 		String fid;
 		try {
 			fid = pkey.encode( rs );
+			
+			//wrap the fid in the type name
+			fid = featureType.getTypeName() + "." + fid;
 		} 
 		catch (Exception e) {
 			throw new RuntimeException( "Could not determine fid from primary key", e );

@@ -89,6 +89,7 @@ public abstract class PrimaryKey {
         Object value = rs.getObject(columnName);
         
         //TODO: run column[i].type through converter to string
+        //return tableName + "." + value.toString();
         return value.toString();
     }
 

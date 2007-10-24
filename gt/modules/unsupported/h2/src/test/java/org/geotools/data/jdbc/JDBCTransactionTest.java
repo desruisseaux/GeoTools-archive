@@ -15,12 +15,12 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         JDBCFeatureStore fs = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
         
         Transaction tx = new DefaultTransaction();
-        tx.putState( fs, new JDBCTransactionState( fs ) );
+        //tx.putState( fs, new JDBCTransactionState( fs ) );
         
         FeatureWriter writer = dataStore.getFeatureWriterAppend("ft1", tx );
         SimpleFeature feature = writer.next();
         feature.setAttribute( "intProperty", new Integer( 100 ) );
-        
+        writer.write();
         writer.close();
         tx.commit();
         tx.close();
@@ -34,12 +34,12 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         JDBCFeatureStore fs = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
         
         Transaction tx = new DefaultTransaction();
-        tx.putState( fs, new JDBCTransactionState( fs ) );
+        //tx.putState( fs, new JDBCTransactionState( fs ) );
         
         FeatureWriter writer = dataStore.getFeatureWriterAppend("ft1", tx );
         SimpleFeature feature = writer.next();
         feature.setAttribute( "intProperty", new Integer( 100 ) );
-        
+        writer.write();
         writer.close();
         tx.rollback();
         tx.close();
@@ -53,10 +53,10 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         JDBCFeatureStore fs = (JDBCFeatureStore) dataStore.getFeatureSource("ft1");
         
         Transaction tx1 = new DefaultTransaction();
-        tx1.putState( fs, new JDBCTransactionState( fs ) );
+        //tx1.putState( fs, new JDBCTransactionState( fs ) );
         
         Transaction tx2 = new DefaultTransaction();
-        tx2.putState( fs, new JDBCTransactionState( fs ) );
+        //tx2.putState( fs, new JDBCTransactionState( fs ) );
         
         FeatureWriter w1 = dataStore.getFeatureWriterAppend("ft1", tx1 );
         FeatureWriter w2 = dataStore.getFeatureWriterAppend("ft1", tx2 );
@@ -66,6 +66,9 @@ public abstract class JDBCTransactionTest extends JDBCTestSupport {
         
         f1.setAttribute( "intProperty", new Integer( 100 ) );
         f2.setAttribute( "intProperty", new Integer( 101 ) );
+        
+        w1.write();
+        w2.write();
         
         w1.close();
         w2.close();

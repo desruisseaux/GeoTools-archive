@@ -65,9 +65,9 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
           try {
               StringBuffer sql = new StringBuffer();
               sql.append( "SELECT * FROM ");
-              dataStore.getSQLDialect().schema("geotools", sql);
+              dataStore.getSQLDialect().encodeTableName("geotools", sql);
               sql.append( "." );
-              dataStore.getSQLDialect().table("ft2", sql);
+              dataStore.getSQLDialect().encodeSchemaName("ft2", sql);
               st.executeQuery( sql.toString() );   
           }
           catch( SQLException e ) {
@@ -130,6 +130,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
 	    while ( writer.hasNext() ) {
 	        SimpleFeature feature = writer.next();
 	        feature.setAttribute( "intProperty", new Integer( 100 ) );
+	        writer.write();
 	    }
 	    
 	    writer.close();
@@ -157,6 +158,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
         while ( writer.hasNext() ) {
             SimpleFeature feature = writer.next();
             feature.setAttribute( "intProperty", new Integer( 100 ) );
+            writer.write();
         }
         writer.close();
         
@@ -171,6 +173,7 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
         for ( int i = 3; i < 6; i++ ) { 
             SimpleFeature feature = writer.next();
             feature.setAttribute( "intProperty", new Integer( i ) );
+            writer.write();
         }
         writer.close();
         

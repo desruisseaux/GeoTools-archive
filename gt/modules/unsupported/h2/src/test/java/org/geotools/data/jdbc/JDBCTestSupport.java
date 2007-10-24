@@ -78,6 +78,9 @@ public abstract class JDBCTestSupport extends TestCase {
         //do any further setup
         setUpInternal();
         
+        //initialize the database
+        setup.initializeDatabase();
+        
         //initialize the data
         setup.setUpData();
         
@@ -104,7 +107,7 @@ public abstract class JDBCTestSupport extends TestCase {
     
     protected abstract JDBCTestSetup createTestSetup();
    
-    protected void setUpInternal() throws Exception {
+    protected final void setUpInternal() throws Exception {
        
     }
     

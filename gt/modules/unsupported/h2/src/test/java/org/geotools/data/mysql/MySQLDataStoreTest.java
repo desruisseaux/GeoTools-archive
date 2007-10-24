@@ -1,7 +1,5 @@
 package org.geotools.data.mysql;
 
-import junit.framework.TestResult;
-
 import org.geotools.data.jdbc.JDBCDataStoreTest;
 import org.geotools.data.jdbc.JDBCTestSetup;
 

@@ -1,5 +1,6 @@
 package org.geotools.data.jdbc;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -18,6 +19,14 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.BoundingBox;
 
+/**
+ * Base class for jdbc based iterators.
+ * <p>
+ * JDBC based iterators are wrapped directly around a {@link ResultSet} object.
+ * </p>
+ * @author Justin Deoliveira, The Open Planning Project
+ *
+ */
 public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
 
     /**
@@ -31,14 +40,16 @@ public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
      */
     protected SimpleFeatureType featureType;
     /**
-     * datastore
+     * collection iterator originated from
      */
+    protected JDBCFeatureCollection collection;
     protected JDBCDataStore dataStore;
     
-    protected JDBCFeatureIteratorSupport( Statement st, SimpleFeatureType featureType, JDBCDataStore dataStore ) {
+    protected JDBCFeatureIteratorSupport( Statement st, SimpleFeatureType featureType, JDBCFeatureCollection collection ) {
         this.st = st;
         this.featureType = featureType;
-        this.dataStore = dataStore;
+        this.collection = collection;
+        dataStore = collection.getDataStore();
         
         try {
             rs = st.getResultSet();
@@ -72,6 +83,10 @@ public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
          * updated values 
          * */
         Object[] values;
+        /**
+         * fid
+         */
+        String fid;
         /** 
          * dirty flags 
          */
@@ -85,28 +100,55 @@ public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
          */
         HashMap<Object,Object> userData = new HashMap<Object, Object>();
         
-        ResultSetFeature( ResultSet rs ) throws SQLException {
+        ResultSetFeature( ResultSet rs ) throws SQLException, IOException {
             this.rs = rs;
             
+            //get the result set metadata
             ResultSetMetaData md = rs.getMetaData();
             
+            //get the primary key, ensure its not contained in the values
+            PrimaryKey key = dataStore.getPrimaryKey(featureType);
+            int count = md.getColumnCount();
+            for ( int i = 0; i < md.getColumnCount(); i++ ) {
+                if ( key.getColumnName().equals( md.getColumnName(i+1)) ){
+                    count--;
+                }
+            }
             //set up values
-            values = new Object[ md.getColumnCount() ];
+            values = new Object[ count ];
             dirty = new boolean[ values.length ];
             
             //set up name lookup
             index = new HashMap<String,Integer>();
-            for ( int i = 0; i < values.length; i++ ) {
-                index.put( md.getColumnName(i+1), i );
+            int offset = 0;
+            for ( int i = 0; i < md.getColumnCount(); i++ ) {
+                if ( key.getColumnName().equals( md.getColumnName(i+1)) ){
+                    offset = 1;
+                    continue;
+                }
+                
+                index.put( md.getColumnName(i+1), i-offset );
             }
         }
         
-        public void init() {
+        public void init( String fid ) throws Exception {
+            //clear values
             for ( int i = 0; i < values.length; i++ ) {
                 values[i] = null;
                 dirty[i] = false;
             }
+            
+            this.fid = fid;
         }
+        
+        public void init() throws Exception {
+            //get fid
+            PrimaryKey pkey = dataStore.getPrimaryKey(featureType);
+            
+            //TODO: factory fid prefixing out
+            init( featureType.getTypeName() + "." + pkey.encode(rs) );
+        }
+        
         public SimpleFeatureType getFeatureType() {
             return featureType;
         }
@@ -116,7 +158,7 @@ public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
         }
         
         public String getID() {
-            return null;
+            return fid;
         }
         
         public Object getAttribute(String name) {
@@ -148,6 +190,12 @@ public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
             dirty[index] = true;
         }
         
+        public void setAttributes(List<Object> values) {
+            for ( int i = 0; i < values.size(); i++ ) {
+                setAttribute( i, values.get( i ) );
+            }
+        }
+        
         public int getAttributeCount() {
             return values.length;
         }
@@ -169,10 +217,6 @@ public abstract class JDBCFeatureIteratorSupport implements FeatureIterator {
         }
 
         public Object getDefaultGeometry() {
-            throw new UnsupportedOperationException();
-        }
-
-        public void setAttributes(List<Object> values) {
             throw new UnsupportedOperationException();
         }
 

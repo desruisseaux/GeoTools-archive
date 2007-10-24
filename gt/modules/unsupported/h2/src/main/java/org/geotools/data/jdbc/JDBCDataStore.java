@@ -20,9 +20,8 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-import org.geotools.data.collection.DelegateFeatureWriter;
+import org.geotools.data.Transaction.State;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;
@@ -36,6 +35,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -70,13 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * specific database are reported with a {@link FilterCapabilities} instance. 
  * This is specified using {@link #setFilterCapabilities(FilterCapabilities)}.  
  * </p>
- * <p>
- *   <h3>Type Mapping</h3>
- * This datastore maintains a set of internal mappings which it uses to map 
- * database types to java types, and vice versa. The datastore uses a set of 
- * internal defaults, but this can be overriden using {@link #setSqlTypeToClassMappings(HashMap)}
- * and {@link #setClassToSqlTypeMappings(HashMap)}.
- * </p>
+ *   
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
@@ -351,38 +345,7 @@ public final class JDBCDataStore extends ContentDataStore {
     }
     
     /**
-     * Generates a feature writer by delegating to {@link JDBCFeatureCollection#writer()}
-     * and wrapping it in a {@link DelegateFeatureWriter}.
-     * 
-     * @see DataStore#getFeatureWriter(String, Transaction)}.
-     */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
-            Transaction tx) throws IOException {
-        
-        //TODO: possibly move this up to the parent datastore
-        JDBCFeatureCollection collection = 
-            (JDBCFeatureCollection) getFeatureSource( typeName,tx).getFeatures( filter );
-        return new DelegateFeatureWriter( collection.getSchema(), collection.writer() );
-    }
-    
-    /**
-     * Generates a feature writer by delegating to {@link JDBCFeatureCollection#inserter()}
-     * and wrapping it in a {@link DelegateFeatureWriter}.
-     * 
-     * @see DataStore#getFeatureWriter(String, Transaction)}.
-     */
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction tx) 
-        throws IOException {
-        
-        //TODO: possibly move this up to the parent datastore
-        JDBCFeatureCollection collection = 
-            (JDBCFeatureCollection) getFeatureSource(typeName,tx).getFeatures();
-        return new DelegateFeatureWriter( collection.getSchema(), collection.inserter() );
-    }
-    
-
-    /**
-     * Creates an instanceof {@link JDBCFeatureStore}.
+     * Creates a new instance of {@link JDBCFeatureStore}.
      * 
      * @see ContentDataStore#createFeatureSource(ContentEntry)
      */
@@ -392,12 +355,21 @@ public final class JDBCDataStore extends ContentDataStore {
     }
     
     /**
+     * Creates a new instance of {@link JDBCTransactionState}. 
+     */
+    protected State createTransactionState(ContentFeatureSource featureSource)
+            throws IOException {
+        return new JDBCTransactionState((JDBCFeatureStore) featureSource);
+    }
+    
+    /**
      * Creates an instanceof {@link JDBCState}.
      * 
      * @see ContentDataStore#createContentState(ContentEntry)
      */
     protected ContentState createContentState(ContentEntry entry) {
-        return new JDBCState( entry );
+        JDBCState state = new JDBCState( entry );
+        return state;
     }
     
     /**
@@ -507,7 +479,7 @@ public final class JDBCDataStore extends ContentDataStore {
                                     
                                     StringBuffer sql = new StringBuffer();
                                     sql.append( "SELECT ");
-                                    dialect.column( columnName, sql );
+                                    dialect.encodeColumnName( columnName, sql );
                                     sql.append( " FROM ");
                                     encodeTableName( tableName, sql );
                                     
@@ -685,7 +657,7 @@ public final class JDBCDataStore extends ContentDataStore {
                     try {
                         Object value = 
                             dialect.getNextPrimaryKeyValue(databaseSchema, key.getTableName(), key.getColumnName(), cx);
-                        fid = value.toString();
+                        fid = featureType.getTypeName() + "." + value.toString();
                     }
                     catch( SQLException e ) {
                         String msg = "Error obtaining next feature id";
@@ -758,6 +730,17 @@ public final class JDBCDataStore extends ContentDataStore {
     }
     
     /**
+     * Deletes an existing feature in the database for a particular feature type / fid.
+     */
+    protected void delete( SimpleFeatureType featureType, String fid, Connection cx ) 
+        throws IOException {
+        
+        Filter filter = 
+            filterFactory.id( Collections.singleton(filterFactory.featureId(fid)) );
+        delete( featureType, filter, cx );
+    }
+    
+    /**
      * Deletes an existing feature(s) in the database for a particular feature type / table.
      */
     protected void delete( SimpleFeatureType featureType, Filter filter, Connection cx ) throws IOException {
@@ -782,8 +765,7 @@ public final class JDBCDataStore extends ContentDataStore {
     /**
      * Gets a database connection for the specified feature store.
      */
-    protected final Connection getConnection( JDBCFeatureStore featureSource ) {
-        JDBCState state = featureSource.getState();
+    protected final Connection getConnection( JDBCState state ) {
         Connection cx = state.getConnection();
         
         if ( cx == null ) {
@@ -793,7 +775,7 @@ public final class JDBCDataStore extends ContentDataStore {
                 
                 //set auto commit to false if tx != auto commit
                 try {
-                    cx.setAutoCommit( featureSource.getTransaction() == Transaction.AUTO_COMMIT );
+                    cx.setAutoCommit( state.getTransaction() == Transaction.AUTO_COMMIT );
                 }
                 catch( SQLException e ) {
                     throw new RuntimeException( e );
@@ -818,7 +800,9 @@ public final class JDBCDataStore extends ContentDataStore {
             Connection cx = getDataSource().getConnection();
             
             //TODO: make this configurable
-            cx.setTransactionIsolation( Connection.TRANSACTION_READ_UNCOMMITTED );
+            //cx.setTransactionIsolation( Connection.TRANSACTION_SERIALIZABLE );
+            //cx.setTransactionIsolation( Connection.TRANSACTION_READ_UNCOMMITTED );
+            cx.setTransactionIsolation( Connection.TRANSACTION_READ_COMMITTED );
             
             return cx;
         } 
@@ -930,7 +914,7 @@ public final class JDBCDataStore extends ContentDataStore {
         sql.append(" ( ");
 
         //fid column
-        dialect.primaryKey( "fid", sql );
+        dialect.encodePrimaryKey( "fid", sql );
         sql.append( ", ");
         
         //normal attributes
@@ -938,11 +922,12 @@ public final class JDBCDataStore extends ContentDataStore {
             AttributeDescriptor att = featureType.getAttribute(i);
 
             //the column name
-            dialect.column(att.getLocalName(), sql);
+            dialect.encodeColumnName(att.getLocalName(), sql);
             sql.append(" ");
 
             //sql type name
-            sql.append(sqlTypeNames[i]);
+            dialect.encodeColumnType(sqlTypeNames[i],att,sql);
+            //sql.append(sqlTypeNames[i]);
 
             if (i < (sqlTypeNames.length - 1)) {
                 sql.append(", ");
@@ -975,7 +960,7 @@ public final class JDBCDataStore extends ContentDataStore {
         catch (IOException e) {
             throw new RuntimeException( e );
         }
-        dialect.column( key.getColumnName(), sql );
+        dialect.encodeColumnName( key.getColumnName(), sql );
         sql.append( "," );
         
         //other columns
@@ -988,7 +973,7 @@ public final class JDBCDataStore extends ContentDataStore {
                 dialect.encodeColumnAlias( att.getLocalName(), sql );
             }
             else {
-                dialect.column( att.getLocalName(), sql );
+                dialect.encodeColumnName( att.getLocalName(), sql );
             }
             sql.append(",");
         }
@@ -1020,14 +1005,9 @@ public final class JDBCDataStore extends ContentDataStore {
         
         sql.append( "SELECT " );
         
-        //check for aggregate vs per row bounds
         String geometryColumn = featureType.getDefaultGeometry().getLocalName();
-        if ( dialect.hasAggregateExtent() ) {
-            dialect.aggregateExtent(geometryColumn, sql);
-        }
-        else {
-            dialect.encodeGeometryEnvelope( geometryColumn, sql );
-        }
+        dialect.encodeGeometryEnvelope( geometryColumn, sql );
+
         sql.append( " FROM " );
         encodeTableName( featureType.getTypeName(), sql );
         
@@ -1103,7 +1083,7 @@ public final class JDBCDataStore extends ContentDataStore {
         //column names
         sql.append( " ( ");
         for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
-            dialect.column(featureType.getAttribute(i).getLocalName(), sql );
+            dialect.encodeColumnName(featureType.getAttribute(i).getLocalName(), sql );
             sql.append( "," );
         }
         
@@ -1131,14 +1111,33 @@ public final class JDBCDataStore extends ContentDataStore {
             else {
                 if ( Geometry.class.isAssignableFrom(binding) ) {
                     try {
-                        dialect.encodeGeometryValue( (Geometry) value, sql );
+                        Geometry g = (Geometry) value;
+                        
+                        int srid = 0;
+
+                        // check for srid
+                        if ( g.getSRID() > 0 ) {
+                            srid = g.getSRID();
+                        }
+                        
+                        if ( srid == 0 ) {
+                            //check for crs object
+                            CoordinateReferenceSystem crs = 
+                                (CoordinateReferenceSystem) g.getUserData();
+                            if ( crs != null ) {
+                                //pull out the epsg code
+                                
+                            }
+                        }
+                        
+                        dialect.encodeGeometryValue( (Geometry) value, srid, sql );
                     } 
                     catch (IOException e) {
                         throw new RuntimeException( e );
                     }
                 }
                 else {
-                    dialect.value(value, binding, sql);    
+                    dialect.encodeValue(value, binding, sql);    
                 }    
             }
             
@@ -1161,9 +1160,9 @@ public final class JDBCDataStore extends ContentDataStore {
         
         sql.append( " SET ");
         for ( int i = 0; i < attributes.length; i++ ) {
-            dialect.column( attributes[i].getLocalName(), sql);
+            dialect.encodeColumnName( attributes[i].getLocalName(), sql);
             sql.append( " = " );
-            dialect.value( values[i], attributes[i].getType().getBinding(), sql );
+            dialect.encodeValue( values[i], attributes[i].getType().getBinding(), sql );
             sql.append( "," );
         }
         sql.setLength( sql.length()-1 );
@@ -1186,7 +1185,7 @@ public final class JDBCDataStore extends ContentDataStore {
     /**
      * Creates a new instance of a filter to sql encoder.
      */
-    protected FilterToSQL createFilterToSQL(SimpleFeatureType featureType ) {
+    protected FilterToSQL createFilterToSQL(final SimpleFeatureType featureType ) {
         //set up a fid mapper
         //TODO: remove this
         final PrimaryKey key;
@@ -1229,6 +1228,10 @@ public final class JDBCDataStore extends ContentDataStore {
             }
 
             public Object[] getPKAttributes(String FID) throws IOException {
+                //strip off the feature type name
+                if ( FID.startsWith(featureType.getTypeName() + ".") ) {
+                    FID = FID.substring(featureType.getTypeName().length()+1);
+                }
                 try {
                     return new Object[]{key.decode(FID)};
                 } 
@@ -1271,14 +1274,20 @@ public final class JDBCDataStore extends ContentDataStore {
      */
     protected void encodeTableName(  String tableName, StringBuffer sql ) {
         if ( databaseSchema != null ) {
-            dialect.schema(databaseSchema, sql);
+            dialect.encodeTableName(databaseSchema, sql);
             sql.append( "." ); 
         }
-        dialect.table( tableName, sql);
+        dialect.encodeSchemaName( tableName, sql);
     }
     
-    
-
+    /**
+     * Utility method for closing a result set.
+     * <p>
+     * This method closed the result set "safely" in that it never throws an 
+     * exception. Any exceptions that do occur are logged at {@link Level#FINER}.
+     * </p>
+     * @param rs The result set to close.
+     */
     public static void closeSafe( ResultSet rs ) {
         if ( rs == null ) 
             return;
@@ -1295,6 +1304,14 @@ public final class JDBCDataStore extends ContentDataStore {
         }
     }
     
+    /**
+     * Utility method for closing a statement.
+     * <p>
+     * This method closed the statement"safely" in that it never throws an 
+     * exception. Any exceptions that do occur are logged at {@link Level#FINER}.
+     * </p>
+     * @param st The statement to close.
+     */
     public static void closeSafe( Statement st ) {
         if ( st == null ) 
             return;
@@ -1310,6 +1327,15 @@ public final class JDBCDataStore extends ContentDataStore {
             }
         }
     }
+    
+    /**
+     * Utility method for closing a connection.
+     * <p>
+     * This method closed the connection "safely" in that it never throws an 
+     * exception. Any exceptions that do occur are logged at {@link Level#FINER}.
+     * </p>
+     * @param cx The connection to close.
+     */
     public static void closeSafe( Connection cx ) {
         if ( cx == null ) 
             return;

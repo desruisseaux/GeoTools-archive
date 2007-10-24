@@ -5,15 +5,20 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.SQLInput;
 import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
-
 /**
  * Sets up the test harness for a database.
+ * <p>
+ * The responsibilities of the test harness are the following:
+ * <ol>
+ *   <li>Create and configure the {@link DataSource} used to connect to the 
+ *   underlying database
+ *   <li>Populate the underlying database with the data used by the tests.
+ * </ol>
+ * </p>
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
@@ -32,7 +37,12 @@ public abstract class JDBCTestSetup {
         }
     }
     
+    protected void initializeDatabase() throws Exception {
+        
+    }
+    
     protected void setUpData() throws Exception {
+        
     }
     
     public void tearDown() throws Exception {
@@ -67,6 +77,7 @@ public abstract class JDBCTestSetup {
                 String line = null;
 
                 while ((line = reader.readLine()) != null) {
+                    System.out.println( line );
                     st.execute(line);
                 }
 

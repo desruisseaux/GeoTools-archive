@@ -42,11 +42,13 @@ public abstract class JDBCFeatureCollectionTest extends JDBCTestSupport {
             SimpleFeature feature = (SimpleFeature) i.next();
             assertNotNull( feature );
             
+            String fid = feature.getID();
+            int id = Integer.parseInt( fid.substring(fid.indexOf('.')+1) );
             if ( base == -1 ) {
-                base = Integer.parseInt( feature.getID() );
+                base = id;
             }
             
-            assertEquals( "" + base++, feature.getID() );
+            assertEquals( base++, id );
             assertEquals( new Integer(x), feature.getAttribute("intProperty" ) );
         }
         

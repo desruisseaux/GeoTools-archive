@@ -9,15 +9,22 @@ import java.util.Map;
 
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.SQLDialect;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
+import com.vividsolutions.jts.io.WKBWriter;
+import com.vividsolutions.jts.io.WKTWriter;
 
 public class MySQLDialect extends SQLDialect {
 
@@ -27,7 +34,10 @@ public class MySQLDialect extends SQLDialect {
     protected Integer POINT = new Integer( 2001 );
     protected Integer LINESTRING = new Integer( 2002 );
     protected Integer POLYGON = new Integer( 2003 );
-    protected Integer GEOMETRY = new Integer( 2004 );
+    protected Integer MULTIPOINT = new Integer( 2004 );
+    protected Integer MULTILINESTRING = new Integer( 2005 );
+    protected Integer MULTIPOLYGON = new Integer( 2006 );
+    protected Integer GEOMETRY = new Integer( 2007 );
     
     public String getNameEscape() {
         return "";
@@ -36,10 +46,19 @@ public class MySQLDialect extends SQLDialect {
     public String getGeometryTypeName(Integer type) {
         if ( POINT.equals( type ) ) 
             return "POINT";
+        if ( MULTIPOINT.equals( type ) )
+            return "MULTIPOINT";
+        
         if ( LINESTRING.equals( type ) ) 
             return "LINESTRING";
+        if ( MULTILINESTRING.equals( type ) ) 
+            return "MULTILINESTRING";
+        
         if ( POLYGON.equals( type ) ) 
             return "POLYGON";
+        if ( MULTIPOLYGON.equals( type ) ) 
+            return "MULTIPOLYGON";
+        
         if ( GEOMETRY.equals( type ) ) 
             return "GEOMETRY";
         
@@ -53,17 +72,17 @@ public class MySQLDialect extends SQLDialect {
         //execute SELECT srid(<columnName>) FROM <tableName> LIMIT 1;
         StringBuffer sql = new StringBuffer();
         sql.append( "SELECT srid(");
-        column( columnName, sql );
+        encodeColumnName( columnName, sql );
         sql.append( ") ");
         sql.append( "FROM ");
         
         if ( schemaName != null ) {
-            schema( schemaName, sql );
+            encodeTableName( schemaName, sql );
             sql.append(".");
         }
-        table( tableName, sql );
+        encodeSchemaName( tableName, sql );
         sql.append( " WHERE ");
-        column( columnName, sql );
+        encodeColumnName( columnName, sql );
         sql.append( " is not null LIMIT 1");
         
         JDBCDataStore.LOGGER.fine( sql.toString() );
@@ -92,26 +111,37 @@ public class MySQLDialect extends SQLDialect {
         
     }
     
+    public void encodeColumnType(String sqlTypeName, AttributeDescriptor att,
+            StringBuffer sql) {
+        if ( "VARCHAR".equalsIgnoreCase(sqlTypeName) ) {
+            sql.append( "VARCHAR(255)" );
+        }
+        else {
+            super.encodeColumnType(sqlTypeName, att, sql);
+        }
+    }
+    
     public void encodeGeometryColumn(GeometryDescriptor gatt, StringBuffer sql) {
         sql.append( "asWKB(");
-        column( gatt.getLocalName(), sql );
+        encodeColumnName( gatt.getLocalName(), sql );
         sql.append( ")");
     }
     
     public void encodeGeometryEnvelope(String geometryColumn, StringBuffer sql) {
         sql.append( "asWKB(");
         sql.append( "envelope(");
-        column( geometryColumn, sql );
+        encodeColumnName( geometryColumn, sql );
         sql.append( "))");
     }
     
     public Envelope decodeGeometryEnvelope(ResultSet rs, int column)
             throws SQLException, IOException {
         
-        String wkb = rs.getString( column );
+        //String wkb = rs.getString( column );
+        byte[] wkb = rs.getBytes( column );
         try {
             //TODO: srid
-            Polygon polygon = (Polygon) new WKBReader().read( wkb.getBytes() );
+            Polygon polygon = (Polygon) new WKBReader().read( wkb );
             return polygon.getEnvelopeInternal();
         } 
         catch (ParseException e) {
@@ -120,36 +150,33 @@ public class MySQLDialect extends SQLDialect {
         }
     }
     
-    public Geometry decodeGeometryValue(Object value, GeometryDescriptor descriptor) 
-        throws IOException {
-        
-        byte[] bytes = null;
-        if ( value instanceof byte[] ) {
-            bytes = (byte[]) value;
+    public void encodeGeometryValue(Geometry value, int srid, StringBuffer sql)
+            throws IOException {
+        sql.append("GeomFromText('");
+        sql.append( new WKTWriter().write( value) );
+        sql.append( "')");
+    }
+    
+    public Geometry decodeGeometryValue(GeometryDescriptor descriptor,
+            ResultSet rs, String name, GeometryFactory factory) throws IOException, SQLException {
+        byte[] bytes = rs.getBytes( name );
+        try {
+            return new WKBReader(factory).read( bytes );
+        } catch (ParseException e) {
+            String msg = "Error decoding wkb";
+            throw (IOException) new IOException( msg ).initCause( e );
         }
-        else if ( value instanceof String ) {
-            bytes = ((String) value).getBytes();
-        }
-        
-        if ( bytes != null ) {
-            try {
-                return new WKBReader().read( bytes );
-            } catch (ParseException e) {
-                String msg = "Error decoding wkb";
-                throw (IOException) new IOException( msg ).initCause( e );
-            }
-        }
-        
-        return super.decodeGeometryValue(value, descriptor);
     }
     
     public void registerClassToSqlMappings(Map<Class<?>, Integer> mappings) {
         super.registerClassToSqlMappings(mappings);
     
-        //TODO: multi geometries
         mappings.put( Point.class, POINT );
         mappings.put( LineString.class, LINESTRING );
         mappings.put( Polygon.class, POLYGON );
+        mappings.put( MultiPoint.class, MULTIPOINT );
+        mappings.put( MultiLineString.class, MULTILINESTRING );
+        mappings.put( MultiPolygon.class, MULTIPOLYGON );
         mappings.put( Geometry.class, GEOMETRY );
     }
     
@@ -157,10 +184,12 @@ public class MySQLDialect extends SQLDialect {
     public void registerSqlTypeToClassMappings(Map<Integer, Class<?>> mappings) {
         super.registerSqlTypeToClassMappings(mappings);
         
-        //TODO: multi geometries
         mappings.put( POINT, Point.class );
         mappings.put( LINESTRING, LineString.class );
         mappings.put( POLYGON, Polygon.class );
+        mappings.put( MULTIPOINT, MultiPoint.class );
+        mappings.put( MULTILINESTRING, MultiLineString.class );
+        mappings.put( MULTIPOLYGON, MultiPolygon.class );
         mappings.put( GEOMETRY, Geometry.class );
     }
     
@@ -171,6 +200,9 @@ public class MySQLDialect extends SQLDialect {
        mappings.put( "point", Point.class );
        mappings.put( "linestring", LineString.class );
        mappings.put( "polygon", Polygon.class );
+       mappings.put( "multipoint", MultiPoint.class );
+       mappings.put( "multilinestring", MultiLineString.class );
+       mappings.put( "multipolygon", MultiPolygon.class );
        mappings.put( "geometry", Geometry.class );
     }
     
@@ -179,8 +211,8 @@ public class MySQLDialect extends SQLDialect {
         sql.append( "ENGINE=InnoDB");
     }
     
-    public void primaryKey(String column, StringBuffer sql) {
-        column(column,sql);
+    public void encodePrimaryKey(String column, StringBuffer sql) {
+        encodeColumnName(column,sql);
         sql.append( " int AUTO_INCREMENT PRIMARY KEY" );
         
     }
@@ -191,7 +223,7 @@ public class MySQLDialect extends SQLDialect {
         Statement st = cx.createStatement();
         try {
             String sql = "SELECT max( " + columnName + ")+1" +
-            " FROM " + schemaName + "." + tableName; 
+            " FROM " + tableName; 
             JDBCDataStore.LOGGER.fine( sql );
             
             ResultSet rs = st.executeQuery( sql );

@@ -24,18 +24,18 @@ public final class JDBCTransactionState implements State {
     
     public void setTransaction(Transaction tx) {
         if ( tx == null && this.tx != null ) {
-            //close the connection
-            try {
-                synchronized ( featureSource ) {
-                    featureSource.setTransaction( this.tx );
-                    if ( featureSource.getState().getConnection() != null ) {
-                        featureSource.getState().getConnection().close();
-                    }
-                }
-            } 
-            catch (SQLException e) {
-                throw new RuntimeException( e );
-            }
+//            //close the connection
+//            try {
+//                synchronized ( featureSource ) {
+//                    featureSource.setTransaction( this.tx );
+//                    if ( featureSource.getState().getConnection() != null ) {
+//                        featureSource.getState().getConnection().close();
+//                    }
+//                }
+//            } 
+//            catch (SQLException e) {
+//                throw new RuntimeException( e );
+//            }
         }
         this.tx = tx;
     }

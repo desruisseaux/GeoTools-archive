@@ -5,11 +5,13 @@
 -- 
 --       contact: dblasby@openplans.org 
 
-CREATE ALIAS geometryFromText for "org.openplans.spatialdbbox.JTS.geometryFromText";
-CREATE ALIAS geometryFromBytes for "org.openplans.spatialdbbox.JTS.geometryFromBytes";
-CREATE ALIAS extent FOR "org.openplans.spatialdbbox.JTS.extentB";
-CREATE ALIAS setSRID FOR "org.openplans.spatialdbbox.JTS.setSRID";
+CREATE ALIAS GeomFromText for "org.openplans.spatialdbbox.JTS.GeomFromText";
+CREATE ALIAS envelope for "org.openplans.spatialdbbox.JTS.envelope";
 CREATE ALIAS getSRID FOR "org.openplans.spatialdbbox.JTS.getSRID";
+--CREATE ALIAS GeometryFromBytes for "org.openplans.spatialdbbox.JTS.geometryFromBytes";
+--CREATE ALIAS extent FOR "org.openplans.spatialdbbox.JTS.extentB";
+--CREATE ALIAS setSRID FOR "org.openplans.spatialdbbox.JTS.setSRID";
+
 
 CREATE ALIAS equals FOR "org.openplans.spatialdbbox.StaticGeometry.equals";
 CREATE ALIAS toString FOR "org.openplans.spatialdbbox.StaticGeometry.toString";
