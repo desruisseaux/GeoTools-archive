@@ -77,7 +77,6 @@ public abstract class JDBCTestSetup {
                 String line = null;
 
                 while ((line = reader.readLine()) != null) {
-                    System.out.println( line );
                     st.execute(line);
                 }
 
