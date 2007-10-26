@@ -91,7 +91,7 @@ public class ArcSDEGCReaderSpatialTest extends TestCase {
         medRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500,500)), new ReferencedEnvelope(150000.0,151000.0,900000.0,901000.0,crs));
         lowRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(200,200)), new ReferencedEnvelope(30000.0,300000.0,630000.0,900000.0,crs));
         realWordlExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(256,128)), new ReferencedEnvelope(33000.25,330000.225,774000.25,983400.225, crs));
-        // 33,000.25Â m 782,500.143Â m , 332,999.75Â m 953,499.857Â m], java.awt.Rectangle[x=0,y=0,width=500,height=285]
+        // 33,000.25 m 782,500.143 m , 332,999.75 m 953,499.857 m], java.awt.Rectangle[x=0,y=0,width=500,height=285]
         statewideRealWorldExampleRes = new GridGeometry2D(new GeneralGridRange(new Rectangle(500,285)), new ReferencedEnvelope(33000.25,332999.75,782500.143,953499.857,crs));
         
     }
