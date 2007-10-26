@@ -237,7 +237,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
 
     /**
      * Constructs a parameter descriptor wrapping the specified JAI descriptor.
-     * If {@code operation} is non-null, then {@code descriptor} should be derived from it.
+     * If {@code operation} is non-null, then {@code descriptor} should be derived from it.
      * This constructor is private in order to ensure this condition.
      */
     private ImagingParameterDescriptors(final Map properties,

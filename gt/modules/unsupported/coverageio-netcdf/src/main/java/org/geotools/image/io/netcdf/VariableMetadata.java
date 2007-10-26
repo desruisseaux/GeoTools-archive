@@ -51,7 +51,7 @@ import org.geotools.image.io.metadata.Band;
  */
 final class VariableMetadata {
     /**
-     * Raw image type as one of {@link DataBuffer} constants.
+     * Raw image type as one of {@link DataBuffer} constants.
      */
     private final int imageType;
 

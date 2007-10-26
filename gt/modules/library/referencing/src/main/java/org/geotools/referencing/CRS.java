@@ -1352,7 +1352,7 @@ public final class CRS {
      * Prints to the {@linkplain System#out standard output stream} some information about
      * {@linkplain CoordinateReferenceSystem coordinate reference systems} specified by their
      * authority codes. This method can be invoked from the command line in order to test the
-     * {@linkplain #getAuthorityFactory authority factory} content for some specific CRS.
+     * {@linkplain #getAuthorityFactory authority factory} content for some specific CRS.
      * <p>
      * By default, this method prints all enumerated objects as <cite>Well Known Text</cite>.
      * However this method can prints different kind of information if an option such as

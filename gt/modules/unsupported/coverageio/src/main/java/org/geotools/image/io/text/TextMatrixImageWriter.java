@@ -118,12 +118,12 @@ public class TextMatrixImageWriter extends TextImageWriter {
      */
     public static class Spi extends TextImageWriter.Spi {
         /**
-         * The format names for the default {@link TextMatrixImageWriter} configuration.
+         * The format names for the default {@link TextMatrixImageWriter} configuration.
          */
         private static final String[] NAMES = {"matrix"};
 
         /**
-         * The mime types for the default {@link TextMatrixImageWriter} configuration.
+         * The mime types for the default {@link TextMatrixImageWriter} configuration.
          */
         private static final String[] MIME_TYPES = {"text/x-matrix"};
 

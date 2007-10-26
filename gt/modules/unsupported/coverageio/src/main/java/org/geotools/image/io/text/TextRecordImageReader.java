@@ -655,12 +655,12 @@ public class TextRecordImageReader extends TextImageReader {
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * The format names for the default {@link TextRecordImageReader} configuration.
+         * The format names for the default {@link TextRecordImageReader} configuration.
          */
         private static final String[] NAMES = {"records"};
 
         /**
-         * The mime types for the default {@link TextRecordImageReader} configuration.
+         * The mime types for the default {@link TextRecordImageReader} configuration.
          */
         private static final String[] MIME_TYPES = {"text/x-records"};
 

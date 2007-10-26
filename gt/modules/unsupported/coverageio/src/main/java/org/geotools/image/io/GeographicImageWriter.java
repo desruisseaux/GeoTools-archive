@@ -194,7 +194,7 @@ public abstract class GeographicImageWriter extends ImageWriter {
     /**
      * Finds a common metadata format name between the two specified metadata objects. This
      * method query for the {@code outData} {@linkplain #getNativeMetadataFormatName native
-     * metadata format name} first.
+     * metadata format name} first.
      *
      * @param  inData  The input metadata.
      * @param  outData The output metadata.

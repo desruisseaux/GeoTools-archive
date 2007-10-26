@@ -379,12 +379,12 @@ public class TextMatrixImageReader extends TextImageReader {
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * The format names for the default {@link TextMatrixImageReader} configuration.
+         * The format names for the default {@link TextMatrixImageReader} configuration.
          */
         private static final String[] NAMES = {"matrix"};
 
         /**
-         * The mime types for the default {@link TextMatrixImageReader} configuration.
+         * The mime types for the default {@link TextMatrixImageReader} configuration.
          */
         private static final String[] MIME_TYPES = {"text/x-matrix"};
 
