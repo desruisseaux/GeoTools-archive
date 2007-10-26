@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.demo;
 
 import java.awt.BorderLayout;
@@ -47,6 +46,7 @@ import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.control.JMapPaneInfoPanel;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
+import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.ServerDataPanel;
@@ -66,6 +66,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.postgresql.jdbc3.Jdbc3Array;
 
 /**
  *
@@ -98,7 +99,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         Style style;
         MapLayer layer;
         try {
-            
+
             //_context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             _context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
             hash = new HashMap();
@@ -145,15 +146,15 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         /***********************JMAPPANE***************************************/
         map = new JMapPane();
         map.setOpaque(false);
-        map.setRenderer(new ShapefileRenderer());        
+        map.setRenderer(new ShapefileRenderer());
         map.setContext(_context);
         pan_jmappane.setLayout(new GridLayout(1, 1));
         pan_jmappane.add(map);
 
         try {
-        map.setMapArea(map.getContext().getLayerBounds());
+            map.setMapArea(map.getContext().getLayerBounds());
         } catch (IOException ex) {
-        ex.printStackTrace();
+            ex.printStackTrace();
         }
         map.revalidate();
 
@@ -175,8 +176,8 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         ContextTreeListener ecouteur = new ContextTreeListener(map);
         pan_listener.add(ecouteur);
         tree.addTreeListener(ecouteur);
-        
-        
+
+
     }
 
     /** This method is called from within the constructor to
@@ -524,7 +525,6 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     private void actionAddContext(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddContext
         DefaultMapContext context;
         try {
@@ -561,12 +561,18 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
             if (chk_server.isSelected()) {
                 lst.add(new ServerDataPanel());
             }
-            List<MapLayer> layers = JDataChooser.showDialog(lst, state);
 
+            JDataChooser jdc = new JDataChooser(null, true, state);
+            jdc.setDataTypeChooser(lst);
+            int ret = jdc.showDialog();
 
-            for (MapLayer layer : layers) {
-                tree.getActiveContext().addLayer(layer);
+            if (ret == JDataChooser.ADD_EXIT) {
+                List<MapLayer> layers = jdc.getLayers();
+                for (MapLayer layer : layers) {
+                    tree.getActiveContext().addLayer(layer);
+                }
             }
+        
         }
     }//GEN-LAST:event_dataChooserAction
 

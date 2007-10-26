@@ -125,7 +125,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
 
         lbl_dbtype.setText("jLabel1");
 
-        txt_host.setText("localhost");
+        txt_host.setText("www.refractions.net");
 
         lbl_host.setText("jLabel2");
 
@@ -141,7 +141,11 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
 
         txt_port.setText("5432");
 
-        txt_schema.setText("default");
+        txt_schema.setText("public");
+
+        txt_database.setText("demo-bc");
+
+        txt_user.setText("demo");
 
         but_refresh.setText("jButton1");
         but_refresh.addActionListener(new java.awt.event.ActionListener() {
@@ -161,6 +165,8 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
         jScrollPane1.setViewportView(tab_table);
 
         jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis" }));
+
+        txt_password.setText("demo");
 
         but_add.setText("jButton1");
         but_add.addActionListener(new java.awt.event.ActionListener() {

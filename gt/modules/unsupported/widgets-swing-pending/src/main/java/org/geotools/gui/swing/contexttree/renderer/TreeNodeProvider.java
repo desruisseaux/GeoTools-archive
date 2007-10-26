@@ -22,7 +22,12 @@ import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.geotools.data.AbstractFileDataStore;
+import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.jdbc.JDBC1DataStore;
+import org.geotools.data.postgis.PostgisDataStore;
+import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.icon.IconBundle;
@@ -85,36 +90,20 @@ public class TreeNodeProvider extends ComponentProvider<JLabel> {
             MapLayer layer = (MapLayer)node.getUserObject();
             
             rendererComponent.setFont(new Font("Arial",Font.PLAIN,9));
-            rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE );
             
             //choose icon from datastoretype
-            FeatureSource fs = layer.getFeatureSource();
+            DataStore ds = layer.getFeatureSource().getDataStore();
             
-//            System.out.println( layer.getFeatureSource().getClass().getSimpleName());
-//            FeatureSource fs = layer.getFeatureSource();
-//            if( fs != null){
-//                System.out.println( fs.getClass().equals(IndexedShapefileDataStore.class ));
-//                System.out.println( fs instanceof IndexedShapefileDataStore);
-//                //System.out.println( fs instanceof IndexedShapefileDataStore.class);
-//                System.out.println( IndexedShapefileDataStore.class.isInstance(fs.getClass()));
-//                System.out.println( fs.getClass().isInstance(IndexedShapefileDataStore.class ));
-//                //System.out.println( fs.isInstance(IndexedShapefileDataStore.class));
-//                //IndexedShapefileDataStore.class.
-//                
-//                if( fs.getClass().getSimpleName().equals( "IndexedShapefileDataStore" ) ){
-//                    rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE );
-//                }else if(fs instanceof GridCoverageFactory){
-//                    rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE );
-//                }else if(fs instanceof PostgisDataStore){
-//                    rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_DB_VISIBLE : ICON_LAYER_DB_UNVISIBLE );
-//                }else{
-//                    rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE );
-//                }
-//                
-//                
-//            }else{            
-//                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE );
-//            }
+            if ( layer.getFeatureSource().getSchema().getTypeName().equals("GridCoverage")){
+                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_FILE_RASTER_VISIBLE : ICON_LAYER_FILE_RASTER_UNVISIBLE );
+            }else if(AbstractFileDataStore.class.isAssignableFrom( ds.getClass() )){
+                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_FILE_VECTOR_VISIBLE : ICON_LAYER_FILE_VECTOR_UNVISIBLE );
+            }else if(JDBC1DataStore.class.isAssignableFrom( ds.getClass() )){
+                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_DB_VISIBLE : ICON_LAYER_DB_UNVISIBLE  );
+            }else{
+                rendererComponent.setIcon( (layer.isVisible()) ? ICON_LAYER_VISIBLE : ICON_LAYER_UNVISIBLE );
+            }
+            
             rendererComponent.setText( layer.getTitle() );
         } else {
             rendererComponent.setText(arg0.getValue().toString());

@@ -133,7 +133,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="txt_host">
       <Properties>
-        <Property name="text" type="java.lang.String" value="localhost"/>
+        <Property name="text" type="java.lang.String" value="www.refractions.net"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lbl_host">
@@ -173,12 +173,18 @@
     </Component>
     <Component class="javax.swing.JTextField" name="txt_schema">
       <Properties>
-        <Property name="text" type="java.lang.String" value="default"/>
+        <Property name="text" type="java.lang.String" value="public"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txt_database">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="demo-bc"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txt_user">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="demo"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="but_refresh">
       <Properties>
@@ -214,6 +220,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JPasswordField" name="txt_password">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="demo"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="but_add">
       <Properties>
