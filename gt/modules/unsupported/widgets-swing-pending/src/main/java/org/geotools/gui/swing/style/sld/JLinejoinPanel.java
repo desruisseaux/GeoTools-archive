@@ -16,7 +16,9 @@
 
 package org.geotools.gui.swing.style.sld;
 
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
 import org.opengis.filter.expression.Expression;
 
@@ -26,6 +28,10 @@ import org.opengis.filter.expression.Expression;
  */
 public class JLinejoinPanel extends javax.swing.JPanel {
     
+    private MapLayer layer = null;
+    private Expression exp = null;
+    private StyleBuilder sb = new StyleBuilder();
+    
     /** Creates new form JLinecapPanel */
     public JLinejoinPanel() {
         initComponents();
@@ -34,6 +40,10 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         but_bevel.setIcon( IconBundle.getResource().getIcon("16_linejoin_bevel"));
         
         but_round.setSelected(true);
+    }
+    
+    public void setLayer(MapLayer layer) {
+        this.layer = layer;
     }
     
     
@@ -49,24 +59,28 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     
     public void setLineJoin(Expression exp){
                 
-        if( "bevel".equals(exp.toString().toLowerCase()) )
-            but_bevel.setSelected(true);
-        else if( "mitre".equals(exp.toString().toLowerCase()) )
-            but_mitre.setSelected(true);
-        else 
-            but_round.setSelected(true);        
+        this.exp = exp;
+        if (exp != null) {
+            if (exp.toString().toLowerCase().equals("bevel")) {
+                but_bevel.setSelected(true);
+            } else if (exp.toString().toLowerCase().equals("mitre")) {
+                but_mitre.setSelected(true);
+            } else if (exp.toString().toLowerCase().equals("round")) {
+                but_round.setSelected(true);
+            }
+        }
+              
     }
        
     
     public Expression getLineJoin(){
-        StyleBuilder sb = new StyleBuilder();
         
-        if(but_bevel.isSelected())
-            return sb.literalExpression("bevel");
-        else if(but_mitre.isSelected())
-            return sb.literalExpression("mitre");
-        else
-            return sb.literalExpression("round");        
+        if(exp != null){
+            return exp;
+        }else{
+            return sb.literalExpression("round");
+        }
+               
     }
     
     /** This method is called from within the constructor to
@@ -81,18 +95,43 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         but_round = new javax.swing.JToggleButton();
         but_bevel = new javax.swing.JToggleButton();
         but_mitre = new javax.swing.JToggleButton();
+        jButton1 = new javax.swing.JButton();
 
         buttonGroup1.add(but_round);
         but_round.setIconTextGap(0);
         but_round.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        but_round.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                but_roundActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(but_bevel);
         but_bevel.setIconTextGap(0);
         but_bevel.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        but_bevel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                but_bevelActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(but_mitre);
+        but_mitre.setText(" ");
         but_mitre.setIconTextGap(0);
         but_mitre.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        but_mitre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                but_mitreActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText(TextBundle.getResource().getString("shortexpression"));
+        jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1actionDialogLineCap(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -103,21 +142,49 @@ public class JLinejoinPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_bevel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(but_mitre))
+                .add(but_mitre)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton1))
         );
-
-        layout.linkSize(new java.awt.Component[] {but_bevel, but_mitre, but_round}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(but_round)
             .add(but_bevel)
             .add(but_mitre)
+            .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
         );
 
-        layout.linkSize(new java.awt.Component[] {but_bevel, but_mitre, but_round}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {but_bevel, but_mitre, but_round, jButton1}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1actionDialogLineCap(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1actionDialogLineCap
+        JExpressionDialog dialog = new JExpressionDialog();
+        
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(jButton1);
+        dialog.setLayer(layer);
+        dialog.setExpression(exp);
+        dialog.setVisible(true);
+        
+        exp = dialog.getExpression();
+        
+        but_bevel.setSelected(false);
+        but_round.setSelected(false);
+        but_mitre.setSelected(false);
+    }//GEN-LAST:event_jButton1actionDialogLineCap
+
+    private void but_roundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_roundActionPerformed
+       exp = sb.literalExpression("round");   
+    }//GEN-LAST:event_but_roundActionPerformed
+
+    private void but_bevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_bevelActionPerformed
+        exp = sb.literalExpression("bevel");
+    }//GEN-LAST:event_but_bevelActionPerformed
+
+    private void but_mitreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_mitreActionPerformed
+        exp = sb.literalExpression("mitre");
+    }//GEN-LAST:event_but_mitreActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -125,6 +192,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     private javax.swing.JToggleButton but_mitre;
     private javax.swing.JToggleButton but_round;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
+
+    
     
 }

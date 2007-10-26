@@ -103,8 +103,6 @@ public class JStrokePanel extends javax.swing.JPanel {
         lbl_b_alpha2 = new javax.swing.JLabel();
         GuiStrokeLineCap = new org.geotools.gui.swing.style.sld.JLinecapPanel();
         GuiStrokeLineJoin = new org.geotools.gui.swing.style.sld.JLinejoinPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JSeparator();
 
         lbl_b_alpha.setText(TextBundle.getResource().getString("opacity"));
@@ -167,22 +165,6 @@ public class JStrokePanel extends javax.swing.JPanel {
 
         lbl_b_alpha2.setText(TextBundle.getResource().getString("linejoin"));
 
-        jButton2.setText(TextBundle.getResource().getString("shortexpression"));
-        jButton2.setMargin(new java.awt.Insets(0, 3, 0, 3));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionDialogLineJoin(evt);
-            }
-        });
-
-        jButton1.setText(TextBundle.getResource().getString("shortexpression"));
-        jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionDialogLineCap(evt);
-            }
-        });
-
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -191,25 +173,21 @@ public class JStrokePanel extends javax.swing.JPanel {
                 .add(lbl_b_alpha1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(GuiStrokeLineCap, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton1))
+                .add(83, 83, 83))
             .add(jPanel2Layout.createSequentialGroup()
                 .add(lbl_b_alpha2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(GuiStrokeLineJoin, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton2))
+                .add(83, 83, 83))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, lbl_b_alpha1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, GuiStrokeLineCap, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jButton2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, lbl_b_alpha2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, GuiStrokeLineJoin, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
@@ -249,29 +227,6 @@ public class JStrokePanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-    private void actionDialogLineCap(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDialogLineCap
-        JExpressionDialog dialog = new JExpressionDialog();
-
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(jButton1);
-        dialog.setLayer(layer);
-        dialog.setExpression(GuiStrokeLineCap.getLinecap());
-        dialog.setVisible(true);
-
-        GuiStrokeLineCap.setLineCap(dialog.getExpression());
-}//GEN-LAST:event_actionDialogLineCap
-
-    private void actionDialogLineJoin(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDialogLineJoin
-        JExpressionDialog dialog = new JExpressionDialog();
-
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(jButton1);
-        dialog.setLayer(layer);
-        dialog.setExpression(GuiStrokeLineJoin.getLineJoin());
-        dialog.setVisible(true);
-
-        GuiStrokeLineJoin.setLineJoin(dialog.getExpression());
-}//GEN-LAST:event_actionDialogLineJoin
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         StyleBuilder sb = new StyleBuilder();
@@ -296,8 +251,6 @@ public class JStrokePanel extends javax.swing.JPanel {
     private org.geotools.gui.swing.style.sld.JLinecapPanel GuiStrokeLineCap;
     private org.geotools.gui.swing.style.sld.JLinejoinPanel GuiStrokeLineJoin;
     private org.geotools.gui.swing.style.sld.JExpressionPanel GuiStrokeWidth;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

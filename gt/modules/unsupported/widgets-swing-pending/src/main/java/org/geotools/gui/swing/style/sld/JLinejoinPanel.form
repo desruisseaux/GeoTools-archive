@@ -20,19 +20,22 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Component id="but_round" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <Component id="but_round" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="but_bevel" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <Component id="but_bevel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="but_mitre" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <Component id="but_mitre" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="but_round" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-          <Component id="but_bevel" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-          <Component id="but_mitre" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
+          <Component id="but_round" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+          <Component id="but_bevel" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+          <Component id="but_mitre" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+          <Component id="jButton1" linkSize="2" alignment="3" pref="23" max="32767" attributes="1"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -47,6 +50,9 @@
           <Insets value="[2, 2, 2, 2]"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="but_roundActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="but_bevel">
       <Properties>
@@ -58,17 +64,37 @@
           <Insets value="[2, 2, 2, 2]"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="but_bevelActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JToggleButton" name="but_mitre">
       <Properties>
         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
           <ComponentRef name="buttonGroup1"/>
         </Property>
+        <Property name="text" type="java.lang.String" value=" "/>
         <Property name="iconTextGap" type="int" value="0"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="but_mitreActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="TextBundle.getResource().getString(&quot;shortexpression&quot;)" type="code"/>
+        </Property>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[0, 3, 0, 3]"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1actionDialogLineCap"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

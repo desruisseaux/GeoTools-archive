@@ -16,7 +16,9 @@
 
 package org.geotools.gui.swing.style.sld;
 
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.map.MapLayer;
 import org.geotools.styling.StyleBuilder;
 import org.opengis.filter.expression.Expression;
 
@@ -25,16 +27,21 @@ import org.opengis.filter.expression.Expression;
  */
 public class JLinecapPanel extends javax.swing.JPanel {
 
+    private Expression exp = null;
+    private MapLayer layer = null;
+    private StyleBuilder sb = new StyleBuilder();
+    
     /** Creates new form JLinecapPanel */
     public JLinecapPanel() {
         initComponents();
-        but_round.setIcon(IconBundle.getResource().getIcon("16_linecap_round"));
-        but_butt.setIcon(IconBundle.getResource().getIcon("16_linecap_butt"));
-        but_square.setIcon(IconBundle.getResource().getIcon("16_linecap_square"));
 
         but_round.setSelected(true);
     }
 
+    public void setLayer(MapLayer layer) {
+        this.layer = layer;
+    }
+    
     public void setLineCap(String exp) {
         if (exp != null) {
             if (exp.toLowerCase().equals("butt")) {
@@ -48,25 +55,22 @@ public class JLinecapPanel extends javax.swing.JPanel {
     }
 
     public void setLineCap(Expression exp) {
+        this.exp = exp;
         if (exp != null) {
             if (exp.toString().toLowerCase().equals("butt")) {
                 but_butt.setSelected(true);
             } else if (exp.toString().toLowerCase().equals("square")) {
                 but_square.setSelected(true);
-            } else {
+            } else if (exp.toString().toLowerCase().equals("round")) {
                 but_round.setSelected(true);
             }
         }
     }
 
     public Expression getLinecap() {
-        StyleBuilder sb = new StyleBuilder();
-
-        if (but_butt.isSelected()) {
-            return sb.literalExpression("butt");
-        } else if (but_square.isSelected()) {
-            return sb.literalExpression("square");
-        } else {
+        if(exp != null){
+            return exp;
+        }else{
             return sb.literalExpression("round");
         }
     }
@@ -83,18 +87,48 @@ public class JLinecapPanel extends javax.swing.JPanel {
         but_round = new javax.swing.JToggleButton();
         but_butt = new javax.swing.JToggleButton();
         but_square = new javax.swing.JToggleButton();
+        jButton1 = new javax.swing.JButton();
 
         buttonGroup1.add(but_round);
+        but_round.setIcon(IconBundle.getResource().getIcon("16_linecap_round"));
+        but_round.setText(" ");
         but_round.setIconTextGap(0);
         but_round.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        but_round.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                but_roundActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(but_butt);
+        but_butt.setIcon(IconBundle.getResource().getIcon("16_linecap_butt"));
+        but_butt.setText(" ");
         but_butt.setIconTextGap(0);
         but_butt.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        but_butt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                but_buttActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(but_square);
+        but_square.setIcon(IconBundle.getResource().getIcon("16_linecap_square"));
+        but_square.setText(" ");
         but_square.setIconTextGap(0);
         but_square.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        but_square.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                but_squareActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText(TextBundle.getResource().getString("shortexpression"));
+        jButton1.setMargin(new java.awt.Insets(0, 3, 0, 3));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1actionDialogLineCap(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -105,25 +139,56 @@ public class JLinecapPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_butt)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(but_square))
+                .add(but_square)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton1))
         );
-
-        layout.linkSize(new java.awt.Component[] {but_butt, but_round, but_square}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(but_round)
-            .add(but_butt)
-            .add(but_square)
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(but_round, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(but_butt, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(but_square, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
         );
 
-        layout.linkSize(new java.awt.Component[] {but_butt, but_round, but_square}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {but_butt, but_round, but_square, jButton1}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
+
+    private void but_squareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_squareActionPerformed
+        exp = sb.literalExpression("square");
+    }//GEN-LAST:event_but_squareActionPerformed
+
+    private void jButton1actionDialogLineCap(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1actionDialogLineCap
+        JExpressionDialog dialog = new JExpressionDialog();
+        
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(jButton1);
+        dialog.setLayer(layer);
+        dialog.setExpression(exp);
+        dialog.setVisible(true);
+        
+        exp = dialog.getExpression();
+        
+        but_butt.setSelected(false);
+        but_round.setSelected(false);
+        but_square.setSelected(false);
+    }//GEN-LAST:event_jButton1actionDialogLineCap
+
+    private void but_buttActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_buttActionPerformed
+        exp = sb.literalExpression("butt");
+    }//GEN-LAST:event_but_buttActionPerformed
+
+    private void but_roundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_roundActionPerformed
+        exp = sb.literalExpression("round");
+    }//GEN-LAST:event_but_roundActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton but_butt;
     private javax.swing.JToggleButton but_round;
     private javax.swing.JToggleButton but_square;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
 }
