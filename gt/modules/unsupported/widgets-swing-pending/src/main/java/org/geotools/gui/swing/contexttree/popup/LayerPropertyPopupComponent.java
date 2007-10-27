@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import java.util.List;
 import javax.swing.JMenuItem;
 
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
@@ -41,6 +42,7 @@ import org.geotools.map.MapLayer;
 public class LayerPropertyPopupComponent extends JMenuItem implements PopupComponent{
     
     private MapLayer layer;
+    private List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
     
     /** Creates a new instance of DefaultContextPropertyPop */
     public LayerPropertyPopupComponent() {
@@ -54,14 +56,19 @@ public class LayerPropertyPopupComponent extends JMenuItem implements PopupCompo
         return this;
     }
     
+    public void setPropertyPanels(List<PropertyPanel> liste){
+        lst.clear();
+        lst.addAll(liste);
+    }
+    
     private void init(){
-        addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                
-                ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
-                lst.add(new LayerFilterPropertyPanel());
+        lst.add(new LayerFilterPropertyPanel());
                 lst.add(new LayerStylePropertyPanel());
                 lst.add(new LayerFeaturePropertyPanel());
+        
+        addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                                
                 JPropertyDialog.showDialog(lst, layer);
                 
             }

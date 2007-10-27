@@ -68,6 +68,18 @@ public class KeyModel implements TableModel {
         
         return config;
     }
+    
+    public void parse(Map map){
+        
+        for(int i=0;i<getRowCount();i++){            
+            Object key = getValueAt(i, 0);            
+            if(map.containsKey(key)){                
+                setValueAt(map.get(key), i, 1);
+            }            
+        }
+        
+    }
+    
 
     public int getColumnCount() {
         return 2;

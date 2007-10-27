@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.datachooser;
 
+import com.sun.org.apache.bcel.internal.generic.LSTORE;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -99,6 +100,39 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
 
     public Map getProperties() {
         return ((KeyModel) tab_key.getModel()).getProperties();
+    }
+
+    public void parseProperties(Map map) {
+
+        if (map.containsKey("dbtype")) {
+            Object type = map.get("dbtype");
+
+            if (type.equals("postgis")) {
+                jcb_dbtype.setSelectedIndex(0);
+                
+                PostgisDataStoreFactory pdsf = new PostgisDataStoreFactory();
+
+                KeyModel model = new KeyModel(tab_key);
+                model.setParam(pdsf.getParametersInfo());
+                model.parse(map);
+                tab_key.setModel(model);
+                tab_key.revalidate();
+                tab_key.repaint();
+            } else if (type.equals("oracle")) {
+                jcb_dbtype.setSelectedIndex(1);
+                OracleDataStoreFactory pdsf = new OracleDataStoreFactory();
+
+                KeyModel model = new KeyModel(tab_key);
+                model.setParam(pdsf.getParametersInfo());
+                model.parse(map);
+                tab_key.setModel(model);
+                tab_key.revalidate();
+                tab_key.repaint();
+            }
+
+        }
+
+
     }
 
     private void refreshTable() {
