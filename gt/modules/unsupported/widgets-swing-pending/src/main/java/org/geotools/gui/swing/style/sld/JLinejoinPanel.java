@@ -30,7 +30,7 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     
     private MapLayer layer = null;
     private Expression exp = null;
-    private StyleBuilder sb = new StyleBuilder();
+    
     
     /** Creates new form JLinecapPanel */
     public JLinejoinPanel() {
@@ -78,6 +78,7 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         if(exp != null){
             return exp;
         }else{
+            StyleBuilder sb = new StyleBuilder();
             return sb.literalExpression("round");
         }
                
@@ -147,7 +148,7 @@ public class JLinejoinPanel extends javax.swing.JPanel {
                 .add(jButton1))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
             .add(but_round)
             .add(but_bevel)
             .add(but_mitre)
@@ -175,14 +176,17 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1actionDialogLineCap
 
     private void but_roundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_roundActionPerformed
+       StyleBuilder sb = new StyleBuilder();
        exp = sb.literalExpression("round");   
     }//GEN-LAST:event_but_roundActionPerformed
 
     private void but_bevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_bevelActionPerformed
+        StyleBuilder sb = new StyleBuilder();
         exp = sb.literalExpression("bevel");
     }//GEN-LAST:event_but_bevelActionPerformed
 
     private void but_mitreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_mitreActionPerformed
+        StyleBuilder sb = new StyleBuilder();
         exp = sb.literalExpression("mitre");
     }//GEN-LAST:event_but_mitreActionPerformed
     

@@ -241,7 +241,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="org.geotools.gui.swing.extended.JDegreePanel" name="gui_orientation">
+        <Component class="org.geotools.gui.swing.style.sld.JDegreePanel" name="gui_orientation">
         </Component>
         <Component class="javax.swing.JLabel" name="lbl_gen_size">
           <Properties>

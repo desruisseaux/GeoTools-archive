@@ -216,6 +216,14 @@
 
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt2-oracle-spatial</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+
+
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>

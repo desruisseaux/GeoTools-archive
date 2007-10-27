@@ -27,14 +27,18 @@ import org.opengis.filter.expression.Expression;
  */
 public class JLinecapPanel extends javax.swing.JPanel {
 
+    
     private Expression exp = null;
-    private MapLayer layer = null;
-    private StyleBuilder sb = new StyleBuilder();
+    private MapLayer layer = null;    
+    
+    
     
     /** Creates new form JLinecapPanel */
     public JLinecapPanel() {
         initComponents();
 
+        
+        
         but_round.setSelected(true);
     }
 
@@ -68,9 +72,12 @@ public class JLinecapPanel extends javax.swing.JPanel {
     }
 
     public Expression getLinecap() {
+        
+        
         if(exp != null){
             return exp;
         }else{
+            StyleBuilder sb = new StyleBuilder();
             return sb.literalExpression("round");
         }
     }
@@ -157,6 +164,7 @@ public class JLinecapPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void but_squareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_squareActionPerformed
+        StyleBuilder sb = new StyleBuilder();
         exp = sb.literalExpression("square");
     }//GEN-LAST:event_but_squareActionPerformed
 
@@ -177,10 +185,12 @@ public class JLinecapPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1actionDialogLineCap
 
     private void but_buttActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_buttActionPerformed
-        exp = sb.literalExpression("butt");
+          StyleBuilder sb = new StyleBuilder();
+          exp = sb.literalExpression("butt");
     }//GEN-LAST:event_but_buttActionPerformed
 
     private void but_roundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_but_roundActionPerformed
+        StyleBuilder sb = new StyleBuilder();
         exp = sb.literalExpression("round");
     }//GEN-LAST:event_but_roundActionPerformed
 

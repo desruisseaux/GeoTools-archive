@@ -31,7 +31,7 @@
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
-      <Group type="103" groupAlignment="0" attributes="0">
+      <Group type="103" groupAlignment="3" attributes="0">
           <Component id="but_round" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
           <Component id="but_bevel" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
           <Component id="but_mitre" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>

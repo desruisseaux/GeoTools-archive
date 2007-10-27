@@ -13,13 +13,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.datachooser;
 
 import java.awt.Component;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -28,8 +28,10 @@ import javax.swing.event.EventListenerList;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.oracle.OracleDataStoreFactory;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.gui.swing.datachooser.model.DBModel;
+import org.geotools.gui.swing.datachooser.model.KeyModel;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
@@ -45,40 +47,63 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
 
     private DataStore store;
     private EventListenerList listeners = new EventListenerList();
-    
+
     /** Creates new form DefaultShapeTypeChooser */
     public JDatabaseDataPanel() {
         initComponents();
 
         lbl_dbtype.setText(TextBundle.getResource().getString("dbtype"));
-        lbl_host.setText(TextBundle.getResource().getString("host"));
-        lbl_port.setText(TextBundle.getResource().getString("port"));
-        lbl_schema.setText(TextBundle.getResource().getString("schema"));
-        lbl_database.setText(TextBundle.getResource().getString("database"));
-        lbl_user.setText(TextBundle.getResource().getString("user"));
-        lbl_password.setText(TextBundle.getResource().getString("password"));
         but_refresh.setText(TextBundle.getResource().getString("refresh"));
         but_add.setText(TextBundle.getResource().getString("add"));
 
         tab_table.setTableHeader(null);
         tab_table.setModel(new DBModel(tab_table));
+
+        PostgisDataStoreFactory pdsf = new PostgisDataStoreFactory();
+
+        KeyModel model = new KeyModel(tab_key);
+        model.setParam(pdsf.getParametersInfo());
+        tab_key.setModel(model);
+        tab_key.revalidate();
+        tab_key.repaint();
+
+        jcb_dbtype.addItemListener(new ItemListener() {
+
+                    public void itemStateChanged(ItemEvent e) {
+
+                        if (e.getItem() != null) {
+
+                            if (e.getItem().equals("postgis")) {
+                                PostgisDataStoreFactory pdsf = new PostgisDataStoreFactory();
+
+                                KeyModel model = new KeyModel(tab_key);
+                                model.setParam(pdsf.getParametersInfo());
+                                tab_key.setModel(model);
+                                tab_key.revalidate();
+                                tab_key.repaint();
+                            } else {
+                                OracleDataStoreFactory pdsf = new OracleDataStoreFactory();
+
+                                KeyModel model = new KeyModel(tab_key);
+                                model.setParam(pdsf.getParametersInfo());
+                                tab_key.setModel(model);
+                                tab_key.revalidate();
+                                tab_key.repaint();
+                            }
+                        }
+                    }
+                });
+
+
     }
 
     public Map getProperties() {
-        Map config = new HashMap();
-        config.put(PostgisDataStoreFactory.DBTYPE.key, jcb_dbtype.getSelectedItem());
-        config.put(PostgisDataStoreFactory.HOST.key, txt_host.getText());
-        config.put(PostgisDataStoreFactory.PORT.key, txt_port.getText());
-        config.put(PostgisDataStoreFactory.SCHEMA.key,  txt_schema.getText());
-        config.put(PostgisDataStoreFactory.DATABASE.key,  txt_database.getText());
-        config.put(PostgisDataStoreFactory.USER.key,  txt_user.getText());
-        config.put(PostgisDataStoreFactory.PASSWD.key,  String.valueOf(txt_password.getPassword()) );
-        return config;
+        return ((KeyModel) tab_key.getModel()).getProperties();
     }
 
-    private void refreshTable(){
-        
-        if(store!= null){
+    private void refreshTable() {
+
+        if (store != null) {
             ((DBModel) tab_table.getModel()).clean();
             try {
                 ((DBModel) tab_table.getModel()).add(store.getTypeNames());
@@ -86,16 +111,16 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                 System.out.println(ex);
             }
         }
-        
+
     }
-    
-    private void fireEvent(MapLayer[] layers){
-        for( DataListener lst : listeners.getListeners(DataListener.class)){
+
+    private void fireEvent(MapLayer[] layers) {
+        for (DataListener lst : listeners.getListeners(DataListener.class)) {
             lst.addLayers(layers);
         }
-        
+
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -105,47 +130,15 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
     private void initComponents() {
 
         lbl_dbtype = new javax.swing.JLabel();
-        txt_host = new javax.swing.JTextField();
-        lbl_host = new javax.swing.JLabel();
-        lbl_port = new javax.swing.JLabel();
-        lbl_schema = new javax.swing.JLabel();
-        lbl_database = new javax.swing.JLabel();
-        lbl_user = new javax.swing.JLabel();
-        lbl_password = new javax.swing.JLabel();
-        txt_port = new javax.swing.JTextField();
-        txt_schema = new javax.swing.JTextField();
-        txt_database = new javax.swing.JTextField();
-        txt_user = new javax.swing.JTextField();
         but_refresh = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tab_table = new org.jdesktop.swingx.JXTable();
         jcb_dbtype = new javax.swing.JComboBox();
-        txt_password = new javax.swing.JPasswordField();
         but_add = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tab_key = new javax.swing.JTable();
 
         lbl_dbtype.setText("jLabel1");
-
-        txt_host.setText("www.refractions.net");
-
-        lbl_host.setText("jLabel2");
-
-        lbl_port.setText("jLabel3");
-
-        lbl_schema.setText("jLabel4");
-
-        lbl_database.setText("jLabel5");
-
-        lbl_user.setText("jLabel6");
-
-        lbl_password.setText("jLabel7");
-
-        txt_port.setText("5432");
-
-        txt_schema.setText("public");
-
-        txt_database.setText("demo-bc");
-
-        txt_user.setText("demo");
 
         but_refresh.setText("jButton1");
         but_refresh.addActionListener(new java.awt.event.ActionListener() {
@@ -164,9 +157,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
         ));
         jScrollPane1.setViewportView(tab_table);
 
-        jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis" }));
-
-        txt_password.setText("demo");
+        jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis", "oracle" }));
 
         but_add.setText("jButton1");
         but_add.addActionListener(new java.awt.event.ActionListener() {
@@ -175,107 +166,63 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
             }
         });
 
+        tab_key.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tab_key);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(but_refresh))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_dbtype)
-                                .add(18, 18, 18)
-                                .add(jcb_dbtype, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_host)
-                                .add(18, 18, 18)
-                                .add(txt_host, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_database)
-                                .add(18, 18, 18)
-                                .add(txt_database, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_user)
-                                .add(18, 18, 18)
-                                .add(txt_user, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_password)
-                                .add(18, 18, 18)
-                                .add(txt_password, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_port)
-                                .add(18, 18, 18)
-                                .add(txt_port, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(lbl_schema)
-                                .add(18, 18, 18)
-                                .add(txt_schema, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, but_refresh)
+                    .add(jScrollPane2, 0, 182, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(lbl_dbtype)
+                        .add(18, 18, 18)
+                        .add(jcb_dbtype, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, but_add)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(92, 92, 92)
+                        .add(but_add)))
                 .addContainerGap())
         );
-
-        layout.linkSize(new java.awt.Component[] {jcb_dbtype, txt_database, txt_host, txt_password, txt_port, txt_schema, txt_user}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
-        layout.linkSize(new java.awt.Component[] {lbl_database, lbl_dbtype, lbl_host, lbl_password, lbl_port, lbl_schema, lbl_user}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 177, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(but_add))
-                    .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(lbl_dbtype)
                             .add(jcb_dbtype, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lbl_host)
-                            .add(txt_host, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lbl_port)
-                            .add(txt_port, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lbl_schema)
-                            .add(txt_schema, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lbl_database)
-                            .add(txt_database, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lbl_user)
-                            .add(txt_user, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lbl_password)
-                            .add(txt_password, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(but_refresh)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(but_add)
+                    .add(but_refresh))
+                .addContainerGap())
         );
-
-        layout.linkSize(new java.awt.Component[] {jcb_dbtype, txt_database, txt_host, txt_password, txt_port, txt_schema, txt_user}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        layout.linkSize(new java.awt.Component[] {lbl_database, lbl_dbtype, lbl_host, lbl_password, lbl_port, lbl_schema, lbl_user}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
     }// </editor-fold>//GEN-END:initComponents
 
     private void actionRefresh(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionRefresh
-        
+
         try {
             store = DataStoreFinder.getDataStore(getProperties());
             refreshTable();
@@ -287,31 +234,31 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
     }//GEN-LAST:event_actionRefresh
 
     private void actionAdd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAdd
-       ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
-        
-        if(store!=null){
-            
-            for(int i=0;i<tab_table.getSelectedRows().length; i++){
+        ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
+
+        if (store != null) {
+
+            for (int i = 0; i < tab_table.getSelectedRows().length; i++) {
                 try {
                     DBModel model = (DBModel) tab_table.getModel();
-                    String name = (String) model.getValueAt( tab_table.getSelectedRows()[i],0);
+                    String name = (String) model.getValueAt(tab_table.getSelectedRows()[i], 0);
                     FeatureSource fs = store.getFeatureSource(name);
                     Style style = RandomStyleFactory.createRandomVectorStyle(fs);
-                    
-                    MapLayer layer = new DefaultMapLayer(fs,style);
-                    layer.setTitle( jcb_dbtype.getSelectedItem().toString() +"-"+ name);
+
+                    MapLayer layer = new DefaultMapLayer(fs, style);
+                    layer.setTitle(jcb_dbtype.getSelectedItem().toString() + "-" + name);
                     layers.add(layer);
                 } catch (IOException ex) {
                     System.out.println(ex);
-                }                
-            }
-            
-            if(layers.size()>0){
-                MapLayer[] lys = new MapLayer[layers.size()];
-                for(int i=0;i<layers.size();i++){
-                    lys[i] =  layers.get(i);
                 }
-                fireEvent( lys );
+            }
+
+            if (layers.size() > 0) {
+                MapLayer[] lys = new MapLayer[layers.size()];
+                for (int i = 0; i < layers.size(); i++) {
+                    lys[i] = layers.get(i);
+                }
+                fireEvent(lys);
             }
         }
     }//GEN-LAST:event_actionAdd
@@ -339,26 +286,14 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
     public void removeListener(DataListener listener) {
         listeners.remove(DataListener.class, listener);
     }
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_add;
     private javax.swing.JButton but_refresh;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JComboBox jcb_dbtype;
-    private javax.swing.JLabel lbl_database;
     private javax.swing.JLabel lbl_dbtype;
-    private javax.swing.JLabel lbl_host;
-    private javax.swing.JLabel lbl_password;
-    private javax.swing.JLabel lbl_port;
-    private javax.swing.JLabel lbl_schema;
-    private javax.swing.JLabel lbl_user;
+    private javax.swing.JTable tab_key;
     private org.jdesktop.swingx.JXTable tab_table;
-    private javax.swing.JTextField txt_database;
-    private javax.swing.JTextField txt_host;
-    private javax.swing.JPasswordField txt_password;
-    private javax.swing.JTextField txt_port;
-    private javax.swing.JTextField txt_schema;
-    private javax.swing.JTextField txt_user;
     // End of variables declaration//GEN-END:variables
 }

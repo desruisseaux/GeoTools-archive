@@ -58,9 +58,9 @@ public class DegreeClock extends JComponent implements MouseMotionListener, Mous
        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
        
        g2d.setColor(Color.WHITE);
-       g2d.fillOval(0, 0, getWidth()-1, getHeight()-1);
+       g2d.fillOval(0, 0, getWidth()-2, getHeight()-2);
        g2d.setColor(Color.GRAY);
-       g2d.drawOval(0, 0, getWidth()-1, getHeight()-1);
+       g2d.drawOval(0, 0, getWidth()-2, getHeight()-2);
              
        g2d.setColor(Color.BLACK);
        g2d.drawLine(getWidth()/2, getHeight()/2, X, Y);

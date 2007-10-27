@@ -50,6 +50,8 @@ public class JStrokePanel extends javax.swing.JPanel {
         GuiStrokeWidth.setLayer(layer);
         GuiStrokeColor.setLayer(layer);
         GuiStrokeAlpha.setLayer(layer);
+        GuiStrokeLineCap.setLayer(layer);
+        GuiStrokeLineJoin.setLayer(layer);
     }
 
     public void parseStroke(Stroke stroke) {
