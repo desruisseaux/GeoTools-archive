@@ -700,162 +700,166 @@ public class SLDStyleFactory {
      * @return The first of the specified fonts found on this machine or null if none found
      */
     private java.awt.Font getFont(Object feature, Font[] fonts) {
-        if (fontFamilies == null) {
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            fontFamilies = new HashSet();
-
-            List f = Arrays.asList(ge.getAvailableFontFamilyNames());
-            fontFamilies.addAll(f);
-
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("there are " + fontFamilies.size() + " fonts available");
-            }
-        }
-
-        java.awt.Font javaFont = null;
-
-        int styleCode = 0;
-        int size = 6;
-        String requestedFont = "";
-
-        for (int k = 0; k < fonts.length; k++) {
-            requestedFont = fonts[k].getFontFamily().evaluate(feature).toString();
-
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("trying to load " + requestedFont);
-            }
-
-            if (loadedFonts.containsKey(requestedFont)) {
-                javaFont = (java.awt.Font) loadedFonts.get(requestedFont);
-
-                String reqStyle = (String) fonts[k].getFontStyle().evaluate(feature);
-
-                if (fontStyleLookup.containsKey(reqStyle)) {
-                    styleCode = ((Integer) fontStyleLookup.get(reqStyle)).intValue();
-                } else {
-                    styleCode = java.awt.Font.PLAIN;
-                }
-
-                String reqWeight = (String) fonts[k].getFontWeight().evaluate(feature);
-
-                if (reqWeight.equalsIgnoreCase("Bold")) {
-                    styleCode = styleCode | java.awt.Font.BOLD;
-                }
-
-                size = ((Number) fonts[k].getFontSize().evaluate(feature)).intValue();
-
-                return javaFont.deriveFont(styleCode, size);
-            }
-
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("not already loaded");
-            }
-
-            if (fontFamilies.contains(requestedFont)) {
-                String reqStyle = (String) fonts[k].getFontStyle().evaluate(feature);
-
-                if (fontStyleLookup.containsKey(reqStyle)) {
-                    styleCode = ((Integer) fontStyleLookup.get(reqStyle)).intValue();
-                } else {
-                    styleCode = java.awt.Font.PLAIN;
-                }
-
-                String reqWeight = (String) fonts[k].getFontWeight().evaluate(feature);
-
-                if (reqWeight.equalsIgnoreCase("Bold")) {
-                    styleCode = styleCode | java.awt.Font.BOLD;
-                }
-
-                size = ((Number) fonts[k].getFontSize().evaluate(feature)).intValue();
-
+        // we need to synchronize font loading or multithreaded access may
+        // result in us returning the wrong font
+        synchronized (loadedFonts) {
+            if (fontFamilies == null) {
+                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                fontFamilies = new HashSet();
+    
+                List f = Arrays.asList(ge.getAvailableFontFamilyNames());
+                fontFamilies.addAll(f);
+    
                 if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.finest("requesting " + requestedFont + " " + styleCode + " " + size);
+                    LOGGER.finest("there are " + fontFamilies.size() + " fonts available");
                 }
-
-                javaFont = new java.awt.Font(requestedFont, styleCode, size);
-                loadedFonts.put(requestedFont, javaFont);
-
-                return javaFont;
             }
-
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("not a system font");
-            }
-
-            // may be its a file or url
-            InputStream is = null;
-
-            if (requestedFont.startsWith("http") || requestedFont.startsWith("file:")) {
-                try {
-                    URL url = new URL(requestedFont);
-                    is = url.openStream();
-                } catch (MalformedURLException mue) {
-                    // this may be ok - but we should mention it
-                    if (LOGGER.isLoggable(Level.INFO)) {
-                        LOGGER.info("Bad url in SLDStyleFactory " + requestedFont + "\n" + mue);
+    
+            java.awt.Font javaFont = null;
+    
+            int styleCode = 0;
+            int size = 6;
+            String requestedFont = "";
+    
+            for (int k = 0; k < fonts.length; k++) {
+                requestedFont = fonts[k].getFontFamily().evaluate(feature).toString();
+    
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("trying to load " + requestedFont);
+                }
+    
+                if (loadedFonts.containsKey(requestedFont)) {
+                    javaFont = (java.awt.Font) loadedFonts.get(requestedFont);
+    
+                    String reqStyle = (String) fonts[k].getFontStyle().evaluate(feature);
+    
+                    if (fontStyleLookup.containsKey(reqStyle)) {
+                        styleCode = ((Integer) fontStyleLookup.get(reqStyle)).intValue();
+                    } else {
+                        styleCode = java.awt.Font.PLAIN;
                     }
+    
+                    String reqWeight = (String) fonts[k].getFontWeight().evaluate(feature);
+    
+                    if (reqWeight.equalsIgnoreCase("Bold")) {
+                        styleCode = styleCode | java.awt.Font.BOLD;
+                    }
+    
+                    size = ((Number) fonts[k].getFontSize().evaluate(feature)).intValue();
+    
+                    return javaFont.deriveFont(styleCode, size);
+                }
+    
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("not already loaded");
+                }
+    
+                if (fontFamilies.contains(requestedFont)) {
+                    String reqStyle = (String) fonts[k].getFontStyle().evaluate(feature);
+    
+                    if (fontStyleLookup.containsKey(reqStyle)) {
+                        styleCode = ((Integer) fontStyleLookup.get(reqStyle)).intValue();
+                    } else {
+                        styleCode = java.awt.Font.PLAIN;
+                    }
+    
+                    String reqWeight = (String) fonts[k].getFontWeight().evaluate(feature);
+    
+                    if (reqWeight.equalsIgnoreCase("Bold")) {
+                        styleCode = styleCode | java.awt.Font.BOLD;
+                    }
+    
+                    size = ((Number) fonts[k].getFontSize().evaluate(feature)).intValue();
+    
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("requesting " + requestedFont + " " + styleCode + " " + size);
+                    }
+    
+                    javaFont = new java.awt.Font(requestedFont, styleCode, size);
+                    loadedFonts.put(requestedFont, javaFont);
+    
+                    return javaFont;
+                }
+    
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("not a system font");
+                }
+    
+                // may be its a file or url
+                InputStream is = null;
+    
+                if (requestedFont.startsWith("http") || requestedFont.startsWith("file:")) {
+                    try {
+                        URL url = new URL(requestedFont);
+                        is = url.openStream();
+                    } catch (MalformedURLException mue) {
+                        // this may be ok - but we should mention it
+                        if (LOGGER.isLoggable(Level.INFO)) {
+                            LOGGER.info("Bad url in SLDStyleFactory " + requestedFont + "\n" + mue);
+                        }
+                    } catch (IOException ioe) {
+                        // we'll ignore this for the moment
+                        if (LOGGER.isLoggable(Level.INFO)) {
+                            LOGGER.info("IO error in SLDStyleFactory " + requestedFont + "\n" + ioe);
+                        }
+                    }
+                } else {
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.finest("not a URL");
+                    }
+    
+                    File file = new File(requestedFont);
+    
+                    //if(file.canRead()){
+                    try {
+                        is = new FileInputStream(file);
+                    } catch (FileNotFoundException fne) {
+                        // this may be ok - but we should mention it
+                        if (LOGGER.isLoggable(Level.INFO)) {
+                            LOGGER.info("Bad file name in SLDStyleFactory" + requestedFont + "\n" + fne);
+                        }
+                    }
+                }
+    
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("about to load");
+                }
+    
+                if (is == null) {
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.info("null input stream");
+                    }
+    
+                    continue;
+                }
+    
+                try {
+                    javaFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, is);
+                } catch (FontFormatException ffe) {
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.info("Font format error in SLDStyleFactory " + requestedFont + "\n"
+                            + ffe);
+                    }
+    
+                    continue;
                 } catch (IOException ioe) {
                     // we'll ignore this for the moment
                     if (LOGGER.isLoggable(Level.INFO)) {
                         LOGGER.info("IO error in SLDStyleFactory " + requestedFont + "\n" + ioe);
                     }
+    
+                    continue;
                 }
-            } else {
-                if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.finest("not a URL");
-                }
-
-                File file = new File(requestedFont);
-
-                //if(file.canRead()){
-                try {
-                    is = new FileInputStream(file);
-                } catch (FileNotFoundException fne) {
-                    // this may be ok - but we should mention it
-                    if (LOGGER.isLoggable(Level.INFO)) {
-                        LOGGER.info("Bad file name in SLDStyleFactory" + requestedFont + "\n" + fne);
-                    }
-                }
+    
+                loadedFonts.put(requestedFont, javaFont);
+    
+                return javaFont;
             }
-
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("about to load");
-            }
-
-            if (is == null) {
-                if (LOGGER.isLoggable(Level.INFO)) {
-                    LOGGER.info("null input stream");
-                }
-
-                continue;
-            }
-
-            try {
-                javaFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, is);
-            } catch (FontFormatException ffe) {
-                if (LOGGER.isLoggable(Level.INFO)) {
-                    LOGGER.info("Font format error in SLDStyleFactory " + requestedFont + "\n"
-                        + ffe);
-                }
-
-                continue;
-            } catch (IOException ioe) {
-                // we'll ignore this for the moment
-                if (LOGGER.isLoggable(Level.INFO)) {
-                    LOGGER.info("IO error in SLDStyleFactory " + requestedFont + "\n" + ioe);
-                }
-
-                continue;
-            }
-
-            loadedFonts.put(requestedFont, javaFont);
-
-            return javaFont;
+    
+            // if everything else fails fall back on a default font distributed
+            // along with the jdk
+            return new java.awt.Font("Serif",java.awt.Font.PLAIN,12);
         }
-
-        // if everything else fails fall back on a default font distributed
-        // along with the jdk
-        return new java.awt.Font("Serif",java.awt.Font.PLAIN,12);
     }
 
     void setScaleRange(Style style, Range scaleRange) {
@@ -1193,7 +1197,10 @@ public class SLDStyleFactory {
             }
 
             try {
-                img = imageLoader.get(eg.getLocation(), false);
+                // imageLoader is not
+                synchronized (imageLoader) {
+                    img = imageLoader.get(eg.getLocation(), false);
+                }
 
                 if (LOGGER.isLoggable(Level.FINEST)) {
                     LOGGER.finest("Image return = " + img);
