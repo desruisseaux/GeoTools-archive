@@ -15,17 +15,15 @@
  */
 package org.geotools.io;
 
-// Standard I/O
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
- * A writer that put some spaces in front of every line. The indentation is initially set
+ * A writer that put some spaces in front of every lines. The indentation is initially set
  * to 0 spaces. Users must invoke {@link #setIndentation} in order to set a different value.
  *
  * @source $URL$
@@ -86,9 +84,9 @@ public class IndentedLineWriter extends FilterWriter {
     }
 
     /**
-     * Write the specified character.
+     * Writes the specified character.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
     private void doWrite(final int c) throws IOException {
         assert Thread.holdsLock(lock);
@@ -104,8 +102,9 @@ public class IndentedLineWriter extends FilterWriter {
     /**
      * Writes a single character.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final int c) throws IOException {
         synchronized (lock) {
             doWrite(c);
@@ -115,11 +114,12 @@ public class IndentedLineWriter extends FilterWriter {
     /**
      * Writes a portion of an array of characters.
      *
-     * @param  buffer  Buffer of characters to be written
-     * @param  offset  Offset from which to start reading characters
-     * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  buffer  Buffer of characters to be written.
+     * @param  offset  Offset from which to start reading characters.
+     * @param  length  Number of characters to be written.
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final char[] buffer, int offset, final int length) throws IOException {
         final int upper = offset + length;
         synchronized (lock) {
@@ -147,11 +147,12 @@ check:      while (offset < upper) {
     /**
      * Writes a portion of a string.
      *
-     * @param  string  String to be written
-     * @param  offset  Offset from which to start reading characters
-     * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  string  String to be written.
+     * @param  offset  Offset from which to start reading characters.
+     * @param  length  Number of characters to be written.
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final String string, int offset, final int length) throws IOException {
         final int upper = offset + length;
         synchronized (lock) {

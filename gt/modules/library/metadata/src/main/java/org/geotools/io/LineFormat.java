@@ -16,7 +16,6 @@
  */
 package org.geotools.io;
 
-// Text format
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.Format;
@@ -26,7 +25,6 @@ import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
@@ -78,44 +76,45 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class LineFormat extends Format {
     /**
-     * Nombre de données valides dans le tableau {@link #data}.
-     * Il s'agit du nombre de données lues lors du dernier appel
-     * de la méthode {@link #setLine(String)}.
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 1663380990689494113L;
+
+    /**
+     * Number of valid data in the {@link #data} array. This is the number of data
+     * found last time {@link #setLine(String)} has been invoked.
      */
     private int count;
 
     /**
-     * Données lus lors du dernier appel de la méthode {@link #setLine(String)}.
-     * Ces données seront restitués par des appels à {@link #getValues(float[])}.
+     * Data read last time {@link #setLine(String)} has been invoked.
+     * Those data are returned by methods like {@link #getValues(float[])}.
      */
     private Object[] data;
 
     /**
-     * Tableau de formats à utiliser. Chaque format de ce tableau correspond à une
-     * colonne. Par exemple la donnée {@code data[4]} aura été lu avec le format
-     * {@code format[4]}. Il n'est toutefois pas obligatoire qu'il y ait autant
-     * de format que de colonnes. Si {@link #data} et plus long que {@link #format},
-     * alors le dernier format sera réutilisé pour toutes les colonnes restantes.
+     * Array of formats to use for parsing a line. Each format object in this array match
+     * one column. For example {@code data[4]} will be parsed with {@code format[4]}. If
+     * the {@link #data} array is longer than {@link #format}, then the last format is
+     * reused for all remaining columns.
      */
     private final Format[] format;
 
     /**
-     * Objet {@link ParsePosition} utilisé lors de la lecture pour spécifier quelle
-     * partie de la chaîne doit être interprétée.
+     * The {@link ParsePosition} used for specifying the substring to parse.
      */
     private final ParsePosition position = new ParsePosition(0);
 
     /**
-     * Index du caractère auquel commençaient les éléments qui ont été lus. Par exemple
-     * {@code index[0]} contient l'index du premier caractère qui a été lu pour la
-     * donnée {@code data[0]}, et ainsi de suite. Ce tableau doit <u>toujours</u>
-     * avoir une longueur de <code>{@link #data}.length + 1</code>. Le dernier élément
-     * de ce tableau sera la longueur de la ligne.
+     * Index of the the first character parsed in each column. For example {@code index[0]}
+     * contains the index of the first character read for {@code data[0]}, <cite>etc</cite>.
+     * This array length must be equals to <code>{@linkplain #data}.length + 1</code>. The
+     * last element will be the line length.
      */
     private int[] limits;
 
     /**
-     * Dernière ligne de texte à avoir été spécifiée à la méthode {@link #setLine(String)}.
+     * The line specified in the last call to {@link #setLine(String)}.
      */
     private String line;
 
@@ -153,7 +152,7 @@ public class LineFormat extends Format {
     /**
      * Constructs a new line parser using the specified format objects. For example the first
      * column will be parsed using {@code formats[0]}; the second column will be parsed using
-     * {@code formats[1]}, <cite>etc.</cite> If there is more columns than formats, then the
+     * {@code formats[1]}, <cite>etc</cite>. If there is more columns than formats, then the
      * last format object is reused for all remaining columns.
      *
      * @param  formats The formats to use for parsing.
@@ -174,7 +173,7 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Clear this parser. Next call to {@link #getValueCount} will returns 0.
+     * Clears this parser. Next call to {@link #getValueCount} will returns 0.
      */
     public void clear() {
         line = null;
@@ -183,7 +182,7 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Parse the specified line. The content is immediately parsed and values
+     * Parses the specified line. The content is immediately parsed and values
      * can be obtained using one of the {@code getValues(...)} method.
      *
      * @param  line The line to parse.
@@ -196,7 +195,7 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Parse a substring of the specified line. The content is immediately parsed
+     * Parses a substring of the specified line. The content is immediately parsed
      * and values can be obtained using one of the {@code getValues(...)} method.
      *
      * @param  line  The line to parse.
@@ -258,15 +257,14 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Returns the number of elements found in the last line parsed by
-     * {@link #setLine(String)}.
+     * Returns the number of elements found in the last line parsed by {@link #setLine(String)}.
      */
     public int getValueCount() {
         return count;
     }
 
     /**
-     * Set all values in the current line. The {@code values} argument must be an array,
+     * Sets all values in the current line. The {@code values} argument must be an array,
      * which may be of primitive type.
      *
      * @param  values The array to set as values.
@@ -284,7 +282,7 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Set or add a value to current line. The index should be in the range 0 to
+     * Sets or adds a value to current line. The index should be in the range 0 to
      * {@link #getValueCount} inclusively. If the index is equals to {@link #getValueCount},
      * then {@code value} will be appended as a new column after existing data.
      *
@@ -292,9 +290,7 @@ public class LineFormat extends Format {
      * @param  value The new value.
      * @throws ArrayIndexOutOfBoundsException If the index is outside the expected range.
      */
-    public void setValue(final int index, final Object value)
-            throws ArrayIndexOutOfBoundsException
-    {
+    public void setValue(final int index, final Object value) throws ArrayIndexOutOfBoundsException {
         if (index > count) {
             throw new ArrayIndexOutOfBoundsException(index);
         }
@@ -335,17 +331,16 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Retourne sous forme de nombre la valeur à l'index {@code index}.
+     * Returns {@code data[index]} as a number.
      *
-     * @param  index Index de la valeur demandée.
-     * @return La valeur demandée sous forme d'objet {@link Number}.
-     * @throws ParseException si la valeur n'est pas convertible en objet {@link Number}.
+     * @param  index Index of the value to returns.
+     * @return The value as a {@link Number}.
+     * @throws ParseException if the value can not be converted to a {@link Number}.
      */
     private Number getNumber(final int index) throws ParseException {
         Exception error = null;
         if (data[index] instanceof Comparable) {
-            try
-            {
+            try {
                 return ClassChanger.toNumber((Comparable)data[index]);
             } catch (ClassNotFoundException exception) {
                 error = exception;
@@ -522,10 +517,11 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Vérifie si le nombre de données lues correspond au nombre de données
-     * attendues. Si ce n'est pas le cas, une exception sera lancée.
+     * Ensures that the number of columns just parsed is equals to the number of columns expected.
+     * If a mismatch is found, then an exception is thrown.
      *
-     * @throws ParseException si le nombre de données lues ne correspond pas au nombre de données attendues.
+     * @param  expected The expected number of columns.
+     * @throws ParseException If the number of columns parsed is not equals to the number expected.
      */
     private void checkLength(final int expected) throws ParseException {
         if (count != expected) {
@@ -541,7 +537,7 @@ public class LineFormat extends Format {
     /**
      * Creates an exception for a value not being an integer.
      *
-     * @param  i the value index.
+     * @param  i The value index.
      * @return The exception.
      */
     private ParseException notAnInteger(final int i) {
@@ -554,7 +550,7 @@ public class LineFormat extends Format {
      * the {@link Format} object specified at construction time. Columns are separated
      * by tabulation.
      */
-    //@Override
+    @Override
     public String toString() {
         return toString(new StringBuffer()).toString();
     }
@@ -624,11 +620,11 @@ public class LineFormat extends Format {
     }
 
     /**
-     * Parses text from the beginning of the given string to produce an object. 
+     * Parses text from the beginning of the given string to produce an object.
      *
      * @since 2.4
      */
-    //@Override
+    @Override
     public Object parseObject(final String source) throws ParseException {
         setLine(source.substring(0, getLineEnd(source, 0, true)));
         return getValues();
@@ -638,11 +634,11 @@ public class LineFormat extends Format {
      * Returns a clone of this parser. In current implementation, this
      * clone is <strong>not</strong> for usage in concurrent thread.
      */
-    //@Override
-    public Object clone() {
+    @Override
+    public LineFormat clone() {
         final LineFormat copy = (LineFormat) super.clone();
-        copy.data   = (Object[]) data.clone();
-        copy.limits = (int[])  limits.clone();
+        copy.data   = data.clone();
+        copy.limits = limits.clone();
         return copy;
     }
 }

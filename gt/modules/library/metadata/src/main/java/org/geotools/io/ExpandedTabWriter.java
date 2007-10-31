@@ -16,18 +16,15 @@
  */
 package org.geotools.io;
 
-// Standard I/O
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
- * Writes characters to a stream while expanding
- * tabs (<code>'\t'</code>) into spaces.
+ * Writes characters to a stream while expanding tabs ({@code '\t'}) into spaces.
  *
  * @source $URL$
  * @version $Id$
@@ -42,41 +39,38 @@ public class ExpandedTabWriter extends FilterWriter {
     private int tabWidth = 8;
 
     /**
-     * Current column position.
-     * Columns are numbered from 0.
+     * Current column position. Columns are numbered from 0.
      */
     private int column = 0;
-    
+
     /**
-     * Constructs a filter which replaces tab characters (<code>'\t'</code>)
-     * with spaces. Tab widths default to 8 characters.
+     * Constructs a filter which replaces tab characters ({@code '\t'})
+     * by spaces. Tab widths default to 8 characters.
      *
-     * @param out a Writer object to provide the underlying stream.
+     * @param out A writer object to provide the underlying stream.
      */
     public ExpandedTabWriter(final Writer out) {
         super(out);
     }
-    
+
     /**
-     * Constructs a filter which replaces tab characters (<code>'\t'</code>)
-     * with spaces, using the specified tab width.
+     * Constructs a filter which replaces tab characters ({@code '\t'})
+     * by spaces, using the specified tab width.
      *
-     * @param  out a Writer object to provide the underlying stream.
+     * @param  out A writer object to provide the underlying stream.
      * @param  tabWidth The tab width. Must be greater than 0.
-     * @throws IllegalArgumentException if {@code tabWidth}
-     *         is not greater than 0.
+     * @throws IllegalArgumentException if {@code tabWidth} is not greater than 0.
      */
-    public ExpandedTabWriter(Writer out, int tabWidth) throws IllegalArgumentException {
+    public ExpandedTabWriter(final Writer out, final int tabWidth) throws IllegalArgumentException {
         super(out);
         setTabWidth(tabWidth);
     }
-    
+
     /**
      * Sets the tab width.
      *
      * @param  tabWidth The tab width. Must be greater than 0.
-     * @throws IllegalArgumentException if {@code tabWidth}
-     *         is not greater than 0.
+     * @throws IllegalArgumentException if {@code tabWidth} is not greater than 0.
      */
     public void setTabWidth(final int tabWidth) throws IllegalArgumentException {
         synchronized (lock) {
@@ -87,30 +81,31 @@ public class ExpandedTabWriter extends FilterWriter {
             }
         }
     }
-    
+
     /**
      * Returns the tab width.
      */
     public int getTabWidth() {
         return tabWidth;
     }
-    
+
     /**
      * Writes spaces for a tab character.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
     private void expand() throws IOException {
         final int width = tabWidth - (column % tabWidth);
         out.write(Utilities.spaces(width));
         column += width;
     }
-    
+
     /**
      * Writes a single character.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final int c) throws IOException {
         synchronized (lock) {
             switch (c) {
@@ -122,31 +117,32 @@ public class ExpandedTabWriter extends FilterWriter {
             out.write(c);
         }
     }
-    
+
     /**
      * Writes a portion of an array of characters.
      *
      * @param  buffer  Buffer of characters to be written
      * @param  offset  Offset from which to start reading characters
      * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final char[] buffer, final int offset, int length) throws IOException {
         synchronized (lock) {
             int start = offset;
             length += offset;
             for (int end=offset; end<length; end++) {
-                final char c=buffer[end];
+                final char c = buffer[end];
                 switch (c) {
                     case '\r': // fall through
-                    case '\n': column=0;
+                    case '\n': column = 0;
                                break;
 
                     case '\t': out.write(buffer, start, end-start);
-                               start=end+1;
+                               start = end+1;
                                expand();
                                break;
-                    
+
                     default  : column++;
                                break;
                 }
@@ -154,31 +150,32 @@ public class ExpandedTabWriter extends FilterWriter {
             out.write(buffer, start, length-start);
         }
     }
-    
+
     /**
      * Writes a portion of a string.
      *
      * @param  string  String to be written
      * @param  offset  Offset from which to start reading characters
      * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final String string, final int offset, int length) throws IOException {
         synchronized (lock) {
             int start = offset;
             length += offset;
             for (int end=offset; end<length; end++) {
-                final char c=string.charAt(end);
+                final char c = string.charAt(end);
                 switch (c) {
                     case '\r': // fall through
-                    case '\n': column=0;
+                    case '\n': column = 0;
                                break;
-                    
+
                     case '\t': out.write(string, start, end-start);
-                               start=end+1;
+                               start = end+1;
                                expand();
                                break;
-                    
+
                     default  : column++;
                                break;
                 }

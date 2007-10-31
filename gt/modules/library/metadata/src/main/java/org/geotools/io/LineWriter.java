@@ -16,22 +16,19 @@
  */
 package org.geotools.io;
 
-// Miscellaneous
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
 /**
- * Write characters to a stream while replacing various EOL by a unique string.
- * This class catch all occurrences of <code>"\r"</code>, <code>"\n"</code> and
- * <code>"\r\n"</code>, and replace them by the platform depend EOL string
- * (<code>"\r\n"</code> on Windows, <code>"\n"</code> on Unix), or any other EOL
- * explicitly set at construction time. This writer also remove trailing blanks
- * before end of lines.
+ * Writes characters to a stream while replacing various EOL by a unique string. This class
+ * catches all occurrences of {@code "\r"}, {@code "\n"} and {@code "\r\n"}, and replaces them
+ * by the platform depend EOL string ({@code "\r\n"} on Windows, {@code "\n"} on Unix), or any
+ * other EOL explicitly set at construction time. This writer also remove trailing blanks before
+ * end of lines.
  *
  * @source $URL$
  * @version $Id$
@@ -67,10 +64,9 @@ public class LineWriter extends FilterWriter {
     private int count = 0;
 
     /**
-     * Construct a {@code LineWriter} object that
-     * will use the platform dependent line separator.
+     * Constructs a {@code LineWriter} object that will use the platform dependent line separator.
      *
-     * @param  out a Writer object to provide the underlying stream.
+     * @param  out A writer object to provide the underlying stream.
      * @throws IllegalArgumentException if {@code out} is {@code null}.
      */
     public LineWriter(final Writer out) {
@@ -78,13 +74,11 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Construct a {@code LineWriter} object
-     * that will use the specified line separator.
+     * Constructs a {@code LineWriter} object that will use the specified line separator.
      *
-     * @param  out a Writer object to provide the underlying stream.
+     * @param  out A writer object to provide the underlying stream.
      * @param  lineSeparator String to use as line separator.
-     * @throws IllegalArgumentException if {@code out} or
-     *         {@code lineSeparator} is {@code null}.
+     * @throws IllegalArgumentException if {@code out} or {@code lineSeparator} is {@code null}.
      */
     public LineWriter(final Writer out, final String lineSeparator) {
         super(out);
@@ -104,11 +98,11 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Change the line separator. This is the string to insert in place of
-     * every occurences of "\r", "\n" or "\r\n".
+     * Changes the line separator. This is the string to insert in place of every occurences of
+     * {@code "\r"}, {@code "\n"} or {@code "\r\n"}.
      *
      * @param lineSeparator The new line separator.
-     * @throws IllegalArgumentException if {@code lineSeparator} is {@code null}.
+     * @throws IllegalArgumentException If {@code lineSeparator} is {@code null}.
      */
     public void setLineSeparator(final String lineSeparator) {
         if (lineSeparator == null) {
@@ -120,20 +114,19 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Write a line separator.
+     * Writes a line separator.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
     private void writeEOL() throws IOException {
-        assert count==0;
+        assert count == 0 : count;
         // Do NOT call super.write(String).
         out.write(lineSeparator);
     }
 
     /**
-     * Returns {@code true} if {@link #buffer} contains only
-     * white spaces. It should always be the case. This method is
-     * used for assertions only.
+     * Returns {@code true} if {@link #buffer} contains only white spaces. It should
+     * always be the case. This method is used for assertions only.
      */
     private boolean bufferBlank() {
         for (int i=count; --i>=0;) {
@@ -145,10 +138,9 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Flush the content of {@link #buffer}
-     * to the underlying stream.
+     * Flushs the content of {@link #buffer} to the underlying stream.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
     private void flushBuffer() throws IOException {
         assert bufferBlank();
@@ -159,12 +151,12 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Write a portion of an array of characters. This
-     * portion must NOT contains any line separator.
+     * Writes a portion of an array of characters. This portion must
+     * <strong>not</strong> contains any line separator.
      */
     private void writeLine(final char[] cbuf, final int lower, int upper) throws IOException {
-        while (upper!=lower) {
-            final char c=cbuf[upper-1];
+        while (upper != lower) {
+            final char c = cbuf[upper-1];
             assert (c!='\r' && c!='\n');
             if (Character.isSpaceChar(c)) {
                 upper--;
@@ -175,16 +167,16 @@ public class LineWriter extends FilterWriter {
             break;
         }
         assert bufferBlank();
-        count=0;
+        count = 0;
     }
 
     /**
-     * Write a portion of an array of characters. This
-     * portion must NOT contains any line separator.
+     * Writes a portion of an array of characters. This portion must
+     * <strong>not</strong> contains any line separator.
      */
     private void writeLine(final String str, final int lower, int upper) throws IOException {
-        while (upper!=lower) {
-            final char c=str.charAt(upper-1);
+        while (upper != lower) {
+            final char c = str.charAt(upper-1);
             assert (c!='\r' && c!='\n');
             if (Character.isSpaceChar(c)) {
                 upper--;
@@ -195,31 +187,32 @@ public class LineWriter extends FilterWriter {
             break;
         }
         assert bufferBlank();
-        count=0;
+        count = 0;
     }
 
     /**
-     * Write a single character.
+     * Writes a single character.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final int c) throws IOException {
         synchronized (lock) {
             switch (c) {
                 case '\r': {
                     assert bufferBlank();
-                    count=0; // Discard whitespaces
+                    count = 0; // Discard whitespaces
                     writeEOL();
-                    skipCR=true;
+                    skipCR = true;
                     break;
                 }
                 case '\n': {
                     if (!skipCR) {
                         assert bufferBlank();
-                        count=0; // Discard whitespaces
+                        count = 0; // Discard whitespaces
                         writeEOL();
                     }
-                    skipCR=false;
+                    skipCR = false;
                     break;
                 }
                 default: {
@@ -228,14 +221,14 @@ public class LineWriter extends FilterWriter {
                         Character.isSpaceChar((char)c))
                     {
                         if (count >= buffer.length) {
-                            buffer = XArray.resize(buffer, count+Math.min(8192, count));
+                            buffer = XArray.resize(buffer, count + Math.min(8192, count));
                         }
                         buffer[count++] = (char)c;
                     } else {
                         flushBuffer();
                         out.write(c);
                     }
-                    skipCR=false;
+                    skipCR = false;
                     break;
                 }
             }
@@ -243,18 +236,19 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Write a portion of an array of characters.
+     * Writes a portion of an array of characters.
      *
-     * @param  cbuf    Buffer of characters to be written
-     * @param  offset  Offset from which to start reading characters
-     * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  cbuf    Buffer of characters to be written.
+     * @param  offset  Offset from which to start reading characters.
+     * @param  length  Number of characters to be written.
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final char cbuf[], int offset, int length) throws IOException {
         if (offset<0 || length<0 || (offset+length)>cbuf.length) {
             throw new IndexOutOfBoundsException();
         }
-        if (length==0) {
+        if (length == 0) {
             return;
         }
         synchronized (lock) {
@@ -262,7 +256,7 @@ public class LineWriter extends FilterWriter {
                 offset++;
                 length--;
             }
-            int upper=offset;
+            int upper = offset;
             for (; length!=0; length--) {
                 switch (cbuf[upper++]) {
                     case '\r': {
@@ -272,13 +266,13 @@ public class LineWriter extends FilterWriter {
                             upper++;
                             length--;
                         }
-                        offset=upper;
+                        offset = upper;
                         break;
                     }
                     case '\n': {
                         writeLine(cbuf, offset, upper-1);
                         writeEOL();
-                        offset=upper;
+                        offset = upper;
                         break;
                     }
                 }
@@ -294,8 +288,8 @@ public class LineWriter extends FilterWriter {
                     break;
                 }
             }
-            length = upper-offset;
-            final int newCount = count+length;
+            length = upper - offset;
+            final int newCount = count + length;
             if (newCount > buffer.length) {
                 buffer = XArray.resize(buffer, newCount);
             }
@@ -305,18 +299,19 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Write a portion of an array of a string.
+     * Writes a portion of an array of a string.
      *
-     * @param  string  String to be written
-     * @param  offset  Offset from which to start reading characters
-     * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  string  String to be written.
+     * @param  offset  Offset from which to start reading characters.
+     * @param  length  Number of characters to be written.
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final String string, int offset, int length) throws IOException {
         if (offset<0 || length<0 || (offset+length)>string.length()) {
             throw new IndexOutOfBoundsException();
         }
-        if (length==0) {
+        if (length == 0) {
             return;
         }
         synchronized (lock) {
@@ -324,7 +319,7 @@ public class LineWriter extends FilterWriter {
                 offset++;
                 length--;
             }
-            int upper=offset;
+            int upper = offset;
             for (; length!=0; length--) {
                 switch (string.charAt(upper++)) {
                     case '\r': {
@@ -345,7 +340,7 @@ public class LineWriter extends FilterWriter {
                     }
                 }
             }
-            skipCR = (string.charAt(upper-1)=='\r');
+            skipCR = (string.charAt(upper-1) == '\r');
             /*
              * Write the remainding characters and
              * put trailing blanks into the buffer.
@@ -356,7 +351,7 @@ public class LineWriter extends FilterWriter {
                     break;
                 }
             }
-            length = upper-offset;
+            length = upper - offset;
             final int newCount = count+length;
             if (newCount > buffer.length) {
                 buffer = XArray.resize(buffer, newCount);
@@ -364,17 +359,18 @@ public class LineWriter extends FilterWriter {
             while (--length>=0) {
                 buffer[count++] = string.charAt(offset++);
             }
-            assert count==newCount;
+            assert count == newCount : newCount;
         }
     }
 
     /**
-     * Flush the stream's content to the underlying stream. This method flush completly
-     * all internal buffers,  including any whitespace characters that should have been
+     * Flushs the stream's content to the underlying stream. This method flush completly
+     * all internal buffers, including any whitespace characters that should have been
      * skipped if the next non-blank character is a line separator.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void flush() throws IOException {
         synchronized (lock) {
             flushBuffer();

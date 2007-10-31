@@ -16,17 +16,14 @@
  */
 package org.geotools.io;
 
-// Input/output
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import javax.swing.text.StyleConstants;
 
 import org.geotools.resources.Utilities;
@@ -70,26 +67,20 @@ import org.geotools.resources.XArray;
  */
 public class TableWriter extends FilterWriter {
     /**
-     * A possible value for cell alignment. This
-     * specifies that the text is aligned to the left
-     * indent and extra whitespace should be placed on
-     * the right.
+     * A possible value for cell alignment. This specifies that the text is aligned
+     * to the left indent and extra whitespace should be placed on the right.
      */
     public static final int ALIGN_LEFT = StyleConstants.ALIGN_LEFT;
 
     /**
-     * A possible value for cell alignment. This
-     * specifies that the text is aligned to the right
-     * indent and extra whitespace should be placed on
-     * the left.
+     * A possible value for cell alignment. This specifies that the text is aligned
+     * to the right indent and extra whitespace should be placed on the left.
      */
     public static final int ALIGN_RIGHT = StyleConstants.ALIGN_RIGHT;
 
     /**
-     * A possible value for cell alignment. This
-     * specifies that the text is aligned to the center
-     * and extra whitespace should be placed equally on
-     * the left and right.
+     * A possible value for cell alignment. This specifies that the text is aligned
+     * to the center and extra whitespace should be placed equally on the left and right.
      */
     public static final int ALIGN_CENTER = StyleConstants.ALIGN_CENTER;
 
@@ -136,23 +127,22 @@ public class TableWriter extends FilterWriter {
     private static final char SPACE = ' ';
 
     /**
-     * Temporary string buffer. This buffer
-     * contains only one cell's content.
+     * Temporary string buffer. This buffer contains only one cell's content.
      */
-    private final StringBuffer buffer = new StringBuffer();
+    private final StringBuilder buffer = new StringBuilder();
 
     /**
      * List of {@link Cell} objects, from left to right and top to bottom.
      * By convention, a {@code null} value or a {@link Cell} object
      * with <code>{@link Cell#text}==null</code> are move to the next line.
      */
-    private final List cells = new ArrayList();
+    private final List<Cell> cells = new ArrayList<Cell>();
 
     /**
      * Alignment for current and next cells.
      */
     private int alignment = ALIGN_LEFT;
-    
+
     /**
      * Column position of the cell currently being written. The field
      * is incremented each time {@link #nextColumn()} is invoked.
@@ -187,37 +177,34 @@ public class TableWriter extends FilterWriter {
     private final String rightBorder;
 
     /**
-     * Tells if cells can span more than one line. If {@code true},
-     * then EOL characters likes '\n' move to the next line <em>inside</em>
-     * the current cell. If {@code false}, then EOL characters move to
-     * the next table's row. Default value is {@code false}.
+     * Tells if cells can span more than one line. If {@code true}, then EOL characters likes
+     * {@code '\n'} move to the next line <em>inside</em> the current cell. If {@code false},
+     * then EOL characters move to the next table's row. Default value is {@code false}.
      */
     private boolean multiLinesCells;
 
     /**
-     * {@code true} if this {@code TableWriter}
-     * has been constructed with the no-arg constructor.
+     * {@code true} if this {@code TableWriter} has been constructed with the no-arg constructor.
      */
     private final boolean stringOnly;
 
     /**
-     * Tells if the next '\n' character must be ignored. This field
-     * is used in order to avoid writing two EOL in place of "\r\n".
+     * Tells if the next '\n' character must be ignored. This field is
+     * used in order to avoid writing two EOL in place of {@code "\r\n"}.
      */
     private boolean skipCR;
 
     /**
      * Creates a new table writer with a default column separator.
-     * Note: this writer may produces bad output on Windows console,
-     * unless the underlying stream use the correct codepage (e.g.
-     * <code>OutputStreamWriter(System.out,&nbsp;"Cp437")</code>).
-     * To display the appropriate codepage for a Windows NT console,
-     * type {@code chcp} on the command line.
+     * <p>
+     * <b>Note:</b> this writer may produces bad output on Windows console, unless the underlying
+     * stream use the correct codepage (e.g. {@code OutputStreamWriter(System.out, "Cp437")}).
+     * To display the appropriate codepage for a Windows NT console, type {@code chcp} on the
+     * command line.
      *
-     * @param out Writer object to provide the underlying stream,
-     *        or {@code null} if there is no underlying stream.
-     *        If {@code out} is null, then the {@link #toString}
-     *        method is the only way to get the table's content.
+     * @param out Writer object to provide the underlying stream, or {@code null} if there is no
+     *        underlying stream. If {@code out} is null, then the {@link #toString} method is the
+     *        only way to get the table's content.
      */
     public TableWriter(final Writer out) {
         super(out!=null ? out : new StringWriter());
@@ -228,13 +215,11 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Creates a new table writer with the specified
-     * amount of spaces as column separator.
+     * Creates a new table writer with the specified amount of spaces as column separator.
      *
-     * @param out Writer object to provide the underlying stream,
-     *        or {@code null} if there is no underlying stream.
-     *        If {@code out} is null, then the {@link #toString}
-     *        method is the only way to get the table's content.
+     * @param out Writer object to provide the underlying stream, or {@code null} if there is no
+     *        underlying stream. If {@code out} is null, then the {@link #toString} method is the
+     *        only way to get the table's content.
      * @param spaces Amount of white spaces to use as column separator.
      */
     public TableWriter(final Writer out, final int spaces) {
@@ -244,17 +229,15 @@ public class TableWriter extends FilterWriter {
     /**
      * Creates a new table writer with the specified column separator.
      *
-     * @param out Writer object to provide the underlying stream,
-     *        or {@code null} if there is no underlying stream.
-     *        If {@code out} is null, then the {@link #toString}
-     *        method is the only way to get the table's content.
-     * @param separator String to write between columns. Drawing box characters
-     *        are treated specially. For example <code>" \\u2502 "</code> can be
-     *        used for a single-line box.
+     * @param out Writer object to provide the underlying stream, or {@code null} if there is no
+     *        underlying stream. If {@code out} is null, then the {@link #toString} method is the
+     *        only way to get the table's content.
+     * @param separator String to write between columns. Drawing box characters are treated
+     *        specially. For example {@code " \\u2502 "} can be used for a single-line box.
      */
     public TableWriter(final Writer out, final String separator) {
         super(out!=null ? out : new StringWriter());
-        stringOnly = (out==null);
+        stringOnly = (out == null);
         final int length = separator.length();
         int lower = 0;
         int upper = length;
@@ -280,7 +263,7 @@ public class TableWriter extends FilterWriter {
                              final char horizontalChar) throws IOException
     {
         /*
-         * Obtiens les ensembles de caractères qui
+         * Obtient les ensembles de caractères qui
          * conviennent pour la ligne horizontale.
          */
         int boxCount = 0;
@@ -327,7 +310,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Set the desired behavior for EOL and tabulations characters.
+     * Sets the desired behavior for EOL and tabulations characters.
      * <ul>
      *   <li>If {@code true}, EOL (<code>'\r'</code>, <code>'\n'</code> or
      *       <code>"\r\n"</code>) and tabulations (<code>'\t'</code>) characters
@@ -358,7 +341,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Set the alignment for all cells in the specified column. This method
+     * Sets the alignment for all cells in the specified column. This method
      * overwrite the alignment for all previous cells in the specified column.
      *
      * @param column The 0-based column number.
@@ -374,8 +357,7 @@ public class TableWriter extends FilterWriter {
         }
         synchronized (lock) {
             int current = 0;
-            for (final Iterator it=cells.iterator(); it.hasNext();) {
-                final Cell cell = (Cell) it.next();
+            for (final Cell cell : cells) {
                 if (cell==null || cell.text==null) {
                     current = 0;
                     continue;
@@ -389,7 +371,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Set the alignment for current and next cells. Change to the
+     * Sets the alignment for current and next cells. Change to the
      * alignment doesn't affect the alignment of previous cells and
      * previous rows. The default alignment is {@link #ALIGN_LEFT}.
      *
@@ -421,8 +403,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Returns the number of rows in this table.
-     * This count is reset to 0 by {@link #flush}.
+     * Returns the number of rows in this table. This count is reset to 0 by {@link #flush}.
      */
     private int getRowCount() {
         int count = row;
@@ -441,17 +422,16 @@ public class TableWriter extends FilterWriter {
 
     /**
      * Write a single character. If {@link #isMultiLinesCells()}
-     * is false (which is the default), then:
+     * is {@code false} (which is the default), then:
      * <ul>
-     *   <li>Tabulations (<code>'\t'</code>) are replaced
-     *       by {@link #nextColumn()} invocations.</li>
-     *   <li>Line separators (<code>'\r'</code>, <code>'\n'</code>
-     *       or <code>"\r\n"</code>) are replaced
-     *       by {@link #nextLine()} invocations.</li>
+     *   <li>Tabulations (<code>'\t'</code>) are replaced by {@link #nextColumn()} invocations.</li>
+     *   <li>Line separators (<code>'\r'</code>, <code>'\n'</code> or <code>"\r\n"</code>)
+     *       are replaced by {@link #nextLine()} invocations.</li>
      * </ul>
      *
      * @param c Character to write.
      */
+    @Override
     public void write(final int c) {
         synchronized (lock) {
             if (!multiLinesCells) {
@@ -484,23 +464,24 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Write a string. Tabulations and line separators
-     * are interpreted as by {@link #write(int)}.
+     * Writes a string. Tabulations and line separators are interpreted as by {@link #write(int)}.
      *
      * @param string String to write.
      */
+    @Override
     public void write(final String string) {
         write(string, 0, string.length());
     }
 
     /**
-     * Write a portion of a string. Tabulations and line
+     * Writes a portion of a string. Tabulations and line
      * separators are interpreted as by {@link #write(int)}.
      *
      * @param string String to write.
      * @param offset Offset from which to start writing characters.
      * @param length Number of characters to write.
      */
+    @Override
     public void write(final String string, int offset, int length) {
         if (offset<0 || length<0 || (offset+length)>string.length()) {
             throw new IndexOutOfBoundsException();
@@ -520,7 +501,7 @@ public class TableWriter extends FilterWriter {
                         case '\t': {
                             buffer.append(string.substring(offset, upper-1));
                             nextColumn();
-                            offset=upper;
+                            offset = upper;
                             break;
                         }
                         case '\r': {
@@ -549,28 +530,30 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Write an array of characters. Tabulations and line
+     * Writes an array of characters. Tabulations and line
      * separators are interpreted as by {@link #write(int)}.
      *
      * @param cbuf Array of characters to be written.
      */
+    @Override
     public void write(final char cbuf[]) {
         write(cbuf, 0, cbuf.length);
     }
 
     /**
-     * Write a portion of an array of characters. Tabulations and
+     * Writes a portion of an array of characters. Tabulations and
      * line separators are interpreted as by {@link #write(int)}.
      *
      * @param cbuf   Array of characters.
      * @param offset Offset from which to start writing characters.
      * @param length Number of characters to write.
      */
+    @Override
     public void write(final char cbuf[], int offset, int length) {
         if (offset<0 || length<0 || (offset+length)>cbuf.length) {
             throw new IndexOutOfBoundsException();
         }
-        if (length==0) {
+        if (length == 0) {
             return;
         }
         synchronized (lock) {
@@ -579,7 +562,7 @@ public class TableWriter extends FilterWriter {
                 length--;
             }
             if (!multiLinesCells) {
-                int upper=offset;
+                int upper = offset;
                 for (; length!=0; length--) {
                     switch (cbuf[upper++]) {
                         case '\t': {
@@ -614,7 +597,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Write an horizontal separator.
+     * Writes an horizontal separator.
      */
     public void writeHorizontalSeparator() {
         synchronized (lock) {
@@ -626,8 +609,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Moves one column to the right. Next write
-     * operations will occur in a new cell on the
+     * Moves one column to the right. Next write operations will occur in a new cell on the
      * same row.
      */
     public void nextColumn() {
@@ -635,13 +617,12 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Moves one column to the right. Next write operations will occur in a
-     * new cell on the same row.  This method fill every remaining space in
-     * the current cell with the specified character. For example calling
-     * <code>nextColumn('*')</code> from the first character of a cell is
-     * a convenient way to put a pad value in this cell.
+     * Moves one column to the right. Next write operations will occur in a new cell on the
+     * same row. This method fill every remaining space in the current cell with the specified
+     * character. For example calling {@code nextColumn('*')} from the first character of a cell
+     * is a convenient way to put a pad value in this cell.
      *
-     * @param  fill Character filling the cell (default to whitespace).
+     * @param fill Character filling the cell (default to whitespace).
      */
     public void nextColumn(final char fill) {
         synchronized (lock) {
@@ -675,15 +656,13 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Moves to the first column on the next row. Next write operations will
-     * occur on a new row. This method fill every remaining cell in the current
-     * row with the specified character. Calling <code>nextLine('-')</code>
-     * from the first column of a row is a convenient way to fill this row
-     * with a line separator.
+     * Moves to the first column on the next row. Next write operations will occur on a new
+     * row. This method fill every remaining cell in the current row with the specified character.
+     * Calling {@code nextLine('-')} from the first column of a row is a convenient way to fill
+     * this row with a line separator.
      *
-     * @param  fill Character filling the rest of the line
-     *         (default to whitespace). This caracter may
-     *         be use as a row separator.
+     * @param fill Character filling the rest of the line (default to whitespace).
+     *             This caracter may be use as a row separator.
      */
     public void nextLine(final char fill) {
         synchronized (lock) {
@@ -698,13 +677,12 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Flush the table content to the underlying stream.
-     * This method should not be called before the table
-     * is completed (otherwise, columns may have the
-     * wrong width).
+     * Flushs the table content to the underlying stream. This method should not be called
+     * before the table is completed (otherwise, columns may have the wrong width).
      *
      * @throws IOException if an output operation failed.
      */
+    @Override
     public void flush() throws IOException {
         synchronized (lock) {
             if (buffer.length() != 0) {
@@ -725,10 +703,11 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Flush the table content and close the underlying stream.
+     * Flushs the table content and close the underlying stream.
      *
      * @throws IOException if an output operation failed.
      */
+    @Override
     public void close() throws IOException {
         synchronized (lock) {
             flush();
@@ -737,14 +716,13 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Ecrit vers le flot spécifié toutes les cellules qui avaient été disposées
+     * Écrit vers le flot spécifié toutes les cellules qui avaient été disposées
      * dans le tableau. Ces cellules seront automatiquement alignées en colonnes.
      * Cette méthode peut être appelée plusieurs fois pour écrire le même tableau
      * par exemple vers plusieurs flots.
      *
      * @param  out Flot vers où écrire les données.
-     * @throws IOException si une erreur est survenue lors de l'écriture dans
-     *         {@code out}.
+     * @throws IOException si une erreur est survenue lors de l'écriture dans {@code out}.
      */
     private void flushTo(final Writer out) throws IOException {
         final String columnSeparator = this.separator;
@@ -762,7 +740,7 @@ public class TableWriter extends FilterWriter {
             Cell lineFill = null;
             int currentCount = 0;
             do {
-                final Cell cell = (Cell) cells.get(cellIndex);
+                final Cell cell = cells.get(cellIndex);
                 if (cell == null) {
                     break;
                 }
@@ -877,8 +855,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Checks if {@code array} contains
-     * only {@code null} elements.
+     * Checks if {@code array} contains only {@code null} elements.
      */
     private static boolean isEmpty(final Object[] array) {
         for (int i=array.length; --i>=0;) {
@@ -890,7 +867,7 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Repeat a character.
+     * Repeats a character.
      *
      * @param out   The destination stream.
      * @param car   Character to write (usually ' ').
@@ -905,6 +882,7 @@ public class TableWriter extends FilterWriter {
     /**
      * Returns the table content as a string.
      */
+    @Override
     public String toString() {
         synchronized (lock) {
             int capacity = 2; // Room for EOL.
@@ -974,6 +952,7 @@ public class TableWriter extends FilterWriter {
         /**
          * Returns the cell's content.
          */
+        @Override
         public String toString() {
             return text;
         }

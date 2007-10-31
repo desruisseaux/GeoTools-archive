@@ -16,12 +16,10 @@
  */
 package org.geotools.io;
 
-// Standard I/O
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
-// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
@@ -54,6 +52,7 @@ public class NumberedLineWriter extends IndentedLineWriter {
         }
 
         /** Flush the stream without closing it. */
+        @Override
         public void close() throws IOException {
             flush();
         }
@@ -102,6 +101,7 @@ public class NumberedLineWriter extends IndentedLineWriter {
      *
      * @throws IOException If an I/O error occurs
      */
+    @Override
     protected void beginNewLine() throws IOException {
         final String number = String.valueOf(current++);
         out.write('[');

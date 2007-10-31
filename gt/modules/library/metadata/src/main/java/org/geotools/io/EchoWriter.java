@@ -16,7 +16,6 @@
  */
 package org.geotools.io;
 
-// J2SE dependencies
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -63,10 +62,12 @@ public class EchoWriter extends FilterWriter {
     }
 
     /**
-     * Write a single character.
+     * Writes a single character.
      *
-     * @throws IOException  If an I/O error occurs
+     * @param  c The character to write.
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final int c) throws IOException {
         synchronized (lock) {
             out .write(c);
@@ -75,11 +76,12 @@ public class EchoWriter extends FilterWriter {
     }
 
     /**
-     * Write an array of characters.
+     * Writes an array of characters.
      *
-     * @param  cbuf  Buffer of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  cbuf Buffer of characters to be written.
+     * @throws IOException  If an I/O error occurs.
      */
+    @Override
     public void write(final char[] cbuf) throws IOException {
         synchronized (lock) {
             out .write(cbuf);
@@ -88,41 +90,44 @@ public class EchoWriter extends FilterWriter {
     }
 
     /**
-     * Write a portion of an array of characters.
+     * Writes a portion of an array of characters.
      *
-     * @param  cbuf  Buffer of characters to be written
-     * @param  off   Offset from which to start reading characters
-     * @param  len   Number of characters to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  cbuf   Buffer of characters to be written.
+     * @param  offset Offset from which to start reading characters.
+     * @param  length Number of characters to be written.
+     * @throws IOException If an I/O error occurs.
      */
-    public void write(final char[] cbuf, final int off, final int len) throws IOException {
+    @Override
+    public void write(final char[] cbuf, final int offset, final int length) throws IOException {
         synchronized (lock) {
-            out .write(cbuf, off, len);
-            echo.write(cbuf, off, len);
+            out .write(cbuf, offset, length);
+            echo.write(cbuf, offset, length);
         }
     }
 
     /**
-     * Write a string.
+     * Writes a string.
      *
-     * @param  str  String to be written
-     * @throws IOException  If an I/O error occurs
+     * @param  string String to be written.
+     * @throws IOException If an I/O error occurs.
      */
-    public void write(final String str) throws IOException {
+    @Override
+    public void write(final String string) throws IOException {
         synchronized (lock) {
-            out .write(str);
-            echo.write(str);
+            out .write(string);
+            echo.write(string);
         }
     }
 
     /**
-     * Write a portion of a string.
+     * Writes a portion of a string.
      *
-     * @param  str  A String
-     * @param  off  Offset from which to start writing characters
-     * @param  len  Number of characters to write
-     * @throws IOException  If an I/O error occurs
+     * @param  string String to be written.
+     * @param  offset Offset from which to start writing characters.
+     * @param  lenth  Number of characters to write.
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void write(final String str, final int off, final int len) throws IOException {
         synchronized (lock) {
             out .write(str, off, len);
@@ -131,10 +136,11 @@ public class EchoWriter extends FilterWriter {
     }
 
     /**
-     * Flush both streams.
+     * Flushs both streams.
      *
-     * @throws  IOException  If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void flush() throws IOException {
         synchronized (lock) {
             out .flush();
@@ -143,13 +149,13 @@ public class EchoWriter extends FilterWriter {
     }
 
     /**
-     * Close the main stream, If this object has been constructed with the
-     * {@linkplain #EchoWriter(Writer) one argument constructor} (i.e.
-     * if the echo stream is the {@linkplain System#out standard output}),
-     * then the echo stream will not be closed. Otherwise it will be closed too.
+     * Closes the main stream and the echo stream. In the particular case of writers created
+     * with the {@linkplain #EchoWriter(Writer) one argument constructor}, the echo stream
+     * will not be closed since it maps to the {@linkplain System#out standard output}.
      *
-     * @throws  IOException  If an I/O error occurs
+     * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {
         synchronized (lock) {
             out .close();

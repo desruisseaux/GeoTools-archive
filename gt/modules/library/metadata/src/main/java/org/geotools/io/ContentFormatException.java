@@ -16,12 +16,11 @@
  */
 package org.geotools.io;
 
-// J2SE dependencies
 import java.io.IOException;
 
 
 /**
- * Throws when a stream can't be parsed because some content use an invalid format.
+ * Throws when a stream can't be parsed because some content uses an invalid format.
  * This exception typically has a {@link java.text.ParseException} has its cause.
  * It is similar in spirit to {@link java.util.InvalidPropertiesFormatException}.
  *
