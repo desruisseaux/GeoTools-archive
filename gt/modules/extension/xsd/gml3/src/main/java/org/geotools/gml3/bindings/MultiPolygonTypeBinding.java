@@ -63,6 +63,10 @@ public class MultiPolygonTypeBinding extends AbstractComplexBinding {
         return GML.MultiPolygonType;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
