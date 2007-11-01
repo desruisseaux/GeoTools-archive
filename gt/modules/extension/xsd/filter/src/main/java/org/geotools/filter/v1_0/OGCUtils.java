@@ -25,6 +25,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.GML;
 import org.geotools.xml.Node;
 
@@ -116,6 +117,10 @@ public class OGCUtils {
                             new Coordinate(envelope.getMinX(), envelope.getMaxY()),
                             new Coordinate(envelope.getMinX(), envelope.getMinY())
                         }), null);
+
+            if (envelope instanceof ReferencedEnvelope) {
+                polygon.setUserData(((ReferencedEnvelope) envelope).getCoordinateReferenceSystem());
+            }
 
             spatial = ff.literal(polygon);
         }
