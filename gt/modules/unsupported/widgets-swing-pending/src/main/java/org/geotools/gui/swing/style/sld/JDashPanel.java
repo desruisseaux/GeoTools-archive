@@ -26,7 +26,9 @@ import org.opengis.filter.expression.Expression;
  */
 public class JDashPanel extends javax.swing.JPanel {
 
-    /** Creates new form JDashPanel */
+    /** 
+     * Creates new form JDashPanel 
+     */
     public JDashPanel() {
         initComponents();
 
@@ -41,6 +43,10 @@ public class JDashPanel extends javax.swing.JPanel {
         jsp_offset.setMargins(-65000f,65000f);
     }
 
+    /**
+     * 
+     * @return float[]
+     */
     public float[] getDashes() {
         if (jsp_lenght.getFloatValue() == 0 || jsp_between.getFloatValue() == 0) {
             return new float[0];
@@ -52,6 +58,10 @@ public class JDashPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * 
+     * @param dashes , the default dashes array
+     */
     public void setDashes(float[] dashes) {
 
         if (dashes.length != 0) {
@@ -60,12 +70,20 @@ public class JDashPanel extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * 
+     * @return Expression dashes offset
+     */
     public Expression getOffset(){
         StyleBuilder sb = new StyleBuilder();        
         return sb.literalExpression(jsp_offset.getFloatValue());
     }
 
        
+    /**
+     * 
+     * @param exp default dashes offset
+     */
     public void setOffset(Expression exp){
         
         if(exp != null)

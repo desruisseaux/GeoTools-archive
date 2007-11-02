@@ -33,7 +33,9 @@ public class JLinecapPanel extends javax.swing.JPanel {
     
     
     
-    /** Creates new form JLinecapPanel */
+    /** 
+     * Creates new form JLinecapPanel 
+     */
     public JLinecapPanel() {
         initComponents();
 
@@ -42,10 +44,18 @@ public class JLinecapPanel extends javax.swing.JPanel {
         but_round.setSelected(true);
     }
 
+    /**
+     * 
+     * @param layer the layer style to edit
+     */
     public void setLayer(MapLayer layer) {
         this.layer = layer;
     }
     
+    /**
+     * 
+     * @param exp String Expression of LineCap
+     */
     public void setLineCap(String exp) {
         if (exp != null) {
             if (exp.toLowerCase().equals("butt")) {
@@ -58,6 +68,10 @@ public class JLinecapPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * 
+     * @param exp Expression of LineCap
+     */
     public void setLineCap(Expression exp) {
         this.exp = exp;
         if (exp != null) {
@@ -71,6 +85,10 @@ public class JLinecapPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * 
+     * @return new Expression of LineCap
+     */
     public Expression getLinecap() {
         
         

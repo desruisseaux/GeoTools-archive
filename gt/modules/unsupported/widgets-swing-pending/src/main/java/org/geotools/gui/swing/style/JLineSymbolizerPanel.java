@@ -43,7 +43,7 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
     private MapLayer layer;
     
     /** Creates new form LineStylePanel
-     * @param layer
+     * @param layer the layer style to edit
      */
     public JLineSymbolizerPanel(MapLayer layer) {
         initComponents();
@@ -109,8 +109,7 @@ public class JLineSymbolizerPanel extends javax.swing.JPanel implements Symboliz
         StyleBuilder sb = new StyleBuilder();     
         return sb.createLineSymbolizer( GuiStroke.getStroke() );
     }
-    
-    
+        
     public Style getStyle() {
         StyleBuilder sb = new StyleBuilder();               
         Style style = sb.createStyle();

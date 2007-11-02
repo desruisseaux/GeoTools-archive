@@ -48,7 +48,7 @@ public class JPointSymbolizerPanel extends javax.swing.JPanel implements Symboli
     private MapLayer layer = null;
 
     /** Creates new form LineStylePanel
-     * @param layer
+     * @param layer the layer style to edit
      */
     public JPointSymbolizerPanel(MapLayer layer) {
         initComponents();

@@ -1,8 +1,19 @@
 /*
- * JExpressionDialog.java
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2007, GeoTools Project Managment Committee (PMC)
  *
- * Created on 19 octobre 2007, 15:40
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
+
 package org.geotools.gui.swing.style.sld;
 
 import java.util.Collection;
@@ -24,23 +35,38 @@ import org.opengis.filter.expression.Expression;
 
 /**
  *
- * @author  Administrateur
+ * @author johann Sorel
  */
 public class JExpressionDialog extends javax.swing.JDialog {
 
-    /** Creates new form JExpressionDialog */
+    /** 
+     * Creates new form JExpressionDialog 
+     */
     public JExpressionDialog() {
         this(null, null);
     }
 
+    /**
+     * 
+     * @param layer the layer to edit
+     */
     public JExpressionDialog(MapLayer layer) {
         this(layer, null);
     }
 
+    /**
+     * 
+     * @param exp the default expression
+     */
     public JExpressionDialog(Expression exp) {
         this(null, exp);
     }
 
+    /**
+     * 
+     * @param layer the layer to edit
+     * @param exp the default expression
+     */
     public JExpressionDialog(MapLayer layer, Expression exp) {
         initComponents();
 
@@ -68,6 +94,10 @@ public class JExpressionDialog extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * 
+     * @param layer the layer to edit
+     */
     public void setLayer(MapLayer layer) {
         lst_field.removeAll();
 
@@ -90,6 +120,10 @@ public class JExpressionDialog extends javax.swing.JDialog {
 
     }
 
+    /**
+     * 
+     * @param exp the default expression
+     */
     public void setExpression(Expression exp) {
 
         if (exp != null) {
@@ -100,6 +134,10 @@ public class JExpressionDialog extends javax.swing.JDialog {
 
     }
 
+    /**
+     * 
+     * @return Expression : New Expression
+     */
     public Expression getExpression() {
 
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);

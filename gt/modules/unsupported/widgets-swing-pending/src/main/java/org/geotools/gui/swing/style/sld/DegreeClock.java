@@ -32,21 +32,28 @@ import javax.swing.SwingUtilities;
  *
  * @author johann sorel
  */
-public class DegreeClock extends JComponent implements MouseMotionListener, MouseListener{
+class DegreeClock extends JComponent implements MouseMotionListener, MouseListener{
 
     private double degree = 0;
     public JDegreePanel pan = null;
     int X = 0;
     int Y = 0;
     
-    public DegreeClock(){
+    /**
+     * clock component to edit degrees
+     */
+    DegreeClock(){
         super();
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         setDegree(0);
     }
     
-    public void setPan(JDegreePanel pan) {
+    /**
+     * 
+     * @param pan related JdegreePanel
+     */
+    void setPan(JDegreePanel pan) {
         this.pan = pan;
     }
     
@@ -67,7 +74,7 @@ public class DegreeClock extends JComponent implements MouseMotionListener, Mous
        
     }
 
-    public void update(MouseEvent e){
+    void update(MouseEvent e){
         
         int mouseX = e.getX();
         int mouseY = e.getY();
@@ -99,7 +106,7 @@ public class DegreeClock extends JComponent implements MouseMotionListener, Mous
         
     }
     
-    public void setDegree(double degree){
+    void setDegree(double degree){
                        
         double cos = Math.cos( Math.toRadians(degree));
         double sin = Math.sin( Math.toRadians(degree));
@@ -122,7 +129,7 @@ public class DegreeClock extends JComponent implements MouseMotionListener, Mous
         });        
     }
     
-    public double getDegree(){
+    double getDegree(){
         return degree;
     }
     

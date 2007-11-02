@@ -25,19 +25,18 @@ import org.opengis.filter.expression.Expression;
  */
 public class JDegreePanel extends javax.swing.JPanel {
 
-    /** Creates new form JDegreePanel */
+    /** 
+     * Creates new form JDegreePanel 
+     */
     public JDegreePanel() {
         initComponents();
         clock.setPan(this);
     }
 
-    //    public void setDegree(double degree){
-//        
-//    }
-//    
-//    public double getDegree(){       
-//        return clock.getDegree();
-//    }
+    /**
+     * 
+     * @param exp the default expression
+     */
     public void setExpression(Expression exp) {
             
         exptxt.setExpression(exp);
@@ -48,6 +47,10 @@ public class JDegreePanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * 
+     * @return Expression : new Expression
+     */
     public Expression getExpression() {
         return exptxt.getExpression();
     }
@@ -59,6 +62,10 @@ public class JDegreePanel extends javax.swing.JPanel {
         exptxt.setExpression(sb.literalExpression(val));
     }
 
+    /**
+     * 
+     * @param layer the layer to edit
+     */
     public void setLayer(MapLayer layer){
         exptxt.setLayer(layer);
     }

@@ -36,7 +36,9 @@ public class JRasterSymbolizerPanel extends javax.swing.JPanel implements Symbol
     
     
     
-    /** Creates new form RasterStylePanel */
+    /** Creates new form RasterStylePanel
+     * @param layer the layer style to edit
+     */
     public JRasterSymbolizerPanel(MapLayer layer) {
         super();
         initComponents();

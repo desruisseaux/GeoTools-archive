@@ -39,7 +39,7 @@ import org.geotools.styling.Symbolizer;
 public class JPolygonSymbolizerPanel extends javax.swing.JPanel implements SymbolizerPanel {
 
     /** Creates new form LineStylePanel
-     * @param layer
+     * @param layer the layer style to edit
      */
     public JPolygonSymbolizerPanel(MapLayer layer) {
         initComponents();

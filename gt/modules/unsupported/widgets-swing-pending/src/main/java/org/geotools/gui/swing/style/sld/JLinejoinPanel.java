@@ -32,7 +32,9 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     private Expression exp = null;
     
     
-    /** Creates new form JLinecapPanel */
+    /** 
+     * Creates new form JLinecapPanel 
+     */
     public JLinejoinPanel() {
         initComponents();
         but_round.setIcon( IconBundle.getResource().getIcon("16_linejoin_round"));
@@ -42,11 +44,19 @@ public class JLinejoinPanel extends javax.swing.JPanel {
         but_round.setSelected(true);
     }
     
+    /**
+     * 
+     * @param layer the layer style to edit
+     */
     public void setLayer(MapLayer layer) {
         this.layer = layer;
     }
     
     
+    /**
+     * 
+     * @param exp String to parse
+     */
     public void setLineJoin(String exp){
                 
         if( "bevel".equals(exp.toLowerCase()) )
@@ -57,6 +67,10 @@ public class JLinejoinPanel extends javax.swing.JPanel {
             but_round.setSelected(true);        
     }
     
+    /**
+     * 
+     * @param exp Expression of the linejoin
+     */
     public void setLineJoin(Expression exp){
                 
         this.exp = exp;
@@ -73,6 +87,10 @@ public class JLinejoinPanel extends javax.swing.JPanel {
     }
        
     
+    /**
+     * 
+     * @return Expression : new Expression of LineJoin
+     */
     public Expression getLineJoin(){
         
         if(exp != null){

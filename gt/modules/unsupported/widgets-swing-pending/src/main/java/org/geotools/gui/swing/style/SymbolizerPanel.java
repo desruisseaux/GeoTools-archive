@@ -26,10 +26,23 @@ import org.geotools.styling.Symbolizer;
  */
 public interface SymbolizerPanel {
 
+    /**
+     * 
+     * @return return a Point,ligne,polygon or raster symbolizer
+     */
     public Symbolizer getSymbolizer();
     
+    
+    /**
+     * 
+     * @return return a Style with only one rule and the symbolizer
+     */
     public Style getStyle();
             
+    /**
+     * 
+     * @return return the Component for symbolizer edition
+     */
     public JComponent getComponent();
     
 }

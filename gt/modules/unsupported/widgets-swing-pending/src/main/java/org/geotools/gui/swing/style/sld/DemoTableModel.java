@@ -37,6 +37,10 @@ public class DemoTableModel extends AbstractTableModel implements TableModel {
 
     Rule[] rules = null;
 
+    /**
+     * 
+     * @param demofile sld file containing style exemples
+     */
     public DemoTableModel(String demofile) {
 
         Configuration configuration = new SLDConfiguration();

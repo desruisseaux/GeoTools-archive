@@ -28,17 +28,27 @@ import org.geotools.styling.StyleBuilder;
 public class JFillPanel extends javax.swing.JPanel {
 
     
-    /** Creates new form JFillPanel */
+    /** 
+     * Creates new form JFillPanel 
+     */
     public JFillPanel() {
         initComponents();
                 
     }
 
+    /**
+     * 
+     * @param layer the layer style to edit
+     */
     public void setLayer(MapLayer layer){
         GuiFillColor.setLayer(layer);
         GuiFillAlpha.setLayer(layer);
     }
     
+    /**
+     * 
+     * @param fill The fill to edit
+     */
     public void parseFill(Fill fill) {
         if (fill != null) {
             // TODO : not yet implemented
@@ -51,6 +61,10 @@ public class JFillPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * 
+     * @return Fill : new Fill
+     */
     public Fill getFill() {
         StyleBuilder sb = new StyleBuilder();
         return sb.createFill(GuiFillColor.getExpression(), GuiFillAlpha.getExpression());

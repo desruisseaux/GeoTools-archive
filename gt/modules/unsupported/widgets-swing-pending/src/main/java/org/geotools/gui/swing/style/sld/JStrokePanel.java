@@ -34,7 +34,9 @@ public class JStrokePanel extends javax.swing.JPanel {
     //private JExpressionDialog dialog = new JExpressionDialog();
     private MapLayer layer = null;
 
-    /** Creates new form JStrokePanel */
+    /** 
+     * Creates new form JStrokePanel 
+     */
     public JStrokePanel() {
         super();
         initComponents();
@@ -45,6 +47,10 @@ public class JStrokePanel extends javax.swing.JPanel {
         //GuiStrokeWidth.setFloatable(false);
     }
 
+    /**
+     * 
+     * @param layer the layer style to edit
+     */
     public void setLayer(MapLayer layer) {
         this.layer = layer;
         GuiStrokeWidth.setLayer(layer);
@@ -54,6 +60,10 @@ public class JStrokePanel extends javax.swing.JPanel {
         GuiStrokeLineJoin.setLayer(layer);
     }
 
+    /**
+     * 
+     * @param stroke the stroke to edit
+     */
     public void parseStroke(Stroke stroke) {
         if (stroke != null) {
             // TODO : not yet implemented
@@ -69,6 +79,10 @@ public class JStrokePanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * 
+     * @return Stroke : a new Stroke result from the edit panel
+     */
     public Stroke getStroke() {
         StyleBuilder sb = new StyleBuilder();
 

@@ -31,10 +31,17 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  */
 public class JDemoTable extends JXTable{
 
+    /**
+     * Table for style exemple
+     */
     public JDemoTable(){
         super();
     }
         
+    /**
+     * 
+     * @param sldsource path to sld file
+     */
     public void setSLDSource(String sldsource){
         setModel(new DemoTableModel(sldsource ));
         setHorizontalScrollEnabled(false);
