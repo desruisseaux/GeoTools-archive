@@ -68,11 +68,12 @@ import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.postgresql.jdbc3.Jdbc3Array;
 
+
 /**
  *
  * @author johann sorel
  */
-public class DemoSwingGeowidgets extends javax.swing.JFrame {
+public class DemoAll extends javax.swing.JFrame {
 
     private ImageIcon ICO_CHECK = IconBundle.getResource().getIcon("16_check");
     private ImageIcon ICO_ERROR = IconBundle.getResource().getIcon("16_error");
@@ -88,7 +89,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
-    public DemoSwingGeowidgets() {
+    public DemoAll() {
         initComponents();
         setLocationRelativeTo(null);
 
@@ -103,7 +104,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
             //_context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             _context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
             hash = new HashMap();
-            hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
+            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
             store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RandomStyleFactory.createRandomVectorStyle(fs);
@@ -113,7 +114,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
             _layer = layer;
 
             hash = new HashMap();
-            hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
+            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
             store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RandomStyleFactory.createRandomVectorStyle(fs);
@@ -122,7 +123,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
             _context.addLayer(layer);
 
             hash = new HashMap();
-            hash.put("url", DemoSwingGeowidgets.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
+            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
             store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RandomStyleFactory.createRandomVectorStyle(fs);
@@ -604,7 +605,7 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
         }
 
 
-        new DemoSwingGeowidgets().setVisible(true);
+        new DemoAll().setVisible(true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBoxMenuItem chk_database;
@@ -643,7 +644,6 @@ public class DemoSwingGeowidgets extends javax.swing.JFrame {
     private org.jdesktop.swingx.JXTitledPanel titled_jcontexttree;
     // End of variables declaration//GEN-END:variables
 }
-
 class ContextTreeListener extends JXTitledPanel implements TreeListener {
 
     private JTextArea txt = new JTextArea();
