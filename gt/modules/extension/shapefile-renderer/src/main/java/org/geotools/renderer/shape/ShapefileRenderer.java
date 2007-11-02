@@ -1422,6 +1422,7 @@ public class ShapefileRenderer implements GTRenderer {
 		renderer.setContext(context);
 		renderer.setJava2DHints(getJava2DHints());
 		Map rendererHints2 = new HashMap(getRendererHints() != null ? getRendererHints() : Collections.EMPTY_MAP);
+		rendererHints2.put(LABEL_CACHE_KEY, new IntegratingLabelCache(labelCache));
 		renderer.setRendererHints(rendererHints2);
 		renderer.paint(graphics, paintArea, envelope, transform);
 	}
