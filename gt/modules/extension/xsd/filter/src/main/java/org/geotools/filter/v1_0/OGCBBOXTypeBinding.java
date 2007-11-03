@@ -21,7 +21,10 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gml2.GML;
+import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -52,9 +55,15 @@ import org.geotools.xml.Node;
  */
 public class OGCBBOXTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
+    private CoordinateReferenceSystem crs;
 
-    public OGCBBOXTypeBinding(FilterFactory factory) {
-        this.factory = factory;
+    public OGCBBOXTypeBinding() {
+        //(JD) TODO: fix this. The reason we dont use constructor injection to get 
+        // the factory is that pico does not do both setter + constructor injection
+        // And since we support setter injection of a crs we just fall back on 
+        // common factory finder... since there is actually only one filter factory
+        // impl not a huge deal, but it woul dbe nice to be consistent
+        factory = CommonFactoryFinder.getFilterFactory(null);
     }
 
     /**
@@ -62,6 +71,17 @@ public class OGCBBOXTypeBinding extends AbstractComplexBinding {
      */
     public QName getTarget() {
         return OGC.BBOXType;
+    }
+
+    /**
+     * Setter for crs.
+     * <p>
+     * This is used to allow containing entities (liek a wfs query) to provide
+     * a coordinate reference system in the context.
+     * </p>
+     */
+    public void setCRS(CoordinateReferenceSystem crs) {
+        this.crs = crs;
     }
 
     /**
@@ -87,6 +107,10 @@ public class OGCBBOXTypeBinding extends AbstractComplexBinding {
         Envelope box = (Envelope) node.getChildValue(Envelope.class);
         Node srsNode = node.getChild(Envelope.class).getAttribute("srsName");
         String srs = (srsNode != null) ? srsNode.getValue().toString() : null;
+
+        if ((srs == null) && (crs != null)) {
+            srs = GML2EncodingUtils.crs(crs);
+        }
 
         return factory.bbox(propertyName.getPropertyName(), box.getMinX(), box.getMinY(),
             box.getMaxX(), box.getMaxY(), srs);
