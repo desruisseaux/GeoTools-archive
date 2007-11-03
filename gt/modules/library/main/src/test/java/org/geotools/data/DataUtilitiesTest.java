@@ -25,6 +25,7 @@ import java.util.Set;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -32,6 +33,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.referencing.CRS;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -48,6 +50,7 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -529,6 +532,27 @@ public class DataUtilitiesTest extends DataTestCase {
     		assertTrue(filter1.equals(subFilter) || filter2.equals(subFilter));
     	}
 	}
+    
+    public void testSpecNoCRS() throws Exception {
+        String spec = "id:String,polygonProperty:Polygon";
+        SimpleFeatureType ft = DataUtilities.createType("testType", spec);
+        assertEquals(spec, DataUtilities.spec(ft));
+    }
+    
+    public void testSpecCRS() throws Exception {
+        String spec = "id:String,polygonProperty:Polygon:srid=32615";
+        SimpleFeatureType ft = DataUtilities.createType("testType", spec);
+        assertEquals(spec, DataUtilities.spec(ft));
+    }
+    
+    public void testSpecNotIdentifiable() throws Exception {
+        String spec = "id:String,polygonProperty:Polygon:srid=32615";
+        SimpleFeatureType ft = DataUtilities.createType("testType", spec);
+        CoordinateReferenceSystem crsNoId = CRS.parseWKT("PROJCS[\"Geoscience Australia Standard National Scale Lambert Projection\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS_1978\",6378135,298.26],TOWGS84[0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"Decimal_Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"central_meridian\",134.0],PARAMETER[\"latitude_of_origin\",0.0],PARAMETER[\"standard_parallel_1\",-18.0],PARAMETER[\"standard_parallel_2\",-36.0],UNIT[\"Meter\",1]]");
+        SimpleFeatureType transformedFt = FeatureTypes.transform(ft, crsNoId);
+        // since we cannot go back to a code with do a best effort encoding
+        assertEquals("id:String,polygonProperty:Polygon", DataUtilities.spec(transformedFt));
+    }
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(DataUtilitiesTest.class);

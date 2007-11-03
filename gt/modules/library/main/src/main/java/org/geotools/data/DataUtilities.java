@@ -57,10 +57,12 @@ import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.util.Converters;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -107,6 +109,8 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+import org.opengis.metadata.Identifier;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -1395,6 +1399,21 @@ public class DataUtilities {
             buf.append(type.getLocalName());
             buf.append(":");
             buf.append(typeMap(type.getType().getBinding()));
+            if(type instanceof GeometryDescriptor) {
+                GeometryDescriptor gd = (GeometryDescriptor) type;
+                if(gd.getCRS() != null && gd.getCRS().getIdentifiers() != null) {
+                    for (Iterator<ReferenceIdentifier> it = gd.getCRS().getIdentifiers().iterator(); it.hasNext();) {
+                        ReferenceIdentifier id = (ReferenceIdentifier) it.next();
+
+                        if ((id.getAuthority() != null)
+                                && id.getAuthority().getTitle().equals(Citations.EPSG.getTitle())) {
+                            buf.append(":srid=" + id.getCode());
+                            break;
+                        }
+                        
+                    }
+                }
+            }
 
             if (i < (types.size() - 1)) {
                 buf.append(",");
