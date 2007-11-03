@@ -23,8 +23,10 @@ import org.geotools.filter.IllegalFilterException;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Not;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
@@ -38,14 +40,14 @@ import org.opengis.filter.expression.Literal;
  */
 public class DuplicateFilterVisitorTest extends TestCase {
 
-    private org.opengis.filter.FilterFactory fac;
+    private org.opengis.filter.FilterFactory2 fac;
 
 	public DuplicateFilterVisitorTest(String testName) {
         super(testName);
     }
 
     protected void setUp() throws Exception {
-        fac = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
+        fac = CommonFactoryFinder.getFilterFactory2(GeoTools.getDefaultHints());
     }
     
     public void testLogicFilterDuplication() throws IllegalFilterException {
@@ -62,6 +64,7 @@ public class DuplicateFilterVisitorTest extends TestCase {
     	assertNotNull(newFilter);
     	assertEquals( and, newFilter );
     }    
+    
     public void testOptimizationExample(){
         Expression add = fac.add(fac.literal(1), fac.literal(2));
         class Optimization extends DuplicatingFilterVisitor {
@@ -79,5 +82,16 @@ public class DuplicateFilterVisitorTest extends TestCase {
         };
         Expression modified = (Expression) add.accept( new Optimization(), null );
         assertTrue( modified instanceof Literal );
+    }
+    
+    public void testNotFilter() {
+        // set GEOT-1566
+        PropertyIsLike like = fac.like(fac.property("stringProperty"), "ab*");
+        Not not = fac.not(like);
+        DuplicatingFilterVisitor visitor = new DuplicatingFilterVisitor(fac);
+        Not clone = (Not) not.accept(visitor, null);
+        assertEquals(not, clone);
+        assertNotSame(not, clone);
+        assertNotSame(like, clone.getFilter());
     }
 }

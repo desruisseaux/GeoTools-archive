@@ -135,7 +135,7 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 	}
 
 	public Object visit(Not filter, Object extraData) {
-		return getFactory(extraData).not(filter.getFilter());
+		return getFactory(extraData).not((Filter) filter.getFilter().accept(this, extraData));
 	}
 
 	public Object visit(Or filter, Object extraData) {
