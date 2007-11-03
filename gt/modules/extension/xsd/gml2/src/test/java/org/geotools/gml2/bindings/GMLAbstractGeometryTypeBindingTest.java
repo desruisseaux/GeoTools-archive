@@ -43,7 +43,7 @@ public class GMLAbstractGeometryTypeBindingTest extends GMLTestSupport {
 
     public void testEncode() throws Exception {
         Point p = GML2MockData.point();
-        p.setUserData(CRS.decode("EPSG:4326"));
+        p.setUserData(CRS.decode("EPSG:4326", true));
 
         Document doc = encode(p, GML.Point);
         assertEquals("http://www.opengis.net/gml/srs/epsg.xml#4326",

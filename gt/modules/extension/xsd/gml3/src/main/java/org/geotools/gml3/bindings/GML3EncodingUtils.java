@@ -24,6 +24,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.gml2.bindings.GML2EncodingUtils;
 import org.geotools.referencing.CRS;
 
 
@@ -51,16 +52,16 @@ public class GML3EncodingUtils {
             return null;
         }
 
-        for (Iterator i = crs.getIdentifiers().iterator(); i.hasNext();) {
-            Identifier id = (Identifier) i.next();
+        try {
+            String crsCode = GML2EncodingUtils.crs(crs);
 
-            try {
-                return new URI("urn:x-ogc:def:crs:EPSG:6.11.2:" + id.getCode());
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+            if (crsCode != null) {
+                return new URI(crsCode);
+            } else {
+                return null;
             }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 }
