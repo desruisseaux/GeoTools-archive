@@ -20,22 +20,24 @@ import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.*;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Binding object for the type http://www.opengis.net/wfs:BaseRequestType.
- *
+ * 
  * <p>
- *        <pre>
+ * 
+ * <pre>
  *         <code>
- *  &lt;xsd:complexType abstract="true" name="BaseRequestType"&gt;
+ *  &lt;xsd:complexType abstract=&quot;true&quot; name=&quot;BaseRequestType&quot;&gt;
  *      &lt;xsd:annotation&gt;
  *          &lt;xsd:documentation&gt;
  *              XML encoded WFS operation request base, for all operations
  *              except GetCapabilities.
  *           &lt;/xsd:documentation&gt;
  *      &lt;/xsd:annotation&gt;
- *      &lt;xsd:attribute default="WFS" name="service" type="ows:ServiceType" use="optional"&gt;
+ *      &lt;xsd:attribute default=&quot;WFS&quot; name=&quot;service&quot; type=&quot;ows:ServiceType&quot; use=&quot;optional&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                The service attribute is included to support service
@@ -54,7 +56,7 @@ import org.geotools.xml.*;
  *             &lt;/xsd:documentation&gt;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
- *      &lt;xsd:attribute default="1.1.0" name="version" type="xsd:string" use="optional"&gt;
+ *      &lt;xsd:attribute default=&quot;1.1.0&quot; name=&quot;version&quot; type=&quot;xsd:string&quot; use=&quot;optional&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                 The version attribute is used to indicate the version of the
@@ -67,7 +69,7 @@ import org.geotools.xml.*;
  *             &lt;/xsd:documentation&gt;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
- *      &lt;xsd:attribute name="handle" type="xsd:string" use="optional"&gt;
+ *      &lt;xsd:attribute name=&quot;handle&quot; type=&quot;xsd:string&quot; use=&quot;optional&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                 The handle attribute allows a client application
@@ -82,11 +84,11 @@ import org.geotools.xml.*;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
  *  &lt;/xsd:complexType&gt;
- *
- *          </code>
+ * </code>
  *         </pre>
+ * 
  * </p>
- *
+ * 
  * @generated
  */
 public class BaseRequestTypeBinding extends AbstractComplexEMFBinding {
@@ -102,24 +104,11 @@ public class BaseRequestTypeBinding extends AbstractComplexEMFBinding {
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
      * @generated modifiable
      */
     public Class getType() {
         return BaseRequestType.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object parse(ElementInstance instance, Node node, Object value)
-        throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, node, value);
     }
 }
