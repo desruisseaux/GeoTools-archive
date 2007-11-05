@@ -17,6 +17,7 @@ package org.geotools.filter;
 
 import java.math.BigInteger;
 
+import org.geotools.filter.expression.Value;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
 
@@ -233,6 +234,12 @@ public class LiteralExpressionImpl extends DefaultExpression
         }
         
         return literal;
+    }
+    
+    public Object evaluate(Object feature, Class context) {
+        
+        Value v = new Value( literal );
+        return v.value(context);
     }
 
     /**
