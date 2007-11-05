@@ -114,7 +114,7 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
         if (EObject.class.isAssignableFrom(getType()) && (factory != null)) {
             EObject eObject;
 
-            if (value == null) {
+            if (value == null || !(getType().isAssignableFrom(value.getClass())) ) {
                 // yes, try and use the factory to dynamically create a new instance
 
                 // get the classname
@@ -135,13 +135,10 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
 
                 // create the instance
                 eObject = (EObject) create.invoke(factory, null);
-            } else if (getType().isAssignableFrom(value.getClass())) {
+            } else {
                 // value already provided (e.g., by a subtype binding with
                 // BEFORE execution mode)
                 eObject = (EObject) value;
-            } else {
-                throw new IllegalStateException(
-                        "Properties for the value provided can't be reflectively set");
             }
             
             // reflectivley set the properties of it
