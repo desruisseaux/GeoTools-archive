@@ -15,37 +15,33 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.QueryType;
 import net.opengis.wfs.WfsFactory;
-import java.util.List;
 import javax.xml.namespace.QName;
-import org.opengis.filter.sort.SortBy;
-import org.geotools.filter.v1_1.OGC;
 import org.geotools.wfs.WFS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexEMFBinding;
 
 
 /**
  * Binding object for the type http://www.opengis.net/wfs:QueryType.
  *
  * <p>
- *        <pre>
+ *
+ * <pre>
  *         <code>
- *  &lt;xsd:complexType name="QueryType"&gt;
+ *  &lt;xsd:complexType name=&quot;QueryType&quot;&gt;
  *      &lt;xsd:annotation&gt;
  *          &lt;xsd:documentation&gt;
  *              The Query element is of type QueryType.
  *           &lt;/xsd:documentation&gt;
  *      &lt;/xsd:annotation&gt;
  *      &lt;xsd:sequence&gt;
- *          &lt;xsd:choice maxOccurs="unbounded" minOccurs="0"&gt;
- *              &lt;xsd:element ref="wfs:PropertyName"&gt;
+ *          &lt;xsd:choice maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot;&gt;
+ *              &lt;xsd:element ref=&quot;wfs:PropertyName&quot;&gt;
  *                  &lt;xsd:annotation&gt;
  *                      &lt;xsd:documentation&gt;
  *                     The Property element is used to specify one or more
  *                     properties of a feature whose values are to be retrieved
  *                     by a Web Feature Service.
- *
  *                     While a Web Feature Service should endeavour to satisfy
  *                     the exact request specified, in some instance this may
  *                     not be possible.  Specifically, a Web Feature Service
@@ -57,26 +53,24 @@ import org.geotools.xml.*;
  *                     may add them automatically to the Query before processing
  *                     it.  Thus a client application should, in general, be
  *                     prepared to receive more properties than it requested.
- *
  *                     Of course, using the DescribeFeatureType request, a client
  *                     application can determine which properties are mandatory
  *                     and request them in the first place.
  *                  &lt;/xsd:documentation&gt;
  *                  &lt;/xsd:annotation&gt;
  *              &lt;/xsd:element&gt;
- *              &lt;xsd:element ref="wfs:XlinkPropertyName"/&gt;
- *              &lt;xsd:element ref="ogc:Function"&gt;
+ *              &lt;xsd:element ref=&quot;wfs:XlinkPropertyName&quot;/&gt;
+ *              &lt;xsd:element ref=&quot;ogc:Function&quot;&gt;
  *                  &lt;xsd:annotation&gt;
  *                      &lt;xsd:documentation&gt;
  *                     A function may be used as a select item in a query.
  *                     However, if a function is used, care must be taken
  *                     to ensure that the result type matches the type in the
- *
  *                  &lt;/xsd:documentation&gt;
  *                  &lt;/xsd:annotation&gt;
  *              &lt;/xsd:element&gt;
  *          &lt;/xsd:choice&gt;
- *          &lt;xsd:element maxOccurs="1" minOccurs="0" ref="ogc:Filter"&gt;
+ *          &lt;xsd:element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; ref=&quot;ogc:Filter&quot;&gt;
  *              &lt;xsd:annotation&gt;
  *                  &lt;xsd:documentation&gt;
  *                  The Filter element is used to define spatial and/or non-spatial
@@ -87,7 +81,7 @@ import org.geotools.xml.*;
  *               &lt;/xsd:documentation&gt;
  *              &lt;/xsd:annotation&gt;
  *          &lt;/xsd:element&gt;
- *          &lt;xsd:element maxOccurs="1" minOccurs="0" ref="ogc:SortBy"&gt;
+ *          &lt;xsd:element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; ref=&quot;ogc:SortBy&quot;&gt;
  *              &lt;xsd:annotation&gt;
  *                  &lt;xsd:documentation&gt;
  *                  The SortBy element is used specify property names whose
@@ -97,7 +91,7 @@ import org.geotools.xml.*;
  *              &lt;/xsd:annotation&gt;
  *          &lt;/xsd:element&gt;
  *      &lt;/xsd:sequence&gt;
- *      &lt;xsd:attribute name="handle" type="xsd:string" use="optional"&gt;
+ *      &lt;xsd:attribute name=&quot;handle&quot; type=&quot;xsd:string&quot; use=&quot;optional&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                 The handle attribute allows a client application
@@ -111,7 +105,7 @@ import org.geotools.xml.*;
  *              &lt;/xsd:documentation&gt;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
- *      &lt;xsd:attribute name="typeName" type="wfs:TypeNameListType" use="required"&gt;
+ *      &lt;xsd:attribute name=&quot;typeName&quot; type=&quot;wfs:TypeNameListType&quot; use=&quot;required&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                The typeName attribute is a list of one or more
@@ -125,7 +119,7 @@ import org.geotools.xml.*;
  *             &lt;/xsd:documentation&gt;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
- *      &lt;xsd:attribute name="featureVersion" type="xsd:string" use="optional"&gt;
+ *      &lt;xsd:attribute name=&quot;featureVersion&quot; type=&quot;xsd:string&quot; use=&quot;optional&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                For systems that implement versioning, the featureVersion
@@ -137,7 +131,7 @@ import org.geotools.xml.*;
  *             &lt;/xsd:documentation&gt;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
- *      &lt;xsd:attribute name="srsName" type="xsd:anyURI" use="optional"&gt;
+ *      &lt;xsd:attribute name=&quot;srsName&quot; type=&quot;xsd:anyURI&quot; use=&quot;optional&quot;&gt;
  *          &lt;xsd:annotation&gt;
  *              &lt;xsd:documentation&gt;
  *                This attribute is used to specify a specific WFS-supported SRS
@@ -152,9 +146,9 @@ import org.geotools.xml.*;
  *          &lt;/xsd:annotation&gt;
  *      &lt;/xsd:attribute&gt;
  *  &lt;/xsd:complexType&gt;
- *
- *          </code>
+ * </code>
  *         </pre>
+ *
  * </p>
  *
  * @generated
