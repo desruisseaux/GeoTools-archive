@@ -19,7 +19,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,12 +92,12 @@ public class EMFUtils {
             collection.addAll(collection(value));
         }
     }
-    
+
     /**
      * Returns a collection view for value, taking care of the case where value
      * is of an array type, in which case the collection returned contains the
      * array elements, not the array itself.
-     * 
+     *
      * @param value a value to be added to an EObject collection property
      * @return value wrapped in a collection, or a collection containing the
      * array elements in case value is an array.
@@ -110,14 +109,17 @@ public class EMFUtils {
         } else if (value.getClass().isArray()) {
             final int len = java.lang.reflect.Array.getLength(value);
             List list = new ArrayList(len);
+
             for (int i = 0; i < len; i++) {
                 Object val = Array.get(value, i);
                 list.add(val);
             }
+
             return list;
         } else if (value instanceof Collection) {
             return (Collection) value;
         }
+
         return Collections.singletonList(value);
     }
 

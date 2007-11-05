@@ -114,7 +114,7 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
         if (EObject.class.isAssignableFrom(getType()) && (factory != null)) {
             EObject eObject;
 
-            if (value == null || !(getType().isAssignableFrom(value.getClass())) ) {
+            if ((value == null) || !(getType().isAssignableFrom(value.getClass()))) {
                 // yes, try and use the factory to dynamically create a new instance
 
                 // get the classname
@@ -140,7 +140,7 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
                 // BEFORE execution mode)
                 eObject = (EObject) value;
             }
-            
+
             // reflectivley set the properties of it
             for (Iterator c = node.getChildren().iterator(); c.hasNext();) {
                 Node child = (Node) c.next();
