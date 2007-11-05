@@ -112,28 +112,39 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
         throws Exception {
         //does this binding actually map to an eObject?
         if (EObject.class.isAssignableFrom(getType()) && (factory != null)) {
-            //yes, try and use the factory to dynamically create a new instance
+            EObject eObject;
 
-            //get the classname
-            String className = getType().getName();
-            int index = className.lastIndexOf('.');
+            if (value == null) {
+                // yes, try and use the factory to dynamically create a new instance
 
-            if (index != -1) {
-                className = className.substring(index + 1);
+                // get the classname
+                String className = getType().getName();
+                int index = className.lastIndexOf('.');
+
+                if (index != -1) {
+                    className = className.substring(index + 1);
+                }
+
+                // find the proper create method
+                Method create = factory.getClass().getMethod("create" + className, null);
+
+                if (create == null) {
+                    // no dice
+                    return value;
+                }
+
+                // create the instance
+                eObject = (EObject) create.invoke(factory, null);
+            } else if (getType().isAssignableFrom(value.getClass())) {
+                // value already provided (e.g., by a subtype binding with
+                // BEFORE execution mode)
+                eObject = (EObject) value;
+            } else {
+                throw new IllegalStateException(
+                        "Properties for the value provided can't be reflectively set");
             }
-
-            //find the proper create method
-            Method create = factory.getClass().getMethod("create" + className, null);
-
-            if (create == null) {
-                //no dice
-                return value;
-            }
-
-            //create the instance
-            EObject eObject = (EObject) create.invoke(factory, null);
-
-            //reflectivley set the properties of it
+            
+            // reflectivley set the properties of it
             for (Iterator c = node.getChildren().iterator(); c.hasNext();) {
                 Node child = (Node) c.next();
                 String property = child.getComponent().getName();
