@@ -24,7 +24,8 @@ import org.geotools.xml.XSD;
 
 /**
  * This interface contains the qualified names of all the types,elements, and
- * attributes in the http://www.opengis.net/wfs schema.
+ * attributes in the <code>http://www.opengis.net/wfs</code> for the
+ * <code>http://schemas.opengis.net/wfs/1.1.0/wfs.xsd</code> schema.
  *
  * @generated
  */
