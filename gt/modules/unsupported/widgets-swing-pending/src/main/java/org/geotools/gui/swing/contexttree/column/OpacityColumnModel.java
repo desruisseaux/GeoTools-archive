@@ -50,34 +50,34 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.opengis.filter.expression.Expression;
 
+
 /**
  * @author johann sorel
  */
-public class OpacityColumnModel implements ColumnModel {
+public class OpacityColumnModel extends ContextTreeColumn {
 
-    private boolean edit = true;
-    private TableColumnExt col = new TableColumnExt();
 
     /**
      * Creates a new instance of JXVisibleColumn
      */
     public OpacityColumnModel() {
+        super();
         ColumnHeader head1 = new ColumnHeader(TextBundle.getResource().getString("col_opacity"), new JLabel(IconBundle.getResource().getIcon("16_opacity")));
 
-        TableCellRenderer headerRenderer = new HeaderRenderer(head1);
 
-        col.setHeaderValue(head1);
-        col.setHeaderRenderer(headerRenderer);
+        setHeaderValue(head1);
+        setHeaderRenderer( new HeaderRenderer(head1) );
 
         ComponentProvider myProvider = new OpacityCellProvider();
-        col.setCellRenderer(new OpacityCellRenderer(myProvider));
-        col.setCellEditor(new Edito());
+        setCellRenderer(new OpacityCellRenderer(myProvider));
+        setCellEditor(new Edito());
 
-        col.setResizable(false);
-        col.setMaxWidth(60);
-        col.setMinWidth(60);
-        col.setPreferredWidth(60);
-        col.setWidth(25);
+        setEditable(true);
+        setResizable(false);
+        setMaxWidth(60);
+        setMinWidth(60);
+        setPreferredWidth(60);
+        setWidth(25);
     }
 
     public void setValue(Object target, Object value) {
@@ -96,31 +96,28 @@ public class OpacityColumnModel implements ColumnModel {
         return TextBundle.getResource().getString("col_symbol");
     }
 
-    public boolean isEditable() {
-        return edit;
-    }
-
+    
     public boolean isCellEditable(Object target) {
 
         if (target instanceof MapLayer) {
-            return edit;
+            return isEditable();
         } else {
             return false;
         }
     }
 
-    public void setEditable(boolean edit) {
-        this.edit = edit;
-    }
 
     public Class getColumnClass() {
         return Boolean.class;
     }
 
-    public TableColumnExt getTableColumnExt() {
-        return col;
+
+    @Override
+    public boolean isEditableOnMouseOver() {
+        return true;
     }
 }
+
 
 class Edito extends AbstractCellEditor implements TableCellEditor {
 

@@ -23,7 +23,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 
@@ -35,14 +35,14 @@ import org.geotools.map.MapContext;
 public class ContextActivePopupComponent extends JCheckBoxMenuItem implements PopupComponent{
     
     private MapContext context;
-    private JContextTree xtree ;
+    private TreeTable xtree ;
     
     
     /** 
      * Creates a new instance of ContextActiveControl 
      * @param tree 
      */
-    public ContextActivePopupComponent(JContextTree tree) {
+    public ContextActivePopupComponent(TreeTable tree) {
         this.setText( TextBundle.getResource().getString("activated")  );
         xtree = tree;
         init();
@@ -52,7 +52,7 @@ public class ContextActivePopupComponent extends JCheckBoxMenuItem implements Po
     
     public Component getComponent(Object obj, ContextTreeNode node) {
         context = (MapContext)obj;
-        this.setSelected( context.equals(xtree.getActiveContext()));
+        this.setSelected( context.equals(xtree.getTreeTableModel().getActiveContext()));
         
         return this;
     }
@@ -63,9 +63,9 @@ public class ContextActivePopupComponent extends JCheckBoxMenuItem implements Po
             public void actionPerformed(ActionEvent e) {
                 if(isSelected()){
                     if(xtree != null && context != null)
-                        xtree.setActiveContext(context);
+                        xtree.getTreeTableModel().setActiveContext(context);
                 } else if(xtree != null){
-                    xtree.setActiveContext(null);
+                    xtree.getTreeTableModel().setActiveContext(null);
                 }
             }
         });

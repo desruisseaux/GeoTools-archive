@@ -49,6 +49,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.column.VisibleColumnModel;
 import org.geotools.gui.swing.contexttree.popup.LayerDeletePopupComponent;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyPopupComponent;
@@ -198,9 +199,10 @@ public class DemoExplorer extends JFrame {
         lst.add(new LayerFeaturePropertyPanel());
         feature.setPropertyPanels(lst);
 
-        tree.getPopup().addPopControl(zoom);
-        tree.getPopup().addPopControl(feature);
-        tree.getPopup().addPopControl(new LayerDeletePopupComponent());
+        JContextTreePopup popup = (JContextTreePopup) tree.getTreeTable().getComponentPopupMenu();
+        popup.addPopControl(zoom);
+        popup.addPopControl(feature);
+        popup.addPopControl(new LayerDeletePopupComponent());
         tree.addColumnModel(new VisibleColumnModel());
         tree.setPreferredSize(new Dimension(250, 250));
         try {

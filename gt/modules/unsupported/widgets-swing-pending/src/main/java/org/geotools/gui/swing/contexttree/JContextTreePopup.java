@@ -45,8 +45,7 @@ public class JContextTreePopup extends JPopupMenu {
     
     
     private ArrayList<PopupComponent> controls = new ArrayList<PopupComponent>();
-    private JContextTree tree;
-    private JXTreeTable treetable;
+    private TreeTable treetable;
     
     
     /**
@@ -64,9 +63,8 @@ public class JContextTreePopup extends JPopupMenu {
      * @param tree the tree related to the poup
      * @param treetable 
      */
-    JContextTreePopup(JContextTree tree, JXTreeTable treetable) {
+    JContextTreePopup(TreeTable treetable) {
         super();
-        this.tree = tree;
         this.treetable = treetable;
     }
     
@@ -84,9 +82,9 @@ public class JContextTreePopup extends JPopupMenu {
         addPopControl(new LayerPropertyPopupComponent());
         
         //context popup
-        addPopControl(new ContextActivePopupComponent(tree));
+        addPopControl(new ContextActivePopupComponent(treetable));
         addSeparator(MapContext.class);
-        addPopControl(new ContextDeletePopupComponent(tree));
+        addPopControl(new ContextDeletePopupComponent(treetable));
         addSeparator(MapContext.class);
         addPopControl(new ContextPropertyPopupComponent());
         
@@ -129,7 +127,7 @@ public class JContextTreePopup extends JPopupMenu {
         
         ContextTreeNode node = null;
         
-        if(tree != null){
+        if(treetable != null){
             try{
                 Point location = treetable.getMousePosition();
                 TreePath path = treetable.getPathForLocation(location.x, location.y);
@@ -158,8 +156,7 @@ public class JContextTreePopup extends JPopupMenu {
         
     }
     
-    public void setTree(JContextTree tree, JXTreeTable treetable) {
-        this.tree = tree;
+    public void setTree(TreeTable treetable) {
         this.treetable = treetable;
     }
     

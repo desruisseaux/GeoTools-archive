@@ -23,7 +23,7 @@ import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.geotools.gui.swing.contexttree.column.ColumnModel;
+import org.geotools.gui.swing.contexttree.column.ContextTreeColumn;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -46,7 +46,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     public static final int TREE = 0;
     private MapContext activeContext;
     private boolean treeedit = true;
-    private ArrayList<ColumnModel> columns = new ArrayList<ColumnModel>();
+    private ArrayList<ContextTreeColumn> columns = new ArrayList<ContextTreeColumn>();
     private Vector columnNames = new Vector();
 
     /**
@@ -161,19 +161,19 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * add a new column in the model
      * @param model the new column model
      */
-    void addColumnModel(ColumnModel model) {
+    void addColumnModel(ContextTreeColumn model) {
         columns.add(model);
         columnNames.add(model.getName());
         setColumnIdentifiers(columnNames);
 
-        model.getTableColumnExt().setModelIndex(columns.indexOf(model) + 1);
+        model.setModelIndex(columns.indexOf(model) + 1);
     }
 
     /**
      * get the list of column
      * @return list of column models
      */
-    ArrayList<ColumnModel> getColumnModels() {
+    ArrayList<ContextTreeColumn> getColumnModels() {
         return columns;
     }
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * get the active context
      * @return return the active MapContext, if none return null
      */
-    MapContext getActiveContext() {
+    public MapContext getActiveContext() {
         return activeContext;
     }
 
@@ -192,7 +192,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * active the context if in the tree
      * @param context the mapcontext to active
      */
-    void setActiveContext(MapContext context) {
+    public void setActiveContext(MapContext context) {
 
         if (getMapContextIndex(context) >= 0) {
             ContextTreeNode node;
@@ -218,7 +218,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * add context to the Tree if not allready in it
      * @param context the context to add
      */
-    void addMapContext(MapContext context) {
+    public void addMapContext(MapContext context) {
 
         if (getMapContextIndex(context) < 0) {
             context.addMapLayerListListener(this);
@@ -243,7 +243,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * remove context from the tree
      * @param context target mapcontext to remove
      */
-    void removeMapContext(MapContext context) {
+    public void removeMapContext(MapContext context) {
 
         for (int i = 0; i < getRoot().getChildCount(); i++) {
             ContextTreeNode jm = (ContextTreeNode) getRoot().getChildAt(i);
@@ -265,7 +265,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * count MapContext in the tree
      * @return number of mapcontext in the tree
      */
-    int getMapContextCount() {
+    public int getMapContextCount() {
         return getRoot().getChildCount();
     }
 
@@ -274,7 +274,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param i position of the mapcontext
      * @return the mapcontext a position i
      */
-    MapContext getMapContext(int i) {
+    public MapContext getMapContext(int i) {
         return (MapContext) ((ContextTreeNode)getRoot().getChildAt(i)).getUserObject();
     }
 
@@ -283,7 +283,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param context the mapcontext to find
      * @return index of context
      */
-    int getMapContextIndex(MapContext context) {
+    public int getMapContextIndex(MapContext context) {
         int ret = -1;
 
         if (context != null) {
@@ -419,7 +419,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param mapcontext the added mapcontext
      * @param position the position of the mapcontext in the tree
      */
-    void fireContextAdded(MapContext mapcontext, int position) {
+    public void fireContextAdded(MapContext mapcontext, int position) {
         TreeEvent kevent = new TreeEvent(this, mapcontext, position);
 
         TreeListener[] list = getTreeListeners();
@@ -433,7 +433,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param mapcontext the removed mapcontext
      * @param position the last position of the mapcontext
      */
-    void fireContextRemoved(MapContext mapcontext, int position) {
+    public void fireContextRemoved(MapContext mapcontext, int position) {
         TreeEvent event = new TreeEvent(this, mapcontext, position);
 
         TreeListener[] list = getTreeListeners();
@@ -447,7 +447,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param mapcontext the activated mapcontext (null if none activated)
      * @param index the position of the activated context
      */
-    void fireContextActivated(MapContext mapcontext, int index) {
+    public void fireContextActivated(MapContext mapcontext, int index) {
         TreeEvent event = new TreeEvent(this, mapcontext, index);
 
         TreeListener[] list = getTreeListeners();
@@ -462,7 +462,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param begin the start position of the mapcontext
      * @param end the end position of the mapcontext
      */
-    void fireContextMoved(MapContext mapcontext, int begin, int end) {
+    public void fireContextMoved(MapContext mapcontext, int begin, int end) {
         TreeEvent event = new TreeEvent(this, mapcontext, begin, end);
 
         TreeListener[] list = getTreeListeners();
@@ -475,7 +475,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * add treeListener to Model
      * @param ker the new listener
      */
-    void addTreeListener(TreeListener ker) {
+    public void addTreeListener(TreeListener ker) {
         listeners.add(TreeListener.class, ker);
     }
 
@@ -483,7 +483,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * remove treeListener from Model
      * @param ker the listner to remove
      */
-    void removeTreeListener(TreeListener ker) {
+    public void removeTreeListener(TreeListener ker) {
         listeners.remove(TreeListener.class, ker);
     }
 
@@ -491,7 +491,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * get treeListeners list
      * @return the listener's table
      */
-    TreeListener[] getTreeListeners() {
+    public TreeListener[] getTreeListeners() {
         return listeners.getListeners(TreeListener.class);
     }
 ////////////////////////////////////////////////////////////////////////////////

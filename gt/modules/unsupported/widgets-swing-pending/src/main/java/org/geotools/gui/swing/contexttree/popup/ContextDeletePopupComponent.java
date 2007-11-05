@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
@@ -37,13 +38,13 @@ import org.geotools.map.MapContext;
 public class ContextDeletePopupComponent extends JMenuItem implements PopupComponent{
     
     private MapContext context;
-    private JContextTree xtree ;
+    private TreeTable xtree ;
     
     /** 
      * Creates a new instance of ContextDeleteControl 
      * @param tree 
      */
-    public ContextDeletePopupComponent( JContextTree tree ) {
+    public ContextDeletePopupComponent( TreeTable tree ) {
         super();
         init();
         setText( TextBundle.getResource().getString("delete")  );
@@ -70,7 +71,7 @@ public class ContextDeletePopupComponent extends JMenuItem implements PopupCompo
                 int answer = JOptionPane.showConfirmDialog(null, TextBundle.getResource().getString("delete_question"), TextBundle.getResource().getString("confirm"),JOptionPane.YES_NO_OPTION);
                    
                 if(answer == JOptionPane.YES_OPTION && context != null && xtree != null)                 
-                        xtree.removeMapContext(context);
+                        xtree.getTreeTableModel().removeMapContext(context);
                                                         
             }
         });

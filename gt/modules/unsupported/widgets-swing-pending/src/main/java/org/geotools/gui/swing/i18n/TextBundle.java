@@ -31,6 +31,7 @@ public class TextBundle {
     
     private TextBundle() {
         bundles.add( ResourceBundle.getBundle("org/geotools/gui/swing/i18n/translate") );
+        bundles.add( ResourceBundle.getBundle("org/geotools/gui/swing/i18n/trs_fileformat") );
     }
     
         

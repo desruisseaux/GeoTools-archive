@@ -30,6 +30,7 @@ import org.geotools.data.postgis.PostgisDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -44,7 +45,7 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  */
 public class TreeNodeProvider extends ComponentProvider<JLabel> {
     
-    private JContextTree tree;
+    private TreeTable tree;
     public static final ImageIcon ICON_LAYER_VISIBLE = IconBundle.getResource().getIcon("16_maplayer_visible");
     public static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");
     
@@ -59,7 +60,7 @@ public class TreeNodeProvider extends ComponentProvider<JLabel> {
     public static final ImageIcon ICON_CONTEXT_DESACTIVE = IconBundle.getResource().getIcon("16_mapcontext_disable");
 
     
-    public TreeNodeProvider(JContextTree tree) {
+    public TreeNodeProvider(TreeTable tree) {
         this.tree = tree;
         rendererComponent = new JLabel();
     }
@@ -78,7 +79,7 @@ public class TreeNodeProvider extends ComponentProvider<JLabel> {
     protected void format(CellContext arg0) {
         ContextTreeNode node  = (ContextTreeNode) arg0.getValue();
         if(node.getUserObject() instanceof MapContext) {
-            if(node.getUserObject().equals(tree.getActiveContext())) {
+            if(node.getUserObject().equals(tree.getTreeTableModel().getActiveContext())) {
                 rendererComponent.setIcon( ICON_CONTEXT_ACTIVE );
                 rendererComponent.setFont(new Font("Tahoma",Font.BOLD,10));
             } else{

@@ -45,35 +45,33 @@ import org.jdesktop.swingx.table.TableColumnExt;
 /**
  * @author johann sorel
  */
-public class StyleColumnModel implements ColumnModel{
+public class StyleColumnModel extends ContextTreeColumn {
     
-    private boolean edit = true;
-    private TableColumnExt col = new TableColumnExt();
     
     /**
      * Creates a new instance of JXVisibleColumn
      */
     public StyleColumnModel() {
+        super();
         ColumnHeader head1 = new ColumnHeader(
                 TextBundle.getResource().getString("col_symbol"),
                 new JLabel( IconBundle.getResource().getIcon("16_style") )
                 
                 );
-        
-        TableCellRenderer headerRenderer = new HeaderRenderer(head1);
-        
-        col.setHeaderValue(head1);
-        col.setHeaderRenderer(headerRenderer);
+                
+        setHeaderValue(head1);
+        setHeaderRenderer(new HeaderRenderer(head1));
         
         ComponentProvider myProvider = new StyleCellProvider();
-        col.setCellRenderer( new StyleCellRenderer(myProvider) );
-        col.setCellEditor( new Editor() );
+        setCellRenderer( new StyleCellRenderer(myProvider) );
+        setCellEditor( new Editor() );
         
-        col.setResizable(false);
-        col.setMaxWidth(25);
-        col.setMinWidth(25);
-        col.setPreferredWidth(25);
-        col.setWidth(25);
+        setEditable(true);
+        setResizable(false);
+        setMaxWidth(25);
+        setMinWidth(25);
+        setPreferredWidth(25);
+        setWidth(25);
     }
     
     
@@ -92,28 +90,26 @@ public class StyleColumnModel implements ColumnModel{
         return TextBundle.getResource().getString("col_symbol");
     }
     
-    public boolean isEditable() {
-        return edit;
-    }
+    
     
     public boolean isCellEditable(Object target){
         
         if(target instanceof MapLayer)
-            return edit;
+            return isEditable();
         else
             return false;
     }
     
-    public void setEditable(boolean edit) {
-        this.edit = edit;
-    }
+    
     
     public Class getColumnClass() {
         return Boolean.class;
     }
     
-    public TableColumnExt getTableColumnExt() {
-        return col;
+    
+    @Override
+    public boolean isEditableOnMouseOver() {
+        return true;
     }
     
 }

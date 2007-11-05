@@ -19,27 +19,22 @@ package org.geotools.gui.swing.contexttree.column;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
+ *
  * @author johann sorel
  */
-public interface ColumnModel {
-    
-    
-    public void setValue(Object target,Object value);
-    
-    public Object getValue(Object target);
-    
-    public Class getColumnClass();
-    
-    public String getName();
-    
-    public boolean isEditable();
-    
-    public void setEditable(boolean edit);
+public abstract class ContextTreeColumn extends TableColumnExt{
 
-    public boolean isCellEditable(Object target);
+    public abstract void setValue(Object target,Object value);
     
-    public TableColumnExt getTableColumnExt();
-            
+    public abstract Object getValue(Object target);
+    
+    public abstract Class getColumnClass();
+    
+    public abstract String getName();
+
+    public abstract boolean isCellEditable(Object target);
+    
+    public abstract boolean isEditableOnMouseOver();
     
     
 }
