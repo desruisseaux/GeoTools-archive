@@ -19,8 +19,11 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -87,8 +90,35 @@ public class EMFUtils {
 
         if ((feature != null) && isCollection(eobject, property)) {
             Collection collection = (Collection) get(eobject, property);
-            collection.add(value);
+            collection.addAll(collection(value));
         }
+    }
+    
+    /**
+     * Returns a collection view for value, taking care of the case where value
+     * is of an array type, in which case the collection returned contains the
+     * array elements, not the array itself.
+     * 
+     * @param value a value to be added to an EObject collection property
+     * @return value wrapped in a collection, or a collection containing the
+     * array elements in case value is an array.
+     * @see #add(EObject, String, Object)
+     */
+    private static Collection collection(Object value) {
+        if (null == value) {
+            return Collections.EMPTY_LIST;
+        } else if (value.getClass().isArray()) {
+            final int len = java.lang.reflect.Array.getLength(value);
+            List list = new ArrayList(len);
+            for (int i = 0; i < len; i++) {
+                Object val = Array.get(value, i);
+                list.add(val);
+            }
+            return list;
+        } else if (value instanceof Collection) {
+            return (Collection) value;
+        }
+        return Collections.singletonList(value);
     }
 
     /**
