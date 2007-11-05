@@ -15,16 +15,14 @@
  */
 package org.geotools.wfs.bindings;
 
-import java.net.URL;
-
 import net.opengis.wfs.BaseRequestType;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.net.URL;
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -45,10 +43,10 @@ public class BaseRequestTypeBindingTest extends WFSTestSupport {
         brq.setHandle("foo");
         brq.setService("NotAService");
         brq.setVersion("0.1.0");
-        
+
         final Document dom = encode(brq, WFS.DescribeFeatureType);
         final Element root = dom.getDocumentElement();
-        
+
         assertEquals("NotAService", root.getAttribute("service"));
         assertEquals("0.1.0", root.getAttribute("version"));
         assertEquals("foo", root.getAttribute("handle"));
@@ -57,8 +55,10 @@ public class BaseRequestTypeBindingTest extends WFSTestSupport {
     public void testParse() throws Exception {
         final URL resource = TestData.getResource(this, "BaseRequestTypeBindingTest.xml");
         buildDocument(resource);
+
         Object parsed = parse(WFS.DescribeFeatureType);
         assertTrue(parsed instanceof BaseRequestType);
+
         BaseRequestType brq = (BaseRequestType) parsed;
         assertEquals("1.1.0", brq.getVersion());
         assertEquals("WFS", brq.getService());

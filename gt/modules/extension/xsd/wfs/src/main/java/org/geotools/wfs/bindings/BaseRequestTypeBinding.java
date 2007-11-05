@@ -17,17 +17,18 @@ package org.geotools.wfs.bindings;
 
 import net.opengis.wfs.BaseRequestType;
 import net.opengis.wfs.WfsFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
 
 /**
  * Binding object for the type http://www.opengis.net/wfs:BaseRequestType.
- * 
+ *
  * <p>
- * 
+ *
  * <pre>
  *         <code>
  *  &lt;xsd:complexType abstract=&quot;true&quot; name=&quot;BaseRequestType&quot;&gt;
@@ -86,9 +87,9 @@ import org.w3c.dom.Element;
  *  &lt;/xsd:complexType&gt;
  * </code>
  *         </pre>
- * 
+ *
  * </p>
- * 
+ *
  * @generated
  */
 public class BaseRequestTypeBinding extends AbstractComplexEMFBinding {
@@ -105,7 +106,7 @@ public class BaseRequestTypeBinding extends AbstractComplexEMFBinding {
 
     /**
      * <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated modifiable
      */
     public Class getType() {
