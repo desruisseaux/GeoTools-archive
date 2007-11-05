@@ -15,33 +15,29 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.QueryType;
-import net.opengis.wfs.XlinkPropertyNameType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.NoSuchElementException;
+
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.sort.SortOrder;
+
+import net.opengis.wfs.QueryType;
+import net.opengis.wfs.XlinkPropertyNameType;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.v1_1.OGC;
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -64,6 +60,44 @@ public class QueryTypeBindingTest extends WFSTestSupport {
         final Object parsed = parse(WFS.Query);
         assertTrue((parsed == null) ? "null" : parsed.getClass().toString(),
             parsed instanceof QueryType);
+        QueryType query = (QueryType) parsed;
+        assertEquals(1, query.getTypeName().size());
+        QName typeName = new QName("http://www.geotools.org/test", "testType1");
+        assertEquals(typeName, query.getTypeName().get(0));
+        assertEquals("testHandle", query.getHandle());
+        assertEquals("HEAD", query.getFeatureVersion());
+        assertEquals("urn:x-ogc:def:crs:EPSG:6.11.2:4326", query.getSrsName().toString());
+        
+        assertEquals(2, query.getPropertyName().size());
+        assertEquals(2, query.getXlinkPropertyName().size());
+        assertEquals(2, query.getFunction().size());
+        
+        assertEquals("property1", query.getPropertyName().get(0));
+        assertEquals("property2", query.getPropertyName().get(1));
+        
+        XlinkPropertyNameType xlink;
+        xlink = (XlinkPropertyNameType) query.getXlinkPropertyName().get(0);
+        assertEquals("gt:propertyA/gt:propertyB", xlink.getValue());
+        assertEquals("*", xlink.getTraverseXlinkDepth());
+        assertEquals(BigInteger.valueOf(10), xlink.getTraverseXlinkExpiry());
+
+        xlink = (XlinkPropertyNameType) query.getXlinkPropertyName().get(1);
+        assertEquals("gt:propertyC/gt:propertyD", xlink.getValue());
+        assertEquals("1", xlink.getTraverseXlinkDepth());
+        assertNull(xlink.getTraverseXlinkExpiry());
+        
+        Function function;
+        function = (Function) query.getFunction().get(0);
+        assertNotNull(function);
+        assertEquals("max", function.getName());
+
+        function = (Function) query.getFunction().get(1);
+        assertNotNull(function);
+        assertEquals("min", function.getName());
+        
+        assertTrue(query.getFilter() instanceof Id);
+        assertEquals(1, query.getSortBy().size());
+        assertTrue(query.getSortBy().get(0) instanceof SortBy);
     }
 
     @SuppressWarnings("unchecked")
