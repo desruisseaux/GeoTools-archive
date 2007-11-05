@@ -17,9 +17,15 @@ package org.geotools.wfs.bindings;
 
 import net.opengis.wfs.WfsFactory;
 import net.opengis.wfs.XlinkPropertyNameType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexEMFBinding;
+import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -82,24 +88,20 @@ public class _XlinkPropertyNameBinding extends AbstractComplexEMFBinding {
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
+     * Explicit implementation of
+     * {@link ComplexBinding#encode(Object, Document, Element)} as
+     * {@link AbstractComplexEMFBinding#encode(Object, Document, Element)} does
+     * not set the value.
      *
-     * @generated modifiable
+     * @see ComplexBinding#encode(Object, Document, Element).
      */
-    public Class getType() {
-        return XlinkPropertyNameType.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object parse(ElementInstance instance, Node node, Object value)
+    public Element encode(final Object object, final Document document, Element value)
         throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, node, value);
+        final XlinkPropertyNameType xlink = (XlinkPropertyNameType) object;
+        final String textValue = xlink.getValue();
+        final Text textNode = document.createTextNode(textValue);
+        value.appendChild(textNode);
+
+        return value;
     }
 }
