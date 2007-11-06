@@ -16,30 +16,30 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
-import javax.swing.JLabel;
-import javax.swing.table.TableCellRenderer;
 
 import org.geotools.gui.swing.contexttree.ContextTreeRenderer;
-import org.geotools.gui.swing.contexttree.renderer.ColumnHeader;
-import org.geotools.gui.swing.contexttree.renderer.HeaderRenderer;
+import org.geotools.gui.swing.contexttree.renderer.DefaultCellEditor;
+import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
+import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
+import org.geotools.gui.swing.contexttree.column.VisibleComponent;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.renderer.ButtonProvider;
-import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * @author johann sorel
  */
-public class VisibleColumnModel extends ContextTreeColumn {
+public class VisibleTreeTableColumn extends TreeTableColumn {
     
     
-    public VisibleColumnModel() {
-        ColumnHeader head1 = new ColumnHeader(TextBundle.getResource().getString("col_visible"),new JLabel( IconBundle.getResource().getIcon("16_visible")  ));
-                
-        setHeaderValue(head1);
-        setHeaderRenderer(new HeaderRenderer(head1));
-        setCellRenderer(new ContextTreeRenderer(new ButtonProvider()));
+    public VisibleTreeTableColumn() {
+       
+        setHeaderRenderer(new DefaultHeaderRenderer(IconBundle.getResource().getIcon("16_visible"),null,TextBundle.getResource().getString("col_visible")));
+        
+        //setCellRenderer(new ContextTreeRenderer(new ButtonProvider()));
+        setCellEditor( new DefaultCellEditor(new VisibleComponent()));
+        setCellRenderer( new DefaultCellRenderer(new VisibleComponent()));
         
         setEditable(true);
         setResizable(false);

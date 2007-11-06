@@ -22,7 +22,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
  *
  * @author johann sorel
  */
-public abstract class ContextTreeColumn extends TableColumnExt{
+public abstract class TreeTableColumn extends TableColumnExt{
 
     public abstract void setValue(Object target,Object value);
     

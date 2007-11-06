@@ -16,14 +16,12 @@
 
 package org.geotools.gui.swing.contexttree.renderer;
 
-
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
-
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-
 import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
@@ -31,12 +29,21 @@ import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.TableCellContext;
 
-public class OpacityCellRenderer implements TableCellRenderer, RolloverRenderer, Serializable {
+/**
+ *
+ * @author johann sorel
+ */
+public class DefaultCellRenderer implements TableCellRenderer, RolloverRenderer, Serializable {
     
     protected ComponentProvider componentController;
     private CellContext<JTable> cellContext;
+    private RendererAndEditorComponent view;
     
-    
+        
+    public DefaultCellRenderer(RendererAndEditorComponent component){
+        this(new Provider(component));
+        this.view = component;        
+    }
     
     /**
      * Instantiates a default table renderer with the given componentController.
@@ -46,7 +53,8 @@ public class OpacityCellRenderer implements TableCellRenderer, RolloverRenderer,
      * @param componentController the provider of the configured component to
      *        use for cell rendering
      */
-    public OpacityCellRenderer(ComponentProvider componentController) {
+    private DefaultCellRenderer(ComponentProvider componentController) {
+                
         if (componentController == null) {
             componentController = new LabelProvider();
         }
@@ -54,17 +62,6 @@ public class OpacityCellRenderer implements TableCellRenderer, RolloverRenderer,
         this.cellContext = new TableCellContext();
     }
     
-    /**
-     * Instantiates a default table renderer with a default component
-     * controller using the given converter.
-     *
-     * @param converter the converter to use for mapping the
-     *   content value to a String representation.
-     *
-     */
-    public OpacityCellRenderer(StringValue converter) {
-        this(new LabelProvider(converter));
-    }
     
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
@@ -111,11 +108,39 @@ public class OpacityCellRenderer implements TableCellRenderer, RolloverRenderer,
     
     /**
      * {@inheritDoc}
+     * @return 
      */
     public boolean isEnabled() {
         return (componentController instanceof RolloverRenderer) && ((RolloverRenderer) componentController).isEnabled();
         
     }
+    
+}
+
+
+class Provider extends ComponentProvider<JComponent>{
+    
+    
+    /** Creates a new instance of SymbolRendererProvider */
+    public Provider(RendererAndEditorComponent view) {
+        this.rendererComponent = view;
+    }
+
+    @Override
+    protected void format(CellContext cellContext) {   
+        ((RendererAndEditorComponent)rendererComponent).parse(cellContext.getValue());       
+    }
+
+    @Override
+    protected void configureState(CellContext cellContext) {}
+
+    
+    @Override
+    protected RendererAndEditorComponent createRendererComponent() {
+        return (RendererAndEditorComponent) rendererComponent;
+    }
+    
+    
     
     
 }

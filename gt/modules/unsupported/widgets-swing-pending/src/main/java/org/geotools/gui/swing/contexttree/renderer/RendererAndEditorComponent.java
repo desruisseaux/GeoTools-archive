@@ -16,34 +16,22 @@
 
 package org.geotools.gui.swing.contexttree.renderer;
 
-import javax.swing.JComponent;
-
-import org.jdesktop.swingx.renderer.CellContext;
-import org.jdesktop.swingx.renderer.ComponentProvider;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 /**
  *
  * @author johann sorel
  */
-public class OpacityCellProvider extends ComponentProvider<JComponent>{
+public abstract class RendererAndEditorComponent extends JPanel {
+
+    public RendererAndEditorComponent(){
+        super();        
+        setBorder(new EmptyBorder(1,1,1,1));
+    }
     
-    /** Creates a new instance of SymbolRendererProvider */
-    public OpacityCellProvider() {
-    }
-
-    @Override
-    protected void format(CellContext cellContext) {   
-        ((OpacityViewComponent)rendererComponent).format(cellContext.getValue());       
-    }
-
-    @Override
-    protected void configureState(CellContext cellContext) {}
-
+    public abstract void parse(Object obj);
     
-    @Override
-    protected OpacityViewComponent createRendererComponent() {
-        return new OpacityViewComponent();
-    }
-
+    public abstract Object getValue();
     
 }

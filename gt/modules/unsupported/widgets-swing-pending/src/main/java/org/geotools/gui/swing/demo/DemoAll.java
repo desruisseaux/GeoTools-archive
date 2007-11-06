@@ -33,13 +33,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.geotools.coverage.FactoryFinder;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.ContextTreeTable;
 import org.geotools.gui.swing.contexttree.TreeEvent;
 import org.geotools.gui.swing.contexttree.TreeListener;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
@@ -58,15 +57,11 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.styling.Style;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.postgresql.jdbc3.Jdbc3Array;
 
 
 /**
@@ -81,7 +76,7 @@ public class DemoAll extends javax.swing.JFrame {
     private ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
     private MapContext _context;
     private MapLayer _layer;
-    private JContextTree tree;
+    private ContextTreeTable tree;
     private JMapPane map;
     private JLightMapPaneControl lightcontrol;
     private JMapPaneInfoPanel infopanel;
@@ -138,9 +133,9 @@ public class DemoAll extends javax.swing.JFrame {
 
         /************************JCONTEXTTREE**********************************/
         titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        tree = new JContextTree(true);
+        tree = new ContextTreeTable(true);
         tree.addMapContext(_context);
-        tree.getTreeTable().expandAll();
+        tree.expandAll();
         pan_jcontexttree.setLayout(new GridLayout(1, 1));
         pan_jcontexttree.add(tree);
 

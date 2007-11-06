@@ -20,10 +20,9 @@ import java.awt.Color;
 
 import javax.swing.ListSelectionModel;
 
-import org.geotools.gui.swing.contexttree.renderer.StyleCellProvider;
-import org.geotools.gui.swing.contexttree.renderer.StyleCellRenderer;
+import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
+import org.geotools.gui.swing.contexttree.column.StyleComponent;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.renderer.ComponentProvider;
 
 /**
  *
@@ -46,8 +45,7 @@ public class JDemoTable extends JXTable{
         setModel(new DemoTableModel(sldsource ));
         setHorizontalScrollEnabled(false);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        ComponentProvider myProvider = new StyleCellProvider();
-        getColumnExt(0).setCellRenderer(new StyleCellRenderer(myProvider));
+        getColumnExt(0).setCellRenderer( new DefaultCellRenderer( new StyleComponent()));
         getColumnExt(0).setMaxWidth(25);
         getColumnExt(0).setMinWidth(25);
         getColumnExt(0).setPreferredWidth(25);

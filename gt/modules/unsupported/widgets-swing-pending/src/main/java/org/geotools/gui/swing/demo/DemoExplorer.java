@@ -48,9 +48,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.ContextTreeTable;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
-import org.geotools.gui.swing.contexttree.column.VisibleColumnModel;
+import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.LayerDeletePopupComponent;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyPopupComponent;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomPopupComponent;
@@ -72,7 +72,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 public class DemoExplorer extends JFrame {
 
     private JMapPane map = new JMapPane();
-    private JContextTree tree = new JContextTree(false);
+    private ContextTreeTable tree = new ContextTreeTable(false);
     private JLightMapPaneControl control = new JLightMapPaneControl(map);
     private JTabbedPane tabbed = null;
     private MapContext context = null;
@@ -199,11 +199,11 @@ public class DemoExplorer extends JFrame {
         lst.add(new LayerFeaturePropertyPanel());
         feature.setPropertyPanels(lst);
 
-        JContextTreePopup popup = (JContextTreePopup) tree.getTreeTable().getComponentPopupMenu();
+        JContextTreePopup popup = (JContextTreePopup) tree.getComponentPopupMenu();
         popup.addPopControl(zoom);
         popup.addPopControl(feature);
         popup.addPopControl(new LayerDeletePopupComponent());
-        tree.addColumnModel(new VisibleColumnModel());
+        tree.addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));

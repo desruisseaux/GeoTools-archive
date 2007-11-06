@@ -23,17 +23,64 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 
 /**
- * @author johann Sorel
- * specific header component styled for JXMapContextTree
+ *
+ * @author johann sorel
  */
-public class ColumnHeader extends JPanel{
+public class DefaultHeaderRenderer implements TableCellRenderer{
+
     
-    private String name = "";
-    private Component comp;
+    private DefaultColumnHeader header = null;
+    
+    
+    public DefaultHeaderRenderer(){
+        this(null,null,null);
+    }
+    
+    public DefaultHeaderRenderer(ImageIcon img){
+        this(img,null,null);
+    }
+    
+    public DefaultHeaderRenderer(String str){
+        this(null,str,null);
+    }
+    
+    public DefaultHeaderRenderer(ImageIcon img, String str, String tooltip){
+        
+        if(img == null && str == null){
+            header = new DefaultColumnHeader();
+        }
+        else{
+            JLabel lbl = new JLabel(img);
+            lbl.setText(str);            
+            header = new DefaultColumnHeader(lbl);
+        }
+        
+        if(tooltip != null){
+            header.setToolTipText(tooltip);
+        }
+                
+    }
+    
+    
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      return header;      
+    }
+}
+
+
+class DefaultColumnHeader extends JPanel{
+    
+    
+    public DefaultColumnHeader() { 
+        this(null);
+    }
     
     
     /** 
@@ -41,21 +88,16 @@ public class ColumnHeader extends JPanel{
      * @param name 
      * @param c 
      */
-    public ColumnHeader(String name,Component c) {        
+    public DefaultColumnHeader(Component comp) {        
         super( new GridLayout(1,1));       
         setPreferredSize( new Dimension(20,20));
-        setToolTipText(name);
         setOpaque(true);
-        this.name = name;
-        comp = c;
-        add(comp);
+        
+        if(comp != null){
+            add(comp);
+        }        
     }
     
-    
-    @Override
-    public String toString(){
-        return name;
-    }
         
     @Override
     protected void paintComponent(Graphics g) {

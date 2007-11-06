@@ -23,7 +23,7 @@ import javax.swing.event.EventListenerList;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.geotools.gui.swing.contexttree.column.ContextTreeColumn;
+import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -46,7 +46,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     public static final int TREE = 0;
     private MapContext activeContext;
     private boolean treeedit = true;
-    private ArrayList<ContextTreeColumn> columns = new ArrayList<ContextTreeColumn>();
+    private ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
     private Vector columnNames = new Vector();
 
     /**
@@ -161,7 +161,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * add a new column in the model
      * @param model the new column model
      */
-    void addColumnModel(ContextTreeColumn model) {
+    void addColumnModel(TreeTableColumn model) {
         columns.add(model);
         columnNames.add(model.getName());
         setColumnIdentifiers(columnNames);
@@ -173,7 +173,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * get the list of column
      * @return list of column models
      */
-    ArrayList<ContextTreeColumn> getColumnModels() {
+    ArrayList<TreeTableColumn> getColumnModels() {
         return columns;
     }
 ////////////////////////////////////////////////////////////////////////////////

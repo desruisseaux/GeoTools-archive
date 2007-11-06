@@ -15,96 +15,144 @@
  */
 package org.geotools.gui.swing.contexttree;
 
+import java.awt.Color;
 import java.awt.ComponentOrientation;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-
-import javax.swing.JPanel;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreePath;
-
-import org.geotools.gui.swing.contexttree.column.ContextTreeColumn;
-import org.geotools.gui.swing.contexttree.column.OpacityColumnModel;
-import org.geotools.gui.swing.contexttree.column.StyleColumnModel;
-import org.geotools.gui.swing.contexttree.column.VisibleColumnModel;
+import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
+import org.geotools.gui.swing.contexttree.renderer.TreeNodeProvider;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
+import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 
 /**
- * Tree Component for easy MapContext and MapLayer management
+ *
  * @author johann sorel
  */
-public class JContextTree extends JPanel {
+public class ContextTreeTable extends JXTreeTable {
 
     
-    private TreeTable tree = new TreeTable();
-    private ArrayList<ContextTreeColumn> columns = new ArrayList<ContextTreeColumn>();
-
-    /**
-     * constructor
-     */
-    public JContextTree() {
+    
+    public ContextTreeTable(){
         this(false);
     }
+    
+    public ContextTreeTable(boolean defaultRendering) {
+        super(new ContextTreeModel());
 
-    public JContextTree(boolean complete) {
-        super(new GridLayout(1, 1));
-        init();
+        setComponentPopupMenu(new JContextTreePopup(this));
+        setColumnControlVisible(true);
+        setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(this)));
 
-        if (complete) {
-            addColumnModel(new VisibleColumnModel());
-            addColumnModel(new OpacityColumnModel());
-            addColumnModel(new StyleColumnModel());
-            ((JContextTreePopup)tree.getComponentPopupMenu()).activeDefaultPopups();
+
+        getColumnModel().getColumn(0).setHeaderRenderer(new DefaultHeaderRenderer(null, null, TextBundle.getResource().getString("col_tree")));
+
+        setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 1)});
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        ContextTreeTransferHandler handler = new ContextTreeTransferHandler();
+        setTransferHandler(handler);
+        setDropTarget(new ContextTreeDrop(handler));
+        setDragEnabled(true);
+
+        this.addMouseMotionListener(new MouseMotionListener() {
+
+                    public void mouseDragged(MouseEvent e) {
+                    }
+
+                    public void mouseMoved(MouseEvent e) {
+                        Point p = e.getPoint();
+                        if (p != null) {
+                            int row = rowAtPoint(p);
+                            int col = columnAtPoint(p);
+
+
+                            if (row != editingRow || col != editingColumn) {
+
+
+                                if (isEditing()) {
+                                    TableCellEditor editor = cellEditor;
+                                    if (!editor.stopCellEditing()) {
+                                        editor.cancelCellEditing();
+                                    }
+                                }
+
+                                if (!isEditing() && col >= 0 && row >= 0) {
+
+                                    //we handle differently ContextTreeColumn
+                                    if (getColumnExt(col) instanceof TreeTableColumn) {
+                                        TreeTableColumn column = (TreeTableColumn) getColumnExt(col);
+                                        if (isCellEditable(row, col) && column.isEditableOnMouseOver()) {
+                                            editCellAt(row, col);
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                    }
+                });
+
+
+        //build default rendering
+        if (defaultRendering) {
+            getTreeTableModel().addColumnModel(new VisibleTreeTableColumn());
+            getTreeTableModel().addColumnModel(new OpacityTreeTableColumn());
+            getTreeTableModel().addColumnModel(new StyleTreeTableColumn());
+            ((JContextTreePopup) getComponentPopupMenu()).activeDefaultPopups();
         }
 
-
     }
 
-    private void init() {
-        
-        //popup.setTree(this, tree);
-
-        JScrollPane pane = new JScrollPane(getTreeTable());
-        pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        add(pane);
+    
+    
+    
+    @Override
+    public ContextTreeModel getTreeTableModel() {
+        return (ContextTreeModel) super.getTreeTableModel();
     }
-
-   
-    /**
-     * get the swinglabs jxtreetable. 
-     * @return JXTreeTable
-     */
-    public TreeTable getTreeTable() {
-        return tree;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////
+    
+    
+////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
+    
     /**
      * add a new column in the model and update the treetable
      * @param model the new column model
      */
-    public void addColumnModel(ContextTreeColumn model) {
-        tree.getTreeTableModel().addColumnModel(model);
-        columns.add(model);
+    public void addColumnModel(TreeTableColumn model) {
+        getTreeTableModel().addColumnModel(model);
 
-        tree.getColumnModel().addColumn(model);
-        tree.revalidate();
+        getColumnModel().addColumn(model);
+        revalidate();
     }
     /**
      * get the list of column
      * @return list of column models
      */
 
-    public ArrayList<ContextTreeColumn> getColumnModels() {
-        return columns;
+    public TreeTableColumn[] getColumnModels() {
+        return (TreeTableColumn[]) getTreeTableModel().getColumnModels().toArray();
     }
-
-    ////////////////////////////////////////////////////////////////////////////////
+    
+////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT MANAGEMENT ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -113,7 +161,7 @@ public class JContextTree extends JPanel {
      * @return return the active MapContext, if none return null
      */
     public MapContext getActiveContext() {
-        return tree.getTreeTableModel().getActiveContext();
+        return getTreeTableModel().getActiveContext();
     }
     /**
      * active the context if in the tree
@@ -121,7 +169,7 @@ public class JContextTree extends JPanel {
      */
 
     public void setActiveContext(MapContext context) {
-        tree.getTreeTableModel().setActiveContext(context);
+        getTreeTableModel().setActiveContext(context);
     }
     /**
      * add context to the Tree if not allready in it
@@ -129,8 +177,8 @@ public class JContextTree extends JPanel {
      */
 
     public void addMapContext(MapContext context) {
-        tree.getTreeTableModel().addMapContext(context);
-        tree.expandPath(new TreePath(tree.getTreeTableModel().getRoot()));
+        getTreeTableModel().addMapContext(context);
+        expandPath(new TreePath(getTreeTableModel().getRoot()));
     }
     /**
      * remove context from the tree
@@ -138,7 +186,7 @@ public class JContextTree extends JPanel {
      */
 
     public void removeMapContext(MapContext context) {
-        tree.getTreeTableModel().removeMapContext(context);
+        getTreeTableModel().removeMapContext(context);
     }
     /**
      * count MapContext in the tree
@@ -146,7 +194,7 @@ public class JContextTree extends JPanel {
      */
 
     public int getMapContextCount() {
-        return tree.getTreeTableModel().getMapContextCount();
+        return getTreeTableModel().getMapContextCount();
     }
     /**
      * return context at index i
@@ -155,7 +203,7 @@ public class JContextTree extends JPanel {
      */
 
     public MapContext getMapContext(int i) {
-        return tree.getTreeTableModel().getMapContext(i);
+        return getTreeTableModel().getMapContext(i);
     }
     /**
      * get the index of a mapcontext in the tree
@@ -164,7 +212,7 @@ public class JContextTree extends JPanel {
      */
 
     public int getMapContextIndex(MapContext context) {
-        return tree.getTreeTableModel().getMapContextIndex(context);
+        return getTreeTableModel().getMapContextIndex(context);
     }
     /**
      * move a mapcontext
@@ -173,12 +221,12 @@ public class JContextTree extends JPanel {
      */
 
     public void moveMapContext(MapContext context, int newplace) {
-        ContextTreeNode moveNode = (ContextTreeNode) tree.getTreeTableModel().getMapContextNode(context);
+        ContextTreeNode moveNode = (ContextTreeNode) getTreeTableModel().getMapContextNode(context);
         ContextTreeNode father = (ContextTreeNode) moveNode.getParent();
-        tree.getTreeTableModel().moveMapContext(moveNode, father, newplace);
+        getTreeTableModel().moveMapContext(moveNode, father, newplace);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // LISTENERS ///////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -187,7 +235,7 @@ public class JContextTree extends JPanel {
      * @param ker the new listener
      */
     public void addTreeListener(TreeListener ker) {
-        tree.getTreeTableModel().addTreeListener(ker);
+        getTreeTableModel().addTreeListener(ker);
     }
     /**
      * remove treeListener from Model
@@ -195,7 +243,7 @@ public class JContextTree extends JPanel {
      */
 
     public void removeTreeListener(TreeListener ker) {
-        tree.getTreeTableModel().removeTreeListener(ker);
+        getTreeTableModel().removeTreeListener(ker);
     }
     /**
      * get treeListeners list
@@ -203,6 +251,8 @@ public class JContextTree extends JPanel {
      */
 
     public TreeListener[] getTreeListeners() {
-        return tree.getTreeTableModel().getTreeListeners();
+        return getTreeTableModel().getTreeListeners();
     }
+    
+        
 }

@@ -16,33 +16,32 @@
 
 package org.geotools.gui.swing.contexttree.renderer;
 
-import javax.swing.JLabel;
-
-import org.jdesktop.swingx.renderer.CellContext;
-import org.jdesktop.swingx.renderer.ComponentProvider;
+import java.awt.Component;
+import javax.swing.AbstractCellEditor;
+import javax.swing.JTable;
+import javax.swing.table.TableCellEditor;
 
 /**
  *
  * @author johann sorel
  */
-public class StyleCellProvider extends ComponentProvider<JLabel>{
+public class DefaultCellEditor extends AbstractCellEditor implements TableCellEditor{
+
+    private RendererAndEditorComponent view = null;
     
-    /** Creates a new instance of SymbolRendererProvider */
-    public StyleCellProvider() {
+    public DefaultCellEditor(RendererAndEditorComponent view){
+        this.view = view;
+    }
+        
+    public Object getCellEditorValue() {
+        return view.getValue();
     }
 
-    @Override
-    protected void format(CellContext cellContext) {   
-        ((StyleViewComponent)rendererComponent).format(cellContext.getValue());       
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        view.parse(value);
+        return view;
     }
-
-    @Override
-    protected void configureState(CellContext cellContext) {}
-
     
-    @Override
-    protected StyleViewComponent createRendererComponent() {
-        return new StyleViewComponent();
-    }
+    
     
 }
