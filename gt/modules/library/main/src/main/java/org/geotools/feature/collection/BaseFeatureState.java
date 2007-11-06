@@ -75,7 +75,7 @@ public class BaseFeatureState extends FeatureState {
 	    SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName("AbstractFeatureColletionType");
         tb.setNamespaceURI( FeatureTypes.DEFAULT_NAMESPACE.toString() );
-        tb.namespaceURI(FeatureTypes.DEFAULT_NAMESPACE.toString()).add( "AbstractFeatureType", SimpleFeature.class );
+        tb.add( "AbstractFeatureType", SimpleFeature.class );
 	    
         return tb.buildFeatureType();
 	}

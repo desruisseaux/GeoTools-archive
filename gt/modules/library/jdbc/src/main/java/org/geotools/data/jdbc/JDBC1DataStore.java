@@ -1204,7 +1204,7 @@ public abstract class JDBC1DataStore implements DataStore {
 					.toArray(new AttributeDescriptor[0]);
 
 			SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
-			ftb.name(typeName);
+			ftb.setName(typeName);
 			ftb.addAll(types);
 			ftb.setNamespaceURI(getNameSpace());
 			return ftb.buildFeatureType();

@@ -100,9 +100,13 @@ public class BasicFeatureTypes
             //AttributeDescriptor[] types =  new AttributeDescriptor[] {};
             
             build.setName( "pointFeature" );
-            tmpPoint = build.name("pointFeature").buildFeatureType();            
-            tmpLine = build.name("lineFeature").buildFeatureType();
-            tmpPolygon  = build.name("polygonFeature").buildFeatureType();   
+            tmpPoint = build.buildFeatureType();
+            
+            build.setName( "lineFeature" );
+            tmpLine = build.buildFeatureType();
+            
+            build.setName( "polygonFeature" );
+            tmpPolygon = build.buildFeatureType();
         } catch (Exception ex) {
             Logger.getLogger( "org.geotools.feature.type.BasicFeatureTypes" ).log(
                Level.SEVERE, "Error creating basic feature types", ex );
