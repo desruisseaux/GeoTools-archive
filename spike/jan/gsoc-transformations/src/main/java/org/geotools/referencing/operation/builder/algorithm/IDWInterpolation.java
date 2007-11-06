@@ -41,15 +41,15 @@ public class IDWInterpolation extends AbstractInterpolation {
      * @param dy Value of step in y direction between generated cells
      * @param envelope Envelope that should be filled by generated grid
      */
-    public IDWInterpolation(HashMap positions, double dx, double dy, Envelope envelope) {
-        super(positions, dx, dy, envelope);
+    public IDWInterpolation(HashMap/*<DirectPosition, float>*/ positions, int xNumOfCells, int yNumOfCells, Envelope envelope) {
+        super(positions, xNumOfCells, yNumOfCells, envelope);
     }
 
     /**
      * Constructs Interpolation from specified positions and its values.
      * @param positions
      */
-    public IDWInterpolation(HashMap positions) {
+    public IDWInterpolation(HashMap/*<DirectPosition, float>*/ positions) {
         super(positions);
     }
 

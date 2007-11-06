@@ -167,25 +167,33 @@ public class WarpGridTransform2D extends WarpTransform2D {
     }
 
     public void transform(double[] srcPts, int srcOff, double[] dstPts, int dstOff, int numPts)
-         throws TransformException{
+       {
         // TODO Auto-generated method stub
         //transformToGrid(srcPts, srcOff, srcPts, srcOff, numPts, false);
-        double[] helperPts = srcPts.clone();
+        try {
+			double[] helperPts = srcPts.clone();
 
-        
-            if (worldToGrid != null) {
-                worldToGrid.transform(helperPts, srcOff, helperPts, srcOff, numPts);
-            }
-       
+			
+			    if (worldToGrid != null) {
+			        worldToGrid.transform(helperPts, srcOff, helperPts, srcOff, numPts);
+			    }
+      
 
-        
-			super.transform(helperPts, srcOff, dstPts, dstOff, numPts);
-		
+			
+				super.transform(helperPts, srcOff, dstPts, dstOff, numPts);
+			
 
-        
-            if (worldToGrid != null) {
-                worldToGrid.inverse().transform(dstPts, dstOff, dstPts, dstOff, numPts);
-            }
+			
+			    if (worldToGrid != null) {
+			        worldToGrid.inverse().transform(dstPts, dstOff, dstPts, dstOff, numPts);
+			    }
+		} catch (NoninvertibleTransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public void transform(float[] srcPts, int srcOff, float[] dstPts, int dstOff, int numPts) {

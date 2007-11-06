@@ -67,7 +67,7 @@ public class TPSInterpolation extends AbstractInterpolation {
      * @param dy Value of step in y direction between generated cells
      * @param envelope Envelope that should be filled by generated grid
      */
-    public TPSInterpolation(HashMap positions, double dx, double dy, Envelope envelope) {
+  /*  public TPSInterpolation(HashMap positions, double dx, double dy, Envelope envelope) {
         super(positions, dx, dy, envelope);
 
         L = new GeneralMatrix(number + 3, number + 3);
@@ -81,9 +81,23 @@ public class TPSInterpolation extends AbstractInterpolation {
         GeneralMatrix V = fillVMatrix(0);
         result = new GeneralMatrix(number + 3, 1);
         result.mul(L, V);
-    }
-
+    }*/ 
     
+   public TPSInterpolation(HashMap/*<DirectPosition, float>*/ positions, int xNumOfCells, int yNumOfCells, Envelope envelope) {
+       super(positions, xNumOfCells, yNumOfCells, envelope);
+
+    L = new GeneralMatrix(number + 3, number + 3);
+
+    fillKsubMatrix();
+    fillPsubMatrix();
+    fillOsubMatrix();
+
+    L.invert();
+
+    GeneralMatrix V = fillVMatrix(0);
+    result = new GeneralMatrix(number + 3, 1);
+    result.mul(L, V);
+    }
     public float getValue(DirectPosition p) {
         // TODO Auto-generated method stub
         return calculateTPSFunction(result, p);

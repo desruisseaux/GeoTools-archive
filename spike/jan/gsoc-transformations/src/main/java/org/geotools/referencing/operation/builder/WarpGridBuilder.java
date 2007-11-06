@@ -53,7 +53,7 @@ import org.geotools.resources.i18n.Errors;
  * @see <A HREF="http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/WarpGrid.html">WarpGrid at JAI </A>
  *
  * @source $URL$
- * @version $id$
+ * @version $Id$
  * @author jezekjan
  *
  */
@@ -158,9 +158,9 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
      * Transforms MappedPostions to grid system
      *
      */
-    private List transformMPToGrid(List MappedPositions, MathTransform trans)
+    private List/*<MappedPosition>*/ transformMPToGrid(List MappedPositions, MathTransform trans)
         throws MismatchedDimensionException, TransformException {
-        List gridmp = new ArrayList();
+        List/*<MappedPosition>*/ gridmp = new ArrayList();
 
         for (Iterator i = MappedPositions.iterator(); i.hasNext();) {
             MappedPosition mp = (MappedPosition) i.next();

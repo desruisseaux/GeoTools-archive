@@ -40,9 +40,10 @@ import org.opengis.referencing.operation.TransformException;
 public class WarpGridBuilderTest extends TestCase {
     private double tolerance = 0.05; //cm
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
-    private boolean show = true;
-    private boolean write = false;
-
+    private boolean show = true;//false;
+    private boolean write = true;//false;
+ 
+    private String path="/home/jezekjan/tmp/";
     /**
      * Run the suite from the command line.
      *
@@ -115,11 +116,11 @@ public class WarpGridBuilderTest extends TestCase {
             
             if (write == true) {
             WorldImageWriter writerx = new WorldImageWriter((Object) (new File(
-            "/home/jezekjan/gsoc/geodata/idwdx.png")));
+            		path+"idwdx.png")));
   
              writerx.write(dx, null);
              WorldImageWriter writery = new WorldImageWriter((Object) (new File(
-             "/home/jezekjan/gsoc/geodata/idwdy.png")));
+             path+"idwdy.png")));
    
               writery.write(dy, null);
             }
@@ -157,7 +158,7 @@ public class WarpGridBuilderTest extends TestCase {
 
             GridCoverage2D dx  =  (new GridCoverageFactory()).create("tps - dx", builder.getDxGrid(), env);
             GridCoverage2D dy =  (new GridCoverageFactory()).create("tps - dy", builder.getDyGrid(), env);
-                      
+            
             if (show == true) {
             	dx.show();
             	dy.show();
@@ -165,11 +166,11 @@ public class WarpGridBuilderTest extends TestCase {
             
             if (write == true) {
             WorldImageWriter writerx = new WorldImageWriter((Object) (new File(
-            "/home/jezekjan/gsoc/geodata/tpsdx.png")));
+            path+"tpsdx.png")));
   
              writerx.write(dx, null);
              WorldImageWriter writery = new WorldImageWriter((Object) (new File(
-             "/home/jezekjan/gsoc/geodata/tpsdy.png")));
+             path+"tpsdy.png")));
    
               writery.write(dy, null);
             }
@@ -213,11 +214,11 @@ public class WarpGridBuilderTest extends TestCase {
             
             if (write == true) {
             WorldImageWriter writerx = new WorldImageWriter((Object) (new File(
-            "/home/jezekjan/gsoc/geodata/rubberdx.png")));
+            path+"/rubberdx.png")));
   
              writerx.write(rubberdx, null);
              WorldImageWriter writery = new WorldImageWriter((Object) (new File(
-             "/home/jezekjan/gsoc/geodata/rubberdy.png")));
+             path+"/rubberdy.png")));
    
               writery.write(rubberdy, null);
             }
@@ -242,8 +243,8 @@ public class WarpGridBuilderTest extends TestCase {
 
                final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
                ParameterValueGroup gridParams = factory.getDefaultParameters("Warp Grid (form file)");
-               String pathx = "/home/jezekjan/dx";
-               String pathy = "/home/jezekjan/dy";
+               String pathx = path+"dx";
+               String pathy = path+"dy";
                builder.getDeltaFile(0, pathx);
                builder.getDeltaFile(1, pathy);
                gridParams.parameter("X_difference_file").setValue(pathx);

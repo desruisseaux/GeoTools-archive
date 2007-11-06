@@ -177,11 +177,11 @@ public class GridDemo {
             GridCoverage2D c= (new GridCoverageFactory()).create("Intepolated Coverage",  interpolation.getRaster (), interpolation.getEnv(),
                                                     null, null, null, new Color[][] {colors}, null);
                     
-            c.show();
+           
             
             
             WorldImageWriter writer = new WorldImageWriter((Object) (new File(
-            "/home/jezekjan/gsoc/geodata/p.tif")));
+            		"/home/jezekjan/WDokumenty/geodata/rasters/p1010099.jpg")));// "/home/jezekjan/gsoc/geodata/p.tif")));
           
             writer.write( c,null);
            
@@ -202,7 +202,7 @@ public class GridDemo {
 
             URL url = null;
 
-            url = new File("/home/jezekjan/gsoc/geodata/p1010099.tif").toURL();
+            url = new File("/home/jezekjan/tmp/testgeodata/rasters/p1010099.tif").toURL();
 
             // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
 
@@ -231,19 +231,19 @@ public class GridDemo {
              * We also have to set the column size of controlling grid that is going to be generated
              * Within this grid there will be just approximative billiner interpalation used.
              */
-            WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 0.01, 0.01, env,
+            WarpGridBuilder gridBuilder = new TPSGridBuilder(vectors, 1000, 1000, env,
                     coverage.getGridGeometry().getGridToCRS().inverse());
 
             SimilarTransformBuilder builder =  new SimilarTransformBuilder(vectors);
             
             /* Get new transformation from builder */
-              (new GridCoverageFactory()).create("DX", gridBuilder.getDxGrid(), coverage.getEnvelope())
-             .show();
-            (new GridCoverageFactory()).create("DY", gridBuilder.getDyGrid(), coverage.getEnvelope())
-             .show();
+            //  (new GridCoverageFactory()).create("DX", gridBuilder.getDxGrid(), coverage.getEnvelope())
+            // .show();
+           // (new GridCoverageFactory()).create("DY", gridBuilder.getDyGrid(), coverage.getEnvelope())
+            // .show();
 
             /* Get new transformation from builder */
-            MathTransform trans =  builder.getMathTransform();//gridBuilder.getMathTransform();
+            MathTransform trans =  gridBuilder.getMathTransform();//gridBuilder.getMathTransform();
 
             System.out.println(trans.getSourceDimensions());
             System.out.println(trans.getTargetDimensions());
@@ -269,7 +269,21 @@ public class GridDemo {
             GridCoverage2D projected = (GridCoverage2D) processor.doOperation(param);
             final RenderedImage image = projected.getRenderedImage();
             projected = projected.geophysics(false);
-            projected.show();
+                        
+            
+            WorldImageWriter writer = new WorldImageWriter((Object) (new File(
+                                "/home/jezekjan/tmp/pp.png")));
+                    writer.write(projected, null);
+            
+                    url = new File("/home/jezekjan/tmp/pp.png").toURL();
+
+                    // url = new File("/media/sda5/Dokumenty/geodata/rasters/Mane_3_1_4.tif").toURL();
+
+                    /* Open the file with Image */
+                    WorldImageReader preader = new WorldImageReader(url);
+                    GridCoverage2D pcoverage = (GridCoverage2D) preader.read(null);
+            
+          
 
            /* 
                Envelope envelope = CRS.transform(coverage.getGridGeometry().getGridToCRS().inverse(),
@@ -277,9 +291,9 @@ public class GridDemo {
                GridCoverage2D target1 = projectTo((GridCoverage2D) coverage, gridCRS,
                        (GridGeometry2D) coverage.getGridGeometry(), null, false);
                target1.show();*/
-               WorldImageWriter writer = new WorldImageWriter((Object) (new File(
-                           "/home/jezekjan/gsoc/geodata/p.tif")));
-               writer.write(projected, null);
+             //  WorldImageWriter writer = new WorldImageWriter((Object) (new File(
+               //            "/home/jezekjan/gsoc/geodata/p.tif")));
+              // writer.write(projected, null);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

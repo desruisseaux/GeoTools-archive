@@ -17,31 +17,57 @@ package org.geotools.referencing.operation.builder.algorithm;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
-import java.util.HashMap;
+import java.util.Map;
 import javax.media.jai.RasterFactory;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
 
 
+/**
+ * Super class for implementing interpolation algorithms. Subclass has to implement just the 
+ * {@link #getValue(DirectPosition)} method.
+ * 
+ * @source $URL$
+ * @version $Id$
+ * @author jezekjan
+ *
+ */
 public abstract class AbstractInterpolation {
-    private final HashMap positions;
-    private final double dx;
-    private final double dy;
+	
+	/** Known values at positions*/
+    private final Map /*<DirectPosition, float>*/ positions;
+    
+    /** Grid spacing in x */    
+    private double dx;
+    
+    /** grid spacing in y */
+    private double dy;
+    
+    /** Envelope of interpolated area*/
     private final Envelope env;
-    private final int xNumCells;
-    private final int yNumCells;
+    
+    /** Number of rows*/
+    private int xNumCells;
+    
+    /** Number of cells*/
+    private int yNumCells;
+    
+    /**Calculated values in 1D array*/
     private float[] gridValues;
+    
+    /**Calculated values in 2D array*/
     private float[][] grid2D;
+    
+    /**Calculated values in raster*/
     private WritableRaster raster;
 
     /**
      *
      * @param positions keys - point (DirectPosition), values - point values
      */
-    public AbstractInterpolation(HashMap positions) {
+    public AbstractInterpolation(Map /*<DirectPosition, float>*/ positions) {
         this.positions = positions;
         this.dx = 0;
         this.dy = 0;
@@ -51,26 +77,8 @@ public abstract class AbstractInterpolation {
         this.yNumCells = 0;
     }
 
-    /**
-     * Abstract class for interpolation algorithms
-     * @param positions keys - point (DirectPosition), values - point values
-     * @param dx
-     * @param dy
-     * @param envelope
-     */
-    public AbstractInterpolation(HashMap positions, double dx, double dy, Envelope env) {
-        this.positions = positions;
-        this.dx = dx;
-        this.dy = dy;
-        this.env = env;
-
-        this.xNumCells = (int) Math.floor(env.getLength(0) / dx);
-        this.yNumCells = (int) Math.floor(env.getLength(1) / dy);
-
-        //gridValues = new float[xNumCells*yNumCells];
-    }
-
-    public AbstractInterpolation(HashMap positions, int xNumOfCells, int yNumOfCells, Envelope env) {
+    public AbstractInterpolation(Map /*<DirectPosition, float>*/ positions, int xNumOfCells,
+        int yNumOfCells, Envelope env) {
         this.positions = positions;
         this.xNumCells = xNumOfCells;
         this.yNumCells = yNumOfCells;
@@ -82,6 +90,31 @@ public abstract class AbstractInterpolation {
         //gridValues = new float[xNumCells*yNumCells];
     }
 
+    /**
+     * Sets the spacing between grid cells and rows.
+     * @param dx Spacing between rows
+     * @param dy Spacing between cells
+     */
+    public void setSpacing(double dx, double dy) {
+        this.dx = dx;
+        this.dy = dy;
+
+        this.xNumCells = (int) Math.floor(env.getLength(0) / dx);
+        this.yNumCells = (int) Math.floor(env.getLength(1) / dy);
+    }
+
+    /**
+     * Sets the number of rows and cells. The spacing is calculated by dividing the envelope
+     * @param xNumOfCells Number of grid cells
+     * @param yNumOfCells Number of grid rows
+     */
+    public void setDensity(int xNumOfCells, int yNumOfCells) {
+        this.xNumCells = xNumOfCells;
+        this.yNumCells = yNumOfCells;
+
+        dx = env.getLength(0) / xNumOfCells;
+        dy = env.getLength(1) / yNumOfCells;
+    }
 
     /**
      * Returns array of float of interpolated grid values.
@@ -125,10 +158,8 @@ public abstract class AbstractInterpolation {
 
             raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT, yNumCells + 1,
                     xNumCells + 1, 1, null);
-            
-           
 
-            raster.setSamples(0, 0, yNumCells+1, xNumCells+1, 0, gridPositions);         
+            raster.setSamples(0, 0, yNumCells + 1, xNumCells + 1, 0, gridPositions);
         }
 
         return raster;
@@ -154,23 +185,23 @@ public abstract class AbstractInterpolation {
 
         return grid2D;
     }
-    
+
     /**
      * Return interpolated value in position p
      * @param p position where we want to compute the value
      * @return the value at position p
      */
-    public float intepolateValue(DirectPosition p){
-    	return getValue(p);
+    public float intepolateValue(DirectPosition p) {
+        return getValue(p);
     }
 
     /**
-     * Real computation is performed here. Real algorithm has to be implemented her. 
+     * Real computation is performed here. Real algorithm has to be implemented her.
      * @param p position where we want to compute the value
      * @return the value at position p
      */
     abstract public float getValue(DirectPosition p);
-    
+
     public double getDx() {
         return dx;
     }
@@ -191,7 +222,7 @@ public abstract class AbstractInterpolation {
         return yNumCells;
     }
 
-    public HashMap getPositions() {
+    public Map getPositions() {
         return positions;
     }
 }
