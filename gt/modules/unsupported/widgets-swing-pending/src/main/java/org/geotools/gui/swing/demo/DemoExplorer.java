@@ -203,12 +203,12 @@ public class DemoExplorer extends JFrame {
         popup.addPopControl(zoom);
         popup.addPopControl(feature);
         popup.addPopControl(new LayerDeletePopupComponent());
-        tree.getTreeTable().addColumnModel(new VisibleTreeTableColumn());
+        tree.addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             context.setTitle("Explore-Context");
-            tree.getTreeTable().addMapContext(context);
+            tree.addMapContext(context);
             map.setContext(context);
         } catch (Exception e) {
         }

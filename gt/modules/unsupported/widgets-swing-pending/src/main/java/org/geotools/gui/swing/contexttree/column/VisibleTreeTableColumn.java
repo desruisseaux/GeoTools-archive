@@ -51,14 +51,15 @@ public class VisibleTreeTableColumn extends TreeTableColumn {
          
     
     public void setValue(Object target, Object value) {
-        if(target instanceof MapLayer && value instanceof Boolean)
-            ((MapLayer)target).setVisible((Boolean)value);
+//        if(target instanceof MapLayer && value instanceof Boolean)
+//            ((MapLayer)target).setVisible((Boolean)value);
     }
     
     public Object getValue(Object target) {
         
         if(target instanceof MapLayer)
-            return ((MapLayer)target).isVisible();
+            return (MapLayer)target;
+            //return ((MapLayer)target).isVisible();
         else
             return "n/a";
     }

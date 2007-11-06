@@ -16,11 +16,12 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
+import java.awt.event.ActionEvent;
 import org.geotools.gui.swing.contexttree.renderer.*;
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.BorderUIResource.EmptyBorderUIResource;
+import org.geotools.map.MapLayer;
 
 /**
  *
@@ -29,20 +30,36 @@ import javax.swing.plaf.BorderUIResource.EmptyBorderUIResource;
 public class VisibleComponent extends RendererAndEditorComponent{
 
     private JCheckBox check = new JCheckBox();
+    private MapLayer layer = null;
     
     public VisibleComponent(){
         super();
         setLayout(new GridLayout(1,1));
         check.setOpaque(false);
+        
+        check.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if(layer != null){
+                    layer.setVisible(check.isSelected());
+                }
+            }
+        });
     }
     
     
     @Override
     public void parse(Object obj) {
-       
+       layer = null;
+        
         removeAll();
         if(obj instanceof Boolean){
             check.setSelected((Boolean)obj);
+            add(check);
+        }
+        else if(obj instanceof MapLayer){
+            check.setSelected(((MapLayer)obj).isVisible());
+            layer = (MapLayer) obj;
             add(check);
         }
         

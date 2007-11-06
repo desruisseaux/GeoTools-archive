@@ -45,7 +45,7 @@ public class JContextTreePopup extends JPopupMenu {
     
     
     private ArrayList<PopupComponent> controls = new ArrayList<PopupComponent>();
-    private ContextTreeTable treetable;
+    private TreeTable treetable;
     
     
     /**
@@ -63,7 +63,7 @@ public class JContextTreePopup extends JPopupMenu {
      * @param tree the tree related to the poup
      * @param treetable 
      */
-    JContextTreePopup(ContextTreeTable treetable) {
+    JContextTreePopup(TreeTable treetable) {
         super();
         this.treetable = treetable;
     }
@@ -156,7 +156,7 @@ public class JContextTreePopup extends JPopupMenu {
         
     }
     
-    public void setTree(ContextTreeTable treetable) {
+    public void setTree(TreeTable treetable) {
         this.treetable = treetable;
     }
     

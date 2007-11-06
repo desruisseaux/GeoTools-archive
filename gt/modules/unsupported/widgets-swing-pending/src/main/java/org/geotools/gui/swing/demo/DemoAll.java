@@ -134,7 +134,7 @@ public class DemoAll extends javax.swing.JFrame {
         /************************JCONTEXTTREE**********************************/
         titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
         tree = new JContextTree(true);
-        tree.getTreeTable().addMapContext(_context);
+        tree.addMapContext(_context);
         tree.getTreeTable().expandAll();
         pan_jcontexttree.setLayout(new GridLayout(1, 1));
         pan_jcontexttree.add(tree);
@@ -171,7 +171,7 @@ public class DemoAll extends javax.swing.JFrame {
         pan_listener.setLayout(new GridLayout(1, 1));
         ContextTreeListener ecouteur = new ContextTreeListener(map);
         pan_listener.add(ecouteur);
-        tree.getTreeTable().addTreeListener(ecouteur);
+        tree.addTreeListener(ecouteur);
 
 
     }
@@ -526,7 +526,7 @@ public class DemoAll extends javax.swing.JFrame {
         try {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             context.setTitle("Context " + nb);
-            tree.getTreeTable().addMapContext(context);
+            tree.addMapContext(context);
             nb++;
         } catch (NoSuchAuthorityCodeException ex) {
             ex.printStackTrace();
@@ -545,7 +545,7 @@ public class DemoAll extends javax.swing.JFrame {
 
     private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
 
-        if (tree.getTreeTable().getActiveContext() != null) {
+        if (tree.getActiveContext() != null) {
             List<DataPanel> lst = new ArrayList<DataPanel>();
 
             if (chk_file.isSelected()) {
@@ -565,7 +565,7 @@ public class DemoAll extends javax.swing.JFrame {
             if (ret == JDataChooser.ADD_EXIT) {
                 List<MapLayer> layers = jdc.getLayers();
                 for (MapLayer layer : layers) {
-                    tree.getTreeTable().getActiveContext().addLayer(layer);
+                    tree.getActiveContext().addLayer(layer);
                 }
             }
         

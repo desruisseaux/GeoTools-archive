@@ -304,7 +304,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param context the context to find
      * @return the node contining the mapcontext
      */
-    TreeNode getMapContextNode(MapContext context) {
+    public TreeNode getMapContextNode(MapContext context) {
         TreeNode node = null;
 
         if (context != null) {
@@ -326,7 +326,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param father the new parent node
      * @param place new position of the child node
      */
-    void moveMapContext(ContextTreeNode moveNode, ContextTreeNode father, int place) {
+    public void moveMapContext(ContextTreeNode moveNode, ContextTreeNode father, int place) {
         int depart = ((ContextTreeNode) getRoot()).getIndex(moveNode);
 
         removeNodeFromParent(moveNode);
@@ -344,7 +344,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param parent the father node
      * @param index new position of the child node
      */
-    void insertLayerInto(ContextTreeNode newChild, ContextTreeNode parent, int index) {
+    public void insertLayerInto(ContextTreeNode newChild, ContextTreeNode parent, int index) {
 
 
         if (newChild.getUserObject() instanceof MapLayer && parent.getUserObject() instanceof MapContext) {
@@ -371,7 +371,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * remove a node maplayer from it's parent
      * @param node the node to remove
      */
-    void removeLayerFromParent(ContextTreeNode node) {
+    public void removeLayerFromParent(ContextTreeNode node) {
 
         if (node.getUserObject() instanceof MapLayer && ((ContextTreeNode) node.getParent()).getUserObject() instanceof MapContext) {
 
@@ -388,7 +388,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      * @param parent the new father node
      * @param index the position of the child node
      */
-    void moveLayer(ContextTreeNode Child, ContextTreeNode parent, int index) {
+    public void moveLayer(ContextTreeNode Child, ContextTreeNode parent, int index) {
 
         if (Child.getUserObject() instanceof MapLayer && parent.getUserObject() instanceof MapContext) {
 

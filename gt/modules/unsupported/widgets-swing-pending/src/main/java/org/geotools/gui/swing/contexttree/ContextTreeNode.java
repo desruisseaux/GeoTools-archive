@@ -54,7 +54,7 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
      * @param anotherNode the node to compare with
      * @return true is anotherNode is an ancestor of node
      */
-    boolean isNodeAncestor(ContextTreeNode anotherNode) {
+    public boolean isNodeAncestor(ContextTreeNode anotherNode) {
         
         if (anotherNode == null) {
             return false;
@@ -101,25 +101,6 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
         
         
         
-//        if(getUserObject() instanceof MapContext){
-//            switch (column) {
-//                case JXMapContextTreeModel.TREE:
-//                    res = ((MapContext)getUserObject()).getTitle();
-//                    break;
-//            }
-//        } else if(getUserObject() instanceof MapLayer){
-//
-//            switch (column) {
-//                case JXMapContextTreeModel.TREE:
-//                    res = ((MapLayer)getUserObject()).getTitle();
-//                    break;
-//                case JXMapContextTreeModel.VISIBLE:
-//                    res = ((MapLayer)getUserObject()).isVisible();
-//                    break;
-//            }
-//        }
-//
-        
         return res;
         
     }
@@ -144,25 +125,6 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
                 model.getColumnModels().get(column-1).setValue(getUserObject(),aValue);
             
         }
-        
-        
-//        if(getUserObject() instanceof MapContext){
-//            switch (column) {
-//                case JXMapContextTreeModel.TREE:
-//                    ((MapContext)getUserObject()).setTitle((String)aValue);
-//                    break;
-//            }
-//        } else if(getUserObject() instanceof MapLayer){
-//
-//            switch (column) {
-//                case JXMapContextTreeModel.TREE:
-//                    ((MapLayer)getUserObject()).setTitle((String)aValue);
-//                    break;
-//                case JXMapContextTreeModel.VISIBLE:
-//                    ((MapLayer)getUserObject()).setVisible((Boolean)aValue);
-//                    break;
-//            }
-//        }
         
     }
 
