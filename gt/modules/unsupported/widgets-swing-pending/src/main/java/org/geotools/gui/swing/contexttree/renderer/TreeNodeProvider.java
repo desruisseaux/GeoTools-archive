@@ -29,7 +29,7 @@ import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.data.postgis.PostgisDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.JContextTree_old;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.ContextTreeTable;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;

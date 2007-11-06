@@ -38,7 +38,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.ContextTreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.TreeEvent;
 import org.geotools.gui.swing.contexttree.TreeListener;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
@@ -76,7 +76,7 @@ public class DemoAll extends javax.swing.JFrame {
     private ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
     private MapContext _context;
     private MapLayer _layer;
-    private ContextTreeTable tree;
+    private JContextTree tree;
     private JMapPane map;
     private JLightMapPaneControl lightcontrol;
     private JMapPaneInfoPanel infopanel;
@@ -133,9 +133,9 @@ public class DemoAll extends javax.swing.JFrame {
 
         /************************JCONTEXTTREE**********************************/
         titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        tree = new ContextTreeTable(true);
-        tree.addMapContext(_context);
-        tree.expandAll();
+        tree = new JContextTree(true);
+        tree.getTreeTable().addMapContext(_context);
+        tree.getTreeTable().expandAll();
         pan_jcontexttree.setLayout(new GridLayout(1, 1));
         pan_jcontexttree.add(tree);
 
@@ -171,7 +171,7 @@ public class DemoAll extends javax.swing.JFrame {
         pan_listener.setLayout(new GridLayout(1, 1));
         ContextTreeListener ecouteur = new ContextTreeListener(map);
         pan_listener.add(ecouteur);
-        tree.addTreeListener(ecouteur);
+        tree.getTreeTable().addTreeListener(ecouteur);
 
 
     }
@@ -526,7 +526,7 @@ public class DemoAll extends javax.swing.JFrame {
         try {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             context.setTitle("Context " + nb);
-            tree.addMapContext(context);
+            tree.getTreeTable().addMapContext(context);
             nb++;
         } catch (NoSuchAuthorityCodeException ex) {
             ex.printStackTrace();
@@ -545,7 +545,7 @@ public class DemoAll extends javax.swing.JFrame {
 
     private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
 
-        if (tree.getActiveContext() != null) {
+        if (tree.getTreeTable().getActiveContext() != null) {
             List<DataPanel> lst = new ArrayList<DataPanel>();
 
             if (chk_file.isSelected()) {
@@ -565,7 +565,7 @@ public class DemoAll extends javax.swing.JFrame {
             if (ret == JDataChooser.ADD_EXIT) {
                 List<MapLayer> layers = jdc.getLayers();
                 for (MapLayer layer : layers) {
-                    tree.getActiveContext().addLayer(layer);
+                    tree.getTreeTable().getActiveContext().addLayer(layer);
                 }
             }
         

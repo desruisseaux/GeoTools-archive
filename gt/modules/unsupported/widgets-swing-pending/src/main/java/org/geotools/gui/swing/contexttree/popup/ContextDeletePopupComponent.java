@@ -24,7 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.JContextTree_old;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.ContextTreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;

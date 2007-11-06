@@ -48,7 +48,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.ContextTreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.LayerDeletePopupComponent;
@@ -72,7 +72,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 public class DemoExplorer extends JFrame {
 
     private JMapPane map = new JMapPane();
-    private ContextTreeTable tree = new ContextTreeTable(false);
+    private JContextTree tree = new JContextTree(false);
     private JLightMapPaneControl control = new JLightMapPaneControl(map);
     private JTabbedPane tabbed = null;
     private MapContext context = null;
@@ -203,12 +203,12 @@ public class DemoExplorer extends JFrame {
         popup.addPopControl(zoom);
         popup.addPopControl(feature);
         popup.addPopControl(new LayerDeletePopupComponent());
-        tree.addColumnModel(new VisibleTreeTableColumn());
+        tree.getTreeTable().addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             context.setTitle("Explore-Context");
-            tree.addMapContext(context);
+            tree.getTreeTable().addMapContext(context);
             map.setContext(context);
         } catch (Exception e) {
         }
