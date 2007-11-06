@@ -258,23 +258,6 @@ public class SimpleFeatureTypeBuilder {
 		return uri;
 	}
 	/**
-	 * Sets the namespace uri of the built type.
-	 */
-	public SimpleFeatureTypeBuilder namespaceURI(String namespaceURI) {
-		setNamespaceURI(namespaceURI);
-		return this;
-	}
-	/**
-	 * Set the name and continue chaining.
-	 * @param name
-	 * @return SimpleFeatureTypeBuilder with the indicated name
-	 */
-	public SimpleFeatureTypeBuilder name( String name ){
-	    setName( name );
-	    return this;
-	}
-	
-	/**
 	 * Sets the name of the built type.
 	 */
 	public void setName(String name) {
@@ -554,7 +537,7 @@ public class SimpleFeatureTypeBuilder {
 	}
 	
 	/**
-	 * Sets the srid of the next attributed added to the feature type.
+	 * Sets the srid of the next attribute added to the feature type.
 	 * <p>
      * The <tt>srid</tt> parameter is the epsg code of a spatial reference 
      * system, for example: "4326".
@@ -566,8 +549,7 @@ public class SimpleFeatureTypeBuilder {
      * This value is reset after a call to {@link #add(String, Class)}
      * </p>
 	 * 
-	 * @param srid
-	 * @return
+	 * @param srid The id of a spatial reference system.
 	 */
 	public SimpleFeatureTypeBuilder srid( Integer srid ) {
 	    if ( srid == null ) {
@@ -575,6 +557,19 @@ public class SimpleFeatureTypeBuilder {
 	    }
 	    
 	    return crs( decode( "EPSG:" + srid ) );
+	}
+	
+	/**
+	 * Sets user data for the next attribute added to the feature type.
+	 * <p>
+	 * This value is reset after a call to {@link #add(String, Class)}
+	 * </p>
+	 * @param key  The key of the user data.
+	 * @param value The value of the user data.
+	 */
+	public SimpleFeatureTypeBuilder userData( Object key, Object value ) {
+	    attributeBuilder.addUserData( key, value );
+	    return this;
 	}
 	
 	/**
@@ -591,7 +586,7 @@ public class SimpleFeatureTypeBuilder {
 	    minOccurs( descriptor.getMinOccurs() );
 	    maxOccurs( descriptor.getMaxOccurs() );
 	    nillable( descriptor.isNillable() );
-	    namespaceURI( descriptor.getName().getNamespaceURI() );
+	    //namespaceURI( descriptor.getName().getNamespaceURI() );
 	    defaultValue( descriptor.getDefaultValue() );
 	    
 	    if ( descriptor instanceof GeometryDescriptor ) {

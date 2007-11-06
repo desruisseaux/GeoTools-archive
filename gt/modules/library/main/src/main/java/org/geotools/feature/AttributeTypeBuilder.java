@@ -1,7 +1,9 @@
 package org.geotools.feature;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
@@ -151,8 +153,16 @@ public class AttributeTypeBuilder {
 	 * If this value is set an additional restriction
 	 * will be added based on the length function.
 	 */
-    private Integer length = null;
+    protected Integer length = null;
 	
+    /**
+     * User data for the attribute.
+     */
+    protected Map userData = null;
+    
+    /**
+     * filter factory
+     */
     protected FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
 	
 	/**
@@ -209,6 +219,7 @@ public class AttributeTypeBuilder {
 		minOccurs = null;
 		maxOccurs = null;
 		isNillable = true;
+		userData = new HashMap();
 	}
 	
 	public AttributeTypeBuilder setFactory(FeatureTypeFactory factory) {
@@ -305,6 +316,10 @@ public class AttributeTypeBuilder {
 		restrictions().add(restriction);
 	}
 	
+	public void addUserData( Object key, Object value ) {
+	    userData.put( key, value );
+	}
+	
 	// Descriptor methods
 	//
 	
@@ -394,6 +409,10 @@ public class AttributeTypeBuilder {
 		return this;
 	}
 	
+	public AttributeTypeBuilder userData( Object key, Object value ) {
+	    addUserData( key, value );
+	    return this;
+	}
 	
 	// construction methods
 	//
@@ -491,9 +510,13 @@ public class AttributeTypeBuilder {
 	}
 	
 	public AttributeDescriptor buildDescriptor(Name name, AttributeType type ) {
-		AttributeDescriptor descriptor = factory.createAttributeDescriptor(
+		
+	    //build the descriptor
+	    AttributeDescriptor descriptor = factory.createAttributeDescriptor(
 			type, name, minOccurs(), maxOccurs(), isNillable, defaultValue());
 	
+	    //set the user data
+		descriptor.getUserData().putAll( userData );
 		resetDescriptorState();
 		return descriptor;
 	}
