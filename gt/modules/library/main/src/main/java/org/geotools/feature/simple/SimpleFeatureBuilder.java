@@ -2,7 +2,9 @@ package org.geotools.feature.simple;
 
 import java.rmi.server.UID;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataUtilities;
@@ -125,6 +127,10 @@ public class SimpleFeatureBuilder {
 	 * default geometry
 	 */
 	protected GeometryAttribute defaultGeometry;
+	/**
+	 * user data
+	 */
+	protected Map userData = new HashMap();
 	
 	/**
      * Constructs the builder.
@@ -167,9 +173,22 @@ public class SimpleFeatureBuilder {
      * Internal method which initializes builder state.
      */
     protected void init() {
-    	attributes = null;
+    	attributes = null; 
+    	userData = new HashMap();
     }
     
+    /**
+     * Adds some user data to the next attributed added to the feature.
+     * <p>
+     * This value is reset when the next attribute is added. 
+     * </p>
+     * @param key The key of the user data
+     * @param value The value of the user data.
+    */
+    public SimpleFeatureBuilder userData( Object key, Object value ) {
+        userData.put( key, value );
+        return this;
+    }
     /**
      * Adds an attribute.
      * <p>
@@ -226,6 +245,9 @@ public class SimpleFeatureBuilder {
     	else {
     		attribute = factory.createAttribute( value, descriptor, id ) ;
     	}
+    	
+    	//user data
+    	attribute.getUserData().putAll( userData );
     	
     	//add it
     	attributes().add(attributes().size(),attribute);
