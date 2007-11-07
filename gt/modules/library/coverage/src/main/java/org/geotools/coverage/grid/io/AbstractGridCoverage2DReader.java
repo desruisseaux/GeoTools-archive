@@ -92,6 +92,10 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	protected static final double EPS = 1E-6;
 
+	   /** Buffered factory for coordinate operations. */
+    protected final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
+            new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
+    
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
 	 * data
@@ -509,8 +513,12 @@ public abstract class AbstractGridCoverage2DReader implements
 			bands[i] = new GridSampleDimension(names[i],
 					new Category[] { values }, null).geophysics(true);
 		}
-
+		
 		// creating coverage
+		if (raster2Model != null) {
+		        return coverageFactory.create(coverageName, image, crs,
+		                        raster2Model, bands, null, null);
+		}
 		return coverageFactory.create(coverageName, image, new GeneralEnvelope(
 				originalEnvelope), bands, null, null);
 

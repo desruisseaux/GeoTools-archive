@@ -46,6 +46,15 @@
 
 
   <profiles>
+     <!-- ================================================== -->
+     <!--     Modules requiring GDAL DLLs be in your JDK     -->
+     <!-- ================================================== -->
+     <profile>
+       <id>gdal</id>
+       <modules>
+         <module>mrsid</module>
+       </modules>
+     </profile>
      
      <!-- ================================================== -->
      <!--     Modules not yet included in the build          -->
