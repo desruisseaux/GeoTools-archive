@@ -53,9 +53,9 @@ public class ContextDeletePopupComponent extends JMenuItem implements PopupCompo
     }
     
     
-    public Component getComponent(Object obj, ContextTreeNode node) {
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
         
-        ContextTreeNode child = (ContextTreeNode)node;
+        ContextTreeNode child = (ContextTreeNode)node[0];
         
         if( child.getUserObject() instanceof MapContext){
             context = (MapContext)child.getUserObject();
@@ -77,6 +77,14 @@ public class ContextDeletePopupComponent extends JMenuItem implements PopupCompo
         });
     }
 
+    public boolean isValid(Object[] objs) {
+        
+        if(objs.length == 1){
+            return isValid(objs[0]);
+        }        
+        return false;        
+    }
+    
     public boolean isValid(Object obj) {
         return obj instanceof MapContext;
     }

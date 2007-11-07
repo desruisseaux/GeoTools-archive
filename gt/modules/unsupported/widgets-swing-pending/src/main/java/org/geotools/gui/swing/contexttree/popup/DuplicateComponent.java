@@ -13,62 +13,47 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBoxMenuItem;
-
+import javax.swing.JMenuItem;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.map.MapLayer;
-
-
+import org.geotools.gui.swing.icon.IconBundle;
 
 /**
+ *
  * @author johann sorel
- * Default popup control for visibility of MapLayer, use for JXMapContextTreePopup
  */
-public class LayerVisiblePopupComponent extends JCheckBoxMenuItem implements PopupComponent{
+public class DuplicateComponent implements PopupComponent{
+
+    private JMenuItem duplicateitem = null;
+    private TreeTable tree = null;
     
-    private MapLayer layer;
-    
-    
-    /** Creates a new instance of LayerVisibleControl */
-    public LayerVisiblePopupComponent() {
-        this.setText( TextBundle.getResource().getString("visible"));
-        init();
-    }
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        this.setSelected(layer.isVisible());
+    public DuplicateComponent(final TreeTable tree){
+        this.tree = tree;
         
-        return this;
-    }
-    
-    private void init(){
+        duplicateitem = new JMenuItem( TextBundle.getResource().getString("duplicate") );
+        duplicateitem.setIcon( IconBundle.getResource().getIcon("16_duplicate") );
         
-        addActionListener(new ActionListener() {
+        duplicateitem.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                layer.setVisible(isSelected());
+                tree.duplicateSelection();
             }
         });
     }
     
     public boolean isValid(Object[] objs) {
-        
-        if(objs.length == 1){
-            return isValid(objs[0]);
-        }        
-        return false;        
+        return true;
     }
-    
-    private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+       
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
+        duplicateitem.setEnabled(tree.canDuplicateSelection());
+        return duplicateitem;
     }
-    
+
 }

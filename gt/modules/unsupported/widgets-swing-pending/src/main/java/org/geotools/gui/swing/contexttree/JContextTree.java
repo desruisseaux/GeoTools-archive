@@ -55,7 +55,7 @@ public class JContextTree extends JPanel {
         if (complete) {
             addColumnModel(new VisibleTreeTableColumn());
             addColumnModel(new OpacityTreeTableColumn());
-            addColumnModel(new StyleTreeTableColumn());
+            addColumnModel(new StyleTreeTableColumn());            
             ((JContextTreePopup) tree.getComponentPopupMenu()).activeDefaultPopups();
             revalidate();
         }
@@ -77,7 +77,7 @@ public class JContextTree extends JPanel {
         return tree;
     }
     
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
     

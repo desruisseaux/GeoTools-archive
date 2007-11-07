@@ -46,8 +46,8 @@ public class ContextPropertyPopupComponent extends JMenuItem implements PopupCom
     }
     
      
-    public Component getComponent(Object obj, ContextTreeNode node) {
-        context = (MapContext)obj;
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
+        context = (MapContext)obj[0];
         return this;
     }
     
@@ -63,6 +63,14 @@ public class ContextPropertyPopupComponent extends JMenuItem implements PopupCom
         );
     }
 
+    public boolean isValid(Object[] objs) {
+        
+        if(objs.length == 1){
+            return isValid(objs[0]);
+        }        
+        return false;        
+    }
+    
     public boolean isValid(Object obj) {
         return obj instanceof MapContext;
     }

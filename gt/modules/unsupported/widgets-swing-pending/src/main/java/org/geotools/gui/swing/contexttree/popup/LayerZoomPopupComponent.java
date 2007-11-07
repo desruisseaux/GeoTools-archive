@@ -48,8 +48,8 @@ public class LayerZoomPopupComponent extends JMenuItem implements PopupComponent
     }
     
     
-    public Component getComponent(Object obj, ContextTreeNode node) {
-        layer = (MapLayer)obj;
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
+        layer = (MapLayer)obj[0];
         this.setSelected(layer.isVisible());
         
         return this;
@@ -66,7 +66,15 @@ public class LayerZoomPopupComponent extends JMenuItem implements PopupComponent
         });
     }
     
-    public boolean isValid(Object obj) {
+    public boolean isValid(Object[] objs) {
+        
+        if(objs.length == 1){
+            return isValid(objs[0]);
+        }        
+        return false;        
+    }
+    
+    private boolean isValid(Object obj) {
         return obj instanceof MapLayer;
     }
     

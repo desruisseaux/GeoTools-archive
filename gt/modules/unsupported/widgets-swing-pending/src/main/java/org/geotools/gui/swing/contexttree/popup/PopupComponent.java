@@ -31,7 +31,7 @@ public interface PopupComponent {
      * @param obj 
      * @return 
      */
-    public boolean isValid(Object obj);
+    public boolean isValid(Object[] obj);
     
     /**
      * return the component to by shown
@@ -39,6 +39,6 @@ public interface PopupComponent {
      * @param node 
      * @return 
      */
-    public Component getComponent(Object obj, ContextTreeNode node);
+    public Component getComponent(Object[] obj, ContextTreeNode[] node);
     
 }

@@ -42,11 +42,22 @@ public class SeparatorPopupComponent extends JSeparator implements PopupComponen
 
 
 
-    public Component getComponent(Object obj, ContextTreeNode node) {
+    public Component getComponent(Object[] obj, ContextTreeNode[] node) {
         return this;
     }
     
-    public boolean isValid(Object obj) {
+    public boolean isValid(Object[] objs) {
+        for(Object obj : objs){            
+            if( !isValid(obj) ){
+                return false;
+            }
+        }
+        
+        return true;
+        
+    }
+    
+    private boolean isValid(Object obj){
         return classe.isAssignableFrom(obj.getClass())  ;
     }
     

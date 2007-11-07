@@ -51,10 +51,10 @@ public class LayerDeletePopupComponent extends JMenuItem implements PopupCompone
     
     
     
-    public Component getComponent(Object obj, ContextTreeNode node) {
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
         
-        layer = ((MapLayer)obj);
-        final ContextTreeNode child = node;
+        layer = ((MapLayer)obj[0]);
+        final ContextTreeNode child = node[0];
         final ContextTreeNode parent = (ContextTreeNode)child.getParent();
         
         if( parent.getUserObject() instanceof MapContext){
@@ -77,6 +77,13 @@ public class LayerDeletePopupComponent extends JMenuItem implements PopupCompone
         });
     }
     
+    public boolean isValid(Object[] objs) {
+        
+        if(objs.length == 1){
+            return isValid(objs[0]);
+        }        
+        return false;        
+    }
     
     public boolean isValid(Object obj) {
         return obj instanceof MapLayer;

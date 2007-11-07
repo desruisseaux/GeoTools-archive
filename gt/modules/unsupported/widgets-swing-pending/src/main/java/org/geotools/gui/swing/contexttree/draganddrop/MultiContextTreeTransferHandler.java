@@ -63,7 +63,7 @@ public class MultiContextTreeTransferHandler extends TransferHandler {
      * @see javax.swing.TransferHandler#createTransferable(javax.swing.JComponent)
      */
     @Override
-    protected Transferable createTransferable(JComponent c) {
+    public Transferable createTransferable(JComponent c) {
         metaTransfers = new ArrayList<MultiMetaTransfer>();
 
         Transferable t = null;

@@ -47,8 +47,8 @@ public class LayerFeaturePopupComponent extends JMenuItem implements PopupCompon
     }
     
     
-    public Component getComponent(Object obj, ContextTreeNode node) {
-        layer = (MapLayer)obj;
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
+        layer = (MapLayer)obj[0];
         return this;
     }
     
@@ -62,6 +62,14 @@ public class LayerFeaturePopupComponent extends JMenuItem implements PopupCompon
             }
         }
         );
+    }
+    
+    public boolean isValid(Object[] objs) {
+        
+        if(objs.length == 1){
+            return isValid(objs[0]);
+        }        
+        return false;        
     }
     
     public boolean isValid(Object obj) {

@@ -19,56 +19,43 @@ package org.geotools.gui.swing.contexttree.popup;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBoxMenuItem;
-
+import javax.swing.JMenuItem;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.map.MapLayer;
-
-
+import org.geotools.gui.swing.icon.IconBundle;
 
 /**
+ *
  * @author johann sorel
- * Default popup control for visibility of MapLayer, use for JXMapContextTreePopup
  */
-public class LayerVisiblePopupComponent extends JCheckBoxMenuItem implements PopupComponent{
+public class CutComponent implements PopupComponent{
+
+    private TreeTable tree = null;
+    private JMenuItem cutitem = null;
     
-    private MapLayer layer;
-    
-    
-    /** Creates a new instance of LayerVisibleControl */
-    public LayerVisiblePopupComponent() {
-        this.setText( TextBundle.getResource().getString("visible"));
-        init();
-    }
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        this.setSelected(layer.isVisible());
+    public CutComponent(final TreeTable tree){
+        this.tree = tree;
         
-        return this;
-    }
-    
-    private void init(){
+        cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));
+        cutitem.setIcon( IconBundle.getResource().getIcon("16_cut") );
         
-        addActionListener(new ActionListener() {
+        cutitem.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                layer.setVisible(isSelected());
+                tree.cutSelectionInBuffer();
             }
         });
-    }
-    
-    public boolean isValid(Object[] objs) {
         
-        if(objs.length == 1){
-            return isValid(objs[0]);
-        }        
-        return false;        
     }
     
-    private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+    public boolean isValid(Object[] obj) {
+        return true;
     }
-    
+
+    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
+        cutitem.setEnabled( tree.hasSelection());
+        return cutitem;
+    }
+
 }
