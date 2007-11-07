@@ -61,7 +61,7 @@ public abstract class LoggerFactory {
         synchronized (loggers) {
             Logger logger = loggers.get(name);
             if (logger == null || !target.equals(unwrap(logger))) {
-                logger = wrap(target);
+                logger = wrap(name, target);
                 loggers.put(name, logger);
             }
             return logger;
@@ -81,12 +81,13 @@ public abstract class LoggerFactory {
     /**
      * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
      *
+     * @param  name The name of the logger.
      * @param  implementation An implementation returned by {@link #getImplementation}.
      * @return A new logger wrapping the specified implementation.
      * @throws ClassCastException if the given implementation is not an instance
      *         of the expected class.
      */
-    protected abstract Logger wrap(Object implementation) throws ClassCastException;
+    protected abstract Logger wrap(String name, Object implementation) throws ClassCastException;
 
     /**
      * Returns the {@linkplain #getImplementation implementation} wrapped by the specified logger,

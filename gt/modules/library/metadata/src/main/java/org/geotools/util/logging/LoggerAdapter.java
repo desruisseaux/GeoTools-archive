@@ -38,37 +38,43 @@ import java.util.regex.Pattern;
  * above-cited methods. Note that this is the opposite approach than the Java logging framework
  * one, which implemented everything on top of {@link Logger#log(LogRecord)}. This adapter is
  * defined in terms of {@link #severe(String) severe} &hellip; {@link #finest(String) finest}
- * methods instead because external frameworks like <a href="http://commons.apache.org/logging/">Commons-logging</a>
+ * methods instead because external frameworks like
+ * <a href="http://commons.apache.org/logging/">Commons-logging</a>
  * don't work with {@link LogRecord}, and sometime provides nothing else than convenience methods
  * equivalent to {@link #severe(String) severe} &hellip; {@link #finest(String) finest}.
  * <p>
  * <b>Restrictions</b><br>
  * Because the configuration is expected to be fully controled by the external logging
- * framework, this adapter disables all following features:
+ * framework, every configuration methods inherited from {@link Logger} are disabled:
+ * <p>
  * <ul>
- *   <li>{@link #addHandler},
+ *   <li>{@link #addHandler}
  *       since the handling is performed by the external framework.</li>
  *
- *   <li>{@link #setUseParentHandlers},
- *       since this adapter never delegates to the parent handlers (because the parent
- *       logger belongs to Java logging and we avoid mixing frameworks).</li>
+ *   <li>{@link #setUseParentHandlers}
+ *       since this adapter never delegates to the parent handlers. This is consistent with the
+ *       previous item and avoid mixing loggings from the external framework with Java loggings.</li>
  *
- *   <li>{@link #setFilter} except for {@link #log(LogRecord)},
- *       because it may be argued that filtering belong to the external logging framework, and
- *       because it is difficult to query efficiently the filter in this {@code LoggerAdapter}
- *       architecture (e.g. we would need to make sure that {@link Filter#isLoggable} is invoked
- *       only once even if a {@code log} call is cascaded into many other {@code log} calls, and
- *       this test must works in multi-threads environment).</li>
+ *   <li>{@link #setParent}
+ *       since this adapter should not inherits any configuration from a parent logger using the
+ *       Java logging framework.</li>
  *
- *   <li>{@link #getResourceBundle}
- *       because this logger is always created without resource bundles. Localization must be
- *       performed through explicit calls to a {@code logrb} or {@link #log(LogRecord)} method.
- *       This is suffisient for GeoTools needs, which performs all localizations through the
- *       later. Note that those methods will be slower with this {@code LoggerAdapter} than with
- *       the default Java logging framework because this adapter will localizes and formats the
- *       record immediately instead of letting the {@linkplain Handler} performs this work only
- *       if needed.</li>
+ *   <li>{@link #setFilter}
+ *       for keeping this {@code LoggerAdapter} simple.</li>
  * </ul>
+ * <p>
+ * Since {@code LoggerAdapter}s do not hold any configuration by themself, it is not strictly
+ * necessary to {@linkplain java.util.logging.LogManager#addLogger add them to the log manager}.
+ * The adapters can be created, garbage-collected and recreated again while preserving their
+ * behavior since their configuration is entirely contained in the external logging framework.
+ * <p>
+ * <b>Localization</b><br>
+ * This logger is always created without resource bundles. Localizations must be performed through
+ * explicit calls to {@code logrb} or {@link #log(LogRecord)} methods. This is suffisient for
+ * GeoTools needs, which performs all localizations through the later. Note that those methods
+ * will be slower in this {@code LoggerAdapter} than the default {@link Logger} because this
+ * adapter localizes and formats records immediately instead of letting the {@linkplain Handler}
+ * performs this work only if needed.
  * <p>
  * <b>Logging levels</b><br>
  * If a log record {@linkplain Level level} is not one of the predefined ones, then this class
@@ -97,7 +103,17 @@ public abstract class LoggerAdapter extends Logger {
      */
     protected LoggerAdapter(final String name) {
         super(name, null);
-        super.setUseParentHandlers(false); // Don't invoke the overriden method.
+        /*
+         * Must invokes the super-class method, because LoggerAdapter overrides it as a no-op.
+         */
+        super.setUseParentHandlers(false);
+        /*
+         * Sets the level to ALL as a matter of principle,  but we will never check the level
+         * anyway (we will let the external logging framework do its own check). Note that we
+         * must invoke the method in the super-class  because we want to set the java logging
+         * level, not the external framework level.
+         */
+        super.setLevel(Level.ALL);
     }
 
     /**
@@ -142,14 +158,14 @@ public abstract class LoggerAdapter extends Logger {
      *     final int n = level.intValue();
      *     switch (n / 100) {
      *         default: if (n &lt; 0) return false; // fallthrough otherwise.
-     *         case 10: return isSevereLoggable ();
-     *         case  9: return isWarningLoggable();
-     *         case  8: return isInfoLoggable   ();
-     *         case  7: return isConfigLoggable ();
+     *         case 10: return isSevereEnabled();
+     *         case  9: return isWarningEnabled();
+     *         case  8: return isInfoEnabled();
+     *         case  7: return isConfigEnabled();
      *         case  6: // fallthrough
-     *         case  5: return isFineLoggable   ();
-     *         case  4: return isFinerLoggable  ();
-     *         case  3: return isFinestLoggable ();
+     *         case  5: return isFineEnabled();
+     *         case  4: return isFinerEnabled();
+     *         case  3: return isFinestEnabled();
      *         case  2: // fallthrough
      *         case  1: // fallthrough
      *         case  0: return false; // Logging OFF
@@ -167,35 +183,10 @@ public abstract class LoggerAdapter extends Logger {
     public abstract void severe(String message);
 
     /**
-     * Logs a {@link Level#SEVERE SEVERE} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #severe severe}(message)}</code>.
-     * Subclasses should override this method if the external framework supports exception
-     * loggings.
-     * <p>
-     * This method is protected rather than public because users should never invoke
-     * this method directly. Doing so would require a cast from {@code Logger} to
-     * {@code LoggerAdapter}, which would broke any program wanting to work directly
-     * with the Java logging framework.
-     */
-    protected void severe(String message, Throwable thrown) {
-        severe(message);
-    }
-
-    /**
      * Logs a {@link Level#WARNING WARNING} message.
      */
     @Override
     public abstract void warning(String message);
-
-    /**
-     * Logs a {@link Level#WARNING WARNING} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #warning warning}(message)}</code>.
-     * <p>
-     * This method is protected for the same reason than {@link #severe(String,Throwable) severe}.
-     */
-    protected void warning(String message, Throwable thrown) {
-        warning(message);
-    }
 
     /**
      * Logs an {@link Level#INFO INFO} message.
@@ -204,30 +195,10 @@ public abstract class LoggerAdapter extends Logger {
     public abstract void info(String message);
 
     /**
-     * Logs a {@link Level#INFO INFO} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #info info}(message)}</code>.
-     * <p>
-     * This method is protected for the same reason than {@link #severe(String,Throwable) severe}.
-     */
-    protected void info(String message, Throwable thrown) {
-        info(message);
-    }
-
-    /**
      * Logs an {@link Level#CONFIG CONFIG} message.
      */
     @Override
     public abstract void config(String message);
-
-    /**
-     * Logs a {@link Level#CONFIG CONFIG} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #config config}(message)}</code>.
-     * <p>
-     * This method is protected for the same reason than {@link #severe(String,Throwable) severe}.
-     */
-    protected void config(String message, Throwable thrown) {
-        config(message);
-    }
 
     /**
      * Logs a {@link Level#FINE FINE} message.
@@ -236,46 +207,16 @@ public abstract class LoggerAdapter extends Logger {
     public abstract void fine(String message);
 
     /**
-     * Logs a {@link Level#FINE FINE} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #fine fine}(message)}</code>.
-     * <p>
-     * This method is protected for the same reason than {@link #severe(String,Throwable) severe}.
-     */
-    protected void fine(String message, Throwable thrown) {
-        fine(message);
-    }
-
-    /**
      * Logs a {@link Level#FINER FINER} message.
      */
     @Override
     public abstract void finer(String message);
 
     /**
-     * Logs a {@link Level#FINER FINER} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #finer finer}(message)}</code>.
-     * <p>
-     * This method is protected for the same reason than {@link #severe(String,Throwable) severe}.
-     */
-    protected void finer(String message, Throwable thrown) {
-        finer(message);
-    }
-
-    /**
      * Logs a {@link Level#FINEST FINEST} message.
      */
     @Override
     public abstract void finest(String message);
-
-    /**
-     * Logs a {@link Level#FINEST FINEST} message with an exception. The default implementation
-     * discards the exception and invokes <code>{@linkplain #finest finest}(message)}</code>.
-     * <p>
-     * This method is protected for the same reason than {@link #severe(String,Throwable) severe}.
-     */
-    protected void finest(String message, Throwable thrown) {
-        finest(message);
-    }
 
     /**
      * Logs a method entry to the {@linkplain #getDebugLevel debug level}. Compared to the
@@ -356,15 +297,15 @@ public abstract class LoggerAdapter extends Logger {
     /**
      * Logs a record. The default implementation delegates to
      * {@link #logrb(Level,String,String,String,String,Object[]) logrb}.
-     * <p>
-     * If a {@linkplain #setFilter filter is set}, then this method checks if the record
-     * {@linkplain Filter#isLoggable is loggable}. Note that this is <strong>not</strong>
-     * the check for logging {@linkplain Level level}. This is rather a check based on
-     * user-specified criterions. The check for logging level will be left to the wrapped
-     * logging framework.
      */
     @Override
     public void log(final LogRecord record) {
+        /*
+         * The filter should always be null since we overrode the 'setFilter' method as a no-op.
+         * But we check it anyway as matter of principle just in case some subclass overrides the
+         * 'getFilter()' method. This is the only method where we can do this check cheaply. Note
+         * that this is NOT the check for logging level; Filters are for user-specified criterions.
+         */
         final Filter filter = getFilter();
         if (filter != null && !filter.isLoggable(record)) {
             return;
@@ -431,30 +372,12 @@ public abstract class LoggerAdapter extends Logger {
     }
 
     /**
-     * Logs a record at the specified level. The default implementation delegates to one of the
-     * {@link #severe(String,Throwable) severe}, {@link #warning(String,Throwable) warning},
-     * {@link #info(String,Throwable) info}, {@link #config(String,Throwable) config},
-     * {@link #fine(String,Throwable) fine}, {@link #finer(String,Throwable) finer} or
-     * {@link #finest(String,Throwable) finest} methods according the supplied level.
+     * Logs a record at the specified level. The default implementation discards the exception
+     * and delegates to <code>{@linkplain #log(Level,String) log}(level, message)</code>.
      */
     @Override
-    @SuppressWarnings("fallthrough")
     public void log(final Level level, final String message, final Throwable thrown) {
-        final int n = level.intValue();
-        switch (n / 100) {
-            default: if (n < 0)                break; // Fallthrough otherwise.
-            case 10: severe (message, thrown); break;
-            case  9: warning(message, thrown); break;
-            case  8: info   (message, thrown); break;
-            case  7: config (message, thrown); break;
-            case  6:
-            case  5: fine   (message, thrown); break;
-            case  4: finer  (message, thrown); break;
-            case  3: finest (message, thrown); break;
-            case  2: /* Logging OFF */
-            case  1: /* Logging OFF */
-            case  0: /* Logging OFF */         break;
-        }
+        log(level, message);
     }
 
     /**
@@ -582,9 +505,9 @@ public abstract class LoggerAdapter extends Logger {
 
     /**
      * Do nothing since this logger adapter does not supports handlers.
-     * The configuration should be fully controlled by the wrapped logging framework
+     * The configuration should be fully controlled by the external logging framework
      * (e.g. <a href="http://commons.apache.org/logging/">Commons-logging</a>) instead,
-     * which is not expected to use handlers.
+     * which is not expected to use {@link Handler} objects.
      */
     @Override
     public void addHandler(Handler handler) {
@@ -598,7 +521,9 @@ public abstract class LoggerAdapter extends Logger {
     }
 
     /**
-     * Do nothing since this logger never use parent handlers.
+     * Do nothing since this logger never use parent handlers. This is consistent
+     * with {@link #addHandler} not allowing to add any handlers, and avoid mixing
+     * loggings from the external framework with Java loggings.
      */
     @Override
     public void setUseParentHandlers(boolean useParentHandlers) {
@@ -606,9 +531,22 @@ public abstract class LoggerAdapter extends Logger {
 
     /**
      * Do nothing since this logger adapter does not support arbitrary parents.
+     * More specifically, it should not inherits any configuration from a parent
+     * logger using the Java logging framework.
      */
     @Override
     public void setParent(Logger parent) {
+    }
+
+    /**
+     * Do nothing since this logger adapter does not support filters.  It is difficult to query
+     * efficiently the filter in this {@code LoggerAdapter} architecture (e.g. we would need to
+     * make sure that {@link Filter#isLoggable} is invoked only once even if a {@code log} call
+     * is cascaded into many other {@code log} calls, and this test must works in multi-threads
+     * environment).
+     */
+    @Override
+    public void setFilter(Filter filter) {
     }
 
     /**
