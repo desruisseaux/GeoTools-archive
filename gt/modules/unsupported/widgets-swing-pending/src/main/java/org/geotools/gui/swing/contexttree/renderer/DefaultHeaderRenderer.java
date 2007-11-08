@@ -30,7 +30,8 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 /**
- *
+ * Styled header Renderer for JContextTree
+ * 
  * @author johann sorel
  */
 public class DefaultHeaderRenderer implements TableCellRenderer{
@@ -39,18 +40,38 @@ public class DefaultHeaderRenderer implements TableCellRenderer{
     private DefaultColumnHeader header = null;
     
     
+    /**
+     * create en empty header, only a styled background
+     */
     public DefaultHeaderRenderer(){
         this(null,null,null);
     }
     
+    /**
+     * create a header with the specified image
+     * 
+     * @param img
+     */
     public DefaultHeaderRenderer(ImageIcon img){
         this(img,null,null);
     }
     
+    /**
+     * create a header with the specified text
+     * 
+     * @param str
+     */
     public DefaultHeaderRenderer(String str){
         this(null,str,null);
     }
     
+    /**
+     * create a header with the specified text,image and tooltip
+     * 
+     * @param img null if no image
+     * @param str null if no string
+     * @param tooltip null if no tooltip
+     */
     public DefaultHeaderRenderer(ImageIcon img, String str, String tooltip){
         
         if(img == null && str == null){
@@ -72,13 +93,14 @@ public class DefaultHeaderRenderer implements TableCellRenderer{
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       return header;      
     }
+    
 }
 
 
 class DefaultColumnHeader extends JPanel{
     
     
-    public DefaultColumnHeader() { 
+    DefaultColumnHeader() { 
         this(null);
     }
     

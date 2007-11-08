@@ -16,6 +16,7 @@
 package org.geotools.gui.swing.demo;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -31,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -38,9 +40,9 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.TreeEvent;
 import org.geotools.gui.swing.contexttree.TreeListener;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.control.JMapPaneInfoPanel;
 import org.geotools.gui.swing.datachooser.DataPanel;
@@ -78,7 +80,7 @@ public class DemoAll extends javax.swing.JFrame {
     
     private MapContext _context;
     private MapLayer _layer;
-    private JContextTree tree;
+    private TreeTable tree;
     private JMapPane map;
     private JLightMapPaneControl lightcontrol;
     private JMapPaneInfoPanel infopanel;
@@ -152,11 +154,16 @@ public class DemoAll extends javax.swing.JFrame {
 
         /************************JCONTEXTTREE**********************************/
         titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        tree = JContextTree.createDefaultTree(map);
+        tree = TreeTable.createDefaultTree(map);
         tree.addMapContext(_context);
-        tree.getTreeTable().expandAll();
+        
+        JScrollPane pane = new JScrollPane(tree);
+        pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        
+        tree.expandAll();
         pan_jcontexttree.setLayout(new GridLayout(1, 1));
-        pan_jcontexttree.add(tree);
+        pan_jcontexttree.add(pane);
         
         /************************JLIGHTMAPPANECONTROL**************************/
         pan_lightmappanecontrol.setLeftDecoration(new JLabel(ICO_INFORMATION));

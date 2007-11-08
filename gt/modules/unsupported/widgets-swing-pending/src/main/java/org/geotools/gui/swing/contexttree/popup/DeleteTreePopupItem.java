@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
@@ -31,34 +30,37 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author johann sorel
  */
-public class CutComponent implements PopupComponent{
+public class DeleteTreePopupItem implements TreePopupItem{
 
+    private JMenuItem deleteitem = null;
     private TreeTable tree = null;
-    private JMenuItem cutitem = null;
     
-    public CutComponent(final TreeTable tree){
+    /**
+     * delete item for jcontexttreepopup
+     * @param tree
+     */
+    public DeleteTreePopupItem(final TreeTable tree){
         this.tree = tree;
         
-        cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));
-        cutitem.setIcon( IconBundle.getResource().getIcon("16_cut") );
-        cutitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+        deleteitem = new JMenuItem( TextBundle.getResource().getString("delete") );
+        deleteitem.setIcon( IconBundle.getResource().getIcon("16_delete") );
+        deleteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,0));
         
-        cutitem.addActionListener(new ActionListener() {
+        deleteitem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                tree.cutSelectionInBuffer();
+                tree.deleteSelection();
             }
         });
-        
     }
     
-    public boolean isValid(Object[] obj) {
+    public boolean isValid(Object[] objs) {
         return true;
     }
-
+       
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        cutitem.setEnabled( tree.canCutSelection() );
-        return cutitem;
+        deleteitem.setEnabled(tree.canDeleteSelection());        
+        return deleteitem;
     }
 
 }

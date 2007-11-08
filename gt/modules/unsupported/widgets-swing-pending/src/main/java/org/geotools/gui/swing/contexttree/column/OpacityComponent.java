@@ -44,6 +44,9 @@ public class OpacityComponent extends RendererAndEditorComponent {
     private MapLayer layer = null;
     private JSlider slide = new JSlider(0, 100);
 
+    /**
+     * opacity component, slider
+     */
     public OpacityComponent() {
         super();
         setLayout(new GridLayout(1, 1));

@@ -34,23 +34,25 @@ import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
 /**
- * JXMapContextTreeModel for JXTreeTable
+ * ContextTreeModel for JContextTree
  * @author johann sorel
  */
 public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerListListener {
 
-    private EventListenerList listeners = new EventListenerList();
     /**
      * number of the tree column
      */
     public static final int TREE = 0;
+    
+    private final EventListenerList listeners = new EventListenerList();    
     private MapContext activeContext;
     private boolean treeedit = true;
     private ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
     private Vector columnNames = new Vector();
 
     /**
-     * Creates a new instance of JXMapContextTreeModel
+     * Creates a new instance of ContextTreeModel
+     * prevent build model by other use
      * 
      */
     ContextTreeModel() {
@@ -70,7 +72,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      */
     @Override
     public Class getColumnClass(int column) {
-        Class c = Object.class;
+        Class c ;
 
 
         if (column == TREE) {
@@ -78,6 +80,8 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
         } else {
             if (column <= columns.size()) {
                 c = columns.get(column - 1).getColumnClass();
+            }else{
+                c = Object.class;
             }
         }
 
@@ -109,8 +113,6 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      */
     @Override
     public boolean isCellEditable(Object node, int column) {
-
-        ContextTreeNode treenode = (ContextTreeNode) node;
 
         if (column == TREE) {
             return treeedit;
@@ -163,7 +165,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
      */
     void addColumnModel(TreeTableColumn model) {
         columns.add(model);
-        columnNames.add(model.getName());
+        columnNames.add(model.getTitle());
         setColumnIdentifiers(columnNames);
 
         model.setModelIndex(columns.indexOf(model) + 1);

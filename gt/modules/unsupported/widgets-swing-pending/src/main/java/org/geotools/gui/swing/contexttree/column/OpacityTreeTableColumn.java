@@ -25,13 +25,15 @@ import org.geotools.map.MapLayer;
 
 
 /**
+ * opacity column for jcontexttree, with slider
+ * 
  * @author johann sorel
  */
 public class OpacityTreeTableColumn extends TreeTableColumn {
 
 
     /**
-     * Creates a new instance of JXVisibleColumn
+     * Creates a new instance 
      */
     public OpacityTreeTableColumn() {
         super();
@@ -40,6 +42,7 @@ public class OpacityTreeTableColumn extends TreeTableColumn {
         setCellRenderer(new DefaultCellRenderer( new OpacityComponent()));
         setCellEditor(new DefaultCellEditor( new OpacityComponent()));
 
+        setTitle(TextBundle.getResource().getString("col_opacity"));
         setEditable(true);
         setResizable(false);
         setMaxWidth(60);
@@ -61,10 +64,7 @@ public class OpacityTreeTableColumn extends TreeTableColumn {
         }
     }
 
-    public String getName() {
-        return TextBundle.getResource().getString("col_symbol");
-    }
-
+   
     public boolean isCellEditable(Object target) {
 
         if (target instanceof MapLayer) {

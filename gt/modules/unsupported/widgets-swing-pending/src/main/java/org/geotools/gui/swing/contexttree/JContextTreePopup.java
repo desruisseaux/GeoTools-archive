@@ -23,22 +23,20 @@ import javax.swing.JPopupMenu;
 import javax.swing.tree.TreePath;
 
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.popup.ContextActivePopupComponent;
-import org.geotools.gui.swing.contexttree.popup.ContextPropertyPopupComponent;
-import org.geotools.gui.swing.contexttree.popup.CopyComponent;
-import org.geotools.gui.swing.contexttree.popup.CutComponent;
-import org.geotools.gui.swing.contexttree.popup.DeleteComponent;
-import org.geotools.gui.swing.contexttree.popup.DuplicateComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerFeaturePopupComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerOpacityPopupComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerPropertyPopupComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerVisiblePopupComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerVisiblePopupComponent2;
-import org.geotools.gui.swing.contexttree.popup.LayerZoomPopupComponent;
-import org.geotools.gui.swing.contexttree.popup.MapRelatedComponent;
-import org.geotools.gui.swing.contexttree.popup.PasteComponent;
-import org.geotools.gui.swing.contexttree.popup.PopupComponent;
-import org.geotools.gui.swing.contexttree.popup.SeparatorPopupComponent;
+import org.geotools.gui.swing.contexttree.popup.ContextActiveTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.ContextPropertyTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.CopyTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.CutTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.DeleteTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.DuplicateTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.LayerFeatureTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.LayerPropertyTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.LayerVisibleTreePopupItem2;
+import org.geotools.gui.swing.contexttree.popup.LayerZoomTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.MapRelatedTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.PasteTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.SeparatorTreePopupItem;
 
 /**
  * Dynamic Popup used by JXMapContextTree
@@ -47,7 +45,7 @@ import org.geotools.gui.swing.contexttree.popup.SeparatorPopupComponent;
  */
 public class JContextTreePopup extends JPopupMenu {
 
-    private ArrayList<PopupComponent> controls = new ArrayList<PopupComponent>();
+    private ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
     private TreeTable treetable;
     private JMapPane map;
 
@@ -71,11 +69,11 @@ public class JContextTreePopup extends JPopupMenu {
     }
     
     /**
-     *
      * Creates a new instance of JXMapContextTreePopup
      * Dynamic Popup used by JXMapContextTree
-     * @param tree the tree related to the poup
-     * @param treetable 
+     * 
+     * @param map 
+     * @param treetable the tree related to the popup
      */
     public JContextTreePopup(TreeTable treetable,JMapPane map) {
         super();
@@ -88,10 +86,10 @@ public class JContextTreePopup extends JPopupMenu {
     public void setMapPane(JMapPane map){
         this.map = map;
         
-        for(PopupComponent pc : controls){
+        for(TreePopupItem pc : controls){
             
-            if( pc instanceof MapRelatedComponent){
-                ((MapRelatedComponent)pc).setMapPane(map);
+            if( pc instanceof MapRelatedTreePopupItem){
+                ((MapRelatedTreePopupItem)pc).setMapPane(map);
             }
         }
     }
@@ -103,29 +101,29 @@ public class JContextTreePopup extends JPopupMenu {
     public void activeDefaultPopups() {
 
         
-        addPopControl(new LayerVisiblePopupComponent2());            //layer 
+        addPopControl(new LayerVisibleTreePopupItem2());            //layer 
         
         addSeparator(Object.class);
         
-        addPopControl(new LayerZoomPopupComponent(map));            //layer
-        addPopControl(new LayerFeaturePopupComponent());            //layer
-        addPopControl(new ContextActivePopupComponent(treetable));  //context
+        addPopControl(new LayerZoomTreePopupItem(map));            //layer
+        addPopControl(new LayerFeatureTreePopupItem());            //layer
+        addPopControl(new ContextActiveTreePopupItem(treetable));  //context
 
         addSeparator(Object.class);
 
-        addPopControl(new CutComponent(treetable));                 //all
-        addPopControl(new CopyComponent(treetable));                //all
-        addPopControl(new PasteComponent(treetable));               //all
-        addPopControl(new DuplicateComponent(treetable));           //all
+        addPopControl(new CutTreePopupItem(treetable));                 //all
+        addPopControl(new CopyTreePopupItem(treetable));                //all
+        addPopControl(new PasteTreePopupItem(treetable));               //all
+        addPopControl(new DuplicateTreePopupItem(treetable));           //all
         
         addSeparator(Object.class);
         
-        addPopControl(new DeleteComponent(treetable));              //all
+        addPopControl(new DeleteTreePopupItem(treetable));              //all
 
         addSeparator(Object.class);
 
-        addPopControl(new LayerPropertyPopupComponent());           //layer
-        addPopControl(new ContextPropertyPopupComponent());         //context
+        addPopControl(new LayerPropertyTreePopupItem());           //layer
+        addPopControl(new ContextPropertyTreePopupItem());         //context
 
     }
 
@@ -133,7 +131,7 @@ public class JContextTreePopup extends JPopupMenu {
      * Add a Control to the PopupMenu
      * @param control the new popup
      */
-    public void addPopControl(PopupComponent control) {
+    public void addPopControl(TreePopupItem control) {
         controls.add(control);
     }
 
@@ -141,7 +139,7 @@ public class JContextTreePopup extends JPopupMenu {
      * get the list of controls
      * @return list of JXMapContextTreePopControl
      */
-    public ArrayList<PopupComponent> getControls() {
+    public ArrayList<TreePopupItem> getControls() {
         return controls;
     }
 
@@ -150,17 +148,17 @@ public class JContextTreePopup extends JPopupMenu {
      * @param classe the classe where the separator will appear
      */
     public void addSeparator(Class classe) {
-        controls.add(new SeparatorPopupComponent(classe));
+        controls.add(new SeparatorTreePopupItem(classe));
 
     }
 
     /**
-     * show or hide the popupmenu
-     * @param b the visible state
+     * will not be set visible if nothing is in the popup
+     * 
+     * @param view 
      */
     @Override
     public void setVisible(boolean view) {
-
 
 
         if (view) {
@@ -204,7 +202,7 @@ public class JContextTreePopup extends JPopupMenu {
             }
 
 
-            for (PopupComponent control : controls) {
+            for (TreePopupItem control : controls) {
                 if (control.isValid(nodeobjects)) {
                     add(control.getComponent(nodeobjects, nodes));
                 }
@@ -226,7 +224,7 @@ public class JContextTreePopup extends JPopupMenu {
 
     private void removeLastSeparators() {
         if (getComponentCount() > 0) {
-            while (getComponent(getComponentCount() - 1) instanceof SeparatorPopupComponent) {
+            while (getComponent(getComponentCount() - 1) instanceof SeparatorTreePopupItem) {
                 remove(getComponentCount() - 1);
             }
         }
@@ -240,12 +238,12 @@ public class JContextTreePopup extends JPopupMenu {
     public Component add(Component menuItem) {
 
         if (getComponentCount() > 0) {
-            if (!(getComponent(getComponentCount() - 1) instanceof SeparatorPopupComponent && menuItem instanceof SeparatorPopupComponent)) {
+            if (!(getComponent(getComponentCount() - 1) instanceof SeparatorTreePopupItem && menuItem instanceof SeparatorTreePopupItem)) {
                 return super.add(menuItem);
             }
         }
 
-        if (!(menuItem instanceof SeparatorPopupComponent)) {
+        if (!(menuItem instanceof SeparatorTreePopupItem)) {
             return super.add(menuItem);
         }
 

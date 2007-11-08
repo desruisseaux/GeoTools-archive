@@ -16,9 +16,6 @@
 
 package org.geotools.gui.swing.contexttree.column;
 
-
-
-
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellEditor;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
 import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
@@ -27,13 +24,15 @@ import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 
 /**
+ * Style column, glyph legend
+ * 
  * @author johann sorel
  */
 public class StyleTreeTableColumn extends TreeTableColumn {
     
     
     /**
-     * Creates a new instance of JXVisibleColumn
+     * Creates a new instance 
      */
     public StyleTreeTableColumn() {
         super();
@@ -42,6 +41,7 @@ public class StyleTreeTableColumn extends TreeTableColumn {
         setCellEditor( new DefaultCellEditor( new StyleComponent()));
         setCellRenderer( new DefaultCellRenderer( new StyleComponent()));
         
+        setTitle(TextBundle.getResource().getString("col_symbol"));
         setEditable(true);
         setResizable(false);
         setMaxWidth(25);
@@ -62,11 +62,7 @@ public class StyleTreeTableColumn extends TreeTableColumn {
             return "n/a";
     }
     
-    public String getName() {
-        return TextBundle.getResource().getString("col_symbol");
-    }
-    
-    
+        
     
     public boolean isCellEditable(Object target){
         

@@ -26,11 +26,11 @@ import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.LabelProvider;
-import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.TableCellContext;
 
 /**
- *
+ * DefaultCellRenderer for JContextTree columns
+ * 
  * @author johann sorel
  */
 public class DefaultCellRenderer implements TableCellRenderer, RolloverRenderer, Serializable {
@@ -40,19 +40,16 @@ public class DefaultCellRenderer implements TableCellRenderer, RolloverRenderer,
     private RendererAndEditorComponent view;
     
         
+    /**
+     * Constructor
+     * @param component
+     */
     public DefaultCellRenderer(RendererAndEditorComponent component){
         this(new Provider(component));
         this.view = component;        
     }
     
-    /**
-     * Instantiates a default table renderer with the given componentController.
-     * If the controller is null, creates and uses a default. The default
-     * controller is of type <code>LabelProvider</code>.
-     *
-     * @param componentController the provider of the configured component to
-     *        use for cell rendering
-     */
+    
     private DefaultCellRenderer(ComponentProvider componentController) {
                 
         if (componentController == null) {
@@ -63,7 +60,6 @@ public class DefaultCellRenderer implements TableCellRenderer, RolloverRenderer,
     }
     
     
-    // -------------- implements javax.swing.table.TableCellRenderer
     /**
      *
      * Returns a configured component, appropriate to render the given
@@ -122,7 +118,7 @@ class Provider extends ComponentProvider<JComponent>{
     
     
     /** Creates a new instance of SymbolRendererProvider */
-    public Provider(RendererAndEditorComponent view) {
+    Provider(RendererAndEditorComponent view) {
         this.rendererComponent = view;
     }
 

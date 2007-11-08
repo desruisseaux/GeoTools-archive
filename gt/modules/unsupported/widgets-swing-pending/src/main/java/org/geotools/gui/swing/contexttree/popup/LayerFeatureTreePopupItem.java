@@ -19,58 +19,52 @@ package org.geotools.gui.swing.contexttree.popup;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
 
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.map.MapContext;
+import org.geotools.gui.swing.propertyedit.JPropertyDialog;
+import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.map.MapLayer;
 
 
 /**
  * @author johann sorel
- * Default popup control for activation of MapContext, use for JXMapContextTreePopup
+ * Default popup control for property page of MapLayer, use for JContextTreePopup
  */
-public class ContextActivePopupComponent extends JCheckBoxMenuItem implements PopupComponent{
+public class LayerFeatureTreePopupItem extends JMenuItem implements TreePopupItem{
     
-    private MapContext context;
-    private TreeTable xtree ;
-    
+    private MapLayer layer;
     
     /** 
-     * Creates a new instance of ContextActiveControl 
-     * @param tree 
+     * Creates a new instance of DefaultContextPropertyPop 
      */
-    public ContextActivePopupComponent(TreeTable tree) {
-        this.setText( TextBundle.getResource().getString("activated")  );
-        xtree = tree;
+    public LayerFeatureTreePopupItem() {
+        super( TextBundle.getResource().getString("feature_table")  );
         init();
     }
     
-   
     
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        context = (MapContext)obj[0];
-        this.setSelected( context.equals(xtree.getTreeTableModel().getActiveContext()));
-        
+        layer = (MapLayer)obj[0];
         return this;
     }
     
     private void init(){
-        
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if(isSelected()){
-                    if(xtree != null && context != null)
-                        xtree.getTreeTableModel().setActiveContext(context);
-                } else if(xtree != null){
-                    xtree.getTreeTableModel().setActiveContext(null);
-                }
+                ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+                lst.add(new LayerFeaturePropertyPanel());
+                JPropertyDialog.showDialog(lst, layer);
+                
             }
-        });
+        }
+        );
     }
-
+    
     public boolean isValid(Object[] objs) {
         
         if(objs.length == 1){
@@ -79,9 +73,8 @@ public class ContextActivePopupComponent extends JCheckBoxMenuItem implements Po
         return false;        
     }
     
-    public boolean isValid(Object obj) {
-        return obj instanceof MapContext;
+    private boolean isValid(Object obj) {
+        return obj instanceof MapLayer;
     }
-    
     
 }

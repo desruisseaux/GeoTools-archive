@@ -40,6 +40,9 @@ public class StyleComponent extends RendererAndEditorComponent {
     private Symbolizer symbol = null;
     
     
+    /**
+     * create new instance
+     */
     public StyleComponent(){
         
         addMouseListener(new MouseListener() {

@@ -19,21 +19,43 @@ package org.geotools.gui.swing.contexttree.column;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
- *
+ * Abstract class for columnmodel
  * @author johann sorel
  */
 public abstract class TreeTableColumn extends TableColumnExt{
 
+    /**
+     * affect value object to target object, value come from editor
+     * @param target
+     * @param value
+     */
     public abstract void setValue(Object target,Object value);
     
+    /**
+     * value of target object,will be used by renderer and editor
+     * @param target
+     * @return
+     */
     public abstract Object getValue(Object target);
     
+    /**
+     * column class
+     * @return
+     */
     public abstract Class getColumnClass();
-    
-    public abstract String getName();
-
+        
+    /**
+     * 
+     * @param target
+     * @return
+     */
     public abstract boolean isCellEditable(Object target);
     
+    /**
+     * 
+     * @return true if the cell must go in edit mode on mouseover,
+     * more ressource consuming but make component highly interactive.
+     */
     public abstract boolean isEditableOnMouseOver();
     
     

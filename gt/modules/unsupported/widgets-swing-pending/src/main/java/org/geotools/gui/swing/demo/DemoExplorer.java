@@ -17,6 +17,7 @@ package org.geotools.gui.swing.demo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -43,17 +44,19 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
+import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
-import org.geotools.gui.swing.contexttree.popup.DeleteComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerPropertyPopupComponent;
-import org.geotools.gui.swing.contexttree.popup.LayerZoomPopupComponent;
+import org.geotools.gui.swing.contexttree.popup.DeleteTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.LayerPropertyTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.LayerZoomTreePopupItem;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.datachooser.DataListener;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
@@ -72,7 +75,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 public class DemoExplorer extends JFrame {
 
     private JMapPane map = new JMapPane();
-    private JContextTree tree = new JContextTree();
+    private TreeTable tree = new TreeTable();
     private JLightMapPaneControl control = new JLightMapPaneControl(map);
     private JTabbedPane tabbed = null;
     private MapContext context = null;
@@ -192,8 +195,8 @@ public class DemoExplorer extends JFrame {
         setJMenuBar(bar);
 
         //build up the tree
-        LayerZoomPopupComponent zoom = new LayerZoomPopupComponent(map);
-        LayerPropertyPopupComponent feature = new LayerPropertyPopupComponent();
+        LayerZoomTreePopupItem zoom = new LayerZoomTreePopupItem(map);
+        LayerPropertyTreePopupItem feature = new LayerPropertyTreePopupItem();
         List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
         lst.add(new LayerFeaturePropertyPanel());
         feature.setPropertyPanels(lst);
@@ -201,7 +204,7 @@ public class DemoExplorer extends JFrame {
         JContextTreePopup popup = (JContextTreePopup) tree.getComponentPopupMenu();
         popup.addPopControl(zoom);
         popup.addPopControl(feature);
-        popup.addPopControl(new DeleteComponent(tree.getTreeTable()));
+        popup.addPopControl(new DeleteTreePopupItem(tree));
         tree.addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {
@@ -263,8 +266,13 @@ public class DemoExplorer extends JFrame {
         pan_map.add(BorderLayout.NORTH, control);
         pan_map.add(BorderLayout.CENTER, map);
 
+        JScrollPane pane = new JScrollPane(tree);
+        pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        
+        
         JSplitPane center = new JSplitPane();
-        center.setLeftComponent(tree);
+        center.setLeftComponent(pane);
         center.setRightComponent(pan_map);
         center.setDividerLocation(240);
 

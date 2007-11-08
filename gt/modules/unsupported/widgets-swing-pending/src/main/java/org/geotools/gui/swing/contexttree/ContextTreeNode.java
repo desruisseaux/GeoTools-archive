@@ -23,8 +23,8 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
 
 /**
  * a specific mutabletreenode for jcontexttree
+ * 
  * @author johann sorel
- * Node for JXMapContextTree
  */
 public class ContextTreeNode extends AbstractMutableTreeTableNode{
     
@@ -32,10 +32,10 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
     private ContextTreeModel model = null;
     
     /**
-     * Creates a new instance of JXMapContextTreeNode
+     * Creates a new instance of ContextTreeNode
      * @param model model of the tree
      */
-    public ContextTreeNode(ContextTreeModel model) {
+    ContextTreeNode(ContextTreeModel model) {
         super();
         this.model = model;
     }
@@ -82,7 +82,7 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
      */
     public Object getValueAt(int column) {
         
-        Object res = "n/a";
+        Object res;
         
         if(column == ContextTreeModel.TREE){
             if(getUserObject() instanceof MapContext)
@@ -99,10 +99,7 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
             }
         }
         
-        
-        
-        return res;
-        
+        return res;        
     }
     
     
@@ -136,7 +133,5 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
         return model.getColumnCount();
     }
     
-    
-    
-    
+        
 }

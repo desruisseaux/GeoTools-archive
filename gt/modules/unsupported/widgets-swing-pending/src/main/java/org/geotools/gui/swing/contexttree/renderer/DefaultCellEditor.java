@@ -22,13 +22,18 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
 /**
- *
+ * DefaultCellEditot for JContextTree columns
+ * 
  * @author johann sorel
  */
 public class DefaultCellEditor extends AbstractCellEditor implements TableCellEditor{
 
     private RendererAndEditorComponent view = null;
     
+    /**
+     * DefaultCellEditot for JContextTree columns
+     * @param view
+     */
     public DefaultCellEditor(RendererAndEditorComponent view){
         this.view = view;
     }

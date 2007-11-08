@@ -14,31 +14,18 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree.popup;
-
-import java.awt.Component;
-
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
+package org.geotools.gui.swing.contexttree;
 
 /**
+ * Exception throw if incorrect Model is used on the JContextTree
+ * 
  * @author johann sorel
- * Interface used to build a Popup control for JXMapContextPopup
  */
-public interface PopupComponent {
-        
-    /**
-     * return true if the control should by shown
-     * @param obj 
-     * @return 
-     */
-    public boolean isValid(Object[] obj);
+public class ModelTypeException extends Exception{
+
+    ModelTypeException() {
+        super("Incorrect Model class, must be ContextTreeModel");
+    }
     
-    /**
-     * return the component to by shown
-     * @param obj 
-     * @param node 
-     * @return 
-     */
-    public Component getComponent(Object[] obj, ContextTreeNode[] node);
     
 }

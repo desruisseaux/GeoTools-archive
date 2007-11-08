@@ -27,15 +27,17 @@ import org.geotools.map.MapLayer;
 
 /**
  * @author johann sorel
- * Default popup control for visibility of MapLayer, use for JXMapContextTreePopup
+ * Default popup control for zoom on MapLayer, use for JContextTreePopup
  */
-public class LayerZoomPopupComponent extends JMenuItem implements PopupComponent, MapRelatedComponent {
+public class LayerZoomTreePopupItem extends JMenuItem implements TreePopupItem, MapRelatedTreePopupItem {
 
     private MapLayer layer;
     private JMapPane map;
 
-    /** Creates a new instance of LayerVisibleControl */
-    public LayerZoomPopupComponent(JMapPane map) {
+    /** Creates a new instance
+     * @param map 
+     */
+    public LayerZoomTreePopupItem(JMapPane map) {
         this.setText(TextBundle.getResource().getString("zoom_to_layer"));
         this.map = map;
         init();

@@ -34,14 +34,18 @@ import org.geotools.map.MapLayer;
  *
  * @author johann sorel
  */
-public class PasteComponent implements PopupComponent {
+public class PasteTreePopupItem implements TreePopupItem {
 
     private JMenuItem pasteitem = null;
     private TreeTable tree = null;
     private List<MapContext> contexts = new ArrayList<MapContext>();
     private List<MapLayer> layers = new ArrayList<MapLayer>();
 
-    public PasteComponent(final TreeTable tree) {
+    /**
+     * Paste menuitem for jcontextpopup 
+     * @param tree
+     */
+    public PasteTreePopupItem(final TreeTable tree) {
         this.tree = tree;
 
         pasteitem = new JMenuItem(TextBundle.getResource().getString("paste"));

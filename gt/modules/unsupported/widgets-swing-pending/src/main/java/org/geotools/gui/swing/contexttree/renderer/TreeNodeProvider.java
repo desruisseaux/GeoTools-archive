@@ -24,12 +24,8 @@ import javax.swing.JLabel;
 
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.jdbc.JDBC1DataStore;
-import org.geotools.data.postgis.PostgisDataStore;
-import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
@@ -40,41 +36,57 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
 
 
 /**
+ * Provider for ContextTree to render TreeColumn
  * 
  * @author johann sorel
  */
 public class TreeNodeProvider extends ComponentProvider<JLabel> {
-    
-    private TreeTable tree;
+        
     public static final ImageIcon ICON_LAYER_VISIBLE = IconBundle.getResource().getIcon("16_maplayer_visible");
-    public static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");
-    
+    public static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");    
     public static final ImageIcon ICON_LAYER_FILE_VECTOR_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fv");
     public static final ImageIcon ICON_LAYER_FILE_VECTOR_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fv");
     public static final ImageIcon ICON_LAYER_FILE_RASTER_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fr");
     public static final ImageIcon ICON_LAYER_FILE_RASTER_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fr");
     public static final ImageIcon ICON_LAYER_DB_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_db");
-    public static final ImageIcon ICON_LAYER_DB_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_db");
-    
+    public static final ImageIcon ICON_LAYER_DB_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_db");    
     public static final ImageIcon ICON_CONTEXT_ACTIVE = IconBundle.getResource().getIcon("16_mapcontext_enable");
     public static final ImageIcon ICON_CONTEXT_DESACTIVE = IconBundle.getResource().getIcon("16_mapcontext_disable");
 
+    private final TreeTable tree;
     
+    
+    /**
+     * Provider for ContextTree to render TreeColumn
+     * 
+     * @param tree related JContextTree
+     */
     public TreeNodeProvider(TreeTable tree) {
         this.tree = tree;
         rendererComponent = new JLabel();
     }
     
+    /**
+     * {@inheritDoc}
+     * @param arg0 
+     */
     @Override
     protected void configureState(CellContext arg0) {
     }
     
+    /** 
+     * {@inheritDoc}
+     * @return 
+     */
     @Override
-    protected JLabel createRendererComponent() {
-        
+    protected JLabel createRendererComponent() {        
         return new JLabel();
     }
     
+    /**
+     * {@inheritDoc}
+     * @param arg0 
+     */
     @Override
     protected void format(CellContext arg0) {
         ContextTreeNode node  = (ContextTreeNode) arg0.getValue();

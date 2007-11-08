@@ -24,27 +24,32 @@ import javax.swing.SwingConstants;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 
 /**
+ * Default popup control separator, use for JContextTreePopup
+ * 
  * @author johann sorel
- * Default popup control separator, use for JXMapContextTreePopup
+ * 
  */
-public class SeparatorPopupComponent extends JSeparator implements PopupComponent{
+public class SeparatorTreePopupItem extends JSeparator implements TreePopupItem{
     
     private Class classe;
     
-    public SeparatorPopupComponent() {
+    /**
+     * Constructor
+     */
+    public SeparatorTreePopupItem() {
         this(Object.class);
     }
     
     
-    /** Creates a new instance of DefaultPopSeparator 
+    /** 
+     * Creates a new instance of DefaultPopSeparator 
      * @param classe 
      */
-    public SeparatorPopupComponent(Class classe) {
+    public SeparatorTreePopupItem(Class classe) {
         super();
         this.setOrientation(SwingConstants.HORIZONTAL);
         this.classe = classe;
     }
-
 
 
     public Component getComponent(Object[] obj, ContextTreeNode[] node) {

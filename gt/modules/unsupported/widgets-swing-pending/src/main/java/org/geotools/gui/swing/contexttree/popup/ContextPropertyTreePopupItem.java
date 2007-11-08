@@ -16,67 +16,55 @@
 
 package org.geotools.gui.swing.contexttree.popup;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
 
-import javax.swing.JPanel;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.column.OpacityComponent;
 import org.geotools.gui.swing.i18n.TextBundle;
-import org.geotools.map.MapLayer;
-
-
+import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
+import org.geotools.gui.swing.propertyedit.JPropertyDialog;
+import org.geotools.gui.swing.propertyedit.PropertyPanel;
+import org.geotools.map.MapContext;
 
 /**
- * @author johann sorel
- * Default popup control for visibility of MapLayer, use for JXMapContextTreePopup
+ * Default popup control for property page of MapContext, use for JContextTreePopup 
+ * 
+ * @author johann sorel 
  */
-public class LayerVisiblePopupComponent2 extends JPanel implements PopupComponent{
+public class ContextPropertyTreePopupItem extends JMenuItem implements TreePopupItem{
     
-    private MapLayer layer;
-    private JCheckBox jck = new JCheckBox();
-    private OpacityComponent opa = new OpacityComponent();
+    private MapContext context;
     
-    
-    /** Creates a new instance of LayerVisibleControl */
-    public LayerVisiblePopupComponent2() {
+    /** 
+     * Creates a new instance of DefaultContextPropertyPop 
+     */
+    public ContextPropertyTreePopupItem() {
+        super( TextBundle.getResource().getString("properties")  );
         init();
     }
     
+     
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        jck.setSelected(layer.isVisible());
-        opa.parse(layer);
-        
+        context = (MapContext)obj[0];
         return this;
     }
     
     private void init(){
-        setLayout(new BorderLayout());
-        
-        
-        setOpaque(false);
-        opa.setOpaque(false);
-        opa.setPreferredSize(new Dimension(30,20));
-        
-        jck.setOpaque(false);
-        jck.setText( TextBundle.getResource().getString("visible"));
-        jck.addActionListener(new ActionListener() {
+        addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                layer.setVisible(jck.isSelected());
+                ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
+                lst.add(new ContextCRSPropertyPanel());
+                JPropertyDialog.showDialog(lst, context);
+                
             }
-        });
-        
-        add(BorderLayout.WEST,jck);
-        add(BorderLayout.CENTER,opa);
+        }
+        );
     }
-    
+
     public boolean isValid(Object[] objs) {
         
         if(objs.length == 1){
@@ -86,7 +74,7 @@ public class LayerVisiblePopupComponent2 extends JPanel implements PopupComponen
     }
     
     private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+        return obj instanceof MapContext;
     }
     
 }

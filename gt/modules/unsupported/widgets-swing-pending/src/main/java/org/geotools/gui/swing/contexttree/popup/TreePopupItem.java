@@ -13,38 +13,32 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.contexttree.renderer;
 
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+package org.geotools.gui.swing.contexttree.popup;
+
+import java.awt.Component;
+
+import org.geotools.gui.swing.contexttree.ContextTreeNode;
 
 /**
- * Abstrat class extending JPanel, can be used for Render and Edition Cell
- * in the JContextTree
- * 
  * @author johann sorel
+ * Interface used to build a Popup control for JXMapContextPopup
  */
-public abstract class RendererAndEditorComponent extends JPanel {
-
+public interface TreePopupItem {
+        
     /**
-     * Abstrat class extending JPanel, can be used for Render and Edition Cell
-     * in the JContextTree
-     */
-    public RendererAndEditorComponent() {
-        super();
-        setBorder(new EmptyBorder(1, 1, 1, 1));
-    }
-
-    /**
-     * initialize the component with the target object
-     * 
+     * return true if the control should by shown
      * @param obj 
+     * @return 
      */
-    public abstract void parse(Object obj);
-
+    public boolean isValid(Object[] obj);
+    
     /**
-     * 
-     * @return new value when edition stop
+     * return the component to by shown
+     * @param obj 
+     * @param node 
+     * @return 
      */
-    public abstract Object getValue();
+    public Component getComponent(Object[] obj, ContextTreeNode[] node);
+    
 }

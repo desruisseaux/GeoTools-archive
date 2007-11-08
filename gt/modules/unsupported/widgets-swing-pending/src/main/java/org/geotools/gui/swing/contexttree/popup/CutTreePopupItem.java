@@ -31,22 +31,26 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author johann sorel
  */
-public class CopyComponent implements PopupComponent{
+public class CutTreePopupItem implements TreePopupItem{
 
     private TreeTable tree = null;
-    private JMenuItem copyitem = null;
+    private JMenuItem cutitem = null;
     
-    public CopyComponent(final TreeTable tree){
+    /**
+     * cut item for jcontexttreepopup
+     * @param tree
+     */
+    public CutTreePopupItem(final TreeTable tree){
         this.tree = tree;
         
-        copyitem = new JMenuItem(TextBundle.getResource().getString("copy"));
-        copyitem.setIcon( IconBundle.getResource().getIcon("16_copy") );
-        copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+        cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));
+        cutitem.setIcon( IconBundle.getResource().getIcon("16_cut") );
+        cutitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
         
-        copyitem.addActionListener(new ActionListener() {
+        cutitem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                tree.copySelectionInBuffer();
+                tree.cutSelectionInBuffer();
             }
         });
         
@@ -57,8 +61,8 @@ public class CopyComponent implements PopupComponent{
     }
 
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        copyitem.setEnabled( tree.canCopySelection() );
-        return copyitem;
+        cutitem.setEnabled( tree.canCutSelection() );
+        return cutitem;
     }
 
 }

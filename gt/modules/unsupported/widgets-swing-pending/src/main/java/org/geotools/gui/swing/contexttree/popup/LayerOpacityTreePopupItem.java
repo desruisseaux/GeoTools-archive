@@ -17,46 +17,23 @@
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.contexttree.column.OpacityComponent;
 import org.geotools.map.MapLayer;
 
-
-
 /**
+ *
  * @author johann sorel
- * Default popup control for visibility of MapLayer, use for JXMapContextTreePopup
  */
-public class LayerVisiblePopupComponent extends JCheckBoxMenuItem implements PopupComponent{
+public class LayerOpacityTreePopupItem implements TreePopupItem{
+
+    private final OpacityComponent comp = new OpacityComponent();
     
-    private MapLayer layer;
-    
-    
-    /** Creates a new instance of LayerVisibleControl */
-    public LayerVisiblePopupComponent() {
-        this.setText( TextBundle.getResource().getString("visible"));
-        init();
-    }
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        this.setSelected(layer.isVisible());
-        
-        return this;
-    }
-    
-    private void init(){
-        
-        addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                layer.setVisible(isSelected());
-            }
-        });
+    /**
+     * create new instance
+     */
+    public LayerOpacityTreePopupItem(){
+        comp.setOpaque(false);
     }
     
     public boolean isValid(Object[] objs) {
@@ -70,5 +47,10 @@ public class LayerVisiblePopupComponent extends JCheckBoxMenuItem implements Pop
     private boolean isValid(Object obj) {
         return obj instanceof MapLayer;
     }
-    
+
+    public Component getComponent(Object[] obj, ContextTreeNode[] node) {
+        comp.parse(obj[0]);
+        return comp;
+    }
+
 }

@@ -13,6 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
@@ -30,33 +31,38 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author johann sorel
  */
-public class DuplicateComponent implements PopupComponent{
+public class CopyTreePopupItem implements TreePopupItem{
 
-    private JMenuItem duplicateitem = null;
     private TreeTable tree = null;
+    private JMenuItem copyitem = null;
     
-    public DuplicateComponent(final TreeTable tree){
+    /**
+     * copy item for jcontexttreepopup
+     * @param tree
+     */
+    public CopyTreePopupItem(final TreeTable tree){
         this.tree = tree;
         
-        duplicateitem = new JMenuItem( TextBundle.getResource().getString("duplicate") );
-        duplicateitem.setIcon( IconBundle.getResource().getIcon("16_duplicate") );
-        duplicateitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+        copyitem = new JMenuItem(TextBundle.getResource().getString("copy"));
+        copyitem.setIcon( IconBundle.getResource().getIcon("16_copy") );
+        copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
         
-        duplicateitem.addActionListener(new ActionListener() {
+        copyitem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                tree.duplicateSelection();
+                tree.copySelectionInBuffer();
             }
         });
+        
     }
     
-    public boolean isValid(Object[] objs) {
+    public boolean isValid(Object[] obj) {
         return true;
     }
-       
+
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        duplicateitem.setEnabled(tree.canDuplicateSelection());
-        return duplicateitem;
+        copyitem.setEnabled( tree.canCopySelection() );
+        return copyitem;
     }
 
 }

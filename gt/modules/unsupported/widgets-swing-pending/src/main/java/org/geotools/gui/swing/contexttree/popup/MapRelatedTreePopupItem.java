@@ -19,13 +19,24 @@ package org.geotools.gui.swing.contexttree.popup;
 import org.geotools.gui.swing.JMapPane;
 
 /**
- *
+ * Interface for TreePopupItem needing a MapPane element 
+ * 
  * @author johann sorel
  */
-public interface MapRelatedComponent {
+public interface MapRelatedTreePopupItem {
 
+    /**
+     * set target MapPane
+     * 
+     * @param map
+     */
     public void setMapPane(JMapPane map);
     
+    /**
+     * get MapPane
+     * 
+     * @return
+     */
     public JMapPane getMapPane();
     
     
