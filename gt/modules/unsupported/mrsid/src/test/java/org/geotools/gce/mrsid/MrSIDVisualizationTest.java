@@ -16,7 +16,7 @@
  */
 package org.geotools.gce.mrsid;
 
-import org.geotools.TestData;
+import org.geotools.test.TestData;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
