@@ -55,7 +55,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  *
  * @author johann sorel
  */
-public class TreeTable extends JXTreeTable {
+public class JContextTree extends JXTreeTable {
 
     /**
      * Default copy action used for Key Input
@@ -117,7 +117,7 @@ public class TreeTable extends JXTreeTable {
      * Tree widget to manage MapContexts and MapLayers
      * 
      */
-    public TreeTable() {
+    public JContextTree() {
         super(new ContextTreeModel());
 
         setComponentPopupMenu(new JContextTreePopup(this));
@@ -210,21 +210,25 @@ public class TreeTable extends JXTreeTable {
 
     }
     
-     /**
-     *      
+    /**
+     * get the tree model. dont play with the model, too much things are linked    
      * @return the tree model
+     * @deprecated 
      */
     @Override
+    @Deprecated
     public ContextTreeModel getTreeTableModel() {
         return (ContextTreeModel) super.getTreeTableModel();
     }
     
     /**
-     * set the tree model. 
+     * set the tree model. dont play with the model, too much things are linked
      * @param contexttreemodel the new model, <b>MUST</b> be a ContextTreeModel.
      * 
+     * @deprecated 
      */
     @Override
+    @Deprecated
     public void setTreeTableModel(TreeTableModel contexttreemodel){
         if(contexttreemodel != null){
             if(contexttreemodel instanceof ContextTreeModel){
@@ -248,8 +252,8 @@ public class TreeTable extends JXTreeTable {
      * @param map
      * @return default JContextTree
      */
-    public static TreeTable createDefaultTree(JMapPane map) {
-        TreeTable tree = new TreeTable();
+    public static JContextTree createDefaultTree(JMapPane map) {
+        JContextTree tree = new JContextTree();
 
 
         tree.addColumnModel(new VisibleTreeTableColumn());

@@ -46,7 +46,7 @@ import org.geotools.gui.swing.contexttree.popup.SeparatorTreePopupItem;
 public class JContextTreePopup extends JPopupMenu {
 
     private ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
-    private TreeTable treetable;
+    private JContextTree treetable;
     private JMapPane map;
 
     /**
@@ -64,7 +64,7 @@ public class JContextTreePopup extends JPopupMenu {
      * @param tree the tree related to the poup
      * @param treetable 
      */
-    public JContextTreePopup(TreeTable treetable) {
+    public JContextTreePopup(JContextTree treetable) {
         this(treetable,null);
     }
     
@@ -75,7 +75,7 @@ public class JContextTreePopup extends JPopupMenu {
      * @param map 
      * @param treetable the tree related to the popup
      */
-    public JContextTreePopup(TreeTable treetable,JMapPane map) {
+    public JContextTreePopup(JContextTree treetable,JMapPane map) {
         super();
         this.treetable = treetable;
         this.map = map;
@@ -230,7 +230,7 @@ public class JContextTreePopup extends JPopupMenu {
         }
     }
 
-    public void setTree(TreeTable treetable) {
+    public void setTree(JContextTree treetable) {
         this.treetable = treetable;
     }
 

@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
@@ -33,14 +33,14 @@ import org.geotools.gui.swing.icon.IconBundle;
  */
 public class CopyTreePopupItem implements TreePopupItem{
 
-    private TreeTable tree = null;
+    private JContextTree tree = null;
     private JMenuItem copyitem = null;
     
     /**
      * copy item for jcontexttreepopup
      * @param tree
      */
-    public CopyTreePopupItem(final TreeTable tree){
+    public CopyTreePopupItem(final JContextTree tree){
         this.tree = tree;
         
         copyitem = new JMenuItem(TextBundle.getResource().getString("copy"));

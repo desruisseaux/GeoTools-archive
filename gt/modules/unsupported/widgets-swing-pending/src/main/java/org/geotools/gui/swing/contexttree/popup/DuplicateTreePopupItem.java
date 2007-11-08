@@ -22,7 +22,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
@@ -33,13 +33,13 @@ import org.geotools.gui.swing.icon.IconBundle;
 public class DuplicateTreePopupItem implements TreePopupItem{
 
     private JMenuItem duplicateitem = null;
-    private final TreeTable tree;
+    private final JContextTree tree;
     
     /**
      * create new instance
      * @param tree
      */
-    public DuplicateTreePopupItem(final TreeTable tree){
+    public DuplicateTreePopupItem(final JContextTree tree){
         this.tree = tree;
         
         duplicateitem = new JMenuItem( TextBundle.getResource().getString("duplicate") );

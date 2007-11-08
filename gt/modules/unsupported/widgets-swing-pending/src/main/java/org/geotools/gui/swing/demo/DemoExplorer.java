@@ -52,7 +52,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.DeleteTreePopupItem;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyTreePopupItem;
@@ -75,7 +75,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 public class DemoExplorer extends JFrame {
 
     private JMapPane map = new JMapPane();
-    private TreeTable tree = new TreeTable();
+    private JContextTree tree = new JContextTree();
     private JLightMapPaneControl control = new JLightMapPaneControl(map);
     private JTabbedPane tabbed = null;
     private MapContext context = null;

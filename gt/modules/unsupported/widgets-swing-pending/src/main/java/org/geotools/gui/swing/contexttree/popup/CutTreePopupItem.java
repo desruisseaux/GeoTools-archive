@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
@@ -33,14 +33,14 @@ import org.geotools.gui.swing.icon.IconBundle;
  */
 public class CutTreePopupItem implements TreePopupItem{
 
-    private TreeTable tree = null;
+    private JContextTree tree = null;
     private JMenuItem cutitem = null;
     
     /**
      * cut item for jcontexttreepopup
      * @param tree
      */
-    public CutTreePopupItem(final TreeTable tree){
+    public CutTreePopupItem(final JContextTree tree){
         this.tree = tree;
         
         cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));

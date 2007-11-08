@@ -26,7 +26,7 @@ import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.JDBC1DataStore;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -53,7 +53,7 @@ public class TreeNodeProvider extends ComponentProvider<JLabel> {
     public static final ImageIcon ICON_CONTEXT_ACTIVE = IconBundle.getResource().getIcon("16_mapcontext_enable");
     public static final ImageIcon ICON_CONTEXT_DESACTIVE = IconBundle.getResource().getIcon("16_mapcontext_disable");
 
-    private final TreeTable tree;
+    private final JContextTree tree;
     
     
     /**
@@ -61,7 +61,7 @@ public class TreeNodeProvider extends ComponentProvider<JLabel> {
      * 
      * @param tree related JContextTree
      */
-    public TreeNodeProvider(TreeTable tree) {
+    public TreeNodeProvider(JContextTree tree) {
         this.tree = tree;
         rendererComponent = new JLabel();
     }

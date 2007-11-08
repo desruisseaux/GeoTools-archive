@@ -23,7 +23,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 
@@ -37,14 +37,14 @@ import org.geotools.map.MapContext;
 public class ContextActiveTreePopupItem extends JCheckBoxMenuItem implements TreePopupItem{
     
     private MapContext context;
-    private TreeTable xtree ;
+    private JContextTree xtree ;
     
     
     /** 
      * Creates a new instance of ContextActiveControl 
      * @param tree 
      */
-    public ContextActiveTreePopupItem(TreeTable tree) {
+    public ContextActiveTreePopupItem(JContextTree tree) {
         this.setText( TextBundle.getResource().getString("activated")  );
         xtree = tree;
         init();

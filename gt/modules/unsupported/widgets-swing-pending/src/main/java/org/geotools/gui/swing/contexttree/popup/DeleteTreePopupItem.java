@@ -22,7 +22,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
@@ -33,13 +33,13 @@ import org.geotools.gui.swing.icon.IconBundle;
 public class DeleteTreePopupItem implements TreePopupItem{
 
     private JMenuItem deleteitem = null;
-    private TreeTable tree = null;
+    private JContextTree tree = null;
     
     /**
      * delete item for jcontexttreepopup
      * @param tree
      */
-    public DeleteTreePopupItem(final TreeTable tree){
+    public DeleteTreePopupItem(final JContextTree tree){
         this.tree = tree;
         
         deleteitem = new JMenuItem( TextBundle.getResource().getString("delete") );

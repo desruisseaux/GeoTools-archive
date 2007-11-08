@@ -42,7 +42,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.TreeEvent;
 import org.geotools.gui.swing.contexttree.TreeListener;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.control.JMapPaneInfoPanel;
 import org.geotools.gui.swing.datachooser.DataPanel;
@@ -80,7 +80,7 @@ public class DemoAll extends javax.swing.JFrame {
     
     private MapContext _context;
     private MapLayer _layer;
-    private TreeTable tree;
+    private JContextTree tree;
     private JMapPane map;
     private JLightMapPaneControl lightcontrol;
     private JMapPaneInfoPanel infopanel;
@@ -154,7 +154,7 @@ public class DemoAll extends javax.swing.JFrame {
 
         /************************JCONTEXTTREE**********************************/
         titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        tree = TreeTable.createDefaultTree(map);
+        tree = JContextTree.createDefaultTree(map);
         tree.addMapContext(_context);
         
         JScrollPane pane = new JScrollPane(tree);

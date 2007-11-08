@@ -24,7 +24,7 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
-import org.geotools.gui.swing.contexttree.TreeTable;
+import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
@@ -37,7 +37,7 @@ import org.geotools.map.MapLayer;
 public class PasteTreePopupItem implements TreePopupItem {
 
     private JMenuItem pasteitem = null;
-    private TreeTable tree = null;
+    private JContextTree tree = null;
     private List<MapContext> contexts = new ArrayList<MapContext>();
     private List<MapLayer> layers = new ArrayList<MapLayer>();
 
@@ -45,7 +45,7 @@ public class PasteTreePopupItem implements TreePopupItem {
      * Paste menuitem for jcontextpopup 
      * @param tree
      */
-    public PasteTreePopupItem(final TreeTable tree) {
+    public PasteTreePopupItem(final JContextTree tree) {
         this.tree = tree;
 
         pasteitem = new JMenuItem(TextBundle.getResource().getString("paste"));
