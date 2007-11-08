@@ -301,6 +301,10 @@ public class Drawer {
             Color c = SLD.pointColor( pointSymbolizer );
             Color fill=SLD.pointFill( pointSymbolizer );
             int width = SLD.width(SLD.stroke(pointSymbolizer));
+            
+            if(width == SLD.NOTFOUND)
+                width =1;
+            
             float[] point=new float[6];
             shape.getPathIterator(null).currentSegment(point);
             SLDStyleFactory styleFactory=new SLDStyleFactory();
@@ -342,7 +346,7 @@ public class Drawer {
                 g.setTransform(AffineTransform.getRotateInstance(rotation));
  
                 BufferedImage image = (BufferedImage)style.getImage();
-                //g.drawI
+                
                 g.drawImage(image, (int)(point[0]-((double)image.getWidth())/(double)2), (int)(point[1]-((double)image.getHeight())/(double)2),null);
             }
         }
