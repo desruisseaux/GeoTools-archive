@@ -139,7 +139,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// Source management
 			//
 			// /////////////////////////////////////////////////////////////////////
-			checkSource(input);
+			checkSource(input, hints);
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -231,13 +231,16 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @param input
 	 *            provied to this {@link ArcGridReader}.
+	 * @param hints
+	 *            Hints to be used by this reader throughout his life.
 	 * @throws UnsupportedEncodingException
 	 * @throws DataSourceException
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
-	private void checkSource(Object input) throws UnsupportedEncodingException,
-			DataSourceException, IOException, FileNotFoundException {
+	private void checkSource(Object input, final Hints hints)
+			throws UnsupportedEncodingException, DataSourceException,
+			IOException, FileNotFoundException {
 		if (input == null) {
 			final DataSourceException ex = new DataSourceException(
 					"No source set to read this coverage.");
@@ -401,7 +404,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		GeneralEnvelope readEnvelope = null;
 		Rectangle requestedDim = null;
 		if (params != null) {
-
 			final int length = params.length;
 			Parameter param;
 			String name;
@@ -415,7 +417,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
 				}
-
 			}
 		}
 		return createCoverage(readEnvelope, requestedDim);
@@ -436,7 +437,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			Rectangle requestedDim) throws IOException {
 
 		if (!closeMe) {
-
 			inStream.reset();
 			inStream.mark();
 		}
@@ -539,7 +539,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 						* 0.1, inNoData + Math.abs(inNoData) * 10));
 
 			}
-
 
 			//
 			// ///////////////////////////////////////////////////////////////////
@@ -660,7 +659,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	private void getCoordinateReferenceSystem() throws FileNotFoundException,
 			IOException {
 
-//		 check to see if there is a projection file
+		// check to see if there is a projection file
 		if (source instanceof File
 				|| (source instanceof URL && (((URL) source).getProtocol() == "file"))) {
 			// getting name for the prj file
@@ -680,7 +679,7 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			final File prjFile = new File(base.toString());
 			if (prjFile.exists()) {
 				// it exists then we have top read it
-				PrjFileReader projReader=null;
+				PrjFileReader projReader = null;
 				try {
 					FileChannel channel = new FileInputStream(prjFile)
 							.getChannel();
@@ -698,17 +697,17 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 					// warn about the error but proceed, it is not fatal
 					// we have at least the default crs to use
 					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-				}
-				finally{
-					if(projReader!=null)
-						try{
+				} finally {
+					if (projReader != null)
+						try {
 							projReader.close();
+						} catch (IOException e) {
+							// warn about the error but proceed, it is not fatal
+							// we have at least the default crs to use
+							LOGGER
+									.log(Level.SEVERE, e.getLocalizedMessage(),
+											e);
 						}
-					catch (IOException e) {
-						// warn about the error but proceed, it is not fatal
-						// we have at least the default crs to use
-						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-					}
 				}
 
 			}
