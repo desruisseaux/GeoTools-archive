@@ -281,7 +281,7 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     /**
      * get the index of a mapcontext in the tree
      * @param context the mapcontext to find
-     * @return index of context
+     * @return index of context, -1 if context isn't in the tree
      */
     public int getMapContextIndex(MapContext context) {
         int ret = -1;

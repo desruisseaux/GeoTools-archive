@@ -18,42 +18,97 @@ package org.geotools.gui.swing.contexttree.popup;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
 
 /**
  *
  * @author johann sorel
  */
-public class PasteComponent implements PopupComponent{
+public class PasteComponent implements PopupComponent {
 
     private JMenuItem pasteitem = null;
     private TreeTable tree = null;
-    
-    public PasteComponent(final TreeTable tree){
+    private List<MapContext> contexts = new ArrayList<MapContext>();
+    private List<MapLayer> layers = new ArrayList<MapLayer>();
+
+    public PasteComponent(final TreeTable tree) {
         this.tree = tree;
-        
-        pasteitem = new JMenuItem( TextBundle.getResource().getString("paste") );
-        pasteitem.setIcon( IconBundle.getResource().getIcon("16_paste") );
-        
+
+        pasteitem = new JMenuItem(TextBundle.getResource().getString("paste"));
+        pasteitem.setIcon(IconBundle.getResource().getIcon("16_paste"));
+        pasteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
+
         pasteitem.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
-                tree.pasteBuffer();
-            }
-        });
+                    public void actionPerformed(ActionEvent e) {
+                        tree.pasteBuffer();
+                    }
+                });
     }
-    
+
+    private String buildToolTip(Object[] buffer) {
+        String tooltip = "<html>";
+
+        for (Object obj : buffer) {
+
+            if (obj instanceof MapLayer) {
+                layers.add((MapLayer) obj);
+            }
+
+            if (obj instanceof MapContext) {
+                contexts.add((MapContext) obj);
+            }
+        }
+
+
+        if (contexts.size() > 0) {
+            tooltip += "<b>&nbsp " + TextBundle.getResource().getString("contexts") + "</b> : &nbsp";
+
+            for (MapContext context : contexts) {
+                tooltip += "<br>&nbsp &nbsp - " + context.getTitle() +"&nbsp &nbsp &nbsp";
+            }
+        }
+
+
+
+        if (layers.size() > 0) {
+
+            if (tooltip.length() > 6) {
+                tooltip += "<br>";
+            }
+
+            tooltip += "<b>&nbsp " + TextBundle.getResource().getString("layers") + "</b> : &nbsp";
+
+            for (MapLayer layer : layers) {
+                tooltip += "<br>&nbsp &nbsp - " + layer.getTitle() +"&nbsp &nbsp &nbsp";
+            }
+        }
+        
+        tooltip += "</html>";
+        
+        contexts.clear();
+        layers.clear();
+        return tooltip;
+    }
+
     public boolean isValid(Object[] objs) {
         return true;
     }
-       
+
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
         pasteitem.setEnabled(tree.canPasteBuffer());
+        pasteitem.setToolTipText(buildToolTip(tree.getBuffer()));
+
         return pasteitem;
     }
-
 }

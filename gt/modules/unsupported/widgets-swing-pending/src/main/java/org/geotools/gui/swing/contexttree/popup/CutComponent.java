@@ -19,7 +19,9 @@ package org.geotools.gui.swing.contexttree.popup;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
@@ -39,6 +41,7 @@ public class CutComponent implements PopupComponent{
         
         cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));
         cutitem.setIcon( IconBundle.getResource().getIcon("16_cut") );
+        cutitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
         
         cutitem.addActionListener(new ActionListener() {
 
@@ -54,7 +57,7 @@ public class CutComponent implements PopupComponent{
     }
 
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        cutitem.setEnabled( tree.hasSelection());
+        cutitem.setEnabled( tree.canCutSelection() );
         return cutitem;
     }
 

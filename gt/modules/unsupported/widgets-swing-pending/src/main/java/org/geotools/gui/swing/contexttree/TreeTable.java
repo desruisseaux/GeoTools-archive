@@ -18,21 +18,27 @@ package org.geotools.gui.swing.contexttree;
 import org.geotools.gui.swing.contexttree.draganddrop.MultiContextTreeDrop;
 import org.geotools.gui.swing.contexttree.draganddrop.MultiContextTreeTransferHandler;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JPopupMenu;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.TreeNodeProvider;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.jdesktop.swingx.JXTreeTable;
@@ -47,7 +53,56 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
  */
 public class TreeTable extends JXTreeTable {
 
-    private List<Object> buffer = new ArrayList<Object>();
+    /**
+     * Default copy action used for Key Input
+     */
+    public final Action COPY_ACTION = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    copySelectionInBuffer();
+                }
+                };
+    /**
+     * Default cut action used for Key Input
+     */
+    public final Action CUT_ACTION = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    cutSelectionInBuffer();
+                }
+                };
+    /**
+     * Default paste action used for Key Input
+     */
+    public final Action PASTE_ACTION = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    pasteBuffer();
+                }
+                };
+    /**
+     * Default delete action used for Key Input
+     */
+    public final Action DELETE_ACTION = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    deleteSelection();
+                }
+                };
+    /**
+     * Default duplicate action used for Key Input
+     */
+    public final Action DUPLICATE_ACTION = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    duplicateSelection();
+                }
+                };
+                
+                
+                
+    private final List<Object> buffer = new ArrayList<Object>();
+    private final String COPY_NAME = "-" + TextBundle.getResource().getString("copy") + "- ";
 
     public TreeTable() {
         super(new ContextTreeModel());
@@ -102,6 +157,7 @@ public class TreeTable extends JXTreeTable {
 
         //drag and drop 
         initDragAndDrop();
+        initKeySupport();
     }
 
     private void initDragAndDrop() {
@@ -115,14 +171,45 @@ public class TreeTable extends JXTreeTable {
 
     }
 
+    private void initKeySupport() {
+        InputMap inputMap = getInputMap();
+        ActionMap actionMap = getActionMap();
+
+        KeyStroke copyKeys = KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK);
+        KeyStroke cutKeys = KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK);
+        KeyStroke pasteKeys = KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK);
+        KeyStroke deleteKeys = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+        KeyStroke duplicateKeys = KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK);
+        String copycode = "copy";
+        String cutcode = "cut";
+        String pastecode = "paste";
+        String deletecode = "delete";
+        String duplicatecode = "duplicate";
+        
+        inputMap.put(copyKeys, copycode);
+        inputMap.put(cutKeys, cutcode);
+        inputMap.put(pasteKeys, pastecode);
+        inputMap.put(deleteKeys, deletecode);
+        inputMap.put(duplicateKeys, duplicatecode);
+        actionMap.put(copycode, COPY_ACTION);
+        actionMap.put(cutcode, CUT_ACTION);
+        actionMap.put(pastecode, PASTE_ACTION);
+        actionMap.put(deletecode, DELETE_ACTION);
+        actionMap.put(duplicatecode, DUPLICATE_ACTION);
+
+    }
+
     ////////////////////////////////////////////////////////////////////////////
-    // CUT/COPY/PASTE/DUPLICATE  ///////////////////////////////////////////////
+    // CUT/COPY/PASTE/DUPLICATE/DELETE  ////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
 
-    
+    private String getCopyName(String name) {
+        return COPY_NAME + name;
+    }
+
     public boolean hasSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
-        
+
         if (selections != null) {
             if (selections.length > 0) {
                 return true;
@@ -130,7 +217,7 @@ public class TreeTable extends JXTreeTable {
         }
         return false;
     }
-    
+
     private boolean hasSelection(TreePath[] selections) {
 
         if (selections != null) {
@@ -141,19 +228,18 @@ public class TreeTable extends JXTreeTable {
         return false;
     }
 
-    
-    private boolean onlyMapContexts(List<Object> lst){
-        
-        for(Object obj : lst){
-            
-            if( !(obj instanceof MapContext)){
+    private boolean onlyMapContexts(List<Object> lst) {
+
+        for (Object obj : lst) {
+
+            if (!(obj instanceof MapContext)) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     private boolean onlyMapContexts(TreePath[] paths) {
 
         for (TreePath path : paths) {
@@ -164,19 +250,18 @@ public class TreeTable extends JXTreeTable {
         }
         return true;
     }
-    
-    private boolean onlyMapLayers(List<Object> lst){
-        
-        for(Object obj : lst){
-            
-            if( !(obj instanceof MapLayer)){
+
+    private boolean onlyMapLayers(List<Object> lst) {
+
+        for (Object obj : lst) {
+
+            if (!(obj instanceof MapLayer)) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
 
     private boolean onlyMapLayers(TreePath[] paths) {
 
@@ -192,12 +277,30 @@ public class TreeTable extends JXTreeTable {
     public void duplicateSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
-        if (hasSelection(selections)) {
-            
-            if(onlyMapLayers(selections)){
-                //a faire
-            }else if(onlyMapContexts(selections)){
-                
+        if (canDuplicateSelection()) {
+            FacilitiesFactory ff = new FacilitiesFactory();
+
+            if (onlyMapLayers(selections)) {
+
+                for (TreePath tp : selections) {
+                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
+                    MapLayer copylayer = ff.duplicateLayer(layer);
+                    copylayer.setTitle(getCopyName(layer.getTitle()));
+
+                    parent.addLayer(copylayer);
+                    parent.moveLayer(parent.indexOf(copylayer), parent.indexOf(layer));
+                }
+
+            } else if (onlyMapContexts(selections)) {
+
+                for (TreePath tp : selections) {
+                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    MapContext copycontext = ff.duplicateContext(context);
+                    copycontext.setTitle(getCopyName(context.getTitle()));
+
+                    getTreeTableModel().addMapContext(copycontext);
+                }
             }
         }
     }
@@ -206,10 +309,46 @@ public class TreeTable extends JXTreeTable {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
         if (hasSelection(selections)) {
-            return onlyMapContexts(selections) || onlyMapLayers(selections);
+            return (onlyMapContexts(selections) || onlyMapLayers(selections));
         } else {
             return false;
         }
+    }
+
+    public boolean canDeleteSelection() {
+        return hasSelection();
+    }
+
+    public boolean canCopySelection() {
+        return canDuplicateSelection();
+    }
+
+    public boolean canCutSelection() {
+        return canDuplicateSelection();
+    }
+
+    public void deleteSelection() {
+
+        if (canDeleteSelection()) {
+            TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
+
+            for (int i = selections.length - 1; i >= 0; i--) {
+                TreePath tp = selections[i];
+
+                if (((ContextTreeNode) tp.getLastPathComponent()).getUserObject() instanceof MapLayer) {
+                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
+
+                    parent.removeLayer(layer);
+
+
+                } else if (((ContextTreeNode) tp.getLastPathComponent()).getUserObject() instanceof MapContext) {
+                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    getTreeTableModel().removeMapContext(context);
+                }
+            }
+        }
+
     }
 
     public void copySelectionInBuffer() {
@@ -218,12 +357,22 @@ public class TreeTable extends JXTreeTable {
         if (hasSelection(selections)) {
             buffer.clear();
 
-            if (selections != null) {
+            if (onlyMapLayers(selections)) {
+
                 for (TreePath tp : selections) {
-                    ContextTreeNode node = (ContextTreeNode) tp.getLastPathComponent();
-                    buffer.add(node.getUserObject());
+                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    buffer.add(layer);
+                }
+
+            } else if (onlyMapContexts(selections)) {
+
+                for (TreePath tp : selections) {
+                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    buffer.add(context);
                 }
             }
+
+
         }
 
     }
@@ -234,12 +383,27 @@ public class TreeTable extends JXTreeTable {
         if (hasSelection(selections)) {
             buffer.clear();
 
-            if (selections != null) {
+
+            if (onlyMapLayers(selections)) {
+
                 for (TreePath tp : selections) {
-                    ContextTreeNode node = (ContextTreeNode) tp.getLastPathComponent();
-                    buffer.add(node.getUserObject());
+                    MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+                    MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
+
+                    buffer.add(layer);
+                    parent.removeLayer(layer);
+                }
+
+            } else if (onlyMapContexts(selections)) {
+
+                for (TreePath tp : selections) {
+                    MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
+
+                    buffer.add(context);
+                    getTreeTableModel().removeMapContext(context);
                 }
             }
+
         }
     }
 
@@ -252,22 +416,22 @@ public class TreeTable extends JXTreeTable {
     }
 
     public boolean canPasteBuffer() {
-        if(isBufferEmpty()){
+        if (isBufferEmpty()) {
             return false;
-        }else{
-            
-            if(onlyMapContexts(buffer)){
+        } else {
+
+            if (onlyMapContexts(buffer)) {
                 return true;
-            }else if(onlyMapLayers(buffer)){
+            } else if (onlyMapLayers(buffer)) {
                 TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
-                    
-                if(hasSelection(selections)){
-                    if(selections.length == 1){
+
+                if (hasSelection(selections)) {
+                    if (selections.length == 1) {
                         return true;
                     }
                 }
             }
-            
+
         }
         return false;
     }
@@ -275,30 +439,81 @@ public class TreeTable extends JXTreeTable {
     public void pasteBuffer() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
-        if (hasSelection(selections)) {
 
-            if (selections != null) {
-                if (selections.length > 0) {
+        if (!isBufferEmpty()) {
+            FacilitiesFactory ff = new FacilitiesFactory();
 
-                    ContextTreeNode node = (ContextTreeNode) selections[0].getLastPathComponent();
 
-                    if (node.getUserObject() instanceof MapLayer) {
+            if (onlyMapLayers(buffer)) {
 
-                    } else if (node.getUserObject() instanceof MapContext) {
-                        MapContext context = (MapContext) node.getUserObject();
+                if (hasSelection(selections)) {
 
-                        for (Object obj : buffer) {
-                            if (obj instanceof MapLayer) {
-                                context.addLayer((MapLayer) obj);
+                    if (selections.length == 1) {
+
+
+                        if (((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject() instanceof MapLayer) {
+                            MapLayer insertlayer = (MapLayer) ((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject();
+                            MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) selections[0].getLastPathComponent()).getParent()).getUserObject();
+
+                            for (Object obj : buffer) {
+                                MapLayer layer = (MapLayer) obj;
+
+                                if (parent.indexOf(layer) == -1) {
+                                    parent.addLayer(layer);
+                                    parent.moveLayer(parent.indexOf(layer), parent.indexOf(insertlayer));
+                                } else {
+                                    MapLayer copy = ff.duplicateLayer(layer);
+                                    copy.setTitle(getCopyName(layer.getTitle()));
+                                    parent.addLayer(copy);
+                                    parent.moveLayer(parent.indexOf(copy), parent.indexOf(insertlayer));
+                                }
                             }
-                        }
 
+
+                        } else if (((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject() instanceof MapContext) {
+                            MapContext context = (MapContext) ((ContextTreeNode) selections[0].getLastPathComponent()).getUserObject();
+
+
+                            for (Object obj : buffer) {
+                                MapLayer layer = (MapLayer) obj;
+
+                                if (context.indexOf(layer) == -1) {
+                                    context.addLayer(layer);
+                                } else {
+                                    MapLayer copy = ff.duplicateLayer(layer);
+                                    copy.setTitle(getCopyName(layer.getTitle()));
+                                    context.addLayer(copy);
+                                    context.moveLayer(context.indexOf(copy), context.indexOf(layer));
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+
+
+            } else if (onlyMapContexts(buffer)) {
+
+                for (Object obj : buffer) {
+                    MapContext context = (MapContext) obj;
+
+                    if (getTreeTableModel().getMapContextIndex(context) == -1) {
+                        getTreeTableModel().addMapContext(context);
+                    } else {
+                        getTreeTableModel().addMapContext(ff.duplicateContext(context));
                     }
 
                 }
+
+                buffer.clear();
             }
+
+
         }
-        buffer.clear();
+
+
+
     }
 
     public Object[] getBuffer() {

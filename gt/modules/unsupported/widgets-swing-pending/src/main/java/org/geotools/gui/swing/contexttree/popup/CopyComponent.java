@@ -19,7 +19,9 @@ package org.geotools.gui.swing.contexttree.popup;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.TreeTable;
 import org.geotools.gui.swing.i18n.TextBundle;
@@ -39,6 +41,7 @@ public class CopyComponent implements PopupComponent{
         
         copyitem = new JMenuItem(TextBundle.getResource().getString("copy"));
         copyitem.setIcon( IconBundle.getResource().getIcon("16_copy") );
+        copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
         
         copyitem.addActionListener(new ActionListener() {
 
@@ -54,7 +57,7 @@ public class CopyComponent implements PopupComponent{
     }
 
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        copyitem.setEnabled( tree.hasSelection());
+        copyitem.setEnabled( tree.canCopySelection() );
         return copyitem;
     }
 

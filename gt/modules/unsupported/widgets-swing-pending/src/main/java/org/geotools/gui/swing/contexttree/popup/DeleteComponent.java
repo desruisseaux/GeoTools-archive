@@ -30,22 +30,23 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author johann sorel
  */
-public class DuplicateComponent implements PopupComponent{
+public class DeleteComponent implements PopupComponent{
 
-    private JMenuItem duplicateitem = null;
+    private JMenuItem deleteitem = null;
     private TreeTable tree = null;
     
-    public DuplicateComponent(final TreeTable tree){
+    public DeleteComponent(final TreeTable tree){
         this.tree = tree;
         
-        duplicateitem = new JMenuItem( TextBundle.getResource().getString("duplicate") );
-        duplicateitem.setIcon( IconBundle.getResource().getIcon("16_duplicate") );
-        duplicateitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+        deleteitem = new JMenuItem( TextBundle.getResource().getString("delete") );
+        deleteitem.setIcon( IconBundle.getResource().getIcon("16_delete") );
+        //deleteitem.setMnemonic(KeyEvent.VK_DELETE);
+        deleteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,0));
         
-        duplicateitem.addActionListener(new ActionListener() {
+        deleteitem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                tree.duplicateSelection();
+                tree.deleteSelection();
             }
         });
     }
@@ -55,8 +56,8 @@ public class DuplicateComponent implements PopupComponent{
     }
        
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        duplicateitem.setEnabled(tree.canDuplicateSelection());
-        return duplicateitem;
+        deleteitem.setEnabled(tree.canDeleteSelection());        
+        return deleteitem;
     }
 
 }

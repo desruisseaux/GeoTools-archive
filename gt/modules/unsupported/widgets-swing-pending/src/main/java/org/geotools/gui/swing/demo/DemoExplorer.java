@@ -51,7 +51,7 @@ import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
-import org.geotools.gui.swing.contexttree.popup.LayerDeletePopupComponent;
+import org.geotools.gui.swing.contexttree.popup.DeleteComponent;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyPopupComponent;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomPopupComponent;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
@@ -202,7 +202,7 @@ public class DemoExplorer extends JFrame {
         JContextTreePopup popup = (JContextTreePopup) tree.getComponentPopupMenu();
         popup.addPopControl(zoom);
         popup.addPopControl(feature);
-        popup.addPopControl(new LayerDeletePopupComponent());
+        popup.addPopControl(new DeleteComponent(tree.getTreeTable()));
         tree.addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {
