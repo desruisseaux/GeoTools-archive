@@ -117,6 +117,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
 
     private void actionNouveau(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionNouveau
         ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
+        RandomStyleFactory rsf = new RandomStyleFactory();
         
         File[] files = gui_choose.getSelectedFiles();
             for (File f : files) {
@@ -125,7 +126,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                 if (source != null) {
                     try {
                         FeatureSource fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
-                        Style style = RandomStyleFactory.createRandomVectorStyle(fs);
+                        Style style = rsf.createRandomVectorStyle(fs);
                         MapLayer layer = new DefaultMapLayer(fs, style);
                         layer.setTitle(f.getName());
                         layers.add(layer);
@@ -137,7 +138,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                     source = getGridCoverage(f);
                     if (source != null) {
                         try {
-                            Style style = RandomStyleFactory.createRasterStyle();
+                            Style style = rsf.createRasterStyle();
                             MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
                             layer.setTitle(f.getName());
                             layers.add(layer);

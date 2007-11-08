@@ -52,12 +52,20 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class RandomStyleFactory {
     
+    private final String[] POINT_SHAPES = {"square","circle","triangle","star","cross","x"};
+    private final int[] SIZES = {8,10,12,14,16,18};
+    private final int[] WIDTHS = {1,2};
+    private final Color[] COLORS = {
+        Color.BLACK,Color.BLUE,Color.CYAN,Color.DARK_GRAY,
+        Color.GRAY,Color.GREEN.darker(),Color.LIGHT_GRAY,
+        Color.ORANGE,Color.RED,Color.YELLOW.darker()};
     
-    public static Style createPolygonStyle(){
+    
+    public Style createPolygonStyle(){
         Style style = null;
         
         StyleBuilder sb = new StyleBuilder();
-        Symbolizer ps = sb.createPolygonSymbolizer(Color.BLUE,2d);
+        Symbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
         
         style = sb.createStyle();
         style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
@@ -65,11 +73,11 @@ public class RandomStyleFactory {
         return style;
     }
     
-    public static Style createRandomVectorStyle(FeatureSource fs){
+    public Style createRandomVectorStyle(FeatureSource fs){
         Style style = null;
         
         StyleBuilder sb = new StyleBuilder();
-        Symbolizer ps = sb.createPolygonSymbolizer(Color.BLUE,2d);
+        Symbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
                 
         try {
             FeatureType typ = fs.getSchema();            
@@ -79,17 +87,17 @@ public class RandomStyleFactory {
             Class cla = type.getBinding();
             
             if( cla.equals(Polygon.class) || cla.equals(MultiPolygon.class) ){
-                ps = sb.createPolygonSymbolizer(new Color(253, 241, 187), new Color(163, 151, 97), 1);
+                ps = sb.createPolygonSymbolizer(randomColor(), randomColor(), 1);
             }else if( cla.equals(LineString.class) || cla.equals(MultiLineString.class) ){
-                ps = sb.createLineSymbolizer(Color.BLUE,2d);
+                ps = sb.createLineSymbolizer(randomColor(),randomWidth());
             }else if( cla.equals(Point.class) || cla.equals(MultiPoint.class) ){
-                Fill fill = sb.createFill(Color.RED, 1d);
-                Stroke stroke = sb.createStroke(Color.BLACK, 2d);
-                Mark mark = sb.createMark("square", fill, stroke  );
+                Fill fill = sb.createFill(randomColor(), 1);
+                Stroke stroke = sb.createStroke(randomColor(), 1);
+                Mark mark = sb.createMark(randomPointShape(), fill, stroke  );
                 Graphic gra = sb.createGraphic();
                 gra.setOpacity( sb.literalExpression(1) );
                 gra.setMarks(new Mark[]{mark});
-                gra.setSize(sb.literalExpression(8));
+                gra.setSize(sb.literalExpression(randomPointSize()));
                 ps = sb.createPointSymbolizer(gra);
             }
                         
@@ -103,7 +111,7 @@ public class RandomStyleFactory {
         return style;
     }
     
-    public static Style createRasterStyle() {
+    public Style createRasterStyle() {
         Style style = null;
         
         StyleBuilder sb = new StyleBuilder();
@@ -113,7 +121,7 @@ public class RandomStyleFactory {
         return style;
     }
     
-    public static BufferedImage createGlyph(MapLayer layer){
+    public BufferedImage createGlyph(MapLayer layer){
         BufferedImage bi = null;
         
         if(layer != null){
@@ -141,7 +149,7 @@ public class RandomStyleFactory {
         return bi;
     }
     
-    public static BufferedImage createGlyph(Symbolizer symbol){
+    public BufferedImage createGlyph(Symbolizer symbol){
         BufferedImage bi = null;
         
         if( symbol != null){
@@ -166,6 +174,22 @@ public class RandomStyleFactory {
         }
         
         return bi;
+    }
+    
+    public int randomPointSize(){
+        return SIZES[ ((int)(Math.random() * SIZES.length)) ];
+    }
+    
+    public int randomWidth(){
+        return WIDTHS[ ((int)(Math.random() * WIDTHS.length)) ];
+    }
+    
+    public String randomPointShape(){
+        return POINT_SHAPES[ ((int)(Math.random() * POINT_SHAPES.length)) ];
+    }
+    
+    public Color randomColor(){
+        return COLORS[ ((int)(Math.random() * COLORS.length)) ];
     }
     
     

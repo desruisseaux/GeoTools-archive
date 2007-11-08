@@ -269,6 +269,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
 
     private void actionAdd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAdd
         ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
+        RandomStyleFactory rsf = new RandomStyleFactory();
 
         if (store != null) {
 
@@ -277,7 +278,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                     DBModel model = (DBModel) tab_table.getModel();
                     String name = (String) model.getValueAt(tab_table.getSelectedRows()[i], 0);
                     FeatureSource fs = store.getFeatureSource(name);
-                    Style style = RandomStyleFactory.createRandomVectorStyle(fs);
+                    Style style = rsf.createRandomVectorStyle(fs);
 
                     MapLayer layer = new DefaultMapLayer(fs, style);
                     layer.setTitle(jcb_dbtype.getSelectedItem().toString() + "-" + name);

@@ -70,10 +70,12 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  */
 public class DemoAll extends javax.swing.JFrame {
 
-    private ImageIcon ICO_CHECK = IconBundle.getResource().getIcon("16_check");
-    private ImageIcon ICO_ERROR = IconBundle.getResource().getIcon("16_error");
-    private ImageIcon ICO_WARNING = IconBundle.getResource().getIcon("16_warning");
-    private ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
+    private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
+    private final ImageIcon ICO_CHECK = IconBundle.getResource().getIcon("16_check");
+    private final ImageIcon ICO_ERROR = IconBundle.getResource().getIcon("16_error");
+    private final ImageIcon ICO_WARNING = IconBundle.getResource().getIcon("16_warning");
+    private final ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
+    
     private MapContext _context;
     private MapLayer _layer;
     private JContextTree tree;
@@ -102,7 +104,7 @@ public class DemoAll extends javax.swing.JFrame {
             hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
             store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
-            style = RandomStyleFactory.createRandomVectorStyle(fs);
+            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");
             _context.addLayer(layer);
@@ -112,7 +114,7 @@ public class DemoAll extends javax.swing.JFrame {
             hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
             store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
-            style = RandomStyleFactory.createRandomVectorStyle(fs);
+            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_line.shp");
             _context.addLayer(layer);
@@ -121,7 +123,7 @@ public class DemoAll extends javax.swing.JFrame {
             hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
             store = DataStoreFinder.getDataStore(hash);
             fs = store.getFeatureSource(store.getTypeNames()[0]);
-            style = RandomStyleFactory.createRandomVectorStyle(fs);
+            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_point.shp");
             _context.addLayer(layer);

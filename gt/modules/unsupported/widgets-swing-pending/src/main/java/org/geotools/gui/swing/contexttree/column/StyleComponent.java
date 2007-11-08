@@ -35,8 +35,10 @@ import org.geotools.styling.Symbolizer;
  */
 public class StyleComponent extends RendererAndEditorComponent {
     
+    private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
     private MapLayer layer = null;
     private Symbolizer symbol = null;
+    
     
     public StyleComponent(){
         
@@ -71,10 +73,10 @@ public class StyleComponent extends RendererAndEditorComponent {
         super.paintComponent(g);      
         
         if( layer != null ){
-            g.drawImage( RandomStyleFactory.createGlyph(layer), (getWidth()-16)/2,(getHeight()-16)/2,this);
+            g.drawImage( RANDOM_STYLE_FACTORY.createGlyph(layer), (getWidth()-16)/2,(getHeight()-16)/2,this);
         }
         else if( symbol != null ){
-            g.drawImage( RandomStyleFactory.createGlyph(symbol), (getWidth()-16)/2,(getHeight()-16)/2,this);
+            g.drawImage( RANDOM_STYLE_FACTORY.createGlyph(symbol), (getWidth()-16)/2,(getHeight()-16)/2,this);
         }
     }
 
