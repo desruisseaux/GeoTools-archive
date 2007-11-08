@@ -138,7 +138,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			// Source management
 			//
 			// //
-			checkSource(input);
+			checkSource(input, hints);
 
 			// Getting a reader for this format
 			final ImageReader reader = readerSPI.createReaderInstance();
@@ -367,13 +367,16 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * other objects and flags accordingly.
 	 * 
 	 * @param input
-	 *            provided to this {@link MrSIDReader}.
+	 *            provided to this {@link MrSIDReader}. *
+	 * @param hints
+	 *            Hints to be used by this reader throughout his life.
+	 * 
 	 * @throws UnsupportedEncodingException
 	 * @throws DataSourceException
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
-	private void checkSource(Object input) throws UnsupportedEncodingException,
+	private void checkSource(Object input, final Hints hints) throws UnsupportedEncodingException,
 			DataSourceException, IOException, FileNotFoundException {
 		if (input == null) {
 			final DataSourceException ex = new DataSourceException(

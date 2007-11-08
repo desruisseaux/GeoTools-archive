@@ -16,9 +16,9 @@
  
  <!--  <scm>-->
  <!--   <connection>-->
- <!--     scm:svn:https://www.geo-solutions.it/svn/repo/geotools/trunk/gt/modules/plugin/mrsid/-->
+ <!--     scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mrsid/-->
  <!--   </connection>-->
- <!--   <url>https://www.geo-solutions.it/svn/repo/geotools/trunk/gt/modules/plugin/mrsid/</url>-->
+ <!--   <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/mrsid/</url>-->
  <!-- </scm>-->
 
   <description>

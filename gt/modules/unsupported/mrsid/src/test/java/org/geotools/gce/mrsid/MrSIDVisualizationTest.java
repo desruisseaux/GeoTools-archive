@@ -63,6 +63,15 @@ public final class MrSIDVisualizationTest extends AbstractMrSIDTestCase {
 	 */
 	public void testVisualization() throws Exception {
 		// read in the grid coverage
+		if (fileName.equalsIgnoreCase("")) {
+			LOGGER
+					.info("===================================================================\n"
+							+ " Warning! No valid test File has been yet specified.\n"
+							+ " Please provide a valid sample in the source code and repeat this test!\n"
+							+ "========================================================================");
+			return;
+		}
+		
 		final AbstractGridCoverage2DReader reader = new MrSIDReader(TestData
 				.file(this, fileName));
 
