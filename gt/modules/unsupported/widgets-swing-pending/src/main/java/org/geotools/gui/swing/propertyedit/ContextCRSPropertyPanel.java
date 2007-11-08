@@ -18,9 +18,17 @@ package org.geotools.gui.swing.propertyedit;
 
 import java.awt.Component;
 
+import java.awt.FlowLayout;
 import javax.swing.ImageIcon;
 
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.referencing.AuthorityCodesComboBox;
 import org.geotools.map.MapContext;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.operation.TransformException;
 
 
 
@@ -32,21 +40,23 @@ public class ContextCRSPropertyPanel extends javax.swing.JPanel implements Prope
     
     private MapContext context;
     
+    private AuthorityCodesComboBox combo;
+    
     /** Creates new form DefaultMapContextCRSEditPanel */
     public ContextCRSPropertyPanel() {
         initComponents();
         
-//        try {            
-//            combo = new AuthorityCodesComboBox();
-//        } catch (FactoryRegistryException ex) {
-//            ex.printStackTrace();
-//        } catch (FactoryException ex) {
-//            ex.printStackTrace();
-//        }
-//        
-//        setLayout(new FlowLayout());
-//        
-//        add( combo );
+        try {            
+            combo = new AuthorityCodesComboBox();
+        } catch (FactoryRegistryException ex) {
+            ex.printStackTrace();
+        } catch (FactoryException ex) {
+            ex.printStackTrace();
+        }
+        
+        setLayout(new FlowLayout());
+        
+        add( combo );
     }
     
     /** This method is called from within the constructor to
@@ -79,15 +89,15 @@ public class ContextCRSPropertyPanel extends javax.swing.JPanel implements Prope
     }
 
     public void apply() {
-//        try {
-//            context.setCoordinateReferenceSystem(CRS.decode("EPSG"+combo.getSelectedCode()));
-//        } catch (NoSuchAuthorityCodeException ex) {
-//            ex.printStackTrace();
-//        } catch (TransformException ex) {
-//            ex.printStackTrace();
-//        } catch (FactoryException ex) {
-//            ex.printStackTrace();
-//        }
+        try {
+            context.setCoordinateReferenceSystem(CRS.decode("EPSG:"+combo.getSelectedCode()));
+        } catch (NoSuchAuthorityCodeException ex) {
+            ex.printStackTrace();
+        } catch (TransformException ex) {
+            ex.printStackTrace();
+        } catch (FactoryException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public String getTitle() {
@@ -95,8 +105,7 @@ public class ContextCRSPropertyPanel extends javax.swing.JPanel implements Prope
     }
 
     public ImageIcon getIcon() {
-        return null;
-        //return  new ImageIcon(DefaultMapContextCRSEditPanel.class.getResource("/data/icone/icon_planete.png"));
+        return  IconBundle.getResource().getIcon("16_CRS");
     }
 
     public String getToolTip() {
@@ -108,8 +117,7 @@ public class ContextCRSPropertyPanel extends javax.swing.JPanel implements Prope
     }
 
     private void init() {
-        //combo.filter(context.getCoordinateReferenceSystem().getName().getCodeSpace());
-        //jtf_epsg.setText(context.getCoordinateReferenceSystem().getName().getCode());
+        combo.filter(context.getCoordinateReferenceSystem().getName().getCodeSpace());
     }
 
     public void reset() {

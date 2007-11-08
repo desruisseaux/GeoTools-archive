@@ -31,6 +31,11 @@ public class SeparatorPopupComponent extends JSeparator implements PopupComponen
     
     private Class classe;
     
+    public SeparatorPopupComponent() {
+        this(Object.class);
+    }
+    
+    
     /** Creates a new instance of DefaultPopSeparator 
      * @param classe 
      */

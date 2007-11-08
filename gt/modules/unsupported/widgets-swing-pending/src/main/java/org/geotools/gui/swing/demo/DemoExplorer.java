@@ -72,7 +72,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 public class DemoExplorer extends JFrame {
 
     private JMapPane map = new JMapPane();
-    private JContextTree tree = new JContextTree(false);
+    private JContextTree tree = new JContextTree();
     private JLightMapPaneControl control = new JLightMapPaneControl(map);
     private JTabbedPane tabbed = null;
     private MapContext context = null;
@@ -192,8 +192,7 @@ public class DemoExplorer extends JFrame {
         setJMenuBar(bar);
 
         //build up the tree
-        LayerZoomPopupComponent zoom = new LayerZoomPopupComponent();
-        zoom.setMapPane(map);
+        LayerZoomPopupComponent zoom = new LayerZoomPopupComponent(map);
         LayerPropertyPopupComponent feature = new LayerPropertyPopupComponent();
         List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
         lst.add(new LayerFeaturePropertyPanel());

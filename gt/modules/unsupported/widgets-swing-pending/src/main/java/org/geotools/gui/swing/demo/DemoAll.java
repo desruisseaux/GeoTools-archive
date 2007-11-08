@@ -133,13 +133,7 @@ public class DemoAll extends javax.swing.JFrame {
         _context.setTitle("DemoContext");
 
 
-        /************************JCONTEXTTREE**********************************/
-        titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        tree = new JContextTree(true);
-        tree.addMapContext(_context);
-        tree.getTreeTable().expandAll();
-        pan_jcontexttree.setLayout(new GridLayout(1, 1));
-        pan_jcontexttree.add(tree);
+        
 
         /***********************JMAPPANE***************************************/
         map = new JMapPane();
@@ -156,6 +150,14 @@ public class DemoAll extends javax.swing.JFrame {
         }
         map.revalidate();
 
+        /************************JCONTEXTTREE**********************************/
+        titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
+        tree = JContextTree.createDefaultTree(map);
+        tree.addMapContext(_context);
+        tree.getTreeTable().expandAll();
+        pan_jcontexttree.setLayout(new GridLayout(1, 1));
+        pan_jcontexttree.add(tree);
+        
         /************************JLIGHTMAPPANECONTROL**************************/
         pan_lightmappanecontrol.setLeftDecoration(new JLabel(ICO_INFORMATION));
         lightcontrol = new JLightMapPaneControl();

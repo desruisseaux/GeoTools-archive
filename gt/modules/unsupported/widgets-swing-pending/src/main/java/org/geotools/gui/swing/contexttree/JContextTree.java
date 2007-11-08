@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreePath;
 
+import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
@@ -43,23 +44,9 @@ public class JContextTree extends JPanel {
      * constructor
      */
     public JContextTree() {
-        this(false);
-    }
-
-    public JContextTree(boolean complete) {
         super(new GridLayout(1, 1));
         tree = new TreeTable();
         init();
-
-        //build default rendering
-        if (complete) {
-            addColumnModel(new VisibleTreeTableColumn());
-            addColumnModel(new OpacityTreeTableColumn());
-            addColumnModel(new StyleTreeTableColumn());            
-            ((JContextTreePopup) tree.getComponentPopupMenu()).activeDefaultPopups();
-            revalidate();
-        }
-
     }
 
     private void init() {
@@ -76,11 +63,11 @@ public class JContextTree extends JPanel {
     public TreeTable getTreeTable() {
         return tree;
     }
-    
-////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * add a new column in the model and update the treetable
      * @param model the new column model
@@ -99,8 +86,8 @@ public class JContextTree extends JPanel {
     public TreeTableColumn[] getColumnModels() {
         return (TreeTableColumn[]) tree.getTreeTableModel().getColumnModels().toArray();
     }
-    
-////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT MANAGEMENT ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -174,7 +161,7 @@ public class JContextTree extends JPanel {
         tree.getTreeTableModel().moveMapContext(moveNode, father, newplace);
     }
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 // LISTENERS ///////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -201,8 +188,22 @@ public class JContextTree extends JPanel {
     public TreeListener[] getTreeListeners() {
         return tree.getTreeTableModel().getTreeListeners();
     }
-    
-        
-    
-    
+
+    ////////////////////////////////////////////////////////////////////////////
+    // STATIC CONSTRUCTORS /////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+
+    public static JContextTree createDefaultTree(JMapPane map) {
+        JContextTree tree = new JContextTree();
+
+
+        tree.addColumnModel(new VisibleTreeTableColumn());
+        tree.addColumnModel(new OpacityTreeTableColumn());
+        tree.addColumnModel(new StyleTreeTableColumn());
+        ((JContextTreePopup) tree.getTreeTable().getComponentPopupMenu()).activeDefaultPopups();
+        ((JContextTreePopup) tree.getTreeTable().getComponentPopupMenu()).setMapPane(map);
+        tree.revalidate();
+
+        return tree;
+    }
 }

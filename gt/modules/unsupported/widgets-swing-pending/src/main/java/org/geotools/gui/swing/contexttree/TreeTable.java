@@ -32,7 +32,6 @@ import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
