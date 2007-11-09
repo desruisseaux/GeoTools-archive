@@ -27,7 +27,7 @@ import org.geotools.map.MapLayer;
 /**
  * @author johann sorel
  */
-public class VisibleTreeTableColumn extends TreeTableColumn {
+public final class VisibleTreeTableColumn extends TreeTableColumn {
     
     
     /**

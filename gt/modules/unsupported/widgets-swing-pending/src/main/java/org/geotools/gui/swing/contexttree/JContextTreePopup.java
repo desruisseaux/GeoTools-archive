@@ -19,6 +19,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import java.util.Collection;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.TreePath;
 
@@ -37,7 +38,7 @@ import org.geotools.gui.swing.contexttree.popup.MapRelatedTreePopupItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
-import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
+import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 
@@ -46,9 +47,10 @@ import org.geotools.map.MapLayer;
  * @author johann Sorel
  *
  */
-public final class JContextTreePopup extends JPopupMenu {
+public final class JContextTreePopup {
 
-    private final ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
+    private final TreePopup popup;
+    final ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
     private final TreeTable treetable;
     private final JContextTree frame;
     private JMapPane map;
@@ -77,8 +79,14 @@ public final class JContextTreePopup extends JPopupMenu {
         this.treetable = treetable;
         this.frame = frame;
         this.map = map;
+        this.popup = new TreePopup(treetable, this);
     }
         
+    JPopupMenu getPopupMenu(){
+        return popup;
+    }
+       
+    
     public void setMapPane(JMapPane map){
         this.map = map;
         
@@ -89,133 +97,74 @@ public final class JContextTreePopup extends JPopupMenu {
             }
         }
     }
-    
-   
+       
     /**
      * Add a Control to the PopupMenu
      * @param control the new popup
+     * @return true is succesfully added
      */
-    public void addPopControl(TreePopupItem control) {
-        controls.add(control);
+    public boolean addItem(TreePopupItem control) {
+        return controls.add(control);
     }
-
+    
     /**
-     * get the list of controls
-     * @return list of JXMapContextTreePopControl
+     * Add a Control to the PopupMenu
+     * @param index 
+     * @param control the new popup
      */
-    public ArrayList<TreePopupItem> getControls() {
-        return controls;
+    public void addItem(int index, TreePopupItem control) {
+        controls.add(index,control);
     }
-
+    
     /**
-     * Add a Separator in the popup
+     * Add a Control to the PopupMenu
+     * @param index index of the first item
+     * @param col Collection of TreePopupItem
+     * @return true is succesfully added
      */
-    @Override
-    public void addSeparator() {
-        controls.add(new SeparatorItem());
+    public boolean addAllItem(int index, Collection <? extends TreePopupItem> col) {
+        return controls.addAll(index,col);
     }
-
+    
     /**
-     * will not be set visible if nothing is in the popup
-     * 
-     * @param view 
+     * Add a Control to the PopupMenu
+     * @param col Collection of TreePopupItem
+     * @return true is succesfully added
      */
-    @Override
-    public void setVisible(boolean view) {
-
-
-        if (view) {
-            removeAll();
-
-            SelectionData[] selection = {};
-
-            if (treetable != null) {
-
-                Point location = treetable.getMousePosition();
-                if (location != null) {
-                    TreePath path = treetable.getPathForLocation(location.x, location.y);
-
-                    if (path == null) {
-                        treetable.getTreeSelectionModel().clearSelection();
-                    } else {
-                        treetable.getTreeSelectionModel().addSelectionPath(path);
-                    }
-                } else {
-                    treetable.getTreeSelectionModel().clearSelection();
-                }
-
-                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
-
-                if (paths != null) {
-
-                    selection = new SelectionData[paths.length];
-
-                    for (int i = 0; i < paths.length; i++) {
-                        
-                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
-                        Object last = lastnode.getUserObject();
-                        
-                        if(last instanceof MapLayer){
-                            MapLayer layer = (MapLayer) last;
-                            MapContext context = (MapContext) ((ContextTreeNode)lastnode.getParent()).getUserObject();
-                            SelectionData data = new SelectionData(context,layer);
-                            selection[i] = data;
-                        }
-                        else{
-                            MapContext context = (MapContext) last;
-                            SelectionData data = new SelectionData(context,null);
-                            selection[i] = data;
-                        }
-                        
-                    }
-                }
-
-            }
-
-
-            for (TreePopupItem control : controls) {
-                if (control.isValid(selection)) {
-                    add(control.getComponent(selection));
-                }
-            }
-            removeLastSeparators();
-
-            if (getComponentCount() > 0) {
-                super.setVisible(view);
-            }
-        }else{
-            super.setVisible(view);
-        }
-
-
+    public boolean addAllItem(Collection <? extends TreePopupItem> col) {
+        return controls.addAll(col);
+    }
+    
+    
+    /**
+     * @param control
+     * @return true if TreePopupItem successfuly removed
+     */
+    public boolean removeItem(TreePopupItem control){
+        return controls.remove(control);
+    }
         
-
-
+    /**
+     * @param index
+     * @return the removed TreePopupItem
+     */
+    public TreePopupItem removeItem(int index){
+        return controls.remove(index);
     }
-
-    private void removeLastSeparators() {
-        if (getComponentCount() > 0) {
-            while (getComponent(getComponentCount() - 1) instanceof SeparatorItem) {
-                remove(getComponentCount() - 1);
-            }
+        
+    /**
+     * @return array of TreePopupItem or null if no TreePopupItem
+     */
+    public TreePopupItem[] getControls() {
+        if(controls.size() > 0){
+            return controls.toArray( new TreePopupItem[controls.size()]);
+        }else{
+            return null;
         }
     }
 
     
-    @Override
-    public Component add(Component menuItem) {
-
-        if (getComponentCount() > 0) {
-            if (!(getComponent(getComponentCount() - 1) instanceof SeparatorItem && menuItem instanceof SeparatorItem)) {
-                return super.add(menuItem);
-            }
-        }
-
-        if (!(menuItem instanceof SeparatorItem)) {
-            return super.add(menuItem);
-        }
-
-        return null;
-
-    }
+    
+    
+    
 }

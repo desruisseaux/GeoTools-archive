@@ -21,6 +21,7 @@ import java.awt.ComponentOrientation;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
@@ -37,7 +38,11 @@ import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
+import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
+import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
+import org.jdesktop.swingx.JXTitledSeparator;
 
 /**
  *
@@ -89,21 +94,22 @@ public class JContextTree extends JComponent{
         
         
         JContextTreePopup popup = tree.getPopupMenu();        
-        popup.addPopControl(new LayerVisibilityItem());            //layer         
-        popup.addSeparator();        
-        popup.addPopControl(new LayerZoomItem(map));            //layer
-        popup.addPopControl(new LayerFeatureItem());            //layer
-        popup.addPopControl(new ContextActiveItem(tree));  //context
-        popup.addSeparator();
-        popup.addPopControl(new CutItem(tree));                 //all
-        popup.addPopControl(new CopyItem(tree));                //all
-        popup.addPopControl(new PasteItem(tree));               //all
-        popup.addPopControl(new DuplicateItem(tree));           //all        
-        popup.addSeparator();        
-        popup.addPopControl(new DeleteItem(tree));              //all
-        popup.addSeparator();
-        popup.addPopControl(new LayerPropertyItem());           //layer
-        popup.addPopControl(new ContextPropertyItem());         //context
+                
+        popup.addItem(new LayerVisibilityItem());           //layer         
+        popup.addItem(new SeparatorItem() );        
+        popup.addItem(new LayerZoomItem(map));              //layer
+        popup.addItem(new LayerFeatureItem());              //layer
+        popup.addItem(new ContextActiveItem(tree));         //context
+        popup.addItem(new SeparatorItem() );
+        popup.addItem(new CutItem(tree));                   //all
+        popup.addItem(new CopyItem(tree));                  //all
+        popup.addItem(new PasteItem(tree));                 //all
+        popup.addItem(new DuplicateItem(tree));             //all        
+        popup.addItem(new SeparatorItem() );        
+        popup.addItem(new DeleteItem(tree));                //all
+        popup.addItem(new SeparatorItem() );        
+        popup.addItem(new LayerPropertyItem());             //layer
+        popup.addItem(new ContextPropertyItem());           //context
                 
         popup.setMapPane(map);
         

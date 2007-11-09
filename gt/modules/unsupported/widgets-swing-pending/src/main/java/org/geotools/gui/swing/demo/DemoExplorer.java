@@ -201,10 +201,10 @@ public class DemoExplorer extends JFrame {
         lst.add(new LayerFeaturePropertyPanel());
         feature.setPropertyPanels(lst);
 
-        JContextTreePopup popup = (JContextTreePopup) tree.getComponentPopupMenu();
-        popup.addPopControl(zoom);
-        popup.addPopControl(feature);
-        popup.addPopControl(new DeleteItem(tree));
+        JContextTreePopup popup = tree.getPopupMenu();
+        popup.addItem(zoom);
+        popup.addItem(feature);
+        popup.addItem(new DeleteItem(tree));
         tree.addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {

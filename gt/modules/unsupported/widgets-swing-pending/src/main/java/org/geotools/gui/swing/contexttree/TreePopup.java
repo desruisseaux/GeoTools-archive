@@ -1,0 +1,138 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2007, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.geotools.gui.swing.contexttree;
+
+import java.awt.Component;
+import java.awt.Point;
+import javax.swing.JPopupMenu;
+import javax.swing.tree.TreePath;
+import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
+import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
+import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
+
+/**
+ *
+ * @author johann sorel
+ */
+final class TreePopup extends JPopupMenu {
+
+    private final JContextTreePopup manager;
+    private final TreeTable treetable;
+
+    TreePopup(TreeTable treetable, JContextTreePopup manager) {
+        this.manager = manager;
+        this.treetable = treetable;
+    }
+
+    /**
+     * will not be set visible if nothing is in the popup
+     * 
+     * @param view 
+     */
+    @Override
+    public void setVisible(boolean view) {
+
+        if (view) {
+            removeAll();
+
+            SelectionData[] selection = 
+               {};
+
+            if (treetable != null) {
+
+                Point location = treetable.getMousePosition();
+                if (location != null) {
+                    TreePath path = treetable.getPathForLocation(location.x, location.y);
+
+                    if (path == null) {
+                        treetable.getTreeSelectionModel().clearSelection();
+                    } else {
+                        treetable.getTreeSelectionModel().addSelectionPath(path);
+                    }
+                } else {
+                    treetable.getTreeSelectionModel().clearSelection();
+                }
+
+                TreePath[] paths = treetable.getTreeSelectionModel().getSelectionPaths();
+
+                if (paths != null) {
+
+                    selection = new SelectionData[paths.length];
+
+                    for (int i = 0; i < paths.length; i++) {
+
+                        ContextTreeNode lastnode = (ContextTreeNode) paths[i].getLastPathComponent();
+                        Object last = lastnode.getUserObject();
+
+                        if (last instanceof MapLayer) {
+                            MapLayer layer = (MapLayer) last;
+                            MapContext context = (MapContext) ((ContextTreeNode) lastnode.getParent()).getUserObject();
+                            SelectionData data = new SelectionData(context, layer);
+                            selection[i] = data;
+                        } else {
+                            MapContext context = (MapContext) last;
+                            SelectionData data = new SelectionData(context, null);
+                            selection[i] = data;
+                        }
+
+                    }
+                }
+
+            }
+
+            for (TreePopupItem control : manager.controls) {
+                if (control.isValid(selection)) {
+                    add(control.getComponent(selection));
+                }
+            }
+            removeLastSeparators();
+
+            if (getComponentCount() > 0) {
+                super.setVisible(view);
+            }
+        } else {
+            super.setVisible(view);
+        }
+
+
+    }
+
+    private void removeLastSeparators() {
+        if (getComponentCount() > 0) {
+            while (getComponent(getComponentCount() - 1) instanceof TitledSeparatorItem) {
+                remove(getComponentCount() - 1);
+            }
+        }
+    }
+
+    @Override
+    public Component add(Component menuItem) {
+
+        if (getComponentCount() > 0) {
+            if (!(getComponent(getComponentCount() - 1) instanceof TitledSeparatorItem && menuItem instanceof TitledSeparatorItem)) {
+                return super.add(menuItem);
+            } else {
+                remove(getComponentCount() - 1);
+                return super.add(menuItem);
+            }
+        }
+
+        return super.add(menuItem);
+
+
+    }
+}

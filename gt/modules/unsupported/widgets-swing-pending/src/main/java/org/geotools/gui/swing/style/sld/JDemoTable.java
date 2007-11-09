@@ -45,7 +45,7 @@ public class JDemoTable extends JXTable{
         setModel(new DemoTableModel(sldsource ));
         setHorizontalScrollEnabled(false);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        getColumnExt(0).setCellRenderer( new DefaultCellRenderer( new StyleComponent()));
+        getColumnExt(0).setCellRenderer( new DefaultCellRenderer( new StyleComponent()));        
         getColumnExt(0).setMaxWidth(25);
         getColumnExt(0).setMinWidth(25);
         getColumnExt(0).setPreferredWidth(25);

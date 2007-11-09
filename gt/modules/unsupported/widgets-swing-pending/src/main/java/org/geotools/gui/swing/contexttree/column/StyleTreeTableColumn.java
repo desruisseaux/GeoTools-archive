@@ -28,7 +28,7 @@ import org.geotools.map.MapLayer;
  * 
  * @author johann sorel
  */
-public class StyleTreeTableColumn extends TreeTableColumn {
+public final class StyleTreeTableColumn extends TreeTableColumn {
     
     
     /**

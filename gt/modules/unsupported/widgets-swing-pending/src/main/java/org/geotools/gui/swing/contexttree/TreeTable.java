@@ -97,10 +97,13 @@ final class TreeTable extends JXTreeTable {
                     duplicateSelection();
                 }
                 };
+                
     /**
      * the buffer containing the cutted/copied datas
      */
     private final List<SelectionData> buffer = new ArrayList<SelectionData>();
+    
+    private final JContextTreePopup popupManager;
     
     private final TreeSelectionManager selectionManager;
     
@@ -116,7 +119,10 @@ final class TreeTable extends JXTreeTable {
     TreeTable(JContextTree frame) {
         super(new ContextTreeModel(frame));
 
-        setComponentPopupMenu(new JContextTreePopup(this, frame));
+        selectionManager = new TreeSelectionManager(frame);
+        popupManager = new JContextTreePopup(this, frame);
+        
+        setComponentPopupMenu( popupManager.getPopupMenu() );
         setColumnControlVisible(true);
         setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(frame)));
 
@@ -127,7 +133,7 @@ final class TreeTable extends JXTreeTable {
         initDragAndDrop();
         initKeySupport();
         
-        selectionManager = new TreeSelectionManager(frame);
+        
         getTreeSelectionModel().addTreeSelectionListener( selectionManager );
        
         
@@ -216,7 +222,7 @@ final class TreeTable extends JXTreeTable {
     }
     
     JContextTreePopup getPopupMenu() {
-        return (JContextTreePopup) getComponentPopupMenu();
+        return popupManager;
     }
         
     SelectionData[] getSelection() {

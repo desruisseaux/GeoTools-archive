@@ -29,7 +29,7 @@ import org.geotools.map.MapLayer;
  * 
  * @author johann sorel
  */
-public class OpacityTreeTableColumn extends TreeTableColumn {
+public final class OpacityTreeTableColumn extends TreeTableColumn {
 
 
     /**

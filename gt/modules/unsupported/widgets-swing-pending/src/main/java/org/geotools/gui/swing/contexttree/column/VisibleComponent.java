@@ -27,12 +27,12 @@ import org.geotools.map.MapLayer;
  *
  * @author johann sorel
  */
-public class VisibleComponent extends RendererAndEditorComponent{
+final class VisibleComponent extends RendererAndEditorComponent{
 
-    private JCheckBox check = new JCheckBox();
+    private final JCheckBox check = new JCheckBox();
     private MapLayer layer = null;
     
-    public VisibleComponent(){
+    VisibleComponent(){
         super();
         setLayout(new GridLayout(1,1));
         check.setOpaque(false);
