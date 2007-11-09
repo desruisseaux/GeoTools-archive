@@ -97,18 +97,14 @@ public abstract class FIDReader {
      */
     public String[] getPropertiesToFetch(SimpleFeatureType schema) throws IOException {
 
-        List attNames = new ArrayList(schema.getAttributeCount() + 1);
+        List<String> attNames = new ArrayList<String>(schema.getAttributeCount() + 1);
 
         // /List attDescriptors = Descriptors.nodes(schema.getDescriptor());
-        List attDescriptors = Arrays.asList(schema.getAttributes());
+        List<AttributeDescriptor> attDescriptors = schema.getAttributes();
 
-        int i = 0;
-        for (Iterator it = attDescriptors.iterator(); it.hasNext(); i++) {
-            AttributeDescriptor property = (AttributeDescriptor) it.next();
-            // /attNames.add( property.getName().getLocalPart() );
+        for( AttributeDescriptor property : attDescriptors ){
             attNames.add(property.getLocalName());
         }
-
         String fidColumn = getFidColumn();
         int fidIndex = attNames.indexOf(fidColumn);
         if (fidColumn != null && fidIndex == -1) {
@@ -176,8 +172,14 @@ public abstract class FIDReader {
     }
 
     public static class ShapeFidReader extends FIDReader {
-        private final String shapeColName;
+        /**
+         * Name of the Shape, populated as a side effect of getPropertiesToFetch()
+         */
 
+        private final String shapeColName;
+        /**
+         * Index of the Shape, populated as a side effect of getPropertiesToFetch()
+         */
         private int shapeIndex;
 
         public ShapeFidReader(final String layerName, final String shapeColName,
@@ -209,17 +211,14 @@ public abstract class FIDReader {
         }
 
         public String[] getPropertiesToFetch(SimpleFeatureType schema) throws IOException {
-            List attNames = new ArrayList(schema.getAttributeCount() + 1);
+            List<String> attNames = new ArrayList<String>(schema.getAttributeCount() + 1);
 
             // /List attDescriptors = Descriptors.nodes(schema.getDescriptor());
-            List attDescriptors = Arrays.asList(schema.getAttributes());
-
-            int i = 0;
-            for (Iterator it = attDescriptors.iterator(); it.hasNext(); i++) {
-                AttributeDescriptor property = (AttributeDescriptor) it.next();
+            List<AttributeDescriptor> attDescriptors = schema.getAttributes();            
+            for( AttributeDescriptor property : attDescriptors ){
                 attNames.add(property.getLocalName());
             }
-
+            
             shapeIndex = attNames.indexOf(shapeColName);
             if (shapeIndex == -1) {
                 String fidColumn = getFidColumn();
