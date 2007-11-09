@@ -487,6 +487,18 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
     public ReferencedEnvelope transform(final CoordinateReferenceSystem targetCRS,
         final boolean lenient, final int numPointsForTransformation)
         throws TransformException, FactoryException {
+        if( crs == null ){
+            if( isEmpty() ){
+                // We don't have a CRS yet because we are still empty, being empty is
+                // something we can represent in the targetCRS
+                return new ReferencedEnvelope(targetCRS);
+            }
+            else {
+                // really this is a the code that created this ReferencedEnvelope
+                throw new NullPointerException("Unable to transform referenced envelope, crs has not yet been provided.");
+            }
+        }
+        
         /*
          * Gets a first estimation using an algorithm capable to take singularity in account
          * (North pole, South pole, 180ï¿½ longitude). We will expand this initial box later.
