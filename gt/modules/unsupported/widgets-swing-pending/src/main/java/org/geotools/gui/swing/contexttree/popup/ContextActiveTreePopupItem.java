@@ -54,7 +54,7 @@ public class ContextActiveTreePopupItem extends JCheckBoxMenuItem implements Tre
     
     public Component getComponent(Object[] obj, ContextTreeNode node[]) {
         context = (MapContext)obj[0];
-        this.setSelected( context.equals(xtree.getTreeTableModel().getActiveContext()));
+        this.setSelected( context.equals(xtree.getActiveContext()));
         
         return this;
     }
@@ -65,9 +65,9 @@ public class ContextActiveTreePopupItem extends JCheckBoxMenuItem implements Tre
             public void actionPerformed(ActionEvent e) {
                 if(isSelected()){
                     if(xtree != null && context != null)
-                        xtree.getTreeTableModel().setActiveContext(context);
+                        xtree.setActiveContext(context);
                 } else if(xtree != null){
-                    xtree.getTreeTableModel().setActiveContext(null);
+                    xtree.setActiveContext(null);
                 }
             }
         });

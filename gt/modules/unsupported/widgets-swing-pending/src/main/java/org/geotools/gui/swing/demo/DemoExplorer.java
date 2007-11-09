@@ -51,8 +51,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.DeleteTreePopupItem;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyTreePopupItem;
@@ -266,13 +266,10 @@ public class DemoExplorer extends JFrame {
         pan_map.add(BorderLayout.NORTH, control);
         pan_map.add(BorderLayout.CENTER, map);
 
-        JScrollPane pane = new JScrollPane(tree);
-        pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
         
         JSplitPane center = new JSplitPane();
-        center.setLeftComponent(pane);
+        center.setLeftComponent(tree);
         center.setRightComponent(pan_map);
         center.setDividerLocation(240);
 

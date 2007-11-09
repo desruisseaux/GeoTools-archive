@@ -55,12 +55,12 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  *
  * @author johann sorel
  */
-public class JContextTree extends JXTreeTable {
+class TreeTable extends JXTreeTable {
 
     /**
      * Default copy action used for Key Input
      */
-    public final Action COPY_ACTION = new AbstractAction() {
+    final Action COPY_ACTION = new AbstractAction() {
 
                 public void actionPerformed(ActionEvent e) {
                     copySelectionInBuffer();
@@ -69,7 +69,7 @@ public class JContextTree extends JXTreeTable {
     /**
      * Default cut action used for Key Input
      */
-    public final Action CUT_ACTION = new AbstractAction() {
+    final Action CUT_ACTION = new AbstractAction() {
 
                 public void actionPerformed(ActionEvent e) {
                     cutSelectionInBuffer();
@@ -78,7 +78,7 @@ public class JContextTree extends JXTreeTable {
     /**
      * Default paste action used for Key Input
      */
-    public final Action PASTE_ACTION = new AbstractAction() {
+    final Action PASTE_ACTION = new AbstractAction() {
 
                 public void actionPerformed(ActionEvent e) {
                     pasteBuffer();
@@ -87,7 +87,7 @@ public class JContextTree extends JXTreeTable {
     /**
      * Default delete action used for Key Input
      */
-    public final Action DELETE_ACTION = new AbstractAction() {
+    final Action DELETE_ACTION = new AbstractAction() {
 
                 public void actionPerformed(ActionEvent e) {
                     deleteSelection();
@@ -96,7 +96,7 @@ public class JContextTree extends JXTreeTable {
     /**
      * Default duplicate action used for Key Input
      */
-    public final Action DUPLICATE_ACTION = new AbstractAction() {
+    final Action DUPLICATE_ACTION = new AbstractAction() {
 
                 public void actionPerformed(ActionEvent e) {
                     duplicateSelection();
@@ -111,18 +111,18 @@ public class JContextTree extends JXTreeTable {
     /**
      * String added to layer name use when paste/duplicate
      */
-    private String COPY_NAME = "-" + TextBundle.getResource().getString("a_copy") + "- ";
+    private String PREFIX = "-" + TextBundle.getResource().getString("a_copy") + "- ";
 
     /**
      * Tree widget to manage MapContexts and MapLayers
      * 
      */
-    public JContextTree() {
-        super(new ContextTreeModel());
-
-        setComponentPopupMenu(new JContextTreePopup(this));
+    TreeTable(JContextTree frame) {
+        super(new ContextTreeModel(frame));
+        
+        setComponentPopupMenu(new JContextTreePopup(this,frame));
         setColumnControlVisible(true);
-        setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(this)));
+        setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(frame)));
 
         getColumnModel().getColumn(0).setHeaderRenderer(new DefaultHeaderRenderer(null, null, TextBundle.getResource().getString("col_tree")));
         setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 1)});
@@ -216,7 +216,6 @@ public class JContextTree extends JXTreeTable {
      * @deprecated 
      */
     @Override
-    @Deprecated
     public ContextTreeModel getTreeTableModel() {
         return (ContextTreeModel) super.getTreeTableModel();
     }
@@ -228,7 +227,6 @@ public class JContextTree extends JXTreeTable {
      * @deprecated 
      */
     @Override
-    @Deprecated
     public void setTreeTableModel(TreeTableModel contexttreemodel){
         if(contexttreemodel != null){
             if(contexttreemodel instanceof ContextTreeModel){
@@ -237,35 +235,13 @@ public class JContextTree extends JXTreeTable {
             }
         }        
     }
-    
-    
-    
-    
-////////////////////////////////////////////////////////////////////////////////
-// STATIC CONSTRUCTORS /////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * create a default JContextTree, with default columns
-     * and default JContextTreePopup items
-     * 
-     * @param map
-     * @return default JContextTree
-     */
-    public static JContextTree createDefaultTree(JMapPane map) {
-        JContextTree tree = new JContextTree();
-
-
-        tree.addColumnModel(new VisibleTreeTableColumn());
-        tree.addColumnModel(new OpacityTreeTableColumn());
-        tree.addColumnModel(new StyleTreeTableColumn());
-        ((JContextTreePopup) tree.getComponentPopupMenu()).activeDefaultPopups();
-        ((JContextTreePopup) tree.getComponentPopupMenu()).setMapPane(map);
-        tree.revalidate();
-
-        return tree;
+           
+    JContextTreePopup getPopupMenu(){
+        return (JContextTreePopup) getComponentPopupMenu();
     }
-        
+    
+            
 ////////////////////////////////////////////////////////////////////////////////
 // CUT/COPY/PASTE/DUPLICATE/DELETE  ////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -331,11 +307,11 @@ public class JContextTree extends JXTreeTable {
      * 
      * @param prefix if null, prefix will be an empty string
      */
-    public void setPrefixString(String prefix){
+    void setPrefixString(String prefix){
         if(prefix != null){
-            COPY_NAME = prefix;
+            PREFIX = prefix;
         }else{
-            COPY_NAME = "";
+            PREFIX = "";
         }
     }
         
@@ -344,15 +320,15 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return String 
      */
-    public String getPrefixString() {
-        return COPY_NAME;
+    String getPrefixString() {
+        return PREFIX;
     }
 
     /**
      * 
      * @return true if ther is something selected
      */
-    public boolean hasSelection() {
+    boolean hasSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
         if (selections != null) {
@@ -369,7 +345,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if duplication succeed
      */
-    public boolean duplicateSelection() {
+    boolean duplicateSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
         if (canDuplicateSelection()) {
@@ -381,7 +357,7 @@ public class JContextTree extends JXTreeTable {
                     MapLayer layer = (MapLayer) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
                     MapContext parent = (MapContext) ((ContextTreeNode) ((ContextTreeNode) tp.getLastPathComponent()).getParent()).getUserObject();
                     MapLayer copylayer = ff.duplicateLayer(layer);
-                    copylayer.setTitle(COPY_NAME + layer.getTitle());
+                    copylayer.setTitle(PREFIX + layer.getTitle());
 
                     parent.addLayer(copylayer);
                     parent.moveLayer(parent.indexOf(copylayer), parent.indexOf(layer));
@@ -394,7 +370,7 @@ public class JContextTree extends JXTreeTable {
                 for (TreePath tp : selections) {
                     MapContext context = (MapContext) ((ContextTreeNode) tp.getLastPathComponent()).getUserObject();
                     MapContext copycontext = ff.duplicateContext(context);
-                    copycontext.setTitle(COPY_NAME + context.getTitle());
+                    copycontext.setTitle(PREFIX + context.getTitle());
 
                     getTreeTableModel().addMapContext(copycontext);
                 }
@@ -410,7 +386,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if tree buffer is empty
      */
-    public boolean isBufferEmpty() {
+    boolean isBufferEmpty() {
         if (buffer.size() == 0) {
             return true;
         } else {
@@ -422,7 +398,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true is paste can succeed
      */
-    public boolean canPasteBuffer() {
+    boolean canPasteBuffer() {
         if (isBufferEmpty()) {
             return false;
         } else {
@@ -447,7 +423,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if duplication can succeed
      */
-    public boolean canDuplicateSelection() {
+    boolean canDuplicateSelection() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
         if (hasSelection(selections)) {
@@ -461,7 +437,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if delete can succeed
      */
-    public boolean canDeleteSelection() {
+    boolean canDeleteSelection() {
         return hasSelection();
     }
 
@@ -469,7 +445,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if copy can succeed
      */
-    public boolean canCopySelection() {
+    boolean canCopySelection() {
         return canDuplicateSelection();
     }
 
@@ -477,7 +453,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if cut can succeed
      */
-    public boolean canCutSelection() {
+    boolean canCutSelection() {
         return canDuplicateSelection();
     }
 
@@ -486,7 +462,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if delete suceed
      */
-    public boolean deleteSelection() {
+    boolean deleteSelection() {
 
         if (canDeleteSelection()) {
             TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
@@ -518,7 +494,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if copy succeed
      */
-    public boolean copySelectionInBuffer() {
+    boolean copySelectionInBuffer() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
         if (hasSelection(selections)) {
@@ -554,7 +530,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if cut succeed
      */
-    public boolean cutSelectionInBuffer() {
+    boolean cutSelectionInBuffer() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
         if (hasSelection(selections)) {
@@ -591,7 +567,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return true if paste succeed
      */
-    public boolean pasteBuffer() {
+    boolean pasteBuffer() {
         TreePath[] selections = getTreeSelectionModel().getSelectionPaths();
 
 
@@ -618,7 +594,7 @@ public class JContextTree extends JXTreeTable {
                                     parent.moveLayer(parent.indexOf(layer), parent.indexOf(insertlayer));
                                 } else {
                                     MapLayer copy = ff.duplicateLayer(layer);
-                                    copy.setTitle(COPY_NAME + layer.getTitle());
+                                    copy.setTitle(PREFIX + layer.getTitle());
                                     parent.addLayer(copy);
                                     parent.moveLayer(parent.indexOf(copy), parent.indexOf(insertlayer));
                                 }
@@ -636,7 +612,7 @@ public class JContextTree extends JXTreeTable {
                                     context.addLayer(layer);
                                 } else {
                                     MapLayer copy = ff.duplicateLayer(layer);
-                                    copy.setTitle(COPY_NAME + layer.getTitle());
+                                    copy.setTitle(PREFIX + layer.getTitle());
                                     context.addLayer(copy);
                                     context.moveLayer(context.indexOf(copy), context.indexOf(layer));
                                 }
@@ -678,7 +654,7 @@ public class JContextTree extends JXTreeTable {
      * 
      * @return object array, can be MapLayers or MapContexts or empty array
      */
-    public Object[] getBuffer() {
+    Object[] getBuffer() {
         return buffer.toArray();
     }
 
@@ -691,17 +667,37 @@ public class JContextTree extends JXTreeTable {
      * add a new column in the model and update the treetable
      * @param model the new column model
      */
-    public void addColumnModel(TreeTableColumn model) {
+    void addColumnModel(TreeTableColumn model) {
         getTreeTableModel().addColumnModel(model);
         getColumnModel().addColumn(model);
         revalidate();
     }
     
     /**
+     * remove column
+     * @param model
+     */
+    void removeColumnModel(TreeTableColumn model){
+        getTreeTableModel().removeColumnModel(model);
+        getColumnModel().removeColumn(model);
+        revalidate();
+    }
+    
+    /**
+     * remove column at index column
+     * @param column
+     */
+    void removeColumnModel(int column){
+        getTreeTableModel().removeColumnModel(column);
+        getColumnModel().removeColumn(getColumnModel().getColumn(column));
+        revalidate();       
+    }
+    
+    /**
      * get the list of column
      * @return list of column models
      */
-    public TreeTableColumn[] getColumnModels() {
+    TreeTableColumn[] getColumnModels() {
         return (TreeTableColumn[]) getTreeTableModel().getColumnModels().toArray();
     }
 
@@ -713,7 +709,7 @@ public class JContextTree extends JXTreeTable {
      * get the active context
      * @return return the active MapContext, if none return null
      */
-    public MapContext getActiveContext() {
+    MapContext getActiveContext() {
         return getTreeTableModel().getActiveContext();
     }
     
@@ -721,7 +717,7 @@ public class JContextTree extends JXTreeTable {
      * active the context if in the tree
      * @param context the mapcontext to active
      */
-    public void setActiveContext(MapContext context) {
+    void setActiveContext(MapContext context) {
         getTreeTableModel().setActiveContext(context);
     }
     
@@ -729,7 +725,7 @@ public class JContextTree extends JXTreeTable {
      * add context to the Tree if not allready in it
      * @param context the context to add
      */
-    public void addMapContext(MapContext context) {
+    void addMapContext(MapContext context) {
         getTreeTableModel().addMapContext(context);
         expandPath(new TreePath(getTreeTableModel().getRoot()));
     }
@@ -738,7 +734,7 @@ public class JContextTree extends JXTreeTable {
      * remove context from the tree
      * @param context target mapcontext to remove
      */
-    public void removeMapContext(MapContext context) {
+    void removeMapContext(MapContext context) {
         getTreeTableModel().removeMapContext(context);
     }
     
@@ -746,7 +742,7 @@ public class JContextTree extends JXTreeTable {
      * count MapContext in the tree
      * @return number of mapcontext in the tree
      */
-    public int getMapContextCount() {
+    int getMapContextCount() {
         return getTreeTableModel().getMapContextCount();
     }
     
@@ -755,7 +751,7 @@ public class JContextTree extends JXTreeTable {
      * @param i position of the mapcontext
      * @return the mapcontext a position i
      */
-    public MapContext getMapContext(int i) {
+    MapContext getMapContext(int i) {
         return getTreeTableModel().getMapContext(i);
     }
     
@@ -764,16 +760,24 @@ public class JContextTree extends JXTreeTable {
      * @param context the mapcontext to find
      * @return index of context
      */
-    public int getMapContextIndex(MapContext context) {
+    int getMapContextIndex(MapContext context) {
         return getTreeTableModel().getMapContextIndex(context);
     }
     
+    /**
+     * MapContext Array
+     * @return empty Array if no mapcontexts in tree
+     */
+    MapContext[] getMapContexts(){
+        return getTreeTableModel().getMapContexts();
+    }
+        
     /**
      * move a mapcontext
      * @param context the context to move
      * @param newplace new position of the child node
      */
-    public void moveMapContext(MapContext context, int newplace) {
+    void moveMapContext(MapContext context, int newplace) {
         ContextTreeNode moveNode = (ContextTreeNode) getTreeTableModel().getMapContextNode(context);
         ContextTreeNode father = (ContextTreeNode) moveNode.getParent();
         getTreeTableModel().moveMapContext(moveNode, father, newplace);
@@ -787,7 +791,7 @@ public class JContextTree extends JXTreeTable {
      * add treeListener to Model
      * @param ker the new listener
      */
-    public void addTreeListener(TreeListener ker) {
+    void addTreeListener(TreeListener ker) {
         getTreeTableModel().addTreeListener(ker);
     }
     
@@ -795,7 +799,7 @@ public class JContextTree extends JXTreeTable {
      * remove treeListener from Model
      * @param ker the listner to remove
      */
-    public void removeTreeListener(TreeListener ker) {
+    void removeTreeListener(TreeListener ker) {
         getTreeTableModel().removeTreeListener(ker);
     }
     
@@ -803,7 +807,7 @@ public class JContextTree extends JXTreeTable {
      * get treeListeners list
      * @return the listener's table
      */
-    public TreeListener[] getTreeListeners() {
+    TreeListener[] getTreeListeners() {
         return getTreeTableModel().getTreeListeners();
     }
     

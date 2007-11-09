@@ -42,21 +42,25 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     /**
      * number of the tree column
      */
-    public static final int TREE = 0;
+    static final int TREE = 0;
     
     private final EventListenerList listeners = new EventListenerList();    
     private MapContext activeContext;
-    private boolean treeedit = true;
-    private ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
+    private boolean treeedit = true;    
     private Vector columnNames = new Vector();
+    private final JContextTree frame;
+    
+    private ArrayList<TreeTableColumn> columns = new ArrayList<TreeTableColumn>();
+    
 
     /**
      * Creates a new instance of ContextTreeModel
      * prevent build model by other use
      * 
      */
-    ContextTreeModel() {
+    ContextTreeModel(JContextTree frame) {
         super();
+        this.frame = frame;
         ContextTreeNode node = new ContextTreeNode(this);
         setRoot(node);
 
@@ -73,7 +77,6 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     @Override
     public Class getColumnClass(int column) {
         Class c ;
-
 
         if (column == TREE) {
             c = TreeTableModel.class;
@@ -155,6 +158,8 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
         super.removeNodeFromParent(newChild);
         super.insertNodeInto(newChild, father, index);
     }
+
+        
 ////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,9 +172,22 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
         columns.add(model);
         columnNames.add(model.getTitle());
         setColumnIdentifiers(columnNames);
-
+        
         model.setModelIndex(columns.indexOf(model) + 1);
     }
+    
+    void removeColumnModel(TreeTableColumn model) {
+        int index = columns.indexOf(model);
+        removeColumnModel(index);
+        
+    }
+    
+    void removeColumnModel(int index){
+        columns.remove(index);
+        columnNames.remove(index+1);
+        setColumnIdentifiers(columnNames);
+    }
+    
 
     /**
      * get the list of column
@@ -178,6 +196,8 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     ArrayList<TreeTableColumn> getColumnModels() {
         return columns;
     }
+
+    
 ////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT MANAGEMENT ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,6 +356,19 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
 
         fireContextMoved((MapContext) moveNode.getUserObject(), depart, place);
     }
+    
+    public MapContext[] getMapContexts(){
+        
+        ContextTreeNode rootnode = ((ContextTreeNode)root);
+        int childs = rootnode.getChildCount();
+        MapContext[] contexts = new MapContext[childs];
+        for(int i=0;i<childs;i++){
+            contexts[i] = (MapContext) ((ContextTreeNode)rootnode.getChildAt(i)).getUserObject();
+        }
+        return contexts;
+    }
+     
+    
 ////////////////////////////////////////////////////////////////////////////////
 // LAYER MANAGEMENT - USE BY DRAG&DROP CLASSES /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -412,6 +445,8 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
             context.moveLayer(begin, index);
         }
     }
+
+    
 ////////////////////////////////////////////////////////////////////////////////
 // FIREEVENT AND LISTENERS /////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -496,6 +531,8 @@ public class ContextTreeModel extends DefaultTreeTableModel implements MapLayerL
     public TreeListener[] getTreeListeners() {
         return listeners.getListeners(TreeListener.class);
     }
+
+    
 ////////////////////////////////////////////////////////////////////////////////
 // MAPCONTEXT LISTENER /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

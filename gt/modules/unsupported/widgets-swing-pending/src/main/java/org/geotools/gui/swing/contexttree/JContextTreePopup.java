@@ -45,18 +45,12 @@ import org.geotools.gui.swing.contexttree.popup.SeparatorTreePopupItem;
  */
 public class JContextTreePopup extends JPopupMenu {
 
-    private ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
-    private JContextTree treetable;
+    private final ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
+    private final TreeTable treetable;
+    private final JContextTree frame;
     private JMapPane map;
 
-    /**
-     * Creates a new instance of JXMapContextTreePopup
-     * Dynamic Popup used by JXMapContextTree
-     */
-    public JContextTreePopup() {
-        this(null,null);
-    }
-
+    
     /**
      *
      * Creates a new instance of JXMapContextTreePopup
@@ -64,8 +58,8 @@ public class JContextTreePopup extends JPopupMenu {
      * @param tree the tree related to the poup
      * @param treetable 
      */
-    public JContextTreePopup(JContextTree treetable) {
-        this(treetable,null);
+    JContextTreePopup(TreeTable treetable,JContextTree frame) {
+        this(treetable,frame,null);
     }
     
     /**
@@ -75,9 +69,10 @@ public class JContextTreePopup extends JPopupMenu {
      * @param map 
      * @param treetable the tree related to the popup
      */
-    public JContextTreePopup(JContextTree treetable,JMapPane map) {
+    JContextTreePopup(TreeTable treetable,JContextTree frame,JMapPane map) {
         super();
         this.treetable = treetable;
+        this.frame = frame;
         this.map = map;
     }
     
@@ -99,7 +94,6 @@ public class JContextTreePopup extends JPopupMenu {
      * active the defaults Popup controls
      */
     public void activeDefaultPopups() {
-
         
         addPopControl(new LayerVisibleTreePopupItem2());            //layer 
         
@@ -107,24 +101,24 @@ public class JContextTreePopup extends JPopupMenu {
         
         addPopControl(new LayerZoomTreePopupItem(map));            //layer
         addPopControl(new LayerFeatureTreePopupItem());            //layer
-        addPopControl(new ContextActiveTreePopupItem(treetable));  //context
+        addPopControl(new ContextActiveTreePopupItem(frame));  //context
 
         addSeparator(Object.class);
 
-        addPopControl(new CutTreePopupItem(treetable));                 //all
-        addPopControl(new CopyTreePopupItem(treetable));                //all
-        addPopControl(new PasteTreePopupItem(treetable));               //all
-        addPopControl(new DuplicateTreePopupItem(treetable));           //all
+        addPopControl(new CutTreePopupItem(frame));                 //all
+        addPopControl(new CopyTreePopupItem(frame));                //all
+        addPopControl(new PasteTreePopupItem(frame));               //all
+        addPopControl(new DuplicateTreePopupItem(frame));           //all
         
         addSeparator(Object.class);
         
-        addPopControl(new DeleteTreePopupItem(treetable));              //all
+        addPopControl(new DeleteTreePopupItem(frame));              //all
 
         addSeparator(Object.class);
 
         addPopControl(new LayerPropertyTreePopupItem());           //layer
         addPopControl(new ContextPropertyTreePopupItem());         //context
-
+        
     }
 
     /**
@@ -230,10 +224,7 @@ public class JContextTreePopup extends JPopupMenu {
         }
     }
 
-    public void setTree(JContextTree treetable) {
-        this.treetable = treetable;
-    }
-
+    
     @Override
     public Component add(Component menuItem) {
 

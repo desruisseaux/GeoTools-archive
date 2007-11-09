@@ -91,7 +91,7 @@ public class TreeNodeProvider extends ComponentProvider<JLabel> {
     protected void format(CellContext arg0) {
         ContextTreeNode node  = (ContextTreeNode) arg0.getValue();
         if(node.getUserObject() instanceof MapContext) {
-            if(node.getUserObject().equals(tree.getTreeTableModel().getActiveContext())) {
+            if(node.getUserObject().equals(tree.getActiveContext())) {
                 rendererComponent.setIcon( ICON_CONTEXT_ACTIVE );
                 rendererComponent.setFont(new Font("Tahoma",Font.BOLD,10));
             } else{
