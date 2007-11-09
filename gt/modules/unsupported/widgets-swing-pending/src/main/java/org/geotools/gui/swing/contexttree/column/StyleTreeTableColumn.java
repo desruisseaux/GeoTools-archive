@@ -19,6 +19,7 @@ package org.geotools.gui.swing.contexttree.column;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellEditor;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
 import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
+import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
@@ -37,11 +38,12 @@ public final class StyleTreeTableColumn extends TreeTableColumn {
     public StyleTreeTableColumn() {
         super();
         
-        setHeaderRenderer(new DefaultHeaderRenderer(IconBundle.getResource().getIcon("16_style"),null,TextBundle.getResource().getString("col_symbol")));
         setCellEditor( new DefaultCellEditor( new StyleComponent()));
         setCellRenderer( new DefaultCellRenderer( new StyleComponent()));
-        
-        setTitle(TextBundle.getResource().getString("col_symbol"));
+                
+        String name = TextBundle.getResource().getString("col_symbol");                
+        setHeaderValue( new HeaderInfo(name,null,IconBundle.getResource().getIcon("16_style") ));
+                
         setEditable(true);
         setResizable(false);
         setMaxWidth(25);

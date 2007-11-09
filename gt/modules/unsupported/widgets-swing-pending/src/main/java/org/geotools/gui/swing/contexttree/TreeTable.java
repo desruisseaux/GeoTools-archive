@@ -32,7 +32,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
+import org.geotools.gui.swing.contexttree.renderer.DefaultContextTreeHeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
+import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.MapContext;
@@ -124,18 +126,21 @@ final class TreeTable extends JXTreeTable {
         
         setComponentPopupMenu( popupManager.getPopupMenu() );
         setColumnControlVisible(true);
+        
         setTreeCellRenderer(new DefaultTreeRenderer(new TreeNodeProvider(frame)));
+        getTableHeader().setDefaultRenderer(new DefaultContextTreeHeaderRenderer());
 
-        getColumnModel().getColumn(0).setHeaderRenderer(new DefaultHeaderRenderer(null, null, TextBundle.getResource().getString("col_tree")));
         setHighlighters(new Highlighter[]{HighlighterFactory.createAlternateStriping(Color.white, HighlighterFactory.QUICKSILVER, 1)});
 
         initCellEditAcceleration();
         initDragAndDrop();
         initKeySupport();
         
+        String name = TextBundle.getResource().getString("col_tree");                
+        getColumnModel().getColumn(0).setHeaderValue( new HeaderInfo(name,null,null) );
+        
         
         getTreeSelectionModel().addTreeSelectionListener( selectionManager );
-       
         
     }
 

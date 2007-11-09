@@ -24,6 +24,30 @@ import org.jdesktop.swingx.table.TableColumnExt;
  */
 public abstract class TreeTableColumn extends TableColumnExt{
 
+    private String title = "";
+    private Object headervalue = null;
+    
+    @Override
+    public void setTitle(String text) {
+        title = text;
+    }
+
+    @Override
+    public void setHeaderValue(Object value) {
+        headervalue = value;
+    }
+
+    @Override
+    public Object getHeaderValue() {
+        return headervalue;
+    }
+    
+    @Override
+    public String getTitle(){
+        return title;
+    }
+        
+    
     /**
      * affect value object to target object, value come from editor
      * @param target

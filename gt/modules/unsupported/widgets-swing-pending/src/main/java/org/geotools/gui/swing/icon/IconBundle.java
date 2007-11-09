@@ -30,7 +30,7 @@ import javax.swing.ImageIcon;
 public class IconBundle {
 
     private static IconBundle instance;
-    private ImageIcon EMPTY_ICON = getIcon(getURL("/org/geotools/gui/swing/icon/blanc.png", IconBundle.class));
+    public static final ImageIcon EMPTY_ICON = new ImageIcon(IconBundle.class.getResource("/org/geotools/gui/swing/icon/blanc.png"));
     private List<ResourceBundle> bundles = new ArrayList<ResourceBundle>();
     private WeakHashMap<String, ImageIcon> iconsmap = new WeakHashMap<String, ImageIcon>();
 

@@ -20,6 +20,7 @@ package org.geotools.gui.swing.contexttree.column;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellEditor;
 import org.geotools.gui.swing.contexttree.renderer.DefaultCellRenderer;
 import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
+import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
@@ -35,11 +36,12 @@ public final class VisibleTreeTableColumn extends TreeTableColumn {
      */
     public VisibleTreeTableColumn() {
        
-        setHeaderRenderer(new DefaultHeaderRenderer(IconBundle.getResource().getIcon("16_visible"),null,TextBundle.getResource().getString("col_visible")));        
         setCellEditor( new DefaultCellEditor(new VisibleComponent()));
         setCellRenderer( new DefaultCellRenderer(new VisibleComponent()));
+                
+        String name = TextBundle.getResource().getString("col_visible");                
+        setHeaderValue( new HeaderInfo(name,null,IconBundle.getResource().getIcon("16_visible") ));
         
-        setTitle(TextBundle.getResource().getString("col_visible"));
         setEditable(true);
         setResizable(false);
         setMaxWidth(25);
