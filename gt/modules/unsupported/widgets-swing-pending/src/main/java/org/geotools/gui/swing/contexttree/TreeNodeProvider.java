@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree.renderer;
+package org.geotools.gui.swing.contexttree;
 
 
 import java.awt.Font;
@@ -40,18 +40,18 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
  * 
  * @author johann sorel
  */
-public class TreeNodeProvider extends ComponentProvider<JLabel> {
+public final class TreeNodeProvider extends ComponentProvider<JLabel> {
         
-    public static final ImageIcon ICON_LAYER_VISIBLE = IconBundle.getResource().getIcon("16_maplayer_visible");
-    public static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");    
-    public static final ImageIcon ICON_LAYER_FILE_VECTOR_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fv");
-    public static final ImageIcon ICON_LAYER_FILE_VECTOR_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fv");
-    public static final ImageIcon ICON_LAYER_FILE_RASTER_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fr");
-    public static final ImageIcon ICON_LAYER_FILE_RASTER_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fr");
-    public static final ImageIcon ICON_LAYER_DB_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_db");
-    public static final ImageIcon ICON_LAYER_DB_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_db");    
-    public static final ImageIcon ICON_CONTEXT_ACTIVE = IconBundle.getResource().getIcon("16_mapcontext_enable");
-    public static final ImageIcon ICON_CONTEXT_DESACTIVE = IconBundle.getResource().getIcon("16_mapcontext_disable");
+    private static final ImageIcon ICON_LAYER_VISIBLE = IconBundle.getResource().getIcon("16_maplayer_visible");
+    private static final ImageIcon ICON_LAYER_UNVISIBLE = IconBundle.getResource().getIcon("16_maplayer_unvisible");    
+    private static final ImageIcon ICON_LAYER_FILE_VECTOR_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fv");
+    private static final ImageIcon ICON_LAYER_FILE_VECTOR_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fv");
+    private static final ImageIcon ICON_LAYER_FILE_RASTER_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_fr");
+    private static final ImageIcon ICON_LAYER_FILE_RASTER_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_fr");
+    private static final ImageIcon ICON_LAYER_DB_VISIBLE = IconBundle.getResource().getIcon("JS16_layer_e_db");
+    private static final ImageIcon ICON_LAYER_DB_UNVISIBLE = IconBundle.getResource().getIcon("JS16_layer_d_db");    
+    private static final ImageIcon ICON_CONTEXT_ACTIVE = IconBundle.getResource().getIcon("16_mapcontext_enable");
+    private static final ImageIcon ICON_CONTEXT_DESACTIVE = IconBundle.getResource().getIcon("16_mapcontext_disable");
 
     private final JContextTree tree;
     

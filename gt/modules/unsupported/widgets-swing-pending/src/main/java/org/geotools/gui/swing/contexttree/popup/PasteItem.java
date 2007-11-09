@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
@@ -34,7 +34,7 @@ import org.geotools.map.MapLayer;
  *
  * @author johann sorel
  */
-public class PasteTreePopupItem implements TreePopupItem {
+public class PasteItem implements TreePopupItem {
 
     private JMenuItem pasteitem = null;
     private JContextTree tree = null;
@@ -45,7 +45,7 @@ public class PasteTreePopupItem implements TreePopupItem {
      * Paste menuitem for jcontextpopup 
      * @param tree
      */
-    public PasteTreePopupItem(final JContextTree tree) {
+    public PasteItem(final JContextTree tree) {
         this.tree = tree;
 
         pasteitem = new JMenuItem(TextBundle.getResource().getString("paste"));
@@ -105,11 +105,11 @@ public class PasteTreePopupItem implements TreePopupItem {
         return tooltip;
     }
 
-    public boolean isValid(Object[] objs) {
+    public boolean isValid(SelectionData[] selection) {
         return true;
     }
 
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
+    public Component getComponent(SelectionData[] selection) {
         pasteitem.setEnabled(tree.canPasteBuffer());
         pasteitem.setToolTipText(buildToolTip(tree.getBuffer()));
 

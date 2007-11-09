@@ -41,8 +41,8 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
-import org.geotools.gui.swing.contexttree.TreeEvent;
-import org.geotools.gui.swing.contexttree.TreeListener;
+import org.geotools.gui.swing.contexttree.TreeContextEvent;
+import org.geotools.gui.swing.contexttree.TreeContextListener;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.control.JMapPaneInfoPanel;
 import org.geotools.gui.swing.datachooser.DataPanel;
@@ -177,7 +177,7 @@ public class DemoAll extends javax.swing.JFrame {
         pan_listener.setLayout(new GridLayout(1, 1));
         ContextTreeListener ecouteur = new ContextTreeListener(map);
         pan_listener.add(ecouteur);
-        tree.addTreeListener(ecouteur);
+        tree.addTreeContextListener(ecouteur);
 
 
     }
@@ -645,7 +645,7 @@ public class DemoAll extends javax.swing.JFrame {
     private org.jdesktop.swingx.JXTitledPanel titled_jcontexttree;
     // End of variables declaration//GEN-END:variables
 }
-class ContextTreeListener extends JXTitledPanel implements TreeListener {
+class ContextTreeListener extends JXTitledPanel implements TreeContextListener {
 
     private JTextArea txt = new JTextArea();
     private JMapPane map;
@@ -664,21 +664,21 @@ class ContextTreeListener extends JXTitledPanel implements TreeListener {
         add(BorderLayout.CENTER, new JScrollPane(txt));
     }
 
-    public void ContextAdded(TreeEvent event) {
+    public void contextAdded(TreeContextEvent event) {
         message = "ADDED index: ";
         message += event.getFromIndex();
         message += "  who: " + event.getMapContext().getTitle();
         txt.setText(txt.getText() + message + "\n");
     }
 
-    public void ContextRemoved(TreeEvent event) {
+    public void contextRemoved(TreeContextEvent event) {
         message = "REMOVED index: ";
         message += event.getFromIndex();
         message += "  who: " + event.getMapContext().getTitle();
         txt.setText(txt.getText() + message + "\n");
     }
 
-    public void ContextActivated(TreeEvent event) {
+    public void contextActivated(TreeContextEvent event) {
         message = "ACTIVATED index: ";
         message += event.getFromIndex();
         message += "  who: " + ((event.getMapContext() != null) ? event.getMapContext().getTitle() : "null");
@@ -698,7 +698,7 @@ class ContextTreeListener extends JXTitledPanel implements TreeListener {
         }
     }
 
-    public void ContextMoved(TreeEvent event) {
+    public void contextMoved(TreeContextEvent event) {
         message = "MOVED indexes: ";
         message += event.getFromIndex() + " > " + event.getToIndex();
         message += "  who: " + event.getMapContext().getTitle();

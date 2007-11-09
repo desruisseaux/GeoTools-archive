@@ -22,8 +22,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapContext;
 
@@ -34,7 +34,7 @@ import org.geotools.map.MapContext;
  * @author johann sorel
  * 
  */
-public class ContextActiveTreePopupItem extends JCheckBoxMenuItem implements TreePopupItem{
+public class ContextActiveItem extends JCheckBoxMenuItem implements TreePopupItem{
     
     private MapContext context;
     private JContextTree xtree ;
@@ -44,19 +44,10 @@ public class ContextActiveTreePopupItem extends JCheckBoxMenuItem implements Tre
      * Creates a new instance of ContextActiveControl 
      * @param tree 
      */
-    public ContextActiveTreePopupItem(JContextTree tree) {
+    public ContextActiveItem(JContextTree tree) {
         this.setText( TextBundle.getResource().getString("activated")  );
         xtree = tree;
         init();
-    }
-    
-   
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        context = (MapContext)obj[0];
-        this.setSelected( context.equals(xtree.getActiveContext()));
-        
-        return this;
     }
     
     private void init(){
@@ -73,16 +64,18 @@ public class ContextActiveTreePopupItem extends JCheckBoxMenuItem implements Tre
         });
     }
 
-    public boolean isValid(Object[] objs) {
-        
-        if(objs.length == 1){
-            return isValid(objs[0]);
-        }        
-        return false;        
+    public boolean isValid(SelectionData[] selection) {
+        if (selection.length == 1) {
+            return (selection[0].layer == null) ;
+        }
+        return false;
     }
-    
-    private boolean isValid(Object obj) {
-        return obj instanceof MapContext;
+
+    public Component getComponent(SelectionData[] selection) {
+        context = selection[0].context;
+        this.setSelected( context.equals(xtree.getActiveContext()));
+        
+        return this;
     }
     
     

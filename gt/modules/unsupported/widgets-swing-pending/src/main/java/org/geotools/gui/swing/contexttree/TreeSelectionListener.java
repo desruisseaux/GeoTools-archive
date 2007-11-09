@@ -14,30 +14,23 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.contexttree.popup;
+package org.geotools.gui.swing.contexttree;
 
-import org.geotools.gui.swing.contexttree.SelectionData;
-import java.awt.Component;
-
+import java.util.EventListener;
 
 /**
+ * Selection listener for JContextTree
+ * 
  * @author johann sorel
- * Interface used to build a Popup control for JXMapContextPopup
  */
-public interface TreePopupItem {
+public interface TreeSelectionListener extends EventListener{
         
     /**
-     * return true if the control should by shown
-     * @param selection 
-     * @return 
+     * When selection changed
+     * 
+     * @param event the event
      */
-    public boolean isValid(SelectionData[] selection);
-    
-    /**
-     * return the component to by shown
-     * @param selection 
-     * @return 
-     */
-    public Component getComponent(SelectionData[] selection);
-    
+    public void selectionChanged(TreeSelectionEvent event) ;
+     
+        
 }

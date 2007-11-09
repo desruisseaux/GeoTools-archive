@@ -53,6 +53,9 @@ public class JContextTree extends JComponent{
         return treetable.getPopupMenu();
     }
     
+    public SelectionData[] getSelection(){
+        return treetable.getSelection();
+    }
     
 ////////////////////////////////////////////////////////////////////////////////
 // STATIC CONSTRUCTORS /////////////////////////////////////////////////////////
@@ -335,30 +338,52 @@ public class JContextTree extends JComponent{
 ////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * add treeListener to Model
+     * add tree context Listener 
      * @param ker the new listener
      */
-    public void addTreeListener(TreeListener ker) {
-        treetable.addTreeListener(ker);
+    public void addTreeContextListener(TreeContextListener ker) {
+        treetable.addTreeContextListener(ker);
     }
     
     /**
-     * remove treeListener from Model
+     * remove tree context Listener 
      * @param ker the listner to remove
      */
-    public void removeTreeListener(TreeListener ker) {
-        treetable.removeTreeListener(ker);
+    public void removeTreeContextListener(TreeContextListener ker) {
+        treetable.removeTreeContextListener(ker);
     }
     
     /**
-     * get treeListeners list
+     * get tree context Listeners array
      * @return the listener's table
      */
-    public TreeListener[] getTreeListeners() {
-        return treetable.getTreeListeners();
+    public TreeContextListener[] getTreeContextListeners() {
+        return treetable.getTreeContextListeners();
     }
     
+    /**
+     * add tree Selection Listener 
+     * @param ker the new listener
+     */
+    public void addTreeSelectionListener(TreeSelectionListener ker) {
+        treetable.getSelectionManager().addTreeSelectionListener(ker);
+    }
     
+    /**
+     * remove tree Selection Listener 
+     * @param ker the listner to remove
+     */
+    public void removeTreeSelectionListener(TreeSelectionListener ker) {
+        treetable.getSelectionManager().removeTreeSelectionListener(ker);
+    }
+    
+    /**
+     * get tree Selection Listeners array
+     * @return the listener's table
+     */
+    public TreeSelectionListener[] getTreeSelectionListeners() {
+        return treetable.getSelectionManager().getTreeSelectionListeners();
+    }
     
     
 }

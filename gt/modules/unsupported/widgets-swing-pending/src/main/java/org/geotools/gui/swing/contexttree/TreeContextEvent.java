@@ -25,7 +25,7 @@ import org.geotools.map.MapContext;
  * @author johann sorel
  * 
  */
-public class TreeEvent extends EventObject{
+public class TreeContextEvent extends EventObject{
     
     private final MapContext mapcontext;
     private final int begin;
@@ -38,11 +38,8 @@ public class TreeEvent extends EventObject{
      * @param mapcontext the mapcontext concerne
      * @param position the position of the mapcontext
      */
-    public TreeEvent(ContextTreeModel treetable, MapContext mapcontext, int position) {
-        super(treetable);
-        this.mapcontext = mapcontext;
-        this.begin = position;
-        this.end = position;
+    TreeContextEvent(JContextTree treetable, MapContext mapcontext, int position) {
+        this(treetable,mapcontext,position,position);
     }
     
     /**
@@ -52,7 +49,7 @@ public class TreeEvent extends EventObject{
      * @param begin start position of the mapcontext
      * @param end end position of the mapcontext
      */
-    public TreeEvent(ContextTreeModel treetable, MapContext mapcontext, int begin, int end) {
+    TreeContextEvent(JContextTree treetable, MapContext mapcontext, int begin, int end) {
         super(treetable);
         this.mapcontext = mapcontext;
         this.begin = begin;

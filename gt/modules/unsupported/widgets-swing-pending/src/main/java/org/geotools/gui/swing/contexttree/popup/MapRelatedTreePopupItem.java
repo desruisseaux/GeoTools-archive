@@ -23,7 +23,7 @@ import org.geotools.gui.swing.JMapPane;
  * 
  * @author johann sorel
  */
-public interface MapRelatedTreePopupItem {
+public interface MapRelatedTreePopupItem extends TreePopupItem {
 
     /**
      * set target MapPane

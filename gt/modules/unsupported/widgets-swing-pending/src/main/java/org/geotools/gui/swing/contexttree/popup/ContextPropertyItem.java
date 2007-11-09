@@ -23,58 +23,52 @@ import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.propertyedit.ContextCRSPropertyPanel;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
-import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
-import org.geotools.map.MapLayer;
-
+import org.geotools.map.MapContext;
 
 /**
- * @author johann sorel
- * Default popup control for property page of MapLayer, use for JContextTreePopup
+ * Default popup control for property page of MapContext, use for JContextTreePopup 
+ * 
+ * @author johann sorel 
  */
-public class LayerFeatureTreePopupItem extends JMenuItem implements TreePopupItem{
+public class ContextPropertyItem extends JMenuItem implements TreePopupItem{
     
-    private MapLayer layer;
+    private MapContext context;
     
     /** 
      * Creates a new instance of DefaultContextPropertyPop 
      */
-    public LayerFeatureTreePopupItem() {
-        super( TextBundle.getResource().getString("feature_table")  );
+    public ContextPropertyItem() {
+        super( TextBundle.getResource().getString("properties")  );
         init();
-    }
-    
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        return this;
     }
     
     private void init(){
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<PropertyPanel> lst = new ArrayList<PropertyPanel>();
-                lst.add(new LayerFeaturePropertyPanel());
-                JPropertyDialog.showDialog(lst, layer);
+                lst.add(new ContextCRSPropertyPanel());
+                JPropertyDialog.showDialog(lst, context);
                 
             }
         }
         );
     }
     
-    public boolean isValid(Object[] objs) {
-        
-        if(objs.length == 1){
-            return isValid(objs[0]);
-        }        
-        return false;        
+    public boolean isValid(SelectionData[] selection) {
+        if (selection.length == 1) {
+            return (selection[0].layer == null) ;
+        }
+        return false;
     }
-    
-    private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+
+    public Component getComponent(SelectionData[] selection) {
+        context = selection[0].context;
+        return this;
     }
     
 }

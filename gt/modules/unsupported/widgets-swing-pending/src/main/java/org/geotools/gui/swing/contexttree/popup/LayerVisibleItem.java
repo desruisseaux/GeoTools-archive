@@ -22,7 +22,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBoxMenuItem;
 
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 
@@ -32,7 +32,7 @@ import org.geotools.map.MapLayer;
  * @author johann sorel
  * Default popup control for visibility of MapLayer, use for JContextTreePopup
  */
-public class LayerVisibleTreePopupItem extends JCheckBoxMenuItem implements TreePopupItem{
+public class LayerVisibleItem extends JCheckBoxMenuItem implements TreePopupItem{
     
     private MapLayer layer;
     
@@ -40,18 +40,11 @@ public class LayerVisibleTreePopupItem extends JCheckBoxMenuItem implements Tree
     /** 
      * Creates a new instance of LayerVisibleControl 
      */
-    public LayerVisibleTreePopupItem() {
+    public LayerVisibleItem() {
         this.setText( TextBundle.getResource().getString("visible"));
         init();
     }
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        this.setSelected(layer.isVisible());
         
-        return this;
-    }
-    
     private void init(){
         
         addActionListener(new ActionListener() {
@@ -60,17 +53,19 @@ public class LayerVisibleTreePopupItem extends JCheckBoxMenuItem implements Tree
             }
         });
     }
-    
-    public boolean isValid(Object[] objs) {
-        
-        if(objs.length == 1){
-            return isValid(objs[0]);
-        }        
-        return false;        
+     
+    public boolean isValid(SelectionData[] selection) {
+        if (selection.length == 1) {
+            return (selection[0].layer != null) ;
+        }
+        return false;
     }
-    
-    private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+
+    public Component getComponent(SelectionData[] selection) {
+        layer = selection[0].layer;
+        this.setSelected(layer.isVisible());
+        
+        return this;
     }
     
 }

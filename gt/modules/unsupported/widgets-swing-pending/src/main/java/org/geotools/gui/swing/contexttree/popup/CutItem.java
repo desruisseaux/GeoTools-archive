@@ -22,8 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
@@ -31,38 +31,38 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author johann sorel
  */
-public class CopyTreePopupItem implements TreePopupItem{
+public class CutItem implements TreePopupItem{
 
     private JContextTree tree = null;
-    private JMenuItem copyitem = null;
+    private JMenuItem cutitem = null;
     
     /**
-     * copy item for jcontexttreepopup
+     * cut item for jcontexttreepopup
      * @param tree
      */
-    public CopyTreePopupItem(final JContextTree tree){
+    public CutItem(final JContextTree tree){
         this.tree = tree;
         
-        copyitem = new JMenuItem(TextBundle.getResource().getString("copy"));
-        copyitem.setIcon( IconBundle.getResource().getIcon("16_copy") );
-        copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+        cutitem = new JMenuItem(TextBundle.getResource().getString("cut"));
+        cutitem.setIcon( IconBundle.getResource().getIcon("16_cut") );
+        cutitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
         
-        copyitem.addActionListener(new ActionListener() {
+        cutitem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                tree.copySelectionInBuffer();
+                tree.cutSelectionInBuffer();
             }
         });
         
     }
     
-    public boolean isValid(Object[] obj) {
+    public boolean isValid(SelectionData[] selection) {
         return true;
     }
 
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        copyitem.setEnabled( tree.canCopySelection() );
-        return copyitem;
+    public Component getComponent(SelectionData[] selection) {
+        cutitem.setEnabled( tree.canCutSelection() );
+        return cutitem;
     }
 
 }

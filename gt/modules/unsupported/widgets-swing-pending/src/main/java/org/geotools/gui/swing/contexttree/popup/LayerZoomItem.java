@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
 import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 
@@ -29,7 +29,7 @@ import org.geotools.map.MapLayer;
  * @author johann sorel
  * Default popup control for zoom on MapLayer, use for JContextTreePopup
  */
-public class LayerZoomTreePopupItem extends JMenuItem implements TreePopupItem, MapRelatedTreePopupItem {
+public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelatedTreePopupItem {
 
     private MapLayer layer;
     private JMapPane map;
@@ -37,7 +37,7 @@ public class LayerZoomTreePopupItem extends JMenuItem implements TreePopupItem, 
     /** Creates a new instance
      * @param map 
      */
-    public LayerZoomTreePopupItem(JMapPane map) {
+    public LayerZoomItem(JMapPane map) {
         this.setText(TextBundle.getResource().getString("zoom_to_layer"));
         this.map = map;
         init();
@@ -50,14 +50,7 @@ public class LayerZoomTreePopupItem extends JMenuItem implements TreePopupItem, 
     public JMapPane getMapPane() {
         return map;
     }
-
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer) obj[0];
-        this.setEnabled((map != null));
-
-        return this;
-    }
-
+   
     private void init() {
 
         addActionListener(new ActionListener() {
@@ -77,16 +70,18 @@ public class LayerZoomTreePopupItem extends JMenuItem implements TreePopupItem, 
                     }
                 });
     }
-
-    public boolean isValid(Object[] objs) {
-
-        if (objs.length == 1) {
-            return isValid(objs[0]);
+   
+    public boolean isValid(SelectionData[] selection) {
+        if (selection.length == 1) {
+            return (selection[0].layer != null) ;
         }
         return false;
     }
 
-    private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+    public Component getComponent(SelectionData[] selection) {
+        layer = selection[0].layer;
+        this.setEnabled((map != null));
+
+        return this;
     }
 }

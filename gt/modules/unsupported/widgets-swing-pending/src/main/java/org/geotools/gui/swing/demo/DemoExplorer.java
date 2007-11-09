@@ -54,9 +54,9 @@ import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
-import org.geotools.gui.swing.contexttree.popup.DeleteTreePopupItem;
-import org.geotools.gui.swing.contexttree.popup.LayerPropertyTreePopupItem;
-import org.geotools.gui.swing.contexttree.popup.LayerZoomTreePopupItem;
+import org.geotools.gui.swing.contexttree.popup.DeleteItem;
+import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
+import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.datachooser.DataListener;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
@@ -195,8 +195,8 @@ public class DemoExplorer extends JFrame {
         setJMenuBar(bar);
 
         //build up the tree
-        LayerZoomTreePopupItem zoom = new LayerZoomTreePopupItem(map);
-        LayerPropertyTreePopupItem feature = new LayerPropertyTreePopupItem();
+        LayerZoomItem zoom = new LayerZoomItem(map);
+        LayerPropertyItem feature = new LayerPropertyItem();
         List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
         lst.add(new LayerFeaturePropertyPanel());
         feature.setPropertyPanels(lst);
@@ -204,7 +204,7 @@ public class DemoExplorer extends JFrame {
         JContextTreePopup popup = (JContextTreePopup) tree.getComponentPopupMenu();
         popup.addPopControl(zoom);
         popup.addPopControl(feature);
-        popup.addPopControl(new DeleteTreePopupItem(tree));
+        popup.addPopControl(new DeleteItem(tree));
         tree.addColumnModel(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {

@@ -25,7 +25,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 import javax.swing.JPanel;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.contexttree.column.OpacityComponent;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
@@ -36,7 +36,7 @@ import org.geotools.map.MapLayer;
  * @author johann sorel
  * popup control for visibility of MapLayer, use for JContextTreePopup
  */
-public class LayerVisibleTreePopupItem2 extends JPanel implements TreePopupItem{
+public class LayerVisibilityItem extends JPanel implements TreePopupItem{
     
     private MapLayer layer;
     private JCheckBox jck = new JCheckBox();
@@ -46,21 +46,12 @@ public class LayerVisibleTreePopupItem2 extends JPanel implements TreePopupItem{
     /** 
      * Creates a new instance of LayerVisibleControl 
      */
-    public LayerVisibleTreePopupItem2() {
+    public LayerVisibilityItem() {
         init();
     }
-    
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        layer = (MapLayer)obj[0];
-        jck.setSelected(layer.isVisible());
-        opa.parse(layer);
-        
-        return this;
-    }
-    
+            
     private void init(){
         setLayout(new BorderLayout());
-        
         
         setOpaque(false);
         opa.setOpaque(false);
@@ -78,16 +69,20 @@ public class LayerVisibleTreePopupItem2 extends JPanel implements TreePopupItem{
         add(BorderLayout.CENTER,opa);
     }
     
-    public boolean isValid(Object[] objs) {
-        
-        if(objs.length == 1){
-            return isValid(objs[0]);
-        }        
-        return false;        
-    }
     
-    private boolean isValid(Object obj) {
-        return obj instanceof MapLayer;
+    public boolean isValid(SelectionData[] selection) {
+        if (selection.length == 1) {
+            return (selection[0].layer != null) ;
+        }
+        return false;
+    }
+
+    public Component getComponent(SelectionData[] selection) {
+        layer = selection[0].layer;
+        jck.setSelected(layer.isVisible());
+        opa.parse(layer);
+        
+        return this;
     }
     
 }

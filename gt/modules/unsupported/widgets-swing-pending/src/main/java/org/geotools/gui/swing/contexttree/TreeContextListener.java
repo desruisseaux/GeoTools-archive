@@ -23,34 +23,34 @@ import java.util.EventListener;
  * 
  * @author johann sorel
  */
-public interface TreeListener extends EventListener{
+public interface TreeContextListener extends EventListener{
         
     /**
      * When a Context is added
      * 
      * @param event the event
      */
-    public void ContextAdded(TreeEvent event) ;
+    public void contextAdded(TreeContextEvent event) ;
       
     /**
      * When a Context is removed
      * 
      * @param event the event
      */
-    public void ContextRemoved(TreeEvent event);
+    public void contextRemoved(TreeContextEvent event);
       
     /**
      * When a Context is activated
      * 
      * @param event the event
      */
-    public void ContextActivated(TreeEvent event);
+    public void contextActivated(TreeContextEvent event);
       
     /**
      * When a Context moved
      * 
      * @param event the event
      */
-    public void ContextMoved(TreeEvent event);
+    public void contextMoved(TreeContextEvent event);
         
 }

@@ -16,16 +16,22 @@
 
 package org.geotools.gui.swing.contexttree;
 
+import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
+
 /**
- * Exception throw if incorrect Model is used on the JContextTree
- * 
+ *
  * @author johann sorel
  */
-public class ModelTypeException extends Exception{
+public final class SelectionData {
 
-    ModelTypeException() {
-        super("Incorrect Model class, must be ContextTreeModel");
+public final MapContext context;
+public final MapLayer layer;
+    
+    SelectionData(MapContext context, MapLayer layer){
+        this.context = context;
+        this.layer = layer;
     }
-    
-    
+
 }
+

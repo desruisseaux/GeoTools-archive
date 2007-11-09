@@ -26,10 +26,9 @@ import org.jdesktop.swingx.treetable.TreeTableNode;
  * 
  * @author johann sorel
  */
-public class ContextTreeNode extends AbstractMutableTreeTableNode{
+final class ContextTreeNode extends AbstractMutableTreeTableNode{
     
-    
-    private ContextTreeModel model = null;
+    private final ContextTreeModel model;
     
     /**
      * Creates a new instance of ContextTreeNode
@@ -39,16 +38,7 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
         super();
         this.model = model;
     }
-    
-    /**
-     * set the model to use
-     * @param model the new jcontexttreemodel
-     */
-    public void setModel(ContextTreeModel model){
-        this.model = model;
-    }
-    
-    
+            
     /**
      * find if a node is an ancetor of another
      * @param anotherNode the node to compare with
@@ -71,9 +61,6 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
         return false;
         
     }
-    
-    
-    
     
     /**
      * get a object at column
@@ -101,8 +88,7 @@ public class ContextTreeNode extends AbstractMutableTreeTableNode{
         
         return res;        
     }
-    
-    
+        
     /**
      * set a new object at specific place
      * @param aValue the new value

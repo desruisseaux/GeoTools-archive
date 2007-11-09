@@ -21,8 +21,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import org.geotools.gui.swing.contexttree.ContextTreeNode;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 
@@ -30,37 +30,37 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author johann sorel
  */
-public class DuplicateTreePopupItem implements TreePopupItem{
+public class DeleteItem implements TreePopupItem{
 
-    private JMenuItem duplicateitem = null;
-    private final JContextTree tree;
+    private JMenuItem deleteitem = null;
+    private JContextTree tree = null;
     
     /**
-     * create new instance
+     * delete item for jcontexttreepopup
      * @param tree
      */
-    public DuplicateTreePopupItem(final JContextTree tree){
+    public DeleteItem(final JContextTree tree){
         this.tree = tree;
         
-        duplicateitem = new JMenuItem( TextBundle.getResource().getString("duplicate") );
-        duplicateitem.setIcon( IconBundle.getResource().getIcon("16_duplicate") );
-        duplicateitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+        deleteitem = new JMenuItem( TextBundle.getResource().getString("delete") );
+        deleteitem.setIcon( IconBundle.getResource().getIcon("16_delete") );
+        deleteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,0));
         
-        duplicateitem.addActionListener(new ActionListener() {
+        deleteitem.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                tree.duplicateSelection();
+                tree.deleteSelection();
             }
         });
     }
     
-    public boolean isValid(Object[] objs) {
+    public boolean isValid(SelectionData[] selection) {
         return true;
     }
-       
-    public Component getComponent(Object[] obj, ContextTreeNode node[]) {
-        duplicateitem.setEnabled(tree.canDuplicateSelection());
-        return duplicateitem;
+
+    public Component getComponent(SelectionData[] selection) {
+        deleteitem.setEnabled(tree.canDeleteSelection());        
+        return deleteitem;
     }
 
 }
