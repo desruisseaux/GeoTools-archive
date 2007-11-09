@@ -147,6 +147,27 @@ public class SLDStyleTest extends TestCase {
          assertEquals( Color.BLACK, SLD.color( color ) );
     }
     
+    public void testSLDParserWithhMixedContent() throws Exception {
+        java.net.URL surl = TestData.getResource(this, "mixedContent.sld");
+         SLDParser stylereader = new SLDParser(sf, surl);
+         StyledLayerDescriptor sld = stylereader.parseSLD();
+         
+         Symbolizer[] symbolizers = ((NamedLayer) sld.getStyledLayers()[0]).getStyles()[0]
+                .getFeatureTypeStyles()[0].getRules()[0].getSymbolizers();
+
+         PolygonSymbolizer polygon = (PolygonSymbolizer) symbolizers[0];
+         TextSymbolizer text = (TextSymbolizer) symbolizers[1];
+         
+         Expression fill = polygon.getFill().getColor();
+         Expression label = text.getLabel();
+         
+         String fillValue = (String) fill.evaluate(null, String.class);
+         String labelValue = (String) label.evaluate(null, String.class);
+
+         assertEquals("#96C3F5", fillValue);
+         assertEquals("this is a prefix; this is an expression; this is a postfix", labelValue);
+    }
+    
     /**
 	 * SLD --> XML --> SLD
 	 * @throws Exception

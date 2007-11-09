@@ -32,6 +32,7 @@ import org.geotools.filter.ExpressionBuilder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -1023,7 +1024,9 @@ public class SLDParser {
 
 			if (childName.equalsIgnoreCase("Label")) {
 				LOGGER.finest("parsing label " + child.getNodeValue());
-				symbol.setLabel(parseCssParameter(child));
+				// the label parser should preserve whitespaces, so
+				// we call parseCssParameter with trimWhiteSpace=false
+				symbol.setLabel(parseCssParameter(child,false));
 				if (symbol.getLabel() == null)
 				{
 					LOGGER.warning("parsing TextSymbolizer node - couldnt find anything in the Label element!");
@@ -1814,7 +1817,36 @@ public class SLDParser {
 		return fill;
 	}
 
+	/**
+	 * Concatenates the given expressions (through the strConcat FunctionFilter expression) 
+	 * @param left 
+	 * @param right
+	 * @return
+	 */
+	private Expression manageMixed(Expression left,Expression right) {
+		if(left==null)
+			return right;
+		if(right==null)
+			return left;
+		Function mixed=ff.function("strConcat",new Expression[] {left,right});
+		return mixed;
+	}
+	/**
+	 * Parses a css parameter. Default implementation trims whitespaces from text nodes.
+	 * @param root node to parse
+	 * @return
+	 */
 	private Expression parseCssParameter(Node root) {
+		return parseCssParameter(root,true);
+	}
+	/**
+	 * Parses a css parameter. You can choose if the parser must trim whitespace 
+	 * from text nodes or not.
+	 * @param root node to parse
+	 * @param trimWhiteSpace true to trim whitespace from text nodes
+	 * @return
+	 */
+	private Expression parseCssParameter(Node root,boolean trimWhiteSpace) {
 		Expression ret = null;
 
 		if (LOGGER.isLoggable(Level.FINEST)) {
@@ -1826,41 +1858,41 @@ public class SLDParser {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 
-			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+			// Added mixed="true" management through concatenation of text and expression nodes
+			if ((child == null)) {
 				continue;
-			}
+			} else if(child.getNodeType()==Node.TEXT_NODE) {
+				String value = child.getNodeValue();
+				// trim whitespace if asked to do so
+				value = (value != null && trimWhiteSpace) ? value.trim() : value;
+				if(value!=null && value.length()!=0) {
+					Element literal = dom.createElement("literal");
+					Node text = dom .createTextNode(value);
+	
+					literal.appendChild(text);
 
 			if (LOGGER.isLoggable(Level.FINEST)) {
-				LOGGER.finest("about to parse " + child.getLocalName());
+						LOGGER.finest("Built new literal " + literal);
 			}
-
-			ret = org.geotools.filter.ExpressionDOMParser
-					.parseExpression(child);
-
-			break;
+					// add the text node as a literal
+					ret = manageMixed(ret,org.geotools.filter.ExpressionDOMParser
+							.parseExpression(literal));
 		}
+			} else if(child.getNodeType()==Node.ELEMENT_NODE) {
 
 		if (LOGGER.isLoggable(Level.FINEST)) {
-			LOGGER.finest("no children in CssParam");
+					LOGGER.finest("about to parse " + child.getLocalName());
 		}
+				// add the element node as an expression
+				ret = manageMixed(ret,org.geotools.filter.ExpressionDOMParser
+						.parseExpression(child));
+			} else
+				continue;
 
-		if (ret == null) {
-			//JD: There are no CssParameters that require leading and trailign 
-			// spaces, so we trim them
-			String value = root.getFirstChild().getNodeValue();
-			value = value != null ? value.trim() : value;
-			
-			Element literal = dom.createElement("literal");
-			Node child = dom .createTextNode(value);
-
-			literal.appendChild(child);
-
-			if (LOGGER.isLoggable(Level.FINEST)) {
-				LOGGER.finest("Built new literal " + literal);
 			}
 
-			ret = org.geotools.filter.ExpressionDOMParser
-					.parseExpression(literal);
+		if (ret==null && LOGGER.isLoggable(Level.FINEST)) {
+			LOGGER.finest("no children in CssParam");
 		}
 
 		return ret;
