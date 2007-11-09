@@ -78,9 +78,7 @@ public final class JContextTreePopup extends JPopupMenu {
         this.frame = frame;
         this.map = map;
     }
-    
-    
-    
+        
     public void setMapPane(JMapPane map){
         this.map = map;
         
@@ -92,38 +90,7 @@ public final class JContextTreePopup extends JPopupMenu {
         }
     }
     
-
-    /**
-     * active the defaults Popup controls
-     */
-    public void activeDefaultPopups() {
-        
-        addPopControl(new LayerVisibilityItem());            //layer 
-        
-        addSeparator();
-        
-        addPopControl(new LayerZoomItem(map));            //layer
-        addPopControl(new LayerFeatureItem());            //layer
-        addPopControl(new ContextActiveItem(frame));  //context
-
-        addSeparator();
-
-        addPopControl(new CutItem(frame));                 //all
-        addPopControl(new CopyItem(frame));                //all
-        addPopControl(new PasteItem(frame));               //all
-        addPopControl(new DuplicateItem(frame));           //all
-        
-        addSeparator();
-        
-        addPopControl(new DeleteItem(frame));              //all
-
-        addSeparator();
-
-        addPopControl(new LayerPropertyItem());           //layer
-        addPopControl(new ContextPropertyItem());         //context
-        
-    }
-
+   
     /**
      * Add a Control to the PopupMenu
      * @param control the new popup
@@ -141,12 +108,11 @@ public final class JContextTreePopup extends JPopupMenu {
     }
 
     /**
-     * Add a Separator in the popup for a specific classe
-     * @param classe the classe where the separator will appear
+     * Add a Separator in the popup
      */
+    @Override
     public void addSeparator() {
         controls.add(new SeparatorItem());
-
     }
 
     /**

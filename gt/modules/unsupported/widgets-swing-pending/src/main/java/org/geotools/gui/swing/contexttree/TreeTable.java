@@ -29,7 +29,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.EventListenerList;
 import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
@@ -103,7 +102,7 @@ final class TreeTable extends JXTreeTable {
      */
     private final List<SelectionData> buffer = new ArrayList<SelectionData>();
     
-    private final SelectionManager selectionManager;
+    private final TreeSelectionManager selectionManager;
     
     /**
      * String added to layer name use when paste/duplicate
@@ -128,7 +127,7 @@ final class TreeTable extends JXTreeTable {
         initDragAndDrop();
         initKeySupport();
         
-        selectionManager = new SelectionManager(frame);
+        selectionManager = new TreeSelectionManager(frame);
         getTreeSelectionModel().addTreeSelectionListener( selectionManager );
        
         
@@ -212,7 +211,7 @@ final class TreeTable extends JXTreeTable {
 
     }
 
-    public SelectionManager getSelectionManager() {
+    public TreeSelectionManager getSelectionManager() {
         return selectionManager;
     }
     
@@ -857,57 +856,3 @@ final class TreeTable extends JXTreeTable {
     
 }
 
-
-
-
-class SelectionManager implements javax.swing.event.TreeSelectionListener{
-    
-    private final JContextTree tree;
-    private final EventListenerList listeners = new EventListenerList();    
-    
-    
-    SelectionManager(JContextTree tree){
-        this.tree = tree;
-    }
-
-    
-    /**
-     * add treeListener to Model
-     * @param ker the new listener
-     */
-    void addTreeSelectionListener(TreeSelectionListener ker) {
-        listeners.add(TreeSelectionListener.class, ker);
-    }
-
-    /**
-     * remove treeListener from Model
-     * @param ker the listner to remove
-     */
-    void removeTreeSelectionListener(TreeSelectionListener ker) {
-        listeners.remove(TreeSelectionListener.class, ker);
-    }
-
-    /**
-     * get treeListeners list
-     * @return the listener's table
-     */
-    TreeSelectionListener[] getTreeSelectionListeners() {
-        return listeners.getListeners(TreeSelectionListener.class);
-    }
-    
-    public void valueChanged(javax.swing.event.TreeSelectionEvent e) {
-        TreeSelectionEvent tse = new TreeSelectionEvent(tree, tree.getSelection());
-        fireEvent(tse);
-    }
-    
-    private void fireEvent(TreeSelectionEvent tse){
-        TreeSelectionListener[] list = getTreeSelectionListeners();
-        for (TreeSelectionListener tsl : list) {
-            tsl.selectionChanged(tse);
-        }
-    }
-    
-    
-    
-    
-}

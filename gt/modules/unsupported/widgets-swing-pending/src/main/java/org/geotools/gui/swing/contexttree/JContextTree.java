@@ -26,6 +26,17 @@ import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.popup.ContextActiveItem;
+import org.geotools.gui.swing.contexttree.popup.ContextPropertyItem;
+import org.geotools.gui.swing.contexttree.popup.CopyItem;
+import org.geotools.gui.swing.contexttree.popup.CutItem;
+import org.geotools.gui.swing.contexttree.popup.DeleteItem;
+import org.geotools.gui.swing.contexttree.popup.DuplicateItem;
+import org.geotools.gui.swing.contexttree.popup.LayerFeatureItem;
+import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
+import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
+import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
+import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.map.MapContext;
 
 /**
@@ -75,8 +86,26 @@ public class JContextTree extends JComponent{
         tree.addColumnModel(new OpacityTreeTableColumn());
         tree.addColumnModel(new StyleTreeTableColumn());
         
-        tree.getPopupMenu().activeDefaultPopups();
-        tree.getPopupMenu().setMapPane(map);
+        
+        
+        JContextTreePopup popup = tree.getPopupMenu();        
+        popup.addPopControl(new LayerVisibilityItem());            //layer         
+        popup.addSeparator();        
+        popup.addPopControl(new LayerZoomItem(map));            //layer
+        popup.addPopControl(new LayerFeatureItem());            //layer
+        popup.addPopControl(new ContextActiveItem(tree));  //context
+        popup.addSeparator();
+        popup.addPopControl(new CutItem(tree));                 //all
+        popup.addPopControl(new CopyItem(tree));                //all
+        popup.addPopControl(new PasteItem(tree));               //all
+        popup.addPopControl(new DuplicateItem(tree));           //all        
+        popup.addSeparator();        
+        popup.addPopControl(new DeleteItem(tree));              //all
+        popup.addSeparator();
+        popup.addPopControl(new LayerPropertyItem());           //layer
+        popup.addPopControl(new ContextPropertyItem());         //context
+                
+        popup.setMapPane(map);
         
         tree.revalidate();
 
@@ -366,7 +395,7 @@ public class JContextTree extends JComponent{
      * @param ker the new listener
      */
     public void addTreeSelectionListener(TreeSelectionListener ker) {
-        treetable.getSelectionManager().addTreeSelectionListener(ker);
+        treetable.getSelectionManager().addTreeSelectionListener(ker);        
     }
     
     /**
