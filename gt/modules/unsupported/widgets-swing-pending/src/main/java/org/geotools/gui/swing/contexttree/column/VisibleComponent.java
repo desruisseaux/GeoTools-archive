@@ -27,7 +27,7 @@ import org.geotools.map.MapLayer;
  *
  * @author johann sorel
  */
-final class VisibleComponent extends RendererAndEditorComponent{
+final class VisibleComponent extends RenderAndEditComponent{
 
     private final JCheckBox check = new JCheckBox();
     private MapLayer layer = null;

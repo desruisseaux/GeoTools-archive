@@ -49,6 +49,8 @@ public final class OpacityTreeTableColumn extends TreeTableColumn {
         setMinWidth(60);
         setPreferredWidth(60);
         setWidth(25);
+        
+        setEditableOnMouseOver(true);
     }
 
     public void setValue(Object target, Object value) {
@@ -77,12 +79,6 @@ public final class OpacityTreeTableColumn extends TreeTableColumn {
     public Class getColumnClass() {
         return Boolean.class;
     }
-
-    @Override
-    public boolean isEditableOnMouseOver() {
-        return true;
-    }
-
 
 }
 

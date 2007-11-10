@@ -39,7 +39,7 @@ import org.opengis.filter.expression.Expression;
  *
  * @author johann sorel
  */
-public final class OpacityComponent extends RendererAndEditorComponent {
+public final class OpacityComponent extends RenderAndEditComponent {
 
     private MapLayer layer = null;
     private JSlider slide = new JSlider(0, 100);

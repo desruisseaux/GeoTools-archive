@@ -33,7 +33,7 @@ import org.geotools.styling.Symbolizer;
  *
  * @author johann sorel
  */
-public final class StyleComponent extends RendererAndEditorComponent {
+public final class StyleComponent extends RenderAndEditComponent {
     
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
     private MapLayer layer = null;

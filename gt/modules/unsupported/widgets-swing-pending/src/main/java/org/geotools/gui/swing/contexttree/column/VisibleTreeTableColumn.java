@@ -48,6 +48,8 @@ public final class VisibleTreeTableColumn extends TreeTableColumn {
         setMinWidth(25);
         setPreferredWidth(25);
         setWidth(25);
+        
+        setEditableOnMouseOver(true);
     }
          
     
@@ -79,10 +81,5 @@ public final class VisibleTreeTableColumn extends TreeTableColumn {
         return Boolean.class;
     }
 
-    
-    @Override
-    public boolean isEditableOnMouseOver() {
-        return true;
-    }
     
 }

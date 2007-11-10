@@ -50,6 +50,8 @@ public final class StyleTreeTableColumn extends TreeTableColumn {
         setMinWidth(25);
         setPreferredWidth(25);
         setWidth(25);
+        
+        setEditableOnMouseOver(true);
     }
     
     
@@ -79,12 +81,7 @@ public final class StyleTreeTableColumn extends TreeTableColumn {
     public Class getColumnClass() {
         return MapLayer.class;
     }
-    
-    
-    @Override
-    public boolean isEditableOnMouseOver() {
-        return true;
-    }
+        
     
 }
 

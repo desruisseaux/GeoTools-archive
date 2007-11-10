@@ -205,12 +205,12 @@ public class DemoExplorer extends JFrame {
         popup.addItem(zoom);
         popup.addItem(feature);
         popup.addItem(new DeleteItem(tree));
-        tree.addColumnModel(new VisibleTreeTableColumn());
+        tree.addColumn(new VisibleTreeTableColumn());
         tree.setPreferredSize(new Dimension(250, 250));
         try {
             context = new DefaultMapContext(CRS.decode("EPSG:4326"));
             context.setTitle("Explore-Context");
-            tree.addMapContext(context);
+            tree.addContext(context);
             map.setContext(context);
         } catch (Exception e) {
         }

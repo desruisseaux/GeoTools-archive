@@ -28,13 +28,13 @@ import javax.swing.table.TableCellEditor;
  */
 public class DefaultCellEditor extends AbstractCellEditor implements TableCellEditor{
 
-    private RendererAndEditorComponent view = null;
+    private RenderAndEditComponent view = null;
     
     /**
      * DefaultCellEditot for JContextTree columns
      * @param view
      */
-    public DefaultCellEditor(RendererAndEditorComponent view){
+    public DefaultCellEditor(RenderAndEditComponent view){
         this.view = view;
     }
         

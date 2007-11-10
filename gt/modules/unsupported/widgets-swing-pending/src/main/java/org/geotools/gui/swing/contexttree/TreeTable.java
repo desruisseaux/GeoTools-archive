@@ -270,7 +270,6 @@ final class TreeTable extends JXTreeTable {
     /**
      * get the tree model. dont play with the model, too much things are linked    
      * @return the tree model
-     * @deprecated 
      */
     @Override
     public ContextTreeModel getTreeTableModel() {
@@ -281,7 +280,6 @@ final class TreeTable extends JXTreeTable {
      * set the tree model. dont play with the model, too much things are linked
      * @param contexttreemodel the new model, <b>MUST</b> be a ContextTreeModel.
      * 
-     * @deprecated 
      */
     @Override
     public void setTreeTableModel(TreeTableModel contexttreemodel) {
@@ -711,6 +709,10 @@ final class TreeTable extends JXTreeTable {
         return buffer.toArray(new SelectionData[buffer.size()]);
     }
 
+    
+    void clearBuffer(){
+        buffer.clear();
+    }
     ////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -745,6 +747,14 @@ final class TreeTable extends JXTreeTable {
         revalidate();
     }
 
+    int getColumnModelIndex(TreeTableColumn model){
+        return getTreeTableModel().getgetColumnModelIndex(model);
+    }
+    
+    public int getColumnModelCount() {
+        return getTreeTableModel().getColumnModelCount();
+    }
+        
     /**
      * get the list of column
      * @return list of column models

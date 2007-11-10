@@ -24,13 +24,13 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author johann sorel
  */
-public abstract class RendererAndEditorComponent extends JPanel {
+public abstract class RenderAndEditComponent extends JPanel {
 
     /**
      * Abstrat class extending JPanel, can be used for Render and Edition Cell
      * in the JContextTree
      */
-    public RendererAndEditorComponent() {
+    public RenderAndEditComponent() {
         super();
         setBorder(new EmptyBorder(1, 1, 1, 1));
     }

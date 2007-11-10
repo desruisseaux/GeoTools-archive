@@ -21,7 +21,6 @@ import java.awt.ComponentOrientation;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
@@ -39,10 +38,7 @@ import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
-import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
-import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapContext;
-import org.jdesktop.swingx.JXTitledSeparator;
 
 /**
  *
@@ -87,9 +83,9 @@ public class JContextTree extends JComponent{
     public static JContextTree createDefaultTree(JMapPane map) {
         JContextTree tree = new JContextTree();
 
-        tree.addColumnModel(new VisibleTreeTableColumn());
-        tree.addColumnModel(new OpacityTreeTableColumn());
-        tree.addColumnModel(new StyleTreeTableColumn());
+        tree.addColumn(new VisibleTreeTableColumn());
+        tree.addColumn(new OpacityTreeTableColumn());
+        tree.addColumn(new StyleTreeTableColumn());
         
         
         
@@ -252,6 +248,13 @@ public class JContextTree extends JComponent{
         return treetable.getBuffer();
     }
 
+    /**
+     * clear the buffer
+     */
+    public void clearBuffer(){
+        treetable.clearBuffer();
+    }
+    
         
 ////////////////////////////////////////////////////////////////////////////////
 // COLUMNS MANAGEMENT //////////////////////////////////////////////////////////
@@ -261,7 +264,7 @@ public class JContextTree extends JComponent{
      * add a new column in the model and update the treetable
      * @param model the new column model
      */
-    public void addColumnModel(TreeTableColumn model) {
+    public void addColumn(TreeTableColumn model) {
         treetable.addColumnModel(model);
     }
     
@@ -269,7 +272,7 @@ public class JContextTree extends JComponent{
      * remove column
      * @param model
      */
-    public void removeColumnModel(TreeTableColumn model){
+    public void removeColumn(TreeTableColumn model){
         treetable.removeColumnModel(model);
     }
     
@@ -277,15 +280,32 @@ public class JContextTree extends JComponent{
      * remove column at index column
      * @param column
      */
-    public void removeColumnModel(int column){
+    public void removeColumn(int column){
              treetable.removeColumnModel(column);
+    }
+    
+    /**
+     * 
+     * @return number of columns (without the tree column)
+     */
+    public int getColumnCount(){
+        return treetable.getColumnCount();
+    }
+    
+    /**
+     * 
+     * @param model
+     * @return index of model column
+     */
+    public int getColumnIndex(TreeTableColumn model){
+        return treetable.getColumnModelIndex(model);
     }
     
     /**
      * get the list of column
      * @return list of column models
      */
-    public TreeTableColumn[] getColumnModels() {
+    public TreeTableColumn[] getColumns() {
         return treetable.getColumnModels();
     }
 
@@ -313,7 +333,7 @@ public class JContextTree extends JComponent{
      * add context to the Tree if not allready in it
      * @param context the context to add
      */
-    public void addMapContext(MapContext context) {
+    public void addContext(MapContext context) {
         treetable.addMapContext(context);
     }
     
@@ -321,7 +341,7 @@ public class JContextTree extends JComponent{
      * remove context from the tree
      * @param context target mapcontext to remove
      */
-    public void removeMapContext(MapContext context) {
+    public void removeContext(MapContext context) {
         treetable.removeMapContext(context);
     }
     
@@ -329,7 +349,7 @@ public class JContextTree extends JComponent{
      * count MapContext in the tree
      * @return number of mapcontext in the tree
      */
-    public int getMapContextCount() {
+    public int getContextCount() {
         return treetable.getMapContextCount();
     }
     
@@ -338,7 +358,7 @@ public class JContextTree extends JComponent{
      * @param i position of the mapcontext
      * @return the mapcontext a position i
      */
-    public MapContext getMapContext(int i) {
+    public MapContext getContext(int i) {
         return treetable.getMapContext(i);
     }
     
@@ -347,7 +367,7 @@ public class JContextTree extends JComponent{
      * @param context the mapcontext to find
      * @return index of context
      */
-    public int getMapContextIndex(MapContext context) {
+    public int getContextIndex(MapContext context) {
         return treetable.getMapContextIndex(context);
     }
     
@@ -355,7 +375,7 @@ public class JContextTree extends JComponent{
      * MapContext Array
      * @return empty Array if no mapcontexts in tree
      */
-    public MapContext[] getMapContexts(){
+    public MapContext[] getContexts(){
         return treetable.getMapContexts();
     }
         
@@ -364,7 +384,7 @@ public class JContextTree extends JComponent{
      * @param context the context to move
      * @param newplace new position of the child node
      */
-    public void moveMapContext(MapContext context, int newplace) {
+    public void moveContext(MapContext context, int newplace) {
         treetable.moveMapContext(context, newplace);
     }
 

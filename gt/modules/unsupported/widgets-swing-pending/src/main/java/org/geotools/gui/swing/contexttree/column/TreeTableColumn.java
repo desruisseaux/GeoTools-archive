@@ -26,6 +26,7 @@ public abstract class TreeTableColumn extends TableColumnExt{
 
     private String title = "";
     private Object headervalue = null;
+    protected boolean editOnMouseOver = false;
     
     @Override
     public void setTitle(String text) {
@@ -80,7 +81,13 @@ public abstract class TreeTableColumn extends TableColumnExt{
      * @return true if the cell must go in edit mode on mouseover,
      * more ressource consuming but make component highly interactive.
      */
-    public abstract boolean isEditableOnMouseOver();
+    public boolean isEditableOnMouseOver(){
+        return editOnMouseOver;
+    }
+    
+    public void setEditableOnMouseOver(boolean edit){
+        editOnMouseOver = edit;
+    }
     
     
 }

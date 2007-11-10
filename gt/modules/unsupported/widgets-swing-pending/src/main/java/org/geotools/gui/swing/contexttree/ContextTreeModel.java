@@ -69,6 +69,8 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         setColumnIdentifiers(columnNames);
     }
 
+    
+
     /**
      * set if the treecolumn (maplayer and mapcontext titles) can be edited
      * @param b new value
@@ -194,6 +196,15 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         }
         
     }
+    
+    int getColumnModelCount() {
+        return columns.size();
+    }
+
+    int getgetColumnModelIndex(TreeTableColumn model) {
+        return columns.indexOf(model);
+    }
+    
     
     /**
      * get the list of column

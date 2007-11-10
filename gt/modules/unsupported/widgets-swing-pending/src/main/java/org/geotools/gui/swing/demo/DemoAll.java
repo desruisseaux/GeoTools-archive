@@ -101,7 +101,7 @@ public class DemoAll extends javax.swing.JFrame {
         }
         map.revalidate();
 
-        tree.addMapContext(context);
+        tree.addContext(context);
 
         lightcontrol.setMapPane(map);
 
@@ -516,7 +516,7 @@ public class DemoAll extends javax.swing.JFrame {
 
         context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         context.setTitle("Context " + nb);
-        tree.addMapContext(context);
+        tree.addContext(context);
         nb++;
         
     }//GEN-LAST:event_actionNewContext
@@ -524,25 +524,25 @@ public class DemoAll extends javax.swing.JFrame {
     private void guiChkVisibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkVisibleActionPerformed
         
         if(guiChkVisible.isSelected()){
-            tree.addColumnModel(colVisible);
+            tree.addColumn(colVisible);
         }else{
-            tree.removeColumnModel(colVisible);
+            tree.removeColumn(colVisible);
         }
 }//GEN-LAST:event_guiChkVisibleActionPerformed
 
     private void guiChkOpacityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkOpacityActionPerformed
          if(guiChkOpacity.isSelected()){
-            tree.addColumnModel(colOpacity);
+            tree.addColumn(colOpacity);
         }else{
-            tree.removeColumnModel(colOpacity);
+            tree.removeColumn(colOpacity);
         }
     }//GEN-LAST:event_guiChkOpacityActionPerformed
 
     private void guiChkStyleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkStyleActionPerformed
          if(guiChkStyle.isSelected()){
-            tree.addColumnModel(colStyle);
+            tree.addColumn(colStyle);
         }else{
-            tree.removeColumnModel(colStyle);
+            tree.removeColumn(colStyle);
         }
     }//GEN-LAST:event_guiChkStyleActionPerformed
 

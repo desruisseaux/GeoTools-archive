@@ -37,14 +37,14 @@ public class DefaultCellRenderer implements TableCellRenderer, RolloverRenderer,
     
     protected ComponentProvider componentController;
     private CellContext<JTable> cellContext;
-    private RendererAndEditorComponent view;
+    private RenderAndEditComponent view;
     
         
     /**
      * Constructor
      * @param component
      */
-    public DefaultCellRenderer(RendererAndEditorComponent component){
+    public DefaultCellRenderer(RenderAndEditComponent component){
         this(new Provider(component));
         this.view = component;        
     }
@@ -118,13 +118,13 @@ class Provider extends ComponentProvider<JComponent>{
     
     
     /** Creates a new instance of SymbolRendererProvider */
-    Provider(RendererAndEditorComponent view) {
+    Provider(RenderAndEditComponent view) {
         this.rendererComponent = view;
     }
 
     @Override
     protected void format(CellContext cellContext) {   
-        ((RendererAndEditorComponent)rendererComponent).parse(cellContext.getValue());       
+        ((RenderAndEditComponent)rendererComponent).parse(cellContext.getValue());       
     }
 
     @Override
@@ -132,8 +132,8 @@ class Provider extends ComponentProvider<JComponent>{
 
     
     @Override
-    protected RendererAndEditorComponent createRendererComponent() {
-        return (RendererAndEditorComponent) rendererComponent;
+    protected RenderAndEditComponent createRendererComponent() {
+        return (RenderAndEditComponent) rendererComponent;
     }
     
     
