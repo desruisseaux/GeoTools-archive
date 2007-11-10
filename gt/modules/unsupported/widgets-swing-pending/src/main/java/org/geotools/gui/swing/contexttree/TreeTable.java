@@ -137,7 +137,7 @@ final class TreeTable extends JXTreeTable {
         initKeySupport();
         
         String name = TextBundle.getResource().getString("col_tree");                
-        getColumnModel().getColumn(0).setHeaderValue( new HeaderInfo(name,null,null) );
+        getColumnModel().getColumn(0).setHeaderValue( new HeaderInfo(name," ",null) );
         
         
         getTreeSelectionModel().addTreeSelectionListener( selectionManager );

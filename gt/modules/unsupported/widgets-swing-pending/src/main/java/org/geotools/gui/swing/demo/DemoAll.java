@@ -15,24 +15,12 @@
  */
 package org.geotools.gui.swing.demo;
 
-import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -41,10 +29,24 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
+import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.TreeContextEvent;
 import org.geotools.gui.swing.contexttree.TreeContextListener;
-import org.geotools.gui.swing.control.JLightMapPaneControl;
-import org.geotools.gui.swing.control.JMapPaneInfoPanel;
+import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
+import org.geotools.gui.swing.contexttree.popup.ContextActiveItem;
+import org.geotools.gui.swing.contexttree.popup.ContextPropertyItem;
+import org.geotools.gui.swing.contexttree.popup.CopyItem;
+import org.geotools.gui.swing.contexttree.popup.CutItem;
+import org.geotools.gui.swing.contexttree.popup.DeleteItem;
+import org.geotools.gui.swing.contexttree.popup.DuplicateItem;
+import org.geotools.gui.swing.contexttree.popup.LayerFeatureItem;
+import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
+import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
+import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
+import org.geotools.gui.swing.contexttree.popup.PasteItem;
+import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.datachooser.DataPanel;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDataChooser;
@@ -57,13 +59,9 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.styling.Style;
-import org.jdesktop.swingx.JXTitledPanel;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 
 /**
@@ -73,17 +71,12 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final ImageIcon ICO_CHECK = IconBundle.getResource().getIcon("16_check");
-    private final ImageIcon ICO_ERROR = IconBundle.getResource().getIcon("16_error");
-    private final ImageIcon ICO_WARNING = IconBundle.getResource().getIcon("16_warning");
-    private final ImageIcon ICO_INFORMATION = IconBundle.getResource().getIcon("16_information");
+    private final JMapPane map = new JMapPane();
+    private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
+    private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
+    private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
     
-    private MapContext _context;
-    private MapLayer _layer;
-    private JContextTree tree;
-    private JMapPane map;
-    private JLightMapPaneControl lightcontrol;
-    private JMapPaneInfoPanel infopanel;
+    
     private JDataChooser.STATE state = JDataChooser.STATE.BUTTONED;
     private int nb = 1;
 
@@ -92,58 +85,14 @@ public class DemoAll extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
 
+        MapContext context = buildContext();
+        initTree(tree,map);
 
-        Map hash;
-        DataStore store;
-        FeatureSource fs;
-        Style style;
-        MapLayer layer;
-        try {
-
-            //_context = new DefaultMapContext(CRS.decode("EPSG:4326"));
-            _context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            hash = new HashMap();
-            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
-            store = DataStoreFinder.getDataStore(hash);
-            fs = store.getFeatureSource(store.getTypeNames()[0]);
-            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
-            layer = new DefaultMapLayer(fs, style);
-            layer.setTitle("demo_polygon.shp");
-            _context.addLayer(layer);
-            _layer = layer;
-
-            hash = new HashMap();
-            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
-            store = DataStoreFinder.getDataStore(hash);
-            fs = store.getFeatureSource(store.getTypeNames()[0]);
-            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
-            layer = new DefaultMapLayer(fs, style);
-            layer.setTitle("demo_line.shp");
-            _context.addLayer(layer);
-
-            hash = new HashMap();
-            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
-            store = DataStoreFinder.getDataStore(hash);
-            fs = store.getFeatureSource(store.getTypeNames()[0]);
-            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
-            layer = new DefaultMapLayer(fs, style);
-            layer.setTitle("demo_point.shp");
-            _context.addLayer(layer);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        _context.setTitle("DemoContext");
-
-
-        
-
-        /***********************JMAPPANE***************************************/
-        map = new JMapPane();
         map.setOpaque(false);
         map.setRenderer(new ShapefileRenderer());
-        map.setContext(_context);
-        pan_jmappane.setLayout(new GridLayout(1, 1));
-        pan_jmappane.add(map);
+        map.setContext(context);
+        pan_mappane.setLayout(new GridLayout(1, 1));
+        pan_mappane.add(map);
 
         try {
             map.setMapArea(map.getContext().getLayerBounds());
@@ -152,36 +101,99 @@ public class DemoAll extends javax.swing.JFrame {
         }
         map.revalidate();
 
-        /************************JCONTEXTTREE**********************************/
-        titled_jcontexttree.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        tree = JContextTree.createDefaultTree(map);
-        tree.addMapContext(_context);
-                
-        pan_jcontexttree.setLayout(new GridLayout(1, 1));
-        pan_jcontexttree.add(tree);
-        
-        /************************JLIGHTMAPPANECONTROL**************************/
-        pan_lightmappanecontrol.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        lightcontrol = new JLightMapPaneControl();
+        tree.addMapContext(context);
+
         lightcontrol.setMapPane(map);
-        pan_lightmappanecontrol.add(lightcontrol);
 
-
-        /************************JMAPPANEINFOPANEL*****************************/
-        pan_mappaneinfo.setLeftDecoration(new JLabel(ICO_INFORMATION));
-        infopanel = new JMapPaneInfoPanel();
         infopanel.setMapPane(map);
-        pan_mappaneinfo.add(infopanel);
+        
+        tree.addTreeContextListener(new TreeContextListener() {
 
-        /************************LISTENER**************************************/
-        pan_listener.setLayout(new GridLayout(1, 1));
-        ContextTreeListener ecouteur = new ContextTreeListener(map);
-        pan_listener.add(ecouteur);
-        tree.addTreeContextListener(ecouteur);
+            public void contextAdded(TreeContextEvent event) {
+            }
 
+            public void contextRemoved(TreeContextEvent event) {
+            }
+
+            public void contextActivated(TreeContextEvent event) {
+                if(event.getMapContext() != null){
+                    map.setContext(event.getMapContext());
+                }
+            }
+
+            public void contextMoved(TreeContextEvent event) {
+            }
+        });
 
     }
 
+    private MapContext buildContext() {
+        MapContext context = null;
+        MapLayer layer;
+
+        try {
+            context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+            HashMap hash = new HashMap();
+            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
+            DataStore store = DataStoreFinder.getDataStore(hash);
+            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
+            Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
+            layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("demo_polygon.shp");
+            context.addLayer(layer);
+
+            hash = new HashMap();
+            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
+            store = DataStoreFinder.getDataStore(hash);
+            fs = store.getFeatureSource(store.getTypeNames()[0]);
+            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
+            layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("demo_line.shp");
+            context.addLayer(layer);
+
+            hash = new HashMap();
+            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
+            store = DataStoreFinder.getDataStore(hash);
+            fs = store.getFeatureSource(store.getTypeNames()[0]);
+            style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
+            layer = new DefaultMapLayer(fs, style);
+            layer.setTitle("demo_point.shp");
+            context.addLayer(layer);
+            context.setTitle("DemoContext");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
+        return context;
+    }
+
+    private void initTree(JContextTree tree,JMapPane map){
+        JContextTreePopup popup = tree.getPopupMenu();        
+                
+        popup.addItem(new LayerVisibilityItem());           //layer         
+        popup.addItem(new SeparatorItem() );        
+        popup.addItem(new LayerZoomItem(map));              //layer
+        popup.addItem(new LayerFeatureItem());              //layer
+        popup.addItem(new ContextActiveItem(tree));         //context
+        popup.addItem(new SeparatorItem() );
+        popup.addItem(new CutItem(tree));                   //all
+        popup.addItem(new CopyItem(tree));                  //all
+        popup.addItem(new PasteItem(tree));                 //all
+        popup.addItem(new DuplicateItem(tree));             //all        
+        popup.addItem(new SeparatorItem() );        
+        popup.addItem(new DeleteItem(tree));                //all
+        popup.addItem(new SeparatorItem() );        
+        popup.addItem(new LayerPropertyItem());             //layer
+        popup.addItem(new ContextPropertyItem());           //context
+                
+        popup.setMapPane(map);
+        
+        tree.revalidate();
+    }
+    
+    
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -196,22 +208,19 @@ public class DemoAll extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
-        jPanel5 = new javax.swing.JPanel();
-        lbl_check = new javax.swing.JLabel();
-        lbl_checking = new javax.swing.JLabel();
-        lbl_working = new javax.swing.JLabel();
-        lbl_stop = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
-        pan_jmappane = new javax.swing.JPanel();
+        jpanel8 = new javax.swing.JPanel();
+        pan_mappane = new javax.swing.JPanel();
+        lightcontrol = new org.geotools.gui.swing.control.JLightMapPaneControl();
+        infopanel = new org.geotools.gui.swing.control.JMapPaneInfoPanel();
         jPanel4 = new javax.swing.JPanel();
-        titled_jcontexttree = new org.jdesktop.swingx.JXTitledPanel();
-        pan_jcontexttree = new javax.swing.JPanel();
-        pan_listener = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        pan_lightmappanecontrol = new org.jdesktop.swingx.JXTitledPanel();
-        pan_mappaneinfo = new org.jdesktop.swingx.JXTitledPanel();
+        tree = new org.geotools.gui.swing.contexttree.JContextTree();
+        guiChkVisible = new javax.swing.JCheckBox();
+        guiChkOpacity = new javax.swing.JCheckBox();
+        guiChkStyle = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -276,107 +285,61 @@ public class DemoAll extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
-
-        lbl_check.setIcon(ICO_CHECK);
-        lbl_check.setText("Working");
-
-        lbl_checking.setIcon(ICO_INFORMATION);
-        lbl_checking.setText("Working but will be improved");
-
-        lbl_working.setIcon(ICO_WARNING);
-        lbl_working.setText("In work");
-
-        lbl_stop.setIcon(ICO_ERROR);
-        lbl_stop.setText("Not yet begin");
-
-        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(lbl_check)
-                .add(30, 30, 30)
-                .add(lbl_checking)
-                .add(31, 31, 31)
-                .add(lbl_working)
-                .add(31, 31, 31)
-                .add(lbl_stop)
-                .addContainerGap(379, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(lbl_check, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanel5Layout.createSequentialGroup()
-                        .add(0, 0, 0)
-                        .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(lbl_checking, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, lbl_working, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(lbl_stop, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap())
-        );
-
         jSplitPane1.setDividerLocation(300);
 
-        pan_jmappane.setBackground(new java.awt.Color(255, 255, 255));
+        jpanel8.setBackground(new java.awt.Color(102, 102, 102));
 
-        org.jdesktop.layout.GroupLayout pan_jmappaneLayout = new org.jdesktop.layout.GroupLayout(pan_jmappane);
-        pan_jmappane.setLayout(pan_jmappaneLayout);
-        pan_jmappaneLayout.setHorizontalGroup(
-            pan_jmappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 454, Short.MAX_VALUE)
+        pan_mappane.setBackground(new java.awt.Color(255, 255, 255));
+
+        org.jdesktop.layout.GroupLayout pan_mappaneLayout = new org.jdesktop.layout.GroupLayout(pan_mappane);
+        pan_mappane.setLayout(pan_mappaneLayout);
+        pan_mappaneLayout.setHorizontalGroup(
+            pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 507, Short.MAX_VALUE)
         );
-        pan_jmappaneLayout.setVerticalGroup(
-            pan_jmappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 340, Short.MAX_VALUE)
-        );
-
-        jSplitPane1.setRightComponent(pan_jmappane);
-
-        titled_jcontexttree.setTitle(" JContextTree");
-
-        org.jdesktop.layout.GroupLayout pan_jcontexttreeLayout = new org.jdesktop.layout.GroupLayout(pan_jcontexttree);
-        pan_jcontexttree.setLayout(pan_jcontexttreeLayout);
-        pan_jcontexttreeLayout.setHorizontalGroup(
-            pan_jcontexttreeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 295, Short.MAX_VALUE)
-        );
-        pan_jcontexttreeLayout.setVerticalGroup(
-            pan_jcontexttreeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 203, Short.MAX_VALUE)
+        pan_mappaneLayout.setVerticalGroup(
+            pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 403, Short.MAX_VALUE)
         );
 
-        org.jdesktop.layout.GroupLayout titled_jcontexttreeLayout = new org.jdesktop.layout.GroupLayout(titled_jcontexttree.getContentContainer());
-        titled_jcontexttree.getContentContainer().setLayout(titled_jcontexttreeLayout);
-        titled_jcontexttreeLayout.setHorizontalGroup(
-            titled_jcontexttreeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pan_jcontexttree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        org.jdesktop.layout.GroupLayout jpanel8Layout = new org.jdesktop.layout.GroupLayout(jpanel8);
+        jpanel8.setLayout(jpanel8Layout);
+        jpanel8Layout.setHorizontalGroup(
+            jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(lightcontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+            .add(infopanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+            .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        titled_jcontexttreeLayout.setVerticalGroup(
-            titled_jcontexttreeLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pan_jcontexttree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        org.jdesktop.layout.GroupLayout pan_listenerLayout = new org.jdesktop.layout.GroupLayout(pan_listener);
-        pan_listener.setLayout(pan_listenerLayout);
-        pan_listenerLayout.setHorizontalGroup(
-            pan_listenerLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 299, Short.MAX_VALUE)
-        );
-        pan_listenerLayout.setVerticalGroup(
-            pan_listenerLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 76, Short.MAX_VALUE)
+        jpanel8Layout.setVerticalGroup(
+            jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jpanel8Layout.createSequentialGroup()
+                .add(lightcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(infopanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        jButton2.setText("Add MapContext");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jSplitPane1.setRightComponent(jpanel8);
+
+        guiChkVisible.setText("Visible Column");
+        guiChkVisible.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionAddContext(evt);
+                guiChkVisibleActionPerformed(evt);
+            }
+        });
+
+        guiChkOpacity.setText("Opacity Column");
+        guiChkOpacity.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkOpacityActionPerformed(evt);
+            }
+        });
+
+        guiChkStyle.setText("Style Column");
+        guiChkStyle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkStyleActionPerformed(evt);
             }
         });
 
@@ -384,49 +347,39 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pan_listener, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jButton2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
-            .add(titled_jcontexttree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(guiChkStyle)
+                    .add(guiChkOpacity)
+                    .add(guiChkVisible))
+                .addContainerGap(192, Short.MAX_VALUE))
+            .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel4Layout.createSequentialGroup()
-                .add(titled_jcontexttree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(guiChkVisible)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton2)
+                .add(guiChkOpacity)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pan_listener, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(guiChkStyle)
+                .addContainerGap())
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
 
-        pan_lightmappanecontrol.setTitle("JLightMapPaneControl");
-
-        org.jdesktop.layout.GroupLayout pan_lightmappanecontrolLayout = new org.jdesktop.layout.GroupLayout(pan_lightmappanecontrol.getContentContainer());
-        pan_lightmappanecontrol.getContentContainer().setLayout(pan_lightmappanecontrolLayout);
-        pan_lightmappanecontrolLayout.setHorizontalGroup(
-            pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 756, Short.MAX_VALUE)
-        );
-        pan_lightmappanecontrolLayout.setVerticalGroup(
-            pan_lightmappanecontrolLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 30, Short.MAX_VALUE)
-        );
-
-        pan_mappaneinfo.setTitle("JMapPaneInfoPanel");
-
-        org.jdesktop.layout.GroupLayout pan_mappaneinfoLayout = new org.jdesktop.layout.GroupLayout(pan_mappaneinfo.getContentContainer());
-        pan_mappaneinfo.getContentContainer().setLayout(pan_mappaneinfoLayout);
-        pan_mappaneinfoLayout.setHorizontalGroup(
-            pan_mappaneinfoLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 756, Short.MAX_VALUE)
-        );
-        pan_mappaneinfoLayout.setVerticalGroup(
-            pan_mappaneinfoLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 35, Short.MAX_VALUE)
-        );
-
         jMenu1.setText("File");
+
+        jMenuItem4.setText("New Context");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionNewContext(evt);
+            }
+        });
+        jMenu1.add(jMenuItem4);
 
         jMenuItem1.setText("Exit");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -440,7 +393,6 @@ public class DemoAll extends javax.swing.JFrame {
 
         jMenu2.setText("Data");
 
-        jMenuItem3.setIcon(ICO_CHECK);
         jMenuItem3.setText("Add Data");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -452,7 +404,6 @@ public class DemoAll extends javax.swing.JFrame {
 
         group_jdatachooser.add(jRadioButtonMenuItem1);
         jRadioButtonMenuItem1.setText("tabbed");
-        jRadioButtonMenuItem1.setIcon(ICO_CHECK);
         jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionDataTabbed(evt);
@@ -463,7 +414,6 @@ public class DemoAll extends javax.swing.JFrame {
         group_jdatachooser.add(jRadioButtonMenuItem2);
         jRadioButtonMenuItem2.setSelected(true);
         jRadioButtonMenuItem2.setText("buttoned");
-        jRadioButtonMenuItem2.setIcon(ICO_CHECK);
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionDataButtoned(evt);
@@ -474,17 +424,14 @@ public class DemoAll extends javax.swing.JFrame {
 
         chk_file.setSelected(true);
         chk_file.setText("FileDataPanel");
-        chk_file.setIcon(ICO_INFORMATION);
         jMenu2.add(chk_file);
 
         chk_database.setSelected(true);
         chk_database.setText("DatabaseDataPanel");
-        chk_database.setIcon(ICO_INFORMATION);
         jMenu2.add(chk_database);
 
         chk_server.setSelected(true);
         chk_server.setText("ServerDataPanel");
-        chk_server.setIcon(ICO_ERROR);
         jMenu2.add(chk_server);
 
         jMenuBar1.add(jMenu2);
@@ -507,39 +454,15 @@ public class DemoAll extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(pan_mappaneinfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 760, Short.MAX_VALUE)
+            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 813, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pan_lightmappanecontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pan_mappaneinfo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    private void actionAddContext(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddContext
-        DefaultMapContext context;
-        try {
-            context = new DefaultMapContext(CRS.decode("EPSG:4326"));
-            context.setTitle("Context " + nb);
-            tree.addMapContext(context);
-            nb++;
-        } catch (NoSuchAuthorityCodeException ex) {
-            ex.printStackTrace();
-        } catch (FactoryException ex) {
-            ex.printStackTrace();
-        }
-    }//GEN-LAST:event_actionAddContext
 
     private void actionDataButtoned(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDataButtoned
         state = JDataChooser.STATE.BUTTONED;
@@ -574,7 +497,7 @@ public class DemoAll extends javax.swing.JFrame {
                     tree.getActiveContext().addLayer(layer);
                 }
             }
-        
+
         }
     }//GEN-LAST:event_dataChooserAction
 
@@ -587,6 +510,41 @@ public class DemoAll extends javax.swing.JFrame {
         dia_about.setSize(400, 200);
         dia_about.setVisible(true);
     }//GEN-LAST:event_menuAbout
+
+    private void actionNewContext(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionNewContext
+        DefaultMapContext context;
+
+        context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        context.setTitle("Context " + nb);
+        tree.addMapContext(context);
+        nb++;
+        
+    }//GEN-LAST:event_actionNewContext
+
+    private void guiChkVisibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkVisibleActionPerformed
+        
+        if(guiChkVisible.isSelected()){
+            tree.addColumnModel(colVisible);
+        }else{
+            tree.removeColumnModel(colVisible);
+        }
+}//GEN-LAST:event_guiChkVisibleActionPerformed
+
+    private void guiChkOpacityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkOpacityActionPerformed
+         if(guiChkOpacity.isSelected()){
+            tree.addColumnModel(colOpacity);
+        }else{
+            tree.removeColumnModel(colOpacity);
+        }
+    }//GEN-LAST:event_guiChkOpacityActionPerformed
+
+    private void guiChkStyleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkStyleActionPerformed
+         if(guiChkStyle.isSelected()){
+            tree.addColumnModel(colStyle);
+        }else{
+            tree.removeColumnModel(colStyle);
+        }
+    }//GEN-LAST:event_guiChkStyleActionPerformed
 
     /**
      * @param args the command line arguments
@@ -614,7 +572,10 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem chk_server;
     private javax.swing.JDialog dia_about;
     private javax.swing.ButtonGroup group_jdatachooser;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JCheckBox guiChkOpacity;
+    private javax.swing.JCheckBox guiChkStyle;
+    private javax.swing.JCheckBox guiChkVisible;
+    private org.geotools.gui.swing.control.JMapPaneInfoPanel infopanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
@@ -624,8 +585,8 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -633,75 +594,9 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSplitPane jSplitPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
-    private javax.swing.JLabel lbl_check;
-    private javax.swing.JLabel lbl_checking;
-    private javax.swing.JLabel lbl_stop;
-    private javax.swing.JLabel lbl_working;
-    private javax.swing.JPanel pan_jcontexttree;
-    private javax.swing.JPanel pan_jmappane;
-    private org.jdesktop.swingx.JXTitledPanel pan_lightmappanecontrol;
-    private javax.swing.JPanel pan_listener;
-    private org.jdesktop.swingx.JXTitledPanel pan_mappaneinfo;
-    private org.jdesktop.swingx.JXTitledPanel titled_jcontexttree;
+    private javax.swing.JPanel jpanel8;
+    private org.geotools.gui.swing.control.JLightMapPaneControl lightcontrol;
+    private javax.swing.JPanel pan_mappane;
+    private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables
-}
-class ContextTreeListener extends JXTitledPanel implements TreeContextListener {
-
-    private JTextArea txt = new JTextArea();
-    private JMapPane map;
-    private String message = "";
-
-    /** Creates a new instance of JXTreeTableFrameListener
-     * @param map
-     */
-    public ContextTreeListener(JMapPane map) {
-        super();
-        this.map = map;
-        setTitle("TreeListener");
-        setLeftDecoration(new JLabel(IconBundle.getResource().getIcon("16_information")));
-        txt.setFont(new Font("Arial", Font.PLAIN, 8));
-        setPreferredSize(new Dimension(100, 120));
-        add(BorderLayout.CENTER, new JScrollPane(txt));
-    }
-
-    public void contextAdded(TreeContextEvent event) {
-        message = "ADDED index: ";
-        message += event.getFromIndex();
-        message += "  who: " + event.getMapContext().getTitle();
-        txt.setText(txt.getText() + message + "\n");
-    }
-
-    public void contextRemoved(TreeContextEvent event) {
-        message = "REMOVED index: ";
-        message += event.getFromIndex();
-        message += "  who: " + event.getMapContext().getTitle();
-        txt.setText(txt.getText() + message + "\n");
-    }
-
-    public void contextActivated(TreeContextEvent event) {
-        message = "ACTIVATED index: ";
-        message += event.getFromIndex();
-        message += "  who: " + ((event.getMapContext() != null) ? event.getMapContext().getTitle() : "null");
-        txt.setText(txt.getText() + message + "\n");
-
-        map.setContext(event.getMapContext());
-
-        if (map.getContext() != null) {
-            try {
-                map.setMapArea(map.getContext().getLayerBounds());
-                map.setReset(true);
-                map.repaint();
-                map.revalidate();
-            } catch (IOException ex) {
-                Logger.getLogger(ContextTreeListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    public void contextMoved(TreeContextEvent event) {
-        message = "MOVED indexes: ";
-        message += event.getFromIndex() + " > " + event.getToIndex();
-        message += "  who: " + event.getMapContext().getTitle();
-        txt.setText(txt.getText() + message + "\n");
-    }
 }

@@ -180,7 +180,7 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
     
     void removeColumnModel(TreeTableColumn model) {
         int index = columns.indexOf(model);
-        removeColumnModel(index);
+        this.removeColumnModel(index);
         
     }
     
@@ -188,6 +188,11 @@ public final class ContextTreeModel extends DefaultTreeTableModel implements Map
         columns.remove(index);
         columnNames.remove(index+1);
         setColumnIdentifiers(columnNames);
+        
+        for(TreeTableColumn col : columns){
+            col.setModelIndex(columns.indexOf(col) + 1);
+        }
+        
     }
     
     /**
