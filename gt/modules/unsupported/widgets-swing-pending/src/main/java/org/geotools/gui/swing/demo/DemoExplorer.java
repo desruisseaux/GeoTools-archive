@@ -57,9 +57,9 @@ import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.DeleteItem;
 import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
-import org.geotools.gui.swing.control.JLightMapPaneControl;
 import org.geotools.gui.swing.datachooser.DataListener;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
+import org.geotools.gui.swing.map.map2d.control.JMap2DControlBar;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.DefaultMapContext;
@@ -76,7 +76,7 @@ public class DemoExplorer extends JFrame {
 
     private JMapPane map = new JMapPane();
     private JContextTree tree = new JContextTree();
-    private JLightMapPaneControl control = new JLightMapPaneControl(map);
+    private JMap2DControlBar control = new JMap2DControlBar(map);
     private JTabbedPane tabbed = null;
     private MapContext context = null;
 

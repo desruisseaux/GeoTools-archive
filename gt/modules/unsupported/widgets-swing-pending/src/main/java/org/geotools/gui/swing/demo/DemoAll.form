@@ -322,9 +322,9 @@
                 </DimensionLayout>
               </Layout>
             </Container>
-            <Component class="org.geotools.gui.swing.control.JLightMapPaneControl" name="lightcontrol">
+            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DControlBar" name="lightcontrol">
             </Component>
-            <Component class="org.geotools.gui.swing.control.JMapPaneInfoPanel" name="infopanel">
+            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar" name="infopanel">
             </Component>
           </SubComponents>
         </Container>

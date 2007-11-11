@@ -55,6 +55,8 @@ import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.ServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.map.map2d.DefaultMap2D;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
@@ -72,7 +74,7 @@ import org.geotools.styling.Style;
 public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final JMapPane map = new JMapPane();
+    private final DefaultMap2D map = new DefaultMap2D();
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
@@ -107,9 +109,9 @@ public class DemoAll extends javax.swing.JFrame {
 
         tree.addContext(context);
 
-        lightcontrol.setMapPane(map);
+        //lightcontrol.setMapPane(map);
 
-        infopanel.setMapPane(map);
+        //infopanel.setMapPane(map);
         
         tree.addTreeContextListener(new TreeContextListener() {
 
@@ -172,12 +174,12 @@ public class DemoAll extends javax.swing.JFrame {
         return context;
     }
 
-    private void initTree(JContextTree tree,JMapPane map){
+    private void initTree(JContextTree tree,Map2D map){
         JContextTreePopup popup = tree.getPopupMenu();        
                 
         popup.addItem(new LayerVisibilityItem());           //layer         
         popup.addItem(new SeparatorItem() );        
-        popup.addItem(new LayerZoomItem(map));              //layer
+        //popup.addItem(new LayerZoomItem(map));              //layer
         popup.addItem(new LayerFeatureItem());              //layer
         popup.addItem(new ContextActiveItem(tree));         //context
         popup.addItem(new SeparatorItem() );
@@ -191,7 +193,7 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new LayerPropertyItem());             //layer
         popup.addItem(new ContextPropertyItem());           //context
                 
-        popup.setMapPane(map);
+        //popup.setMapPane(map);
         
         tree.addColumn(colVisible);
         tree.addColumn(colOpacity);
@@ -219,8 +221,8 @@ public class DemoAll extends javax.swing.JFrame {
         jSplitPane1 = new javax.swing.JSplitPane();
         jpanel8 = new javax.swing.JPanel();
         pan_mappane = new javax.swing.JPanel();
-        lightcontrol = new org.geotools.gui.swing.control.JLightMapPaneControl();
-        infopanel = new org.geotools.gui.swing.control.JMapPaneInfoPanel();
+        lightcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        infopanel = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
         jPanel4 = new javax.swing.JPanel();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -584,7 +586,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem guiChkOpacity;
     private javax.swing.JCheckBoxMenuItem guiChkStyle;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
-    private org.geotools.gui.swing.control.JMapPaneInfoPanel infopanel;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar infopanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
@@ -606,7 +608,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSplitPane jSplitPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
-    private org.geotools.gui.swing.control.JLightMapPaneControl lightcontrol;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DControlBar lightcontrol;
     private javax.swing.JPanel pan_mappane;
     private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables
