@@ -47,6 +47,8 @@ import org.geotools.resources.i18n.Errors;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * 
+ * @deprecated Moved to the {@link org.geotools.util.logging} package.
  */
 public class LoggedFormat<T> extends Format {
     /**

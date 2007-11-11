@@ -30,6 +30,8 @@ import org.geotools.resources.Utilities;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * 
+ * @deprecated Moved to the {@link org.geotools.util.logging} package.
  */
 public final class Logging {
     /**

@@ -42,6 +42,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @author Saul Farber
  *
  * @see Logging
+ * 
+ * @deprecated No replacement. See the new {@link org.geotools.util.logging} package instead.
  */
 final class CommonHandler extends Handler {
     /**
