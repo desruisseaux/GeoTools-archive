@@ -15,15 +15,11 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 import java.util.ConcurrentModificationException;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -71,11 +67,11 @@ public final class SoftValueHashMapTest extends TestCase {
     public void testStrongReferences() {
         final Random random = new Random();
         for (int pass=0; pass<4; pass++) {
-            final SoftValueHashMap softMap = new SoftValueHashMap();
-            final HashMap        strongMap = new HashMap();
+            final SoftValueHashMap<Integer,Integer> softMap = new SoftValueHashMap<Integer,Integer>();
+            final HashMap<Integer,Integer>        strongMap = new HashMap<Integer,Integer>();
             for (int i=0; i<SAMPLE_SIZE; i++) {
-                final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
-                final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
+                final Integer key   = random.nextInt(SAMPLE_SIZE);
+                final Integer value = random.nextInt(SAMPLE_SIZE);
                 assertEquals("containsKey:",   strongMap.containsKey(key),
                                                  softMap.containsKey(key));
                 assertEquals("containsValue:", strongMap.containsValue(value),
@@ -103,21 +99,21 @@ public final class SoftValueHashMapTest extends TestCase {
      */
     public void testSoftReferences() throws InterruptedException {
         final Random random = new Random();
-        final SoftValueHashMap softMap = new SoftValueHashMap();
-        final HashMap strongMap = new HashMap();
+        final SoftValueHashMap<Integer,Integer> softMap = new SoftValueHashMap<Integer,Integer>();
+        final HashMap<Integer,Integer> strongMap = new HashMap<Integer,Integer>();
         for (int pass=0; pass<2; pass++) {
             int count = 0;
             softMap.clear();
             strongMap.clear();
             for (int i=0; i<SAMPLE_SIZE; i++) {
-                final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
-                final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
+                final Integer key   = random.nextInt(SAMPLE_SIZE);
+                final Integer value = random.nextInt(SAMPLE_SIZE);
                 if (random.nextBoolean()) {
                     /*
                      * Test addition.
                      */
-                    final Object   softPrevious = softMap  .put(key, value);
-                    final Object strongPrevious = strongMap.put(key, value);
+                    final Integer   softPrevious = softMap  .put(key, value);
+                    final Integer strongPrevious = strongMap.put(key, value);
                     if (softPrevious == null) {
                         // If the element was not in the SoftValueHashMap (i.e. if the garbage
                         // collector has cleared it), then it must not been in HashMap neither
@@ -136,8 +132,8 @@ public final class SoftValueHashMapTest extends TestCase {
                     /*
                      * Test remove
                      */
-                    final Object   softPrevious = softMap.get(key);
-                    final Object strongPrevious = strongMap.remove(key);
+                    final Integer   softPrevious = softMap.get(key);
+                    final Integer strongPrevious = strongMap.remove(key);
                     if (strongPrevious != null) {
                         assertSame("remove:", strongPrevious, softPrevious);
                     }

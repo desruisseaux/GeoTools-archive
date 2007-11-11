@@ -15,14 +15,12 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.Random;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ListIterator;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -65,14 +63,14 @@ public final class KeySortedListTest extends TestCase {
      * order.
      */
     public void testAdd() {
-        final Random      random = new Random(6969483179756527012L);
-        final KeySortedList list = new KeySortedList();
-        final Collection   check = new ArrayList();
-        final int    maxElements = 1000;
+        final Random random = new Random(6969483179756527012L);
+        final KeySortedList<Integer,Double> list = new KeySortedList<Integer,Double>();
+        final Collection<Double> check = new ArrayList<Double>();
+        final int maxElements = 1000;
         for (int i=0; i<maxElements; i++) {
             final double  x     = random.nextDouble() * (maxElements/10);
-            final Integer key   = new Integer((int) x);
-            final Double  value = new Double(x);
+            final Integer key   = (int) x;
+            final Double  value = x;
             list.add(key, value);
             check.add(value);
         }
@@ -81,14 +79,14 @@ public final class KeySortedListTest extends TestCase {
          */
         assertEquals(maxElements, check.size());
         assertEquals(maxElements, list .size());
-        assertEquals(new HashSet(check), new HashSet(list));
+        assertEquals(new HashSet<Double>(check), new HashSet<Double>(list));
         /*
          * Checks the iteration.
          */
         int count=0, lastKey=0;
-        for (final ListIterator it=list.listIterator(); it.hasNext(); count++) {
+        for (final ListIterator<Double> it=list.listIterator(); it.hasNext(); count++) {
             assertEquals(count, it.nextIndex());
-            final Double element = (Double) it.next();
+            final Double element = it.next();
             assertEquals(count, it.previousIndex());
             final double value = element.doubleValue();
             final int    key   = (int) value;
@@ -100,10 +98,10 @@ public final class KeySortedListTest extends TestCase {
         /*
          * Checks the iteration from a middle point.
          */
-        final Integer     midKey = new Integer(maxElements/10 / 2);
-        final KeySortedList head = list.headList(midKey);
-        final KeySortedList tail = list.tailList(midKey);
-        final Collection rebuild = new ArrayList(head);
+        final Integer midKey = new Integer(maxElements/10 / 2);
+        final KeySortedList<Integer,Double> head = list.headList(midKey);
+        final KeySortedList<Integer,Double> tail = list.tailList(midKey);
+        final Collection<Double> rebuild = new ArrayList<Double>(head);
         rebuild.addAll(tail);
         assertEquals(list.size(), head.size() + tail.size());
         assertEquals(list, rebuild);

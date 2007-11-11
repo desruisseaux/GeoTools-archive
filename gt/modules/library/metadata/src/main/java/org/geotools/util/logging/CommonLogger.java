@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
 
 
 /**
@@ -126,13 +127,23 @@ final class CommonLogger extends LoggerAdapter {
 
     /**
      * Factory for {@link CommonLogger}.
+     *
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Martin Desruisseaux
      */
     static final class Factory extends LoggerFactory {
         /**
-         * Returns the implementation to use for the logger of the specified name.
+         * Returns the implementation to use for the logger of the specified name,
+         * or {@code null} if the logger would delegates to Java logging anyway.
          */
         protected Object getImplementation(final String name) {
-            return LogFactory.getLog(name);
+            final Log log = LogFactory.getLog(name);
+            if (log instanceof Jdk14Logger) {
+                return null;
+            }
+            return log;
         }
 
         /**

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,7 +26,7 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link DisjointSet} class.
+ * Tests the {@link DisjointSet} class.
  *
  * @source $URL$
  * @version $Id$
@@ -60,9 +59,9 @@ public final class DisjointSetTest extends TestCase {
       * Test the set.
       */
      public void testDisjointSet() {
-        DisjointSet t1 = new DisjointSet(true);
-        DisjointSet t2 = new DisjointSet(t1);
-        DisjointSet t3 = new DisjointSet(t2);
+        DisjointSet<String> t1 = new DisjointSet<String>(true);
+        DisjointSet<String> t2 = new DisjointSet<String>(t1);
+        DisjointSet<String> t3 = new DisjointSet<String>(t2);
 
         assertNotNull(t1.getTrash());
         assertSame(t1.getTrash(), t2.getTrash());
@@ -77,7 +76,7 @@ public final class DisjointSetTest extends TestCase {
         assertTrue(t2.remove("bêta"));
 
         assertEquals(Collections.singleton("epsilon"), t1);
-        assertEquals(new HashSet(Arrays.asList(new String[] {"alpha","delta"})), t2);
+        assertEquals(new HashSet<String>(Arrays.asList(new String[] {"alpha","delta"})), t2);
         assertEquals(Collections.singleton("gamma"), t3);
         assertEquals(Collections.singleton("bêta"),  t1.getTrash());
     }

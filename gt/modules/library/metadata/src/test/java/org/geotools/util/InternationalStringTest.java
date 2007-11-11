@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,7 +16,6 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,7 +83,7 @@ public final class InternationalStringTest extends TestCase {
         toTest.add(Locale.ENGLISH, message);
         assertSame("Addition:", message, toTest.toString());
         basicTests(toTest);
-        
+
         toTest = new GrowableInternationalString(message);
         assertSame("Construction:", message, toTest.toString());
         basicTests(toTest);
@@ -137,7 +136,7 @@ public final class InternationalStringTest extends TestCase {
         final ObjectOutputStream objectOut = new ObjectOutputStream(out);
         objectOut.writeObject(toTest);
         objectOut.close();
-        
+
         final ByteArrayInputStream    in = new ByteArrayInputStream(out.toByteArray());
         final ObjectInputStream objectIn = new ObjectInputStream(in);
         final Object              object = objectIn.readObject();

@@ -14,9 +14,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.util;
+package org.geotools.util.logging;
 
-// J2SE dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,7 +49,7 @@ public final class MonolineFormatterTest extends TestCase {
     }
 
     /**
-     * Set to <code>true</code> if this is run has a JUnit test
+     * Set to {@code true} if this is run has a JUnit test
      * (i.e. not from the command line).
      */
     private static boolean runFromJUnit;
@@ -97,18 +96,12 @@ public final class MonolineFormatterTest extends TestCase {
     }
 
     /**
-     * Run the test from the commande line. The {@link GeotoolsHandler} will be registered
-     * only if the <code>-init</code> option was explicitely specified on the command line.
-     * Otherwise, <code>GeotoolsHandler</code> will be used only if declared in
-     * <code>jre/lib/logging.properties</code>.
+     * Run the test from the commande line.
      */
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
         if (arguments.getFlag("-init")) {
             Logging.GEOTOOLS.forceMonolineConsoleOutput();
-        }
-        if (arguments.getFlag("-geotools")) {
-            MonolineFormatter.init("org.geotools", (Level) null);
         }
         arguments.getRemainingArguments(0);
         new MonolineFormatterTest(null).testInitialization();

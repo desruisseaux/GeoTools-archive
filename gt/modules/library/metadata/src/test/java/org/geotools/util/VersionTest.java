@@ -15,7 +15,6 @@
  */
 package org.geotools.util;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -43,7 +42,7 @@ public final class VersionTest extends TestCase {
     public static Test suite() {
         return new TestSuite(VersionTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -62,7 +61,7 @@ public final class VersionTest extends TestCase {
         assertEquals(new Integer( 2), version.getRevision());
         assertSame(version.getRevision(), version.getComponent(2));
         assertNull(version.getComponent(3));
- 
+
         assertTrue(version.compareTo(new Version("6.11.2")) == 0);
         assertTrue(version.compareTo(new Version("6.8"   )) >  0);
         assertTrue(version.compareTo(new Version("6.12.0")) <  0);
@@ -80,7 +79,7 @@ public final class VersionTest extends TestCase {
         assertEquals("b2",            version.getRevision());
         assertSame(version.getRevision(), version.getComponent(2));
         assertNull(version.getComponent(3));
- 
+
         assertTrue(version.compareTo(new Version("1.6.b2")) == 0);
         assertTrue(version.compareTo(new Version("1.6.b1"))  > 0);
         assertTrue(version.compareTo(new Version("1.07.b1")) < 0);

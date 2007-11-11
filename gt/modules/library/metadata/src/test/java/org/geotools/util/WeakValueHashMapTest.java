@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,21 +16,16 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link WeakHashSet}. A standard {@link HashSet} object
- * is used for comparaison purpose.
+ * Test the {@link WeakHashSet}. A standard {@link HashMap} object is used for comparaison purpose.
  *
  * @source $URL$
  * @version $Id$
@@ -72,13 +67,13 @@ public final class WeakValueHashMapTest extends TestCase {
     public void testStrongReferences() {
         final Random random = new Random();
         for (int pass=0; pass<4; pass++) {
-            final WeakValueHashMap weakMap = new WeakValueHashMap();
-            final HashMap        strongMap = new HashMap();
+            final WeakValueHashMap<Integer,Integer> weakMap = new WeakValueHashMap<Integer,Integer>();
+            final HashMap<Integer,Integer>        strongMap = new HashMap<Integer,Integer>();
             for (int i=0; i<SAMPLE_SIZE; i++) {
                 final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
                 final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
-                assertEquals("containsKey:",   strongMap.containsKey(key),
-                                                 weakMap.containsKey(key));
+                assertEquals("containsKey:", strongMap.containsKey(key),
+                                               weakMap.containsKey(key));
                 if (false) {
                     // Can't test this one, since 'WeakValueHashMap.entrySet()' is not implemented.
                     assertEquals("containsValue:", strongMap.containsValue(value),
@@ -108,17 +103,17 @@ public final class WeakValueHashMapTest extends TestCase {
     public void testWeakReferences() throws InterruptedException {
         final Random random = new Random();
         for (int pass=0; pass<2; pass++) {
-            final WeakValueHashMap weakMap = new WeakValueHashMap();
-            final HashMap        strongMap = new HashMap();
+            final WeakValueHashMap<Integer,Integer> weakMap = new WeakValueHashMap<Integer,Integer>();
+            final HashMap<Integer,Integer>        strongMap = new HashMap<Integer,Integer>();
             for (int i=0; i<SAMPLE_SIZE; i++) {
                 final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
                 final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
                 if (random.nextBoolean()) {
                     /*
-                     * Test addition.
+                     * Tests addition.
                      */
-                    final Object   weakPrevious = weakMap  .put(key, value);
-                    final Object strongPrevious = strongMap.put(key, value);
+                    final Integer   weakPrevious = weakMap  .put(key, value);
+                    final Integer strongPrevious = strongMap.put(key, value);
                     if (weakPrevious == null) {
                         // If the element was not in the WeakValueHashMap (i.e. if the garbage
                         // collector has cleared it), then it must not been in HashMap neither
@@ -134,10 +129,10 @@ public final class WeakValueHashMapTest extends TestCase {
                     }
                 } else {
                     /*
-                     * Test remove
+                     * Tests remove
                      */
-                    final Object   weakPrevious = weakMap.get(key);
-                    final Object strongPrevious = strongMap.remove(key);
+                    final Integer   weakPrevious = weakMap.get(key);
+                    final Integer strongPrevious = strongMap.remove(key);
                     if (strongPrevious != null) {
                         assertSame("remove:", strongPrevious, weakPrevious);
                     }

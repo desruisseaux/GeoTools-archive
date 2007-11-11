@@ -20,7 +20,10 @@ import org.geotools.util.WeakValueHashMap;
 
 
 /**
- * A factory for Java {@link Logger} wrapping an other logging framework.
+ * A factory for Java {@link Logger} wrapping an other logging framework. This factory is used
+ * only when wanting to log to an other framework than Java logging. The {@link #getLogger}
+ * method returns some subclass of {@link Logger} (typicallly {@link LoggerAdapter}) that
+ * forward directly all log methods to an other framework.
  *
  * @since 2.4
  * @source $URL$
@@ -28,6 +31,7 @@ import org.geotools.util.WeakValueHashMap;
  * @author Martin Desruisseaux
  *
  * @see Logging
+ * @see LoggerAdapter
  */
 public abstract class LoggerFactory {
     /**
@@ -43,21 +47,26 @@ public abstract class LoggerFactory {
     }
 
     /**
-     * Returns the logger of the specified name. If this method has already been invoked previously
-     * with the same {@code name} argument, than it may returns the same logger provided that:
+     * Returns the logger of the specified name, or {@code null}. If this method has already been
+     * invoked previously with the same {@code name} argument, than it may returns the same logger
+     * provided that:
      * <ul>
      *   <li>the logger has not yet been garbage collected;</li>
      *   <li>the implementation instance (Log4J, SLF4J, <cite>etc.</cite>) returned by
      *       <code>{@linkplain #getImplementation getImplementation}(name)</code> has
      *       not changed.</li>
      * </ul>
-     * Otherwise this method returns a new {@code Logger} instance.
+     * Otherwise this method returns a new {@code Logger} instance, or {@code null} if the
+     * standard Java logging framework should be used.
      *
      * @param  name The name of the logger.
-     * @return The logger (never {@code null}).
+     * @return The logger, or {@code null}.
      */
     public Logger getLogger(final String name) {
         final Object target = getImplementation(name);
+        if (target == null) {
+            return null;
+        }
         synchronized (loggers) {
             Logger logger = loggers.get(name);
             if (logger == null || !target.equals(unwrap(logger))) {
@@ -70,11 +79,14 @@ public abstract class LoggerFactory {
 
     /**
      * Returns the implementation to use for the logger of the specified name. The object to be
-     * returned depends on the logging framework (Log4J, SLF4J, <cite>etc.</cite>).
+     * returned depends on the logging framework (Log4J, SLF4J, <cite>etc.</cite>). If the target
+     * framework redirects logging events to Java logging, then this method should returns
+     * {@code null} since we should not use wrapper at all.
      *
      * @param  name The name of the logger.
-     * @return The logger as an object of the target logging framework
-     *         (Log4J, SLF4J, <cite>etc.</cite>). Never {@code null}.
+     * @return The logger as an object of the target logging framework (Log4J, SLF4J,
+     *         <cite>etc.</cite>), or {@code null} if the target framework would redirect
+     *         to the Java logging framework.
      */
     protected abstract Object getImplementation(String name);
 

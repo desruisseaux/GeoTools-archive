@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,10 +16,8 @@
  */
 package org.geotools.util;
 
-// J2SE dependencies
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -27,8 +25,7 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link CanonicalSet}. A standard {@link HashSet} object
- * is used for comparaison purpose.
+ * Tests the {@link CanonicalSet}. A standard {@link HashSet} object is used for comparaison purpose.
  *
  * @source $URL$
  * @version $Id$
@@ -58,20 +55,19 @@ public final class CanonicalSetTest extends TestCase {
     }
 
     /**
-     * Test the {@link CanonicalSet} using strong references.
-     * The tested {@link CanonicalSet} should behave like a
-     * standard {@link Set} object.
+     * Tests the {@link CanonicalSet} using strong references.
+     * The tested {@link CanonicalSet} should behave like a standard {@link Set} object.
      */
     public void testStrongReferences() {
         final Random random = new Random();
         for (int pass=0; pass<20; pass++) {
-            final CanonicalSet weakSet = new CanonicalSet();
-            final HashSet    strongSet = new HashSet();
+            final CanonicalSet<Integer> weakSet = CanonicalSet.newInstance(Integer.class);
+            final HashSet<Integer>    strongSet = new HashSet<Integer>();
             for (int i=0; i<1000; i++) {
                 final Integer value = new Integer(random.nextInt(500));
                 if (random.nextBoolean()) {
                     /*
-                     * Test addition.
+                     * Tests addition.
                      */
                     final boolean   weakModified = weakSet  .add(value);
                     final boolean strongModified = strongSet.add(value);
@@ -83,7 +79,7 @@ public final class CanonicalSetTest extends TestCase {
                     }
                 } else {
                     /*
-                     * Test remove
+                     * Tests remove
                      */
                     final boolean   weakModified = weakSet  .remove(value);
                     final boolean strongModified = strongSet.remove(value);
@@ -104,13 +100,13 @@ public final class CanonicalSetTest extends TestCase {
     public void testWeakReferences() throws InterruptedException {
         final Random random = new Random();
         for (int pass=0; pass<2; pass++) {
-            final CanonicalSet weakSet = new CanonicalSet();
-            final HashSet    strongSet = new HashSet();
+            final CanonicalSet<Integer> weakSet = CanonicalSet.newInstance(Integer.class);
+            final HashSet<Integer>    strongSet = new HashSet<Integer>();
             for (int i=0; i<500; i++) {
                 final Integer value = new Integer(random.nextInt(500));
                 if (random.nextBoolean()) {
                     /*
-                     * Test addition.
+                     * Tests addition.
                      */
                     final boolean   weakModified = weakSet  .add(value);
                     final boolean strongModified = strongSet.add(value);
