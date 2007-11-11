@@ -75,11 +75,13 @@ public final class LoggingAdapterTest extends TestCase {
             assertEquals(message, logger.last);
         }
         // Actually, Level.OFF has the highest intValue.
+        // LoggerAdapter can easily match this level to a no-op.
         logger.clear();
         logger.log(Level.OFF, "off");
-        assertEquals(Level.SEVERE, logger.level);
+        assertEquals(Level.OFF, logger.level);
 
         // Actually, Level.ALL has the smallest intValue.
+        // LoggerAdapter has no easy match for this level.
         logger.clear();
         logger.log(Level.ALL, "all");
         assertEquals(Level.OFF, logger.level);

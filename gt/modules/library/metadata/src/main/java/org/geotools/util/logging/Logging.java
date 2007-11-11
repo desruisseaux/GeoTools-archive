@@ -260,6 +260,36 @@ public final class Logging {
     }
 
     /**
+     * Redirects {@linkplain java.util.logging Java logging} events to the Apache's
+     * <A HREF="http://logging.apache.org/log4j/">Log4J</A> framework.
+     *
+     * @see org.geotools.factory.GeoTools#init
+     */
+    public void redirectToLog4J() {
+        try {
+            setLoggerFactory(new Log4JLogger.Factory());
+            assert isLog4JAvailable();
+        } catch (NoClassDefFoundError error) {
+            // May occurs if commons-logging is not in the classpath.
+            Utilities.recoverableException("org.geotools.util", Logging.class,
+                    "redirectToLog4J", error);
+        }
+    }
+
+    /**
+     * Returns {@code true} if the <A HREF="http://logging.apache.org/log4j/">Log4J</A>Log4J</A>
+     * framework seems to be available on the classpath.
+     */
+    public static boolean isLog4JAvailable() {
+        try {
+            Class.forName("org.apache.log4j.Logger", false, Logging.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
      * Configures the default {@linkplain java.util.logging.ConsoleHandler console handler} in
      * order to log records on a single line instead of two lines. More specifically, for each
      * {@link java.util.logging.ConsoleHandler} using a {@link java.util.logging.SimpleFormatter},

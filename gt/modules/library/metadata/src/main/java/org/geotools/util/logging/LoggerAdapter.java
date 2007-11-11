@@ -157,7 +157,15 @@ public abstract class LoggerAdapter extends Logger {
      * public boolean isLoggable(Level level) {
      *     final int n = level.intValue();
      *     switch (n / 100) {
-     *         default: if (n &lt; 0) return false; // fallthrough otherwise.
+     *         default: {
+     *             // MAX_VALUE is a special value for Level.OFF. Otherwise and
+     *             // if positive, fallthrough since we are greater than SEVERE.
+     *             switch (n) {
+     *                 case Integer.MIN_VALUE: return true;  // Level.ALL
+     *                 case Integer.MAX_VALUE: return false; // Level.OFF
+     *                 default: if (n &lt; 0) return false;
+     *             }
+     *         }
      *         case 10: return isSevereEnabled();
      *         case  9: return isWarningEnabled();
      *         case  8: return isInfoEnabled();
@@ -356,7 +364,11 @@ public abstract class LoggerAdapter extends Logger {
     public void log(final Level level, final String message) {
         final int n = level.intValue();
         switch (n / 100) {
-            default: if (n < 0)        break; // Fallthrough otherwise.
+            default: {
+                if (n < 0 || n == Integer.MAX_VALUE) break;
+                // MAX_VALUE is a special value for Level.OFF. Otherwise and
+                // if positive, fallthrough since we are greater than SEVERE.
+            }
             case 10: severe (message); break;
             case  9: warning(message); break;
             case  8: info   (message); break;

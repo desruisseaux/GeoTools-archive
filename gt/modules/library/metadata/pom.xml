@@ -128,6 +128,12 @@
       <scope>provided</scope>  <!-- Not required for default execution. -->
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>provided</scope>  <!-- Not required for default execution. -->
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
 

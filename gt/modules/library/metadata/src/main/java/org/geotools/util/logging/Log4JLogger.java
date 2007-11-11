@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006-2007, Geotools Project Managment Committee (PMC)
+ *    (C) 2007, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,13 +17,10 @@ package org.geotools.util.logging;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Jdk14Logger;
 
 
 /**
- * An adapter that redirect all Java logging events to the Apache's commons logging framework.
+ * An adapter that redirect all Java logging events to the Apache's Log4J framework.
  *
  * @since 2.4
  * @source $URL$
@@ -33,68 +30,84 @@ import org.apache.commons.logging.impl.Jdk14Logger;
  *
  * @see Logging
  */
-final class CommonLogger extends LoggerAdapter {
+final class Log4JLogger extends LoggerAdapter {
     /**
-     * The Apache logger to use.
+     * The Log4J logger to use.
      */
-    private final Log logger;
+    private final org.apache.log4j.Logger logger;
 
     /**
      * Creates a new logger.
      *
      * @param name   The logger name.
-     * @param logger The result of {@code LogFactory.getLog(name)}.
+     * @param logger The result of {@code Logger.getLogger(name)}.
      */
-    public CommonLogger(final String name, final Log logger) {
+    public Log4JLogger(final String name, final org.apache.log4j.Logger logger) {
         super(name);
         this.logger = logger;
     }
 
     /**
-     * Do nothing since Commons-Logging doesn't support programmatic change of logging level.
+     * Returns the Log4J level for the given Java level.
      */
-    public void setLevel(Level level) {
+    private static org.apache.log4j.Level toLog4JLevel(final Level level) {
+        final int n = level.intValue();
+        switch (n / 100) {
+            default: {
+                // MAX_VALUE is a special value for Level.OFF. Otherwise and
+                // if positive, log to fatal since we are greater than SEVERE.
+                return (n != Integer.MAX_VALUE && n >= 0) ?
+                    org.apache.log4j.Level.FATAL : org.apache.log4j.Level.OFF;
+            }
+            case 10: return org.apache.log4j.Level.ERROR;    // SEVERE
+            case  9: return org.apache.log4j.Level.WARN;     // WARNING
+            case  8:                                         // INFO
+            case  7: return org.apache.log4j.Level.INFO;     // CONFIG
+            case  6:                                         // (not allocated)
+            case  5:                                         // FINE
+            case  4: return org.apache.log4j.Level.DEBUG;    // FINER
+            case  3: return org.apache.log4j.Level.TRACE;    // FINEST
+            case  2:                                         // (not allocated)
+            case  1:                                         // (not allocated)
+            case  0: return org.apache.log4j.Level.OFF;      // OFF
+        }
+    }
+
+    /**
+     * Returns the Java level for the given Log4J level.
+     */
+    private static Level toJavaLevel(final org.apache.log4j.Level level) {
+        final int n = level.toInt();
+        if (n != org.apache.log4j.Level.OFF_INT) {
+            if (n >= org.apache.log4j.Level.ERROR_INT) return Level.SEVERE;
+            if (n >= org.apache.log4j.Level.WARN_INT)  return Level.WARNING;
+            if (n >= org.apache.log4j.Level.INFO_INT)  return Level.CONFIG;
+            if (n >= org.apache.log4j.Level.DEBUG_INT) return Level.FINER;
+            if (n >= org.apache.log4j.Level.TRACE_INT) return Level.FINEST;
+            if (n == org.apache.log4j.Level.ALL_INT)   return Level.ALL; // Really ==, not >=.
+        }
+        return Level.OFF;
+    }
+
+    /**
+     * Set the level for this logger.
+     */
+    public void setLevel(final Level level) {
+        logger.setLevel(toLog4JLevel(level));
     }
 
     /**
      * Returns the level for this logger.
      */
     public Level getLevel() {
-        if (logger.isTraceEnabled()) return Level.FINEST;
-        if (logger.isDebugEnabled()) return getDebugLevel();
-        if (logger.isInfoEnabled ()) return Level.CONFIG;
-        if (logger.isWarnEnabled ()) return Level.WARNING;
-        if (logger.isErrorEnabled()) return Level.SEVERE;
-        if (logger.isFatalEnabled()) return Level.SEVERE;
-        return Level.OFF;
+        return toJavaLevel(logger.getEffectiveLevel());
     }
 
     /**
      * Returns {@code true} if the specified level is loggable.
      */
-    @SuppressWarnings("fallthrough")
     public boolean isLoggable(final Level level) {
-        final int n = level.intValue();
-        switch (n / 100) {
-            default: {
-                switch (n) { // Special cases (should not occur often).
-                    case Integer.MIN_VALUE: return true;  // ALL
-                    case Integer.MAX_VALUE: return false; // OFF
-                    default: return n>=0 && logger.isFatalEnabled();
-                }
-            }
-            case 10: return logger.isErrorEnabled();    // SEVERE
-            case  9: return logger.isWarnEnabled();     // WARNING
-            case  8:                                    // INFO
-            case  7: return logger.isInfoEnabled();     // CONFIG
-            case  6:                                    // (not allocated)
-            case  5:                                    // FINE
-            case  4: return logger.isDebugEnabled();    // FINER
-            case  3: return logger.isTraceEnabled();    // FINEST
-            case  2:                                    // (not allocated)
-            case  1:                                    // (not allocated)
-            case  0: return false;                      // OFF
-        }
+        return logger.isEnabledFor(toLog4JLevel(level));
     }
 
     /**
@@ -152,18 +165,14 @@ final class CommonLogger extends LoggerAdapter {
          * or {@code null} if the logger would delegates to Java logging anyway.
          */
         protected Object getImplementation(final String name) {
-            final Log log = LogFactory.getLog(name);
-            if (log instanceof Jdk14Logger) {
-                return null;
-            }
-            return log;
+            return org.apache.log4j.Logger.getLogger(name);
         }
 
         /**
          * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
          */
         protected Logger wrap(String name, Object implementation) throws ClassCastException {
-            return new CommonLogger(name, (Log) implementation);
+            return new Log4JLogger(name, (org.apache.log4j.Logger) implementation);
         }
 
         /**
@@ -171,8 +180,8 @@ final class CommonLogger extends LoggerAdapter {
          * or {@code null} if none.
          */
         protected Object unwrap(final Logger logger) {
-            if (logger instanceof CommonLogger) {
-                return ((CommonLogger) logger).logger;
+            if (logger instanceof Log4JLogger) {
+                return ((Log4JLogger) logger).logger;
             }
             return null;
         }
