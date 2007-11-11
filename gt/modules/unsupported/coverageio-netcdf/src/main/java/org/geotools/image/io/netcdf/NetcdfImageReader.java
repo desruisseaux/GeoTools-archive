@@ -24,6 +24,8 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.DataBuffer;
+import java.net.URL;
+import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -44,6 +46,7 @@ import ucar.nc2.dataset.CoordSysBuilder;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 import ucar.nc2.dataset.VariableEnhanced;
+import ucar.nc2.dods.DODSNetcdfFile;
 import ucar.nc2.util.CancelTask;
 import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
@@ -83,6 +86,12 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Then the users can select the <var>z</var> value using {@link ImageReadParam#setSourceBands}.
  * If no band is selected, then the default selection is the first band (0) only. Note that this
  * is different than the usual Image I/O default, which is all bands.
+ * <p>
+ * <b>Connection to DODS servers</b>
+ * This image reader accepts {@link File} and {@link URL} inputs. In the later case, if and only
+ * if the URL uses the DODS protocol (as in "{@code dods://opendap.aviso.oceanobs.com/}"), then
+ * this image reader tries to connect to the DODS remote server. Otherwise the URL content is
+ * copied in a temporary file.
  *
  * @since 2.4
  * @source $URL$
@@ -91,6 +100,14 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  */
 public class NetcdfImageReader extends FileImageReader implements CancelTask {
+    /**
+     * The URL protocol for connections to a DODS server. Any URL with this protocol will be
+     * open using {@link DODSNetcdfFile} instead of the ordinary {@link NetcdfDataset}. The
+     * later works only for local {@linkplain File files}, while the former connects to a
+     * remote server.
+     */
+    private static final String DODS_PROTOCOL = "dods";
+
     /**
      * The dimension <strong>relative to the rank</strong> in {@link #variable} to use as image
      * width. The actual dimension is {@code variable.getRank() - X_DIMENSION}. Is hard-coded
@@ -182,6 +199,35 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      */
     public NetcdfImageReader(final Spi spi) {
         super(spi);
+    }
+
+    /**
+     * Returns the {@linkplain #input input} as an URL to a DODS dataset, or {@code null} if
+     * none. If this method returns a non-null value, then the input should be open using a
+     * {@link DODSNetcdfFile}. Otherwise it should be open using an ordinary {@link NetcdfDataset}.
+     * <p>
+     * Note that we returns the URL as a String, not as a {@link URL} object, in order to avoid
+     * an "unknown protocol" exception.
+     */
+    private String getInputDODS() {
+        String protocol = null;
+        if (input instanceof URL) {
+            final URL url = (URL) input;
+            protocol = url.getProtocol();
+        } else if (input instanceof URI) {
+            final URI url = (URI) input;
+            protocol = url.getScheme();
+        } else if (input instanceof String) {
+            final String url = (String) input;
+            final int s = url.indexOf(':');
+            if (s > 0) {
+                protocol = url.substring(0, s);
+            }
+        }
+        if (protocol == null || !protocol.equalsIgnoreCase(DODS_PROTOCOL)) {
+            return null;
+        }
+        return input.toString();
     }
 
     /**
@@ -469,12 +515,24 @@ scan:       while (it.hasNext()) {
              */
             lastError = null;
             clearAbortRequest();
-            final File inputFile = getInputFile();
-            // TODO: consider using NetcdfDatasetCache.acquire(...) below.
-            dataset = NetcdfDataset.openDataset(inputFile.getPath(), false, this);
-            if (dataset == null) {
-                throw new FileNotFoundException(Errors.format(
-                        ErrorKeys.FILE_DOES_NOT_EXIST_$1, inputFile));
+            final String dodsURL = getInputDODS();
+            if (dodsURL != null) {
+                if (variableNames == null) {
+                    final int s = dodsURL.indexOf('?');
+                    if (s >= 0) {
+                        variableNames = new String[] {
+                            dodsURL.substring(s + 1)
+                        };
+                    }
+                }
+                dataset = new NetcdfDataset(new DODSNetcdfFile(dodsURL, this), false);
+            } else {
+                final File inputFile = getInputFile();
+                dataset = NetcdfDataset.openDataset(inputFile.getPath(), false, this);
+                if (dataset == null) {
+                    throw new FileNotFoundException(Errors.format(
+                            ErrorKeys.FILE_DOES_NOT_EXIST_$1, inputFile));
+                }
             }
             if (variableNames == null) {
                 /*
