@@ -16,6 +16,7 @@
 package org.geotools.gui.swing.demo;
 
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,6 +92,9 @@ public class DemoAll extends javax.swing.JFrame {
         map.setOpaque(false);
         map.setRenderer(new ShapefileRenderer());
         map.setContext(context);
+        RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        map.getRenderer().setJava2DHints(rh);
+        
         pan_mappane.setLayout(new GridLayout(1, 1));
         pan_mappane.add(map);
 
@@ -189,6 +193,10 @@ public class DemoAll extends javax.swing.JFrame {
                 
         popup.setMapPane(map);
         
+        tree.addColumn(colVisible);
+        tree.addColumn(colOpacity);
+        tree.addColumn(colStyle);
+        
         tree.revalidate();
     }
     
@@ -215,9 +223,6 @@ public class DemoAll extends javax.swing.JFrame {
         infopanel = new org.geotools.gui.swing.control.JMapPaneInfoPanel();
         jPanel4 = new javax.swing.JPanel();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
-        guiChkVisible = new javax.swing.JCheckBox();
-        guiChkOpacity = new javax.swing.JCheckBox();
-        guiChkStyle = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -231,6 +236,11 @@ public class DemoAll extends javax.swing.JFrame {
         chk_file = new javax.swing.JCheckBoxMenuItem();
         chk_database = new javax.swing.JCheckBoxMenuItem();
         chk_server = new javax.swing.JCheckBoxMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenu5 = new javax.swing.JMenu();
+        guiChkVisible = new javax.swing.JCheckBoxMenuItem();
+        guiChkOpacity = new javax.swing.JCheckBoxMenuItem();
+        guiChkStyle = new javax.swing.JCheckBoxMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
 
@@ -322,51 +332,15 @@ public class DemoAll extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jpanel8);
 
-        guiChkVisible.setText("Visible Column");
-        guiChkVisible.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guiChkVisibleActionPerformed(evt);
-            }
-        });
-
-        guiChkOpacity.setText("Opacity Column");
-        guiChkOpacity.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guiChkOpacityActionPerformed(evt);
-            }
-        });
-
-        guiChkStyle.setText("Style Column");
-        guiChkStyle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guiChkStyleActionPerformed(evt);
-            }
-        });
-
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(guiChkStyle)
-                    .add(guiChkOpacity)
-                    .add(guiChkVisible))
-                .addContainerGap(192, Short.MAX_VALUE))
             .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel4Layout.createSequentialGroup()
-                .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(guiChkVisible)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiChkOpacity)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(guiChkStyle)
-                .addContainerGap())
+            .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
@@ -435,6 +409,41 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu2.add(chk_server);
 
         jMenuBar1.add(jMenu2);
+
+        jMenu4.setText("GUI");
+
+        jMenu5.setText("Context Tree");
+
+        guiChkVisible.setSelected(true);
+        guiChkVisible.setText("Visible Column");
+        guiChkVisible.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkVisibleActionPerformed(evt);
+            }
+        });
+        jMenu5.add(guiChkVisible);
+
+        guiChkOpacity.setSelected(true);
+        guiChkOpacity.setText("Opacity Column");
+        guiChkOpacity.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkOpacityActionPerformed(evt);
+            }
+        });
+        jMenu5.add(guiChkOpacity);
+
+        guiChkStyle.setSelected(true);
+        guiChkStyle.setText("Style Column");
+        guiChkStyle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiChkStyleActionPerformed(evt);
+            }
+        });
+        jMenu5.add(guiChkStyle);
+
+        jMenu4.add(jMenu5);
+
+        jMenuBar1.add(jMenu4);
 
         jMenu3.setText("?");
 
@@ -536,7 +545,7 @@ public class DemoAll extends javax.swing.JFrame {
         }else{
             tree.removeColumn(colOpacity);
         }
-    }//GEN-LAST:event_guiChkOpacityActionPerformed
+}//GEN-LAST:event_guiChkOpacityActionPerformed
 
     private void guiChkStyleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiChkStyleActionPerformed
          if(guiChkStyle.isSelected()){
@@ -544,7 +553,7 @@ public class DemoAll extends javax.swing.JFrame {
         }else{
             tree.removeColumn(colStyle);
         }
-    }//GEN-LAST:event_guiChkStyleActionPerformed
+}//GEN-LAST:event_guiChkStyleActionPerformed
 
     /**
      * @param args the command line arguments
@@ -572,15 +581,17 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem chk_server;
     private javax.swing.JDialog dia_about;
     private javax.swing.ButtonGroup group_jdatachooser;
-    private javax.swing.JCheckBox guiChkOpacity;
-    private javax.swing.JCheckBox guiChkStyle;
-    private javax.swing.JCheckBox guiChkVisible;
+    private javax.swing.JCheckBoxMenuItem guiChkOpacity;
+    private javax.swing.JCheckBoxMenuItem guiChkStyle;
+    private javax.swing.JCheckBoxMenuItem guiChkVisible;
     private org.geotools.gui.swing.control.JMapPaneInfoPanel infopanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
