@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.math;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -36,12 +35,11 @@ import org.geotools.resources.XMath;
  * The static method {@link #roots(double[])} can be used for computing the root of a polynomial
  * equation without creating a {@code Polygon} object.
  *
+ * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Ken Turkiwski
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class Polynom implements Serializable {
     /**
@@ -65,7 +63,7 @@ public class Polynom implements Serializable {
     private transient double[] roots;
 
     /**
-     * Construct a polynom with the specified coefficients.
+     * Constructs a polynom with the specified coefficients.
      *
      * @param c The coefficients. This array is copied.
      */
@@ -81,7 +79,7 @@ public class Polynom implements Serializable {
     }
 
     /**
-     * Evaluate this polynomial equation for the specified <var>x</var> value.
+     * Evaluates this polynomial equation for the specified <var>x</var> value.
      * More specifically, this method compute
      * <code>c<sub>0</sub> +
      *       c<sub>1</sub>&times;<var>x</var> +
@@ -98,7 +96,7 @@ public class Polynom implements Serializable {
     }
 
     /**
-     * Find the roots of a quadratic equation.
+     * Finds the roots of a quadratic equation.
      * More specifically, this method solves the following equation:
      *
      * <blockquote><code>
@@ -134,7 +132,7 @@ public class Polynom implements Serializable {
     }
 
     /**
-     * Find the roots of a cubic equation.
+     * Finds the roots of a cubic equation.
      * More specifically, this method solves the following equation:
      *
      * <blockquote><code>
@@ -182,7 +180,7 @@ public class Polynom implements Serializable {
     }
 
     /**
-     * Find the roots of this polynome.
+     * Finds the roots of this polynome.
      *
      * @return The roots.
      */
@@ -190,11 +188,11 @@ public class Polynom implements Serializable {
         if (roots == null) {
             roots = roots(c);
         }
-        return (double[]) roots.clone();
+        return roots.clone();
     }
 
     /**
-     * Find the roots of a polynomial equation. More specifically,
+     * Finds the roots of a polynomial equation. More specifically,
      * this method solve the following equation:
      *
      * <blockquote><code>
@@ -256,6 +254,7 @@ public class Polynom implements Serializable {
     /**
      * Returns a hash value for this polynom.
      */
+    @Override
     public int hashCode() {
         long code = c.length;
         for (int i=c.length; --i>=0;) {
@@ -265,8 +264,9 @@ public class Polynom implements Serializable {
     }
 
     /**
-     * Compare this polynom with the specified object for equality.
+     * Compares this polynom with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final Polynom that = (Polynom) object;
@@ -278,11 +278,12 @@ public class Polynom implements Serializable {
     /**
      * Returns a string representation of this polynom.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         for (int i=0; i<c.length; i++) {
-            if (i!=0) {
+            if (i != 0) {
                 buffer.append(", ");
             }
             buffer.append(c[i]);

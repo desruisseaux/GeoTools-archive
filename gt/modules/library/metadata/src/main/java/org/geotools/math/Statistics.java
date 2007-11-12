@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,11 +16,9 @@
  */
 package org.geotools.math;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.resources.i18n.Descriptions;
 import org.geotools.resources.i18n.DescriptionKeys;
@@ -28,7 +26,7 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * Hold some statistics about a series of sample values. Given a series of sample values
+ * Holds some statistics about a series of sample values. Given a series of sample values
  * <var>s<sub>0</sub></var>, <var>s<sub>1</sub></var>, <var>s<sub>2</sub></var>,
  * <var>s<sub>3</sub></var>..., this class computes {@linkplain #minimum minimum},
  * {@linkplain #maximum maximum}, {@linkplain #mean mean}, {@linkplain #rms root mean square}
@@ -51,11 +49,10 @@ import org.opengis.util.Cloneable;
  * System.out.println(stats);
  * </pre></blockquote>
  *
+ * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  */
 public class Statistics implements Cloneable, Serializable {
     /**
@@ -107,14 +104,14 @@ public class Statistics implements Cloneable, Serializable {
     private int nNaN = 0;
 
     /**
-     * Construct an initially empty set of statistics.
+     * Constructs an initially empty set of statistics.
      * All statistical values are initialized to {@link Double#NaN}.
      */
     public Statistics() {
     }
 
     /**
-     * Reset the statistics to their initial {@link Double#NaN NaN} values.
+     * Resets the statistics to their initial {@link Double#NaN NaN} values.
      * This method reset this object state as if it was just created.
      */
     public void reset() {
@@ -127,7 +124,7 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Update statistics for the specified sample. This {@code add}
+     * Updates statistics for the specified sample. This {@code add}
      * method is usually invoked inside a {@code for} loop.
      *
      * @param sample The sample value. {@link Double#NaN NaN} values are ignored.
@@ -152,7 +149,7 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Update statistics for the specified sample. This {@code add}
+     * Updates statistics for the specified sample. This {@code add}
      * method is usually invoked inside a {@code for} loop.
      *
      * @param sample The sample value.
@@ -170,7 +167,7 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Update statistics with all samples from the specified {@code stats}. Invoking this
+     * Updates statistics with all samples from the specified {@code stats}. Invoking this
      * method is equivalent (except for rounding errors)  to invoking {@link #add(double) add}
      * for all samples that were added to {@code stats}.
      *
@@ -278,9 +275,10 @@ public class Statistics implements Cloneable, Serializable {
     /**
      * Returns a clone of this statistics.
      */
-    public Object clone() {
+    @Override
+    public Statistics clone() {
         try {
-            return super.clone();
+            return (Statistics) super.clone();
         } catch (CloneNotSupportedException exception) {
             // Should not happen since we are cloneable
             throw new AssertionError(exception);
@@ -288,8 +286,9 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Test this statistics with the specified object for equality.
+     * Tests this statistics with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj!=null && getClass().equals(obj.getClass())) {
             final Statistics cast = (Statistics) obj;
@@ -305,6 +304,7 @@ public class Statistics implements Cloneable, Serializable {
     /**
      * Returns a hash code value for this statistics.
      */
+    @Override
     public int hashCode() {
         final long code = (Double.doubleToLongBits(min) +
                        37*(Double.doubleToLongBits(max) +
@@ -318,6 +318,7 @@ public class Statistics implements Cloneable, Serializable {
      * {@link #toString(Locale, boolean)}  using the default locale and spaces
      * separator.
      */
+    @Override
     public final String toString() {
         return toString(null, false);
     }
@@ -342,12 +343,7 @@ public class Statistics implements Cloneable, Serializable {
     public String toString(final Locale locale, final boolean tabulations) {
         String text = Descriptions.getResources(locale).getString(
                 DescriptionKeys.STATISTICS_TO_STRING_$6, new Number[] {
-                new Integer(count()  ),
-                new Double (minimum()),
-                new Double (maximum()),
-                new Double (mean()   ),
-                new Double (rms()    ),
-                new Double (standardDeviation(false))
+                count(), minimum(), maximum(), mean(), rms(), standardDeviation(false)
         });
         if (!tabulations) {
             final TableWriter tmp = new TableWriter(null, 1);
@@ -359,7 +355,7 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Hold some statistics about a series of sample values and the difference between them.
+     * Holds some statistics about a series of sample values and the difference between them.
      * Given a series of sample values <var>s<sub>0</sub></var>, <var>s<sub>1</sub></var>,
      * <var>s<sub>2</sub></var>, <var>s<sub>3</sub></var>..., this class computes statistics
      * in the same way than {@link Statistics} and additionnaly computes statistics for
@@ -395,7 +391,7 @@ public class Statistics implements Cloneable, Serializable {
         private long lastAsLong;
 
         /**
-         * Construct an initially empty set of statistics.
+         * Constructs an initially empty set of statistics.
          * All statistical values are initialized to {@link Double#NaN}.
          */
         public Delta() {
@@ -404,13 +400,15 @@ public class Statistics implements Cloneable, Serializable {
         }
 
         /**
-         * Construct an initially empty set of statistics using the specified
+         * Constructs an initially empty set of statistics using the specified
          * object for {@link #getDeltaStatistics delta} statistics. This method
          * allows chaining different kind of statistics objects. For example, one
          * could write:
+         *
          * <blockquote><pre>
          * new Statistics.Delta(new Statistics.Delta());
          * </pre></blockquote>
+         *
          * Which would compute statistics of sample values, statistics of difference between
          * consecutive sample values, and statistics of difference of difference between
          * consecutive sample values. Other kinds of {@link Statistics} object could be
@@ -435,9 +433,10 @@ public class Statistics implements Cloneable, Serializable {
         }
 
         /**
-         * Reset the statistics to their initial {@link Double#NaN NaN} values.
+         * Resets the statistics to their initial {@link Double#NaN NaN} values.
          * This method reset this object state as if it was just created.
          */
+        @Override
         public void reset() {
             super.reset();
             delta.reset();
@@ -447,34 +446,36 @@ public class Statistics implements Cloneable, Serializable {
         }
 
         /**
-         * Update statistics for the specified sample. The {@link #getDeltaStatistics delta}
+         * Updates statistics for the specified sample. The {@link #getDeltaStatistics delta}
          * statistics are updated with <code>sample - sample<sub>last</sub></code> value,
          * where <code>sample<sub>last</sub></code> is the last value given to the previous
          * call of an {@code add(...)} method.
          */
+        @Override
         public void add(final double sample) {
             super.add(sample);
-            delta.add(sample-last);
+            delta.add(sample - last);
             last       = sample;
             lastAsLong = (long)sample;
         }
 
         /**
-         * Update statistics for the specified sample. The {@link #getDeltaStatistics delta}
+         * Updates statistics for the specified sample. The {@link #getDeltaStatistics delta}
          * statistics are updated with <code>sample - sample<sub>last</sub></code> value,
          * where <code>sample<sub>last</sub></code> is the last value given to the previous
          * call of an {@code add(...)} method.
          */
+        @Override
         public void add(final long sample) {
             super.add(sample);
-            if (last == (double)lastAsLong) {
+            if (last == (double) lastAsLong) {
                 // 'lastAsLong' may have more precision than 'last' since the cast to the
                 // 'double' type may loose some digits. Invoke the 'delta.add(long)' version.
-                delta.add(sample-lastAsLong);
+                delta.add(sample - lastAsLong);
             } else {
                 // The sample value is either fractional, outside 'long' range,
                 // infinity or NaN. Invoke the 'delta.add(double)' version.
-                delta.add(sample-last);
+                delta.add(sample - last);
             }
             last       = sample;
             lastAsLong = sample;
@@ -491,6 +492,7 @@ public class Statistics implements Cloneable, Serializable {
          * @throws ClassCastException If {@code stats} is not an instance of
          *         {@code Statistics.Delta}.
          */
+        @Override
         public void add(final Statistics stats) throws ClassCastException {
             if (stats != null) {
                 final Delta toAdd = (Delta) stats;
@@ -506,15 +508,17 @@ public class Statistics implements Cloneable, Serializable {
         /**
          * Returns a clone of this statistics.
          */
-        public Object clone() {
+        @Override
+        public Delta clone() {
             Delta copy = (Delta) super.clone();
-            copy.delta = (Statistics) copy.delta.clone();
+            copy.delta = copy.delta.clone();
             return copy;
         }
 
         /**
-         * Test this statistics with the specified object for equality.
+         * Tests this statistics with the specified object for equality.
          */
+        @Override
         public boolean equals(final Object obj) {
             return super.equals(obj) && delta.equals(((Delta) obj).delta);
         }
@@ -522,6 +526,7 @@ public class Statistics implements Cloneable, Serializable {
         /**
          * Returns a hash code value for this statistics.
          */
+        @Override
         public int hashCode() {
             return super.hashCode() + 37*delta.hashCode();
         }

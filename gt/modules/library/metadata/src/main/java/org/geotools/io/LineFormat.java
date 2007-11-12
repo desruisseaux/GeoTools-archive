@@ -144,7 +144,7 @@ public class LineFormat extends Format {
         this.limits = new int[data.length + 1];
         this.format = new Format[] {format};
         if (format == null) {
-            final Integer one = new Integer(1);
+            final Integer one = 1;
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_FORMAT_$2, one, one));
         }
     }
@@ -167,7 +167,7 @@ public class LineFormat extends Format {
         for (int i=0; i<format.length; i++) {
             if (format[i] == null) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_FORMAT_$2,
-                        new Integer(i+1), new Integer(format.length)));
+                            i+1, format.length));
             }
         }
     }
@@ -529,8 +529,7 @@ public class LineFormat extends Format {
             final int upper = limits[Math.min(count, expected+1)];
             throw new ParseException(Errors.format(count<expected ?
                                      ErrorKeys.LINE_TOO_SHORT_$2 : ErrorKeys.LINE_TOO_LONG_$3,
-                                     new Integer(count), new Integer(expected),
-                                     line.substring(lower,upper).trim()), lower);
+                                     count, expected, line.substring(lower,upper).trim()), lower);
         }
     }
 

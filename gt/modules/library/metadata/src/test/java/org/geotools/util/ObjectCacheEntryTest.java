@@ -41,7 +41,7 @@ public class ObjectCacheEntryTest extends TestCase {
         public void run() {
             try {
                 entry.writeLock();
-                entry.setValue(new Integer(1));
+                entry.setValue(1);
                 entry.writeUnLock();
                 values = new Object[] {entry.getValue()};
             } catch (Exception e) {
@@ -66,7 +66,7 @@ public class ObjectCacheEntryTest extends TestCase {
         Thread.yield();
 
         //write
-        entry.setValue(new Integer(1));
+        entry.setValue(1);
         
         //check that the read thread was blocked
         Object[] values = ((EntryReaderThread) thread1).getValue();
@@ -79,7 +79,7 @@ public class ObjectCacheEntryTest extends TestCase {
         t1.join();
         values = ((EntryReaderThread) thread1).getValue();
         assertNotNull(values);
-        assertEquals(new Integer(1), values[0]);
+        assertEquals(1, values[0]);
     }
 
     public void testWriteWriteDeadlock() throws InterruptedException {
@@ -88,7 +88,7 @@ public class ObjectCacheEntryTest extends TestCase {
         entry.writeLock();
 
         //write the value 2
-        entry.setValue(new Integer(2));
+        entry.setValue(2);
         
         //create another thread which starts writing
         Runnable thread1 = new EntryWriterThread();
@@ -99,7 +99,7 @@ public class ObjectCacheEntryTest extends TestCase {
         //check that the write thread was blocked
         Object[] values = ((EntryWriterThread) thread1).getValue();
         assertNull(values);
-        assertEquals(new Integer(2), entry.getValue());
+        assertEquals(2, entry.getValue());
         
         //unlock
         entry.writeUnLock();
@@ -108,6 +108,6 @@ public class ObjectCacheEntryTest extends TestCase {
         t1.join();
         values = ((EntryWriterThread) thread1).getValue();
         assertNotNull(values);
-        assertEquals(new Integer(1), values[0]);
+        assertEquals(1, values[0]);
     }
 }

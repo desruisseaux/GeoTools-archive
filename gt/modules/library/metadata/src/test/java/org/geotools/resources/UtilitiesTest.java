@@ -15,11 +15,9 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.io.File;
 import java.io.Serializable;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

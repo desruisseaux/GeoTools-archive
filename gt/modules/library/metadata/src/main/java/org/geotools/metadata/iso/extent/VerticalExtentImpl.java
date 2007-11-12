@@ -103,8 +103,8 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
                               final Unit   unit,
                               final VerticalDatum verticalDatum)
     {
-        setMinimumValue (new Double(minimumValue));
-        setMaximumValue (new Double(maximumValue));
+        setMinimumValue (minimumValue);
+        setMaximumValue (maximumValue);
         setUnit         (unit);
         setVerticalDatum(verticalDatum);
     }

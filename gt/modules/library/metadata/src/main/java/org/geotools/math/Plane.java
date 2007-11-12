@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2003, Institut de Recherche pour le Développement
  *    (C) 1998, Pêches et Océans Canada
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,12 +17,10 @@
  */
 package org.geotools.math;
 
-// J2SE and vecmath dependencies
 import java.io.Serializable;
 import javax.vecmath.MismatchedSizeException;
 import javax.vecmath.Point3d;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 
 
@@ -39,12 +37,11 @@ import org.opengis.util.Cloneable;
  * Those coefficients can be set directly, or computed by a linear regression of this plane
  * through a set of three-dimensional points.
  *
+ * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Howard Freeland
- *
- * @since 2.0
  */
 public class Plane implements Cloneable, Serializable {
     /**
@@ -77,7 +74,7 @@ public class Plane implements Cloneable, Serializable {
     }
 
     /**
-     * Compute the <var>z</var> value for the specified (<var>x</var>,<var>y</var>) point.
+     * Computes the <var>z</var> value for the specified (<var>x</var>,<var>y</var>) point.
      * The <var>z</var> value is computed using the following equation:
      *
      * <blockquote><code>
@@ -93,7 +90,7 @@ public class Plane implements Cloneable, Serializable {
     }
 
     /**
-     * Compute the <var>y</var> value for the specified (<var>x</var>,<var>z</var>) point.
+     * Computes the <var>y</var> value for the specified (<var>x</var>,<var>z</var>) point.
      * The <var>y</var> value is computed using the following equation:
      *
      * <blockquote><code>
@@ -109,7 +106,7 @@ public class Plane implements Cloneable, Serializable {
     }
 
     /**
-     * Compute the <var>x</var> value for the specified (<var>y</var>,<var>z</var>) point.
+     * Computes the <var>x</var> value for the specified (<var>y</var>,<var>z</var>) point.
      * The <var>x</var> value is computed using the following equation:
      *
      * <blockquote><code>
@@ -147,7 +144,7 @@ public class Plane implements Cloneable, Serializable {
     }
 
     /**
-     * Compute the plane's coefficients from a set of points. This method use
+     * Computes the plane's coefficients from a set of points. This method use
      * a linear regression in the least-square sense. Result is undertermined
      * if all points are colinear.
      *
@@ -205,14 +202,15 @@ public class Plane implements Cloneable, Serializable {
     /**
      * Returns a string representation of this plane.
      * The string will contains the plane's equation, as below:
-     * 
+     *
      * <blockquote>
      *     <var>z</var>(<var>x</var>,<var>y</var>) = {@link #c} +
      *     {@link #cx}*<var>x</var> + {@link #cy}*<var>y</var>
      * </blockquote>
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer("z(x,y)= ");
+        final StringBuilder buffer = new StringBuilder("z(x,y)= ");
         if (c==0 && cx==0 && cy==0) {
             buffer.append(0);
         } else {
@@ -234,10 +232,11 @@ public class Plane implements Cloneable, Serializable {
         }
         return buffer.toString();
     }
-	
+
     /**
-     * Compare this plane with the specified object for equality.
+     * Compares this plane with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && getClass().equals(object.getClass())) {
             final Plane that = (Plane) object;
@@ -248,10 +247,11 @@ public class Plane implements Cloneable, Serializable {
             return false;
         }
     }
-	
+
     /**
      * Returns a hash code value for this plane.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(c ) +
                       37*(Double.doubleToLongBits(cy) +
@@ -262,9 +262,10 @@ public class Plane implements Cloneable, Serializable {
     /**
      * Returns a clone of this plane.
      */
-    public Object clone() {
+    @Override
+    public Plane clone() {
         try {
-            return super.clone();
+            return (Plane) super.clone();
         } catch (CloneNotSupportedException exception) {
             throw new AssertionError(exception);
         }

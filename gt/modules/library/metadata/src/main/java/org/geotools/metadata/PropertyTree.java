@@ -225,7 +225,7 @@ final class PropertyTree {
         name = name.trim();
         final int length = name.length();
         if (length != 0) {
-            final StringBuffer buffer = new StringBuffer();
+            final StringBuilder buffer = new StringBuilder();
             buffer.append(Character.toUpperCase(name.charAt(0)));
             boolean previousIsUpper = true;
             int base = 1;
@@ -269,7 +269,7 @@ final class PropertyTree {
      * Returns a string representation of the specified tree node.
      */
     public static String toString(final TreeNode node) {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         toString(node, buffer, 0, System.getProperty("line.separator", "\n"));
         return buffer.toString();
     }
@@ -277,10 +277,10 @@ final class PropertyTree {
     /**
      * Append a string representation of the specified node to the specified buffer.
      */
-    private static void toString(final TreeNode     node,
-                                 final StringBuffer buffer,
-                                 final int          indent,
-                                 final String       lineSeparator)
+    private static void toString(final TreeNode      node,
+                                 final StringBuilder buffer,
+                                 final int           indent,
+                                 final String        lineSeparator)
     {
         final int count = node.getChildCount();
         if (count == 0) {

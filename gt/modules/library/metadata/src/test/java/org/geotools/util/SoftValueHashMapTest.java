@@ -106,8 +106,9 @@ public final class SoftValueHashMapTest extends TestCase {
             softMap.clear();
             strongMap.clear();
             for (int i=0; i<SAMPLE_SIZE; i++) {
-                final Integer key   = random.nextInt(SAMPLE_SIZE);
-                final Integer value = random.nextInt(SAMPLE_SIZE);
+                // We really want new instances below.
+                final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
+                final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
                 if (random.nextBoolean()) {
                     /*
                      * Test addition.

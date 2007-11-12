@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-// Geotools dependencies
 import java.util.Arrays;
 import java.util.Iterator;
 

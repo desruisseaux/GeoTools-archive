@@ -55,7 +55,7 @@ public class GeoToolsTest extends TestCase {
     }
 
     /**
-     * Make sures that J2SE 1.4 assertions are enabled.
+     * Makes sures that J2SE 1.4 assertions are enabled.
      */
     public void testAssertionEnabled() {
         assertTrue("Assertions not enabled.", GeoToolsTest.class.desiredAssertionStatus());

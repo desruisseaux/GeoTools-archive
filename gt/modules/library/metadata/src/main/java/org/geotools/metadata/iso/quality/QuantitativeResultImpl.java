@@ -116,7 +116,7 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
         } else {
             values = new CheckedArrayList(Double.class, newValues.length);
             for (int i=0; i<newValues.length; i++) {
-                values.add(new Double(newValues[i]));
+                values.add(Double.valueOf(newValues[i]));
             }
         }
     }

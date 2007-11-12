@@ -218,8 +218,8 @@ public class MeasurementRange extends NumberRange {
         }
         boolean isMinIncluded = isMinIncluded();
         boolean isMaxIncluded = isMaxIncluded();
-        Double minimum = new Double(converter.convert(getMinimum()));
-        Double maximum = new Double(converter.convert(getMaximum()));
+        Double minimum = converter.convert(getMinimum());
+        Double maximum = converter.convert(getMaximum());
         if (minimum.compareTo(maximum) > 0) {
             final Double td = minimum;
             minimum = maximum;

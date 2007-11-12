@@ -15,10 +15,7 @@
  */
 package org.geotools.factory;
 
-// Geotools dependencies
 import java.util.Arrays;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

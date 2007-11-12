@@ -973,7 +973,7 @@ public final class Hints extends RenderingHints {
      */
     public String toString() {
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer buffer = new StringBuffer("Hints:"); // TODO: localize
+        final StringBuilder buffer = new StringBuilder("Hints:"); // TODO: localize
         buffer.append(lineSeparator).append(AbstractFactory.toString(this));
         Map extra = null;
         final boolean changed;
@@ -1174,7 +1174,7 @@ public final class Hints extends RenderingHints {
          *   <li>An array of {@code Class} objects assignable to the expected value class.</li>
          * </ul>
          */
-        //@Override
+        @Override
         public boolean isCompatibleValue(final Object value) {
             if (value == null) {
                 return false;
@@ -1228,7 +1228,7 @@ public final class Hints extends RenderingHints {
         /**
          * Returns {@code true} if the specified object is a valid file or directory.
          */
-        //@Override
+        @Override
         public boolean isCompatibleValue(final Object value) {
             final File file;
             if (value instanceof File) {
@@ -1299,7 +1299,7 @@ public final class Hints extends RenderingHints {
         /**
          * Returns {@code true} if the specified object is a valid integer.
          */
-        //@Override
+        @Override
         public boolean isCompatibleValue(final Object value) {
             if (value instanceof Short || value instanceof Integer) {
                 return true;
@@ -1395,7 +1395,7 @@ public final class Hints extends RenderingHints {
          * options specified at construction time contains the {@code "*"} wildcard, then
          * this method returns {@code true} for every {@link String} object.
          */
-        //@Override
+        @Override
         public boolean isCompatibleValue(final Object value) {
             return wildcard ? (value instanceof String) : options.contains(value);
         }
@@ -1426,7 +1426,7 @@ public final class Hints extends RenderingHints {
         /**
          * Returns {@code true} if the specified object is a data source or data source name.
          */
-        //@Override
+        @Override
         public boolean isCompatibleValue(final Object value) {
             return (value instanceof DataSource) || (value instanceof String) || (value instanceof Name);
         }

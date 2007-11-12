@@ -98,7 +98,7 @@ public final class KeySortedListTest extends TestCase {
         /*
          * Checks the iteration from a middle point.
          */
-        final Integer midKey = new Integer(maxElements/10 / 2);
+        final Integer midKey = (maxElements / 10) / 2;
         final KeySortedList<Integer,Double> head = list.headList(midKey);
         final KeySortedList<Integer,Double> tail = list.tailList(midKey);
         final Collection<Double> rebuild = new ArrayList<Double>(head);

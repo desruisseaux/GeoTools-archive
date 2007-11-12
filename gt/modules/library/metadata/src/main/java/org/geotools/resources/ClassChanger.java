@@ -59,7 +59,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
     private static ClassChanger<?,?>[] changers = new ClassChanger[] {
         new ClassChanger<Date,Long>(Date.class, Long.class) {
             protected Long convert(final Date object) {
-                return new Long(object.getTime());
+                return object.getTime();
             }
 
             protected Date inverseConvert(final Long value) {
@@ -127,8 +127,8 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
      *
      * <blockquote><pre>
      * &nbsp;ClassChanger.register(new ClassChanger(Date.class, Long.class) {
-     * &nbsp;    protected Number convert(final Comparable o) {
-     * &nbsp;        return new Long(((Date) o).getTime());
+     * &nbsp;    protected Long convert(final Comparable o) {
+     * &nbsp;        return ((Date) o).getTime();
      * &nbsp;    }
      * &nbsp;
      * &nbsp;    protected Comparable inverseConvert(final Number number) {

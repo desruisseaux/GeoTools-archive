@@ -201,7 +201,7 @@ public class AbstractFactory implements Factory, RegisterableService {
     	this.priority = priority;
         if (priority<MINIMUM_PRIORITY || priority>MAXIMUM_PRIORITY) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "priority", new Integer(priority)));
+                                               "priority", priority));
         }
     }
 

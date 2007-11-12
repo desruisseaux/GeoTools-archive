@@ -64,7 +64,7 @@ public final class CanonicalSetTest extends TestCase {
             final CanonicalSet<Integer> weakSet = CanonicalSet.newInstance(Integer.class);
             final HashSet<Integer>    strongSet = new HashSet<Integer>();
             for (int i=0; i<1000; i++) {
-                final Integer value = new Integer(random.nextInt(500));
+                final Integer value = random.nextInt(500);
                 if (random.nextBoolean()) {
                     /*
                      * Tests addition.
@@ -103,7 +103,7 @@ public final class CanonicalSetTest extends TestCase {
             final CanonicalSet<Integer> weakSet = CanonicalSet.newInstance(Integer.class);
             final HashSet<Integer>    strongSet = new HashSet<Integer>();
             for (int i=0; i<500; i++) {
-                final Integer value = new Integer(random.nextInt(500));
+                final Integer value = new Integer(random.nextInt(500)); // Really need new instances
                 if (random.nextBoolean()) {
                     /*
                      * Tests addition.

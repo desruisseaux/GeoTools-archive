@@ -93,7 +93,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
                                          final CellGeometry cellGeometry,
                                          final boolean transformationParameterAvailable)
     {
-        setNumberOfDimensions               (new Integer(numberOfDimensions));
+        setNumberOfDimensions               (numberOfDimensions);
         setAxisDimensionsProperties         (axisDimensionsProperties);
         setCellGeometry                     (cellGeometry);
         setTransformationParameterAvailable (transformationParameterAvailable);

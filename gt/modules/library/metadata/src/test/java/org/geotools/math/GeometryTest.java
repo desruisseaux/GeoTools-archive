@@ -17,11 +17,9 @@
  */
 package org.geotools.math;
 
-// J2SE dependencies
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.Random;
-
 import javax.vecmath.Point3d;
 
 import junit.framework.Test;
@@ -30,7 +28,7 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link Line} and {@link Plane} classes.
+ * Tests the {@link Line} and {@link Plane} classes.
  *
  * @source $URL$
  * @version $Id$
@@ -64,7 +62,7 @@ public final class GeometryTest extends TestCase {
     }
 
     /**
-     * Test {@link Line#setLine}.
+     * Tests {@link Line#setLine}.
      */
     public void testLine() {
         final Line line = new Line();
@@ -99,7 +97,7 @@ public final class GeometryTest extends TestCase {
     }
 
     /**
-     * Test {@link Line#isoscelesTriangleBase}.
+     * Tests {@link Line#isoscelesTriangleBase}.
      */
     public void testIsoscelesTriangleBase() {
         final Line test = new Line();
@@ -120,7 +118,7 @@ public final class GeometryTest extends TestCase {
     }
 
     /**
-     * Test {@link Plane#setPlane} methods.
+     * Tests {@link Plane#setPlane} methods.
      */
     public void testPlaneFit() {
         final Random  rd = new Random(457821698762354L);

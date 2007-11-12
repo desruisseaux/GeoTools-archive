@@ -444,7 +444,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(byte lower, byte upper) throws IllegalArgumentException {
-        return add(new Byte(lower), new Byte(upper));
+        return add(Byte.valueOf(lower), Byte.valueOf(upper));
     }
 
     /**
@@ -458,7 +458,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(short lower, short upper) throws IllegalArgumentException {
-        return add(new Short(lower), new Short(upper));
+        return add(Short.valueOf(lower), Short.valueOf(upper));
     }
 
     /**
@@ -472,7 +472,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(int lower, int upper) throws IllegalArgumentException {
-        return add(new Integer(lower), new Integer(upper));
+        return add(Integer.valueOf(lower), Integer.valueOf(upper));
     }
 
     /**
@@ -486,7 +486,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(long lower, long upper) throws IllegalArgumentException {
-        return add(new Long(lower), new Long(upper));
+        return add(Long.valueOf(lower), Long.valueOf(upper));
     }
 
     /**
@@ -500,7 +500,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(float lower, float upper) throws IllegalArgumentException {
-        return add(new Float(lower), new Float(upper));
+        return add(Float.valueOf(lower), Float.valueOf(upper));
     }
 
     /**
@@ -514,7 +514,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(double lower, double upper) throws IllegalArgumentException {
-        return add(new Double(lower), new Double(upper));
+        return add(Double.valueOf(lower), Double.valueOf(upper));
     }
 
     /**
@@ -669,7 +669,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(byte lower, byte upper) throws IllegalArgumentException {
-        return remove(new Byte(lower), new Byte(upper));
+        return remove(Byte.valueOf(lower), Byte.valueOf(upper));
     }
 
     /**
@@ -681,7 +681,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(short lower, short upper) throws IllegalArgumentException {
-        return remove(new Short(lower), new Short(upper));
+        return remove(Short.valueOf(lower), Short.valueOf(upper));
     }
 
     /**
@@ -693,7 +693,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(int lower, int upper) throws IllegalArgumentException {
-        return remove(new Integer(lower), new Integer(upper));
+        return remove(Integer.valueOf(lower), Integer.valueOf(upper));
     }
 
     /**
@@ -705,7 +705,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(long lower, long upper) throws IllegalArgumentException {
-        return remove(new Long(lower), new Long(upper));
+        return remove(Long.valueOf(lower), Long.valueOf(upper));
     }
 
     /**
@@ -717,7 +717,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(float lower, float upper) throws IllegalArgumentException {
-        return remove(new Float(lower), new Float(upper));
+        return remove(Float.valueOf(lower), Float.valueOf(upper));
     }
 
     /**
@@ -729,7 +729,7 @@ public class RangeSet extends AbstractSet<Range>
      * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(double lower, double upper) throws IllegalArgumentException {
-        return remove(new Double(lower), new Double(upper));
+        return remove(Double.valueOf(lower), Double.valueOf(upper));
     }
 
     /**
@@ -1062,7 +1062,7 @@ public class RangeSet extends AbstractSet<Range>
      * Returns a clone of this range set.
      */
     @Override
-    public Object clone() {
+    public RangeSet clone() {
         try {
             final RangeSet set = (RangeSet) super.clone();
             switch (set.indexType) {
@@ -1089,7 +1089,7 @@ public class RangeSet extends AbstractSet<Range>
      */
     @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         boolean first = true;
         for (java.util.Iterator it=iterator(); it.hasNext();) {

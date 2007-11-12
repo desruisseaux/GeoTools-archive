@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2003, Institut de Recherche pour le Développement
  *    (C) 1998, Pêches et Océans Canada
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,11 +17,9 @@
  */
 package org.geotools.math;
 
-// J2SE dependencies
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
-
 import javax.vecmath.MismatchedSizeException;
 
 import org.opengis.util.Cloneable;
@@ -38,11 +36,10 @@ import org.opengis.util.Cloneable;
  * can be computed for a given <var>x</var> value using the {@link #y} method. Method
  * {@link #x} compute the converse and should work even if the line is vertical.
  *
+ * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.0
  *
  * @see Point2D
  * @see Line2D
@@ -98,7 +95,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Set the slope and offset for this line.
+     * Sets the slope and offset for this line.
      * The linear equation will be <var>y</var>=<var>slope</var>*<var>x</var>+<var>y0</var>.
      *
      * @param slope The slope.
@@ -115,7 +112,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Set a line colinear with the specified line segment. The line will continues
+     * Sets a line colinear with the specified line segment. The line will continues
      * toward infinity after the line segment extremities.
      *
      * @param line The line segment.
@@ -127,7 +124,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Set a line through the specified point. The line will continues
+     * Sets a line through the specified point. The line will continues
      * toward infinity after the point.
      *
      * @param p1 Coordinate of the first point.
@@ -140,7 +137,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Set a line through the specified point. The line will continues
+     * Sets a line through the specified point. The line will continues
      * toward infinity after the point.
      *
      * @param x1 Ordinate <var>x</var> of the first point.
@@ -243,7 +240,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Translate the line. The slope stay unchanged.
+     * Translates the line. The slope stay unchanged.
      *
      * @param dx The horizontal translation.
      * @param dy The vertical translation.
@@ -259,7 +256,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Compute <var>y</var>=<var>f</var>(<var>x</var>).
+     * Computes <var>y</var>=<var>f</var>(<var>x</var>).
      * If the line is vertical, then this method returns an infinite value.
      * This method is final for performance reason.
      *
@@ -273,7 +270,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Compute <var>x</var>=<var>f</var><sup>-1</sup>(<var>y</var>).
+     * Computes <var>x</var>=<var>f</var><sup>-1</sup>(<var>y</var>).
      * If the line is horizontal, then this method returns an infinite value.
      * This method is final for performance reason.
      *
@@ -367,7 +364,7 @@ public class Line implements Cloneable, Serializable {
         }
         double eps;
         /*
-         * Ensure that the intersection is in the range of valid x values.
+         * Ensures that the intersection is in the range of valid x values.
          */
         eps = EPS*Math.abs(x);
         if (x1 <= x2) {
@@ -380,7 +377,7 @@ public class Line implements Cloneable, Serializable {
             }
         }
         /*
-         * Ensure that the intersection is in the range of valid y values.
+         * Ensures that the intersection is in the range of valid y values.
          */
         eps = EPS*Math.abs(y);
         if (y1 <= y2) {
@@ -411,7 +408,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Compute the base of a isosceles triangle having the specified summit and side length.
+     * Computes the base of a isosceles triangle having the specified summit and side length.
      * The base will be colinear with this line. In other words, this method compute two
      * points (<var>x1</var>,<var>y1</var>) and (<var>x2</var>,<var>y2</var>) located in
      * such a way that:
@@ -426,7 +423,7 @@ public class Line implements Cloneable, Serializable {
      * @return The base of the isoscele triangle, colinear with this line, or {@code null}
      *         if the base can't be computed. If non-null, then the triangle is the figure formed
      *         by joining (<var>x1</var>,<var>y1</var>), (<var>x2</var>,<var>y2</var>) and
-     *         {@code summit}. 
+     *         {@code summit}.
      */
     public Line2D isoscelesTriangleBase(final Point2D summit, double sideLength) {
         sideLength *= sideLength;
@@ -470,7 +467,7 @@ public class Line implements Cloneable, Serializable {
      */
     public String toString() {
         if (!Double.isInfinite(slope)) {
-            StringBuffer buffer = new StringBuffer("y= ");
+            StringBuilder buffer = new StringBuilder("y= ");
             if (slope != 0) {
                 buffer.append(slope);
                 buffer.append("*x");
@@ -488,8 +485,9 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Compare this object with the specified one for equality.
+     * Compares this object with the specified one for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && getClass().equals(object.getClass())) {
             final Line that = (Line) object;
@@ -504,6 +502,7 @@ public class Line implements Cloneable, Serializable {
     /**
      * Returns a hash code value for this line.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(slope) + 37*Double.doubleToLongBits(y0);
         return (int) code ^ (int) (code >>> 32);
@@ -512,9 +511,10 @@ public class Line implements Cloneable, Serializable {
     /**
      * Returns a clone of this line.
      */
-    public Object clone() {
+    @Override
+    public Line clone() {
         try {
-            return super.clone();
+            return (Line) super.clone();
         } catch (CloneNotSupportedException exception) {
             throw new AssertionError(exception);
         }

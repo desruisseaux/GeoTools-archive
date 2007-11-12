@@ -15,15 +15,11 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.*;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
 import org.geotools.resources.LazySet;
 
 

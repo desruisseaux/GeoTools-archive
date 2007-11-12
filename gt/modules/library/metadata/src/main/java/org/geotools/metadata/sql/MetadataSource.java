@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.metadata.sql;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -40,12 +39,10 @@ import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-// OpenGIS dependencies
 import org.opengis.metadata.MetaData;
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -67,12 +64,12 @@ import org.geotools.util.SimpleInternationalString;
  * where {@code id} is the primary key value for the desired record in the
  * {@code CI_Telephone} table.
  *
+ * @since 2.1
+ * @source $URL$
+ * @version $Id$
  * @author Touraïvane
  * @author Olivier Kartotaroeno
  * @author Martin Desruisseaux
- *
- * @since 2.1
- * @source $URL$
  */
 public class MetadataSource {
     /**
@@ -103,7 +100,7 @@ public class MetadataSource {
      * The prepared statements created is previous call to {@link #getValue}.
      * Those statements are encapsulated into {@link MetadataResult} objects.
      */
-    private final Map statements = new HashMap();
+    private final Map<Class<?>,MetadataResult> statements = new HashMap<Class<?>,MetadataResult>();
 
     /**
      * The map from GeoAPI names to ISO names. For example the GeoAPI
@@ -121,7 +118,7 @@ public class MetadataSource {
      * The class loader to use for proxy creation.
      */
     private final ClassLoader loader;
-    
+
     /**
      * Creates a new metadata source.
      *
@@ -184,30 +181,30 @@ public class MetadataSource {
      * @return The value of the requested attribute.
      * @throws SQLException if the SQL query failed.
      */
-    final synchronized Object getValue(final Class type, final Method method, final String identifier)
+    final synchronized Object getValue(final Class<?> type, final Method method, final String identifier)
             throws SQLException
     {
         final String className = getClassName(type);
-        MetadataResult result = (MetadataResult) statements.get(type);
+        MetadataResult  result = statements.get(type);
         if (result == null) {
             result = new MetadataResult(connection, query, getTableName(className));
             statements.put(type, result);
         }
-        final String columnName = getColumnName(className, method);
-        final Class  valueType  = method.getReturnType();
+        final String  columnName = getColumnName(className, method);
+        final Class<?> valueType = method.getReturnType();
         /*
          * Process the ResultSet value according the expected return type. If a collection
          * is expected, then assumes that the ResultSet contains an array and invokes the
          * 'getValue' method for each element.
          */
         if (Collection.class.isAssignableFrom(valueType)) {
-            final Collection collection;
+            final Collection<Object> collection;
             if (List.class.isAssignableFrom(valueType)) {
-                collection = new ArrayList();
+                collection = new ArrayList<Object>();
             } else if (SortedSet.class.isAssignableFrom(valueType)) {
-                collection = new TreeSet();
+                collection = new TreeSet<Object>();
             } else {
-                collection = new LinkedHashSet();
+                collection = new LinkedHashSet<Object>();
             }
             assert valueType.isAssignableFrom(collection.getClass());
             final Object elements = result.getArray(identifier, columnName);
@@ -253,7 +250,7 @@ public class MetadataSource {
      * The expected value is an instance of a class outside the metadata package, for
      * example {@link String}, {@link InternationalString}, {@link URI}, etc.
      */
-    private static Object convert(final Class valueType, final Object value) {
+    private static Object convert(final Class<?> valueType, final Object value) {
         if (value!=null && !valueType.isAssignableFrom(value.getClass())) {
             if (InternationalString.class.isAssignableFrom(valueType)) {
                return new SimpleInternationalString(value.toString());
@@ -283,7 +280,7 @@ public class MetadataSource {
      * @return The code list element.
      * @throws SQLException if a SQL query failed.
      */
-    private CodeList getCodeList(final Class type, String identifier) throws SQLException {
+    private CodeList getCodeList(final Class<?> type, String identifier) throws SQLException {
         assert Thread.holdsLock(this);
         final String className = getClassName(type);
         int     code;          // The identifier as an integer.
@@ -299,7 +296,7 @@ public class MetadataSource {
          * Converts the numerical value into the code list name.
          */
         if (isNumerical) {
-            MetadataResult result = (MetadataResult) statements.get(type);
+            MetadataResult result = statements.get(type);
             if (result == null) {
                 result = new MetadataResult(connection, codeQuery, getTableName(className));
                 statements.put(type, result);
@@ -311,7 +308,7 @@ public class MetadataSource {
          * in the database. We will use name instead of code numerical
          * value, since the later is more bug prone.
          */
-        final CodeList[] values;
+        final CodeList<?>[] values;
         try {
             values = (CodeList[]) type.getMethod("values", (Class []) null)
                                       .invoke   (null,     (Object[]) null);
@@ -322,8 +319,8 @@ public class MetadataSource {
         } catch (InvocationTargetException exception) {
             throw new MetadataException("Can't read code list.", exception); // TODO: localize
         }
-        CodeList candidate;
-        final StringBuffer candidateName = new StringBuffer(className);
+        CodeList<?> candidate;
+        final StringBuilder candidateName = new StringBuilder(className);
         candidateName.append('.');
         final int base = candidateName.length();
         if (code>=1 && code<values.length) {
@@ -349,7 +346,7 @@ public class MetadataSource {
             }
         }
         // TODO: localize
-        throw new SQLException("Unknow code list: \""+identifier+"\" in table \"" + 
+        throw new SQLException("Unknow code list: \""+identifier+"\" in table \"" +
                                getTableName(className)+'"');
     }
 
@@ -357,7 +354,7 @@ public class MetadataSource {
      * Returns the unqualified Java interface name for the specified type.
      * This is usually the GeoAPI name.
      */
-    private static String getClassName(final Class type) {
+    private static String getClassName(final Class<?> type) {
         final String className = type.getName();
         return className.substring(className.lastIndexOf('.') + 1);
     }
@@ -409,5 +406,5 @@ public class MetadataSource {
             it.remove();
         }
         connection.close();
-    }    
+    }
 }

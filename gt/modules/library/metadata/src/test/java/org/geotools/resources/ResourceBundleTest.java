@@ -15,15 +15,11 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.util.Locale;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 

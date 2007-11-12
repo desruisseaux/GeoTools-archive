@@ -78,7 +78,7 @@ public class DimensionImpl extends MetadataEntity implements Dimension {
      */
     public DimensionImpl(final DimensionNameType dimensionName, final int dimensionSize) {
         setDimensionName(dimensionName);
-        setDimensionSize(new Integer(dimensionSize));
+        setDimensionSize(dimensionSize);
     }
 
     /**

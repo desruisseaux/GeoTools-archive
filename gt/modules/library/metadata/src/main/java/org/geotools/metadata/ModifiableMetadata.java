@@ -127,7 +127,7 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * Returns {@code true} if this metadata is modifiable. This method returns
      * {@code false} if {@link #freeze()} has been invoked on this object.
      */
-    //@Override
+    @Override
     public final boolean isModifiable() {
         return unmodifiable != this;
     }
@@ -286,7 +286,7 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * Invoked when the metadata changed. Some cached informations will need
      * to be recomputed.
      */
-    //@Override
+    @Override
     final void invalidate() {
         super.invalidate();
         unmodifiable = null;

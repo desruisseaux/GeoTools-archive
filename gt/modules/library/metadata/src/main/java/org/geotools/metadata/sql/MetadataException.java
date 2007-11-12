@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,22 +16,23 @@
  */
 package org.geotools.metadata.sql;
 
-// J2SE dependencies
-import java.sql.SQLException;
-
 
 /**
  * Throws when a metadata method failed. The cause for this exception
- * is typically a {@link SQLException}.
+ * is typically a {@link java.sql.SQLException}.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Touraïvane
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 public class MetadataException extends RuntimeException {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -7156617726114815455L;
+
     /**
      * Constructs an instance of {@code MetadataException} with the specified
      * detail message.

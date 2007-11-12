@@ -15,11 +15,8 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.Collections;
-
-// JUnit dependencies
 import junit.framework.Assert;
 
 

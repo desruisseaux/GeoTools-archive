@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.metadata.sql;
 
-// J2SE dependencies
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,12 +33,11 @@ import java.sql.SQLException;
  * a table name, and the method name is translated into a column name.
  * Then the information is fetch in the underlying metadata database.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Touraïvane
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class MetadataEntity implements InvocationHandler {
     /**
@@ -54,7 +52,7 @@ final class MetadataEntity implements InvocationHandler {
      * created from a single database should share the same source.
      */
     private final MetadataSource source;
-    
+
     /**
      * Creates a new metadata entity.
      *
@@ -79,7 +77,7 @@ final class MetadataEntity implements InvocationHandler {
                          final Method method,
                          final Object[] args)
     {
-        final Class type = method.getDeclaringClass();
+        final Class<?> type = method.getDeclaringClass();
         if (type.getName().startsWith(source.metadataPackage)) {
             if (args!=null && args.length!=0) {
                 throw new MetadataException("Unexpected argument."); // TODO: localize

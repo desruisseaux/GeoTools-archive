@@ -250,7 +250,7 @@ public final class IndexedResourceCompiler implements Comparator<Object> {
             if (!allocatedIDs.containsValue(key)) {
                 Integer ID;
                 do {
-                    ID = new Integer(freeID++);
+                    ID = freeID++;
                 } while (allocatedIDs.containsKey(ID));
                 allocatedIDs.put(ID, key);
             }
@@ -269,7 +269,7 @@ public final class IndexedResourceCompiler implements Comparator<Object> {
         final DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
         out.writeInt(count);
         for (int i=0; i<count; i++) {
-            final String value = (String) resources.get(allocatedIDs.get(new Integer(i)));
+            final String value = (String) resources.get(allocatedIDs.get(i));
             out.writeUTF((value!=null) ? value : "");
         }
         out.close();

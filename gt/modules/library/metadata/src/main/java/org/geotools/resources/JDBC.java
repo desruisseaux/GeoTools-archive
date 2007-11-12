@@ -66,8 +66,7 @@ public final class JDBC {
                     try {
                         final Driver d = (Driver) Class.forName(driver).newInstance();
                         log = Logging.format(Level.CONFIG, LoggingKeys.LOADED_JDBC_DRIVER_$3,
-                                             driver, new Integer(d.getMajorVersion()),
-                                                     new Integer(d.getMinorVersion()));
+                                             driver, d.getMajorVersion(), d.getMinorVersion());
                         DRIVERS.add(driver);
                     } catch (Exception exception) {
                         log = Utilities.getLogRecord(exception);

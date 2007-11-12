@@ -21,7 +21,7 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link RangeSet} implementation.
+ * Tests the {@link RangeSet} implementation.
  *
  * @source $URL$
  * @version $Id$
@@ -51,7 +51,7 @@ public final class RangeSetTest extends TestCase {
     }
 
     /**
-     * Test {@link RangeSet#remove}.
+     * Tests {@link RangeSet#remove}.
      */
     public void testRangeRemoval() {
         RangeSet rs = new RangeSet(Double.class);

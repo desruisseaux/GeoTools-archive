@@ -135,9 +135,9 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
      */
     @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer();
-        final List    parsedNames = getParsedNames();
-        final char      separator = getSeparator();
+        final StringBuilder buffer = new StringBuilder();
+        final List     parsedNames = getParsedNames();
+        final char       separator = getSeparator();
         for (final Iterator it=parsedNames.iterator(); it.hasNext();) {
             if (buffer.length() != 0) {
                 buffer.append(separator);

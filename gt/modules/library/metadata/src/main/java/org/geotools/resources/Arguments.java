@@ -257,7 +257,7 @@ public class Arguments {
     public Integer getOptionalInteger(final String name) {
         final String value = getOptionalString(name);
         if (value != null) try {
-            return new Integer(value);
+            return Integer.valueOf(value);
         } catch (NumberFormatException exception) {
             illegalArgument(exception);
         }
@@ -296,7 +296,7 @@ public class Arguments {
     public Double getOptionalDouble(final String name) {
         final String value = getOptionalString(name);
         if (value != null) try {
-            return new Double(value);
+            return Double.valueOf(value);
         } catch (NumberFormatException exception) {
             illegalArgument(exception);
         }

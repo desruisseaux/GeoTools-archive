@@ -381,7 +381,7 @@ public class FactoryRegistry extends ServiceRegistry {
     private static void debug(final String status, final Class category,
                               final Hints.Key key, final String message, final Class type)
     {
-        final StringBuffer buffer = new StringBuffer(status);
+        final StringBuilder buffer = new StringBuilder(status);
         buffer.append(Utilities.spaces(Math.max(1, 7-status.length())))
               .append('(').append(Utilities.getShortName(category));
         if (key != null) {
@@ -758,7 +758,7 @@ public class FactoryRegistry extends ServiceRegistry {
             throw new RecursiveSearchException(category);
         }
         try {
-            final StringBuffer message = getLogHeader(category);
+            final StringBuilder message = getLogHeader(category);
             boolean newServices = false;
             /*
              * First, scan META-INF/services directories (the default mechanism).
@@ -801,7 +801,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @return {@code true} if at least one factory has been registered.
      */
     private boolean register(final Iterator/*<T>*/ factories, final Class/*<T>*/ category,
-                             final StringBuffer message)
+                             final StringBuilder message)
     {
         boolean newServices = false;
         final String lineSeparator = System.getProperty("line.separator", "\n");
@@ -881,7 +881,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @return {@code true} if at least one factory has been registered.
      */
     private boolean registerFromSystemProperty(final ClassLoader loader, final Class category,
-                                               final StringBuffer message)
+                                               final StringBuilder message)
     {
         boolean newServices = false;
         try {
@@ -935,9 +935,9 @@ public class FactoryRegistry extends ServiceRegistry {
     private static void loadingFailure(final Class category, final Throwable error,
                                        final boolean showStackTrace)
     {
-        final String        name = Utilities.getShortName(category);
-        final StringBuffer cause = new StringBuffer(Utilities.getShortClassName(error));
-        final String     message = error.getLocalizedMessage();
+        final String         name = Utilities.getShortName(category);
+        final StringBuilder cause = new StringBuilder(Utilities.getShortClassName(error));
+        final String      message = error.getLocalizedMessage();
         if (message != null) {
             cause.append(": ");
             cause.append(message);
@@ -955,15 +955,15 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * Prepares a message to be logged if any provider has been registered.
      */
-    private static StringBuffer getLogHeader(final Class category) {
-        return new StringBuffer(Logging.getResources(null).getString(
+    private static StringBuilder getLogHeader(final Class category) {
+        return new StringBuilder(Logging.getResources(null).getString(
                 LoggingKeys.FACTORY_IMPLEMENTATIONS_$1, Utilities.getShortName(category)));
     }
 
     /**
      * Log the specified message after all provider for a given category have been registered.
      */
-    private static void log(final String method, final StringBuffer message) {
+    private static void log(final String method, final StringBuilder message) {
         final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
         record.setSourceClassName(FactoryRegistry.class.getName());
         record.setSourceMethodName(method);
@@ -999,7 +999,7 @@ public class FactoryRegistry extends ServiceRegistry {
                     final FactoryIteratorProvider provider = newProviders[i];
                     final Iterator it = provider.iterator(category);
                     if (it != null) {
-                        final StringBuffer message = getLogHeader(category);
+                        final StringBuilder message = getLogHeader(category);
                         if (register(it, category, message)) {
                             log("synchronizeIteratorProviders", message);
                         }

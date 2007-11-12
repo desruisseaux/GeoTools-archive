@@ -11,8 +11,8 @@ import junit.framework.TestCase;
  */
 public class WeakObjectCacheTest extends TestCase {
 
-    Integer key1 = new Integer(1);
-    Integer key2 = new Integer(2);
+    Integer  key1 = 1;
+    Integer  key2 = 2;
     String value1 = new String("value 1");
     String value2 = new String("value 2");
     String value3 = new String("value 3");

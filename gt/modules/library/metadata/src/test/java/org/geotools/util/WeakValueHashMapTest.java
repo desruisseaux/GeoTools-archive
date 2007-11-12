@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link WeakHashSet}. A standard {@link HashMap} object is used for comparaison purpose.
+ * Tests the {@link WeakHashSet}. A standard {@link HashMap} object is used for comparaison purpose.
  *
  * @source $URL$
  * @version $Id$
@@ -70,8 +70,8 @@ public final class WeakValueHashMapTest extends TestCase {
             final WeakValueHashMap<Integer,Integer> weakMap = new WeakValueHashMap<Integer,Integer>();
             final HashMap<Integer,Integer>        strongMap = new HashMap<Integer,Integer>();
             for (int i=0; i<SAMPLE_SIZE; i++) {
-                final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
-                final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
+                final Integer key   = random.nextInt(SAMPLE_SIZE);
+                final Integer value = random.nextInt(SAMPLE_SIZE);
                 assertEquals("containsKey:", strongMap.containsKey(key),
                                                weakMap.containsKey(key));
                 if (false) {
@@ -106,6 +106,7 @@ public final class WeakValueHashMapTest extends TestCase {
             final WeakValueHashMap<Integer,Integer> weakMap = new WeakValueHashMap<Integer,Integer>();
             final HashMap<Integer,Integer>        strongMap = new HashMap<Integer,Integer>();
             for (int i=0; i<SAMPLE_SIZE; i++) {
+                // We really want new instances here.
                 final Integer key   = new Integer(random.nextInt(SAMPLE_SIZE));
                 final Integer value = new Integer(random.nextInt(SAMPLE_SIZE));
                 if (random.nextBoolean()) {

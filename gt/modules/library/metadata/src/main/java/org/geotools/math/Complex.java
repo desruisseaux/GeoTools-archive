@@ -223,7 +223,8 @@ public final class Complex implements Cloneable, Serializable {
     /**
      * Returns a copy of this complex number.
      */
-    public Object clone() {
+    @Override
+    public Complex clone() {
         return new Complex(this);
     }
 
@@ -236,8 +237,9 @@ public final class Complex implements Cloneable, Serializable {
     }
 
     /**
-     * Compare this complex with the specified object for equality.
+     * Compares this complex with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object c) {
         return (c instanceof Complex) && equals((Complex) c);
     }
@@ -245,6 +247,7 @@ public final class Complex implements Cloneable, Serializable {
     /**
      * Returns a hash value for this complex number.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(real) +
                        37*Double.doubleToLongBits(imag);
@@ -254,6 +257,7 @@ public final class Complex implements Cloneable, Serializable {
     /**
      * Returns a string representation of this complex number.
      */
+    @Override
     public String toString() {
         return "Complex[" + real + ", " + imag + ']';
     }

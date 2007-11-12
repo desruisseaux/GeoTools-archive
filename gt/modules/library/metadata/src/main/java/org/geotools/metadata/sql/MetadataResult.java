@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.metadata.sql;
 
-// J2SE dependencies
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,11 +30,10 @@ import org.geotools.util.logging.Logging;
  * table is fetched, the {@link ResultSet} is automatically constructed. If many attributes
  * are fetched consecutivly for the same record, then the same {@link ResultSet} is reused.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @todo Automatically close the ResultSet after some delay (e.g. 2 minutes).
  */
@@ -61,7 +59,7 @@ final class MetadataResult {
      * the {@link #results} will need to be closed and reconstructed.
      */
     private String identifier;
-    
+
     /**
      * Constructs a metadata result from the specified connection.
      *
