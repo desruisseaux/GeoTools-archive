@@ -33,7 +33,7 @@ public class TypesTest extends TestCase {
     /**
      * This utility class is used by Types to prevent attribute modification.
      */
-    public void XtestRestrictionCheck() {
+    public void testRestrictionCheck() {
         FilterFactory fac = CommonFactoryFinder.getFilterFactory(GeoTools
                 .getDefaultHints());
 

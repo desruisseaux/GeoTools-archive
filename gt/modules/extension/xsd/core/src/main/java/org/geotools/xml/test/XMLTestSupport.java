@@ -151,7 +151,8 @@ public abstract class XMLTestSupport extends TestCase {
     /**
      * Logging instance
      */
-    protected static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.xml.test");
+    protected static Logger logger = org.geotools.util.logging.Logging.getLogger(
+            "org.geotools.xml.test");
 
     /**
      * the instance document
