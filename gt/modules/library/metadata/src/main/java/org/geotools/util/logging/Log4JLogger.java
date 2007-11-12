@@ -50,14 +50,18 @@ final class Log4JLogger extends LoggerAdapter {
     /**
      * Returns the Log4J level for the given Java level.
      */
+    @SuppressWarnings("fallthrough")
     private static org.apache.log4j.Level toLog4JLevel(final Level level) {
         final int n = level.intValue();
         switch (n / 100) {
             default: {
                 // MAX_VALUE is a special value for Level.OFF. Otherwise and
                 // if positive, log to fatal since we are greater than SEVERE.
-                return (n != Integer.MAX_VALUE && n >= 0) ?
-                    org.apache.log4j.Level.FATAL : org.apache.log4j.Level.OFF;
+                switch (n) {
+                    default: if (n >= 0)    return org.apache.log4j.Level.FATAL; // fallthrough otherwise.
+                    case Integer.MAX_VALUE: return org.apache.log4j.Level.OFF;
+                    case Integer.MIN_VALUE: return org.apache.log4j.Level.ALL;
+                }
             }
             case 10: return org.apache.log4j.Level.ERROR;    // SEVERE
             case  9: return org.apache.log4j.Level.WARN;     // WARNING
@@ -114,30 +118,16 @@ final class Log4JLogger extends LoggerAdapter {
      * Logs a record at the specified level.
      */
     @Override
-    @SuppressWarnings("fallthrough")
+    public void log(final Level level, final String message) {
+        logger.log(toLog4JLevel(level), message);
+    }
+
+    /**
+     * Logs a record at the specified level.
+     */
+    @Override
     public void log(final Level level, final String message, final Throwable thrown) {
-        final int n = level.intValue();
-        switch (n / 100) {
-            default: {
-                // MAX_VALUE is a special value for Level.OFF. Otherwise and
-                // if positive, log to fatal since we are greater than SEVERE.
-                if (n != Integer.MAX_VALUE || n >= 0) {
-                    logger.fatal(message, thrown);
-                }
-                break;
-            }
-            case 10: logger.error(message, thrown); break;  // SEVERE
-            case  9: logger.warn (message, thrown); break;  // WARNING
-            case  8:                                        // INFO
-            case  7: logger.info (message, thrown); break;  // CONFIG
-            case  6:                                        // (not allocated)
-            case  5:                                        // FINE
-            case  4: logger.debug(message, thrown); break;  // FINER
-            case  3: logger.trace(message, thrown); break;  // FINEST
-            case  2:                                        // (not allocated)
-            case  1:                                        // (not allocated)
-            case  0:                                        // OFF
-        }
+        logger.log(toLog4JLevel(level), message, thrown);
     }
 
     public void severe (String message) {logger.error(message);}
