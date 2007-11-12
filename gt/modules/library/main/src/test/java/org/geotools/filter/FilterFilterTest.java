@@ -31,6 +31,7 @@ import junit.framework.TestCase;
 
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
+import org.geotools.util.logging.Logging;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.ParserAdapter;
 import org.xml.sax.helpers.XMLFilterImpl;
@@ -204,7 +205,7 @@ StringReader reader = new StringReader( filter );
         GMLFilterGeometry geometryFilter = new GMLFilterGeometry(filterParser);
         GMLFilterDocument documentFilter = new GMLFilterDocument(geometryFilter);
 
-//        Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
+//        Logger logger = Logging.getLogger("org.geotools.filter");
 //        logger.setLevel(Level.ALL);
 //        ConsoleHandler consoleHandler = new ConsoleHandler();
 //        consoleHandler.setLevel(Level.ALL);
@@ -257,7 +258,7 @@ StringReader reader = new StringReader( filter );
         GMLFilterGeometry geometryFilter = new GMLFilterGeometry(filterParser);
         GMLFilterDocument documentFilter = new GMLFilterDocument(geometryFilter);
 
-        Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
+        Logger logger = Logging.getLogger("org.geotools.filter");
         logger.setLevel(Level.INFO);
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.INFO);
@@ -286,7 +287,7 @@ StringReader reader = new StringReader( filter );
             try{
                 assertEquals("at index " + i, attName.toString(), parsedName);
             }catch(AssertionFailedError e){
-                Logger.getLogger("org.geotools.filter").warning("expected " + attName + ",\n but was " + parsedName);
+                Logging.getLogger("org.geotools.filter").warning("expected " + attName + ",\n but was " + parsedName);
                 throw e;
             }
             assertEquals("literal-" + i, ((LiteralExpression)subFitler.getRightValue()).getLiteral());

@@ -70,6 +70,7 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.util.logging.Logging;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
@@ -426,7 +427,7 @@ public class WFSDataStore extends AbstractDataStore {
     protected SimpleFeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
         URL getUrl = getDescribeFeatureTypeURLGet(typeName);
-        org.geotools.util.logging.Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
+        Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
         if( getUrl==null )
             return null;
         HttpURLConnection hc = getConnection(getUrl,auth,false);
@@ -443,7 +444,7 @@ public class WFSDataStore extends AbstractDataStore {
 
     private URL getDescribeFeatureTypeURLGet( String typeName ) throws MalformedURLException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
-        org.geotools.util.logging.Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
+        Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
 
         if (getUrl == null) {
             return null;
@@ -625,8 +626,8 @@ public class WFSDataStore extends AbstractDataStore {
 
         url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), this.encoding));
 
-        Logger.getLogger("org.geotools.data.wfs").fine(url);
-        Logger.getLogger("org.geotools.data.communication").fine("Output: "+url);
+        Logging.getLogger("org.geotools.data.wfs").fine(url);
+        Logging.getLogger("org.geotools.data.communication").fine("Output: "+url);
         getUrl = new URL(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 

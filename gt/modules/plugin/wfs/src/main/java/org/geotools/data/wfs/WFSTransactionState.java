@@ -45,6 +45,7 @@ import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.filter.FidFilter;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.geotools.xml.DocumentFactory;
@@ -177,7 +178,7 @@ public class WFSTransactionState implements State {
                 if (action instanceof InsertAction) {
                     InsertAction insertAction = (InsertAction) action;
                     if (currentInsertIndex >= newFids.size()) {
-                        org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").severe(
+                        Logging.getLogger("org.geotools.data.wfs").severe(
                                 "Expected more fids to be returned by " + "TransactionResponse!");
                         break;
                     }
@@ -191,7 +192,7 @@ public class WFSTransactionState implements State {
             }
 
             if (currentInsertIndex != newFids.size()) {
-                org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").severe(
+                Logging.getLogger("org.geotools.data.wfs").severe(
                         "number of fids inserted do not match number of fids returned "
                                 + "by Transaction Response.  Got:" + newFids.size() + " expected: "
                                 + currentInsertIndex);
@@ -255,12 +256,14 @@ public class WFSTransactionState implements State {
 
         // write request
         Writer w = new OutputStreamWriter(os);
-        if (Logger.getLogger("org.geotools.data.wfs").isLoggable(Level.FINE)) {
-            w = new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.wfs"), Level.FINE);
+        Logger logger = Logging.getLogger("org.geotools.data.wfs");
+        if (logger.isLoggable(Level.FINE)) {
+            w = new LogWriterDecorator(w, logger, Level.FINE);
         }
         // special logger for communication information only.
-        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.FINE) ){
-            w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.communication"), Level.FINE);
+        logger = Logger.getLogger("org.geotools.data.communication");
+        if (logger.isLoggable(Level.FINE) ){
+            w = new LogWriterDecorator(w, logger, Level.FINE);
         }
 
         DocumentWriter.writeDocument(this, WFSSchema.getInstance(), w, hints);
