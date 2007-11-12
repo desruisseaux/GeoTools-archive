@@ -13,11 +13,21 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d.event;
 
-import java.util.EventListener;
+package org.geotools.gui.swing.map.map2d;
 
+import org.geotools.gui.swing.map.MapConstants;
 
-public interface HighlightChangeListener extends EventListener {
-    public void highlightChanged(HighlightChangedEvent e);
+/**
+ *
+ * @author Johann Sorel
+ */
+public interface NavigableMap2D extends Map2D{
+    
+    public void setNavigationState(MapConstants.NAVIGATION state);
+    public MapConstants.NAVIGATION getNavigationState();
+    
+    public void setZoomFactor(double zoomFactor);
+    public double getZoomFactor();
+      
 }

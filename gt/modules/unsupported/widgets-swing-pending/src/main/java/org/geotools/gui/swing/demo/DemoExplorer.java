@@ -17,7 +17,6 @@ package org.geotools.gui.swing.demo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -44,13 +43,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
@@ -59,6 +55,7 @@ import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.datachooser.DataListener;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
+import org.geotools.gui.swing.map.map2d.DefaultMap2D;
 import org.geotools.gui.swing.map.map2d.control.JMap2DControlBar;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
@@ -74,7 +71,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
  */
 public class DemoExplorer extends JFrame {
 
-    private JMapPane map = new JMapPane();
+    private DefaultMap2D map = new DefaultMap2D();
     private JContextTree tree = new JContextTree();
     private JMap2DControlBar control = new JMap2DControlBar(map);
     private JTabbedPane tabbed = null;

@@ -14,9 +14,9 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.temp;
 
-import org.geotools.gui.swing.map.map2d.event.SelectionChangeListener;
+import org.geotools.gui.swing.map.map2d.temp.event.SelectionChangeListener;
 import org.geotools.map.MapLayer;
 import org.opengis.filter.Filter;
 

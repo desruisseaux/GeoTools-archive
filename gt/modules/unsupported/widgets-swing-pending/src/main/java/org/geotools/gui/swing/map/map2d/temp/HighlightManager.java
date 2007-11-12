@@ -14,10 +14,10 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.temp;
 
 import java.awt.event.MouseMotionListener;
-import org.geotools.gui.swing.map.map2d.event.HighlightChangeListener;
+import org.geotools.gui.swing.map.map2d.temp.event.HighlightChangeListener;
 import org.geotools.map.MapLayer;
 
 /**

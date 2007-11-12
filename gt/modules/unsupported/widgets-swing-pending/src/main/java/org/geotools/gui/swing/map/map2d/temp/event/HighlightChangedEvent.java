@@ -13,13 +13,25 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+package org.geotools.gui.swing.map.map2d.temp.event;
 
-package org.geotools.gui.swing.map;
+import java.util.EventObject;
+import org.opengis.filter.Filter;
 
-/**
- * @author johann sorel
- */
-public interface Map {
 
-  
+public class HighlightChangedEvent extends EventObject {
+   
+    private static final long serialVersionUID = -7958576070524520655L;
+    Filter filter;
+
+    public HighlightChangedEvent(Object source, org.opengis.filter.Filter filter2) {
+        super(source);
+        this.source = source;
+        this.filter = filter2;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
 }

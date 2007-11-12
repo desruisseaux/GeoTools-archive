@@ -56,6 +56,8 @@ import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.ServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.DefaultMap2D;
+import org.geotools.gui.swing.map.map2d.DefaultNavigableMap2D;
+import org.geotools.gui.swing.map.map2d.temp.JMapPane2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
@@ -74,7 +76,7 @@ import org.geotools.styling.Style;
 public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final DefaultMap2D map = new DefaultMap2D();
+    private final DefaultNavigableMap2D map;
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
@@ -88,11 +90,13 @@ public class DemoAll extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
 
+        map = new DefaultNavigableMap2D(new ShapefileRenderer());
+        map.getComponent().setOpaque(false);
+        
         MapContext context = buildContext();
         initTree(tree,map);
 
-        map.setOpaque(false);
-        map.setRenderer(new ShapefileRenderer());
+        
         map.setContext(context);
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         map.getRenderer().setJava2DHints(rh);
@@ -109,9 +113,8 @@ public class DemoAll extends javax.swing.JFrame {
 
         tree.addContext(context);
 
-        //lightcontrol.setMapPane(map);
-
-        //infopanel.setMapPane(map);
+        lightcontrol.setMap(map);
+        infopanel.setMap(map);
         
         tree.addTreeContextListener(new TreeContextListener() {
 
@@ -179,7 +182,7 @@ public class DemoAll extends javax.swing.JFrame {
                 
         popup.addItem(new LayerVisibilityItem());           //layer         
         popup.addItem(new SeparatorItem() );        
-        //popup.addItem(new LayerZoomItem(map));              //layer
+        popup.addItem(new LayerZoomItem(null));              //layer
         popup.addItem(new LayerFeatureItem());              //layer
         popup.addItem(new ContextActiveItem(tree));         //context
         popup.addItem(new SeparatorItem() );
@@ -193,7 +196,7 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new LayerPropertyItem());             //layer
         popup.addItem(new ContextPropertyItem());           //context
                 
-        //popup.setMapPane(map);
+        popup.setMap(map);
         
         tree.addColumn(colVisible);
         tree.addColumn(colOpacity);

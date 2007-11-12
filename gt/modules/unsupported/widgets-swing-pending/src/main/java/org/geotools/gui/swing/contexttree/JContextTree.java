@@ -38,6 +38,7 @@ import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.map.MapContext;
 
 /**
@@ -80,7 +81,7 @@ public class JContextTree extends JComponent{
      * @param map
      * @return default TreeTable
      */
-    public static JContextTree createDefaultTree(JMapPane map) {
+    public static JContextTree createDefaultTree(Map2D map) {
         JContextTree tree = new JContextTree();
 
         tree.addColumn(new VisibleTreeTableColumn());
@@ -93,7 +94,7 @@ public class JContextTree extends JComponent{
                 
         popup.addItem(new LayerVisibilityItem());           //layer         
         popup.addItem(new SeparatorItem() );        
-        popup.addItem(new LayerZoomItem(map));              //layer
+        popup.addItem(new LayerZoomItem(null));              //layer
         popup.addItem(new LayerFeatureItem());              //layer
         popup.addItem(new ContextActiveItem(tree));         //context
         popup.addItem(new SeparatorItem() );
@@ -107,7 +108,7 @@ public class JContextTree extends JComponent{
         popup.addItem(new LayerPropertyItem());             //layer
         popup.addItem(new ContextPropertyItem());           //context
                 
-        popup.setMapPane(map);
+        popup.setMap(map);
         
         tree.revalidate();
 

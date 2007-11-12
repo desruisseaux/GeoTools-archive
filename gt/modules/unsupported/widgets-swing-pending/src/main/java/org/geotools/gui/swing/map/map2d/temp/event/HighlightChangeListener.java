@@ -13,11 +13,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d.event;
+package org.geotools.gui.swing.map.map2d.temp.event;
 
 import java.util.EventListener;
 
 
-public interface SelectionChangeListener extends EventListener {
-    public void selectionChanged(SelectionChangedEvent e);
+public interface HighlightChangeListener extends EventListener {
+    public void highlightChanged(HighlightChangedEvent e);
 }

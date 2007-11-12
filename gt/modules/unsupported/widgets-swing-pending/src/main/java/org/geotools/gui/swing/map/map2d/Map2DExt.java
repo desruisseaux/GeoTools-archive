@@ -16,46 +16,25 @@
 
 package org.geotools.gui.swing.map.map2d;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.gui.swing.map.map2d.temp.SelectionManager;
+import org.geotools.gui.swing.map.map2d.temp.HighlightManager;
+import org.geotools.gui.swing.map.map2d.temp.StyleSetDescriptor;
 import java.awt.Cursor;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.gui.swing.map.Map;
-import org.geotools.gui.swing.map.MapConstants;
-import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.renderer.GTRenderer;
 
 /**
  *
- * @author johann sorel
+ * @author Johann Sorel
  */
-public interface Map2D extends Map{
-    
-    public void setRenderer(GTRenderer renderer);
-    public GTRenderer getRenderer();    
-        
-    public void setContext(MapContext context);
-    public MapContext getContext();
-        
-    public void setMapArea(Envelope mapArea);
-    public Envelope getMapArea();
-   
-    public void setState(MapConstants.MAP_STATE state);
-    public MapConstants.MAP_STATE getState();
-    
-    public void setZoomFactor(double zoomFactor);
-    public double getZoomFactor();
-        
-    public void reset();
-    public boolean isReset();
+public interface Map2DExt extends Map2D{
+
     
     public void setClickable(boolean clickable);
     public boolean isClickable();
-    
+        
     public void setCursor(Cursor cursor);
     public Cursor getCursor();
-    
-    public void refresh();
     
     //------------------------HIGHLIGHT-----------------------------------------
     public void setHighlightManager(HighlightManager highlightManager);
@@ -95,7 +74,5 @@ public interface Map2D extends Map{
     
     //--------------------EDITION-----------------------------------------------
     //TODO MUST BE COMPLETED
-    
-        
     
 }

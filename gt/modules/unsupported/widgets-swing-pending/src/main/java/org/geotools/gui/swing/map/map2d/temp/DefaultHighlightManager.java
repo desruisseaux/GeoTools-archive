@@ -14,8 +14,9 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.temp;
 
+import org.geotools.gui.swing.map.map2d.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,8 +25,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import javax.swing.event.EventListenerList;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.gui.swing.map.map2d.event.HighlightChangeListener;
-import org.geotools.gui.swing.map.map2d.event.HighlightChangedEvent;
+import org.geotools.gui.swing.map.map2d.temp.event.HighlightChangeListener;
+import org.geotools.gui.swing.map.map2d.temp.event.HighlightChangedEvent;
 import org.geotools.map.MapLayer;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;

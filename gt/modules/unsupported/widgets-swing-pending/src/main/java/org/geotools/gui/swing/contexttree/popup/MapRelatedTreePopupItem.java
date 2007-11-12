@@ -16,7 +16,7 @@
 
 package org.geotools.gui.swing.contexttree.popup;
 
-import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.map.Map;
 
 /**
  * Interface for TreePopupItem needing a MapPane element 
@@ -30,14 +30,14 @@ public interface MapRelatedTreePopupItem extends TreePopupItem {
      * 
      * @param map
      */
-    public void setMapPane(JMapPane map);
+    public void setMap(Map map);
     
     /**
      * get MapPane
      * 
      * @return
      */
-    public JMapPane getMapPane();
+    public Map getMap();
     
     
 }

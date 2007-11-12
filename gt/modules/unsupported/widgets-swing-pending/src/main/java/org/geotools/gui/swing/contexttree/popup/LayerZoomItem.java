@@ -23,6 +23,8 @@ import javax.swing.JMenuItem;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.map.MapLayer;
 
 /**
@@ -32,22 +34,24 @@ import org.geotools.map.MapLayer;
 public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelatedTreePopupItem {
 
     private MapLayer layer;
-    private JMapPane map;
+    private NavigableMap2D map;
 
     /** Creates a new instance
      * @param map 
      */
-    public LayerZoomItem(JMapPane map) {
+    public LayerZoomItem(Map map) {
         this.setText(TextBundle.getResource().getString("zoom_to_layer"));
-        this.map = map;
+        setMap(map);
         init();
     }
 
-    public void setMapPane(JMapPane map) {
-        this.map = map;
+    public void setMap(Map map) {
+        if(map instanceof NavigableMap2D){
+            this.map = (NavigableMap2D) map;
+        }
     }
 
-    public JMapPane getMapPane() {
+    public NavigableMap2D getMap() {
         return map;
     }
    
@@ -60,9 +64,7 @@ public class LayerZoomItem extends JMenuItem implements TreePopupItem, MapRelate
                         if (map != null && layer != null) {
                             try {
                                 map.setMapArea(layer.getBounds());
-                                map.setReset(true);
-                                map.revalidate();
-                                map.repaint();
+                                map.refresh();
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }

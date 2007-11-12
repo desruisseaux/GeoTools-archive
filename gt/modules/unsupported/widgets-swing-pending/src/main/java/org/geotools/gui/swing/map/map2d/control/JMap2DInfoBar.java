@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.gui.swing.JMapPane;
+import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.referencing.AuthorityCodesComboBox;
 import org.jdesktop.layout.GroupLayout;
 import org.opengis.referencing.FactoryException;
@@ -29,7 +31,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
 
     private AuthorityCodesComboBox comboCRS;
     private JPanel flowpanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    private JMapPane map;
+    private Map2D map;
 
     /** Creates new form JMap2DInfoBar */
     public JMap2DInfoBar() {
@@ -52,13 +54,13 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
         }
     }
 
-    public void setMapPane(JMapPane map){
+    public void setMap(Map map){
         
-        if(map != null){
-            map.getContext().addPropertyChangeListener(this);
+        if(map instanceof Map2D){            
+            this.map = (Map2D) map;
+            this.map.getContext().addPropertyChangeListener(this);
         }
         
-        this.map = map;
         init();
     }
     

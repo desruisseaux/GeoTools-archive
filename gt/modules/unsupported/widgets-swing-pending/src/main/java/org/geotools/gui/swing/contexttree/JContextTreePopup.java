@@ -15,32 +15,15 @@
  */
 package org.geotools.gui.swing.contexttree;
 
-import java.awt.Component;
-import java.awt.Point;
 import java.util.ArrayList;
 
 import java.util.Collection;
 import javax.swing.JPopupMenu;
-import javax.swing.tree.TreePath;
 
-import org.geotools.gui.swing.JMapPane;
-import org.geotools.gui.swing.contexttree.popup.ContextActiveItem;
-import org.geotools.gui.swing.contexttree.popup.ContextPropertyItem;
-import org.geotools.gui.swing.contexttree.popup.CopyItem;
-import org.geotools.gui.swing.contexttree.popup.CutItem;
-import org.geotools.gui.swing.contexttree.popup.DeleteItem;
-import org.geotools.gui.swing.contexttree.popup.DuplicateItem;
-import org.geotools.gui.swing.contexttree.popup.LayerFeatureItem;
-import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
-import org.geotools.gui.swing.contexttree.popup.LayerVisibilityItem;
-import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.MapRelatedTreePopupItem;
-import org.geotools.gui.swing.contexttree.popup.PasteItem;
-import org.geotools.gui.swing.contexttree.SelectionData;
 import org.geotools.gui.swing.contexttree.popup.TreePopupItem;
-import org.geotools.gui.swing.contexttree.popup.TitledSeparatorItem;
-import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
+import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  * Dynamic Popup used by JXMapContextTree
@@ -53,7 +36,7 @@ public final class JContextTreePopup {
     final ArrayList<TreePopupItem> controls = new ArrayList<TreePopupItem>();
     private final TreeTable treetable;
     private final JContextTree frame;
-    private JMapPane map;
+    private Map map;
 
     
     /**
@@ -74,7 +57,7 @@ public final class JContextTreePopup {
      * @param map 
      * @param treetable the tree related to the popup
      */
-    JContextTreePopup(TreeTable treetable,JContextTree frame,JMapPane map) {
+    JContextTreePopup(TreeTable treetable,JContextTree frame,Map2D map) {
         super();
         this.treetable = treetable;
         this.frame = frame;
@@ -87,13 +70,13 @@ public final class JContextTreePopup {
     }
        
     
-    public void setMapPane(JMapPane map){
+    public void setMap(Map map){
         this.map = map;
         
         for(TreePopupItem pc : controls){
             
             if( pc instanceof MapRelatedTreePopupItem){
-                ((MapRelatedTreePopupItem)pc).setMapPane(map);
+                ((MapRelatedTreePopupItem)pc).setMap(map);
             }
         }
     }
