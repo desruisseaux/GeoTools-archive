@@ -58,8 +58,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public final class RendererUtilities {
 
-	private final static Logger LOGGER = Logger
-			.getLogger(RendererUtilities.class.getName());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(RendererUtilities.class.getName());
 
 	private final static DefaultGeographicCRS GeogCRS = DefaultGeographicCRS.WGS84;;
 

@@ -87,7 +87,7 @@ import org.opengis.filter.spatial.Within;
 public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor, FilterVisitor {
     
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter.visitor");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter.visitor");
 
     /** expression visitor */
     private ExpressionVisitor expressionVisitor;

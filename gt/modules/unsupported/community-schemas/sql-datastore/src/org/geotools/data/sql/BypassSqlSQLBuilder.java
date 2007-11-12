@@ -18,7 +18,7 @@ import org.opengis.feature.type.GeometryDescriptor;
 
 public class BypassSqlSQLBuilder extends GeoAPISQLBuilder {
 
-	private static final Logger LOGGER = Logger.getLogger(BypassSqlSQLBuilder.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(BypassSqlSQLBuilder.class.getPackage().getName());
 	
 	private BypassSqlFeatureTypeHandler ftHandler;
 	

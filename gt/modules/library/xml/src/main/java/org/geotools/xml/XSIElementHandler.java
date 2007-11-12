@@ -46,7 +46,7 @@ public abstract class XSIElementHandler implements Serializable {
     /**
      * the logger -- should be used for debugging (assuming there are bugs LOL)
      */
-    public final static Logger logger = Logger.getLogger(
+    public final static Logger logger = org.geotools.util.logging.Logging.getLogger(
             "net.refractions.xsi.element");
     private static Level level = Level.WARNING;
 

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class Java2DMark {
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
     static GeneralPath cross;
     static GeneralPath star;
     static GeneralPath triangle;

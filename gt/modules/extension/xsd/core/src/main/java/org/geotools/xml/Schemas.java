@@ -81,7 +81,7 @@ import org.geotools.xml.impl.TypeWalker.Visitor;
  *
  */
 public class Schemas {
-    private static final Logger LOGGER = Logger.getLogger(Schemas.class.getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Schemas.class.getPackage().getName());
 
     static {
         //need to register custom factory to load schema resources

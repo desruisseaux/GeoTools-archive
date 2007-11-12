@@ -49,7 +49,7 @@ import org.opengis.filter.identity.Identifier;
  */
 public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 	/** Logger for the default core module. */
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
 
 	/** List of the Identifer. */
 	private Set fids = new HashSet();

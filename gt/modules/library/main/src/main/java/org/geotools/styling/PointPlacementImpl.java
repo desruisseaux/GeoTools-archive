@@ -37,8 +37,7 @@ import org.opengis.util.Cloneable;
 public class PointPlacementImpl extends AbstractGTComponent
     implements PointPlacement, Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.core");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
 
     // TODO: make container ready
     private final FilterFactory filterFactory;

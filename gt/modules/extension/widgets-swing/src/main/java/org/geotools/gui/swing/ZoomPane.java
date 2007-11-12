@@ -357,7 +357,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     /**
      * The logger for zoom events.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.gui.swing");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.gui.swing");
 
     /**
      * List of default keystrokes used to perform zooms. The elements of this table go in pairs.

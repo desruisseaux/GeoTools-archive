@@ -54,8 +54,7 @@ public class PGConnectionPool extends org.postgresql.jdbc2.optional.ConnectionPo
 	private static final long serialVersionUID = -1157879368880510850L;
 
 	/** Standard logging instance */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.data.geometryless");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
 	//private ConnectionPoolDataSource _nativePool;
 

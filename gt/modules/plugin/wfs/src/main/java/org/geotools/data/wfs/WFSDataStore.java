@@ -426,7 +426,7 @@ public class WFSDataStore extends AbstractDataStore {
     protected SimpleFeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
         URL getUrl = getDescribeFeatureTypeURLGet(typeName);
-        Logger.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
+        org.geotools.util.logging.Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
         if( getUrl==null )
             return null;
         HttpURLConnection hc = getConnection(getUrl,auth,false);

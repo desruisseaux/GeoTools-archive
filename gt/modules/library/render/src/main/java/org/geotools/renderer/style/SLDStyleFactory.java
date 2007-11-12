@@ -136,7 +136,7 @@ This change could affect the j2d renderer as it appears to use the
 
 public class SLDStyleFactory {
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
     /** Holds a lookup bewteen SLD names and java constants. */
     private static final java.util.Map joinLookup = new java.util.HashMap();

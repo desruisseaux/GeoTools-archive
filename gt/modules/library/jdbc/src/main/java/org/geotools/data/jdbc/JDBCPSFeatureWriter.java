@@ -58,7 +58,7 @@ import org.opengis.feature.type.GeometryDescriptor;
  */
 public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");
     FIDMapper mapper = null;
     PreparedStatement insertStatement;

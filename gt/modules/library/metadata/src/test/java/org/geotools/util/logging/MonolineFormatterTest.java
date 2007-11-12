@@ -16,7 +16,6 @@
  */
 package org.geotools.util.logging;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.Test;
@@ -84,7 +83,7 @@ public final class MonolineFormatterTest extends TestCase {
         for (int i=0; i<namespaces.length; i++) {
             System.out.println();
             System.out.print("Testing ");
-            final Logger logger = Logger.getLogger(namespaces[i]);
+            final Logger logger = Logging.getLogger(namespaces[i]);
             System.out.println(logger.getName());
             logger.severe ("Don't worry, just a test");
             logger.warning("This is an imaginary warning");

@@ -40,8 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class DB2FeatureWriter extends JDBCTextFeatureWriter {
 	private DB2SQLBuilder sqlBuilder;
 
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.data.db2");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.db2");
 
 	/**
 	 * DOCUMENT ME!

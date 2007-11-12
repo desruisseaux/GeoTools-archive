@@ -59,7 +59,7 @@ import org.geotools.feature.SchemaException;
  */
 public class VPFDataStoreFactory implements DataStoreFactorySpi {
     /** The logger for the vpf module. */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.vpf");
 
     /**

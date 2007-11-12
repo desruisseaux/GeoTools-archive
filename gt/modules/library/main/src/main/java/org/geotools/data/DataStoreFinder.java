@@ -54,7 +54,7 @@ import org.opengis.referencing.FactoryException;
  */
 public final class DataStoreFinder {
 	/** The logger for the filter module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     
 	/**
 	 * The service registry for this manager. Will be initialized only when

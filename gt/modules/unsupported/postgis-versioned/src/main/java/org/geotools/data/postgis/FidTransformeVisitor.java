@@ -42,7 +42,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 class FidTransformeVisitor extends DuplicatorFilterVisitor {
     /** The logger for the postgis module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
     private VersionedFIDMapper mapper;
 

@@ -68,7 +68,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  */
 public class ComplexDataStoreConfigurator {
     /** DOCUMENT ME! */
-    private static final Logger LOGGER = Logger.getLogger(ComplexDataStoreConfigurator.class
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ComplexDataStoreConfigurator.class
             .getPackage().getName());
 
     /** DOCUMENT ME! */

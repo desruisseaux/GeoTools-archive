@@ -40,7 +40,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  * @source $URL$
  */
 public class MySQLDataStoreFactory extends AbstractDataStoreFactory {
-    private static final Logger LOGGER = Logger.getLogger(MySQLDataStoreFactory.class.getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(MySQLDataStoreFactory.class.getName());
 
     /** Creates MySQL JDBC driver class. */
     private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";

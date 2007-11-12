@@ -38,6 +38,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -54,7 +55,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * @author Martin Desruisseaux
  */
 public class IdentifiedObjectFinder {
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory.finder");
+    public static final Logger LOGGER = Logging.getLogger("org.geotools.referencing.factory.finder");
 
     /**
      * The proxy for object creation.

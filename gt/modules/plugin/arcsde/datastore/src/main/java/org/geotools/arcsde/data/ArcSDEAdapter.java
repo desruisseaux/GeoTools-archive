@@ -73,7 +73,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class ArcSDEAdapter {
     /** Logger for ths class' package */
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEAdapter.class.getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEAdapter.class.getPackage().getName());
 
     /** mappings of SDE attribute's types to Java ones */
     private static final Map sde2JavaTypes = new HashMap();

@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  */
 public class SLDTransformer extends TransformerBase {
     /** The logger for this package. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.styling");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
 
     static final String XLINK_NAMESPACE = "http://www.w3.org/1999/xlink";
 

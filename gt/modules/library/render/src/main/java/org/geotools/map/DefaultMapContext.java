@@ -59,7 +59,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class DefaultMapContext implements MapContext {
 	/** The logger for the map module. */
-	static public final Logger LOGGER = Logger.getLogger("org.geotools.map");
+	static public final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.map");
 
 	List layerList = new ArrayList();
 

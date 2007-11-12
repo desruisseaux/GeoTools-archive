@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** For handling and creating logic filters that come in. */
     private LogicSAXParser logicFactory;

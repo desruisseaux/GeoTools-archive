@@ -56,8 +56,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 		Format {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.imagepyramid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.imagepyramid");
 
 	
 	/** Control the transparency of the output coverage. */

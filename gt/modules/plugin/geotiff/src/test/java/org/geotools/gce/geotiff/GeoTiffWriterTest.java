@@ -59,8 +59,7 @@ import org.opengis.referencing.operation.TransformException;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/test/org/geotools/gce/geotiff/GeoTiffVisualizationTest.java $
  */
 public class GeoTiffWriterTest extends TestCase {
-	private static final Logger logger = Logger
-			.getLogger(GeoTiffWriterTest.class.toString());
+	private static final Logger logger = org.geotools.util.logging.Logging.getLogger(GeoTiffWriterTest.class.toString());
 
 	/**
 	 * 

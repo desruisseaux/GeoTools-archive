@@ -44,7 +44,7 @@ import org.geotools.factory.CommonFactoryFinder;
  */
 public class FileDataStoreFinder {
     /** The logger for the filter module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
 
     private FileDataStoreFinder() {
     }

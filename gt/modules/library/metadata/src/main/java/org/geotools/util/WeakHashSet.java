@@ -26,6 +26,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.geotools.resources.XArray;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -254,7 +255,7 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
                 }
             }
         }
-        final Logger logger = Logger.getLogger("org.geotools.util");
+        final Logger logger = Logging.getLogger("org.geotools.util");
         final Level   level = Level.FINEST;
         if (logger.isLoggable(level)) {
             final LogRecord record = new LogRecord(level, "Rehash from " + oldTable.length +

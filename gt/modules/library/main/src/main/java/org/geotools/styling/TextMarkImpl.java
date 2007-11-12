@@ -30,7 +30,7 @@ import org.opengis.filter.expression.Expression;
 public class TextMarkImpl extends MarkImpl implements TextMark {
     /** The logger for the default core module. */
 
-    //private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    //private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private Expression wellKnownName = null;
     private java.util.List fonts = new java.util.ArrayList();

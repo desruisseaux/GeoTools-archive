@@ -93,7 +93,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
 	/** Logger for the {@link GeoTiffReader} class. */
-	private Logger LOGGER = Logger.getLogger(GeoTiffReader.class.toString());
+	private Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeoTiffReader.class.toString());
 
 	/** SPI for creating tiff readers in ImageIO tools */
 	private final static TIFFImageReaderSpi readerSPI = new TIFFImageReaderSpi();

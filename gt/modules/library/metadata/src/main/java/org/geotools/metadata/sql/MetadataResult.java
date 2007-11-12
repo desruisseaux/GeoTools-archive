@@ -22,7 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Logger;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -101,7 +101,7 @@ final class MetadataResult {
             }
             if (results.next()) {
                 // TODO: Localize
-                Logger.getLogger("org.geotools.metadata.sql")
+                Logging.getLogger("org.geotools.metadata.sql")
                       .warning("Duplicate identifier: "+identifier);
             }
             results.close();

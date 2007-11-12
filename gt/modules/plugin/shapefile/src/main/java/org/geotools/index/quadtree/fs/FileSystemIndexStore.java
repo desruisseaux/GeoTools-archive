@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class FileSystemIndexStore implements IndexStore {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.index.quadtree");
     private File file;
     private byte byteOrder;

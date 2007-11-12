@@ -45,7 +45,7 @@ import org.geotools.factory.AbstractFactory;
 public class JDBCDataStoreFactory extends AbstractFactory
     implements org.geotools.data.DataStoreFactorySpi {
     	
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
 
     /** Specified JDBC driver class. */

@@ -51,7 +51,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  */
 public class PostgisConnectionFactory {
     /** Standard logging instance */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.defaultcore");
 
     /** Creates PostGIS-specific JDBC driver class. */

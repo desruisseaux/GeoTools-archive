@@ -63,7 +63,7 @@ import org.geotools.filter.SQLEncoderMySQL;
  */
 public class MySQLDataStore extends JDBCDataStore {
     /** The logger for the mysql module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.mysql");
 
     /**
      * Basic constructor for MySQLDataStore.

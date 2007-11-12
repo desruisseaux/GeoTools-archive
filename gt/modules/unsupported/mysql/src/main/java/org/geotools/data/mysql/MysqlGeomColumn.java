@@ -73,7 +73,7 @@ public class MysqlGeomColumn {
     private static Map sqlTypeMap = new HashMap();
 
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.mysql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.mysql");
 
     /** Standard logging instance */
 

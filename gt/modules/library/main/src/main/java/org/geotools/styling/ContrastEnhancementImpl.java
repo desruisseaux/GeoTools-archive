@@ -67,7 +67,7 @@ import org.opengis.filter.expression.Expression;
 public class ContrastEnhancementImpl extends AbstractGTComponent
     implements ContrastEnhancement {
     
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("org.geotools.core");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private Expression gamma;
     private Expression type;

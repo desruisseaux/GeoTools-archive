@@ -75,7 +75,7 @@ import org.geotools.resources.Utilities;
 public class StyledLayerDescriptorImpl extends AbstractGTRoot
     implements StyledLayerDescriptor {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.styling");
 
     /** Holds value of property name. */

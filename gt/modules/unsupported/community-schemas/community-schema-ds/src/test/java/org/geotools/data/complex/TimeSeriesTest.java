@@ -66,7 +66,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @since 2.4
  */
 public class TimeSeriesTest extends TestCase {
-    private static final Logger LOGGER = Logger.getLogger(TimeSeriesTest.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(TimeSeriesTest.class.getPackage()
             .getName());
 
     private static final String AWNS = "http://brs.gov.au/awdip/0.2";

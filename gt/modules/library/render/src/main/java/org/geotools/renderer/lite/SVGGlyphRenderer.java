@@ -40,7 +40,7 @@ public class SVGGlyphRenderer implements GlyphRenderer {
     
     private static final java.util.List formats =  java.util.Collections.unmodifiableList(java.util.Arrays.asList(new String[]{"image/svg"}));
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
     
  //   static {
         // do register our xml reader wrapper against batik so that we can use

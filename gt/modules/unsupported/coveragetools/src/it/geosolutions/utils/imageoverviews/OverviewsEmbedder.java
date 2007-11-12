@@ -223,8 +223,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 	private String scaleAlgorithm;
 
 	/** Logger for this class. */
-	private final static Logger LOGGER = Logger
-			.getLogger(OverviewsEmbedder.class.toString());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(OverviewsEmbedder.class.toString());
 
 	/** Default number of resolution steps.. */
 	public final int DEFAULT_RESOLUTION_STEPS = 5;

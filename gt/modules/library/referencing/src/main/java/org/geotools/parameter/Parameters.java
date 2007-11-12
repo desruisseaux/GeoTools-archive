@@ -42,6 +42,7 @@ import org.opengis.parameter.InvalidParameterTypeException;
 
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -339,7 +340,7 @@ public class Parameters {
             final LogRecord record = new LogRecord(Level.FINE, "Axis length mismatch.");
             record.setSourceClassName(Parameters.class.getName());
             record.setSourceMethodName("ensureSet");
-            Logger.getLogger("org.geotools.parameter").log(record);
+            Logging.getLogger("org.geotools.parameter").log(record);
         }
         return true;
     }

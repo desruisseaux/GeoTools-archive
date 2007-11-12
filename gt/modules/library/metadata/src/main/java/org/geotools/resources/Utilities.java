@@ -19,7 +19,7 @@ package org.geotools.resources;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -206,7 +206,7 @@ compare:for (int i=0; i<c1.length; i++) {
         record.setLevel(Level.FINER);
         record.setSourceClassName (classe.getName());
         record.setSourceMethodName(method);
-        Logger.getLogger(paquet).log(record);
+        Logging.getLogger(paquet).log(record);
     }
 
     /**

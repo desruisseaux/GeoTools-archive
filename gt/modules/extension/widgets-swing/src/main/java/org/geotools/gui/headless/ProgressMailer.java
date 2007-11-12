@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 // Formatting
@@ -44,6 +43,7 @@ import javax.mail.internet.AddressException;
 // Geotools dependencies
 import org.geotools.util.ProgressListener;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -206,7 +206,7 @@ public class ProgressMailer implements ProgressListener {
             warning.setSourceClassName(ProgressMailer.class.getName());
             warning.setSourceMethodName(method);
             warning.setThrown(exception);
-            Logger.getLogger("org.geotools.gui.progress").log(warning);
+            Logging.getLogger("org.geotools.gui.progress").log(warning);
         }
     }
 

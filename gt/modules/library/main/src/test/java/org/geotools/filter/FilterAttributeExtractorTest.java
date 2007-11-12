@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class FilterAttributeExtractorTest extends TestCase {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Schema on which to preform tests */
     private static SimpleFeatureType testSchema = null;

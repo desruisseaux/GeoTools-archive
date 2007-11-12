@@ -42,8 +42,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
  */
 public abstract class ClassificationFunction extends DefaultExpression implements FunctionExpression {
 
-    protected static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-    .getLogger("org.geotools.filter.function");
+    protected static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter.function");
 
     /** function name **/
     String name;

@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  */
 public class ArcSDEOldStyleFiltersTest extends TestCase {
     /** package logger */
-    private static Logger LOGGER = Logger.getLogger(ArcSDEOldStyleFiltersTest.class.getPackage()
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEOldStyleFiltersTest.class.getPackage()
                                                                                 .getName());
 
     /** DOCUMENT ME! */

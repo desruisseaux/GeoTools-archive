@@ -44,7 +44,7 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class ArcSDERasterFormat extends AbstractGridFormat implements Format {
 
-	protected static final Logger LOGGER = Logger.getLogger(ArcSDERasterFormat.class.getPackage().getName());
+	protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDERasterFormat.class.getPackage().getName());
 	
 	/**
 	 * Creates an instance and sets the metadata.

@@ -63,7 +63,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDataStore {
     /** The logger for the mysql module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
     private String XCoordColumnName = null;
 

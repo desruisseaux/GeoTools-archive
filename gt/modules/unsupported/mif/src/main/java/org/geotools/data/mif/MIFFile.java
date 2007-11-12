@@ -125,7 +125,7 @@ public class MIFFile {
     private static final String DEFAULT_PEN = "Pen (1,2,0)";
     private static final String DEFAULT_BRUSH = "Brush (2,16777215,16777215)";
     private static final String DEFAULT_SYMBOL = "Symbol (34,0,12)";
-    private static Logger LOGGER = Logger.getLogger(
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.mif.MIFFile");
 
     // Header information

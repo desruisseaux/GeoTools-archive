@@ -27,7 +27,7 @@ import org.geotools.caching.spatialindex.Storage;
 
 public class BufferedDiskStorage implements Storage {
     public final static String BUFFER_SIZE_PROPERTY = "BufferedDiskStorage.BufferSize";
-    protected static Logger logger = Logger.getLogger("org.geotools.caching.spatialindex.store");
+    protected static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.caching.spatialindex.store");
     private DiskStorage storage;
     LinkedHashMap<NodeIdentifier, BufferEntry> buffer;
     int buffer_size;

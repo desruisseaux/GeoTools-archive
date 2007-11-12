@@ -64,7 +64,7 @@ public class DbaseFileHeader {
   
   private int largestFieldSize = 0;
   
-  private Logger logger = Logger.getLogger("org.geotools.data.shapefile");
+  private Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
   
   /**
    * Class for holding the information assicated with a record.

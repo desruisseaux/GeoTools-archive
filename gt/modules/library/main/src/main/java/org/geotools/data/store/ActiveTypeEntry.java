@@ -95,7 +95,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public abstract class ActiveTypeEntry implements TypeEntry {
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.store");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.store");
     
     /**
      * Remember parent.

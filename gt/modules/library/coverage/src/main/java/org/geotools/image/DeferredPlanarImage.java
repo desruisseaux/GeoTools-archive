@@ -102,7 +102,7 @@ public final class DeferredPlanarImage extends PlanarImage
     /**
      * The logger for information messages.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.image");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.image");
 
     /**
      * The thickness (in pixels) of the box to draw around deferred tiles, or 0 for disabling

@@ -31,6 +31,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.geotools.factory.Hints;
+import org.geotools.util.logging.Logging;
 import org.hsqldb.jdbc.jdbcDataSource;
 import org.opengis.referencing.FactoryException;
 
@@ -135,7 +136,7 @@ public class HsqlEpsgDatabase {
      */
     private static void generateData(javax.sql.DataSource dataSource) throws SQLException {
         Connection connection = dataSource.getConnection();
-        Logger.getLogger("org.geotools.referencing.factory").config(
+        Logging.getLogger("org.geotools.referencing.factory").config(
                         "Creating cached EPSG database."); // TODO: localize
         final Statement statement = connection.createStatement();
         try {

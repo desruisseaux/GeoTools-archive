@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  */
 public class GeoMediaAttributeIO implements AttributeIO {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.geomedia");
 
     // geometry adpater

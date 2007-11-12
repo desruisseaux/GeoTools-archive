@@ -42,8 +42,7 @@ import org.xml.sax.SAXException;
  */
 public class TestFilterHandler implements ContentHandler, FilterHandler {
 	/** Standard logging class */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.defaultcore");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.defaultcore");
 
 	/** Local tracking methods to deal with incoming XML stream */
 	/** Tracks tag we are currently inside */

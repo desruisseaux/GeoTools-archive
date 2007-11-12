@@ -209,7 +209,7 @@ public class Encoder {
 
         if (logger == null) {
             //create a default
-            logger = Logger.getLogger("org.geotools.xml");
+            logger = org.geotools.util.logging.Logging.getLogger("org.geotools.xml");
             context.registerComponentInstance(logger);
         }
 

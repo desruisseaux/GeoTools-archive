@@ -131,7 +131,7 @@ public class CoverageScaler extends ProgressManager implements Runnable,
 	private int numFiles;
 
 	/** Default Logger * */
-	private final static Logger LOG = Logger.getLogger(CoverageScaler.class
+	private final static Logger LOG = org.geotools.util.logging.Logging.getLogger(CoverageScaler.class
 			.toString());
 
 	/** Program Version */

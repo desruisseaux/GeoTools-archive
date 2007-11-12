@@ -57,7 +57,7 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class GeometryBuilderTest extends TestCase {
     /** DOCUMENT ME! */
-    static Logger LOGGER = Logger.getLogger(GeometryBuilderTest.class.getPackage()
+    static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeometryBuilderTest.class.getPackage()
                                                                      .getName());
 
     /** DOCUMENT ME! */

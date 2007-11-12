@@ -90,7 +90,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  */
 public class PostgisFeatureStore extends JDBCFeatureStore {
     /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
     /** Well Known Text writer (from JTS). */
     protected static WKTWriter geometryWriter = new WKTWriter();

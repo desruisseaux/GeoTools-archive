@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // Geotools dependencies
 import org.geotools.util.Version;
@@ -275,8 +274,8 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
              * we will attempt to rebuild the whole database. Note: "createBackingStore" is the
              * public method that invoked this method, so we use it for the logging message.
              */
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER, ThreadedHsqlEpsgFactory.class,
-                    "createBackingStore", exception);
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER,
+                    ThreadedHsqlEpsgFactory.class, "createBackingStore", exception);
         }
         delete(directory);
     }
@@ -318,7 +317,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
              * a full SQL statement. For this plugin however, we have compressed "INSERT
              * INTO" statements using Compactor class in this package.
              */
-            Logger.getLogger(LOGGER).log(Logging.format(Level.INFO,
+            org.geotools.util.logging.Logging.getLogger(LOGGER).log(Logging.format(Level.INFO,
                     LoggingKeys.CREATING_CACHED_EPSG_DATABASE_$1, VERSION));
             final Statement statement = connection.createStatement();
             try {

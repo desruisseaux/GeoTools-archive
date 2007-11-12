@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class DB2NullFIDMapper extends NullFIDMapper {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
     private int currentFID = 1;
 

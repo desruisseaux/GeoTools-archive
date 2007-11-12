@@ -47,8 +47,7 @@ import com.esri.sde.sdk.pe.PeFactory;
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     /** package's logger */
-    protected static final Logger LOGGER = Logger
-            .getLogger(ArcSDEDataStoreFactory.class.getPackage().getName());
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEDataStoreFactory.class.getPackage().getName());
     
     /** friendly factory description */
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x and 9.x";

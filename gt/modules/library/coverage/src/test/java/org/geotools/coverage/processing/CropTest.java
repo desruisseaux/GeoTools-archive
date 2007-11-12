@@ -38,6 +38,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -57,8 +58,7 @@ public class CropTest extends GridCoverageTest {
 	/**
 	 * The logger for trace informations in this test suite.
 	 */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.coverage.grid");
+	private final static Logger LOGGER = Logging.getLogger("org.geotools.coverage.grid");
 
 	/**
 	 * {@code true} if the result should be displayed in windows during test
@@ -103,8 +103,7 @@ public class CropTest extends GridCoverageTest {
 	 */
 	public static void main(String[] args) {
 		SHOW = true;
-		org.geotools.util.logging.Logging.GEOTOOLS
-				.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
+		Logging.GEOTOOLS.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
 		junit.textui.TestRunner.run(suite());
 	}
 

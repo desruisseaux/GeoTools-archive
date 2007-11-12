@@ -18,7 +18,6 @@ package org.geotools.util;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
-import java.util.logging.Logger;
 import org.geotools.util.logging.Logging;
 
 
@@ -104,6 +103,6 @@ final class WeakCollectionCleaner extends Thread {
                 // keep the same behaviour as if assertions were turned off.
             }
         }
-        Logger.getLogger(LOGGER).severe("Daemon stopped."); // Should never happen.
+        Logging.getLogger(LOGGER).severe("Daemon stopped."); // Should never happen.
     }
 }

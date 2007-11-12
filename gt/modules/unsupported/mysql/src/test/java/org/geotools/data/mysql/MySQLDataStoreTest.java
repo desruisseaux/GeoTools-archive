@@ -74,7 +74,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  */
 public class MySQLDataStoreTest extends TestCase {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.postgis");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.postgis");
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();

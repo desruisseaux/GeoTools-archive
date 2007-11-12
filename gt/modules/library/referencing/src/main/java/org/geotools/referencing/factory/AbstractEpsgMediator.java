@@ -28,6 +28,7 @@ import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.logging.Logging;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
@@ -49,7 +50,7 @@ public abstract class AbstractEpsgMediator extends AbstractAuthorityMediator {
      * The default priority level for this factory.
      */
     public static final int PRIORITY = NORMAL_PRIORITY - 10;
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.referencing.factory");
 
     protected DataSource datasource;
     

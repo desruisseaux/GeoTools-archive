@@ -242,7 +242,7 @@ public interface Action {
                 // WARNNING: deep copy
                 feature = LenientBuilder.copy( f );
 			} catch (IllegalAttributeException e) {
-				Logger.getLogger("org.geotools.data.wfs").warning("Failed to duplicate feature:"+f);
+				org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").warning("Failed to duplicate feature:"+f);
 				feature=f;
 			}
 			this.feature=feature;

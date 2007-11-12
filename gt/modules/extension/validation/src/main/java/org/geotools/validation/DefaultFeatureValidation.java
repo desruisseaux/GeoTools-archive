@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  */
 public class DefaultFeatureValidation implements FeatureValidation {
     /** The logger for the validation module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.validation");
 
     /** User's Name of this validation test. */

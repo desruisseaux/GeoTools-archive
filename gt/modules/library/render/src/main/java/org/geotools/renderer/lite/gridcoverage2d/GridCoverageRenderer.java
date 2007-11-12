@@ -121,8 +121,7 @@ public final class GridCoverageRenderer {
 	private final static Crop coverageCropFactory = new Crop();
 
 	/** Logger. */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.rendering");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
 	static {
 

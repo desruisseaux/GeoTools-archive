@@ -21,8 +21,7 @@ import org.geotools.filter.FunctionExpression;
 
 public class ClassificationFunctionTest extends FunctionTestSupport {
     
-    protected static final Logger LOGGER = Logger
-        .getLogger("org.geotools.filter");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
     
     public ClassificationFunctionTest(String testName) {
         super(testName);

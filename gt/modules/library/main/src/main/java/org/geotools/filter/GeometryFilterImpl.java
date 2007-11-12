@@ -64,7 +64,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     implements GeometryFilter {
     /** Class logger */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     protected GeometryFilterImpl(FilterFactory factory) {
     	super(factory);

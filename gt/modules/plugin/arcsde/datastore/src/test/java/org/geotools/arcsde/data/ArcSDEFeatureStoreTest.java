@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class ArcSDEFeatureStoreTest extends TestCase {
     /** package logger */
-    private static Logger LOGGER = Logger.getLogger(ArcSDEFeatureStoreTest.class.getPackage()
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEFeatureStoreTest.class.getPackage()
                                                                                 .getName());
 
     /** DOCUMENT ME! */

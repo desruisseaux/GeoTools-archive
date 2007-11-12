@@ -148,6 +148,9 @@ public class TestData implements Runnable {
         try {
             return Boolean.getBoolean(name);
         } catch (SecurityException exception) {
+            // Note: we use Java Logger instead of Geotools Logging because this module
+            // do not depends on the module that defines Logging. This class is used for
+            // test purpose only anyway, so it should not be an issue.
             Logger.getLogger("org.geotools").warning(exception.getLocalizedMessage());
             return false;
         }

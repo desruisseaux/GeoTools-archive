@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  */
 public class SubHandlerPolygon extends SubHandler {
     /** The logger for the GML module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.gml");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gml");
     protected static com.vividsolutions.jts.algorithm.CGAlgorithms cga = new com.vividsolutions.jts.algorithm.RobustCGAlgorithms();
 
     /** Factory for creating the Polygon geometry. */

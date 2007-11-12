@@ -135,7 +135,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * 
  */
 public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, ExpressionVisitor {
-		private static final Logger logger=Logger.getLogger("org.geotools.filter");
+		private static final Logger logger=org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
         
         /**
          * The stack holding the bits of the filter that are not processable

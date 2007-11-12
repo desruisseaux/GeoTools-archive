@@ -41,7 +41,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  */
 public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
     /** A logger for logging */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geomedia");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geomedia");
 
     /** DOCUMENT ME! */
     private GeoMediaConnectionParam[] mConnectionParams = null;

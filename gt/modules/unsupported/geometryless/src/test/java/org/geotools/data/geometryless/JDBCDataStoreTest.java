@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class JDBCDataStoreTest extends TestCase {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     //private static GeometryFactory geomFac = new GeometryFactory();

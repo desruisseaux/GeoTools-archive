@@ -82,7 +82,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class AbstractDataStore implements DataStore {
     /** The logger for the filter module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
 
     /** Manages listener lists for FeatureSource implementation */
     public FeatureListenerManager listenerManager = new FeatureListenerManager();

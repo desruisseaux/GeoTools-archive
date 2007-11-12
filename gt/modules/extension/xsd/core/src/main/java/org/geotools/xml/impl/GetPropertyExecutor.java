@@ -34,7 +34,7 @@ public class GetPropertyExecutor implements BindingWalker.Visitor {
     /**
      * logger
      */
-    static Logger LOGGER = Logger.getLogger("org.geotools.xml");
+    static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.xml");
 
     /** parent + child objects **/
     Object parent;

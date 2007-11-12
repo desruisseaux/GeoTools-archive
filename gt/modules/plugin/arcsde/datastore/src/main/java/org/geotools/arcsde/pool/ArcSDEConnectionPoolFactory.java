@@ -36,7 +36,7 @@ import org.geotools.data.DataSourceException;
  */
 public class ArcSDEConnectionPoolFactory {
     /** package logger */
-    private static Logger LOGGER = Logger.getLogger(ArcSDEConnectionPoolFactory.class.getPackage()
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEConnectionPoolFactory.class.getPackage()
             .getName());
 
     /** singleton pool factory */

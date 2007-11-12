@@ -43,8 +43,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @source $URL$
  */
 public class ColorBrewer {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.brewer.color");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.brewer.color");
     public static final PaletteType ALL = new PaletteType(true, true, "ALL");
     public static final PaletteType SUITABLE_RANGED = new PaletteType(true, false);
     public static final PaletteType SUITABLE_UNIQUE = new PaletteType(false, true);

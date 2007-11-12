@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class DefaultTransaction implements Transaction {
     /** The logger for the data module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
 
     /** Records State by key */
     Map stateLookup = new HashMap();

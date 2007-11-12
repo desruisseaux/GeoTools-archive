@@ -48,6 +48,7 @@ import org.opengis.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -69,7 +70,7 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
     /**
      * The logger for grid coverage operations.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.coverage.grid");
+    public static final Logger LOGGER = Logging.getLogger("org.geotools.coverage.grid");
 
     /**
      * Sources grid coverage, or {@code null} if none. This information is lost during

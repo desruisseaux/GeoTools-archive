@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
@@ -48,6 +47,7 @@ import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.matrix.Matrix2;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -541,7 +541,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
              * know if this point is valid. Otherwise, an exception is thrown.
              */
             if (MASK_NON_CONVERGENCE) {
-                Logger.getLogger("org.geotools.gc").fine("No convergence");
+                Logging.getLogger("org.geotools.gc").fine("No convergence");
                 if (bestX>=0 && bestX<width && bestY>=0 && bestY<height) {
                     target.x = bestX;
                     target.y = bestY;

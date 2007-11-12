@@ -53,7 +53,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 public class FIDFeatureReader implements FeatureReader {
     /** The logger for the data module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     private final AttributeReader attributeReader;
     private final SimpleFeatureType schema;
     private final FIDReader fidReader;

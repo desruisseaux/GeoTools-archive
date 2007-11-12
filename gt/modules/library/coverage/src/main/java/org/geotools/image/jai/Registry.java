@@ -20,7 +20,6 @@ package org.geotools.image.jai;
 import java.util.List;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.awt.image.renderable.RenderedImageFactory;
 
@@ -164,6 +163,6 @@ public final class Registry {
     private static void log(final String method, final LogRecord record) {
         record.setSourceClassName(Registry.class.getName());
         record.setSourceMethodName(method);
-        Logger.getLogger("org.geotools.image").log(record);
+        org.geotools.util.logging.Logging.getLogger("org.geotools.image").log(record);
     }
 }

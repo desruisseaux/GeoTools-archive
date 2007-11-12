@@ -120,7 +120,7 @@ import java.util.logging.Logger;
  */
 public class LogicSAXParser {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** factory for creating filters. */
     private FilterFactory ff;

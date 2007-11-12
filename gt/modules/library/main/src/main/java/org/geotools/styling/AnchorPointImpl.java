@@ -37,8 +37,7 @@ import org.opengis.util.Cloneable;
 public class AnchorPointImpl extends AbstractGTComponent implements AnchorPoint,
     Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.core");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private Expression anchorPointX = null;
     private Expression anchorPointY = null;

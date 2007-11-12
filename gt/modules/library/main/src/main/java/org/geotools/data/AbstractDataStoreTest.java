@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  */
 public abstract class AbstractDataStoreTest extends DataTestCase {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.hsql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.hsql");
     DataStore data;
 
     public AbstractDataStoreTest(String arg0) {

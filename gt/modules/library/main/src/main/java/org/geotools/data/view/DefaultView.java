@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class DefaultView implements FeatureSource {
 
     /** Shared package logger */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.view");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.view");
 
     /** FeatureSource being served up */
     protected FeatureSource source;

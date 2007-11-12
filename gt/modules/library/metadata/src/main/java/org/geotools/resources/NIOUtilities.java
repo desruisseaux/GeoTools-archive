@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -106,6 +106,6 @@ public class NIOUtilities {
         String message = "Error attempting to close a mapped byte buffer : " + buffer.getClass().getName()
                        + "\n JVM : " + System.getProperty("java.version")
                        + ' '         + System.getProperty("java.vendor");
-        Logger.getLogger("org.geotools.io").log(Level.SEVERE, message, e);
+        Logging.getLogger("org.geotools.io").log(Level.SEVERE, message, e);
     }
 }

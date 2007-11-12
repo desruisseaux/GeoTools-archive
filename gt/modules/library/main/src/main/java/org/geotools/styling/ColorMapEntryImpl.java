@@ -29,7 +29,7 @@ import org.opengis.filter.expression.Expression;
  */
 public class ColorMapEntryImpl extends AbstractGTComponent
     implements ColorMapEntry {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("org.geotools.core");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private static final FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
     private Expression quantity;
     private Expression opacity;

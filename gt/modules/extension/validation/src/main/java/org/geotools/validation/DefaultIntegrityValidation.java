@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class DefaultIntegrityValidation implements IntegrityValidation {
     /** The logger for the validation module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.validation");
 
     /** User's Name of this integrity test. */

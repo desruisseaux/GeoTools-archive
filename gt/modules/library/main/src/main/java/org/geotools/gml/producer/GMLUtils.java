@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 final class GMLUtils {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
     "org.geotools.gml.producer");
     
     /** Internal representation of URL used to represent GML */

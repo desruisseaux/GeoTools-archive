@@ -38,7 +38,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  */
 public class MySQLConnectionFactory {
     /** Standard logging instance */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.mysql");
 
     /** Creates Mysql-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";

@@ -57,7 +57,7 @@ import java.util.logging.Logger;
  */
 public class DefaultFIDMapperFactory implements FIDMapperFactory {
     /** The logger for the filter module. */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");
     protected boolean returningTypedFIDMapper = true;
 

@@ -41,7 +41,7 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 
 	private WorldImageReader wiReader;
 
-	private Logger logger = Logger.getLogger(WorldImageReaderTest.class
+	private Logger logger = org.geotools.util.logging.Logging.getLogger(WorldImageReaderTest.class
 			.toString());
 
 	/**

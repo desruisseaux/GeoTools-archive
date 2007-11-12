@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class NodeCache extends LinkedHashMap {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.index.rtree");
     private final int maxElements;
 

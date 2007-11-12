@@ -87,7 +87,7 @@ public class ShapeRendererTest extends TestCase {
     private SimpleFeature sf;
 
     protected void setUp() throws Exception {
-        Logger.getLogger("org.geotools").setLevel(Level.FINE);
+        org.geotools.util.logging.Logging.getLogger("org.geotools").setLevel(Level.FINE);
         File shp = new File(TestData.url(Rendering2DTest.class, "theme1.shp")
                 .getFile());
         File shx = new File(TestData.url(Rendering2DTest.class, "theme1.shx")

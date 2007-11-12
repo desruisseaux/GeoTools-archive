@@ -171,8 +171,7 @@ public final class StreamingRenderer implements GTRenderer {
 	private static final double TOLERANCE = 1e-6;
 
 	/** The logger for the rendering module. */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.rendering");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
 	int error = 0;
 

@@ -100,7 +100,7 @@ import org.opengis.filter.Filter;
  */
 public class AbstractDataStore2 implements DataStore {
     /** The logger for the data module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
 
     /**
      * Manages InProcess locks for FeatureLocking implementations.

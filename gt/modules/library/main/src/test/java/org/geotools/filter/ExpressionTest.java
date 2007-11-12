@@ -50,8 +50,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class ExpressionTest extends TestCase {
 	/** Standard logging instance */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.defaultcore");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.defaultcore");
 
 	/** Feature on which to preform tests */
 	private static SimpleFeature testFeature = null;

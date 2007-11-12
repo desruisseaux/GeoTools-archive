@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class HsqlDataStoreTest extends AbstractDataStoreTest {
 	private HsqlConnectionFactory connFactory;
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.hsql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.hsql");
 
     /**
      * Constructor for MemoryDataStoreTest.

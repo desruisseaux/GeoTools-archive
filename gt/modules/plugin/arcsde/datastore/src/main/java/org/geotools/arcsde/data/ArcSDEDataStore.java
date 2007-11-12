@@ -62,7 +62,7 @@ import java.util.logging.Logger;
  */
 public class ArcSDEDataStore extends AbstractDataStore {
     /** DOCUMENT ME! */
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEDataStore.class.getName());
 
     private static final String DEFAULT_NAMESPACE = "http://www.geotools.org/sde";
 

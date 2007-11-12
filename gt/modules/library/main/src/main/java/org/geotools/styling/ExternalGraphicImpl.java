@@ -36,8 +36,7 @@ import java.util.Map;
 public class ExternalGraphicImpl extends AbstractGTComponent
     implements ExternalGraphic, Symbol, Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.core");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private URL location = null;
     private String format = null;
     private String uri = null;

@@ -64,7 +64,7 @@ import org.opengis.filter.expression.PropertyName;
  */
 public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     private String layerQualifiedName;
 

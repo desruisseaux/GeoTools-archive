@@ -100,8 +100,7 @@ public class PyramidLayerBuilder extends ProgressManager implements Runnable,
 	}
 
 	/** Default Logger * */
-	private final static Logger LOGGER = Logger
-			.getLogger(PyramidLayerBuilder.class.toString());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(PyramidLayerBuilder.class.toString());
 
 	/** Program Version */
 	private final static String versionNumber = "0.2";

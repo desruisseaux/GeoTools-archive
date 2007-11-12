@@ -64,7 +64,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class DocumentWriter {
     /** DOCUMENT ME! */
-    public static final Logger logger = Logger.getLogger(
+    public static final Logger logger = org.geotools.util.logging.Logging.getLogger(
             "net.refractions.xml.write");
     private static Level level = Level.WARNING;
 

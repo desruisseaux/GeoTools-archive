@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  */
 public class DB2SQLBuilder extends GeoAPISQLBuilder {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
     private String tableSchema = null;
     private String tableName = null;

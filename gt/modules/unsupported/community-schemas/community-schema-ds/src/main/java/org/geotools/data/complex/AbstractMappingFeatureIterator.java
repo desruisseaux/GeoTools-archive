@@ -63,8 +63,7 @@ import org.opengis.filter.expression.Expression;
  */
 abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */{
 
-    private static final Logger LOGGER = Logger
-            .getLogger(AbstractMappingFeatureIterator.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(AbstractMappingFeatureIterator.class.getPackage()
                     .getName());
 
     /**

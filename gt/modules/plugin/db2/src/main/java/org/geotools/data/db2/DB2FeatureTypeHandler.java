@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class DB2FeatureTypeHandler extends FeatureTypeHandler {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
 
     // It is really nasty that we make a second copy of the DataStore in the subclass because

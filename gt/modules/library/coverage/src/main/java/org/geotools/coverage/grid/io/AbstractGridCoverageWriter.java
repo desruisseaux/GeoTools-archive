@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.geotools.factory.Hints;
+import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.GridCoverageWriter;
 
@@ -41,8 +42,7 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 
 	/** The {@link Logger} for this {@link AbstractGridCoverageWriter}. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.data.coverage.grid");
+	private final static Logger LOGGER = Logging.getLogger("org.geotools.data.coverage.grid");
 
 	/** the destination object where we will do the writing */
 	protected Object destination;

@@ -25,17 +25,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-
 import javax.naming.Name;
 import javax.sql.DataSource;
 
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 
-// Geotools Dependencies
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 
@@ -1312,7 +1308,7 @@ public final class Hints extends RenderingHints {
                 try {
                     Integer.parseInt(value.toString());
                 } catch (NumberFormatException e) {
-                    Logger.getLogger("org.geotools.factory").finer(e.toString());
+                    Logging.getLogger("org.geotools.factory").finer(e.toString());
                 }
             }
             return false;

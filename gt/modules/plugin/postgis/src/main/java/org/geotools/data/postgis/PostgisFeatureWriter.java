@@ -44,7 +44,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  */
 public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
 
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
     "org.geotools.data.jdbc");
 
     /** Well Known Text writer (from JTS). */

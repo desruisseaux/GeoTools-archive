@@ -52,6 +52,7 @@ import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.io.LineWriter;
 import org.geotools.io.TableWriter;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -90,7 +91,7 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
     /**
      * The logger for the {@link #getGridCoverage} method.
      */
-    static Logger LOGGER = Logger.getLogger("org.geotools.coverage.io");
+    static Logger LOGGER = Logging.getLogger("org.geotools.coverage.io");
 
     /**
      * The format name (e.g. "PNG" or "GeoTIFF"). This format name should

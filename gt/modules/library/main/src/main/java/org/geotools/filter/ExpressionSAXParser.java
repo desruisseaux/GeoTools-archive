@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class ExpressionSAXParser {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Factory to construct filters. */
     private FilterFactory ff;

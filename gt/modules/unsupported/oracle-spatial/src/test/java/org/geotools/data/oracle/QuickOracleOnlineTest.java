@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class QuickOracleOnlineTest extends DataTestCase {
     
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
     
     OracleDataStore data;
     ConnectionPool pool;

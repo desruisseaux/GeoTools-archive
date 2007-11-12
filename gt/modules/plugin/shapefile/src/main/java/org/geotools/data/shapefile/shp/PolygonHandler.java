@@ -198,7 +198,7 @@ public class PolygonHandler implements ShapeHandler {
     }
     // if for some reason, there is only one hole, we just reverse it and carry on.
     else if (holes.size() == 1 && shells.size() == 0) {
-      Logger.getLogger("org.geotools.data.shapefile").warning(
+      org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile").warning(
       "only one hole in this polygon record");
       return createMulti(
         JTSUtilities.reverseRing( (LinearRing) holes.get(0) )

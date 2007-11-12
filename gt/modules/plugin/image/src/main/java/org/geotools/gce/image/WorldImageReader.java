@@ -82,7 +82,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
 	/** Logger. */
-	private Logger LOGGER = Logger.getLogger("org.geotools.gce.image");
+	private Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.image");
 
 	private boolean wmsRequest;
 

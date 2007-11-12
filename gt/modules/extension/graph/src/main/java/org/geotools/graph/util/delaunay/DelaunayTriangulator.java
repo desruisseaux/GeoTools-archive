@@ -46,7 +46,7 @@ public class DelaunayTriangulator {
     public DelaunayNode temp1, temp2, temp3;
     private DelaunayNode[] nodes;
     private Vector triangleList;
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.graph");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.graph");
     
     /** Creates a new instance of delaunayTriangulator */
     public DelaunayTriangulator() {

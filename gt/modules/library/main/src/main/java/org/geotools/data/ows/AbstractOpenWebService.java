@@ -55,7 +55,7 @@ public abstract class AbstractOpenWebService {
     protected Specification[] specs;
     protected Specification specification;
     
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.ows");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.ows");
 
     /**
      * Set up the specifications used and retrieve the Capabilities document

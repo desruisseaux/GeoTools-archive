@@ -42,7 +42,7 @@ import org.opengis.filter.expression.Expression;
  */
 public class FilterToSQLTest extends TestCase {
     private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
-    private static Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
     
     private SimpleFeatureType integerFType;
     private SimpleFeatureType stringFType;

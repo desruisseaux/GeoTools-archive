@@ -79,7 +79,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class DB2DataStore extends JDBCDataStore implements DataStore{
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
 
     /**

@@ -381,7 +381,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         record.setSourceClassName(AuthorityCodes.class.getName());
         record.setSourceMethodName(method);
         record.setThrown(exception);
-        Logger.getLogger(LOGGER).log(record);        
+        org.geotools.util.logging.Logging.getLogger(LOGGER).log(record);        
     }
 
     /**

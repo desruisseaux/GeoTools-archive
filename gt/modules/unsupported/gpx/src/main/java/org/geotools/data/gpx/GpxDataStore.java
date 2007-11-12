@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class GpxDataStore extends AbstractDataStore {
     /** The logger for the GML Data Store */
-    static final Logger LOGGER = Logger.getLogger("org.geotools.data.gpx.GpxDataStore");
+    static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.gpx.GpxDataStore");
     
     public static final String TYPE_NAME_POINT = "waypoint";
     public static final String TYPE_NAME_TRACK = "track";

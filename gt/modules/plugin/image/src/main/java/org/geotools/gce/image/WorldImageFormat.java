@@ -107,8 +107,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	}
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.image");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.image");
 
 	/**
 	 * Format writing parameter. When writing a world image we need to provide

@@ -55,7 +55,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class XSISAXHandler extends DefaultHandler {
     // the logger -- should be used for debugging (assuming there are bugs LOL)
-    protected final static Logger logger = Logger.getLogger(
+    protected final static Logger logger = org.geotools.util.logging.Logging.getLogger(
             "net.refractions.xsi.sax");
 
     // the stack of handers representing a portion of the parse tree

@@ -42,7 +42,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
         try {
             comboCRS = new AuthorityCodesComboBox();
         } catch (FactoryRegistryException ex) {
-            Logger.getLogger(JMap2DInfoBar.class.getName()).log(Level.SEVERE, null, ex);
+            org.geotools.util.logging.Logging.getLogger(JMap2DInfoBar.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FactoryException ex) {
             Logger.getLogger(JMap2DInfoBar.class.getName()).log(Level.SEVERE, null, ex);
         }

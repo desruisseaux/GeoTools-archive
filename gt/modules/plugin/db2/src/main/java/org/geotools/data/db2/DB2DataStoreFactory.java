@@ -44,7 +44,7 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
     implements DataStoreFactorySpi {
     public static final String DRIVERNAME = "com.ibm.db2.jcc.DB2Driver";
 
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
 
     // The DB2 JDBC universal driver class.  isAvailable() uses this to

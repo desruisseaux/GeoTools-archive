@@ -84,7 +84,7 @@ import com.esri.sde.sdk.client.SeTable;
  */
 public class ArcSDEPyramidTest extends TestCase {
 
-    private static Logger LOGGER = Logger.getLogger("org.geotools.arcsde.gce");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.gce");
     private ArcSDEConnectionPool pool;
     private Properties conProps;
 

@@ -35,8 +35,9 @@ import org.opengis.referencing.ObjectFactory;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -68,7 +69,7 @@ public class ReferencingFactory extends AbstractFactory implements Factory {
     /**
      * The logger for event related to Geotools's factories.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory");
+    public static final Logger LOGGER = Logging.getLogger("org.geotools.referencing.factory");
 
     /**
      * A citation which contains only the title "All" in localized language. Used

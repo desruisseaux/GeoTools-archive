@@ -38,7 +38,7 @@ import org.geotools.test.TestData;
  * @version $Id$ Last Modified: $Date: 2003/11/26 22:57:45 $
  */
 public class SQLEncoderOracleTest extends TestCase {
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
     private static final FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
     private static final GeometryFactory geometryFactory = new GeometryFactory();
     private SQLEncoder encoder;

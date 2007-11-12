@@ -94,7 +94,7 @@ import java.util.logging.Logger;
  */
 public class SQLEncoderDB2 extends FilterToSQL{
 //	public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
-	    private static Logger LOGGER = Logger.getLogger("org.geotools.data.db2");
+	    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.db2");
 
 	    // Class to convert geometry value into a Well-known Text string	
 	    private static WKTWriter wktWriter = new WKTWriter();

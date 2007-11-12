@@ -37,7 +37,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 public class SQLEncoderHsql extends SQLEncoder
     implements org.geotools.filter.FilterVisitor {
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** To write geometry so postgis can read it. */
     private static WKTWriter wkt = new WKTWriter();

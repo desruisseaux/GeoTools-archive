@@ -61,7 +61,7 @@ public abstract class AbstractProcessor {
     /**
      * The logger for coverage processing operations.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.coverage.processing");
+    public static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.coverage.processing");
 
     /**
      * The logging level for reporting coverage operations.

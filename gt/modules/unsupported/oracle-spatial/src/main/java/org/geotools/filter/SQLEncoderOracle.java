@@ -71,7 +71,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class SQLEncoderOracle extends SQLEncoder {
 
     /** Logger - for logging */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter.SQLEncoderOracle");
 
     /** Contains filter type to SDO_RELATE mask type mappings */

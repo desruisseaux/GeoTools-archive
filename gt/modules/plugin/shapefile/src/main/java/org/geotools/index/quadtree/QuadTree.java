@@ -43,7 +43,7 @@ public class QuadTree {
     private static final double SPLITRATIO = 0.55d;
     
     private static final Logger LOGGER =
-        Logger.getLogger("org.geotools.index.quadtree");
+        org.geotools.util.logging.Logging.getLogger("org.geotools.index.quadtree");
     
     private Node root;
     private int numShapes;

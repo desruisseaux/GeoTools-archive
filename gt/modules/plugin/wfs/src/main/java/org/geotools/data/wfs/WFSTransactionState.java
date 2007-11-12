@@ -177,7 +177,7 @@ public class WFSTransactionState implements State {
                 if (action instanceof InsertAction) {
                     InsertAction insertAction = (InsertAction) action;
                     if (currentInsertIndex >= newFids.size()) {
-                        Logger.getLogger("org.geotools.data.wfs").severe(
+                        org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").severe(
                                 "Expected more fids to be returned by " + "TransactionResponse!");
                         break;
                     }

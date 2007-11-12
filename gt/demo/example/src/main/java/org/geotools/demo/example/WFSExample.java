@@ -50,7 +50,7 @@ public class WFSExample {
 		}
 	}
 	public static void supressInfo(){
-		Logger.getLogger("org.geotools.gml").setLevel( Level.SEVERE );
+		org.geotools.util.logging.Logging.getLogger("org.geotools.gml").setLevel( Level.SEVERE );
 		Logger.getLogger("net.refractions.xml").setLevel( Level.SEVERE);
 	}
 	

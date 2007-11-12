@@ -98,7 +98,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     private static final int LOCK_DURATION = 3600 * 1000; // one hour
 
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
     String victim = null; // "testGetFeatureWriterRemoveAll";
 

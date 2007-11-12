@@ -25,7 +25,6 @@ import java.util.Comparator;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
-import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import java.awt.Component;
@@ -64,6 +63,7 @@ import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -226,7 +226,7 @@ public class RegisteredOperationBrowser extends JPanel {
                  * deal; just left some label blank. Log the exception with a low level, since
                  * this warning is not really important.
                  */
-                Logger.getLogger("org.geotools.gui.swing").log(Level.FINER,
+                Logging.getLogger("org.geotools.gui.swing").log(Level.FINER,
                                  exception.getLocalizedMessage(), exception);
             }
         }

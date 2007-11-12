@@ -445,8 +445,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             if (remarks == null) {
                 remarks = growable;
             } else if (!growable.isSubsetOf(remarks)) {
-                Logger.getLogger("org.geotools.referencing").log(Logging.format(
-                        Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
+                org.geotools.util.logging.Logging.getLogger("org.geotools.referencing").
+                        log(Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }
         /*

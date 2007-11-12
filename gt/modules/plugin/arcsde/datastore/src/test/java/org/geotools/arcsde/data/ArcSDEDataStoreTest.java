@@ -75,7 +75,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ArcSDEDataStoreTest extends TestCase {
     /** package logger */
-    private static Logger LOGGER = Logger.getLogger(ArcSDEDataStoreTest.class.getPackage()
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEDataStoreTest.class.getPackage()
                                                                              .getName());
 
     /** DOCUMENT ME! */

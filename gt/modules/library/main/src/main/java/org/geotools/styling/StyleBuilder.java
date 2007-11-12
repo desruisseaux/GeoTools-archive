@@ -40,7 +40,7 @@ import org.opengis.filter.expression.PropertyName;
  */
 public class StyleBuilder {
     private static final java.util.logging.Logger LOGGER =
-        java.util.logging.Logger.getLogger("org.geotools.styling");
+        org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
     public static final String LINE_JOIN_MITRE = "mitre";
     public static final String LINE_JOIN_ROUND = "round";
     public static final String LINE_JOIN_BEVEL = "bevel";

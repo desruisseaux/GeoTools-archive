@@ -44,7 +44,7 @@ import com.sun.org.apache.xml.internal.utils.URI.MalformedURIException;
  *
  */
 public abstract class AbstractGenerator {
-    static Logger logger = Logger.getLogger("org.geotools.xml");
+    static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.xml");
 
     /**
      * Package base

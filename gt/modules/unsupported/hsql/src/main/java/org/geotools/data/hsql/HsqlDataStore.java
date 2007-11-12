@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 	/** The logger for the hsql module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.hsql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.hsql");
 	private Connection connection;
 	private HsqlConnectionFactory hsqlConnFactory;
 	private boolean typeTableExists;

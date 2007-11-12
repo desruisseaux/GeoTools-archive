@@ -32,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  */
 public class AttributeBuilder {
-    private static final Logger LOGGER = Logger.getLogger(AttributeBuilder.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(AttributeBuilder.class.getPackage()
             .getName());
 
     /**

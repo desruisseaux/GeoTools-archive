@@ -109,7 +109,7 @@ public class SimpleFeatureBuilder {
 	/**
 	 * logger
 	 */
-    static Logger LOGGER = Logger.getLogger("org.geotools.feature");
+    static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.feature");
     
 	/**
 	 * factory

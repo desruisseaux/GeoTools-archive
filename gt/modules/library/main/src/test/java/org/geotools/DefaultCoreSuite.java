@@ -33,7 +33,7 @@ import org.geotools.styling.TextSymbolTest;
  * @source $URL$
  */                                
 public class DefaultCoreSuite extends TestCase {
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     public DefaultCoreSuite(java.lang.String testName) {
         super(testName);
     }        

@@ -61,7 +61,7 @@ import org.opengis.filter.Filter;
 public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore {
     
    /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.jdbc");
 
 /** Current Transaction this FeatureSource is opperating against */

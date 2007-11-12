@@ -56,6 +56,7 @@ import com.sun.media.jai.util.ImageUtil;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -114,7 +115,7 @@ public class ImageWorker {
 	}
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger.getLogger("org.geotools.image");
+	private final static Logger LOGGER = Logging.getLogger("org.geotools.image");
 
 	/**
 	 * If {@link Boolean#FALSE FALSE}, image operators are not allowed to

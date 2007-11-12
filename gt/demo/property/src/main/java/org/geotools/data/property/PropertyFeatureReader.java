@@ -35,7 +35,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @version $Id
  */
 public class PropertyFeatureReader implements FeatureReader {
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.property");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.property");
     /** DOCUMENT ME! */
     PropertyAttributeReader reader;
 

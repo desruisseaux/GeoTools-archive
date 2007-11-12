@@ -55,7 +55,7 @@ public class QuadTree implements ISpatialIndex {
      * Defaults to orginial value picked in org.geotools.index.quadtree.QuadTree
      */
     protected static final double SPLITRATIO = 0.55d;
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.caching.quadtree");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.caching.quadtree");
 
     /**
      * First node of the tree, pointing recursively to all other nodes.

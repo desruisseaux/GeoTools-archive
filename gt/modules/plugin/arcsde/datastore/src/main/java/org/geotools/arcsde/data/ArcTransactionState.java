@@ -35,8 +35,7 @@ import com.esri.sde.sdk.client.SeException;
  * @version $Id$
  */
 class ArcTransactionState implements Transaction.State {
-	private static final Logger LOGGER = Logger
-			.getLogger(ArcTransactionState.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcTransactionState.class.getPackage().getName());
 
 	private ArcSDEPooledConnection connection;
 

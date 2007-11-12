@@ -38,7 +38,7 @@ public class IndexHeader {
     private static final String SIGNATURE = "SQT";
     private static final byte VERSION = 1;
     private static final byte[] RESERVED = { 0, 0, 0 };
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.index.quadtree");
     private byte byteOrder;
 

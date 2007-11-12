@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ShapefileDataStoreFactory
     implements FileDataStoreFactorySpi {
     
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.shapefile");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
     /**
      * url to the .shp file.
      */

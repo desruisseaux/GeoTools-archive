@@ -54,7 +54,7 @@ public class IndexedResourceBundle extends ResourceBundle {
     /**
      * The logger for reporting resources loading.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.resources");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.resources");
 
     /**
      * Maximum string length for text inserted into another text. This parameter is used by

@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class AreaFunctionTest extends TestCase {
 
       /** Standard logging instance */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter");
     /** Feature on which to preform tests */
     private static SimpleFeature testFeature = null;

@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version 1.0
  */
 public class GeoMediaDataStore extends JDBCDataStore {
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geomedia");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geomedia");
 
     /** Maps SQL Server SQL types to Java classes */
     private static final Map TYPE_MAPPINGS = new HashMap();

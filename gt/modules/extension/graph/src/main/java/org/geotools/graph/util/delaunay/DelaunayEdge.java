@@ -26,7 +26,7 @@ import org.geotools.graph.structure.line.XYNode;
  */
 public class DelaunayEdge extends BasicEdge{
     
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.graph");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.graph");
     Triangle faceA, faceB;
     
     /** Creates a new instance of DelaunayEdge */

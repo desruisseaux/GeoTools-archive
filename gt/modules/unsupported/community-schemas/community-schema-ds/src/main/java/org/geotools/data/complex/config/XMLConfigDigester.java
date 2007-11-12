@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class XMLConfigDigester {
     /** DOCUMENT ME!  */
-    private static final Logger LOGGER = Logger.getLogger(XMLConfigDigester.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(XMLConfigDigester.class.getPackage()
                                                                                .getName());
 
     /** Namespace URI for the ComplexDataStore configuration files */

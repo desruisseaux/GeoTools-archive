@@ -41,7 +41,7 @@ public class TestFilterHandler
 
 
     /** Standard logging class */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.defaultcore");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.defaultcore");
     
     
     /********************************************************

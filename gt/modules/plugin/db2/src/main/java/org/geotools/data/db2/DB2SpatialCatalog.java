@@ -79,7 +79,7 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class DB2SpatialCatalog {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
 
     /** A map of all the catalogs that have been created. */

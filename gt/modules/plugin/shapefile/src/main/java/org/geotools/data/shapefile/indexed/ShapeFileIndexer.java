@@ -54,7 +54,7 @@ import java.util.logging.Logger;
 public class ShapeFileIndexer {
     public static final String RTREE = "RTREE";
     public static final String QUADTREE = "QUADTREE";
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.shapefile");
 
     /**

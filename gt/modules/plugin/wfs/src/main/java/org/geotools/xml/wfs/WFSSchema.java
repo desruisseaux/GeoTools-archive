@@ -88,7 +88,7 @@ import org.geotools.xml.xsi.XSISimpleTypes;
  * @source $URL$
  */
 public class WFSSchema implements Schema {
-    static Logger logger = Logger.getLogger("net.refractions.xml.wfs");
+    static Logger logger = org.geotools.util.logging.Logging.getLogger("net.refractions.xml.wfs");
     private static Schema instance = new WFSSchema();
 
     /** WFS target namespace */

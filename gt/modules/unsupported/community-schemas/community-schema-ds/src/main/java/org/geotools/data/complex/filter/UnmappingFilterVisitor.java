@@ -108,7 +108,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @since 2.4
  */
 public class UnmappingFilterVisitor implements org.opengis.filter.FilterVisitor, ExpressionVisitor {
-    private static final Logger LOGGER = Logger.getLogger(UnmappingFilterVisitor.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(UnmappingFilterVisitor.class.getPackage()
             .getName());
 
     private FeatureTypeMapping mappings;

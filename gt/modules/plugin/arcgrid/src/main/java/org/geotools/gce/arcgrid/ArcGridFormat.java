@@ -45,8 +45,7 @@ public final class ArcGridFormat extends AbstractGridFormat implements Format {
 	 * Logger.
 	 * 
 	 */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.arcgrid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
 
 	/** Indicates whether the arcgrid data is in GRASS format */
 	public static final DefaultParameterDescriptor GRASS = new DefaultParameterDescriptor(

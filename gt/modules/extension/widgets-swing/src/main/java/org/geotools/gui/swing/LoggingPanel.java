@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 
 // Resources
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -190,7 +191,7 @@ public class LoggingPanel extends JPanel {
     public LoggingPanel(Logger logger) {
         this();
         if (logger == null) {
-            logger = Logger.getLogger("");
+            logger = Logging.getLogger("");
         }
         logger.addHandler(getHandler());
         this.logger = logger;

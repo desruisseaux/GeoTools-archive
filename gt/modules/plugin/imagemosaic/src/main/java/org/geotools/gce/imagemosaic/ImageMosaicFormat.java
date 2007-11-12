@@ -104,8 +104,7 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 		Format {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.imagemosaic");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.imagemosaic");
 
 	/** Control the type of the final mosaic. */
 	public static final DefaultParameterDescriptor FADING = new DefaultParameterDescriptor(

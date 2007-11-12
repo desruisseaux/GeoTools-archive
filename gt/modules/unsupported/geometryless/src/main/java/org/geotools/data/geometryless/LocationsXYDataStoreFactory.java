@@ -63,7 +63,7 @@ import org.geotools.factory.AbstractFactory;
 public class LocationsXYDataStoreFactory extends AbstractFactory implements
         org.geotools.data.DataStoreFactorySpi {
 
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
     private static final String GEOM_NAME_DEFAULT = "the_geom";
 

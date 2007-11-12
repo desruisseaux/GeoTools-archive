@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -351,7 +350,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
             if (remarks == null) {
                 remarks = growable;
             } else {
-                Logger.getLogger("org.geotools.referencing").log(
+                org.geotools.util.logging.Logging.getLogger("org.geotools.referencing").log(
                                  Logging.format(Level.WARNING, LoggingKeys.LOCALES_DISCARTED));
             }
         }

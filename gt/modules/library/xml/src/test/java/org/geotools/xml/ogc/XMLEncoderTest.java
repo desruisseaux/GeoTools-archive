@@ -65,7 +65,7 @@ import org.w3c.dom.NodeList;
 public class XMLEncoderTest extends TestCase {
 
     /** Standard logging instance */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter");
     
     /** Constructor with test name. */

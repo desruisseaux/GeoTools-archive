@@ -15,8 +15,7 @@ import java.util.logging.Logger;
 public abstract class AbstractLiteIterator implements PathIterator {
 
 	/** The logger for the rendering module. */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.rendering");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
 	protected double[] dcoords = new double[2];
 

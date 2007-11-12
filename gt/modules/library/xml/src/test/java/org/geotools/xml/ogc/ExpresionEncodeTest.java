@@ -41,7 +41,7 @@ import org.geotools.xml.filter.FilterSchema;
  */
 public class ExpresionEncodeTest extends TestCase {
     /** Standard logging instance */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter");
     /** Constructor with test name. */
     String dataFolder = "";

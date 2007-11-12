@@ -130,7 +130,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *         http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/src/org/geotools/renderer/shape/ShapefileRenderer.java $
  */
 public class ShapefileRenderer implements GTRenderer {
-    public static final Logger LOGGER = Logger.getLogger("org.geotools.renderer.shape");
+    public static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.renderer.shape");
 
     /** Tolerance used to compare doubles for equality */
     private static final double TOLERANCE = 1e-6;

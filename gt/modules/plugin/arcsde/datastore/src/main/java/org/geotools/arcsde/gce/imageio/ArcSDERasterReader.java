@@ -65,7 +65,7 @@ public class ArcSDERasterReader extends ImageReader {
         supportedImageTypes.add(ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_INT_ARGB));
     }
     
-    private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
+    private final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(this.getClass().toString());
     private final ArcSDEPyramid _rasterPyramid;
     private final Dimension _tileSize;
     private final String _rasterTable, _rasterColumn;

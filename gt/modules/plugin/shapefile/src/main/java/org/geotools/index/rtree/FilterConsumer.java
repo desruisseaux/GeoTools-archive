@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  */
 public class FilterConsumer implements FilterVisitor {
-    private static Logger LOGGER = Logger.getLogger("org.geotools.index.rtree");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.index.rtree");
     private Envelope bounds = null;
     
     public Envelope getBounds() {

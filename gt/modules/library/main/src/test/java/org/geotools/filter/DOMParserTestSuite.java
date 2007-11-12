@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class DOMParserTestSuite extends TestSuite {
     
     /** Standard logging instance */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter");
 
     /** Schema on which to preform tests */

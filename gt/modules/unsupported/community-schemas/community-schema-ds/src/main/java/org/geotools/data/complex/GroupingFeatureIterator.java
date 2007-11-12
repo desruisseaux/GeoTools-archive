@@ -142,7 +142,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @since 2.4
  */
 class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
-    private static final Logger LOGGER = Logger.getLogger(GroupingFeatureIterator.class
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GroupingFeatureIterator.class
             .getPackage().getName());
 
     /**

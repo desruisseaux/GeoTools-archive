@@ -32,7 +32,7 @@ public abstract class AbstractGeoResource implements GeoResource {
 	/**
 	 * logger
 	 */
-	protected static Logger logger = Logger.getLogger( "org.geotools.catalog" );
+	protected static Logger logger = org.geotools.util.logging.Logging.getLogger( "org.geotools.catalog" );
 	
 	/**
 	 * Error message

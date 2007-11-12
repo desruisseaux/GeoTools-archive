@@ -56,7 +56,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
  */
 public class GeoMediaConnectionFactory {
     /** DOCUMENT ME! */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geomedia");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geomedia");
 
     /** Map that contains Connection Pool Data Sources */
     private static Map mDataSources = new HashMap();

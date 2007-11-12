@@ -36,7 +36,7 @@ import org.opengis.util.Cloneable;
 public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
     /** The logger for the default core module. */
 
-    //private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    //private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private Expression fontFamily = null;
     private Expression fontSize = null;
     private Expression fontStyle = null;

@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
@@ -32,6 +31,7 @@ import javax.imageio.metadata.IIOInvalidTreeException;
 import org.w3c.dom.Node;
 
 import org.geotools.util.logging.LoggedFormat;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.OptionalDependencies;
@@ -348,7 +348,7 @@ public class GeographicMetadata extends IIOMetadata {
         } else if (owner instanceof GeographicImageWriter) {
             ((GeographicImageWriter) owner).warningOccurred(record);
         } else {
-            Logger.getLogger("org.geotools.image.io.metadata").log(record);
+            Logging.getLogger("org.geotools.image.io.metadata").log(record);
         }
     }
 

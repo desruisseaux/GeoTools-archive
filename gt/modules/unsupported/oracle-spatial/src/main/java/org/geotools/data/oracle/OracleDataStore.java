@@ -83,7 +83,7 @@ import com.vividsolutions.jts.io.ParseException;
  * @source $URL$
  */
 public class OracleDataStore extends JDBCDataStore {
-     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
+     private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle");
      private OracleAuthorityFactory af;
 
     /**

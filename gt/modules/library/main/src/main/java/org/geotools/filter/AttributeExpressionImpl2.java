@@ -34,7 +34,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
 public class AttributeExpressionImpl2 extends DefaultExpression
     implements AttributeExpression {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
 
     /** Holds all sub filters of this filter. */
     protected String attPath;

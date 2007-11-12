@@ -60,7 +60,7 @@ import org.opengis.filter.Filter;
 public class PostgisFeatureLocking extends PostgisFeatureStore
     implements FeatureLocking {
     /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.postgis");
     FeatureLock featureLock = FeatureLock.TRANSACTION;
 

@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class FeatureTypeStyleImpl extends AbstractGTComponent
     implements FeatureTypeStyle, Cloneable {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.styling");
     private java.util.List ruleList;
     private String featureTypeName = "Feature";

@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 class VersionedJdbcTransactionState extends JDBCTransactionState {
 
     /** The logger for the postgis module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
     private long revision;
 

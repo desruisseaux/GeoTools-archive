@@ -35,7 +35,7 @@ import com.esri.sde.sdk.client.SeException;
  */
 public class ArcSDEPooledConnection extends SeConnection {
 
-	private static final Logger LOGGER = Logger.getLogger(ArcSDEPooledConnection.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEPooledConnection.class.getPackage().getName());
 	
 	private ObjectPool pool;
 	

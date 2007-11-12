@@ -44,7 +44,7 @@ import org.geotools.data.DataSourceException;
  */
 public class ArcSDEConnectionPoolTest extends TestCase {
     /** DOCUMENT ME! */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.data.sde");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.sde");
 
     /** DOCUMENT ME! */
     private Map connectionParameters;

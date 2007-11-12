@@ -28,8 +28,7 @@ import org.geotools.filter.parser.ParseException;
  * @source $URL$
  */
 public class ExpressionBuilderTest extends FilterTestSupport {
-    protected static final Logger LOGGER = Logger
-    .getLogger("org.geotools.filter");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
     
     private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
     

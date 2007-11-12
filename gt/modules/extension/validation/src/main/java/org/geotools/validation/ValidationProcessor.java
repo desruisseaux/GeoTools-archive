@@ -104,7 +104,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @version $Id$
  */
 public class ValidationProcessor {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.validation");
 
     /** Magic key used to hold the place of any featureType */

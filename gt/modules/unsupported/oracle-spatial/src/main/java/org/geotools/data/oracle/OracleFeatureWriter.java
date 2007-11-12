@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version $Id$
  */
 public class OracleFeatureWriter extends JDBCTextFeatureWriter {
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle");
 	
 	GeometryConverter converter;
 	

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  */
 class Java2DMark {
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.rendering");
 
     /** Cross general path */

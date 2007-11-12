@@ -33,8 +33,7 @@ import org.opengis.coverage.grid.Format;
  */
 public final class ArcGridFormatFactory implements GridFormatFactorySpi {
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.arcgrid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
 
 	/**
 	 * Tells me if the coverage plugin to access Ascii grids is availaible or

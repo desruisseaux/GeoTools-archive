@@ -56,7 +56,7 @@ import com.esri.sde.sdk.client.SeTable;
  */
 public class ArcSDEJavaApiTest extends TestCase {
 	/** package logger */
-	private static Logger LOGGER = Logger.getLogger(ArcSDEJavaApiTest.class
+	private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEJavaApiTest.class
 			.getPackage().getName());
 
 	/** utility to load test parameters and build a datastore with them */

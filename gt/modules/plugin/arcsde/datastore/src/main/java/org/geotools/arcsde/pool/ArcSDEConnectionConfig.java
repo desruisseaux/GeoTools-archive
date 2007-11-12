@@ -37,8 +37,7 @@ public class ArcSDEConnectionConfig {
 	/**
 	 * Shared package's logger
 	 */
-	private static final Logger LOGGER = Logger
-			.getLogger(ArcSDEConnectionConfig.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEConnectionConfig.class.getPackage().getName());
 
 	/**
 	 * message of the exception thrown if a mandatory parameter is not supplied

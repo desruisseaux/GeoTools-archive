@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class BetweenTest extends TestCase {
     /** Standard logging instance */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter");
 
     public BetweenTest(java.lang.String testName) {

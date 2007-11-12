@@ -31,7 +31,7 @@ public abstract class AbstractService implements Service {
 	/**
 	 * Logger
 	 */
-	protected static Logger logger = Logger.getLogger( "org.geotools.catalog" );
+	protected static Logger logger = org.geotools.util.logging.Logging.getLogger( "org.geotools.catalog" );
 	
     /** 
      * parent catalog containing the service 

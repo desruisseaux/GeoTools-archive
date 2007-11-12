@@ -86,7 +86,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class GeometryEncoderSDE implements FilterVisitor {
     /** Standard java logger */
-    private static Logger log = Logger.getLogger("org.geotools.filter");
+    private static Logger log = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** DOCUMENT ME! */
     private static FilterCapabilities capabilities = new FilterCapabilities();

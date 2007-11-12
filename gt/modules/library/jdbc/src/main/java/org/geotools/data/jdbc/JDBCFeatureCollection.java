@@ -57,7 +57,7 @@ import org.opengis.util.ProgressListener;
  */
 public class JDBCFeatureCollection extends DefaultFeatureResults {
     /** The logger for the filter module. */
-//    private static final Logger LOGGER = Logger.getLogger(
+//    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
 //            "org.geotools.data.jdbc");
     public boolean isOptimized = false;
 

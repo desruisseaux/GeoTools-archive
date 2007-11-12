@@ -92,8 +92,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		GridCoverageWriter {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.gtopo30");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.gtopo30");
 
 	static {
 		// register new JAI operation

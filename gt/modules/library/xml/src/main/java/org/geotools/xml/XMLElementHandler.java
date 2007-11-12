@@ -46,7 +46,7 @@ public abstract class XMLElementHandler implements Serializable {
     /**
      * the logger -- should be used for debugging (assuming there are bugs LOL)
      */
-    protected final static Logger logger = Logger.getLogger(
+    protected final static Logger logger = org.geotools.util.logging.Logging.getLogger(
             "net.refractions.xml.element");
 
     /**

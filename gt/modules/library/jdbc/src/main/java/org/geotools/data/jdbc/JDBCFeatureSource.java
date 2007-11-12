@@ -75,7 +75,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class JDBCFeatureSource implements FeatureSource {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
     
     /** FeatureType being provided */
     private SimpleFeatureType featureType;

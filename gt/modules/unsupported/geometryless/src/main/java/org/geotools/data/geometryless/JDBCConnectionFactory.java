@@ -36,7 +36,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 public class JDBCConnectionFactory {
 
     /** Standard logging instance */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
     /** Creates configuration-driven JDBC driver class. */
     private String _driver = "";

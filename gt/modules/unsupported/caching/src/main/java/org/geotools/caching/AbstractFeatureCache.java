@@ -54,7 +54,7 @@ public abstract class AbstractFeatureCache implements FeatureCache, FeatureListe
 
     static {
         ff = new FilterFactoryImpl();
-        logger = Logger.getLogger("org.geotools.caching");
+        logger = org.geotools.util.logging.Logging.getLogger("org.geotools.caching");
         caps = new FilterCapabilities();
         caps.addType(Or.class);
         caps.addType(And.class);

@@ -141,7 +141,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	private String scaleAlgorithm;
 
 	/** Logger for this class. */
-	private final static Logger LOGGER = Logger.getLogger(PyramidBuilder.class
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(PyramidBuilder.class
 			.toString());
 
 	/** ImageIO caching behvaiour controller. */

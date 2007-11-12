@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class FileSystemPageStore extends PageStore {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.index.rtree");
     protected static final byte B_SHORT = (byte) 1;
     protected static final byte B_INTEGER = (byte) 2;

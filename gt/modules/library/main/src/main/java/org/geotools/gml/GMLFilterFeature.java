@@ -52,7 +52,7 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
     // Static Globals to handle some expected elements
 
     /** The logger for the GML module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.gml");
 
     /** GML namespace string. */

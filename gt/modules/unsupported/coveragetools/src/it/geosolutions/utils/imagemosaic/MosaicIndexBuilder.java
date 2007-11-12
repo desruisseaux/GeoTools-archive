@@ -112,8 +112,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	private int numFiles;
 
 	/** Default Logger * */
-	private final static Logger LOG = Logger
-			.getLogger("it.geosolutions.utils.imagemosaic");
+	private final static Logger LOG = org.geotools.util.logging.Logging.getLogger("it.geosolutions.utils.imagemosaic");
 
 	/** Program Version */
 	private final static String versionNumber = "0.2";

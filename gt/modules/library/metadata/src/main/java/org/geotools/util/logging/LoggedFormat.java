@@ -243,7 +243,7 @@ public class LoggedFormat<T> extends Format {
      */
     protected void logWarning(final LogRecord warning) {
         if (logger != null) {
-            Logger.getLogger(logger).log(warning);
+            Logging.getLogger(logger).log(warning);
         }
     }
 

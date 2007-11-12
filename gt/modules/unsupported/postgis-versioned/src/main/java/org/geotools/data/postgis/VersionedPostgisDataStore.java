@@ -98,7 +98,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class VersionedPostgisDataStore implements VersioningDataStore {
 
     /** The logger for the postgis module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
     public static final String TBL_VERSIONEDTABLES = "versioned_tables";
 

@@ -114,7 +114,7 @@ public class QuadTreeXest extends TestCase {
 
         // assertTrue(q2 < q1) ;
         if (q2 >= q1) {
-            Logger.getLogger("org.geotools.caching.quadtree")
+            org.geotools.util.logging.Logging.getLogger("org.geotools.caching.quadtree")
                   .log(Level.SEVERE, "Index not fast as expected.");
         }
     }

@@ -49,7 +49,7 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 	private final static String[] supportedFormat = new String[] { "tiff",
 			"gif", "png", "bmp", "jpeg" };
 
-	private Logger logger = Logger.getLogger(WorldImageWriterTest.class
+	private Logger logger = org.geotools.util.logging.Logging.getLogger(WorldImageWriterTest.class
 			.toString());
 
 	/** The format for the image e will write. */

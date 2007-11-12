@@ -32,6 +32,8 @@ import javax.imageio.spi.ImageInputStreamSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.FileCacheImageInputStream;
 
+import org.geotools.util.logging.Logging;
+
 
 /**
  * A service provider for {@link ImageInputStream} from {@link URL} connection.
@@ -107,7 +109,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
                 if (--retry < 0) {
                     throw exception;
                 }
-                Logger.getLogger("org.geotools.image.io.stream").warning(exception.toString());
+                Logging.getLogger("org.geotools.image.io.stream").warning(exception.toString());
             }
             /*
              * Failed to get the connection. After we logged a warning, wait a little bit, run

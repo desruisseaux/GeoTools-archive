@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 public class LinePlacementImpl extends AbstractGTComponent
     implements LinePlacement, Cloneable {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private Expression perpendicularOffset = null;
 

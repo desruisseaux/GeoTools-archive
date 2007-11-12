@@ -38,7 +38,7 @@ import com.esri.sde.sdk.client.SeShape;
  */
 class ArcSDEAttributeReader implements AttributeReader {
 	/** Shared package's logger */
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
 
 	/** query passed to the constructor */
 	private ArcSDEQuery query;

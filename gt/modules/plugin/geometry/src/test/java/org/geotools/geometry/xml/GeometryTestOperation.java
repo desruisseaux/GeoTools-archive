@@ -24,7 +24,7 @@ public class GeometryTestOperation extends Assert {
     private Object actualResult;
     private Map<String, OperationHandler> operationMap;
 
-    private static final Logger LOG = Logger.getLogger("org.geotools.geometry");
+    private static final Logger LOG = org.geotools.util.logging.Logging.getLogger("org.geotools.geometry");
 
     /**
      * Constructor

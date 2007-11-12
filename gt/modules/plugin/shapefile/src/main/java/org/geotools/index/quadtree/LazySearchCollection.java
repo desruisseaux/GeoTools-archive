@@ -71,7 +71,7 @@ public class LazySearchCollection extends AbstractCollection implements
 			try {
 				tree.close(iter);
 			} catch (StoreException e) {
-				Logger.getLogger("org.geotools.index.quadtree").severe("Couldn't close iterator");
+				org.geotools.util.logging.Logging.getLogger("org.geotools.index.quadtree").severe("Couldn't close iterator");
 			}
 		}
 	}

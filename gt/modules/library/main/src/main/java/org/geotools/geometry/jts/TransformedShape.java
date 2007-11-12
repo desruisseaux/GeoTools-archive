@@ -255,6 +255,6 @@ public final class TransformedShape extends AffineTransform implements Shape {
 		record.setSourceClassName(TransformedShape.class.getName());
 		record.setSourceMethodName(method);
 		record.setThrown(exception);
-		Logger.getLogger("org.geotools.renderer.lite").log(record);
+		org.geotools.util.logging.Logging.getLogger("org.geotools.renderer.lite").log(record);
 	}
 }

@@ -44,7 +44,7 @@ import org.geotools.filter.visitor.AbstractFilterVisitor;
  */
 public class Collection_AverageFunction extends FunctionExpressionImpl {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter.function");
     FeatureCollection previousFeatureCollection = null;
     Object average = null;

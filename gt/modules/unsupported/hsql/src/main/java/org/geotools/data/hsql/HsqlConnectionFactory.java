@@ -34,7 +34,7 @@ import java.util.Properties;
 public class HsqlConnectionFactory {
 
 	/** Standard logging instance */
-//    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.hsql");
+//    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.hsql");
 
     /** Creates Hsql-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "org.hsqldb.jdbcDriver";

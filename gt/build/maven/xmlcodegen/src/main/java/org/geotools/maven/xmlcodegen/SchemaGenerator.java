@@ -114,7 +114,7 @@ public class SchemaGenerator extends AbstractGenerator {
     /**
      * Logger
      */
-    Logger logger = Logger.getLogger("org.geotools.xml");
+    Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.xml");
 
     public SchemaGenerator(XSDSchema schema) {
         this.schema = schema;

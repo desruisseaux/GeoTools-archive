@@ -138,8 +138,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class JDBC1DataStore implements DataStore {
 
 	/** The logger for the filter module. */
-	protected static final Logger LOGGER = Logger
-			.getLogger("org.geotools.data.jdbc");
+	protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
 
 	/**
 	 * Maps SQL types to Java classes. This might need to be fleshed out more

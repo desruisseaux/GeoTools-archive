@@ -75,8 +75,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	private final static TIFFImageReaderSpi spi = new TIFFImageReaderSpi();
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.geotiff");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.geotiff");
 
 	/**
 	 * Creates a new instance of GeoTiffFormat

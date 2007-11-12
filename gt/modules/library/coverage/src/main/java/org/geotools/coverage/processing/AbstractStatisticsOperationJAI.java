@@ -42,6 +42,7 @@ import org.geotools.parameter.ImagingParameterDescriptors;
 import org.geotools.parameter.ImagingParameters;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.util.logging.Logging;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
@@ -68,8 +69,7 @@ public abstract class AbstractStatisticsOperationJAI extends
 		OperationJAI {
 	//
 	/** {@link Logger} for this class. */
-	public final static Logger LOGGER = Logger
-			.getLogger("org.geotools.coverage.processing");
+	public final static Logger LOGGER = Logging.getLogger("org.geotools.coverage.processing");
 
 	/**
 	 * The parameter descriptor for the SPATIAL_SUBSAMPLING_X

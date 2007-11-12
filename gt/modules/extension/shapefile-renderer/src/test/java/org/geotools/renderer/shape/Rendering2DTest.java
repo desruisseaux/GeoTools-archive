@@ -64,7 +64,7 @@ public class Rendering2DTest extends TestCase {
     // private java.net.URL base = getClass().getResource("/testData/");
 
     /** The logger for the rendering module. */
-    public static final Logger LOGGER = Logger.getLogger(
+    public static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.rendering");
     static final String LINE = "linefeature";
     static final String POLYGON = "polygonfeature";

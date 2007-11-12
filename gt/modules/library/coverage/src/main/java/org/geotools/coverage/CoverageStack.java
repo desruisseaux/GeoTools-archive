@@ -60,6 +60,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.IIOReadProgressAdapter;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -1336,7 +1337,7 @@ public class CoverageStack extends AbstractCoverage {
      * @param record The log record. The message contains information about the images to load.
      */
     protected void logLoading(final LogRecord record) {
-        Logger.getLogger("org.geotools.coverage").log(record);
+        Logging.getLogger("org.geotools.coverage").log(record);
     }
 
     /**

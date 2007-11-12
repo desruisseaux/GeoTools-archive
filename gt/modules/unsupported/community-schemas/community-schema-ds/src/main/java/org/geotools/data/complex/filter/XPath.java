@@ -64,7 +64,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @since 2.4
  */
 public class XPath {
-    private static final Logger LOGGER = Logger.getLogger(XPath.class.getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(XPath.class.getPackage().getName());
 
     private FilterFactory FF;
 

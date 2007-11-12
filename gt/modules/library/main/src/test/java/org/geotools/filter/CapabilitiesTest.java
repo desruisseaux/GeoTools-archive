@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
  */
 public class CapabilitiesTest extends TestCase {
     /** Standard logging instance */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.defaultcore");
 
     /** Feature on which to preform tests */

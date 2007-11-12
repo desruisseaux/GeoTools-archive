@@ -40,6 +40,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.event.IIOReadWarningListener; // For javadoc
 
 import org.geotools.util.NumberRange;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Locales;
 import org.geotools.resources.i18n.Errors;
@@ -95,7 +96,7 @@ public abstract class GeographicImageReader extends ImageReader {
     /**
      * The logger to use for events related to this image reader.
      */
-    static final Logger LOGGER = Logger.getLogger("org.geotools.image.io");
+    static final Logger LOGGER = Logging.getLogger("org.geotools.image.io");
 
     /**
      * Metadata for each images, or {@code null} if not yet created.

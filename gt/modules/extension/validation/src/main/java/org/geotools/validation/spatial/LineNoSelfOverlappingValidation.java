@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Point;
 */
 public class LineNoSelfOverlappingValidation extends DefaultFeatureValidation {
    /** The logger for the validation module. */
-   private static final Logger LOGGER = Logger.getLogger(
+   private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
            "org.geotools.validation");
 
    /**

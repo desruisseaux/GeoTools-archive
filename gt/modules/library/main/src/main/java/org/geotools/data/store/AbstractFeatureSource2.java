@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractFeatureSource2 implements FeatureSource {
 
 	/** The logger for the data module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     
     /**
      * the type entry

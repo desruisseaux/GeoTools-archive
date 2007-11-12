@@ -61,8 +61,7 @@ import org.opengis.filter.expression.PropertyName;
  * @since 2.4
  */
 public class BoreholeTest extends TestCase {
-    private static final Logger LOGGER = Logger
-            .getLogger(BoreholeTest.class.getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(BoreholeTest.class.getPackage().getName());
 
     private static final String XMMLNS = "http://www.opengis.net/xmml";
 

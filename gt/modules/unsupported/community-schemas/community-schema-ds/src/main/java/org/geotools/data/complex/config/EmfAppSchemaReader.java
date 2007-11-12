@@ -84,7 +84,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * @since 2.4
  */
 public class EmfAppSchemaReader {
-    private static final Logger LOGGER = Logger.getLogger(EmfAppSchemaReader.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(EmfAppSchemaReader.class.getPackage()
             .getName());
 
     /**

@@ -34,7 +34,7 @@ public abstract class BaseFeatureCollection extends SimpleFeatureImpl
 	/**
 	 * logger
 	 */
-	protected static Logger LOGGER = Logger.getLogger("org.geotools.feature");
+	protected static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.feature");
 	/**
 	 * listeners
 	 */

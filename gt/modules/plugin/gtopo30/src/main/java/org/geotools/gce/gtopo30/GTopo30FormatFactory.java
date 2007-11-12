@@ -37,8 +37,7 @@ import org.opengis.coverage.grid.Format;
 public class GTopo30FormatFactory implements GridFormatFactorySpi {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.gtopo30");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.gtopo30");
 
 	/**
 	 * Creates a new instance of GTopo30Format

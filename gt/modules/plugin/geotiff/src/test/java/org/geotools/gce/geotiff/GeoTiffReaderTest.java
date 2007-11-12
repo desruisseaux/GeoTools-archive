@@ -49,8 +49,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/test/org/geotools/gce/geotiff/GeoTiffReaderTest.java $
  */
 public class GeoTiffReaderTest extends TestCase {
-	private final static Logger LOGGER = Logger
-			.getLogger(GeoTiffReaderTest.class.toString());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeoTiffReaderTest.class.toString());
 
 	/**
 	 * Constructor for GeoTiffReaderTest.

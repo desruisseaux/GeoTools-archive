@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class BBOXDataStore extends org.geotools.data.geometryless.JDBCDataStore {
     /** The logger for the mysql module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
   private String XMinColumnName,YMinColumnName = null;
    private String XMaxColumnName,YMaxColumnName = null;

@@ -40,6 +40,7 @@ import com.sun.star.lib.uno.helper.WeakBase;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -55,7 +56,7 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
     /**
      * The logger to use for all message to log in this package.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.openoffice");
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.openoffice");
 
     /**
      * Factor for conversions of days to milliseconds.

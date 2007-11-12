@@ -52,7 +52,7 @@ public class DisplayObject {
     /**
      * The logger for the GO implementation module.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.display");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.display");
 
     /**
      * List of classes that provides rendering hints as public static fields.

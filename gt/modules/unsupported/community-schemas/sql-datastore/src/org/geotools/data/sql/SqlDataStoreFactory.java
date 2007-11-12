@@ -52,7 +52,7 @@ import org.geotools.data.DataStoreFinder;
  * @source $URL$
  */
 public class SqlDataStoreFactory implements DataStoreFactorySpi {
-	private static final Logger LOGGER = Logger.getLogger(SqlDataStore.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(SqlDataStore.class.getPackage().getName());
 	
 	private static final String WRAPPERTYPE_FIXED_VALUE = "sql";
 	

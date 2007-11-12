@@ -129,8 +129,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 public final class GeoTiffMetadata2CRSAdapter {
 
 	/** {@link Logger}. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.geotiff.crs_adapters");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.geotiff.crs_adapters");
 
 	/**
 	 * This {@link AffineTransform} can be used when the underlying geotiff

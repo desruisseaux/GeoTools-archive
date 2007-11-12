@@ -46,7 +46,7 @@ import com.esri.sde.sdk.client.SeTable;
  */
 public class InProcessViewSupportTestData {
 
-    private static final Logger LOGGER = Logger.getLogger(InProcessViewSupportTestData.class
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(InProcessViewSupportTestData.class
             .getPackage().getName());
 
     public static final String MASTER_UNQUALIFIED = "GT_SDE_TEST_MASTER";

@@ -66,7 +66,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     protected FilterCapabilities capabilities = null;
 
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Map of comparison types to sql representation */
     protected static Map comparisions = new HashMap();

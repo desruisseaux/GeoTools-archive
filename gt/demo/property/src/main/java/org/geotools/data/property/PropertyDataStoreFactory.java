@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * @version $Id$
  */
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {
-	private static final Logger LOGGER = Logger.getLogger(PropertyDataStoreFactory.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(PropertyDataStoreFactory.class.getPackage().getName());
 	
 	
 	//    public DataSourceMetadataEnity createMetadata( Map params )

@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class FilterTest extends TestCase {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** SimpleFeature on which to preform tests */
     private static SimpleFeature testFeature = null;

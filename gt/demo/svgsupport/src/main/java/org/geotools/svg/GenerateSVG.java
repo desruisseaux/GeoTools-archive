@@ -52,8 +52,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @version $Id$
  */
 public class GenerateSVG {
-    private static Logger LOGGER = Logger
-        .getLogger("org.geotools.svgsupport");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.svgsupport");
     private Dimension canvasSize = new Dimension(300, 300);
 
     /**

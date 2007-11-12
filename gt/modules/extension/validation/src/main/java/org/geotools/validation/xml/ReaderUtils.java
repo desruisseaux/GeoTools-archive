@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  */
 class ReaderUtils {
     /** Used internally to create log information to detect errors. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.vfny.geoserver.global");
 
     /**

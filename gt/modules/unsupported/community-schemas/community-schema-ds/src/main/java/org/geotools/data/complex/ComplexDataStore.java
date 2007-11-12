@@ -71,7 +71,7 @@ public class ComplexDataStore /* extends AbstractDataStore */implements FeatureA
 
     private static final boolean IS_WRITABLE = false;
 
-    private static final Logger LOGGER = Logger.getLogger(ComplexDataStore.class.getPackage()
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ComplexDataStore.class.getPackage()
             .getName());
 
     private Map/* <String, FeatureTypeMapping> */mappings = Collections.EMPTY_MAP;

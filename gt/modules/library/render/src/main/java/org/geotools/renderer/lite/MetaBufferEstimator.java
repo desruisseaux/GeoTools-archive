@@ -57,7 +57,7 @@ import org.opengis.filter.expression.Literal;
 
 public class MetaBufferEstimator extends FilterAttributeExtractor implements StyleVisitor {
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
     boolean estimateAccurate = true;
 

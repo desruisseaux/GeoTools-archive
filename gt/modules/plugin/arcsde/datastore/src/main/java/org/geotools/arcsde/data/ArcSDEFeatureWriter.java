@@ -59,8 +59,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version
  */
 class ArcSDEFeatureWriter implements FeatureWriter {
-	private static final Logger LOGGER = Logger
-			.getLogger(ArcSDEFeatureWriter.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEFeatureWriter.class.getPackage().getName());
 
 	private ArcSDEDataStore dataStore;
     

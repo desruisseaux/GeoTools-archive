@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @see net.refractions.jspatial.jts
  */
 public final class SDO {
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle.sdo");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle.sdo");
     public static final int SRID_NULL = -1;
 
     /** Used to test for Counter Clockwise or Clockwise Linear Rings */

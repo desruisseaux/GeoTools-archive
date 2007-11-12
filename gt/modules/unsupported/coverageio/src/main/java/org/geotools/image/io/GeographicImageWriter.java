@@ -36,6 +36,7 @@ import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
 import org.geotools.image.ImageDimension;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Locales;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -54,7 +55,7 @@ public abstract class GeographicImageWriter extends ImageWriter {
     /**
      * The logger to use for events related to this image writer.
      */
-    static final Logger LOGGER = Logger.getLogger("org.geotools.image.io");
+    static final Logger LOGGER = Logging.getLogger("org.geotools.image.io");
 
     /**
      * Index of the image in process of being written. This convenience index is reset to 0

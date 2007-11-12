@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  */
 public class TouchesIntegrity extends RelationIntegrity {
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.validation");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.validation");
 	
 	
 	/**

@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class ParserTest extends FilterTestSupport {
     /** Standard logging instance */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Test suite for this test case */
     TestSuite suite = null;

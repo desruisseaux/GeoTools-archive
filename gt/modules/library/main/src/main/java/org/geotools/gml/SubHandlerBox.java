@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class SubHandlerBox extends SubHandler {
     /** The logger for the GML module */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.gml");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gml");
 
     /** */
     com.vividsolutions.jts.geom.Envelope e = new com.vividsolutions.jts.geom.Envelope();

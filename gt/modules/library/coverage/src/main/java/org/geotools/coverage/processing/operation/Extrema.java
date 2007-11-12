@@ -29,6 +29,7 @@ import javax.media.jai.operator.ExtremaDescriptor;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.AbstractStatisticsOperationJAI;
+import org.geotools.util.logging.Logging;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -82,8 +83,7 @@ public class Extrema extends AbstractStatisticsOperationJAI {
 	private static final long serialVersionUID = 7731039381590398047L;
 
 	/** {@link Logger} for this class. */
-	public final static Logger LOGGER = Logger
-			.getLogger("org.geotools.coverage.processing.operation");
+	public final static Logger LOGGER = Logging.getLogger("org.geotools.coverage.processing.operation");
 
 	/** {@link String} key for getting the minimum vector. */
 	public final static String GT_SYNTHETIC_PROPERTY_MINIMUM = "minimum";

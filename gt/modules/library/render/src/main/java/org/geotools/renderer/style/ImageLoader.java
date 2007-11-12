@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 class ImageLoader implements Runnable {
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.rendering");
 
     /** The images managed by the loader */
     private static Map images = new HashMap();

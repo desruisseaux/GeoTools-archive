@@ -99,7 +99,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
     
     private static final boolean DEBUG = false;
     /** Logger. */
-    private final static Logger LOGGER = Logger.getLogger(ArcSDERasterGridCoverage2DReader.class.getPackage().getName());
+    private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDERasterGridCoverage2DReader.class.getPackage().getName());
     
     /**
      * The connectionpool we're using to fetch images from this ArcSDE raster

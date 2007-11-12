@@ -82,8 +82,7 @@ import org.opengis.geometry.Envelope;
 public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		GridCoverageWriter {
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.arcgrid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
 
 	/** Imageio {@link AsciiGridsImageWriter} we will use to write out. */
 	private AsciiGridsImageWriter mWriter = new AsciiGridsImageWriter(

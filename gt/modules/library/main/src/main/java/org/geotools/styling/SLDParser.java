@@ -47,8 +47,7 @@ import org.xml.sax.InputSource;
  */
 public class SLDParser {
 
-	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-			.getLogger("org.geotools.styling");
+	private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
 
 	private FilterFactory ff;
 

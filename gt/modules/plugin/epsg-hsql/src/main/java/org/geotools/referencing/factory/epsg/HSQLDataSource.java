@@ -28,10 +28,10 @@ import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.util.logging.Logging;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 // HSQL dependencies
@@ -187,7 +187,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
              * a full SQL statement. For this plugin however, we have compressed "INSERT
              * INTO" statements using Compactor class in this package.
              */
-            Logger.getLogger("org.geotools.referencing.factory").config("Creating cached EPSG database."); // TODO: localize
+            Logging.getLogger("org.geotools.referencing.factory").config("Creating cached EPSG database."); // TODO: localize
             final Statement statement = connection.createStatement();
             try {
                 final BufferedReader in = new BufferedReader(new InputStreamReader(

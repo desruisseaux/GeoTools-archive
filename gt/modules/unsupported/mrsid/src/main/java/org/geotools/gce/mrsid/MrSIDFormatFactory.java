@@ -35,8 +35,7 @@ import org.opengis.coverage.grid.Format;
  */
 public final class MrSIDFormatFactory implements GridFormatFactorySpi {
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.mrsid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.mrsid");
 
 	/**
 	 * Tells me if the coverage plugin to access MrSID is availaible or not.

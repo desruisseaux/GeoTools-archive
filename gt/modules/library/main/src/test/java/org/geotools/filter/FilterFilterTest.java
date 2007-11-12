@@ -204,7 +204,7 @@ StringReader reader = new StringReader( filter );
         GMLFilterGeometry geometryFilter = new GMLFilterGeometry(filterParser);
         GMLFilterDocument documentFilter = new GMLFilterDocument(geometryFilter);
 
-//        Logger logger = Logger.getLogger("org.geotools.filter");
+//        Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 //        logger.setLevel(Level.ALL);
 //        ConsoleHandler consoleHandler = new ConsoleHandler();
 //        consoleHandler.setLevel(Level.ALL);

@@ -32,7 +32,7 @@ public class UnsignedByteBandCopier extends ArcSDERasterBandCopier {
     UnsignedByteBandCopier() {
     }
     
-    Logger LOGGER = Logger.getLogger(this.getClass().toString());
+    Logger LOGGER = org.geotools.util.logging.Logging.getLogger(this.getClass().toString());
     
     public void copyPixelData(SeRasterTile tile, WritableRaster raster, int copyOffX, int copyOffY, int targetBand) throws DataSourceException {
         if (LOGGER.isLoggable(Level.FINER))

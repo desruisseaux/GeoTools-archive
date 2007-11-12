@@ -33,7 +33,7 @@ import org.geotools.filter.expression.AddImpl;
 public class SQLUnpackerTest extends SQLFilterTestSupport {
     /** Standard logging instance */
 
-    //private static final Logger LOGGER = Logger.getLogger("org.geotools.defaultcore");
+    //private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.defaultcore");
 
     /** Filters on which to perform tests */
     private BetweenFilterImpl btwnFilter;

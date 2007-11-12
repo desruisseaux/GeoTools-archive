@@ -88,8 +88,7 @@ import com.vividsolutions.jts.io.InStream;
 public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.arcgrid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.arcgrid");
 
 	/** Caches and ImageReaderSpi for an AsciiGridsImageReader. */
 	private final static ImageReaderSpi readerSPI = new AsciiGridsImageReaderSpi();

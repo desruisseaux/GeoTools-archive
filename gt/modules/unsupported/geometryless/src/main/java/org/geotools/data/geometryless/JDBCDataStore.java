@@ -79,7 +79,7 @@ import org.geotools.data.sql.SqlDataStore;
 
 public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore implements SqlDataStore {
     /** The logger for the mysql module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
     /**
      * Basic constructor for JDBCDataStore. Requires creation of a

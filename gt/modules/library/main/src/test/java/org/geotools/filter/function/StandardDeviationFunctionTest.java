@@ -30,7 +30,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @source $URL$
  */
 public class StandardDeviationFunctionTest extends FunctionTestSupport {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
     "org.geotools.filter");
     
     public StandardDeviationFunctionTest(String testName) {

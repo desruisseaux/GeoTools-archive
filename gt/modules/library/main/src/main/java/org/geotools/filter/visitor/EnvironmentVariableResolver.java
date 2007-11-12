@@ -35,7 +35,7 @@ import org.geotools.filter.parser.ParseException;
 public class EnvironmentVariableResolver {
  
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
     private boolean found = false;
     
     /**

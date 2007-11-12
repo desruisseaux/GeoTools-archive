@@ -79,7 +79,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class DataFeatureCollection extends BaseFeatureCollection implements FeatureCollection {
     
 	/** logger */
-	static Logger LOGGER = Logger.getLogger( "org.geotools.data" );
+	static Logger LOGGER = org.geotools.util.logging.Logging.getLogger( "org.geotools.data" );
 	
     static private int unique = 0;
     

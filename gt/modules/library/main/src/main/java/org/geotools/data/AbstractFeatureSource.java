@@ -74,7 +74,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class AbstractFeatureSource implements FeatureSource {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
     
     protected Set hints = Collections.EMPTY_SET;
     

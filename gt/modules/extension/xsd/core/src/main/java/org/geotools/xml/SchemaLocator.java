@@ -50,7 +50,7 @@ public final class SchemaLocator implements XSDSchemaLocator {
     /**
      * logging instance
      */
-    protected static Logger LOGGER = Logger.getLogger("org.geotools.xml");
+    protected static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.xml");
 
     /**
      * The xsd instance.

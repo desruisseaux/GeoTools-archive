@@ -23,7 +23,7 @@ import org.opengis.feature.type.TypeName;
  * @author Justin Deoliveira
  */
 public class Descriptors {
-    private static final Logger LOGGER = Logger.getLogger(Descriptors.class.getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(Descriptors.class.getPackage().getName());
 
     // /**
     // * Handle subtyping in a "sensible" manner.

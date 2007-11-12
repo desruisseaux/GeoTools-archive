@@ -118,7 +118,7 @@ import com.vividsolutions.jts.io.WKTReader;
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
 	
     /** The logger for the postgis module. */
-    protected static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.postgis");
 
     /** Factory for producing geometries (from JTS). */

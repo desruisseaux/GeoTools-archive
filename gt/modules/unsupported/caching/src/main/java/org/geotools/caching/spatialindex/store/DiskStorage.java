@@ -54,7 +54,7 @@ public class DiskStorage implements Storage {
     public final static String DATA_FILE_PROPERTY = "DiskStorage.DataFile";
     public final static String INDEX_FILE_PROPERTY = "DiskStorage.IndexFile";
     public final static String PAGE_SIZE_PROPERTY = "DiskStorage.PageSize";
-    protected static Logger logger = Logger.getLogger("org.geotools.caching.spatialindex.store");
+    protected static Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.caching.spatialindex.store");
     int stats_bytes = 0;
     int stats_n = 0;
     private RandomAccessFile data_file;

@@ -31,7 +31,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
 
 public class MysqlGeomColTestSuite extends TestCase {
     /** Standard logging instance */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.defaultcore");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.defaultcore");
     private static final String TEST_CATALOG = "US";
     private static final String TEST_SCHEMA = "NY";
     private static final String TEST_F_TABLE = "STREET_LAMP";

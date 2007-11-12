@@ -41,7 +41,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  * @source $URL$
  */
 public class OracleDataStoreFactory implements DataStoreFactorySpi {
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.data.oracle");     
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle");     
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     private static final String JDBC_PATH = "jdbc:oracle:thin:@";
 

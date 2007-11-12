@@ -32,8 +32,7 @@ import javax.sql.PooledConnection;
 public class ConnectionPoolFacade implements ConnectionPoolDataSource {
 
 	/** Standard logging instance */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.data.geometryless");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.geometryless");
 
 	private ConnectionPoolDataSource _nativePool;
 

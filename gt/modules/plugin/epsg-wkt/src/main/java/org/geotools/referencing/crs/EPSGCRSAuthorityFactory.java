@@ -40,6 +40,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.util.logging.Logging;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
@@ -58,7 +59,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 //not quite sure how I am going to create a new factory (what should the geoapi method be)
 public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
 	
-	private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.crs.EPSGCRSAuthorityFactory");
+	private static final Logger LOGGER = Logging.getLogger("org.geotools.referencing.crs.EPSGCRSAuthorityFactory");
 	
     public static final String AUTHORITY = "EPSG";
     public static final String AUTHORITY_PREFIX = "EPSG:";

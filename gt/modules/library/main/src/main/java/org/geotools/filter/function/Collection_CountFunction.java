@@ -42,8 +42,7 @@ import org.geotools.filter.visitor.AbstractFilterVisitor;
  */
 public class Collection_CountFunction extends FunctionExpressionImpl{
 	/** The logger for the filter module. */
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.filter.function");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter.function");
 
 	FeatureCollection previousFeatureCollection = null;
 

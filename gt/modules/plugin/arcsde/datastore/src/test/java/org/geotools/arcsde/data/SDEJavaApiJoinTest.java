@@ -132,8 +132,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SDEJavaApiJoinTest extends TestCase {
     /** package logger */
-    private static Logger LOGGER = Logger
-            .getLogger(SDEJavaApiJoinTest.class.getPackage().getName());
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(SDEJavaApiJoinTest.class.getPackage().getName());
 
     /** Helper class that provides config loading and test data for unit tests */
     private static TestData testData;

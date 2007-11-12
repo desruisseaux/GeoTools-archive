@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.TopologyException;
  */
 public final class ExpressionDOMParser {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Factory for creating filters. */
     private FilterFactory ff;

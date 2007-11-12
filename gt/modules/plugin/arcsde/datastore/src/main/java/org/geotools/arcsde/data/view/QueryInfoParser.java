@@ -50,7 +50,7 @@ import com.esri.sde.sdk.client.SeTable;
  * @since 2.3.x
   */
 public class QueryInfoParser {
-	private static final Logger LOGGER = Logger.getLogger(QueryInfoParser.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(QueryInfoParser.class.getPackage().getName());
 	
 	public static SeQueryInfo parse(SeConnection conn, PlainSelect select)throws SeException, IOException{
 		String []columns = null;

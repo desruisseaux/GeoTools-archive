@@ -54,7 +54,7 @@ import org.geotools.filter.UnaliasSQLEncoder;
  */
 public class SQLEncoderLocationsXY extends UnaliasSQLEncoder {
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /**
      * The srid of the schema, so the bbox conforms. Could be better to have it

@@ -75,7 +75,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class ComplexDataStoreTest extends TestCase {
 
-    private final static Logger LOGGER = Logger.getLogger(ComplexDataStoreTest.class.getPackage()
+    private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ComplexDataStoreTest.class.getPackage()
             .getName());
 
     Name targetName;

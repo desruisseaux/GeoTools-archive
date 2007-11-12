@@ -42,7 +42,7 @@ import org.geotools.resources.NIOUtilities;
  */
 public class IndexFile {
 	private static final Logger LOGGER = 
-	      Logger.getLogger("org.geotools.data.shapefile");
+	      org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
 	  
 	  private static final int RECS_IN_BUFFER = 2000;
 	  

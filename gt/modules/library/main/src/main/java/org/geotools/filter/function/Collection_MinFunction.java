@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 public class Collection_MinFunction extends FunctionExpressionImpl
     implements FunctionExpression {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.filter.function");
     FeatureCollection previousFeatureCollection = null;
     Object min = null;

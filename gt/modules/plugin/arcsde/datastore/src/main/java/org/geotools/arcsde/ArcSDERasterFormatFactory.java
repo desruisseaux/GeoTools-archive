@@ -43,7 +43,7 @@ import com.esri.sde.sdk.pe.PeCoordinateSystem;
 public class ArcSDERasterFormatFactory implements GridFormatFactorySpi {
 	
     /** package's logger */
-    protected static final Logger LOGGER = Logger.getLogger(ArcSDERasterFormatFactory.class.getPackage().getName());
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDERasterFormatFactory.class.getPackage().getName());
     
     /** friendly factory description */
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 9.x Raster Support via GridCoverageExchange Interface";

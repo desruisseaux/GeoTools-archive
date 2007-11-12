@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  */
 public class Lock {
 
-    Logger logger = Logger.getLogger("org.geotools.data.shapefile");
+    Logger logger = org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
 
     /**
      * indicates a write is occurring

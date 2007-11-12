@@ -52,8 +52,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 public final class GTopo30Format extends AbstractGridFormat implements Format {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.gtopo30");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.gtopo30");
 
 	/**
 	 * Creates an instance and sets the metadata.

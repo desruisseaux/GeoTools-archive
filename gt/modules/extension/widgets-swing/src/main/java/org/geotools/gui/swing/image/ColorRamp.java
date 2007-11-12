@@ -685,8 +685,9 @@ public class ColorRamp extends JComponent {
                 graduation = new LogarithmicNumberGraduation(units);
             }
         } else {
-            Logger.getLogger("org.geotools.gui.swing").log(Logging.format(Level.WARNING,
-                    LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1, Utilities.getShortClassName(tr)));
+            org.geotools.util.logging.Logging.getLogger("org.geotools.gui.swing").
+                    log(Logging.format(Level.WARNING, LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1,
+                        Utilities.getShortClassName(tr)));
             graduation = new NumberGraduation(units);
         }
         if (graduation == reuse) {

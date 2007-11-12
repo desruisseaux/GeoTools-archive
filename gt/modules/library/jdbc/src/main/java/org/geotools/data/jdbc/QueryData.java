@@ -57,7 +57,7 @@ import org.opengis.feature.type.GeometryDescriptor;
  */
 public class QueryData implements AttributeReader, AttributeWriter {
     /** The logger for the data module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
 
     protected Object[] fidAttributes;
 

@@ -69,7 +69,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Validator
 {
 	/** Standard logging instance for class */
-	private static final Logger LOGGER = Logger.getLogger(
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
 			"org.vfny.geoserver.responses");
 	
 	private ValidationProcessor validationProcessor;

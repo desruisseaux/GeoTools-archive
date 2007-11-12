@@ -31,8 +31,7 @@ import junit.framework.TestCase;
  */
 public abstract class AbstractMrSIDTestCase extends TestCase {
 
-	protected final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.mrsid");
+	protected final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.mrsid");
 
 	public AbstractMrSIDTestCase(String name) {
 		super(name);

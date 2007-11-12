@@ -51,7 +51,7 @@ import org.geotools.factory.FactoryRegistry;
  */
 public final class DataSourceFinder {
     /** The logger for the filter module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
 
     /**
      * The service registry for this manager. Will be initialized only when first needed.

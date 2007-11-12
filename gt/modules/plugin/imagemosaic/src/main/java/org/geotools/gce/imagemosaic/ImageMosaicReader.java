@@ -120,8 +120,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.imagemosaic");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.imagemosaic");
 
 	/**
 	 * The source {@link URL} pointing to the index shapefile for this

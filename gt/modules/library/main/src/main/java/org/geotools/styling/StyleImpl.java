@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public class StyleImpl extends AbstractGTComponent
     implements org.geotools.styling.Style, Cloneable {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.styling");
     private List featureTypeStyles = new GTList(this, "featureTypeStyles");
     private String abstractText = "";

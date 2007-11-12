@@ -34,6 +34,7 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.TopologyException;
 
 // Geotools dependencies
+import org.geotools.util.logging.Logging;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.FeatureCollection;
@@ -58,7 +59,7 @@ public class FeatureTableModelTest extends TestBase {
     /**
      * Standard logging instance.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    protected static final Logger LOGGER = Logging.getLogger("org.geotools.filter");
     
     /**
      * Feature on which to perform tests.

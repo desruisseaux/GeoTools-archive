@@ -64,8 +64,7 @@ import org.geotools.styling.Symbolizer;
  * @source $URL$
  */
 public class StyleGenerator {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.brewer.color");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.brewer.color");
     public final static int ELSEMODE_IGNORE = 0;
     public final static int ELSEMODE_INCLUDEASMIN = 1;
     public final static int ELSEMODE_INCLUDEASMAX = 2;

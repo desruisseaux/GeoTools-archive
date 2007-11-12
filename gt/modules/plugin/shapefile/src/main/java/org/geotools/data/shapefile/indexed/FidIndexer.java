@@ -36,7 +36,7 @@ import org.geotools.data.shapefile.shp.IndexFile;
  * @author Jesse
  */
 public class FidIndexer {
-	static Logger LOGGER=Logger.getLogger("org.geotools.data.shapefile");
+	static Logger LOGGER=org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile");
     public static synchronized URL generate(URL shpURL) throws IOException {
     	LOGGER.fine("Generating fids for "+shpURL);
         IndexedFidWriter writer = null;

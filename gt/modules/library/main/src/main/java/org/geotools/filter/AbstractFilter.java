@@ -30,7 +30,7 @@ import org.opengis.feature.simple.SimpleFeature;
 public abstract class AbstractFilter extends FilterAbstract implements Filter {
    
 	/** The logger for the default core module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.core");
 
 
     /** Defines filter type (all valid types defined below). */

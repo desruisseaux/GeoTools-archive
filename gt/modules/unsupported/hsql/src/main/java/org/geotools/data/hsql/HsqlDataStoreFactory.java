@@ -38,7 +38,7 @@ import org.geotools.data.DataStoreFactorySpi;
  * @source $URL$
  */
 public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
-    private static final Logger LOGGER = Logger.getLogger(HsqlDataStoreFactory.class
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(HsqlDataStoreFactory.class
             .getName());
 
     /** Creates Hsql JDBC driver class. */

@@ -48,7 +48,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
  */
 public final class ConnectionPool {
     /** A logger */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc");
     /** The default wait time for cleaning the Pool - defaults to 30 secs */
     private static final long DEFAULT_POOL_CLEANER_WAIT = 30000;
     /** A mutex for synchronizing */

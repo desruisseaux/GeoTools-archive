@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class SubHandlerMulti extends SubHandler {
     /** The logger for the GML module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.gml");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gml");
 
     /**
      * Remembers the list of all possible sub (base) types for this multi type.

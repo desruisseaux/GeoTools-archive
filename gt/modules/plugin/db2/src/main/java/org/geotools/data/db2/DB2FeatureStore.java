@@ -50,7 +50,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @source $URL$
  */
 public class DB2FeatureStore extends JDBCFeatureStore{
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
     "org.geotools.data.db2");	
 	
     /**

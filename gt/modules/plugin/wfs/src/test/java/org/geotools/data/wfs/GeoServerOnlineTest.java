@@ -317,7 +317,7 @@ public class GeoServerOnlineTest extends TestCase {
             inStore.close();
         }
         
-        Logger.getLogger("org.geotools.data.wfs").setLevel(Level.FINE);
+        org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").setLevel(Level.FINE);
         FeatureCollection inserts = DataUtilities.collection(new SimpleFeature[] {f,f2});
         Id fp = WFSDataStoreWriteOnlineTest.doInsert(post,ft,inserts);
         

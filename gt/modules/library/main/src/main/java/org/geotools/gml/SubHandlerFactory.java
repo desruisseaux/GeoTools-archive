@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class SubHandlerFactory {
     /** The logger for the GML module */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.gml");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gml");
 
     /** List of all valid OGC multi geometry types. */
     private static final java.util.Collection BASE_GEOMETRY_TYPES = new java.util.Vector(java.util.Arrays

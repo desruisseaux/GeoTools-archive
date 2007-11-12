@@ -41,8 +41,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @author Simone Giannecchini (simboss)
  */
 public final class MrSIDFormat extends AbstractGridFormat implements Format {
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.mrsid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.mrsid");
 
 	/** Caching the {@link MrSIDImageReaderSpi} factory. */
 	private final MrSIDImageReaderSpi spi = new MrSIDImageReaderSpi();

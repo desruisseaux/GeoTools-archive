@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
  */
 public final class FilterDOMParser {
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
     /** Factory to create filters. */
     private static final FilterFactory FILTER_FACT = FilterFactoryFinder.createFilterFactory();

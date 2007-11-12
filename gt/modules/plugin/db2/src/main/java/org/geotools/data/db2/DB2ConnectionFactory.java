@@ -38,7 +38,7 @@ import javax.sql.DataSource;
  * @deprecated Use {@link DataSource}, {@link DataSourceUtil} and {@link DataSourceFinder} instead
  */
 public class DB2ConnectionFactory {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.data.db2");
     private static final String DB2_URL_PREFIX = "jdbc:db2://";
     private static Map DATA_SOURCES = new HashMap();

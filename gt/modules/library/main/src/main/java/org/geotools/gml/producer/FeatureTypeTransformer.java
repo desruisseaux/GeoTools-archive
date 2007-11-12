@@ -176,7 +176,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *       this type can be used directly as a feature.
  */
 public class FeatureTypeTransformer extends TransformerBase {
-    private static final Logger LOGGER = Logger.getLogger(
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
             "org.geotools.gml.producer.FeatureTypeTransformer");
     private static final String SCHEMA_NS = "http://www.w3.org/2001/XMLSchema";
 

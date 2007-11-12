@@ -31,7 +31,9 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 
 
@@ -124,7 +126,7 @@ public class GridCoverageTest extends TestCase {
 //          assertNotSame(read, read.geophysics(true));
             in.close();
         } else {
-            Logger.getLogger("org.geotools.coverage.grid")
+            Logging.getLogger("org.geotools.coverage.grid")
                   .fine("Deserialization test skipped for pre-1.5 Java version.");
         }
     }

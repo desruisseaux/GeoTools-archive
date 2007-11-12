@@ -28,8 +28,7 @@ import com.sun.media.jai.codecimpl.util.RasterFactory;
  */
 public abstract class SliceImageReader extends ImageReader implements
 		IndexManager {
-	private static final Logger LOGGER = Logger
-			.getLogger("it.geosolutions.imageio.plugins.slices2D");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("it.geosolutions.imageio.plugins.slices2D");
 
 	/** set it to <code>true</code> when initialization has been performed */
 	protected boolean isInitialized = false;

@@ -103,7 +103,7 @@ public class DemoExplorer extends JFrame {
                         try {
                             writeObject("database.sav", saves);
                         } catch (IOException ex) {
-                            Logger.getLogger(DemoExplorer.class.getName()).log(Level.SEVERE, null, ex);
+                            org.geotools.util.logging.Logging.getLogger(DemoExplorer.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                     }

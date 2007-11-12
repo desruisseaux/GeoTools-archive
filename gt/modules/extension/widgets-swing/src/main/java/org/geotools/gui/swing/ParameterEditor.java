@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
-import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.text.ParseException;
@@ -64,6 +63,7 @@ import javax.media.jai.RegistryElementDescriptor;
 // Geotools dependencies
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
@@ -285,7 +285,7 @@ public class ParameterEditor extends JPanel {
                          * level is slightly higher than in 'RegisteredOperationBrowser'
                          * since we have tried the global operation description as well.
                          */
-                        Logger.getLogger("org.geotools.gui.swing").log(Level.FINE,
+                        Logging.getLogger("org.geotools.gui.swing").log(Level.FINE,
                                          exception.getLocalizedMessage(), exception);
                     }
                 }

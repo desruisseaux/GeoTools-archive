@@ -72,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 class ArcSDEQuery {
     /** Shared package's logger */
-    private static final Logger LOGGER = Logger.getLogger(ArcSDEQuery.class.getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEQuery.class.getName());
 
     /**
      * The connection to the ArcSDE server obtained when first created the

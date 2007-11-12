@@ -51,7 +51,7 @@ import org.geotools.filter.FilterCapabilities;
  */
 public class SQLEncoderBBOX extends FilterToSQL {
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
 
  
     /**

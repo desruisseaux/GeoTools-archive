@@ -101,7 +101,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     private static final int LOCK_DURATION = 3600 * 1000; // one hour
 
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.mysql");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.mysql");
     static boolean CHECK_TYPE = false;
     MySQLDataStore data;
     ManageableDataSource pool;

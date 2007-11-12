@@ -60,8 +60,7 @@ public final class StyledShapePainter {
 	private final static Canvas imgObserver = new Canvas();
 
 	/** The logger for the rendering module. */
-	private final static Logger LOGGER = Logger
-			.getLogger(StyledShapePainter.class.getName());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(StyledShapePainter.class.getName());
 
 	LabelCache labelCache;
 

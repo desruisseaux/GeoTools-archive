@@ -72,7 +72,7 @@ import org.opengis.parameter.ParameterValueGroup;
 public class CoverageTiler extends ProgressManager implements
 		ProcessingEventListener, Runnable {
 	/** Default Logger * */
-	private final static Logger LOGGER = Logger.getLogger(CoverageTiler.class
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(CoverageTiler.class
 			.toString());
 
 	/** Program Version */

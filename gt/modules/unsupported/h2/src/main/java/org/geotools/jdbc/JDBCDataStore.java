@@ -81,7 +81,7 @@ public final class JDBCDataStore extends ContentDataStore {
 	/**
 	 * logging instance
 	 */
-	public static final Logger LOGGER = Logger.getLogger( "org.geotools.data.jdbc" );
+	public static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger( "org.geotools.data.jdbc" );
 	/**
 	 * data source
 	 */

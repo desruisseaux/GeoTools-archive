@@ -178,7 +178,7 @@ public class DemoBase {
     
     //TODO: Add the logger
 //    private Logger textlog = 
-//            Logger.getLogger("org.geotools.demo.introduction.DemoBase");
+//            org.geotools.util.logging.Logging.getLogger("org.geotools.demo.introduction.DemoBase");
     
     /* The name of the test shapefile. */
     final String SHAPEFILENAME = "/countries.shp";

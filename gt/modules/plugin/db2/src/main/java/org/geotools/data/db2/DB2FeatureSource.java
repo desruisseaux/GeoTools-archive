@@ -56,8 +56,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class DB2FeatureSource extends JDBCFeatureSource {
 
-	private static final Logger LOGGER = Logger
-			.getLogger("org.geotools.data.db2");
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.db2");
 
 	/**
 	 * Constructs a feature source based on a DB2 data store for a specified

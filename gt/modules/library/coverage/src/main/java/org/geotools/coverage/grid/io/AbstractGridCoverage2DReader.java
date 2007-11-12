@@ -51,6 +51,7 @@ import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
+import org.geotools.util.logging.Logging;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -83,8 +84,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
 	/** The {@link Logger} for this {@link AbstractGridCoverage2DReader}. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.data.coverage.grid");
+	private final static Logger LOGGER = Logging.getLogger("org.geotools.data.coverage.grid");
 
 	/** Caches a default GridCoverageFactory for usage in plugins. */
 	protected final static GridCoverageFactory coverageFactory = FactoryFinder

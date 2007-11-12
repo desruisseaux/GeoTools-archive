@@ -74,7 +74,7 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * The logger for all events related to factory registry.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.factory");
 
     /**
      * The logger level for debug messages.

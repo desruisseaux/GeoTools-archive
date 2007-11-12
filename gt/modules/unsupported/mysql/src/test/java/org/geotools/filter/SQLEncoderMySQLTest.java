@@ -46,7 +46,7 @@ import org.opengis.feature.type.GeometryDescriptor;
  */
 public class SQLEncoderMySQLTest extends TestCase {
     /** Standard logging instance */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
     //protected static AttributeTypeFactory attFactory = AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */

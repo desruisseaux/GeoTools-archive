@@ -39,7 +39,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
 public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
     
     /** The logger for the postgis module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
     /** Creates PostGIS-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "org.postgresql.Driver";

@@ -21,7 +21,7 @@ import org.opengis.geometry.Geometry;
  */
 public class GeometryTestCase implements Test {
     private String name;
-    private static final Logger LOG = Logger.getLogger("org.geotools.geometry");
+    private static final Logger LOG = org.geotools.util.logging.Logging.getLogger("org.geotools.geometry");
     private List<GeometryTestOperation> operationList;
     private Geometry geomA;
     private Geometry geomB;

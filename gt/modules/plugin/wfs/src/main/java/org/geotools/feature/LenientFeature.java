@@ -21,7 +21,7 @@ import org.opengis.feature.type.AttributeDescriptor;
  * @author Jesse Eichar
  */
 public class LenientFeature extends SimpleFeatureImpl {
-    static Logger LOGGER = Logger.getLogger("org.geotools.data.wfs");
+    static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs");
     
     boolean constructing;
     /**

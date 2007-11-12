@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class TestData {
     /** DOCUMENT ME! */
-    private static final Logger LOGGER = Logger.getLogger(TestData.class.getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(TestData.class.getPackage().getName());
 
     /** DOCUMENT ME! */
     static final String COORD_SYS = "GEOGCS[\"WGS 84\"," + "DATUM[\"WGS_1984\","

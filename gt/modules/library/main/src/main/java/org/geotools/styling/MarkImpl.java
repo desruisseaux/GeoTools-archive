@@ -35,8 +35,7 @@ import org.opengis.util.Cloneable;
  */
 public class MarkImpl extends AbstractGTComponent implements Mark, Cloneable {
     /** The logger for the default core module. */
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
-        .getLogger("org.geotools.styling");
+    private static final java.util.logging.Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.styling");
 
     //TODO: Make container ready
     private final FilterFactory filterFactory;

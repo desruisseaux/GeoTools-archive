@@ -47,8 +47,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 public final class MemorySpatialIndex {
 
 	/** Logger. */
-	private final static Logger LOGGER = Logger
-			.getLogger("org.geotools.gce.imagemosaic");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.imagemosaic");
 
 	/** The {@link STRtree} index. */
 	private final STRtree index;
