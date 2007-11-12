@@ -1,0 +1,48 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+package org.geotools.gui.swing.map.map2d;
+
+import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Component;
+import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.map.MapContext;
+import org.geotools.renderer.GTRenderer;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+/**
+ *
+ * @author Johann Sorel
+ */
+public interface Map2D extends Map{
+    
+    public void setContext(MapContext context);
+    public MapContext getContext();
+        
+    public void setRenderer(GTRenderer renderer);
+    public GTRenderer getRenderer();
+    
+    public void setMapArea(Envelope mapArea);
+    public Envelope getMapArea();
+   
+    public void setCoordinateReferenceSystem(CoordinateReferenceSystem crs);
+    public CoordinateReferenceSystem getCoordinateReferenceSystem();
+            
+    public void refresh();
+    public Component getComponent();
+    
+}
