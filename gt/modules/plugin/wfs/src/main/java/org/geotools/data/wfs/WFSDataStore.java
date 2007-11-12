@@ -668,12 +668,14 @@ public class WFSDataStore extends AbstractDataStore {
 
         Writer w = new OutputStreamWriter(os);
         // write request
-        if( Logger.getLogger("org.geotools.data.wfs").isLoggable(Level.FINE) ){
-            w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.wfs"), Level.FINE);
+        Logger logger = Logging.getLogger("org.geotools.data.wfs");
+        if (logger.isLoggable(Level.FINE) ){
+            w = new LogWriterDecorator(w, logger, Level.FINE);
         }
         // special logger for communication information only.
-        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.FINE) ){
-            w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.communication"), Level.FINE);
+        logger = Logging.getLogger("org.geotools.data.communication");
+        if (logger.isLoggable(Level.FINE) ){
+            w = new LogWriterDecorator(w, logger, Level.FINE);
         }
         return w;
     }
@@ -697,8 +699,9 @@ public class WFSDataStore extends AbstractDataStore {
             is=new LogInputStream(is, WFSDataStoreFactory.logger, Level.FINE);
         }
         // special logger for communication information only.
-        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.FINE) ){
-            is=new LogInputStream(is, Logger.getLogger("org.geotools.data.communication"), Level.FINE);
+        Logger logger = Logging.getLogger("org.geotools.data.communication");
+        if (logger.isLoggable(Level.FINE) ){
+            is = new LogInputStream(is, logger, Level.FINE);
         }
         return is;
 	}
