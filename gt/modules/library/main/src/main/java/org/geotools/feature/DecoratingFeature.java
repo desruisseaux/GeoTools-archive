@@ -157,6 +157,13 @@ public class DecoratingFeature implements SimpleFeature {
     public void setValue(Object arg0) {
         delegate.setValue(arg0);
     }
-
-    
+    public boolean equals(Object obj) {
+        return delegate.equals(obj);
+    }
+    public int hashCode() {
+        return delegate.hashCode();
+    }
+    public String toString() {
+        return "<"+getClass().getCanonicalName()+">"+delegate.toString();
+    }
 }

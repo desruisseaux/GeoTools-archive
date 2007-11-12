@@ -1,8 +1,22 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2004-2007, GeoTools Project Management Committee (PMC)
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.feature.type;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.NameImpl;
@@ -10,7 +24,6 @@ import org.geotools.util.Converters;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
 
@@ -529,41 +542,7 @@ public class Types {
         if (type.getRestrictions() != null && type.getRestrictions().size() > 0) {
 
             final Attribute fatt = attribute;
-            Attribute fake = new Attribute() {
-
-                public AttributeType getType() {
-                    return fatt.getType();
-                }
-
-                public String getID() {
-                    return fatt.getID();
-                }
-
-                public Object getValue() {
-                    return fatt.getValue();
-                }
-
-                public void setValue(Object newValue) throws IllegalArgumentException {
-                    throw new UnsupportedOperationException("Modification is not supported");
-                }
-
-                public AttributeDescriptor getDescriptor() {
-                    return fatt.getDescriptor();
-                }
-
-                public Name getName() {
-                    return fatt.getName();
-                }
-
-                public Map<Object, Object> getUserData() {
-                    return fatt.getUserData();
-                }
-
-                public boolean isNillable() {
-                    return fatt.isNillable();
-                }
-              
-            };
+            Attribute fake = new ReadonlyAttributeDecorator(fatt);
 
             for (Iterator itr = type.getRestrictions().iterator(); itr.hasNext();) {
                 Filter f = (Filter) itr.next();

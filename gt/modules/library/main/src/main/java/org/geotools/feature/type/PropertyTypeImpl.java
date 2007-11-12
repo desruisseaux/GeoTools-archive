@@ -26,10 +26,14 @@ public class PropertyTypeImpl implements PropertyType {
 		PropertyType superType, InternationalString description 
 	) {
 		if(name== null){
-			throw new NullPointerException("name");
+			throw new NullPointerException("Name is required for PropertyType");
 		}
 		if(binding == null) {
-		    throw new NullPointerException("binding");
+		    if( superType != null && superType.getBinding() != null){
+	            // FIXME: This should be optional as the superType may have the required information?
+		        throw new NullPointerException("Binding to a Java class, did you mean to bind to "+superType.getBinding());
+		    }
+		    throw new NullPointerException("Binding to a Java class is required");
 		}
 		this.name = name;
 		this.binding = binding;
