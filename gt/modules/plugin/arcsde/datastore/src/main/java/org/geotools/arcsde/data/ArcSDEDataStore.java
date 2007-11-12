@@ -813,7 +813,9 @@ public class ArcSDEDataStore extends AbstractDataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * This method is a complete and utter override! As such the facilities
+     * like TransactionStateDiff provided by the super class are not
+     * hooked up!
      * 
      * @param typeName
      * @param filter
@@ -867,34 +869,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
         }
         featureReader.close();
 
-        // Well, this seems to come prepopulated with a state object,
-        // but I can't seem to figure out why. As such we check for
-        // and existing state, and check that states class as well. If
-        // it is a state we already provided (or at least of a workable
-        // type) then we will proceed with it. Otherwise, we must remove
-        // the state and replace it with an appropriate transaction
-        // state object that we understand. This should not present any
-        // danger as the default state could not possibly have come from
-        // us, and as such, no uncommitted changes could be lost.
-        // Jake Fear 6/25/2004
-        ArcTransactionState state = null;
-
-        if (Transaction.AUTO_COMMIT != transaction) {
-            synchronized (this) {
-                Transaction.State s = transaction.getState(this);
-
-                if (!(s instanceof ArcTransactionState)) {
-                    if (s != null) {
-                        transaction.removeState(this);
-                    }
-
-                    state = new ArcTransactionState(this);
-                    transaction.putState(this, state);
-                } else {
-                    state = (ArcTransactionState) s;
-                }
-            }
-        }
+        ArcTransactionState state = getArcTransactionState(transaction);
 
         ArcSDEPooledConnection connection = connectionPool.getConnection();
         SeLayer layer;
@@ -909,6 +884,67 @@ public class ArcSDEDataStore extends AbstractDataStore {
         FeatureWriter writer = new ArcSDEFeatureWriter(this, fidStrategy, state, layer, list);
 
         return writer;
+    }
+
+    /**
+     * Return null as we do not need to use memory based transaction state
+     * to hold edits before a commit.
+     * <p>
+     * Saul can you confirm this is in fact the case? Some code in your superclass
+     * was in trouble because it was trying to check this value.
+     * <p>
+     * @return null indicating memory based transaction isolation is not needed.
+     */
+    protected TransactionStateDiff state(Transaction transaction) {
+        return null;
+    }
+    
+    /**
+     * Grab the ArcTransactionState (when not using AUTO_COMMIT).
+     * <p>
+     * As of GeoTools 2.5 we store the TransactionState using
+     * the connection pool as a key.
+     * 
+     * @param transaction
+     * @return
+     */
+    public ArcTransactionState getArcTransactionState(
+            Transaction transaction) {
+        // Well, this seems to come prepopulated with a state object,
+        // but I can't seem to figure out why. As such we check for
+        // and existing state, and check that states class as well. If
+        // it is a state we already provided (or at least of a workable
+        // type) then we will proceed with it. Otherwise, we must remove
+        // the state and replace it with an appropriate transaction
+        // state object that we understand. This should not present any
+        // danger as the default state could not possibly have come from
+        // us, and as such, no uncommitted changes could be lost.
+        // Jake Fear 6/25/2004
+        // That is because you are using *this* to look up stuff, *this*
+        // is already used by your super class AbtractDataStore to hold the
+        // TransactionStateDiff (so if you are doing your own thing don't
+        // use AbstractDataStore?!?!?)
+        //
+        // Jody Garnett 11/12/2007
+        ArcTransactionState state = null;
+
+        if (Transaction.AUTO_COMMIT != transaction) {
+            synchronized (this) {
+                Transaction.State s = transaction.getState(connectionPool);
+
+                if (!(s instanceof ArcTransactionState)) {
+                    if (s != null) {
+                        transaction.removeState(this);
+                    }
+
+                    state = new ArcTransactionState(this);
+                    transaction.putState(this, state);
+                } else {
+                    state = (ArcTransactionState) s;
+                }
+            }
+        }
+        return state;
     }
 
     /**

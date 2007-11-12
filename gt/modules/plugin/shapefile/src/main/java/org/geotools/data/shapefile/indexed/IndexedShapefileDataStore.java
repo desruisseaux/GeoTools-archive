@@ -341,8 +341,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             writer.next();
         return writer;
 	}
-
-    private TransactionStateDiff state(Transaction transaction) {
+	/**
+	 * This method is identical to the super class WHY?
+	 */
+    protected  TransactionStateDiff state(Transaction transaction) {
         synchronized (transaction) {
             TransactionStateDiff state = (TransactionStateDiff) transaction
                 .getState(this);

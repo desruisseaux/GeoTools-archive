@@ -358,7 +358,10 @@ public abstract class AbstractDataStore implements DataStore {
         // JE
         Diff diff=null;
         if (transaction != Transaction.AUTO_COMMIT) {
-            diff = state(transaction).diff(typeName);
+            TransactionStateDiff state = state(transaction);
+            if( state != null ){
+                diff = state.diff(typeName);
+            }
         }
         
         // This calls our subclass "simple" implementation
@@ -414,54 +417,19 @@ public abstract class AbstractDataStore implements DataStore {
     {
       return filter;
     }
-    /*
-     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
-     *      org.geotools.filter.Filter, org.geotools.data.Transaction)
-     *
-    public FeatureReader getFeatureReader(FeatureType featureType,
-        Filter filter, Transaction transaction) throws IOException {
-        if (filter == null) {
-            throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.INCLUDE?");
-        }
 
-        if (featureType == null) {
-            throw new NullPointerException(
-                "getFeatureReader requires FeatureType: "
-                + "use getSchema( typeName ) to aquire a FeatureType");
-        }
-
-        if (transaction == null) {
-            throw new NullPointerException(
-                "getFeatureReader requires Transaction: "
-                + "did you mean to use Transaction.AUTO_COMMIT?");
-        }
-
-        if (filter == Filter.EXCLUDE) {
-            return new EmptyFeatureReader(featureType);
-        }
-
-        String typeName = featureType.getTypeName();
-
-        FeatureReader reader = getFeatureReader(typeName);
-
-        if (filter != Filter.INCLUDE) {
-            reader = new FilteringFeatureReader(reader, filter);
-        }
-
-        if (transaction != Transaction.AUTO_COMMIT) {
-            Map diff = state(transaction).diff(typeName);
-            reader = new DiffFeatureReader(reader, diff);
-        }
-
-        if (!featureType.equals(reader.getFeatureType())) {
-            reader = new ReTypeFeatureReader(reader, featureType);
-        }
-
-        return reader;
-    }
-   */
-    TransactionStateDiff state(Transaction transaction) {
+    /**
+     * Used to retrive the TransactionStateDiff for this transaction.
+     * If you subclass is doing its own thing (ArcSDE I am talking to
+     * you) then you should arrange for this method to return null.
+     * <p>
+     * By default a TransactionStateDiff will be created that holds
+     * any changes in memory.
+     * <p>
+     * @param transaction
+     * @return TransactionStateDiff or null if subclass is handling differences
+     */
+    protected TransactionStateDiff state(Transaction transaction) {
         synchronized (transaction) {
             TransactionStateDiff state = (TransactionStateDiff) transaction
                 .getState(this);
@@ -507,7 +475,13 @@ public abstract class AbstractDataStore implements DataStore {
         		writer = getFeatureWriter(typeName);
 			}
         } else {
-            writer = state(transaction).writer(typeName, filter);
+            TransactionStateDiff state = state(transaction);
+            if( state != null ){
+                writer = state.writer(typeName, filter);
+            }
+            else {
+                throw new UnsupportedOperationException("Subclass sould implement");
+            }
         }
 
         if (lockingManager != null) {
