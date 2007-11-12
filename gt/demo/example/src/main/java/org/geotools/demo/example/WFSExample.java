@@ -51,7 +51,7 @@ public class WFSExample {
 	}
 	public static void supressInfo(){
 		org.geotools.util.logging.Logging.getLogger("org.geotools.gml").setLevel( Level.SEVERE );
-		Logger.getLogger("net.refractions.xml").setLevel( Level.SEVERE);
+		org.geotools.util.logging.Logging.getLogger("net.refractions.xml").setLevel( Level.SEVERE);
 	}
 	
 	public static void dataAccess( String getCapabilities ) throws Exception {

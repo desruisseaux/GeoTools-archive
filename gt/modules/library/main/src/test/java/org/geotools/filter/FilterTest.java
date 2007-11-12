@@ -84,7 +84,7 @@ public class FilterTest extends TestCase {
         super(testName);
 
         //BasicConfigurator.configure();
-        //LOGGER = Logger.getLogger(FilterTest.class);
+        //LOGGER = org.geotools.util.logging.Logging.getLogger(FilterTest.class);
         //LOGGER.getLoggerRepository().setThreshold(Level.INFO);
     }
 

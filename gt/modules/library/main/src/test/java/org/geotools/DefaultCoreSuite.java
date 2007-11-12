@@ -44,7 +44,7 @@ public class DefaultCoreSuite extends TestCase {
     }
     
     public static Test suite() {
-        //_log = Logger.getLogger(DefaultCoreSuite.class);
+        //_log = org.geotools.util.logging.Logging.getLogger(DefaultCoreSuite.class);
        
         
         TestSuite suite = new TestSuite("All core tests");                

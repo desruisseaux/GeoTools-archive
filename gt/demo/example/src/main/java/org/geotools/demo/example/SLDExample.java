@@ -46,7 +46,7 @@ public class SLDExample {
 	}
 	public static void supressInfo(){
 		org.geotools.util.logging.Logging.getLogger("org.geotools.gml").setLevel( Level.SEVERE );
-		Logger.getLogger("net.refractions.xml").setLevel( Level.SEVERE);
+		org.geotools.util.logging.Logging.getLogger("net.refractions.xml").setLevel( Level.SEVERE);
 	}
 	public static void localSLD() throws Exception {
 		FeatureSource source = demoFeatureSource();

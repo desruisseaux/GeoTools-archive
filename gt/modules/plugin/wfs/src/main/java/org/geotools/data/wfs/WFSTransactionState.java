@@ -191,7 +191,7 @@ public class WFSTransactionState implements State {
             }
 
             if (currentInsertIndex != newFids.size()) {
-                Logger.getLogger("org.geotools.data.wfs").severe(
+                org.geotools.util.logging.Logging.getLogger("org.geotools.data.wfs").severe(
                         "number of fids inserted do not match number of fids returned "
                                 + "by Transaction Response.  Got:" + newFids.size() + " expected: "
                                 + currentInsertIndex);

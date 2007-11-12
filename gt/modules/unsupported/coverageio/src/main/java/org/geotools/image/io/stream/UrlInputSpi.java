@@ -19,7 +19,6 @@ package org.geotools.image.io.stream;
 
 // J2SE dependencies
 import java.util.Locale;
-import java.util.logging.Logger;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -129,7 +128,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
             stopper.cancel();
             // Thread.interrupted() must be first in order to clear the flag.
             if (Thread.interrupted() || stopper.interrupted) {
-                Logger.getLogger("org.geotools.image.io.stream").
+                Logging.getLogger("org.geotools.image.io.stream").
                         warning("System.runFinalization() was blocked.");
             }
         }

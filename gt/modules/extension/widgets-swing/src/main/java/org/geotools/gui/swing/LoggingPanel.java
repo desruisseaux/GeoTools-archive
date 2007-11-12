@@ -203,7 +203,7 @@ public class LoggingPanel extends JPanel {
      * @param logger The logger name to listen to, or {@code null} for the root logger.
      */
     public LoggingPanel(final String logger) {
-        this(Logger.getLogger(logger!=null ? logger : ""));
+        this(org.geotools.util.logging.Logging.getLogger(logger!=null ? logger : ""));
     }
 
     /**

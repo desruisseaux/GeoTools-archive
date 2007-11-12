@@ -443,7 +443,7 @@ public class WFSDataStore extends AbstractDataStore {
 
     private URL getDescribeFeatureTypeURLGet( String typeName ) throws MalformedURLException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
-        Logger.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
+        org.geotools.util.logging.Logging.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
 
         if (getUrl == null) {
             return null;

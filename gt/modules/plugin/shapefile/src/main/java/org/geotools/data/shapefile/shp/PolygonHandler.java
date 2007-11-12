@@ -313,7 +313,7 @@ public class PolygonHandler implements ShapeHandler {
         }
         
         if (minShell == null) {
-          Logger.getLogger("org.geotools.data.shapefile").warning(
+          org.geotools.util.logging.Logging.getLogger("org.geotools.data.shapefile").warning(
           "polygon found with a hole thats not inside a shell"
           );
           // now reverse this bad "hole" and turn it into a shell
