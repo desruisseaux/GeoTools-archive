@@ -36,7 +36,7 @@ import javax.sql.DataSource;
 import org.opengis.util.InternationalString;
 
 // Geotools Dependencies
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 
 

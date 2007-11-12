@@ -106,7 +106,7 @@ public class DefaultFactoryTest extends TestCase {
         verbose = arguments.getFlag("-verbose");
         extensive = true;
         arguments.getRemainingArguments(0);
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());        
     }
 

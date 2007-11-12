@@ -31,7 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 

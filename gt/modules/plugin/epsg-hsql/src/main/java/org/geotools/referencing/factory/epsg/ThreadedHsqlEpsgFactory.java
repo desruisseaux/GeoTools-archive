@@ -275,7 +275,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
              * we will attempt to rebuild the whole database. Note: "createBackingStore" is the
              * public method that invoked this method, so we use it for the logging message.
              */
-            org.geotools.util.Logging.unexpectedException(LOGGER, ThreadedHsqlEpsgFactory.class,
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER, ThreadedHsqlEpsgFactory.class,
                     "createBackingStore", exception);
         }
         delete(directory);

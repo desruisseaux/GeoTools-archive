@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.io.TableWriter;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.NumberRange;
 import org.geotools.util.MeasurementRange;
 import org.geotools.resources.Utilities;

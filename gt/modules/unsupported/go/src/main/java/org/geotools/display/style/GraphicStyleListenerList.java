@@ -31,7 +31,7 @@ import org.opengis.go.display.style.event.GraphicStyleEvent;
 import org.opengis.go.display.style.event.GraphicStyleListener;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.XArray;
 
 

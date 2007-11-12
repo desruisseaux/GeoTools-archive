@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;

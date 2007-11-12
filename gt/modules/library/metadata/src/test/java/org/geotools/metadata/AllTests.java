@@ -40,7 +40,7 @@ public final class AllTests {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         TestRunner.run(suite());
     }
 
@@ -52,7 +52,6 @@ public final class AllTests {
         suite.addTest(org.geotools.resources.XMathTest                  .suite());
         suite.addTest(org.geotools.resources.UtilitiesTest              .suite());
         suite.addTest(org.geotools.resources.ResourceBundleTest         .suite());
-        suite.addTest(org.geotools.util     .MonolineFormatterTest      .suite());
         suite.addTest(org.geotools.util     .InternationalStringTest    .suite());
         suite.addTest(org.geotools.util     .VersionTest                .suite());
         suite.addTest(org.geotools.util     .MeasurementRangeTest       .suite());

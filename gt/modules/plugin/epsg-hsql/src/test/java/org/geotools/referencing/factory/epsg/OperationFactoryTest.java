@@ -67,7 +67,7 @@ public class OperationFactoryTest extends TestCase {
         final Arguments arguments = new Arguments(args);
         final boolean log = arguments.getFlag("-log");
         arguments.getRemainingArguments(0);
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 

@@ -31,7 +31,7 @@ import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import org.w3c.dom.Node;
 
-import org.geotools.util.LoggedFormat;
+import org.geotools.util.logging.LoggedFormat;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.OptionalDependencies;

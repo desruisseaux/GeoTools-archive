@@ -369,7 +369,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                                     final String       method,
                                     final SQLException exception)
     {
-        org.geotools.util.Logging.unexpectedException(LOGGER, classe, method, exception);
+        org.geotools.util.logging.Logging.unexpectedException(LOGGER, classe, method, exception);
     }
 
     /**

@@ -51,7 +51,7 @@ import org.geotools.image.io.metadata.ImageReferencing;
 import org.geotools.image.io.metadata.MetadataAccessor;
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
-import org.geotools.util.LoggedFormat;
+import org.geotools.util.logging.LoggedFormat;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 

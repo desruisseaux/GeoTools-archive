@@ -33,7 +33,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.opengis.util.InternationalString;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 
 
 /**

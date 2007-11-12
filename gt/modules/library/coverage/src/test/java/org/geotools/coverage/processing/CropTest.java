@@ -103,7 +103,7 @@ public class CropTest extends GridCoverageTest {
 	 */
 	public static void main(String[] args) {
 		SHOW = true;
-		org.geotools.util.Logging.GEOTOOLS
+		org.geotools.util.logging.Logging.GEOTOOLS
 				.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
 		junit.textui.TestRunner.run(suite());
 	}

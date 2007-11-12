@@ -96,7 +96,7 @@ import javax.swing.plaf.ComponentUI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 
 // Miscellaneous
 import java.util.Arrays;

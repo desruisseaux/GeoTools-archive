@@ -62,7 +62,7 @@ public class MetadataBuilderTest extends TestCase {
             out = new PrintWriter(new StringWriter());
         }
         arguments.getRemainingArguments(0);
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 

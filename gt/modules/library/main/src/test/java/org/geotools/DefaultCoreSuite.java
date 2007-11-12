@@ -39,7 +39,7 @@ public class DefaultCoreSuite extends TestCase {
     }        
     
     public static void main(java.lang.String[] args) {
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
     

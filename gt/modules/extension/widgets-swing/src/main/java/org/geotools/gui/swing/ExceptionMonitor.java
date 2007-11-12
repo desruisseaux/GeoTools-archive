@@ -52,7 +52,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 // Resources
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;

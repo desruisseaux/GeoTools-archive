@@ -68,7 +68,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
      * @param args the command line arguments.
      */
     public static void main(final String[] args) {
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 

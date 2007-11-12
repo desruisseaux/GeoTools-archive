@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.lang.reflect.Method;
 
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
@@ -32,12 +33,13 @@ import org.geotools.resources.Utilities;
  * chance to redirect log events to an other logging framework, for example
  * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>.
  * <p>
- * In order to redirect every GeoTools log events to Commons-logging, invoke the following
- * once at application startup:
+ * <b>Example:</b> In order to redirect every GeoTools log events to Commons-logging,
+ * invoke the following once at application startup:
  *
- * <blockquote><pre>
- * Logging.{@linkplain #GEOTOOLS}.{@linkplain #redirectToCommonsLogging()};
- * </pre></blockquote>
+ * <blockquote><code>
+ * Logging.{@linkplain #GEOTOOLS}.{@linkplain #setLoggingFramework setLoggingFramework}({@linkplain
+ * LoggingFramework#COMMONS_LOGGING});
+ * </code></blockquote>
  *
  * @since 2.4
  * @source $URL$
@@ -116,11 +118,11 @@ public final class Logging {
 
     /**
      * Returns a logger for the specified name. If a {@linkplain LoggerFactory logger factory}
-     * has been set (typically indirectly through a call to {@link #redirectToCommonsLogging()}
-     * or some similar methods), then this method first ask to the factory. It gives GeoTools a
-     * chance to redirect logging events to
-     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A> or some equivalent
-     * framework.
+     * has been set (typically indirectly through a call to {@link #setLoggingFramework
+     * setLoggingFramework}), then this method first {@linkplain LoggerFactory#getLogger
+     * ask to the factory}. It gives GeoTools a chance to redirect logging events to
+     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
+     * or some equivalent framework.
      * <p>
      * If no factory was found or if the factory choose to not redirect the loggings, then this
      * method returns the usual <code>{@linkplain Logger#getLogger Logger.getLogger}(name)</code>.
@@ -213,11 +215,8 @@ public final class Logging {
      * specified factory will be used by <code>{@linkplain #getLogger getLogger}(name)</code>
      * when {@code name} is this {@code Logging} name or one of its children.
      * <p>
-     * This method is invoked with pre-defined factory by the following methods:
-     * <ul>
-     *   <li>{@link #redirectToCommonsLogging}</li>
-     *   <li>{@link #redirectToLog4J}</li>
-     * </ul>
+     * This method is invoked with pre-defined factory by
+     * {@link #setLoggingFramework setLoggingFramework}.
      */
     public void setLoggerFactory(final LoggerFactory factory) {
         synchronized (EMPTY) {
@@ -229,64 +228,41 @@ public final class Logging {
     }
 
     /**
-     * Redirects {@linkplain java.util.logging Java logging} events to the Apache's
-     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A> framework.
+     * Sets a pre-defined logger factory for {@linkplain java.util.logging Java logging},
+     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A> or
+     * <A HREF="http://logging.apache.org/log4j/">Log4J</A> framework. This method does nothing
+     * if the specified framework is not {@linkplain LoggingFramework#isAvailable available}.
+     *
+     * @param  framework The framework to set.
+     * @return {@code true} if the framework has been set, or {@code false} otherwise.
      *
      * @see org.geotools.factory.GeoTools#init
      */
-    public void redirectToCommonsLogging() {
-        try {
-            setLoggerFactory(new CommonLogger.Factory());
-            assert isCommonsLoggingAvailable();
-        } catch (NoClassDefFoundError error) {
-            // May occurs if commons-logging is not in the classpath.
-            Utilities.recoverableException("org.geotools.util", Logging.class,
-                    "redirectToCommonsLogging", error);
+    public boolean setLoggingFramework(final LoggingFramework framework) {
+        if (framework.isAvailable()) {
+            Throwable error;
+            try {
+                final LoggerFactory factory;
+                if (framework.factoryClassName == null) {
+                    factory = null;
+                } else {
+                    final Class<?> classe = Class.forName(framework.factoryClassName);
+                    final Method   method = classe.getMethod("getInstance", (Class[]) null);
+                    factory = (LoggerFactory) method.invoke(null, (Object[]) null);
+                }
+                setLoggerFactory(factory);
+                return true;
+            } catch (NoClassDefFoundError e) {
+                error = e;
+            } catch (Exception e) {
+                // Catching all exceptions is not a good practice, but
+                // there is really a lot of them when using reflection.
+                error = e;
+            }
+            Utilities.recoverableException("org.geotools.logging.util",
+                    Logging.class, "setLoggingFramework", error);
         }
-    }
-
-    /**
-     * Returns {@code true} if the
-     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
-     * framework seems to be available on the classpath.
-     */
-    public static boolean isCommonsLoggingAvailable() {
-        try {
-            Class.forName("org.apache.commons.logging.Log", false, Logging.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Redirects {@linkplain java.util.logging Java logging} events to the Apache's
-     * <A HREF="http://logging.apache.org/log4j/">Log4J</A> framework.
-     *
-     * @see org.geotools.factory.GeoTools#init
-     */
-    public void redirectToLog4J() {
-        try {
-            setLoggerFactory(new Log4JLogger.Factory());
-            assert isLog4JAvailable();
-        } catch (NoClassDefFoundError error) {
-            // May occurs if commons-logging is not in the classpath.
-            Utilities.recoverableException("org.geotools.util", Logging.class,
-                    "redirectToLog4J", error);
-        }
-    }
-
-    /**
-     * Returns {@code true} if the <A HREF="http://logging.apache.org/log4j/">Log4J</A>Log4J</A>
-     * framework seems to be available on the classpath.
-     */
-    public static boolean isLog4JAvailable() {
-        try {
-            Class.forName("org.apache.log4j.Logger", false, Logging.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
+        return false;
     }
 
     /**

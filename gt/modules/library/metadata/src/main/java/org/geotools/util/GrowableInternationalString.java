@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.opengis.util.InternationalString;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;

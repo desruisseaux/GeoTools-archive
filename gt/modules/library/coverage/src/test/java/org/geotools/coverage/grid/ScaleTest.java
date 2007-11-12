@@ -84,7 +84,7 @@ public class ScaleTest extends GridCoverageTest {
      */
     public static void main(final String[] args) {
         SHOW = true;
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
         junit.textui.TestRunner.run(suite());
     }
 

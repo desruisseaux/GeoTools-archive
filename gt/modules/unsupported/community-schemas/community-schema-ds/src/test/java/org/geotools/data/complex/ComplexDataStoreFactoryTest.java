@@ -31,7 +31,7 @@ import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.iso.Types;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.type.Name;
 
 /**

@@ -468,7 +468,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             result.close();
             statement.close();
         } catch (SQLException exception) {
-            org.geotools.util.Logging.unexpectedException(LOGGER.getName(),
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER.getName(),
                     DirectEpsgFactory.class, "getAuthority", exception);
             return Citations.EPSG;
         }
@@ -1511,7 +1511,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                     properties.put(Datum.REALIZATION_EPOCH_KEY, calendar.getTime());
                 } catch (NumberFormatException exception) {
                     // Not a fatal error...
-                    org.geotools.util.Logging.unexpectedException(LOGGER.getName(),
+                    org.geotools.util.logging.Logging.unexpectedException(LOGGER.getName(),
                             DirectEpsgFactory.class, "createDatum", exception);
                 }
                 final DatumFactory factory = factories.getDatumFactory();

@@ -33,7 +33,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.SimpleInternationalString;
 
 

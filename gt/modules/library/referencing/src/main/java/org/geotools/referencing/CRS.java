@@ -68,7 +68,7 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.Version;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.UnsupportedImplementationException;
 
 

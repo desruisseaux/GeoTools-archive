@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 

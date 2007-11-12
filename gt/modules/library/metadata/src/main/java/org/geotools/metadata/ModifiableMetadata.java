@@ -29,7 +29,7 @@ import java.util.Collections;
 // Geotools dependencies
 import org.geotools.util.CheckedArrayList;
 import org.geotools.util.CheckedHashSet;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 

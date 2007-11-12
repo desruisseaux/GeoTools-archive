@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.IndexedResourceBundle;
 import org.geotools.resources.image.ColorUtilities;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.CanonicalSet;
 
 

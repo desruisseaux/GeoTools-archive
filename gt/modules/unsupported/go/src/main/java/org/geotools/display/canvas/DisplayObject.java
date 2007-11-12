@@ -364,7 +364,7 @@ public class DisplayObject {
                                    final String  sourceMethodName,
                                    final Exception exception)
     {
-        org.geotools.util.Logging.unexpectedException(getLogger().getName(),
+        org.geotools.util.logging.Logging.unexpectedException(getLogger().getName(),
                 sourceClassName, sourceMethodName, exception);
     }
 

@@ -74,7 +74,7 @@ public class FilterEqualsTest extends TestCase {
      * Main for test runner.
      */
     public static void main(String[] args) {
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
     

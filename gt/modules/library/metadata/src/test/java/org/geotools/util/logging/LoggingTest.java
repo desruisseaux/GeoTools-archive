@@ -72,17 +72,17 @@ public class LoggingTest extends TestCase {
     /**
      * Tests the redirection to Commons-logging.
      */
-    public void testCommonLogging() {
-        assertTrue(Logging.isCommonsLoggingAvailable());
+    public void testCommonsLogging() {
+        assertTrue(LoggingFramework.COMMONS_LOGGING.isAvailable());
         try {
-            Logging.GEOTOOLS.redirectToCommonsLogging();
+            Logging.GEOTOOLS.setLoggingFramework(LoggingFramework.COMMONS_LOGGING);
             Logger logger = Logging.getLogger("org.geotools");
             /*
              * 'logger' would be an instanceof from the Java logging framework if Log4J wasn't in
              * the classpath.  But because it is (with "provided" scope), Commons-logging chooses
              * it instead of the Java logging one.
              */
-            assertTrue(logger instanceof CommonLogger);
+            assertTrue(logger instanceof CommonsLogger);
             /*
              * Tests level setting, ending with OFF in order to avoid
              * polluting the standard output stream with this test.
@@ -114,7 +114,7 @@ public class LoggingTest extends TestCase {
             logger.severe ("Message to Commons-logging at SEVERE level.");
             log4j.setLevel(oldLevel);
         } finally {
-            Logging.GEOTOOLS.setLoggerFactory(null);
+            Logging.GEOTOOLS.setLoggingFramework(LoggingFramework.JAVA_LOGGING);
             assertEquals(Logger.class, Logging.getLogger("org.geotools").getClass());
         }
     }
@@ -123,9 +123,9 @@ public class LoggingTest extends TestCase {
      * Tests the redirection to Log4J.
      */
     public void testLog4J() {
-        assertTrue(Logging.isLog4JAvailable());
+        assertTrue(LoggingFramework.LOG4J.isAvailable());
         try {
-            Logging.GEOTOOLS.redirectToLog4J();
+            Logging.GEOTOOLS.setLoggingFramework(LoggingFramework.LOG4J);
             Logger logger = Logging.getLogger("org.geotools");
             assertTrue(logger instanceof Log4JLogger);
             /*
@@ -163,7 +163,7 @@ public class LoggingTest extends TestCase {
             logger.severe ("Message to Log4J at SEVERE level.");
             logger.setLevel(oldLevel);
         } finally {
-            Logging.GEOTOOLS.setLoggerFactory(null);
+            Logging.GEOTOOLS.setLoggingFramework(LoggingFramework.JAVA_LOGGING);
             assertEquals(Logger.class, Logging.getLogger("org.geotools").getClass());
         }
     }

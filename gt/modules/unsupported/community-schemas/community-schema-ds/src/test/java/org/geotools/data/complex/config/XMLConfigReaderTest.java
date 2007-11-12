@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import junit.framework.TestCase;
 
 import org.geotools.data.complex.FeatureTypeMapping;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 
 /**
  * 

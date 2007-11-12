@@ -285,7 +285,7 @@ public class MonolineFormatter extends Formatter {
          * Formats the time (e.g. "00:00:12.365").  The time pattern can be set
          * either programmatically with a call to setTimeFormat(String), or in
          * the logging.properties file with the
-         * "org.geotools.util.MonolineFormatter.time" property.
+         * "org.geotools.util.logging.MonolineFormatter.time" property.
          */
         if (timeFormat != null) {
             Date time = new Date(Math.max(0, record.getMillis() - startMillis));

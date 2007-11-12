@@ -73,7 +73,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.NumberRange;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 
 
 /**

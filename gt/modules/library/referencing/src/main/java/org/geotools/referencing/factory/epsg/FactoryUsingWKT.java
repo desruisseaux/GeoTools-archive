@@ -254,9 +254,9 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
                 }
             }
         } catch (SecurityException exception) {
-            org.geotools.util.Logging.unexpectedException(LOGGER, exception);
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER, exception);
         } catch (MalformedURLException exception) {
-            org.geotools.util.Logging.unexpectedException(LOGGER, exception);
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER, exception);
         }
         return FactoryUsingWKT.class.getResource(FILENAME);
     }

@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.swing.event.ChangeEvent;
@@ -34,7 +33,8 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
+import org.geotools.util.logging.LoggingFramework;
 import org.geotools.util.Version;
 
 
@@ -190,11 +190,11 @@ public final class GeoTools {
      * <ul>
      *   <li>If the <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
      *       framework is available, then every logging message in the {@code org.geotools}
-     *       namespace sent to the Java {@linkplain java.util.logging.Logger logger} is
+     *       namespace sent to the Java {@linkplain java.util.logging.Logger logger} are
      *       redirected to commons-logging.</li>
      * 
      *   <li>Otherwise, the Java logging {@linkplain java.util.logging.Formatter formatter} for
-     *       console output is replaced by a {@linkplain org.geotools.util.MonolineFormatter
+     *       console output is replaced by a {@linkplain org.geotools.util.logging.MonolineFormatter
      *       monoline formatter}.</li>
      * </ul>
      * <p>
@@ -215,14 +215,17 @@ public final class GeoTools {
      * GeoTools.init(hints);
      * </pre></blockquote>
      * 
-     * @see Logging#redirectToCommonsLogging
+     * @see Logging#setLoggingFramework
      * @see Logging#forceMonolineConsoleOutput
      * @see Hints#putSystemDefault
      * @see #getDefaultHints
      */
     public static void init(final Hints hints) {
-        if (!Logging.isCommonsLoggingAvailable() || !Logging.GEOTOOLS.redirectToCommonsLogging()) {
-            Logging.GEOTOOLS.forceMonolineConsoleOutput();
+        final Logging log = Logging.GEOTOOLS;
+        if (!log.setLoggingFramework(LoggingFramework.COMMONS_LOGGING) &&
+            !log.setLoggingFramework(LoggingFramework.LOG4J)) // Fallback if commons not available
+        {
+            log.forceMonolineConsoleOutput();
         }
         Hints.putSystemDefault(hints);
     }

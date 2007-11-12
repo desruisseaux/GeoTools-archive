@@ -71,7 +71,7 @@ import java.util.Iterator;
 import javax.media.jai.JAI;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.SwingUtilities;

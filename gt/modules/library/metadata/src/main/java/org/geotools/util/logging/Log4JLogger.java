@@ -152,7 +152,7 @@ final class Log4JLogger extends LoggerAdapter {
 
 
     /**
-     * Factory for {@link CommonLogger}.
+     * Factory for {@link Log4JLogger}.
      *
      * @since 2.4
      * @source $URL$
@@ -160,6 +160,27 @@ final class Log4JLogger extends LoggerAdapter {
      * @author Martin Desruisseaux
      */
     static final class Factory extends LoggerFactory {
+        /**
+         * The unique instance of this factory.
+         */
+        private static Factory factory;
+
+        /**
+         * Do not allows more than instantiation of this class.
+         */
+        private Factory() {
+        }
+
+        /**
+         * Returns the unique instance of this factory.
+         */
+        public static synchronized Factory getInstance() {
+            if (factory == null) {
+                factory = new Factory();
+            }
+            return factory;
+        }
+
         /**
          * Returns the implementation to use for the logger of the specified name,
          * or {@code null} if the logger would delegates to Java logging anyway.

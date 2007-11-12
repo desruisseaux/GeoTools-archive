@@ -91,7 +91,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.SimpleInternationalString;
 
 // Resources

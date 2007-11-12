@@ -33,7 +33,7 @@ import org.apache.commons.logging.impl.Jdk14Logger;
  *
  * @see Logging
  */
-final class CommonLogger extends LoggerAdapter {
+final class CommonsLogger extends LoggerAdapter {
     /**
      * The Apache logger to use.
      */
@@ -45,7 +45,7 @@ final class CommonLogger extends LoggerAdapter {
      * @param name   The logger name.
      * @param logger The result of {@code LogFactory.getLog(name)}.
      */
-    public CommonLogger(final String name, final Log logger) {
+    public CommonsLogger(final String name, final Log logger) {
         super(name);
         this.logger = logger;
     }
@@ -139,7 +139,7 @@ final class CommonLogger extends LoggerAdapter {
 
 
     /**
-     * Factory for {@link CommonLogger}.
+     * Factory for {@link CommonsLogger}.
      *
      * @since 2.4
      * @source $URL$
@@ -147,6 +147,27 @@ final class CommonLogger extends LoggerAdapter {
      * @author Martin Desruisseaux
      */
     static final class Factory extends LoggerFactory {
+        /**
+         * The unique instance of this factory.
+         */
+        private static Factory factory;
+
+        /**
+         * Do not allows more than instantiation of this class.
+         */
+        private Factory() {
+        }
+
+        /**
+         * Returns the unique instance of this factory.
+         */
+        public static synchronized Factory getInstance() {
+            if (factory == null) {
+                factory = new Factory();
+            }
+            return factory;
+        }
+
         /**
          * Returns the implementation to use for the logger of the specified name,
          * or {@code null} if the logger would delegates to Java logging anyway.
@@ -163,7 +184,7 @@ final class CommonLogger extends LoggerAdapter {
          * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
          */
         protected Logger wrap(String name, Object implementation) throws ClassCastException {
-            return new CommonLogger(name, (Log) implementation);
+            return new CommonsLogger(name, (Log) implementation);
         }
 
         /**
@@ -171,8 +192,8 @@ final class CommonLogger extends LoggerAdapter {
          * or {@code null} if none.
          */
         protected Object unwrap(final Logger logger) {
-            if (logger instanceof CommonLogger) {
-                return ((CommonLogger) logger).logger;
+            if (logger instanceof CommonsLogger) {
+                return ((CommonsLogger) logger).logger;
             }
             return null;
         }
