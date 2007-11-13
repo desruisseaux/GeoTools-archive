@@ -33,6 +33,7 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.util.logging.LoggerFactory;
 import org.geotools.util.logging.Logging;
 import org.geotools.util.logging.LoggingFramework;
 import org.geotools.util.Version;
@@ -230,6 +231,29 @@ public final class GeoTools {
         Hints.putSystemDefault(hints);
     }
 
+    /**
+     * Set the global LogginFactory.
+     * <p>
+     * It looks like Logging.getLogger(...).setLogginFactory() could be used to override
+     * this setting? That would be bad as we want a *single* spot to set the policy for
+     * all of GeoTools.
+     * <p>
+     * This method is the same as Logging.GEOTOOLS.setLoggerFactory( factory ), GeoTools
+     * ships with support for commons logging and log4j. This method exists to allow you
+     * supply your own implementation (this is sometimes required when using a GeoTools
+     * application in an exotic environment like Eclipse, OC4J or your application).
+     * 
+     * @see LoggingFramework
+     * @param factory
+     */
+    public void setLoggerFactory(LoggerFactory factory){
+        if( factory == null ){
+            throw new NullPointerException("factory must be provided, by default we use commons logging");
+        }
+        final Logging log = Logging.GEOTOOLS;
+        log.setLoggerFactory( factory );
+    }
+    
     /**
      * Forces the initial context for test cases, or as needed.
      * 
