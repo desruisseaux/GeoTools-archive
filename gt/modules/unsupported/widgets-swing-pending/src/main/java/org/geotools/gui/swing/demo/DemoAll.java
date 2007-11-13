@@ -82,7 +82,7 @@ public class DemoAll extends javax.swing.JFrame {
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
     
     
-    private JDataChooser.STATE state = JDataChooser.STATE.BUTTONED;
+    private JDataChooser.STATE state = JDataChooser.STATE.TABBED;
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
@@ -382,6 +382,7 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu2.add(jSeparator3);
 
         group_jdatachooser.add(jRadioButtonMenuItem1);
+        jRadioButtonMenuItem1.setSelected(true);
         jRadioButtonMenuItem1.setText("tabbed");
         jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -391,7 +392,6 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu2.add(jRadioButtonMenuItem1);
 
         group_jdatachooser.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setSelected(true);
         jRadioButtonMenuItem2.setText("buttoned");
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
