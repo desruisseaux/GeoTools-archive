@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +43,7 @@ import java.util.zip.GZIPInputStream;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.AbstractDataStore;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
@@ -317,7 +319,10 @@ public class WFSDataStore extends AbstractDataStore {
                 typeNames[i] = ((FeatureSetDescription) l.get(i)).getName();
             }
         }
-        return typeNames;
+        // protect the cache against external modifications
+        String[] retVal = new String[typeNames.length];
+        System.arraycopy(typeNames, 0, retVal, 0, typeNames.length);
+        return retVal;
     }
 
     /**
@@ -366,7 +371,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         if(t == null && sax!=null)
-            throw new IOException(sax.toString());
+            throw new DataSourceException(sax);
 
         if(t == null && io!=null)
             throw io;
