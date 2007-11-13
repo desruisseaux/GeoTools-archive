@@ -58,6 +58,9 @@ class ArcTransactionState implements Transaction.State {
 		try {
 			if (connection != null) {
 				connection.commitTransaction();
+				
+				connection.setTransactionAutoCommit(0);                
+				connection.startTransaction(); // restart transaction to continue editing
 			}
 		} catch (SeException se) {
 			LOGGER.log(Level.WARNING, se.getMessage(), se);
@@ -72,6 +75,9 @@ class ArcTransactionState implements Transaction.State {
 		try {
 			if (connection != null) {
 				connection.rollbackTransaction();
+				
+				connection.setTransactionAutoCommit(0);                
+				connection.startTransaction(); // restart transaction to continue editing
 			}
 		} catch (SeException se) {
 			LOGGER.log(Level.WARNING, se.getMessage(), se);
@@ -92,9 +98,12 @@ class ArcTransactionState implements Transaction.State {
 	public void setTransaction(Transaction transaction) {
 		if ((transaction == null) && (this.connection != null)) {
 			this.connection.close();
+			this.connection = null;
 		} else if (transaction != null) {
 			try {
 				connection = dataStore.getConnectionPool().getConnection();
+				
+				// tells ArcSDE to never to auto commit
 				connection.setTransactionAutoCommit(0);
 				connection.startTransaction();
 			} catch (Exception e) {
@@ -110,7 +119,7 @@ class ArcTransactionState implements Transaction.State {
 	 * Used only within the package to provide access to a single connection on
 	 * which this transaction is being conducted.
 	 * 
-	 * @return DOCUMENT ME!
+	 * @return connection
 	 */
 	ArcSDEPooledConnection getConnection() {
 		return connection;
