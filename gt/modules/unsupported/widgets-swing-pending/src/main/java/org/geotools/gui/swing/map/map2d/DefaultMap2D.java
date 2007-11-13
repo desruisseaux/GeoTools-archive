@@ -18,6 +18,7 @@ package org.geotools.gui.swing.map.map2d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -56,9 +57,7 @@ public class DefaultMap2D extends JPanel implements Map2D {
     protected GTRenderer renderer;
     protected MapContext context;
     protected Envelope mapArea;
-    protected MapContext buffercontext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-    //protected List<BufferedImage> bufferLayer = new ArrayList<BufferedImage>();
-    //protected BufferedImage bufferImage;
+    protected MapContext buffercontext = new OneLayerContext();
 
     private Rectangle mapRectangle;
     private Rectangle oldRect = null;
@@ -76,6 +75,7 @@ public class DefaultMap2D extends JPanel implements Map2D {
         this.renderer = renderer;
         mapLayerListlistener = new MapLayerListListen(this);
         setLayout(new GridLayout(1, 1));
+        layerpane.setLayout(new BorderLayout());
         add(layerpane);
     }
 
@@ -125,7 +125,7 @@ public class DefaultMap2D extends JPanel implements Map2D {
         return new Envelope(ll, ur);
     }
 
-    protected synchronized BufferedImage createBufferImage(MapLayer layer, Rectangle dr) {                
+    protected synchronized BufferedImage createBufferImage(MapLayer layer) {                
         buffercontext.clearLayerList();
         
          try {
@@ -134,17 +134,16 @@ public class DefaultMap2D extends JPanel implements Map2D {
          }
         
         buffercontext.addLayer(layer);
-        BufferedImage buf = new BufferedImage(dr.width, dr.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D ig = buf.createGraphics();
         renderer.setContext(buffercontext);
-        renderer.paint((Graphics2D) ig, dr, mapArea);
+        renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
 
         return buf;
     }
 
     protected void redraw() {
-        
-        
+                
         
         if ((renderer == null) || (mapArea == null)) {
             return;
@@ -177,10 +176,8 @@ public class DefaultMap2D extends JPanel implements Map2D {
             context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
         }
 
-        if (changed ) {
-            
+        if (changed ) {            
             changed = false;
-
             
             if(comps.size() != context.getLayerCount() ){
                 System.out.println("REDRAW-Changed >>>>> FULL");
@@ -196,18 +193,16 @@ public class DefaultMap2D extends JPanel implements Map2D {
                             for (MapLayer layer : layers) {
 
                                 LayerComponent comp = new LayerComponent();
-                                comp.setSize(getWidth(), getHeight());
-                                comp.img = createBufferImage(layer, mapRectangle);
+                                comp.img = createBufferImage(layer);
                                 comp.layer = layer;
                                 comps.add(comp);
-                                layerpane.add(comp, new Integer(context.indexOf(layer)));
-
-                                try{ sleep(100); }catch(Exception e){}
+                                layerpane.add(comp,BorderLayout.CENTER);
+                                layerpane.setLayer(comp, context.indexOf(layer));
+                                
                             }
 
                         }
-                    }.start();
-                
+                    }.start();                
                 
             }else{
                 System.out.println("REDRAW-Changed >>>>> UPDATE");
@@ -219,26 +214,21 @@ public class DefaultMap2D extends JPanel implements Map2D {
                             for (LayerComponent comp : comps) {
 
                                 comp.setSize(getWidth(), getHeight());
-                                comp.img = createBufferImage(comp.layer, mapRectangle);
+                                comp.img = createBufferImage(comp.layer);
                                 comp.repaint();
 
                                 try{ sleep(100); }catch(Exception e){}
                             }
 
                         }
-                    }.start();
-                
+                    }.start();                
                 
             }
-            
-            
-
-
 
         }else{
             System.out.println("REDRAW-No-Changed");
         }
-
+        
     }
 
     protected void paintComponent(Graphics g) {
@@ -246,98 +236,6 @@ public class DefaultMap2D extends JPanel implements Map2D {
         redraw();
     }
 
-    //    @Override
-//    protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-//
-//        if ((renderer == null) || (mapArea == null)) {
-//            return;
-//        }
-//
-//        Rectangle r = getBounds();
-//        Rectangle mapRectangle = new Rectangle(r.width, r.height);
-//
-//        if (!r.equals(oldRect) || reset) {
-//            if (!r.equals(oldRect)) {
-//                try {
-//                    mapArea = context.getLayerBounds();
-//                } catch (IOException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//            }
-//            /* either the viewer size has changed or we've done a reset */
-//            changed = true; /* note we need to redraw */
-//            reset = false;
-//            oldRect = r; /* store what the current size is */
-//            mapArea = fixAspectRatio(r, mapArea);
-//        }
-//
-//        if (!mapArea.equals(oldMapArea)) { /* did the map extent change? */
-//            changed = true;
-//            oldMapArea = mapArea;
-//            //          when we tell the context that the bounds have changed WMSLayers
-//            // can refresh them selves
-//            context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
-//        }
-//                
-//        if (changed) {
-//            changed = false;
-//
-//            buffercontext.clearLayerList();
-//            try {
-//                buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-//            } catch (Exception e) {
-//            }
-//
-//            bufferLayer.clear();
-//            for (MapLayer layer : context.getLayers()) {
-//                buffercontext.addLayer(layer);
-//                BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
-//                Graphics2D ig = buf.createGraphics();
-//                renderer.setContext(buffercontext);
-//                renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
-//                bufferLayer.add(buf);
-//                buffercontext.clearLayerList();
-//            }
-//
-//            final Graphics2D g2d = (Graphics2D)g;
-//            
-//            for (BufferedImage buf : bufferLayer) {
-//                g2d.drawImage(buf, 0, 0, this);                
-//            }
-//
-//
-//        //        bufferImage = new BufferedImage(mapRectangle.width, mapRectangle.height,BufferedImage.TYPE_INT_ARGB);
-////        Graphics2D graph = bufferImage.createGraphics();
-////        
-////        for(BufferedImage buf : bufferLayer){
-////            graph.drawImage(buf, 0, 0, this);
-////        }
-////            
-////        ((Graphics2D) g).drawImage(bufferImage, 0, 0, this);
-//
-//
-//        //            bufferImage = new BufferedImage(mapRectangle.width, mapRectangle.height,
-////                    BufferedImage.TYPE_INT_ARGB);
-////
-////            Graphics2D ig = bufferImage.createGraphics();
-////            renderer.setContext(context);
-////            
-////            try{
-////                renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
-////            }catch(Exception e){
-////                drawError((Graphics2D) ig, e.getMessage());
-////            }
-//
-//        }
-//
-//
-//
-//
-//    //((Graphics2D) g).drawImage(bufferImage, 0, 0, this);
-//
-//    }
 
     void fireDelete(MapLayerListEvent event) {
         System.out.println("DELETE");
@@ -350,14 +248,13 @@ public class DefaultMap2D extends JPanel implements Map2D {
         for (int i = index; i < size; i++) {
             layerpane.moveToFront(comps.get(index));
         }
-        //layerpane.repaint();
     }
 
     void fireChange(MapLayerListEvent event) {
         System.out.println("CHANGE");
         int index = event.getFromIndex();
         LayerComponent comp = comps.get(index);
-        comp.img = createBufferImage(event.getLayer(), mapRectangle);
+        comp.img = createBufferImage(event.getLayer());
         comp.repaint();
     }
 
@@ -372,11 +269,11 @@ public class DefaultMap2D extends JPanel implements Map2D {
         }
         
         LayerComponent comp = new LayerComponent();
-        comp.setSize(getWidth(), getHeight());
-        comp.img = createBufferImage(layer, mapRectangle);
+        comp.img = createBufferImage(layer);
         comp.layer = layer;
         comps.add(index,comp);
-        layerpane.add(comp, new Integer(index));  
+        layerpane.add(comp, BorderLayout.CENTER);  
+        layerpane.setLayer(comp, index);
         layerpane.revalidate();
         layerpane.repaint();
     }
@@ -397,8 +294,7 @@ public class DefaultMap2D extends JPanel implements Map2D {
             layerpane.add(com, context.indexOf(com.layer));
         }
         layerpane.revalidate();
-        layerpane.repaint();
-        
+        layerpane.repaint();        
     }
     
     //-----------------------MAP2D----------------------------------------------    
@@ -463,8 +359,7 @@ public class DefaultMap2D extends JPanel implements Map2D {
 
     public void refresh() {
         reset = true;
-        //repaint();
-        redraw();
+        repaint();
     }
 
     public JPanel getComponent() {
@@ -485,8 +380,7 @@ class MapLayerListListen implements MapLayerListListener {
         this.map = map;
     }
 
-    public void layerAdded(MapLayerListEvent event) {
-        
+    public void layerAdded(MapLayerListEvent event) {        
         MapContext context = map.getContext();
 
         if (context.getLayers().length == 1) {
@@ -496,7 +390,6 @@ class MapLayerListListen implements MapLayerListListener {
                 e.printStackTrace();
             }
         }
-
         map.fireAdd(event);
     }
 
@@ -510,8 +403,6 @@ class MapLayerListListen implements MapLayerListListener {
 
     public void layerMoved(MapLayerListEvent event) {
         map.fireMove(event);
-//        map.setChanged(true);
-//        map.refresh();
     }
 }
 
