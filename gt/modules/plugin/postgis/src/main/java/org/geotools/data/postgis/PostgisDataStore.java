@@ -133,12 +133,19 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     static {
         GEOM_TYPE_MAP.put("GEOMETRY", Geometry.class);
         GEOM_TYPE_MAP.put("POINT", Point.class);
+        GEOM_TYPE_MAP.put("POINTM", Point.class);
         GEOM_TYPE_MAP.put("LINESTRING", LineString.class);
+        GEOM_TYPE_MAP.put("LINESTRINGM", LineString.class);
         GEOM_TYPE_MAP.put("POLYGON", Polygon.class);
+        GEOM_TYPE_MAP.put("POLYGONM", Polygon.class);
         GEOM_TYPE_MAP.put("MULTIPOINT", MultiPoint.class);
+        GEOM_TYPE_MAP.put("MULTIPOINTM", MultiPoint.class);
         GEOM_TYPE_MAP.put("MULTILINESTRING", MultiLineString.class);
+        GEOM_TYPE_MAP.put("MULTILINESTRINGM", MultiLineString.class);
         GEOM_TYPE_MAP.put("MULTIPOLYGON", MultiPolygon.class);
+        GEOM_TYPE_MAP.put("MULTIPOLYGONM", MultiPolygon.class);
         GEOM_TYPE_MAP.put("GEOMETRYCOLLECTION", GeometryCollection.class);
+        GEOM_TYPE_MAP.put("GEOMETRYCOLLECTIONM", GeometryCollection.class);
     }
 
     private static Map CLASS_MAPPINGS = new HashMap();
