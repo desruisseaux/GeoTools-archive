@@ -16,10 +16,7 @@
 package org.geotools.util.logging;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Jdk14Logger;
 
 
 /**
@@ -37,7 +34,7 @@ final class CommonsLogger extends LoggerAdapter {
     /**
      * The Apache logger to use.
      */
-    private final Log logger;
+    final Log logger;
 
     /**
      * Creates a new logger.
@@ -61,7 +58,7 @@ final class CommonsLogger extends LoggerAdapter {
      */
     public Level getLevel() {
         if (logger.isTraceEnabled()) return Level.FINEST;
-        if (logger.isDebugEnabled()) return getDebugLevel();
+        if (logger.isDebugEnabled()) return Level.FINE;
         if (logger.isInfoEnabled ()) return Level.CONFIG;
         if (logger.isWarnEnabled ()) return Level.WARNING;
         if (logger.isErrorEnabled()) return Level.SEVERE;
@@ -88,12 +85,12 @@ final class CommonsLogger extends LoggerAdapter {
             case  8:                                    // INFO
             case  7: return logger.isInfoEnabled();     // CONFIG
             case  6:                                    // (not allocated)
-            case  5:                                    // FINE
-            case  4: return logger.isDebugEnabled();    // FINER
-            case  3: return logger.isTraceEnabled();    // FINEST
+            case  5: return logger.isDebugEnabled();    // FINE
+            case  4:                                    // FINER
+            case  3:                                    // FINEST
             case  2:                                    // (not allocated)
             case  1:                                    // (not allocated)
-            case  0: return false;                      // OFF
+            case  0: return logger.isTraceEnabled();    // ALL
         }
     }
 
@@ -118,12 +115,12 @@ final class CommonsLogger extends LoggerAdapter {
             case  8:                                        // INFO
             case  7: logger.info (message, thrown); break;  // CONFIG
             case  6:                                        // (not allocated)
-            case  5:                                        // FINE
-            case  4: logger.debug(message, thrown); break;  // FINER
-            case  3: logger.trace(message, thrown); break;  // FINEST
+            case  5: logger.debug(message, thrown); break;  // FINE
+            case  4:                                        // FINER
+            case  3:                                        // FINEST
             case  2:                                        // (not allocated)
             case  1:                                        // (not allocated)
-            case  0:                                        // OFF
+            case  0: logger.trace(message, thrown); break;  // ALL
         }
     }
 
@@ -134,68 +131,4 @@ final class CommonsLogger extends LoggerAdapter {
     public void fine   (String message) {logger.debug(message);}
     public void finer  (String message) {logger.debug(message);}
     public void finest (String message) {logger.trace(message);}
-
-
-
-
-    /**
-     * Factory for {@link CommonsLogger}.
-     *
-     * @since 2.4
-     * @source $URL$
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    static final class Factory extends LoggerFactory {
-        /**
-         * The unique instance of this factory.
-         */
-        private static Factory factory;
-
-        /**
-         * Do not allows more than instantiation of this class.
-         */
-        private Factory() {
-        }
-
-        /**
-         * Returns the unique instance of this factory.
-         */
-        public static synchronized Factory getInstance() {
-            if (factory == null) {
-                factory = new Factory();
-            }
-            return factory;
-        }
-
-        /**
-         * Returns the implementation to use for the logger of the specified name,
-         * or {@code null} if the logger would delegates to Java logging anyway.
-         */
-        protected Object getImplementation(final String name) {
-            final Log log = LogFactory.getLog(name);
-            if (log instanceof Jdk14Logger) {
-                return null;
-            }
-            return log;
-        }
-
-        /**
-         * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
-         */
-        protected Logger wrap(String name, Object implementation) throws ClassCastException {
-            return new CommonsLogger(name, (Log) implementation);
-        }
-
-        /**
-         * Returns the {@linkplain #getImplementation implementation} wrapped by the specified logger,
-         * or {@code null} if none.
-         */
-        protected Object unwrap(final Logger logger) {
-            if (logger instanceof CommonsLogger) {
-                return ((CommonsLogger) logger).logger;
-            }
-            return null;
-        }
-    }
 }

@@ -33,9 +33,10 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.util.logging.CommonsLoggerFactory;
+import org.geotools.util.logging.Log4JLoggerFactory;
 import org.geotools.util.logging.LoggerFactory;
 import org.geotools.util.logging.Logging;
-import org.geotools.util.logging.LoggingFramework;
 import org.geotools.util.Version;
 
 
@@ -223,9 +224,17 @@ public final class GeoTools {
      */
     public static void init(final Hints hints) {
         final Logging log = Logging.GEOTOOLS;
-        if (!log.setLoggingFramework(LoggingFramework.COMMONS_LOGGING) &&
-            !log.setLoggingFramework(LoggingFramework.LOG4J)) // Fallback if commons not available
-        {
+        try {
+            log.setLoggerFactory(CommonsLoggerFactory.getInstance());
+        } catch(Exception commonsException) {
+            try {
+                log.setLoggerFactory(Log4JLoggerFactory.getInstance());
+            } catch(Exception log4jException) {
+                // nothing to do, we already tried our best
+            }
+        }
+        // if java logging is used, force monoline console output
+        if (log.getLoggerFactory() == null) {
             log.forceMonolineConsoleOutput();
         }
         Hints.putSystemDefault(hints);
@@ -233,11 +242,7 @@ public final class GeoTools {
 
     /**
      * Set the global LogginFactory.
-     * <p>
-     * It looks like Logging.getLogger(...).setLogginFactory() could be used to override
-     * this setting? That would be bad as we want a *single* spot to set the policy for
-     * all of GeoTools.
-     * <p>
+     * 
      * This method is the same as Logging.GEOTOOLS.setLoggerFactory( factory ), GeoTools
      * ships with support for commons logging and log4j. This method exists to allow you
      * supply your own implementation (this is sometimes required when using a GeoTools
@@ -247,9 +252,6 @@ public final class GeoTools {
      * @param factory
      */
     public void setLoggerFactory(LoggerFactory factory){
-        if( factory == null ){
-            throw new NullPointerException("factory must be provided, by default we use commons logging");
-        }
         final Logging log = Logging.GEOTOOLS;
         log.setLoggerFactory( factory );
     }

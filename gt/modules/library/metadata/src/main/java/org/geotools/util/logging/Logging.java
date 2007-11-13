@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
-import java.lang.reflect.Method;
 
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
@@ -225,44 +224,6 @@ public final class Logging {
                 children[i].setLoggerFactory(factory);
             }
         }
-    }
-
-    /**
-     * Sets a pre-defined logger factory for {@linkplain java.util.logging Java logging},
-     * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A> or
-     * <A HREF="http://logging.apache.org/log4j/">Log4J</A> framework. This method does nothing
-     * if the specified framework is not {@linkplain LoggingFramework#isAvailable available}.
-     *
-     * @param  framework The framework to set.
-     * @return {@code true} if the framework has been set, or {@code false} otherwise.
-     *
-     * @see org.geotools.factory.GeoTools#init
-     */
-    public boolean setLoggingFramework(final LoggingFramework framework) {
-        if (framework.isAvailable()) {
-            Throwable error;
-            try {
-                final LoggerFactory factory;
-                if (framework.factoryClassName == null) {
-                    factory = null;
-                } else {
-                    final Class<?> classe = Class.forName(framework.factoryClassName);
-                    final Method   method = classe.getMethod("getInstance", (Class[]) null);
-                    factory = (LoggerFactory) method.invoke(null, (Object[]) null);
-                }
-                setLoggerFactory(factory);
-                return true;
-            } catch (NoClassDefFoundError e) {
-                error = e;
-            } catch (Exception e) {
-                // Catching all exceptions is not a good practice, but
-                // there is really a lot of them when using reflection.
-                error = e;
-            }
-            Utilities.recoverableException("org.geotools.logging.util",
-                    Logging.class, "setLoggingFramework", error);
-        }
-        return false;
     }
 
     /**

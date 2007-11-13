@@ -16,7 +16,6 @@
 package org.geotools.util.logging;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -34,7 +33,7 @@ final class Log4JLogger extends LoggerAdapter {
     /**
      * The Log4J logger to use.
      */
-    private final org.apache.log4j.Logger logger;
+    final org.apache.log4j.Logger logger;
 
     /**
      * Creates a new logger.
@@ -68,12 +67,12 @@ final class Log4JLogger extends LoggerAdapter {
             case  8:                                         // INFO
             case  7: return org.apache.log4j.Level.INFO;     // CONFIG
             case  6:                                         // (not allocated)
-            case  5:                                         // FINE
-            case  4: return org.apache.log4j.Level.DEBUG;    // FINER
-            case  3: return org.apache.log4j.Level.TRACE;    // FINEST
+            case  5: return org.apache.log4j.Level.DEBUG;    // FINE
+            case  4: return org.apache.log4j.Level.TRACE;    // FINER
+            case  3:                                         // FINEST
             case  2:                                         // (not allocated)
             case  1:                                         // (not allocated)
-            case  0: return org.apache.log4j.Level.OFF;      // OFF
+            case  0: return org.apache.log4j.Level.ALL;      // ALL
         }
     }
 
@@ -86,8 +85,8 @@ final class Log4JLogger extends LoggerAdapter {
             if (n >= org.apache.log4j.Level.ERROR_INT) return Level.SEVERE;
             if (n >= org.apache.log4j.Level.WARN_INT)  return Level.WARNING;
             if (n >= org.apache.log4j.Level.INFO_INT)  return Level.CONFIG;
-            if (n >= org.apache.log4j.Level.DEBUG_INT) return Level.FINER;
-            if (n >= org.apache.log4j.Level.TRACE_INT) return Level.FINEST;
+            if (n >= org.apache.log4j.Level.DEBUG_INT) return Level.FINE;
+            if (n >= org.apache.log4j.Level.TRACE_INT) return Level.FINER;
             if (n == org.apache.log4j.Level.ALL_INT)   return Level.ALL; // Really ==, not >=.
         }
         return Level.OFF;
@@ -137,64 +136,4 @@ final class Log4JLogger extends LoggerAdapter {
     public void fine   (String message) {logger.debug(message);}
     public void finer  (String message) {logger.debug(message);}
     public void finest (String message) {logger.trace(message);}
-
-
-
-
-    /**
-     * Factory for {@link Log4JLogger}.
-     *
-     * @since 2.4
-     * @source $URL$
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    static final class Factory extends LoggerFactory {
-        /**
-         * The unique instance of this factory.
-         */
-        private static Factory factory;
-
-        /**
-         * Do not allows more than instantiation of this class.
-         */
-        private Factory() {
-        }
-
-        /**
-         * Returns the unique instance of this factory.
-         */
-        public static synchronized Factory getInstance() {
-            if (factory == null) {
-                factory = new Factory();
-            }
-            return factory;
-        }
-
-        /**
-         * Returns the implementation to use for the logger of the specified name,
-         * or {@code null} if the logger would delegates to Java logging anyway.
-         */
-        protected Object getImplementation(final String name) {
-            return org.apache.log4j.Logger.getLogger(name);
-        }
-
-        /**
-         * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
-         */
-        protected Logger wrap(String name, Object implementation) throws ClassCastException {
-            return new Log4JLogger(name, (org.apache.log4j.Logger) implementation);
-        }
-
-        /**
-         * Returns the {@linkplain #getImplementation implementation} wrapped by the specified logger,
-         * or {@code null} if none.
-         */
-        protected Object unwrap(final Logger logger) {
-            if (logger instanceof Log4JLogger) {
-                return ((Log4JLogger) logger).logger;
-            }
-            return null;
-        }
-    }
 }
