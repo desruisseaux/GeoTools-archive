@@ -23,6 +23,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.Date;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
@@ -271,11 +272,17 @@ class MouseListen implements MouseInputListener{
         if (map.navigation == MapConstants.NAVIGATION.PAN) {
             // move the image with the mouse
             if ((lastX > 0) && (lastY > 0)) {
-                int dx = lastX - startX;
-                int dy = lastY - startY;
-                // System.out.println("translate "+dx+","+dy);
-                graphics.clearRect(0, 0, map.getWidth(), map.getHeight());
-                ((Graphics2D) graphics).drawImage(map.bufferImage, dx, dy, map);
+//                int dx = lastX - startX;
+//                int dy = lastY - startY;
+//                // System.out.println("translate "+dx+","+dy);
+//                graphics.clearRect(0, 0, map.getWidth(), map.getHeight());
+//                
+//                
+//                for (BufferedImage buf : map.bufferLayer) {
+//                    ((Graphics2D) graphics).drawImage(buf, dx, dy, map);
+//                }
+//                
+                //((Graphics2D) graphics).drawImage(map.bufferImage, dx, dy, map);
             }
 
             lastX = x;

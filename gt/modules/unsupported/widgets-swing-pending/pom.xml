@@ -435,6 +435,8 @@
               <!-- automatically creates the classpath using all project dependencies,also adding the project build directory -->
               <classpath></classpath>
               <argument>org.geotools.gui.swing.demo.DemoAll</argument>
+              <argument>-Xms32m</argument>
+              <argument>-Xmx256m</argument>
             </arguments>
           </configuration>
        </plugin>
