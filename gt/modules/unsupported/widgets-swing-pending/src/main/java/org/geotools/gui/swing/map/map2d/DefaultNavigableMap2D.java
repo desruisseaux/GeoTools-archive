@@ -28,6 +28,7 @@ import java.util.Date;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.NAVIGATION;
+import org.geotools.gui.swing.map.map2d.decolayer.MovingPanel;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
@@ -36,6 +37,8 @@ import org.geotools.renderer.shape.ShapefileRenderer;
  */
 public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2D{
 
+    protected MovingPanel movingPanel = new MovingPanel();
+    
     protected MapConstants.NAVIGATION navigation = MapConstants.NAVIGATION.PAN;
     protected MouseInputListener mouseInputListener; 
     protected double zoomFactor = 2;
@@ -50,6 +53,7 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         mouseInputListener = new MouseListen(this);
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
+        layerPane.add(movingPanel,new Integer(13));
     }
 
     
@@ -253,8 +257,12 @@ class MouseListen implements MouseInputListener{
         int endX = e.getX();
         int endY = e.getY();
 
+        
+        
         if ((map.navigation == MapConstants.NAVIGATION.ZOOM_IN) || (map.navigation == MapConstants.NAVIGATION.ZOOM_OUT)) {
             drawRectangle(map.getGraphics());
+        }else if (map.navigation == MapConstants.NAVIGATION.PAN){
+            map.movingPanel.setCoord(0,0,0,0, false);
         }
 
         processDrag( startX,startY, endX, endY);
@@ -272,17 +280,9 @@ class MouseListen implements MouseInputListener{
         if (map.navigation == MapConstants.NAVIGATION.PAN) {
             // move the image with the mouse
             if ((lastX > 0) && (lastY > 0)) {
-//                int dx = lastX - startX;
-//                int dy = lastY - startY;
-//                // System.out.println("translate "+dx+","+dy);
-//                graphics.clearRect(0, 0, map.getWidth(), map.getHeight());
-//                
-//                
-//                for (BufferedImage buf : map.bufferLayer) {
-//                    ((Graphics2D) graphics).drawImage(buf, dx, dy, map);
-//                }
-//                
-                //((Graphics2D) graphics).drawImage(map.bufferImage, dx, dy, map);
+                int dx = lastX - startX;
+                int dy = lastY - startY;                
+                map.movingPanel.setCoord(dx, dy, map.getWidth(), map.getHeight(), true);                
             }
 
             lastX = x;

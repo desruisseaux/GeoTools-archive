@@ -22,8 +22,6 @@ class LayerComponent extends JComponent{
     public MapLayer layer;
         
     public LayerComponent(){
-        setAlignmentX(0);
-        setAlignmentY(0);
     }
     
     
@@ -31,6 +29,9 @@ class LayerComponent extends JComponent{
     protected void paintComponent(Graphics g) {
         g.drawImage(img, 0, 0, this);
     }
+    
+    
+    
     
     
 }

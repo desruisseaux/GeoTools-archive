@@ -21,80 +21,119 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLayeredPane;
+import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.map.event.MapLayerListEvent;
 
 /**
  * 
  * @author Johann Sorel
  */
 class BufferLayerPane extends JLayeredPane{
-   
-    private int i = 0;
-    private List<MapLayer>layers = new ArrayList<MapLayer>();
-    private List<LayerComponent> comps = new ArrayList<LayerComponent>();
+           
         
-    BufferLayerPane(){
+    List<LayerComponent> comps = new ArrayList<LayerComponent>();
+    final DefaultMap2D map;
+    
+    
+    BufferLayerPane(DefaultMap2D map){
+        this.map = map;
         setLayout(new BorderLayout());
     }
     
-    void removeComp(int index){
+    
+
+    void fireDelete(MapLayerListEvent event) {        
         System.out.println("DELETE");
-        remove(comps.get(index));
+        int index = event.getFromIndex();
+        LayerComponent comp = comps.get(index);
+        remove(comp);
         comps.remove(index);
-        layers.remove(index);        
-        
+
         int size = comps.size();
-        for( i=index ; i<size; i++){
-            moveToFront(comps.get(i));
+        for (int i = index; i < size; i++) {
+            moveToFront(comps.get(index));
         }
     }
-    
-    void removeComp(MapLayer layer){
-        System.out.println("DELETE");
-        int index = layers.indexOf(layer);
-        this.removeComp(index);
+
+    void fireChange(MapLayerListEvent event) {        
+        System.out.println("CHANGE");
+        int index = event.getFromIndex();
+        LayerComponent comp = comps.get(index);
+        comp.img = map.createBufferImage(event.getLayer());
+        comp.repaint();
     }
-    
-    void addComp(MapLayer layer, BufferedImage img, int index){
+
+    void fireAdd(MapLayerListEvent event){
         System.out.println("ADD");
+        MapLayer layer = event.getLayer();
+        int index = map.context.indexOf(layer);
         
         int size = comps.size();
-        for (i = index; i < size; i++) {
+        for (int i = index; i < size; i++) {
             moveToBack(comps.get(index));
         }
         
         LayerComponent comp = new LayerComponent();
-        comp.img = img;
+        comp.img = map.createBufferImage(layer);
+        comp.layer = layer;
         comps.add(index,comp);
-        layers.add(index,layer);
         add(comp, BorderLayout.CENTER);  
         setLayer(comp, index);
         revalidate();
         repaint();
     }
     
-    void changeComp(int index,BufferedImage img) {
-        System.out.println("CHANGE");
-        LayerComponent comp = comps.get(index);
-        comp.img = img;
-        comp.repaint();
-    }
-    
-    void fireMove(int depart, int arrivee){
+    void fireMove(MapLayerListEvent event){
         System.out.println("MOVE");
         
-        LayerComponent comp = comps.get(depart);
-        comps.remove(depart);
-        comps.add(arrivee, comp);
         
-        removeAll();
-        for (LayerComponent com : comps) {
-            //add(com, context.indexOf(com.layer));
-        }
+                comps.clear();
+                removeAll();
+
+                
+
+                            MapLayer[] layers = map.context.getLayers();
+                            for (final MapLayer layer : layers) {
+
+                                
+                                new Thread() {
+                                @Override
+                                public void run() {
+
+                                                LayerComponent comp = new LayerComponent();
+                                                comp.img = map.createBufferImage(layer);
+                                                comp.layer = layer;
+                                                comps.add(comp);
+                                                add(comp,BorderLayout.CENTER);
+                                                setLayer(comp, map.context.indexOf(layer));
+
+                                        }
+                                    }.start();  
+                            }
+ 
+        
+        
         revalidate();
-        repaint();        
+        repaint();  
+        
+        
+        
+//        MapLayer layer = event.getLayer();
+//        int depart = event.getFromIndex();
+//        int arrivee = event.getToIndex();
+//        
+//        LayerComponent comp = comps.get(depart);
+//        comps.remove(depart);
+//        comps.add(arrivee, comp);
+//        
+//        removeAll();
+//        for (LayerComponent com : comps) {
+//            add(com, map.context.indexOf(com.layer));
+//        }
+//        revalidate();
+//        repaint();        
     }
-    
     
 }
 

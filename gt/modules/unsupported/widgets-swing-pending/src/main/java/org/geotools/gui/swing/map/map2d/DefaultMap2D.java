@@ -29,12 +29,15 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.DimensionUIResource;
+import org.geotools.gui.swing.map.map2d.decolayer.RedrawingPanel;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -47,11 +50,13 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
+
+
 /**
  *
  * @author Johann Sorel
  */
-public class DefaultMap2D extends JPanel implements Map2D {
+public class DefaultMap2D extends JPanel implements Map2D,Observer {
 
     protected MapLayerListListener mapLayerListlistener;
     protected GTRenderer renderer;
@@ -64,8 +69,9 @@ public class DefaultMap2D extends JPanel implements Map2D {
     private Envelope oldMapArea = null;
     private boolean changed = true;
     private boolean reset = true;
-    private JLayeredPane layerpane = new JLayeredPane();
-    protected List<LayerComponent> comps = new ArrayList<LayerComponent>();
+    protected JLayeredPane layerPane = new JLayeredPane();
+    protected BufferPane bufferPane = new BufferPane(this);    
+    protected RedrawingPanel waitingPane = new RedrawingPanel();
 
     public DefaultMap2D() {
         this(new ShapefileRenderer());
@@ -75,23 +81,18 @@ public class DefaultMap2D extends JPanel implements Map2D {
         this.renderer = renderer;
         mapLayerListlistener = new MapLayerListListen(this);
         setLayout(new GridLayout(1, 1));
-        layerpane.setLayout(new BorderLayout());
-        add(layerpane);
+        layerPane.setLayout(new BufferLayout());
+        layerPane.add(bufferPane,new Integer(11));
+        layerPane.add(waitingPane,new Integer(12));
+        bufferPane.STATE.addObserver(this);
+        add(layerPane);
     }
 
     protected void setChanged(boolean val) {
         changed = val;
     }
 
-    protected void drawError(Graphics2D g, String error) {
-        g.setColor(Color.RED);
-        g.setStroke(new BasicStroke(3));
-        if (error == null || error.equals("")) {
-            error = "Error";
-        }
-        g.drawString(error, 20, 20);
-    }
-
+    
     protected Envelope fixAspectRatio(Rectangle r, Envelope mapArea) {
         double mapWidth = mapArea.getWidth(); /* get the extent of the map */
         double mapHeight = mapArea.getHeight();
@@ -143,7 +144,6 @@ public class DefaultMap2D extends JPanel implements Map2D {
     }
 
     protected void redraw() {
-                
         
         if ((renderer == null) || (mapArea == null)) {
             return;
@@ -157,7 +157,6 @@ public class DefaultMap2D extends JPanel implements Map2D {
                 try {
                     mapArea = context.getLayerBounds();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -179,54 +178,11 @@ public class DefaultMap2D extends JPanel implements Map2D {
         if (changed ) {            
             changed = false;
             
-            if(comps.size() != context.getLayerCount() ){
-                System.out.println("REDRAW-Changed >>>>> FULL");
-                
-                comps.clear();
-                layerpane.removeAll();
-
-                new Thread() {
-                @Override
-                public void run() {
-
-                            MapLayer[] layers = context.getLayers();
-                            for (MapLayer layer : layers) {
-
-                                LayerComponent comp = new LayerComponent();
-                                comp.img = createBufferImage(layer);
-                                comp.layer = layer;
-                                comps.add(comp);
-                                layerpane.add(comp,BorderLayout.CENTER);
-                                layerpane.setLayer(comp, context.indexOf(layer));
-                                
-                            }
-
-                        }
-                    }.start();                
-                
-            }else{
-                System.out.println("REDRAW-Changed >>>>> UPDATE");
-                
-                new Thread() {
-                @Override
-                public void run() {
-
-                            for (LayerComponent comp : comps) {
-
-                                comp.setSize(getWidth(), getHeight());
-                                comp.img = createBufferImage(comp.layer);
-                                comp.repaint();
-
-                                try{ sleep(100); }catch(Exception e){}
-                            }
-
-                        }
-                    }.start();                
-                
-            }
-
-        }else{
-            System.out.println("REDRAW-No-Changed");
+            if(bufferPane.getBufferSize() != context.getLayerCount() ){  
+                bufferPane.fit();            
+            }else{          
+                bufferPane.update();                
+            }            
         }
         
     }
@@ -236,65 +192,21 @@ public class DefaultMap2D extends JPanel implements Map2D {
         redraw();
     }
 
-
+    
     void fireDelete(MapLayerListEvent event) {
-        System.out.println("DELETE");
-        int index = event.getFromIndex();
-        LayerComponent comp = comps.get(index);
-        layerpane.remove(comp);
-        comps.remove(index);
-
-        int size = comps.size();
-        for (int i = index; i < size; i++) {
-            layerpane.moveToFront(comps.get(index));
-        }
+        bufferPane.deleted(event);
     }
 
     void fireChange(MapLayerListEvent event) {
-        System.out.println("CHANGE");
-        int index = event.getFromIndex();
-        LayerComponent comp = comps.get(index);
-        comp.img = createBufferImage(event.getLayer());
-        comp.repaint();
+        bufferPane.changed(event);
     }
 
     void fireAdd(MapLayerListEvent event){
-        System.out.println("ADD");
-        MapLayer layer = event.getLayer();
-        int index = context.indexOf(layer);
-        
-        int size = comps.size();
-        for (int i = index; i < size; i++) {
-            layerpane.moveToBack(comps.get(index));
-        }
-        
-        LayerComponent comp = new LayerComponent();
-        comp.img = createBufferImage(layer);
-        comp.layer = layer;
-        comps.add(index,comp);
-        layerpane.add(comp, BorderLayout.CENTER);  
-        layerpane.setLayer(comp, index);
-        layerpane.revalidate();
-        layerpane.repaint();
+        bufferPane.added(event);
     }
     
     void fireMove(MapLayerListEvent event){
-        System.out.println("MOVE");
-        
-        MapLayer layer = event.getLayer();
-        int depart = event.getFromIndex();
-        int arrivee = event.getToIndex();
-        
-        LayerComponent comp = comps.get(depart);
-        comps.remove(depart);
-        comps.add(arrivee, comp);
-        
-        layerpane.removeAll();
-        for (LayerComponent com : comps) {
-            layerpane.add(com, context.indexOf(com.layer));
-        }
-        layerpane.revalidate();
-        layerpane.repaint();        
+        bufferPane.moved(event);      
     }
     
     //-----------------------MAP2D----------------------------------------------    
@@ -313,7 +225,7 @@ public class DefaultMap2D extends JPanel implements Map2D {
         if (renderer != null) {
             renderer.setContext(this.context);
         }
-
+        redraw();
         refresh();
     }
 
@@ -365,12 +277,29 @@ public class DefaultMap2D extends JPanel implements Map2D {
     public JPanel getComponent() {
         return this;
     }
+
+    public void update(Observable o, Object arg) {
+        int val = (Integer)arg;
+        if(val > 0){
+            waitingPane.setDrawing(true);
+            waitingPane.repaint();
+        }
+        else{
+            waitingPane.setDrawing(false);
+            waitingPane.repaint();
+        }
+    }
 }
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
 //---------------------MapLayerListListen-------------------------------------//
 ////////////////////////////////////////////////////////////////////////////////
+
 
 class MapLayerListListen implements MapLayerListListener {
 
