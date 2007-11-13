@@ -34,7 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.geotools.data.collection.CollectionDataStore;
@@ -135,34 +137,63 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class DataUtilities {
-    static Map typeMap = new HashMap();
+    
+    static Map<String,Class> typeMap = new HashMap<String,Class>();
+    static Map<Class,String> typeEncode = new HashMap<Class,String>();
     
     static FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
     
     static {
+        typeEncode.put( String.class, "String");
         typeMap.put("String", String.class);
         typeMap.put("string", String.class);
         typeMap.put("\"\"", String.class);
+        
+        typeEncode.put( Integer.class, "Integer");        
         typeMap.put("Integer", Integer.class);
         typeMap.put("int", Integer.class);
         typeMap.put("0", Integer.class);
+
+        typeEncode.put( Double.class, "Double");        
         typeMap.put("Double", Double.class);
         typeMap.put("double", Double.class);
         typeMap.put("0.0", Double.class);
+
+        typeEncode.put( Float.class, "Float");        
         typeMap.put("Float", Float.class);
         typeMap.put("float", Float.class);
         typeMap.put("0.0f", Float.class);
-        typeMap.put("Boolean", Boolean.class);
+
+        typeEncode.put( Boolean.class, "Boolean");        
+        typeMap.put("Boolean", Boolean.class);        
         typeMap.put("true",Boolean.class);
         typeMap.put("false",Boolean.class);
+        
+        typeEncode.put( Geometry.class, "Geometry");
         typeMap.put("Geometry", Geometry.class);
+        
+        typeEncode.put( Point.class, "Point");        
         typeMap.put("Point", Point.class);
+        
+        typeEncode.put( LineString.class, "LineString");
         typeMap.put("LineString", LineString.class);
+        
+        typeEncode.put( Polygon.class, "Polygon");
         typeMap.put("Polygon", Polygon.class);
+        
+        typeEncode.put( MultiPoint.class, "MultiPoint");
         typeMap.put("MultiPoint", MultiPoint.class);
+        
+        typeEncode.put( MultiLineString.class, "MultiLineString");
         typeMap.put("MultiLineString", MultiLineString.class);
+        
+        typeEncode.put( MultiPolygon.class, "MultiPolygon");
         typeMap.put("MultiPolygon", MultiPolygon.class);
+        
+        typeEncode.put( GeometryCollection.class, "GeometryCollection");
         typeMap.put("GeometryCollection", GeometryCollection.class);
+        
+        typeEncode.put( Date.class, "Date");
         typeMap.put("Date",Date.class);
     }
 
@@ -1401,7 +1432,7 @@ public class DataUtilities {
             buf.append(typeMap(type.getType().getBinding()));
             if(type instanceof GeometryDescriptor) {
                 GeometryDescriptor gd = (GeometryDescriptor) type;
-                if(gd.getCRS() != null && gd.getCRS().getIdentifiers() != null) {
+                if(gd.getCRS() != null && gd.getCRS().getIdentifiers() != null) {                    
                     for (Iterator<ReferenceIdentifier> it = gd.getCRS().getIdentifiers().iterator(); it.hasNext();) {
                         ReferenceIdentifier id = (ReferenceIdentifier) it.next();
 
@@ -1432,14 +1463,22 @@ public class DataUtilities {
     }
 
     static String typeMap(Class type) {
+        if( typeEncode.containsKey(type)){
+            return typeEncode.get( type );
+        }        
+        /*
+        SortedSet<String> choose = new TreeSet<String>();
         for (Iterator i = typeMap.entrySet().iterator(); i.hasNext();) {
             Map.Entry entry = (Entry) i.next();
 
             if (entry.getValue().equals(type)) {
-                return (String) entry.getKey();
+                choose.add( (String) entry.getKey() );
             }
         }
-
+        if( !choose.isEmpty() ){
+            return choose.last();
+        }
+        */
         return type.getName();
     }
 

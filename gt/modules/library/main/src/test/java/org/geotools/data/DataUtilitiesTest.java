@@ -536,13 +536,19 @@ public class DataUtilitiesTest extends DataTestCase {
     public void testSpecNoCRS() throws Exception {
         String spec = "id:String,polygonProperty:Polygon";
         SimpleFeatureType ft = DataUtilities.createType("testType", spec);
-        assertEquals(spec, DataUtilities.spec(ft));
+        String spec2 = DataUtilities.spec(ft);
+        //System.out.println("BEFORE:"+spec);
+        //System.out.println(" AFTER:"+spec2);        
+        assertEquals(spec, spec2);
     }
     
     public void testSpecCRS() throws Exception {
         String spec = "id:String,polygonProperty:Polygon:srid=32615";
         SimpleFeatureType ft = DataUtilities.createType("testType", spec);
-        assertEquals(spec, DataUtilities.spec(ft));
+        String spec2 = DataUtilities.spec(ft);
+        //System.out.println("BEFORE:"+spec);
+        //System.out.println(" AFTER:"+spec2);        
+        assertEquals(spec, spec2);
     }
     
     public void testSpecNotIdentifiable() throws Exception {
@@ -550,8 +556,14 @@ public class DataUtilitiesTest extends DataTestCase {
         SimpleFeatureType ft = DataUtilities.createType("testType", spec);
         CoordinateReferenceSystem crsNoId = CRS.parseWKT("PROJCS[\"Geoscience Australia Standard National Scale Lambert Projection\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS_1978\",6378135,298.26],TOWGS84[0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"Decimal_Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"central_meridian\",134.0],PARAMETER[\"latitude_of_origin\",0.0],PARAMETER[\"standard_parallel_1\",-18.0],PARAMETER[\"standard_parallel_2\",-36.0],UNIT[\"Meter\",1]]");
         SimpleFeatureType transformedFt = FeatureTypes.transform(ft, crsNoId);
+
         // since we cannot go back to a code with do a best effort encoding
-        assertEquals("id:String,polygonProperty:Polygon", DataUtilities.spec(transformedFt));
+        String expected = "id:String,polygonProperty:Polygon";
+        String spec2 = DataUtilities.spec(transformedFt);
+        //System.out.println("  BEFORE:"+spec);
+        //System.out.println("EXPECTED:"+expected);
+        //System.out.println("  AFTER:"+spec2);        
+        assertEquals(expected, spec2);
     }
 
     public static void main(String[] args) {
