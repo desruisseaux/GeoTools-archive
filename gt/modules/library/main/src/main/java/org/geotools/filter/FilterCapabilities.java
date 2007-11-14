@@ -15,19 +15,42 @@
  */
 package org.geotools.filter;
 
+import java.awt.Dialog;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
+import org.geotools.util.MapEntry;
 import org.opengis.filter.And;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.Subtract;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 /**
  * Represents the Filter capabilities that are supported by a SQLEncoder.  Each
@@ -158,6 +181,8 @@ public class FilterCapabilities {
     
     public static final FilterCapabilities LOGICAL_OPENGIS;
     
+    static final Map/*<int,Class>*/ intTypeToOpenGisTypeMap = new HashMap();
+    
     static {
         SIMPLE_COMPARISONS_OPENGIS = new FilterCapabilities();
         SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsEqualTo.class);
@@ -171,6 +196,32 @@ public class FilterCapabilities {
         LOGICAL_OPENGIS.addType(And.class);
         LOGICAL_OPENGIS.addType(Not.class);
         LOGICAL_OPENGIS.addType(Or.class);
+        
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_BBOX), BBOX.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_EQUALS), Equals.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_DISJOINT), Disjoint.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_INTERSECT), Intersects.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_TOUCHES), Touches.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_CROSSES), Crosses.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_WITHIN), Within.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_CONTAINS), Contains.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_OVERLAPS), Overlaps.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_BEYOND), Beyond.class);
+        intTypeToOpenGisTypeMap.put(new Long(SPATIAL_DWITHIN), DWithin.class);
+        intTypeToOpenGisTypeMap.put(new Long(SIMPLE_ARITHMETIC), new Class[] {Add.class, Subtract.class, Multiply.class, Divide.class});
+        intTypeToOpenGisTypeMap.put(new Long(FUNCTIONS), Function.class);
+        intTypeToOpenGisTypeMap.put(new Long(COMPARE_EQUALS), PropertyIsEqualTo.class);
+        intTypeToOpenGisTypeMap.put(new Long(COMPARE_NOT_EQUALS), PropertyIsNotEqualTo.class);
+        intTypeToOpenGisTypeMap.put(new Long(COMPARE_GREATER_THAN), PropertyIsGreaterThan.class);
+        intTypeToOpenGisTypeMap.put(new Long(COMPARE_GREATER_THAN_EQUAL), PropertyIsGreaterThanOrEqualTo.class);
+        intTypeToOpenGisTypeMap.put(new Long(COMPARE_LESS_THAN), PropertyIsLessThan.class);
+        intTypeToOpenGisTypeMap.put(new Long(COMPARE_LESS_THAN_EQUAL), PropertyIsLessThanOrEqualTo.class);
+        intTypeToOpenGisTypeMap.put(new Long(NULL_CHECK), PropertyIsNull.class);
+        intTypeToOpenGisTypeMap.put(new Long(LIKE), PropertyIsLike.class);
+        intTypeToOpenGisTypeMap.put(new Long(BETWEEN), PropertyIsBetween.class);
+        intTypeToOpenGisTypeMap.put(new Long(LOGIC_AND), And.class);
+        intTypeToOpenGisTypeMap.put(new Long(LOGIC_OR), Or.class);
+        intTypeToOpenGisTypeMap.put(new Long(LOGIC_NOT), Not.class);
     }
     
     private long ops = NO_OP;
@@ -195,7 +246,29 @@ public class FilterCapabilities {
      * @param type The one of the masks enumerated in this class
      */
     public void addType( long type ) {
+        // avoid infinite recursion with addType(class)
+        if((ops & type) != 0)
+            return;
+        
         ops = ops | type;
+        // the type can be a mask signifying multiple filter types, we have to add them all
+        for (Iterator it = intTypeToOpenGisTypeMap.entrySet().iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            long key = ((Long) entry.getKey()).longValue();
+            if((key & type) != 0) {
+                Object filter = entry.getValue();
+                if(filter != null) {
+                    if(filter instanceof Class[]) {
+                        Class[] filters = (Class[]) filter;
+                        for (int i = 0; i < filters.length; i++) {
+                            addType(filters[i], false);
+                        }
+                    } else {
+                        addType((Class) filter, false);
+                    }
+                }
+            }
+        }
     }    
     
     /**
@@ -214,12 +287,27 @@ public class FilterCapabilities {
     }
     
     /**
+     * Adds a new support type to capabilities.  For 2.2 only function expression support is added this way.
+     * As of geotools 2.3 this will be the supported way of adding to Filtercapabilities.
+     * 
+     * @param type the Class that indicates the new support.
+     */
+    public void addType(Class type, boolean addFunctionType ){
+        if( org.opengis.filter.Filter.class.isAssignableFrom(type)
+                ||
+            org.opengis.filter.expression.Expression.class.isAssignableFrom(type)){
+            if(addFunctionType) addType(FUNCTIONS);
+            functions.add(type);
+        }
+    }
+    
+    /**
      * Add all the capabilities in the provided FilterCapabilities to this capabilities.
      * 
      * @param capabilities capabilities to add.
      */
     public void addAll( FilterCapabilities capabilities){
-    	ops= capabilities.ops|ops;
+    	addType(capabilities.ops);
     	functions.addAll(capabilities.functions);
     }
     
