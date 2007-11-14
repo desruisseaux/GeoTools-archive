@@ -25,6 +25,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.gml3.bindings.TEST;
@@ -35,7 +37,25 @@ import org.geotools.xml.SchemaLocator;
 
 
 public class GML3EncodingTest extends TestCase {
+    boolean isOffline() throws Exception {
+        //this test will only run if network is available
+        URL url = new URL("http://schemas.opengis.net");
+
+        try {
+            URLConnection conn = url.openConnection();
+            conn.getInputStream().read();
+        } catch (Exception e) {
+            return true;
+        }
+
+        return false;
+    }
+
     public void testWithConfiguration() throws Exception {
+        if (isOffline()) {
+            return;
+        }
+
         TestConfiguration configuration = new TestConfiguration();
 
         //first parse in test data
@@ -85,6 +105,10 @@ public class GML3EncodingTest extends TestCase {
 
     public void testWithApplicationSchemaConfiguration()
         throws Exception {
+        if (isOffline()) {
+            return;
+        }
+
         String schemaLocation = new File(TestConfiguration.class.getResource("test.xsd").getFile())
             .getAbsolutePath();
 
