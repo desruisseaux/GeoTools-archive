@@ -24,8 +24,8 @@ import org.geotools.gui.swing.map.MapConstants;
  */
 public interface NavigableMap2D extends Map2D{
     
-    public void setNavigationState(MapConstants.NAVIGATION state);
-    public MapConstants.NAVIGATION getNavigationState();
+    public void setNavigationState(MapConstants.STATE state);
+    public MapConstants.STATE getNavigationState();
     
     public void setZoomFactor(double zoomFactor);
     public double getZoomFactor();

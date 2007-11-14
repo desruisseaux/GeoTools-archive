@@ -24,10 +24,12 @@ package org.geotools.gui.swing.map;
 
 public class MapConstants {
 
-    public static enum NAVIGATION{
+    public static enum STATE{
         ZOOM_IN,
         ZOOM_OUT,
         PAN,
+        SELECT,
+        EDIT,
         NONE
     };
     

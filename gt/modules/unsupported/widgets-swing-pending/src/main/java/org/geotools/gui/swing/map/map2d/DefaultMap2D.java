@@ -37,7 +37,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.DimensionUIResource;
-import org.geotools.gui.swing.map.map2d.decolayer.RedrawingPanel;
+import org.geotools.gui.swing.map.map2d.overLayer.WaitingOverLayer;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -71,7 +71,7 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
     private boolean reset = true;
     protected JLayeredPane layerPane = new JLayeredPane();
     protected BufferPane bufferPane = new BufferPane(this);    
-    protected RedrawingPanel waitingPane = new RedrawingPanel();
+    protected WaitingOverLayer waitingPane = new WaitingOverLayer();
 
     public DefaultMap2D() {
         this(new ShapefileRenderer());
@@ -126,7 +126,7 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
         return new Envelope(ll, ur);
     }
 
-    protected synchronized BufferedImage createBufferImage(MapLayer layer) {                
+    protected BufferedImage createBufferImage(MapLayer layer) {                
         buffercontext.clearLayerList();
         
          try {
@@ -143,7 +143,7 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
         return buf;
     }
 
-    protected void redraw() {
+    protected void redraw(boolean withRepaint) {
         
         if ((renderer == null) || (mapArea == null)) {
             return;
@@ -179,19 +179,32 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
             changed = false;
             
             if(bufferPane.getBufferSize() != context.getLayerCount() ){  
-                bufferPane.fit();            
+                bufferPane.fit();  
             }else{          
                 bufferPane.update();                
             }            
         }
         
+        if(withRepaint){
+            SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                revalidate();
+                repaint();
+            }
+        });
+        }
+        
+        
     }
 
-    protected void paintComponent(Graphics g) {
+    @Override
+    public void paintComponent(Graphics g){
+        redraw(false);
         super.paintComponent(g);
-        redraw();
     }
-
+    
+    
     
     void fireDelete(MapLayerListEvent event) {
         bufferPane.deleted(event);
@@ -225,7 +238,6 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
         if (renderer != null) {
             renderer.setContext(this.context);
         }
-        redraw();
         refresh();
     }
 
@@ -271,7 +283,7 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
 
     public void refresh() {
         reset = true;
-        repaint();
+        redraw(true);
     }
 
     public JPanel getComponent() {

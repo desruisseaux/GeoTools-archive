@@ -64,7 +64,7 @@ public class JMap2DControlBar extends JPanel {
 
                     public void actionPerformed(ActionEvent e) {
                         if (navigationMap != null) {
-                            navigationMap.setNavigationState(MapConstants.NAVIGATION.ZOOM_IN);
+                            navigationMap.setNavigationState(MapConstants.STATE.ZOOM_IN);
                         }
                     }
                 });
@@ -73,7 +73,7 @@ public class JMap2DControlBar extends JPanel {
 
                     public void actionPerformed(ActionEvent e) {
                         if (navigationMap != null) {
-                            navigationMap.setNavigationState(MapConstants.NAVIGATION.ZOOM_OUT);
+                            navigationMap.setNavigationState(MapConstants.STATE.ZOOM_OUT);
                         }
                     }
                 });
@@ -82,7 +82,7 @@ public class JMap2DControlBar extends JPanel {
 
                     public void actionPerformed(ActionEvent e) {
                         if (navigationMap != null) {
-                            navigationMap.setNavigationState(MapConstants.NAVIGATION.PAN);
+                            navigationMap.setNavigationState(MapConstants.STATE.PAN);
                         }
                     }
                 });

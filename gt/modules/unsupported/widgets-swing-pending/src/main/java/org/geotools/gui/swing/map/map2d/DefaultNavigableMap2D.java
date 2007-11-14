@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import java.util.Date;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
-import org.geotools.gui.swing.map.MapConstants.NAVIGATION;
-import org.geotools.gui.swing.map.map2d.decolayer.MovingPanel;
+import org.geotools.gui.swing.map.MapConstants.STATE;
+import org.geotools.gui.swing.map.map2d.overLayer.NavigationOverLayer;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
@@ -37,9 +37,9 @@ import org.geotools.renderer.shape.ShapefileRenderer;
  */
 public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2D{
 
-    protected MovingPanel movingPanel = new MovingPanel();
+    protected NavigationOverLayer movingPanel = new NavigationOverLayer();
     
-    protected MapConstants.NAVIGATION navigation = MapConstants.NAVIGATION.PAN;
+    protected MapConstants.STATE navigation = MapConstants.STATE.PAN;
     protected MouseInputListener mouseInputListener; 
     protected double zoomFactor = 2;
     
@@ -61,10 +61,10 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
     
     
     //-----------------------NAVIGABLEMAP2D-------------------------------------
-    public void setNavigationState(NAVIGATION state) {
+    public void setNavigationState(STATE state) {
         navigation = state;
     }
-    public NAVIGATION getNavigationState() {
+    public STATE getNavigationState() {
         return navigation;
     }
 
@@ -241,8 +241,6 @@ class MouseListen implements MouseInputListener{
         Coordinate ur = new Coordinate(mapX + (width2 / zlevel), mapY + (height2 / zlevel));
 
         map.setMapArea( new Envelope(ll, ur) );
-        // System.out.println("after area "+mapArea+"\nw:"+mapArea.getWidth()+"
-        // h:"+mapArea.getHeight());
         map.repaint();
     
     }
@@ -259,9 +257,9 @@ class MouseListen implements MouseInputListener{
 
         
         
-        if ((map.navigation == MapConstants.NAVIGATION.ZOOM_IN) || (map.navigation == MapConstants.NAVIGATION.ZOOM_OUT)) {
+        if ((map.navigation == MapConstants.STATE.ZOOM_IN) || (map.navigation == MapConstants.STATE.ZOOM_OUT)) {
             drawRectangle(map.getGraphics());
-        }else if (map.navigation == MapConstants.NAVIGATION.PAN){
+        }else if (map.navigation == MapConstants.STATE.PAN){
             map.movingPanel.setCoord(0,0,0,0, false);
         }
 
@@ -277,7 +275,7 @@ class MouseListen implements MouseInputListener{
         int x = e.getX();
         int y = e.getY();
 
-        if (map.navigation == MapConstants.NAVIGATION.PAN) {
+        if (map.navigation == MapConstants.STATE.PAN) {
             // move the image with the mouse
             if ((lastX > 0) && (lastY > 0)) {
                 int dx = lastX - startX;
@@ -287,7 +285,7 @@ class MouseListen implements MouseInputListener{
 
             lastX = x;
             lastY = y;
-        } else if ((map.navigation == MapConstants.NAVIGATION.ZOOM_IN) || (map.navigation == MapConstants.NAVIGATION.ZOOM_OUT)) {
+        } else if ((map.navigation == MapConstants.STATE.ZOOM_IN) || (map.navigation == MapConstants.STATE.ZOOM_OUT)) {
             graphics.setXORMode(Color.RED);
 
             if ((lastX > 0) && (lastY > 0)) {
