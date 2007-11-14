@@ -15,13 +15,13 @@
  */
 package org.geotools.util.logging;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
