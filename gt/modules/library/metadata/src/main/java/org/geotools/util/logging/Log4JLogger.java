@@ -19,7 +19,8 @@ import java.util.logging.Level;
 
 
 /**
- * An adapter that redirect all Java logging events to the Apache's Log4J framework.
+ * An adapter that redirect all Java logging events to the Apache's
+ * <A HREF="http://logging.apache.org/log4j">Log4J</A> framework.
  *
  * @since 2.4
  * @source $URL$
@@ -27,6 +28,7 @@ import java.util.logging.Level;
  * @author Martin Desruisseaux
  * @author Saul Farber
  *
+ * @see Log4JLoggerFactory
  * @see Logging
  */
 final class Log4JLogger extends LoggerAdapter {
@@ -57,9 +59,9 @@ final class Log4JLogger extends LoggerAdapter {
                 // MAX_VALUE is a special value for Level.OFF. Otherwise and
                 // if positive, log to fatal since we are greater than SEVERE.
                 switch (n) {
-                    default: if (n >= 0)    return org.apache.log4j.Level.FATAL; // fallthrough otherwise.
-                    case Integer.MAX_VALUE: return org.apache.log4j.Level.OFF;
+                    default: if (n >= 0)    return org.apache.log4j.Level.FATAL; // fallthrough ALL otherwise.
                     case Integer.MIN_VALUE: return org.apache.log4j.Level.ALL;
+                    case Integer.MAX_VALUE: return org.apache.log4j.Level.OFF;
                 }
             }
             case 10: return org.apache.log4j.Level.ERROR;    // SEVERE
@@ -81,15 +83,13 @@ final class Log4JLogger extends LoggerAdapter {
      */
     private static Level toJavaLevel(final org.apache.log4j.Level level) {
         final int n = level.toInt();
-        if (n != org.apache.log4j.Level.OFF_INT) {
-            if (n >= org.apache.log4j.Level.ERROR_INT) return Level.SEVERE;
-            if (n >= org.apache.log4j.Level.WARN_INT)  return Level.WARNING;
-            if (n >= org.apache.log4j.Level.INFO_INT)  return Level.CONFIG;
-            if (n >= org.apache.log4j.Level.DEBUG_INT) return Level.FINE;
-            if (n >= org.apache.log4j.Level.TRACE_INT) return Level.FINER;
-            if (n == org.apache.log4j.Level.ALL_INT)   return Level.ALL; // Really ==, not >=.
-        }
-        return Level.OFF;
+        if (n == org.apache.log4j.Level.OFF_INT)   return Level.OFF;
+        if (n >= org.apache.log4j.Level.ERROR_INT) return Level.SEVERE;
+        if (n >= org.apache.log4j.Level.WARN_INT)  return Level.WARNING;
+        if (n >= org.apache.log4j.Level.INFO_INT)  return Level.CONFIG;
+        if (n >= org.apache.log4j.Level.DEBUG_INT) return Level.FINE;
+        if (n >= org.apache.log4j.Level.TRACE_INT) return Level.FINER;
+        return Level.ALL;
     }
 
     /**

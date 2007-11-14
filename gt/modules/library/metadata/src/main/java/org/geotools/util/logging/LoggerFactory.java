@@ -33,7 +33,14 @@ import org.geotools.util.WeakValueHashMap;
  * @see Logging
  * @see LoggerAdapter
  */
-public abstract class LoggerFactory {
+public abstract class LoggerFactory<L> {
+    /**
+     * The logger class. We ask for this information right at construction time in order to
+     * force a {@link NoClassDefFoundError} early rather than only the first time a message
+     * is logged.
+     */
+    private final Class<L> loggerClass;
+
     /**
      * The loggers created up to date.
      */
@@ -41,14 +48,17 @@ public abstract class LoggerFactory {
 
     /**
      * Creates a new factory.
+     *
+     * @param loggerClass The class of the wrapped logger.
      */
-    protected LoggerFactory() {
+    protected LoggerFactory(final Class<L> loggerClass) {
+        this.loggerClass = loggerClass;
         loggers = new WeakValueHashMap<String,Logger>();
     }
 
     /**
      * Returns the logger of the specified name, or {@code null}. If this method has already been
-     * invoked previously with the same {@code name} argument, than it may returns the same logger
+     * invoked previously with the same {@code name} argument, then it may returns the same logger
      * provided that:
      * <ul>
      *   <li>the logger has not yet been garbage collected;</li>
@@ -63,7 +73,7 @@ public abstract class LoggerFactory {
      * @return The logger, or {@code null}.
      */
     public Logger getLogger(final String name) {
-        final Object target = getImplementation(name);
+        final L target = getImplementation(name);
         if (target == null) {
             return null;
         }
@@ -78,6 +88,14 @@ public abstract class LoggerFactory {
     }
 
     /**
+     * Returns the base class of objects to be returned by {@link #getImplementation}. The
+     * class depends on the underlying logging framework (Log4J, SLF4J, <cite>etc.</cite>).
+     */
+    public Class<L> getImplementationClass() {
+        return loggerClass;
+    }
+
+    /**
      * Returns the implementation to use for the logger of the specified name. The object to be
      * returned depends on the logging framework (Log4J, SLF4J, <cite>etc.</cite>). If the target
      * framework redirects logging events to Java logging, then this method should returns
@@ -88,7 +106,7 @@ public abstract class LoggerFactory {
      *         <cite>etc.</cite>), or {@code null} if the target framework would redirect
      *         to the Java logging framework.
      */
-    protected abstract Object getImplementation(String name);
+    protected abstract L getImplementation(String name);
 
     /**
      * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
@@ -96,10 +114,8 @@ public abstract class LoggerFactory {
      * @param  name The name of the logger.
      * @param  implementation An implementation returned by {@link #getImplementation}.
      * @return A new logger wrapping the specified implementation.
-     * @throws ClassCastException if the given implementation is not an instance
-     *         of the expected class.
      */
-    protected abstract Logger wrap(String name, Object implementation) throws ClassCastException;
+    protected abstract Logger wrap(String name, L implementation);
 
     /**
      * Returns the {@linkplain #getImplementation implementation} wrapped by the specified logger,
@@ -109,5 +125,5 @@ public abstract class LoggerFactory {
      * @param  logger The logger to test.
      * @return The implementation wrapped by the specified logger, or {@code null} if none.
      */
-    protected abstract Object unwrap(Logger logger);
+    protected abstract L unwrap(Logger logger);
 }

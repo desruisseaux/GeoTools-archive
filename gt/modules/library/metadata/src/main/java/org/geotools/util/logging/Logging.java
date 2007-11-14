@@ -15,14 +15,18 @@
  */
 package org.geotools.util.logging;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.lang.reflect.Method;
 
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -36,8 +40,8 @@ import org.geotools.resources.Utilities;
  * invoke the following once at application startup:
  *
  * <blockquote><code>
- * Logging.{@linkplain #GEOTOOLS}.{@linkplain #setLoggingFramework setLoggingFramework}({@linkplain
- * LoggingFramework#COMMONS_LOGGING});
+ * Logging.{@linkplain #GEOTOOLS}.{@linkplain #setLoggerFactory
+ * setLoggerFactory}("org.geotools.util.logging.CommonsLoggerFactory");
  * </code></blockquote>
  *
  * @since 2.4
@@ -95,6 +99,12 @@ public final class Logging {
     private LoggerFactory factory;
 
     /**
+     * {@code true} if every {@link Logging} instances use the same {@link LoggerFactory}.
+     * This is an optimization for a very common case.
+     */
+    private static boolean sameLoggerFactory;
+
+    /**
      * Creates an instance for the root logger. This constructor should not be used
      * for anything else than {@link #ALL} construction; use {@link #getLogging} instead.
      */
@@ -116,10 +126,9 @@ public final class Logging {
     }
 
     /**
-     * Returns a logger for the specified name. If a {@linkplain LoggerFactory logger factory}
-     * has been set (typically indirectly through a call to {@link #setLoggingFramework
-     * setLoggingFramework}), then this method first {@linkplain LoggerFactory#getLogger
-     * ask to the factory}. It gives GeoTools a chance to redirect logging events to
+     * Returns a logger for the specified name. If a {@linkplain LoggerFactory logger factory} has
+     * been set, then this method first {@linkplain LoggerFactory#getLogger ask to the factory}.
+     * It gives GeoTools a chance to redirect logging events to
      * <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
      * or some equivalent framework.
      * <p>
@@ -130,13 +139,15 @@ public final class Logging {
      * @return A logger for the specified name.
      */
     public static Logger getLogger(final String name) {
-        final Logging logging = getLogging(name, false);
-        if (logging != null) {
-            final LoggerFactory factory = logging.getLoggerFactory();
-            if (factory != null) {
-                final Logger logger = factory.getLogger(name);
-                if (logger != null) {
-                    return logger;
+        synchronized (EMPTY) {
+            final Logging logging = sameLoggerFactory ? ALL : getLogging(name, false);
+            if (logging != null) {
+                final LoggerFactory factory = logging.factory;
+                if (factory != null) {
+                    final Logger logger = factory.getLogger(name);
+                    if (logger != null) {
+                        return logger;
+                    }
                 }
             }
         }
@@ -155,22 +166,25 @@ public final class Logging {
      * @param name The base logger name.
      */
     public static Logging getLogging(final String name) {
-        return getLogging(name, true);
+        synchronized (EMPTY) {
+            return getLogging(name, true);
+        }
     }
 
     /**
      * Returns a logging instance for the specified base logger. If no instance if found for
-     * the specified name and {@code create} is found, then a new instance will be created.
-     * Otherwise the nearest parent is returned.
+     * the specified name and {@code create} is {@code true}, then a new instance will be
+     * created. Otherwise the nearest parent is returned.
      *
      * @param root The root logger name.
      * @param create {@code true} if this method is allowed to create new {@code Logging} instance.
      */
     private static Logging getLogging(final String base, final boolean create) {
-        int offset = 0;
+        assert Thread.holdsLock(EMPTY);
         Logging logging = ALL;
-        synchronized (EMPTY) {
-            if (base.length() != 0) do {
+        if (base.length() != 0) {
+            int offset = 0;
+            do {
                 Logging[] children = logging.children;
                 offset = base.indexOf('.', offset);
                 final String name = (offset >= 0) ? base.substring(0, offset) : base;
@@ -197,7 +211,9 @@ public final class Logging {
      * For testing purpose only; don't make this method public.
      */
     final Logging[] getChildren() {
-        return children.clone();
+        synchronized (EMPTY) {
+            return children.clone();
+        }
     }
 
     /**
@@ -206,16 +222,15 @@ public final class Logging {
      * of its parent.
      */
     public LoggerFactory getLoggerFactory() {
-        return factory;
+        synchronized (EMPTY) {
+            return factory;
+        }
     }
 
     /**
      * Sets a new logger factory for this {@code Logging} instance and every children. The
      * specified factory will be used by <code>{@linkplain #getLogger getLogger}(name)</code>
      * when {@code name} is this {@code Logging} name or one of its children.
-     * <p>
-     * This method is invoked with pre-defined factory by
-     * {@link #setLoggingFramework setLoggingFramework}.
      */
     public void setLoggerFactory(final LoggerFactory factory) {
         synchronized (EMPTY) {
@@ -223,7 +238,85 @@ public final class Logging {
             for (int i=0; i<children.length; i++) {
                 children[i].setLoggerFactory(factory);
             }
+            sameLoggerFactory = sameLoggerFactory(ALL.children, ALL.factory);
         }
+    }
+
+    /**
+     * Returns {@code true} if all children use the specified factory.
+     * Used in order to detect a possible optimization for this very common case.
+     */
+    private static boolean sameLoggerFactory(final Logging[] children, final LoggerFactory factory) {
+        assert Thread.holdsLock(EMPTY);
+        for (int i=0; i<children.length; i++) {
+            final Logging logging = children[i];
+            if (logging.factory != factory || !sameLoggerFactory(logging.children, factory)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Sets a new logger factory from a fully qualidifed class name. This method should be
+     * preferred to {@link #setLoggerFactory(LoggerFactory)} when the underlying logging
+     * framework is not garanteed to be on the classpath.
+     *
+     * @param  className The fully qualified factory class name.
+     * @throws ClassNotFoundException if the specified class was not found.
+     * @throws IllegalArgumentException if the specified class is not a subclass of
+     *         {@link LoggerFactory}, or if no public static {@code getInstance()} method
+     *         has been found or can be executed.
+     */
+    public void setLoggerFactory(final String className)
+            throws ClassNotFoundException, IllegalArgumentException
+    {
+        final LoggerFactory factory;
+        if (className == null) {
+            factory = null;
+        } else {
+            final Class<?> factoryClass;
+            try {
+                factoryClass = Class.forName(className);
+            } catch (NoClassDefFoundError error) {
+                throw factoryNotFound(className, error);
+            }
+            if (!LoggerFactory.class.isAssignableFrom(factoryClass)) {
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
+                        Utilities.getShortName(factoryClass), Utilities.getShortName(LoggerFactory.class)));
+            }
+            try {
+                final Method method = factoryClass.getMethod("getInstance", (Class[]) null);
+                factory = LoggerFactory.class.cast(method.invoke(null, (Object[]) null));
+            } catch (Exception e) {
+                /*
+                 * Catching java.lang.Exception is usually bad practice, but there is really a lot
+                 * of checked exceptions when using reflection. Unfortunatly there is nothing like
+                 * a "ReflectionException" parent class that we could catch instead. There is also
+                 * a few unchecked exception that we want to process here, like ClassCastException.
+                 */
+                Throwable cause = e;
+                if (e instanceof InvocationTargetException) {
+                    cause = e.getCause(); // Simplify the stack trace.
+                }
+                if (cause instanceof ClassNotFoundException) {
+                    throw (ClassNotFoundException) e;
+                }
+                if (cause instanceof NoClassDefFoundError) {
+                    throw factoryNotFound(className, (NoClassDefFoundError) cause);
+                }
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
+                        className, cause));
+            }
+        }
+        setLoggerFactory(factory);
+    }
+
+    /**
+     * Wraps a unchecked {@link NoClassDefFoundError} into a checked {@link ClassNotFoundException}.
+     */
+    private static ClassNotFoundException factoryNotFound(String name, NoClassDefFoundError error) {
+        return new ClassNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1, name), error);
     }
 
     /**

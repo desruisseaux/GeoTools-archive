@@ -20,7 +20,8 @@ import org.apache.commons.logging.Log;
 
 
 /**
- * An adapter that redirect all Java logging events to the Apache's commons logging framework.
+ * An adapter that redirect all Java logging events to the Apache's
+ * <A HREF="http://jakarta.apache.org/commons/logging/">Commons-logging</A> framework.
  *
  * @since 2.4
  * @source $URL$
@@ -28,6 +29,7 @@ import org.apache.commons.logging.Log;
  * @author Martin Desruisseaux
  * @author Saul Farber
  *
+ * @see CommonsLoggerFactory
  * @see Logging
  */
 final class CommonsLogger extends LoggerAdapter {

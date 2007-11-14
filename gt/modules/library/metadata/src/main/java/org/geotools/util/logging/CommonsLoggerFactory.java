@@ -16,35 +16,41 @@
 package org.geotools.util.logging;
 
 import java.util.logging.Logger;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Jdk14Logger;
 
+
 /**
- * Factory for {@link CommonsLogger}.
+ * A factory for loggers that redirect all Java logging events to the Apache's
+ * <A HREF="http://jakarta.apache.org/commons/logging/">Commons-logging</A> framework.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class CommonsLoggerFactory extends LoggerFactory {
+public class CommonsLoggerFactory extends LoggerFactory<Log> {
     /**
      * The unique instance of this factory.
      */
     private static CommonsLoggerFactory factory;
 
     /**
-     * Do not allows more than instantiation of this class.
+     * Constructs a default factory.
+     *
+     * @throws NoClassDefFoundError if Apache's {@code Log} class was not found on the classpath.
      */
-    private CommonsLoggerFactory() {
+    protected CommonsLoggerFactory() throws NoClassDefFoundError {
+        super(Log.class);
     }
 
     /**
      * Returns the unique instance of this factory.
+     *
+     * @throws NoClassDefFoundError if Apache's {@code Log} class was not found on the classpath.
      */
-    public static synchronized CommonsLoggerFactory getInstance() {
+    public static synchronized CommonsLoggerFactory getInstance() throws NoClassDefFoundError {
         if (factory == null) {
             factory = new CommonsLoggerFactory();
         }
@@ -55,7 +61,7 @@ public final class CommonsLoggerFactory extends LoggerFactory {
      * Returns the implementation to use for the logger of the specified name,
      * or {@code null} if the logger would delegates to Java logging anyway.
      */
-    protected Object getImplementation(final String name) {
+    protected Log getImplementation(final String name) {
         final Log log = LogFactory.getLog(name);
         if (log instanceof Jdk14Logger) {
             return null;
@@ -66,15 +72,15 @@ public final class CommonsLoggerFactory extends LoggerFactory {
     /**
      * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
      */
-    protected Logger wrap(String name, Object implementation) throws ClassCastException {
-        return new CommonsLogger(name, (Log) implementation);
+    protected Logger wrap(String name, Log implementation) {
+        return new CommonsLogger(name, implementation);
     }
 
     /**
      * Returns the {@linkplain #getImplementation implementation} wrapped by the specified logger,
      * or {@code null} if none.
      */
-    protected Object unwrap(final Logger logger) {
+    protected Log unwrap(final Logger logger) {
         if (logger instanceof CommonsLogger) {
             return ((CommonsLogger) logger).logger;
         }

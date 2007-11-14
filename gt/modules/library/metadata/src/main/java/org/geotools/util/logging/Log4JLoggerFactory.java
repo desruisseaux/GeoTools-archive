@@ -17,30 +17,37 @@ package org.geotools.util.logging;
 
 import java.util.logging.Logger;
 
+
 /**
- * Factory for {@link Log4JLogger}.
+ * A factory for loggers that redirect all Java logging events to the Apache's
+ * <A HREF="http://logging.apache.org/log4j">Log4J</A> framework.
  *
  * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class Log4JLoggerFactory extends LoggerFactory {
+public class Log4JLoggerFactory extends LoggerFactory<org.apache.log4j.Logger> {
     /**
      * The unique instance of this factory.
      */
     private static Log4JLoggerFactory factory;
 
     /**
-     * Do not allows more than instantiation of this class.
+     * Constructs a default factory.
+     *
+     * @throws NoClassDefFoundError if Apache's {@code Log} class was not found on the classpath.
      */
-    private Log4JLoggerFactory() {
+    protected Log4JLoggerFactory() throws NoClassDefFoundError {
+        super(org.apache.log4j.Logger.class);
     }
 
     /**
      * Returns the unique instance of this factory.
+     *
+     * @throws NoClassDefFoundError if Apache's {@code Log} class was not found on the classpath.
      */
-    public static synchronized Log4JLoggerFactory getInstance() {
+    public static synchronized Log4JLoggerFactory getInstance() throws NoClassDefFoundError {
         if (factory == null) {
             factory = new Log4JLoggerFactory();
         }
@@ -51,22 +58,22 @@ public final class Log4JLoggerFactory extends LoggerFactory {
      * Returns the implementation to use for the logger of the specified name,
      * or {@code null} if the logger would delegates to Java logging anyway.
      */
-    protected Object getImplementation(final String name) {
+    protected org.apache.log4j.Logger getImplementation(final String name) {
         return org.apache.log4j.Logger.getLogger(name);
     }
 
     /**
      * Wraps the specified {@linkplain #getImplementation implementation} in a Java logger.
      */
-    protected Logger wrap(String name, Object implementation) throws ClassCastException {
-        return new Log4JLogger(name, (org.apache.log4j.Logger) implementation);
+    protected Logger wrap(String name, org.apache.log4j.Logger implementation) {
+        return new Log4JLogger(name, implementation);
     }
 
     /**
      * Returns the {@linkplain #getImplementation implementation} wrapped by the specified logger,
      * or {@code null} if none.
      */
-    protected Object unwrap(final Logger logger) {
+    protected org.apache.log4j.Logger unwrap(final Logger logger) {
         if (logger instanceof Log4JLogger) {
             return ((Log4JLogger) logger).logger;
         }

@@ -176,7 +176,7 @@ public abstract class LoggerAdapter extends Logger {
      *         case  3: return isFinestEnabled();
      *         case  2: // fallthrough
      *         case  1: // fallthrough
-     *         case  0: return false; // Logging OFF
+     *         case  0: return false;
      *     }
      * }
      * </pre></blockquote>

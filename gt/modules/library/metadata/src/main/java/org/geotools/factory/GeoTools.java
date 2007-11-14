@@ -185,15 +185,37 @@ public final class GeoTools {
     }
 
     /**
+     * Sets the global {@linkplain LoggerFactory logger factory}.
+     * 
+     * This method is the same as {@code Logging.GEOTOOLS.setLoggerFactory(factory)}.
+     * GeoTools ships with support for
+     * <A HREF="http://jakarta.apache.org/commons/logging/">Commons-logging</A> and
+     * <A HREF="http://logging.apache.org/log4j/">log4j</A>. This method exists to allow you
+     * supply your own implementation (this is sometimes required when using a GeoTools
+     * application in an exotic environment like Eclipse, OC4J or your application).
+     *
+     * @see Logging#setLoggerFactory(LoggerFactory)
+     *
+     * @since 2.4
+     */
+    public void setLoggerFactory(final LoggerFactory factory) {
+        Logging.GEOTOOLS.setLoggerFactory(factory);
+    }
+
+    /**
      * Initializes GeoTools for use. This convenience method performs various tasks (more may
      * be added in the future), including setting up the {@linkplain java.util.logging Java
      * logging framework} in one of the following states:
      * <p>
      * <ul>
-     *   <li>If the <A HREF="http://jakarta.apache.org/commons/logging/">commons-logging</A>
+     *   <li>If the <A HREF="http://jakarta.apache.org/commons/logging/">Commons-logging</A>
      *       framework is available, then every logging message in the {@code org.geotools}
      *       namespace sent to the Java {@linkplain java.util.logging.Logger logger} are
-     *       redirected to commons-logging.</li>
+     *       redirected to Commons-logging.</li>
+     * 
+     *   <li>Otherwise if the <A HREF="http://logging.apache.org/log4j">Log4J</A> framework is
+     *       available, then every logging message in the {@code org.geotools} namespace sent
+     *       to the Java {@linkplain java.util.logging.Logger logger} are redirected to Log4J.</li>
      * 
      *   <li>Otherwise, the Java logging {@linkplain java.util.logging.Formatter formatter} for
      *       console output is replaced by a {@linkplain org.geotools.util.logging.MonolineFormatter
@@ -217,7 +239,7 @@ public final class GeoTools {
      * GeoTools.init(hints);
      * </pre></blockquote>
      * 
-     * @see Logging#setLoggingFramework
+     * @see Logging#setLoggerFactory(String)
      * @see Logging#forceMonolineConsoleOutput
      * @see Hints#putSystemDefault
      * @see #getDefaultHints
@@ -225,35 +247,21 @@ public final class GeoTools {
     public static void init(final Hints hints) {
         final Logging log = Logging.GEOTOOLS;
         try {
-            log.setLoggerFactory(CommonsLoggerFactory.getInstance());
-        } catch(Exception commonsException) {
+            log.setLoggerFactory("org.geotools.util.logging.CommonsLoggerFactory");
+        } catch (ClassNotFoundException commonsException) {
             try {
-                log.setLoggerFactory(Log4JLoggerFactory.getInstance());
-            } catch(Exception log4jException) {
-                // nothing to do, we already tried our best
+                log.setLoggerFactory("org.geotools.util.logging.Log4JLoggerFactory");
+            } catch (ClassNotFoundException log4jException) {
+                // Nothing to do, we already tried our best.
             }
         }
-        // if java logging is used, force monoline console output
+        // If java logging is used, force monoline console output.
         if (log.getLoggerFactory() == null) {
             log.forceMonolineConsoleOutput();
         }
-        Hints.putSystemDefault(hints);
-    }
-
-    /**
-     * Set the global LogginFactory.
-     * 
-     * This method is the same as Logging.GEOTOOLS.setLoggerFactory( factory ), GeoTools
-     * ships with support for commons logging and log4j. This method exists to allow you
-     * supply your own implementation (this is sometimes required when using a GeoTools
-     * application in an exotic environment like Eclipse, OC4J or your application).
-     * 
-     * @see LoggingFramework
-     * @param factory
-     */
-    public void setLoggerFactory(LoggerFactory factory){
-        final Logging log = Logging.GEOTOOLS;
-        log.setLoggerFactory( factory );
+        if (hints != null) {
+            Hints.putSystemDefault(hints);
+        }
     }
     
     /**

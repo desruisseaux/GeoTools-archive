@@ -72,9 +72,9 @@ public class LoggingTest extends TestCase {
     /**
      * Tests the redirection to Commons-logging.
      */
-    public void testCommonsLogging() {
+    public void testCommonsLogging() throws ClassNotFoundException {
         try {
-            Logging.GEOTOOLS.setLoggerFactory(CommonsLoggerFactory.getInstance());
+            Logging.GEOTOOLS.setLoggerFactory("org.geotools.util.logging.CommonsLoggerFactory");
             Logger logger = Logging.getLogger("org.geotools");
             /*
              * 'logger' would be an instanceof from the Java logging framework if Log4J wasn't in
@@ -113,7 +113,7 @@ public class LoggingTest extends TestCase {
             logger.severe ("Message to Commons-logging at SEVERE level.");
             log4j.setLevel(oldLevel);
         } finally {
-            Logging.GEOTOOLS.setLoggerFactory(null);
+            Logging.GEOTOOLS.setLoggerFactory((String) null);
             assertEquals(Logger.class, Logging.getLogger("org.geotools").getClass());
         }
     }
@@ -121,9 +121,9 @@ public class LoggingTest extends TestCase {
     /**
      * Tests the redirection to Log4J.
      */
-    public void testLog4J() {
+    public void testLog4J() throws ClassNotFoundException {
         try {
-            Logging.GEOTOOLS.setLoggerFactory(Log4JLoggerFactory.getInstance());
+            Logging.GEOTOOLS.setLoggerFactory("org.geotools.util.logging.Log4JLoggerFactory");
             Logger logger = Logging.getLogger("org.geotools");
             assertTrue(logger instanceof Log4JLogger);
             /*
@@ -161,7 +161,7 @@ public class LoggingTest extends TestCase {
             logger.severe ("Message to Log4J at SEVERE level.");
             logger.setLevel(oldLevel);
         } finally {
-            Logging.GEOTOOLS.setLoggerFactory(null);
+            Logging.GEOTOOLS.setLoggerFactory((String) null);
             assertEquals(Logger.class, Logging.getLogger("org.geotools").getClass());
         }
     }
