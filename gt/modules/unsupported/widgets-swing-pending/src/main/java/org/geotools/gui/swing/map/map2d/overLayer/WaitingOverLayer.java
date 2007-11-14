@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.decolayer;
+package org.geotools.gui.swing.map.map2d.overLayer;
 
 import java.awt.Font;
 import java.awt.Graphics;
@@ -27,13 +27,13 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author Johann Sorel
  */
-public class RedrawingPanel extends JComponent{
+public class WaitingOverLayer extends JComponent{
 
     private final ImageIcon anim = IconBundle.getResource().getIcon("JS_GT");
     private final String msg = TextBundle.getResource().getString("drawing_wait");
     private boolean drawing = false;
     
-    public RedrawingPanel(){}
+    public WaitingOverLayer(){}
     
     public void setDrawing(boolean b){
         drawing = b;
