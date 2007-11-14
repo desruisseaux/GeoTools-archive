@@ -16,28 +16,24 @@
 
 package org.geotools.gui.swing.map.map2d;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.map.MapLayer;
 
 /**
  *
  * @author Johann Sorel
  */
-public interface SelectableMap2D extends Map2D{
-    
-    public void setSelectionEnable(boolean enable);
-    public boolean isSelectionEnabled();
-    
-    public void setSelectableLayer(MapLayer layer);
-    public void setSelectableLayer(MapLayer[] layer);
+public interface SelectableMap2D extends NavigableMap2D{
+        
+    public void addSelectableLayer(MapLayer layer);
+    public void addSelectableLayer(MapLayer[] layer);
+    public void removeSelectableLayer(MapLayer layer);
     public MapLayer[] getSelectableLayer();
+    public boolean isLayerSelectable(MapLayer layer);
     
     public void doSelection(double x, double y);
-    public void doSelection(Envelope env);
+//    public void doSelection(Envelope env);
     
-    public void setSelection(FeatureCollection selection);
-    public FeatureCollection getSelection();
+//    public void setSelection(FeatureCollection selection);
+//    public FeatureCollection getSelection();
       
 }

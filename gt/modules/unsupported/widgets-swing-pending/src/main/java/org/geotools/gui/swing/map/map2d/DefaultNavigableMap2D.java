@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import java.util.Date;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
-import org.geotools.gui.swing.map.MapConstants.STATE;
-import org.geotools.gui.swing.map.map2d.overLayer.NavigationOverLayer;
+import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
+import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanOverLayer;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
@@ -37,12 +37,12 @@ import org.geotools.renderer.shape.ShapefileRenderer;
  */
 public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2D{
 
-    protected NavigationOverLayer movingPanel = new NavigationOverLayer();
+    private final MouseInputListener mouseInputListener;    
+    private final ZoomPanOverLayer navigationPanel = new ZoomPanOverLayer();
+    private double zoomFactor = 2;
     
-    protected MapConstants.STATE navigation = MapConstants.STATE.PAN;
-    protected MouseInputListener mouseInputListener; 
-    protected double zoomFactor = 2;
-    
+    protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
+     
     
     public DefaultNavigableMap2D(){
         this(new ShapefileRenderer());
@@ -50,22 +50,20 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
     
     public DefaultNavigableMap2D(GTRenderer renderer){
         super(renderer);
-        mouseInputListener = new MouseListen(this);
+        mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
-        layerPane.add(movingPanel,new Integer(13));
+        layerPane.add(navigationPanel,new Integer(NEXT_OVER_LAYER_INDEX));
+        NEXT_OVER_LAYER_INDEX++;
     }
 
     
-    
-    
-    
     //-----------------------NAVIGABLEMAP2D-------------------------------------
-    public void setNavigationState(STATE state) {
-        navigation = state;
+    public void setActionState(ACTION_STATE state) {
+        actionState = state;
     }
-    public STATE getNavigationState() {
-        return navigation;
+    public ACTION_STATE getActionState() {
+        return actionState;
     }
 
     public void setZoomFactor(double zoomFactor) {
@@ -76,50 +74,45 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         return zoomFactor;
     }
     
-}
-
-
-class MouseListen implements MouseInputListener{
+    
+    //---------------------PRIVATE CLASSES--------------------------------------
+    
+    private class MouseListen implements MouseInputListener{
     
     private int startX;
     private int startY;
     private int lastX;
     private int lastY; 
     
-    private final DefaultNavigableMap2D map;    
-    MouseListen(DefaultNavigableMap2D map){
-        this.map = map;
-    }
-    
-    
-    private void drawRectangle(Graphics graphics) {
+        
+    private void drawRectangle(boolean view,boolean fill) {
         int left = Math.min(startX, lastX);
         int right = Math.max(startX, lastX);
         int top = Math.max(startY, lastY);
         int bottom = Math.min(startY, lastY);
         int width = right - left;
         int height = top - bottom;
-        graphics.drawRect(left, bottom, width, height);
+        navigationPanel.setFill(fill);
+        navigationPanel.setCoord(left, bottom, width, height, view);
+        //graphics.drawRect(left, bottom, width, height);
     }
-    
-    
-    
-    void processDrag(int x1, int y1, int x2, int y2) {
+       
+    private void processDrag(int x1, int y1, int x2, int y2) {
         
         if ((x1 == x2) && (y1 == y2)) {            
-            this.mouseClicked(new MouseEvent(map, 0, new Date().getTime(), 0,x1, y1, y2, false));            
+            this.mouseClicked(new MouseEvent((DefaultNavigableMap2D)THIS_MAP, 0, new Date().getTime(), 0,x1, y1, y2, false));            
             return;
         }
 
-        Rectangle bounds = map.getBounds();
+        Rectangle bounds = getBounds();
 
-        double mapWidth = map.mapArea.getWidth();
-        double mapHeight = map.mapArea.getHeight();
+        double mapWidth = mapArea.getWidth();
+        double mapHeight = mapArea.getHeight();
 
-        double startX = ((x1 * mapWidth) / (double) bounds.width) + map.mapArea.getMinX();
-        double startY = (((bounds.getHeight() - y1) * mapHeight) / (double) bounds.height) + map.mapArea.getMinY();
-        double endX = ((x2 * mapWidth) / (double) bounds.width) + map.mapArea.getMinX();
-        double endY = (((bounds.getHeight() - y2) * mapHeight) / (double) bounds.height) + map.mapArea.getMinY();
+        double startX = ((x1 * mapWidth) / (double) bounds.width) + mapArea.getMinX();
+        double startY = (((bounds.getHeight() - y1) * mapHeight) / (double) bounds.height) +mapArea.getMinY();
+        double endX = ((x2 * mapWidth) / (double) bounds.width) + mapArea.getMinX();
+        double endY = (((bounds.getHeight() - y2) * mapHeight) / (double) bounds.height) + mapArea.getMinY();
 
         double left;
         double right;
@@ -128,7 +121,7 @@ class MouseListen implements MouseInputListener{
         Coordinate ll;
         Coordinate ur;
         
-        switch(map.navigation){
+        switch(actionState){
         case PAN :
             // move the image with the mouse
             // calculate X offsets from start point to the end Point
@@ -136,19 +129,19 @@ class MouseListen implements MouseInputListener{
 
             // System.out.println("deltaX " + deltaX1);
             // new edges
-            left = map.mapArea.getMinX() - deltaX1;
-            right = map.mapArea.getMaxX() - deltaX1;
+            left = mapArea.getMinX() - deltaX1;
+            right = mapArea.getMaxX() - deltaX1;
 
             // now for Y
             double deltaY1 = endY - startY;
 
             // System.out.println("deltaY " + deltaY1);
-            bottom = map.mapArea.getMinY() - deltaY1;
-            top = map.mapArea.getMaxY() - deltaY1;
+            bottom = mapArea.getMinY() - deltaY1;
+            top = mapArea.getMaxY() - deltaY1;
             ll = new Coordinate(left, bottom);
             ur = new Coordinate(right, top);
 
-            map.mapArea = map.fixAspectRatio(map.getBounds(), new Envelope(ll, ur));
+            mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
             break;
             
         case ZOOM_IN :
@@ -160,7 +153,7 @@ class MouseListen implements MouseInputListener{
             ll = new Coordinate(left, bottom);
             ur = new Coordinate(right, top);
 
-            map.mapArea = map.fixAspectRatio(map.getBounds(), new Envelope(ll, ur));
+            mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
             break;
             
         case ZOOM_OUT :
@@ -171,46 +164,36 @@ class MouseListen implements MouseInputListener{
             top = Math.max(startY, endY);
             double nWidth = (mapWidth * mapWidth) / (right - left);
             double nHeight = (mapHeight * mapHeight) / (top - bottom);
-            deltaX1 = left - map.mapArea.getMinX();
+            deltaX1 = left - mapArea.getMinX();
             double nDeltaX1 = (deltaX1 * nWidth) / mapWidth;
-            deltaY1 = bottom - map.mapArea.getMinY();
+            deltaY1 = bottom - mapArea.getMinY();
             double nDeltaY1 = (deltaY1 * nHeight) / mapHeight;
-            ll = new Coordinate(map.mapArea.getMinX() - nDeltaX1,map.mapArea.getMinY() - nDeltaY1);
-            double deltaX2 = map.mapArea.getMaxX() - right;
+            ll = new Coordinate(mapArea.getMinX() - nDeltaX1,mapArea.getMinY() - nDeltaY1);
+            double deltaX2 = mapArea.getMaxX() - right;
             double nDeltaX2 = (deltaX2 * nWidth) / mapWidth;
-            double deltaY2 = map.mapArea.getMaxY() - top;
+            double deltaY2 = mapArea.getMaxY() - top;
             double nDeltaY2 = (deltaY2 * nHeight) / mapHeight;
-            ur = new Coordinate(map.mapArea.getMaxX() + nDeltaX2,map.mapArea.getMaxY() + nDeltaY2);
-            map.mapArea = map.fixAspectRatio(map.getBounds(), new Envelope(ll, ur));
+            ur = new Coordinate(mapArea.getMaxX() + nDeltaX2,mapArea.getMaxY() + nDeltaY2);
+            mapArea = fixAspectRatio(getBounds(), new Envelope(ll, ur));
         }
 
-        map.repaint();
+        repaint();
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+            
     public void mouseClicked(MouseEvent e) {
          // TODO Auto-generated method stub
         // System.out.println("before area "+mapArea+"\nw:"+mapArea.getWidth()+"
         // h:"+mapArea.getHeight());
-        Rectangle bounds = map.getBounds();
+        Rectangle bounds = getBounds();
         double x = (double) (e.getX());
         double y = (double) (e.getY());
-        double width = map.mapArea.getWidth();
-        double height = map.mapArea.getHeight();
-        double width2 = map.mapArea.getWidth() / 2.0;
-        double height2 = map.mapArea.getHeight() / 2.0;
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        double width2 = mapArea.getWidth() / 2.0;
+        double height2 = mapArea.getHeight() / 2.0;
 
-        double mapX = ((x * width) / (double) bounds.width) + map.mapArea.getMinX();
-        double mapY = (((bounds.getHeight() - y) * height) / (double) bounds.height) + map.mapArea.getMinY();
+        double mapX = ((x * width) / (double) bounds.width) +mapArea.getMinX();
+        double mapY = (((bounds.getHeight() - y) * height) / (double) bounds.height) + mapArea.getMinY();
 
         /*
          * System.out.println(""+x+"->"+mapX);
@@ -223,15 +206,15 @@ class MouseListen implements MouseInputListener{
          */
         double zlevel = 1.0;
 
-        switch (map.navigation) {
+        switch (actionState) {
         case PAN:
             zlevel = 1.0;
             break;
         case ZOOM_IN:
-            zlevel = map.zoomFactor;
+            zlevel = zoomFactor;
             break;
         case ZOOM_OUT:
-            zlevel = 1.0 / map.zoomFactor;
+            zlevel = 1.0 / zoomFactor;
             break;
         default:
             return;
@@ -240,8 +223,8 @@ class MouseListen implements MouseInputListener{
         Coordinate ll = new Coordinate(mapX - (width2 / zlevel), mapY - (height2 / zlevel));
         Coordinate ur = new Coordinate(mapX + (width2 / zlevel), mapY + (height2 / zlevel));
 
-        map.setMapArea( new Envelope(ll, ur) );
-        map.repaint();
+        setMapArea( new Envelope(ll, ur) );
+        repaint();
     
     }
     public void mousePressed(MouseEvent e) {
@@ -256,12 +239,17 @@ class MouseListen implements MouseInputListener{
         int endY = e.getY();
 
         
-        
-        if ((map.navigation == MapConstants.STATE.ZOOM_IN) || (map.navigation == MapConstants.STATE.ZOOM_OUT)) {
-            drawRectangle(map.getGraphics());
-        }else if (map.navigation == MapConstants.STATE.PAN){
-            map.movingPanel.setCoord(0,0,0,0, false);
+        switch (actionState) {
+        case PAN:
+            navigationPanel.setFill(false);
+            navigationPanel.setCoord(0,0,0,0, false);
+            break;
+        case ZOOM_IN:
+        case ZOOM_OUT:            
+            drawRectangle(false,true);
+            break;
         }
+        
 
         processDrag( startX,startY, endX, endY);
         lastX = 0;
@@ -271,38 +259,43 @@ class MouseListen implements MouseInputListener{
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
     public void mouseDragged(MouseEvent e) {   
-        Graphics graphics = map.getGraphics();
         int x = e.getX();
         int y = e.getY();
-
-        if (map.navigation == MapConstants.STATE.PAN) {
-            // move the image with the mouse
+        
+        switch (actionState) {
+        case PAN:
             if ((lastX > 0) && (lastY > 0)) {
                 int dx = lastX - startX;
-                int dy = lastY - startY;                
-                map.movingPanel.setCoord(dx, dy, map.getWidth(), map.getHeight(), true);                
+                int dy = lastY - startY;     
+                navigationPanel.setFill(false);
+                navigationPanel.setCoord(dx, dy, getWidth(), getHeight(), true);                
             }
-
             lastX = x;
             lastY = y;
-        } else if ((map.navigation == MapConstants.STATE.ZOOM_IN) || (map.navigation == MapConstants.STATE.ZOOM_OUT)) {
-            graphics.setXORMode(Color.RED);
-
-            if ((lastX > 0) && (lastY > 0)) {
-                drawRectangle(graphics);
+            break;
+        case ZOOM_IN:
+        case ZOOM_OUT:
+            if ((lastX > 0) && (lastY > 0)) {               
+                drawRectangle(true,true);
             }
 
             // draw new box
             lastX = x;
             lastY = y;
-            drawRectangle(graphics);
+            drawRectangle(true,true);
+            break;
         }
-    
+        
         
     
 }
-
     public void mouseMoved(MouseEvent e) {}
     
 }
+    
+    
+}
+
+
+
 

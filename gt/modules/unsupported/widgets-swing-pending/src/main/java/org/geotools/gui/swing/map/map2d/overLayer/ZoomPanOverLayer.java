@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.decolayer;
+package org.geotools.gui.swing.map.map2d.overLayer;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -24,15 +24,24 @@ import javax.swing.JComponent;
  *
  * @author Johann Sorel
  */
-public class MovingPanel extends JComponent{
+public class ZoomPanOverLayer extends JComponent{
 
+    private final Color borderColor = new Color(0,0,255);
+    private final Color fillColor = new Color(0,0,255,60);
+    
     private int startx =0;
     private int starty =0;
     private int width = 0;
     private int height = 0;
     private boolean draw = false;
+    private boolean fill = false;
     
-    public MovingPanel(){}
+    public ZoomPanOverLayer(){}
+    
+    public void setFill(boolean fill){
+        this.fill = fill;
+    }
+    
     
     public void setCoord(int sx, int sy, int ex, int ey, boolean draw){
         startx = sx;
@@ -46,7 +55,13 @@ public class MovingPanel extends JComponent{
     @Override
     public void paintComponent(Graphics g) {
         if(draw){
-            g.setColor(Color.BLUE);
+                        
+            if(fill){
+                g.setColor(fillColor);
+                g.fillRect(startx, starty, width, height);
+            }
+            
+            g.setColor(borderColor);
             g.drawRect(startx, starty, width, height);
             }
     }

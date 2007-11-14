@@ -37,19 +37,12 @@ public class BufferPane extends JLayeredPane {
     final State STATE = new State();
     private Map<MapLayer, BufferComponent> stock = new HashMap<MapLayer, BufferComponent>();
     private DefaultMap2D map;
-    //private BufferThread thread = new BufferThread();
 
     BufferPane(DefaultMap2D map) {
         this.map = map;
         setLayout(new BufferLayout());
     }
 
-//    private void stopThread(){
-//        if(thread != null){
-//            thread.setStop(true);
-//        }
-//    }
-//    
     
     private void redraw(){
         
@@ -202,8 +195,10 @@ class BufferComponent extends JComponent {
 
 class State extends Observable {
 
+    
     private int nb = 0;
 
+        
     public int getNB() {
         return nb;
     }
@@ -225,36 +220,3 @@ class State extends Observable {
         }
     }
     }
-
-//
-//interface Stopable{
-//    
-//    
-//    
-//}
-//
-//
-//
-//class BufferThread extends Thread{
-//    
-//    private boolean stop = false; 
-//    private Stopable bufferline;
-//    
-//    public boolean getStop(){
-//        return stop;
-//    }
-//    
-//    public void setStop(boolean b){
-//        stop = b;
-//    }
-//    
-//    
-//    
-//    @Override
-//    public void run(){
-//        
-//        
-//        
-//    }
-//    
-//}

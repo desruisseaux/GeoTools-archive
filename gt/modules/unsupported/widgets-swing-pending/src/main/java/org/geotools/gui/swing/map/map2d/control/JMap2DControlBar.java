@@ -43,7 +43,7 @@ public class JMap2DControlBar extends JPanel {
     private final JButton zoomout = buildButton(IconBundle.getResource().getIcon("16_zoom_out"));
     private final JButton zoompan = buildButton(IconBundle.getResource().getIcon("16_zoom_pan"));
     private final JButton zoomall = buildButton(IconBundle.getResource().getIcon("16_zoom_all"));
-    private final JToggleButton select = buildToggleButton(IconBundle.getResource().getIcon("16_select"));
+    private final JButton select = buildButton(IconBundle.getResource().getIcon("16_select"));
 
     /**
      * Creates a new instance of DefaultLightMapPaneToolBar
@@ -64,7 +64,7 @@ public class JMap2DControlBar extends JPanel {
 
                     public void actionPerformed(ActionEvent e) {
                         if (navigationMap != null) {
-                            navigationMap.setNavigationState(MapConstants.STATE.ZOOM_IN);
+                            navigationMap.setActionState(MapConstants.ACTION_STATE.ZOOM_IN);
                         }
                     }
                 });
@@ -73,7 +73,7 @@ public class JMap2DControlBar extends JPanel {
 
                     public void actionPerformed(ActionEvent e) {
                         if (navigationMap != null) {
-                            navigationMap.setNavigationState(MapConstants.STATE.ZOOM_OUT);
+                            navigationMap.setActionState(MapConstants.ACTION_STATE.ZOOM_OUT);
                         }
                     }
                 });
@@ -82,7 +82,7 @@ public class JMap2DControlBar extends JPanel {
 
                     public void actionPerformed(ActionEvent e) {
                         if (navigationMap != null) {
-                            navigationMap.setNavigationState(MapConstants.STATE.PAN);
+                            navigationMap.setActionState(MapConstants.ACTION_STATE.PAN);
                         }
                     }
                 });
@@ -106,7 +106,7 @@ public class JMap2DControlBar extends JPanel {
         select.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
-                        selectionMap.setSelectionEnable(select.isSelected());
+                        selectionMap.setActionState(MapConstants.ACTION_STATE.SELECT);
                     }
                 });
 
@@ -126,12 +126,6 @@ public class JMap2DControlBar extends JPanel {
         return but;
     }
 
-    private JToggleButton buildToggleButton(ImageIcon img) {
-        JToggleButton but = new JToggleButton(img);
-        but.setBorder(new EmptyBorder(2, 2, 2, 2));
-        return but;
-    }
-
     public void setMap(Map pane) {
         if (pane instanceof NavigableMap2D) {
             this.navigationMap = (NavigableMap2D) pane;
@@ -142,7 +136,6 @@ public class JMap2DControlBar extends JPanel {
 
             if (pane instanceof SelectableMap2D) {
                 this.selectionMap = (SelectableMap2D) pane;
-                select.setSelected(selectionMap.isSelectionEnabled());
                 select.setEnabled(true);
             } else {
                 select.setEnabled(false);

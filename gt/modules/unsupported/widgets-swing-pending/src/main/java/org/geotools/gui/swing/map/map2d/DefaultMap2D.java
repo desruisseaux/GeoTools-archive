@@ -37,6 +37,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.DimensionUIResource;
+import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.overLayer.WaitingOverLayer;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -58,7 +59,10 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class DefaultMap2D extends JPanel implements Map2D,Observer {
 
-    protected MapLayerListListener mapLayerListlistener;
+    protected final Map2D THIS_MAP;
+    protected int NEXT_OVER_LAYER_INDEX = 12;
+    private final MapLayerListListener mapLayerListlistener;
+    
     protected GTRenderer renderer;
     protected MapContext context;
     protected Envelope mapArea;
@@ -79,11 +83,13 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
 
     public DefaultMap2D(GTRenderer renderer) {
         this.renderer = renderer;
-        mapLayerListlistener = new MapLayerListListen(this);
+        this.THIS_MAP = this;
+        mapLayerListlistener = new MapLayerListListen();
         setLayout(new GridLayout(1, 1));
         layerPane.setLayout(new BufferLayout());
         layerPane.add(bufferPane,new Integer(11));
-        layerPane.add(waitingPane,new Integer(12));
+        layerPane.add(waitingPane,new Integer(NEXT_OVER_LAYER_INDEX));
+        NEXT_OVER_LAYER_INDEX++;
         bufferPane.STATE.addObserver(this);
         add(layerPane);
     }
@@ -143,6 +149,15 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
         return buf;
     }
 
+    protected BufferedImage createBufferImage(MapContext context) {        
+        BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D ig = buf.createGraphics();
+        renderer.setContext(context);
+        renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+        return buf;
+    }
+    
+    
     protected void redraw(boolean withRepaint) {
         
         if ((renderer == null) || (mapArea == null)) {
@@ -153,7 +168,7 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
         mapRectangle = new Rectangle(r.width, r.height);
 
         if (!r.equals(oldRect) || reset) {
-            if (!r.equals(oldRect)) {
+            if (reset) {
                 try {
                     mapArea = context.getLayerBounds();
                 } catch (IOException e) {
@@ -164,6 +179,12 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
             changed = true; /* note we need to redraw */
             reset = false;
             oldRect = r; /* store what the current size is */
+            
+            if(mapArea == null){
+                bufferPane.fit();
+                return;
+            }
+            
             mapArea = fixAspectRatio(r, mapArea);
         }
 
@@ -294,58 +315,42 @@ public class DefaultMap2D extends JPanel implements Map2D,Observer {
         int val = (Integer)arg;
         if(val > 0){
             waitingPane.setDrawing(true);
-            waitingPane.repaint();
         }
         else{
             waitingPane.setDrawing(false);
-            waitingPane.repaint();
         }
     }
-}
+    
+    
+    //---------------------- PRIVATE CLASSES------------------------------------    
+    private class MapLayerListListen implements MapLayerListListener {
 
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-//---------------------MapLayerListListen-------------------------------------//
-////////////////////////////////////////////////////////////////////////////////
-
-
-class MapLayerListListen implements MapLayerListListener {
-
-    private final DefaultMap2D map;
-
-    MapLayerListListen(DefaultMap2D map) {
-        this.map = map;
-    }
-
-    public void layerAdded(MapLayerListEvent event) {        
-        MapContext context = map.getContext();
+    public void layerAdded(MapLayerListEvent event) {     
 
         if (context.getLayers().length == 1) {
             try {
-                map.setMapArea(context.getLayerBounds());
+                setMapArea(context.getLayerBounds());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        map.fireAdd(event);
+        fireAdd(event);
     }
 
     public void layerRemoved(MapLayerListEvent event) {
-        map.fireDelete(event);
+        fireDelete(event);
     }
 
     public void layerChanged(MapLayerListEvent event) {
-        map.fireChange(event);
+        fireChange(event);
     }
 
     public void layerMoved(MapLayerListEvent event) {
-        map.fireMove(event);
+        fireMove(event);
     }
 }
-
-
+    
+    
+}
 

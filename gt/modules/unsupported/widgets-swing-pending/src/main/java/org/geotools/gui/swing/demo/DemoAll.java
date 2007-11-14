@@ -28,12 +28,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.TreeContextEvent;
 import org.geotools.gui.swing.contexttree.TreeContextListener;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.SelectionTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.popup.ContextActiveItem;
@@ -55,10 +55,9 @@ import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.ServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.map2d.DefaultMap2D;
-import org.geotools.gui.swing.map.map2d.DefaultNavigableMap2D;
-import org.geotools.gui.swing.map.map2d.temp.JMapPane2D;
+import org.geotools.gui.swing.map.map2d.DefaultSelectableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
@@ -76,10 +75,11 @@ import org.geotools.styling.Style;
 public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final DefaultNavigableMap2D map;
+    private final DefaultSelectableMap2D map;
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
+    private final SelectionTreeTableColumn colSelection = new SelectionTreeTableColumn(null);
     
     
     private JDataChooser.STATE state = JDataChooser.STATE.TABBED;
@@ -90,7 +90,7 @@ public class DemoAll extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
 
-        map = new DefaultNavigableMap2D(new ShapefileRenderer());
+        map = new DefaultSelectableMap2D(new ShapefileRenderer());
         map.getComponent().setOpaque(false);
         
         MapContext context = buildContext();
@@ -177,7 +177,7 @@ public class DemoAll extends javax.swing.JFrame {
         return context;
     }
 
-    private void initTree(JContextTree tree,Map2D map){
+    private void initTree(JContextTree tree,SelectableMap2D map){
         JContextTreePopup popup = tree.getPopupMenu();        
                 
         popup.addItem(new LayerVisibilityItem());           //layer         
@@ -196,11 +196,13 @@ public class DemoAll extends javax.swing.JFrame {
         popup.addItem(new LayerPropertyItem());             //layer
         popup.addItem(new ContextPropertyItem());           //context
                 
-        popup.setMap(map);
+        popup.setMap(map);        
+        colSelection.setMap(map);
         
         tree.addColumn(colVisible);
         tree.addColumn(colOpacity);
         tree.addColumn(colStyle);
+        tree.addColumn(colSelection);
         
         tree.revalidate();
     }

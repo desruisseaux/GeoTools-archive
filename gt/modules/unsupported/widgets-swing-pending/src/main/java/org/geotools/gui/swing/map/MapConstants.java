@@ -24,7 +24,7 @@ package org.geotools.gui.swing.map;
 
 public class MapConstants {
 
-    public static enum STATE{
+    public static enum ACTION_STATE{
         ZOOM_IN,
         ZOOM_OUT,
         PAN,
