@@ -2,8 +2,11 @@ package org.geotools.feature.simple;
 
 import junit.framework.TestCase;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsEqualTo;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -112,4 +115,48 @@ public class SimpleFeatureBuilderTest extends TestCase {
 	    catch( Exception e ) {}
 	    
 	}
+	
+	public void testCreateFeatureWithLength() throws Exception {
+
+	    SimpleFeatureTypeBuilder builder=new SimpleFeatureTypeBuilder(); //$NON-NLS-1$
+        builder.setName("test");
+        builder.length(5).add("name", String.class);
+        
+        SimpleFeatureType featureType = builder.buildFeatureType();
+        SimpleFeature feature = SimpleFeatureBuilder.build( featureType, new Object[]{"Val"}, "ID" );
+        
+        assertNotNull(feature);
+        
+        try{
+            feature = SimpleFeatureBuilder.build( featureType, new Object[]{"Longer Than 5"}, "ID" );
+            fail("this should fail because the value is longer than 5 characters");
+        }catch (Exception e) {
+            // good
+	    }
+    } 
+	
+	public void testCreateFeatureWithRestriction() throws Exception {
+	    FilterFactory fac = CommonFactoryFinder.getFilterFactory(null);
+
+	    String attributeName = "string";
+	    PropertyIsEqualTo filter = fac.equals(fac.property(attributeName), fac.literal("Value"));
+
+	    SimpleFeatureTypeBuilder builder=new SimpleFeatureTypeBuilder(); //$NON-NLS-1$
+	    builder.setName("test");
+	    builder.restriction(filter).add(attributeName, String.class);
+
+	    SimpleFeatureType featureType = builder.buildFeatureType();
+	    SimpleFeature feature = SimpleFeatureBuilder.build( featureType, new Object[]{"Value"}, "ID" );
+
+	    assertNotNull(feature);
+	    
+	    try {
+	        SimpleFeatureBuilder.build( featureType, new Object[]{"NotValue"}, "ID" );
+	       fail( "PropertyIsEqualTo filter should have failed");
+	    }
+	    catch( Exception e ) {
+	        //good
+	    }
+	    
+    }
 }
