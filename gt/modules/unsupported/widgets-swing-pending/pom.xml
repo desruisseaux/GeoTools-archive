@@ -187,6 +187,12 @@
       <version>${project.version}</version> 
     </dependency>
 
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-image</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- gt2-main-2.5-SNAPSHOT.jar -->
     <dependency>
       <groupId>org.geotools</groupId>

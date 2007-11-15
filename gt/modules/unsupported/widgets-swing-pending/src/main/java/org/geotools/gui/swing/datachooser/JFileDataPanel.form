@@ -15,14 +15,14 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jtf_error" pref="300" max="32767" attributes="0"/>
+              <Component id="jtf_error" pref="242" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="but_nouveau" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="gui_choose" alignment="0" pref="425" max="32767" attributes="0"/>
+          <Component id="gui_choose" alignment="0" pref="367" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -42,9 +42,13 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="but_nouveau">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="IconBundle.getResource().getIcon(&quot;16_data_add&quot;)" type="code"/>
+        </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="TextBundle.getResource().getString(&quot;add&quot;)" type="code"/>
         </Property>
+        <Property name="horizontalTextPosition" type="int" value="2"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="actionNouveau"/>

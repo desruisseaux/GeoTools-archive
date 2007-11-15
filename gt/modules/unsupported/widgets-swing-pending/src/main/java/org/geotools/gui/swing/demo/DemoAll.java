@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -53,7 +54,7 @@ import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDataChooser;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
-import org.geotools.gui.swing.datachooser.ServerDataPanel;
+import org.geotools.gui.swing.datachooser.JServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.DefaultSelectableMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
@@ -81,8 +82,6 @@ public class DemoAll extends javax.swing.JFrame {
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
     private final SelectionTreeTableColumn colSelection = new SelectionTreeTableColumn(null);
     
-    
-    private JDataChooser.STATE state = JDataChooser.STATE.TABBED;
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
@@ -98,8 +97,7 @@ public class DemoAll extends javax.swing.JFrame {
 
         
         map.setContext(context);
-        RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        map.getRenderer().setJava2DHints(rh);
+        
         
         pan_mappane.setLayout(new GridLayout(1, 1));
         pan_mappane.add(map);
@@ -237,9 +235,6 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
-        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
-        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
-        jSeparator4 = new javax.swing.JSeparator();
         chk_file = new javax.swing.JCheckBoxMenuItem();
         chk_database = new javax.swing.JCheckBoxMenuItem();
         chk_server = new javax.swing.JCheckBoxMenuItem();
@@ -383,26 +378,6 @@ public class DemoAll extends javax.swing.JFrame {
         jMenu2.add(jMenuItem3);
         jMenu2.add(jSeparator3);
 
-        group_jdatachooser.add(jRadioButtonMenuItem1);
-        jRadioButtonMenuItem1.setSelected(true);
-        jRadioButtonMenuItem1.setText("tabbed");
-        jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionDataTabbed(evt);
-            }
-        });
-        jMenu2.add(jRadioButtonMenuItem1);
-
-        group_jdatachooser.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setText("buttoned");
-        jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionDataButtoned(evt);
-            }
-        });
-        jMenu2.add(jRadioButtonMenuItem2);
-        jMenu2.add(jSeparator4);
-
         chk_file.setSelected(true);
         chk_file.setText("FileDataPanel");
         jMenu2.add(chk_file);
@@ -480,16 +455,9 @@ public class DemoAll extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void actionDataButtoned(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDataButtoned
-        state = JDataChooser.STATE.BUTTONED;
-    }//GEN-LAST:event_actionDataButtoned
-
-    private void actionDataTabbed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionDataTabbed
-        state = JDataChooser.STATE.TABBED;
-    }//GEN-LAST:event_actionDataTabbed
-
     private void dataChooserAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataChooserAction
-
+        
+        
         if (tree.getActiveContext() != null) {
             List<DataPanel> lst = new ArrayList<DataPanel>();
 
@@ -500,14 +468,14 @@ public class DemoAll extends javax.swing.JFrame {
                 lst.add(new JDatabaseDataPanel());
             }
             if (chk_server.isSelected()) {
-                lst.add(new ServerDataPanel());
+                lst.add(new JServerDataPanel());
             }
 
-            JDataChooser jdc = new JDataChooser(null, true, state);
-            jdc.setDataTypeChooser(lst);
-            int ret = jdc.showDialog();
+            JDataChooser jdc = new JDataChooser(null,lst);
+            
+            JDataChooser.ACTION ret = jdc.showDialog();
 
-            if (ret == JDataChooser.ADD_EXIT) {
+            if (ret == JDataChooser.ACTION.APPROVE) {
                 List<MapLayer> layers = jdc.getLayers();
                 for (MapLayer layer : layers) {
                     tree.getActiveContext().addLayer(layer);
@@ -605,11 +573,8 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSplitPane jSplitPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;

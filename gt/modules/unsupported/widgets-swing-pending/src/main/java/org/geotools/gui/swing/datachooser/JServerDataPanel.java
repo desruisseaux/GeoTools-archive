@@ -30,10 +30,10 @@ import org.geotools.map.MapLayer;
  *
  * @author johann sorel
  */
-public class ServerDataPanel extends javax.swing.JPanel implements DataPanel{
+public class JServerDataPanel extends javax.swing.JPanel implements DataPanel{
     
     /** Creates new form DefaultShapeTypeChooser */
-    public ServerDataPanel() {
+    public JServerDataPanel() {
         initComponents();
     }
     
@@ -47,23 +47,23 @@ public class ServerDataPanel extends javax.swing.JPanel implements DataPanel{
 
         jLabel1 = new javax.swing.JLabel();
 
-        jLabel1.setText("serveur connexion");
+        jLabel1.setText("NOT YET");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(165, 165, 165)
+                .addContainerGap()
                 .add(jLabel1)
-                .addContainerGap(352, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(132, 132, 132)
+                .addContainerGap()
                 .add(jLabel1)
-                .addContainerGap(251, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

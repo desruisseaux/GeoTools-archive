@@ -29,7 +29,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="159" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="185" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" pref="92" max="-2" attributes="0"/>
@@ -51,9 +51,9 @@
                           <Component id="jcb_dbtype" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane2" pref="225" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" pref="187" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" pref="253" max="32767" attributes="1"/>
+                  <Component id="jScrollPane1" pref="215" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -68,12 +68,16 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lbl_dbtype">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jLabel1"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="TextBundle.getResource().getString(&quot;dbtype&quot;)" type="code"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="but_refresh">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jButton1"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="TextBundle.getResource().getString(&quot;refresh&quot;)" type="code"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="actionRefresh"/>
@@ -107,7 +111,13 @@
     </Component>
     <Component class="javax.swing.JButton" name="but_add">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jButton1"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="IconBundle.getResource().getIcon(&quot;16_data_add&quot;)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="TextBundle.getResource().getString(&quot;add&quot;)" type="code"/>
+        </Property>
+        <Property name="horizontalTextPosition" type="int" value="2"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="actionAdd"/>

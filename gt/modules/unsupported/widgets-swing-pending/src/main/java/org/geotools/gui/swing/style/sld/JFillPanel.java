@@ -16,10 +16,14 @@
 
 package org.geotools.gui.swing.style.sld;
 
+import java.awt.Color;
+import javax.swing.JColorChooser;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
+import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
 
 /**
@@ -82,10 +86,18 @@ public class JFillPanel extends javax.swing.JPanel {
         lbl_alpha1 = new javax.swing.JLabel();
         GuiFillColor = new org.geotools.gui.swing.style.sld.JExpressionPanel();
         GuiFillAlpha = new org.geotools.gui.swing.style.sld.JExpressionPanel();
+        jButton3 = new javax.swing.JButton();
 
         lbl_color1.setText(TextBundle.getResource().getString("color"));
 
         lbl_alpha1.setText(TextBundle.getResource().getString("opacity"));
+
+        jButton3.setIcon(IconBundle.getResource().getIcon("JS16_color"));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -100,15 +112,22 @@ public class JFillPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(GuiFillColor, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(GuiFillAlpha, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(105, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(12, 12, 12)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(lbl_color1)
-                    .add(GuiFillColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jButton3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(lbl_color1)
+                            .add(GuiFillColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .add(8, 8, 8)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(lbl_alpha1)
@@ -116,9 +135,27 @@ public class JFillPanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        StyleBuilder sb = new StyleBuilder();
+        JColorChooser choose = new JColorChooser(GuiFillColor.getBackground());
+        
+        Color col = Color.WHITE;
+        if (GuiFillColor.getExpression() != null) {
+            try {
+                Color origin = SLD.color(GuiFillColor.getExpression());
+                col = JColorChooser.showDialog(null, "", (origin != null) ? origin : Color.WHITE);
+            } catch (Exception e) {
+            }
+        }
+        
+        GuiFillColor.setExpression(sb.colorExpression(col));
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.geotools.gui.swing.style.sld.JExpressionPanel GuiFillAlpha;
     private org.geotools.gui.swing.style.sld.JExpressionPanel GuiFillColor;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel lbl_alpha1;
     private javax.swing.JLabel lbl_color1;
     // End of variables declaration//GEN-END:variables

@@ -39,6 +39,7 @@ import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.misc.GridCoverageFinder;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.gui.swing.misc.filtre.raster.FiltreTIF;
+import org.geotools.gui.swing.misc.filtre.raster.FiltreWorldImage;
 import org.geotools.gui.swing.misc.filtre.vecteur.FiltreShape;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
@@ -58,13 +59,15 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     /** Creates new form DefaultShapeTypeChooser */
     public JFileDataPanel() {
         initComponents();
-       
-        but_nouveau.setText(TextBundle.getResource().getString("new"));
-        
-        
-        gui_choose.addChoosableFileFilter(new FiltreShape());
+              
+        gui_choose.addChoosableFileFilter(new FiltreWorldImage());
         gui_choose.addChoosableFileFilter(new FiltreTIF());
+        gui_choose.addChoosableFileFilter(new FiltreShape());
         gui_choose.setMultiSelectionEnabled(true);
+        
+        if(LASTPATH != null){
+            gui_choose.setCurrentDirectory(LASTPATH);
+            }
         
     }
 
@@ -80,7 +83,9 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         jtf_error = new javax.swing.JTextField();
         gui_choose = new javax.swing.JFileChooser();
 
+        but_nouveau.setIcon(IconBundle.getResource().getIcon("16_data_add"));
         but_nouveau.setText(TextBundle.getResource().getString("add"));
+        but_nouveau.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         but_nouveau.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionNouveau(evt);
@@ -95,13 +100,13 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                .add(jtf_error, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(but_nouveau)
                 .addContainerGap())
-            .add(gui_choose, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
+            .add(gui_choose, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 367, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -121,7 +126,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         
         File[] files = gui_choose.getSelectedFiles();
             for (File f : files) {
-
+                LASTPATH = f;
                 Object source = getDataStore(f);
                 if (source != null) {
                     try {

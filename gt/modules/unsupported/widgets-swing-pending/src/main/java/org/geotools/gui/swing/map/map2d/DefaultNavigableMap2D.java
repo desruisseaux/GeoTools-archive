@@ -18,12 +18,8 @@ package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.util.Date;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
@@ -38,7 +34,7 @@ import org.geotools.renderer.shape.ShapefileRenderer;
 public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2D{
 
     private final MouseInputListener mouseInputListener;    
-    private final ZoomPanOverLayer navigationPanel = new ZoomPanOverLayer();
+    private final ZoomPanOverLayer zoompanPanel = new ZoomPanOverLayer();
     private double zoomFactor = 2;
     
     protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
@@ -53,7 +49,7 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
-        layerPane.add(navigationPanel,new Integer(NEXT_OVER_LAYER_INDEX));
+        layerPane.add(zoompanPanel,new Integer(NEXT_OVER_LAYER_INDEX));
         NEXT_OVER_LAYER_INDEX++;
     }
 
@@ -92,8 +88,8 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         int bottom = Math.min(startY, lastY);
         int width = right - left;
         int height = top - bottom;
-        navigationPanel.setFill(fill);
-        navigationPanel.setCoord(left, bottom, width, height, view);
+        zoompanPanel.setFill(fill);
+        zoompanPanel.setCoord(left, bottom, width, height, view);
         //graphics.drawRect(left, bottom, width, height);
     }
        
@@ -241,8 +237,8 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         
         switch (actionState) {
         case PAN:
-            navigationPanel.setFill(false);
-            navigationPanel.setCoord(0,0,0,0, false);
+            zoompanPanel.setFill(false);
+            zoompanPanel.setCoord(0,0,0,0, false);
             break;
         case ZOOM_IN:
         case ZOOM_OUT:            
@@ -267,8 +263,8 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
             if ((lastX > 0) && (lastY > 0)) {
                 int dx = lastX - startX;
                 int dy = lastY - startY;     
-                navigationPanel.setFill(false);
-                navigationPanel.setCoord(dx, dy, getWidth(), getHeight(), true);                
+                zoompanPanel.setFill(false);
+                zoompanPanel.setCoord(dx, dy, getWidth(), getHeight(), true);                
             }
             lastX = x;
             lastY = y;

@@ -53,10 +53,6 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
     public JDatabaseDataPanel() {
         initComponents();
 
-        lbl_dbtype.setText(TextBundle.getResource().getString("dbtype"));
-        but_refresh.setText(TextBundle.getResource().getString("refresh"));
-        but_add.setText(TextBundle.getResource().getString("add"));
-
         tab_table.setTableHeader(null);
         tab_table.setModel(new DBModel(tab_table));
 
@@ -172,9 +168,9 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
         jScrollPane2 = new javax.swing.JScrollPane();
         tab_key = new javax.swing.JTable();
 
-        lbl_dbtype.setText("jLabel1");
+        lbl_dbtype.setText(TextBundle.getResource().getString("dbtype"));
 
-        but_refresh.setText("jButton1");
+        but_refresh.setText(TextBundle.getResource().getString("refresh"));
         but_refresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionRefresh(evt);
@@ -193,7 +189,9 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
 
         jcb_dbtype.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "postgis", "oracle" }));
 
-        but_add.setText("jButton1");
+        but_add.setIcon(IconBundle.getResource().getIcon("16_data_add"));
+        but_add.setText(TextBundle.getResource().getString("add"));
+        but_add.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         but_add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionAdd(evt);
@@ -229,7 +227,7 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(92, 92, 92)
                         .add(but_add)))
@@ -245,8 +243,8 @@ public class JDatabaseDataPanel extends javax.swing.JPanel implements DataPanel 
                             .add(lbl_dbtype)
                             .add(jcb_dbtype, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE))
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(but_add)

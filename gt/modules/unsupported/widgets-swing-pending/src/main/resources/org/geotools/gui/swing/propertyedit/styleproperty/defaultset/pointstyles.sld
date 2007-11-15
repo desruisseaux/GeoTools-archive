@@ -29,7 +29,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>8</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
@@ -54,7 +54,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>6</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
@@ -79,7 +79,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>12</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
@@ -104,7 +104,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>24</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
@@ -129,7 +129,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>8</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
@@ -154,7 +154,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>8</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
@@ -179,7 +179,7 @@
                                 <CssParameter name="stroke-dashoffset"><ogc:Literal>0.0</ogc:Literal></CssParameter>
                             </Stroke>
                         </Mark>
-                        <Opacity><ogc:Literal>100</ogc:Literal></Opacity>
+                        <Opacity><ogc:Literal>1</ogc:Literal></Opacity>
                         <Size><ogc:Literal>12</ogc:Literal></Size>
                         <Rotation><ogc:Literal>0.0</ogc:Literal></Rotation>
                     </Graphic>
