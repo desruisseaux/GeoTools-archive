@@ -1,10 +1,7 @@
 package org.geotools.maven.xmlcodegen;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -69,11 +66,28 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 	
 	/**
 	 * Directory to output generated files to. Default is ${project.build.sourceDirectory}
-	 * 
+	 * <p>
+	 * {@link Deprecated}, use one of {@link #sourceOutputDirectory}, {@link #testOutputDirectory}
+	 * or {@link #resourceOutputDirectory}.
+	 * </p>
 	 * @parameter expression="${project.build.sourceDirectory}"
 	 */
 	protected File outputDirectory;
 	
+	/**
+     * Directory to output generated source files to. Default is 
+     * ${project.build.sourceDirectory}
+     * 
+     * @parameter expression="${project.build.sourceDirectory}"
+     */
+	protected File sourceOutputDirectory;
+	/**
+     * Directory to output generated test files to. Default is 
+     * ${project.build.testDirectory}
+     * 
+     * @parameter expression="${project.build.testSourceDirectory}"
+     */
+	protected File testOutputDirectory;
 	/**
 	 * Flag controlling wether files should overide files that already 
 	 * exist with the same name. False by default.

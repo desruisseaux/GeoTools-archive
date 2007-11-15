@@ -97,7 +97,7 @@ public class SchemaLocationResolverGenerator extends AbstractGenerator {
 			//copy over all the schemas
 			for (Iterator i = includes.iterator(); i.hasNext();) {
 			    File include = (File) i.next();
-			    copy(include);
+			    copy(include, resourceLocation);
 			}
 		}
         catch( Exception e ) {
@@ -105,22 +105,4 @@ public class SchemaLocationResolverGenerator extends AbstractGenerator {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        SchemaLocationResolverGenerator g = new SchemaLocationResolverGenerator();
-        XSDSchema schema = null;
-
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-
-            if ("--schema".equals(arg)) {
-                schema = Schemas.parse(args[++i]);
-            } else if ("--output".equals(arg)) {
-                g.setLocation(args[++i]);
-            } else if ("--package".equals(arg)) {
-                g.setPackageBase(args[++i]);
-            }
-        }
-
-        g.generate(schema);
-    }
 }

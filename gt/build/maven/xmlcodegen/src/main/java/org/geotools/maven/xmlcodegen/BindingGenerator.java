@@ -61,6 +61,7 @@ public class BindingGenerator extends AbstractGenerator {
     boolean generateElements = true;
     boolean generateTypes = true;
     boolean generateConfiguration = true;
+    boolean generateTests = false;
     Class complexBindingBaseClass;
     Class simpleBindingBaseClass;
     
@@ -92,6 +93,10 @@ public class BindingGenerator extends AbstractGenerator {
         this.generateConfiguration = generateConfiguration;
     }
 
+    public void setGenerateTests(boolean generateTests) {
+        this.generateTests = generateTests;
+    }
+    
     public void setComplexBindingBaseClass(Class complexBindingBaseClass) {
         this.complexBindingBaseClass = complexBindingBaseClass;
     }
@@ -146,7 +151,7 @@ public class BindingGenerator extends AbstractGenerator {
         if (generateXsd) {
             try {
                 String result = execute("XSDTemplate", schema);
-                write(result, prefix(schema).toUpperCase());
+                write(result, prefix(schema).toUpperCase(), sourceLocation);
             } catch (Exception e) {
                 String msg = "Error generating binding interface";
                 logger.log(Level.WARNING, msg, e);
@@ -158,7 +163,7 @@ public class BindingGenerator extends AbstractGenerator {
                 String result = execute("ConfigurationTemplate", new Object[]{schema,components} );
                         
                 String prefix = Schemas.getTargetPrefix(schema).toUpperCase();
-                write(result, prefix + "Configuration");
+                write(result, prefix + "Configuration",sourceLocation);
 
             }
             catch( Exception e ) {
@@ -205,11 +210,25 @@ public class BindingGenerator extends AbstractGenerator {
             for (Iterator i = includes.iterator(); i.hasNext();) {
                 File include = (File) i.next();
                 try {
-                    copy(include);
+                    copy(include,resourceLocation);
                 } 
                 catch (IOException e) {
                     logger.log( Level.WARNING, "Could not copy file " + include , e );
                 }
+            }
+        }
+        
+        
+        if (generateTests) {
+            try {
+                String result = execute("BindingTestSupportClass", new Object[]{schema} );
+                        
+                String prefix = Schemas.getTargetPrefix(schema).toUpperCase();
+                write(result, prefix + "TestSupport", testLocation);
+
+            }
+            catch( Exception e ) {
+                logger.log( Level.SEVERE, "Error generating test support class", e );
             }
         }
     }
@@ -237,10 +256,22 @@ public class BindingGenerator extends AbstractGenerator {
         try {
             String result = execute("CLASS",
                     new Object[] { c, bindingConstructorArguments, bindingBaseClass });
-            write(result, name(c));
+            write(result, name(c), sourceLocation);
         } catch (Exception ioe) {
             String msg = "Unable to generate binding for " + c;
             logger.log(Level.WARNING, msg, ioe);
+        }
+        
+        if ( generateTests ) {
+            logger.info( "Generating binding test for " + c.getName() );
+            try {
+                String result = execute("BindingTestClass",
+                        new Object[] { c } );
+                write(result, testName(c), testLocation);
+            } catch (Exception ioe) {
+                String msg = "Unable to generate binding test for " + c;
+                logger.log(Level.WARNING, msg, ioe);
+            }   
         }
     }
 
@@ -249,6 +280,11 @@ public class BindingGenerator extends AbstractGenerator {
         + c.getName().substring(1) + "Binding";
     }
 
+    String testName(XSDNamedComponent c) {
+        return c.getName().substring(0, 1).toUpperCase()
+        + c.getName().substring(1) + "BindingTest";
+    }
+    
     public static void main(String[] args) throws Exception {
         XSDSchema schema = Schemas.parse("/home/jdeolive/devel/geotools/trunk/demo/xml-po/src/main/xsd/po.xsd");
         System.out.println( schema.getQNamePrefixToNamespaceMap() );

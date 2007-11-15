@@ -313,7 +313,7 @@ public class SchemaGenerator extends AbstractGenerator {
         String className = Schemas.getTargetPrefix(schema).toUpperCase()
             + "Schema";
 
-        write(result, className);
+        write(result, className, sourceLocation);
     }
 
     /**

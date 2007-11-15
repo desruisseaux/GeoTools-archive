@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.eclipse.xsd.XSDSchema;
@@ -59,7 +60,10 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
     	generator.setComplexTypes( includeComplexTypes );
         generator.setSimpleTypes( includeSimpleTypes );
     	generator.setOverwriting( overwriteExistingFiles );
-		generator.setLocation( outputDirectory.getAbsolutePath() );
+		//generator.setLocation( outputDirectory.getAbsolutePath() );
+		generator.setSourceLocation(sourceOutputDirectory.getAbsolutePath());
+        generator.setTestLocation(testOutputDirectory.getAbsolutePath());
+        generator.setResourceLocation(((Resource)project.getBuild().getResources().get( 0 )).getDirectory());
 		generator.setFollowComplexTypes(followComplexTypes);
 		generator.setIncludes( includes );
 		

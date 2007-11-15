@@ -54,7 +54,10 @@ public abstract class AbstractGenerator {
     /**
      * location to write out files
      */
-    String location;
+    //String location;
+    String sourceLocation;
+    String testLocation;
+    String resourceLocation;
 
     /**
      * Flag determining if generator will overwrite existing files.
@@ -86,17 +89,42 @@ public abstract class AbstractGenerator {
         return packageBase;
     }
 
+//    /**
+//     * Sets the location to write out generated java classes.
+//     *
+//     * @param location A file path.
+//     */
+//    public void setLocation(String location) {
+//        this.location = location;
+//    }
+//
+//    public String getLocation() {
+//        return location;
+//    }
+    
     /**
-     * Sets the location to write out generated java classes.
+     * Sets the location to write out generated source files.
      *
      * @param location A file path.
      */
-    public void setLocation(String location) {
-        this.location = location;
+    public void setSourceLocation(String sourceLocation) {
+        this.sourceLocation = sourceLocation;
     }
-
-    public String getLocation() {
-        return location;
+    /**
+     * Sets the location to write out generated test files.
+     *
+     * @param testLocation A file path.
+     */
+    public void setTestLocation(String testLocation) {
+        this.testLocation = testLocation;
+    }
+    /**
+     * Sets the location to write out generated resource files.
+     *
+     * @param resourceLocation A file path.
+     */
+    public void setResourceLocation(String resourceLocation) {
+        this.resourceLocation = resourceLocation;
     }
 
     /**
@@ -143,10 +171,10 @@ public abstract class AbstractGenerator {
      * @param result Result to write to the files.
      * @param className The name of the file to write out.
      */
-    protected void write(String result, String className)
+    protected void write(String result, String className, String baseLocation)
         throws IOException {
         //convert package to a path
-        File location = outputLocation();
+        File location = outputLocation(baseLocation);
 
         location.mkdirs();
         location = new File(location, className + ".java");
@@ -172,7 +200,7 @@ public abstract class AbstractGenerator {
     }
 
     /**
-     * Copues a file to the output location.
+     * Copies a file to the output location.
      * <p>
      * THe file written out is located under {@link #location}, with the path
      * generated from {@link #packageBase} appended.
@@ -180,8 +208,8 @@ public abstract class AbstractGenerator {
      *
      * @param file The file to copy.
      */
-    protected void copy(File file) throws IOException {
-        File dest = new File(outputLocation(), file.getName());
+    protected void copy(File file, String baseLocation) throws IOException {
+        File dest = new File(outputLocation(baseLocation), file.getName());
 
         logger.info( "Copying " + file + " to " + dest );
         
@@ -249,11 +277,15 @@ public abstract class AbstractGenerator {
      * Convenience method for generating the output location of generated files based on
      * {@link #getLocation()}
      */
-    protected File outputLocation() {
+    protected File outputLocation( String baseLocation ) {
         File location = null;
 
-        if (this.location != null) {
-            location = new File(this.location);
+        if ( baseLocation == null ) {
+            baseLocation = sourceLocation;
+        }
+        
+        if (baseLocation != null) {
+            location = new File(baseLocation);
         } else {
             location = new File(System.getProperty("user.dir"));
         }
