@@ -790,6 +790,7 @@ final class TreeTable extends JXTreeTable {
     void addMapContext(MapContext context) {
         getTreeTableModel().addMapContext(context);
         expandPath(new TreePath(getTreeTableModel().getRoot()));
+        expandPath(new TreePath(getTreeTableModel().getMapContextNode(context)));
     }
 
     /**

@@ -441,8 +441,7 @@ public class JMapPane2D extends JPanel {
         if ((selectionFeature != null) && (selectionFeature.size() > 0)) {
             // paint selection
 
-            String type = selectionLayer.getFeatureSource().getSchema()
-            .getDefaultGeometry().getType().getBinding().getName();
+            String type = selectionLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding().getName();
             /*String type = selection.getDefaultGeometry().getGeometryType();*/
             /*System.out.println(type);*/
             if (type == null)

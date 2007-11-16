@@ -19,9 +19,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -57,10 +54,11 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     protected int NEXT_OVER_LAYER_INDEX = 12;
     private final MapLayerListListener mapLayerListlistener;
     protected GTRenderer renderer;
+    protected MapContext oldcontext = null;
     protected MapContext context;
     protected Envelope mapArea;
     protected MapContext buffercontext = new OneLayerContext();
-    private Rectangle mapRectangle;
+    private Rectangle mapRectangle = null;
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
     private boolean changed = true;
@@ -169,6 +167,10 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         renderer.setContext(buffercontext);
         
         //NOT OPTIMIZED
+        if(mapRectangle == null){
+            mapRectangle = new Rectangle(1,1);
+        }
+        
         BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D ig = buf.createGraphics();
         
@@ -230,7 +232,8 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         if (changed) {
             changed = false;
 
-            if (bufferPane.getBufferSize() != context.getLayerCount()) {
+            if (bufferPane.getBufferSize() != context.getLayerCount() || context != oldcontext) {
+                oldcontext = context;
                 bufferPane.fit();
             } else {
                 bufferPane.update();

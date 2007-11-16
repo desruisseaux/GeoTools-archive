@@ -17,12 +17,10 @@
 package org.geotools.gui.swing.style.sld;
 
 import java.awt.Color;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.map.MapLayer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.StyleBuilder;
-import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 
 /**
