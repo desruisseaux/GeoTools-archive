@@ -25,6 +25,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -45,6 +46,7 @@ import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
@@ -112,6 +114,11 @@ public class OracleDataStoreOnlineTest extends TestCase {
             conn.close();
         if(dstore != null)
             dstore.dispose();
+        
+        // tests with oracle xe fail without these... it seems the oracle poolable connections
+        // are not closed right away even if I traced the dbcp code and it actually closes
+        // the connection...
+        System.gc(); System.gc(); System.gc();
     }
     static boolean first  = false;
     
@@ -328,8 +335,11 @@ public class OracleDataStoreOnlineTest extends TestCase {
         
         FeatureCollection fc = fr;
         assertEquals(1, fc.size());
-        SimpleFeature f = fc.features().next();
-        assertEquals("point 1", f.getAttribute("NAME"));        
+        final FeatureIterator iterator = fc.features();
+        SimpleFeature f = iterator.next();
+        iterator.close();
+        assertEquals("point 1", f.getAttribute("NAME"));
+        
     }
     
     public void testBBoxFilter() throws Exception {
@@ -403,7 +413,9 @@ public class OracleDataStoreOnlineTest extends TestCase {
         FeatureCollection fr = fs.getFeatures(filter);        
         assertEquals(1, fr.size());
         
-        SimpleFeature feature = (SimpleFeature) fr.iterator().next();
+        final Iterator iterator = fr.iterator();
+        SimpleFeature feature = (SimpleFeature) iterator.next();
+        fr.close(iterator);
         Geometry geom = (Geometry) feature.getDefaultGeometry();
         assertEquals(Point.class.getName(), geom.getClass().getName());
         Point point = (Point) geom;
@@ -457,6 +469,7 @@ public class OracleDataStoreOnlineTest extends TestCase {
         q.setPropertyNames(new String[]{"NAME"});
         FeatureReader fr = dstore.getFeatureReader(q, Transaction.AUTO_COMMIT);
         SimpleFeature f = fr.next();
+        fr.close();
         SimpleFeatureType ft = f.getFeatureType();
         assertEquals(1, ft.getAttributeCount());
         assertEquals("NAME", ft.getAttribute(0).getLocalName());        

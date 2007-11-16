@@ -137,10 +137,18 @@ public class QuickOracleOnlineTest extends DataTestCase {
         ConnectionPoolManager manager = ConnectionPoolManager.getInstance();
         manager.closeAll();
         
+        
+        data.dispose();
+        
     	conn = null;
     	pool = null;
     	data = null;
     	super.tearDown();
+    	
+    	// tests with oracle xe fail without these... it seems the oracle poolable connections
+        // are not closed right away even if I traced the dbcp code and it actually closes
+        // the connections...
+    	System.gc(); System.gc(); System.gc();
     }
     public void testSRIDLookup() throws Exception {
     	if( conn == null ) return;

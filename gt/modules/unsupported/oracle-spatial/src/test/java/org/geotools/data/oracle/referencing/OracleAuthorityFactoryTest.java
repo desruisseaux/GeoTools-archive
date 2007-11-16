@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.oracle.OracleDataStoreFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -45,6 +46,13 @@ public class OracleAuthorityFactoryTest extends TestCase {
             return;
         }
 
+    }
+    
+    protected void tearDown() throws Exception {
+        if(conn != null)
+            conn.close();
+        if(pool instanceof ManageableDataSource)
+            ((ManageableDataSource) pool).close();
     }
     
     public void testSRIDLookup() throws Exception {
