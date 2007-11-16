@@ -30,17 +30,4 @@ public class TestConfiguration extends Configuration {
 
     protected void registerBindings(MutablePicoContainer container) {
     }
-
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new XSDSchemaLocationResolver() {
-                public String resolveSchemaLocation(XSDSchema schema, String namespaceURI,
-                    String schemaLocationURI) {
-                    if (getNamespaceURI().equals(namespaceURI)) {
-                        return getSchemaFileURL().toString();
-                    }
-
-                    return null;
-                }
-            };
-    }
 }

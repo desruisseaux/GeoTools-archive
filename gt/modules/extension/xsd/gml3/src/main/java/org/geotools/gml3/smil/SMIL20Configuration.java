@@ -37,8 +37,4 @@ public class SMIL20Configuration extends Configuration {
 
     protected void registerBindings(MutablePicoContainer container) {
     }
-
-    public XSDSchemaLocator getSchemaLocator() {
-        return null;
-    }
 }
