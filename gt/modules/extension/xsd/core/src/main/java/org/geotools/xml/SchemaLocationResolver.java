@@ -44,7 +44,7 @@ import java.net.URL;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public final class SchemaLocationResolver implements XSDSchemaLocationResolver {
+public class SchemaLocationResolver implements XSDSchemaLocationResolver {
     /**
      * the xsd instance
      */

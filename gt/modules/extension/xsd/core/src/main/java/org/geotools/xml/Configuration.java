@@ -340,9 +340,10 @@ public abstract class Configuration {
      * implemntation returns <code>null</code>
      * </p>
      * @return The schema location resolver, or <code>null</code>
+     * @deprecated
      *
      */
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
+    public final XSDSchemaLocationResolver getSchemaLocationResolver() {
         return new SchemaLocationResolver(xsd);
     }
 
@@ -355,9 +356,10 @@ public abstract class Configuration {
      * may return <code>null</code> to indicate that no such locator should be used.
      * </p>
      * @return The schema locator, or <code>null</code>
+     * @deprecated
      *
      */
-    public XSDSchemaLocator getSchemaLocator() {
+    public final XSDSchemaLocator getSchemaLocator() {
         return new SchemaLocator(xsd);
     }
 
