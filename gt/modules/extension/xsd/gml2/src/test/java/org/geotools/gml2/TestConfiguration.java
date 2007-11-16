@@ -15,8 +15,6 @@
  */
 package org.geotools.gml2;
 
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.picocontainer.MutablePicoContainer;
 import org.geotools.xml.Configuration;
 
@@ -29,18 +27,5 @@ public class TestConfiguration extends Configuration {
 
     protected void registerBindings(MutablePicoContainer container) {
         //no bindings
-    }
-
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new XSDSchemaLocationResolver() {
-                public String resolveSchemaLocation(XSDSchema schema, String namespaceURI,
-                    String schemaLocationURI) {
-                    if (getNamespaceURI().equals(namespaceURI)) {
-                        return getSchemaFileURL().toString();
-                    }
-
-                    return null;
-                }
-            };
     }
 }
