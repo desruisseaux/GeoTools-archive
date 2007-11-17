@@ -19,13 +19,12 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.MapConstants;
@@ -39,11 +38,11 @@ public class JMap2DControlBar extends JPanel {
 
     private NavigableMap2D navigationMap;
     private SelectableMap2D selectionMap;
-    private final JButton zoomin = buildButton(IconBundle.getResource().getIcon("16_zoom_in"));
-    private final JButton zoomout = buildButton(IconBundle.getResource().getIcon("16_zoom_out"));
-    private final JButton zoompan = buildButton(IconBundle.getResource().getIcon("16_zoom_pan"));
-    private final JButton zoomall = buildButton(IconBundle.getResource().getIcon("16_zoom_all"));
-    private final JButton select = buildButton(IconBundle.getResource().getIcon("16_select"));
+    private final JToggleButton zoomin = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_in"));
+    private final JToggleButton zoomout = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_out"));
+    private final JToggleButton zoompan = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_pan"));
+    private final JToggleButton zoomall = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_all"));
+    private final JToggleButton select = buildToggleButton(IconBundle.getResource().getIcon("16_select"));
 
     /**
      * Creates a new instance of DefaultLightMapPaneToolBar
@@ -59,7 +58,15 @@ public class JMap2DControlBar extends JPanel {
     }
 
     private void init() {
-
+        
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(zoomin);
+        bg.add(zoomout);
+        bg.add(zoompan);
+        bg.add(zoomall);
+        bg.add(select);
+        
+        
         zoomin.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
@@ -117,12 +124,13 @@ public class JMap2DControlBar extends JPanel {
         add(select);
     }
 
-    private JButton buildButton(ImageIcon img) {
-        JButton but = new JButton(img);
+    private JToggleButton buildToggleButton(ImageIcon img) {
+        JToggleButton but = new JToggleButton(img);
         but.setBorder(new EmptyBorder(2, 2, 2, 2));
-        but.setBorderPainted(false);
-        but.setContentAreaFilled(false);
-        but.setOpaque(false);
+       
+        //but.setBorderPainted(false);
+        //but.setContentAreaFilled(false);
+        //but.setOpaque(false);
         return but;
     }
 
@@ -133,6 +141,24 @@ public class JMap2DControlBar extends JPanel {
             zoomin.setEnabled(true);
             zoomout.setEnabled(true);
             zoompan.setEnabled(true);
+            
+            switch(navigationMap.getActionState()){
+                case ZOOM_IN :
+                    zoomin.setSelected(true);
+                    break;
+                case ZOOM_OUT :
+                    zoomall.setSelected(true);
+                    break;
+                case PAN :
+                    zoompan.setSelected(true);
+                    break;
+                case SELECT :
+                    select.setSelected(true);
+                    break;
+                case EDIT :
+                    break;
+            }
+            
 
             if (pane instanceof SelectableMap2D) {
                 this.selectionMap = (SelectableMap2D) pane;
@@ -148,8 +174,6 @@ public class JMap2DControlBar extends JPanel {
             zoompan.setEnabled(false);
             select.setEnabled(false);
         }
-
-
 
     }
 }

@@ -3,75 +3,59 @@
  *
  * Created on 5 octobre 2007, 11:49
  */
-
 package org.geotools.gui.swing.map.map2d.control;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.JPanel;
-
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.map.Map;
+import org.geotools.gui.swing.map.map2d.DefaultMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.gui.swing.referencing.AuthorityCodesComboBox;
-import org.jdesktop.layout.GroupLayout;
-import org.opengis.referencing.FactoryException;
 
 /**
  *
  * @author johann Sorel
  */
-public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeListener{
+public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeListener {
 
-    private AuthorityCodesComboBox comboCRS;
-    private JPanel flowpanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     private Map2D map;
 
     /** Creates new form JMap2DInfoBar */
     public JMap2DInfoBar() {
 
         initComponents();
-        setLayout(new BorderLayout());
-
-        try {
-            comboCRS = new AuthorityCodesComboBox();
-        } catch (FactoryRegistryException ex) {
-            org.geotools.util.logging.Logging.getLogger(JMap2DInfoBar.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FactoryException ex) {
-            org.geotools.util.logging.Logging.getLogger(JMap2DInfoBar.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-         add(BorderLayout.CENTER,flowpanel);
-        
-        if(comboCRS != null){
-            add(BorderLayout.EAST,comboCRS);            
-        }
     }
 
-    public void setMap(Map map){
-        
-        if(map instanceof Map2D){            
+    public void setMap(Map map) {
+
+        if (map instanceof Map2D) {
             this.map = (Map2D) map;
             this.map.getContext().addPropertyChangeListener(this);
         }
-        
+
         init();
     }
-    
-    private void init(){
-        
-        if(comboCRS != null && map.getContext() != null){
-            comboCRS.filter( map.getContext().getCoordinateReferenceSystem().getName().getCode());
+
+    private void init() {
+
+        if( map instanceof DefaultMap2D ){
+            jrb_multi.setEnabled(true);
+            jrb_single.setEnabled(true);
+            DefaultMap2D dm = (DefaultMap2D) map;
+            
+            DefaultMap2D.BUFFER_TYPE type = dm.getBufferType();
+            
+            if(type == DefaultMap2D.BUFFER_TYPE.SINGLE_BUFFER){
+                jrb_single.setSelected(true);
+            }else{
+                jrb_multi.setSelected(true);
+            }
+        }else{
+            jrb_multi.setEnabled(false);
+            jrb_single.setEnabled(false);
         }
+
     }
-    
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -80,21 +64,79 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        jPanel1 = new javax.swing.JPanel();
+        jrb_multi = new javax.swing.JRadioButton();
+        jrb_single = new javax.swing.JRadioButton();
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        buttonGroup1.add(jrb_multi);
+        jrb_multi.setText("Multi buffer");
+        jrb_multi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrb_multiActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(jrb_single);
+        jrb_single.setText("Single buffer");
+        jrb_single.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrb_singleActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(2, 2, 2)
+                .add(jrb_single)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jrb_multi)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(jrb_multi)
+                .add(jrb_single))
+        );
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 437, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 30, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
+    private void jrb_singleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_singleActionPerformed
+        if( map instanceof DefaultMap2D ){
+            DefaultMap2D dm = (DefaultMap2D) map;
+            dm.setMapBufferType(DefaultMap2D.BUFFER_TYPE.SINGLE_BUFFER); 
+        }
+}//GEN-LAST:event_jrb_singleActionPerformed
+
+    private void jrb_multiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_multiActionPerformed
+        if( map instanceof DefaultMap2D ){
+            DefaultMap2D dm = (DefaultMap2D) map; 
+            dm.setMapBufferType(DefaultMap2D.BUFFER_TYPE.MULTI_BUFFER);
+        }
+    }//GEN-LAST:event_jrb_multiActionPerformed
 
     public void propertyChange(PropertyChangeEvent evt) {
         init();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jrb_multi;
+    private javax.swing.JRadioButton jrb_single;
     // End of variables declaration//GEN-END:variables
 }
