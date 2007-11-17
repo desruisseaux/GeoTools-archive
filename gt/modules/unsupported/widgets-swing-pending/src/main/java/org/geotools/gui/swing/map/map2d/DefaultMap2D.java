@@ -48,24 +48,32 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
+    public static enum BUFFER_TYPE{
+        SINGLE_BUFFER,
+        MULTI_BUFFER
+    };
+    
+    
 //    protected GraphicsConfiguration GC ;
     
     protected final Map2D THIS_MAP;
-    protected int NEXT_OVER_LAYER_INDEX = 12;
-    private final MapLayerListListener mapLayerListlistener;
-    protected GTRenderer renderer;
-    protected MapContext oldcontext = null;
+    protected int NEXT_OVER_LAYER_INDEX = 12;    
+    protected GTRenderer renderer;    
     protected MapContext context;
     protected Envelope mapArea;
     protected MapContext buffercontext = new OneLayerContext();
+    protected JLayeredPane layerPane = new JLayeredPane();
+    protected MapBufferPane bufferPane = new MultiBufferPane(this);
+    protected WaitingOverLayer waitingPane = new WaitingOverLayer();
+    
+    private final MapLayerListListener mapLayerListlistener;
+    private BUFFER_TYPE type = null;
     private Rectangle mapRectangle = null;
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
     private boolean changed = true;
     private boolean reset = true;
-    protected JLayeredPane layerPane = new JLayeredPane();
-    protected BufferPane bufferPane = new BufferPane(this);
-    protected WaitingOverLayer waitingPane = new WaitingOverLayer();
+    
 
     public DefaultMap2D() {
         this(new ShapefileRenderer());
@@ -76,11 +84,12 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         this.THIS_MAP = this;
         mapLayerListlistener = new MapLayerListListen();
         setLayout(new GridLayout(1, 1));
-        layerPane.setLayout(new BufferLayout());
-        layerPane.add(bufferPane, new Integer(11));
+        layerPane.setLayout(new BufferLayout());    
+        
+        setMapBufferType(BUFFER_TYPE.SINGLE_BUFFER);
+                
         layerPane.add(waitingPane, new Integer(NEXT_OVER_LAYER_INDEX));
         NEXT_OVER_LAYER_INDEX++;
-        bufferPane.STATE.addObserver(this);
         add(layerPane);
         
 //        GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -96,9 +105,6 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     }
 
     private void opimizeRenderer() {
-        
-        
-        
         
         Map rendererParams = new HashMap();
         rendererParams.put("optimizedDataLoadingEnabled", new Boolean(true));
@@ -214,7 +220,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
             oldRect = r; /* store what the current size is */
 
             if (mapArea == null) {
-                bufferPane.fit();
+                bufferPane.redraw();
                 return;
             }
 
@@ -231,13 +237,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
         if (changed) {
             changed = false;
-
-            if (bufferPane.getBufferSize() != context.getLayerCount() || context != oldcontext) {
-                oldcontext = context;
-                bufferPane.fit();
-            } else {
-                bufferPane.update();
-            }
+            bufferPane.redraw();
         }
 
         if (withRepaint) {
@@ -253,26 +253,48 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
     }
 
+    public void setMapBufferType(BUFFER_TYPE type){
+        if(this.type != type){
+            this.type = type;
+            bufferPane.deleteObserver(this);
+            layerPane.remove(bufferPane.getComponent());
+                        
+            if(type == BUFFER_TYPE.MULTI_BUFFER){
+                bufferPane = new MultiBufferPane(this);
+            }else{
+                bufferPane = new SingleBufferPane(this);
+            }
+            bufferPane.addObserver(this);
+            bufferPane.redraw();
+            
+            layerPane.add(bufferPane.getComponent(), new Integer(11));
+        }
+    }
+    
+    public BUFFER_TYPE getBufferType(){
+        return type;
+    }
+    
     @Override
     public void paintComponent(Graphics g) {
         redraw(false);
         super.paintComponent(g);
     }
 
-    void fireDelete(MapLayerListEvent event) {
-        bufferPane.deleted(event);
+    private void fireDelete(MapLayerListEvent event) {
+        bufferPane.layerDeleted(event);
     }
 
-    void fireChange(MapLayerListEvent event) {
-        bufferPane.changed(event);
+    private void fireChange(MapLayerListEvent event) {
+        bufferPane.layerChanged(event);
     }
 
-    void fireAdd(MapLayerListEvent event) {
-        bufferPane.added(event);
+    private void fireAdd(MapLayerListEvent event) {
+        bufferPane.layerAdded(event);
     }
 
-    void fireMove(MapLayerListEvent event) {
-        bufferPane.moved(event);
+    private void fireMove(MapLayerListEvent event) {
+        bufferPane.layerMoved(event);
     }
 
     //-----------------------MAP2D----------------------------------------------    
