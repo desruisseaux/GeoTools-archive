@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -29,15 +29,15 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 /**
  * An {@link AbstractGridCoverageWriter} is the base class for all
  * {@link GridCoverageWriter} implementations in GeoTools toolkit.
- * 
- * 
+ *
+ *
  * <p>
  * We expect it to become the place where to move functionalities common to all
  * {@link GridCoverageWriter}.
- * 
+ *
  * @author Simone Giannecchini
  * @since 2.3.x
- * 
+ *
  */
 public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 
@@ -48,7 +48,7 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	protected Object destination;
 
 	/** Hints to be used for the writing process. */
-	protected Hints hints = new Hints(null);
+	protected Hints hints = new Hints();
 
 	/** The destination {@link ImageOutputStream}. */
 	protected ImageOutputStream outStream = null;
@@ -56,7 +56,7 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	/**
 	 * Default constructor for an {@link AbstractGridCoverageWriter}.
 	 */
-	
+
 	public AbstractGridCoverageWriter() {
 
 	}
@@ -81,7 +81,7 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 
 	/**
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
 	 */
 	public final Object getDestination() {
@@ -91,9 +91,9 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 	/**
 	 * Implementation of getMetadataNames. Currently unimplemented because it
 	 * has not been specified where to retrieve the metadata
-	 * 
+	 *
 	 * @return null
-	 * 
+	 *
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
 	 */
 	public String[] getMetadataNames() {

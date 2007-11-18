@@ -58,12 +58,12 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
      * List of the registered graphic style listeners.
      */
     private GraphicStyleListenerList graphicStyleListeners;
-    
+
     /**
      * Creates a default instance of graphic style.
      */
     public DefaultGraphicStyle() {
-        hints                 = new Hints(null);
+        hints                 = new Hints();
         graphicStyleListeners = new GraphicStyleListenerList(this);
     }
 
@@ -107,7 +107,7 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
             listeners.addPropertyChangeListener(graphicStyleListeners);
         }
     }
-    
+
     /**
      * For a listener that was previously added using the {@link #addGraphicStyleListener
      * addGraphicStyleListener} method, de-registers it so that it will no longer receive

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,19 +19,14 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
-import org.opengis.referencing.ObjectFactory;
 
-// Geotools dependencies
 import org.geotools.factory.AbstractFactory;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.citation.CitationImpl;
@@ -47,15 +42,14 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Factories can be grouped in two categories:
  *
  * <ul>
- *   <li><p>{@linkplain AuthorityFactory Authority factories} creates objects from
- *       a compact string defined by an authority.
- *   <br><em>These classes are working as "builders": they hold the definition or recipie
+ *   <li><p>{@linkplain org.opengis.referencing.AuthorityFactory Authority factories}
+ *       creates objects from a compact string defined by an authority.
+ *   <br><em>These classes are working as "builders": they hold the definition or recipies
  *       used to construct an objet.</em></p></li>
  *
- *   <li><p>{@linkplain ObjectFactory Object factories} allows applications
- *       to make objects that cannot be created by an authority factory.
- *       This factory is very flexible, whereas the authority factory is
- *       easier to use.
+ *   <li><p>{@linkplain org.opengis.referencing.ObjectFactory Object factories}
+ *       allows applications to make objects that cannot be created by an authority factory.
+ *       This factory is very flexible, whereas the authority factory is easier to use.
  *   <br><em>These classes are working as "Factories": they provide a series of
  *       {@code create} methods that can be used like a constructor.</em></p></li>
  * </ul>
@@ -138,7 +132,7 @@ public class ReferencingFactory extends AbstractFactory implements Factory {
      * <p>
      * The default implementation always returns an empty set.
      */
-    Collection/*<?>*/ dependencies() {
+    Collection<?> dependencies() {
         return Collections.EMPTY_SET;
     }
 }

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE direct dependencies
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
@@ -26,9 +25,7 @@ import java.util.Iterator;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import javax.imageio.spi.ServiceRegistry;
-import javax.imageio.spi.RegisterableService;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
@@ -42,7 +39,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.MathTransformFactory;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.FactoryCreator;
@@ -70,11 +66,11 @@ import org.geotools.resources.LazySet;
  *
  * <blockquote><pre>com.mycompany.DatumFactoryImpl</pre></blockquote>
  *
- * <P>If the factory classes implements {@link RegisterableService}, it will be notified upon
- * registration and deregistration. Note that the factory classes should be lightweight and quick
- * to load. Implementations of these interfaces should avoid complex dependencies on other classes
- * and on native code. The usual pattern for more complex services is to register a lightweight
- * proxy for the heavyweight service.</P>
+ * <P>If the factory classes implements {@link javax.imageio.spi.RegisterableService}, it will
+ * be notified upon registration and deregistration. Note that the factory classes should be
+ * lightweight and quick to load. Implementations of these interfaces should avoid complex
+ * dependencies on other classes and on native code. The usual pattern for more complex services
+ * is to register a lightweight proxy for the heavyweight service.</P>
  *
  * <H2>Note on factory ordering</H2>
  * <P>This class is thread-safe. However, calls to any {@link #setAuthorityOrdering} or
@@ -114,7 +110,7 @@ public class ReferencingFactoryFinder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(ReferencingFactoryFinder.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class[] {
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
                     DatumFactory.class,
                     CSFactory.class,
                     CRSFactory.class,

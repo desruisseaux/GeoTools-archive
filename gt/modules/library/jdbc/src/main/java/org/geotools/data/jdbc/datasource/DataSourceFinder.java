@@ -184,7 +184,7 @@ public final class DataSourceFinder {
      */
     public static synchronized Iterator getAvailableDataSources() {
         Set availableDS = new HashSet();
-        Iterator it = getServiceRegistry().getServiceProviders(DataSourceFactorySpi.class);
+        Iterator it = getServiceRegistry().getServiceProviders(DataSourceFactorySpi.class, null, null);
         DataSourceFactorySpi dsFactory;
         while (it.hasNext()) {
             dsFactory = (DataSourceFactorySpi) it.next();
@@ -206,7 +206,7 @@ public final class DataSourceFinder {
      */
     public static synchronized Iterator getUnWrappers() {
         Set availableDS = new HashSet();
-        return getServiceRegistry().getServiceProviders(UnWrapper.class);
+        return getServiceRegistry().getServiceProviders(UnWrapper.class, null, null);
     }
 
     /**
@@ -216,7 +216,7 @@ public final class DataSourceFinder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(DataSourceFinder.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class[] { DataSourceFactorySpi.class,
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] { DataSourceFactorySpi.class,
                     UnWrapper.class }));
         }
         return registry;

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,14 +16,11 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.*;
-
 import javax.units.Unit;
 import javax.units.ConversionException;
+import java.awt.RenderingHints;
 
-// OpenGIS dependencies
-import org.opengis.metadata.Identifier;  // For javadoc
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
@@ -33,7 +30,6 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 
-// Geotools dependencies
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
@@ -107,7 +103,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * may be the operation name as a {@link String} rather than a {@link OperationMethod}
      * if the math transform was not created by a Geotools implementation of factory.
      */
-    private final ThreadLocal/*<Object>*/ lastMethod = new ThreadLocal();
+    private final ThreadLocal<Object> lastMethod = new ThreadLocal<Object>();
 
     /**
      * Constructs an instance using the specified factories. If any factory is null,
@@ -162,7 +158,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
          */
         if (!reduced.isEmpty()) {
             setHintsInto(reduced);
-            hints.putAll(reduced);
+            addImplementationHints(reduced);
             initialize();
             hints.clear();
         }
@@ -172,7 +168,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * Returns the factory for the specified hint, or {@code null} if the hint is not a factory
      * instance. It could be for example a {@link Class}.
      */
-    private static Factory extract(final Map reduced, final Hints.Key key) {
+    private static Factory extract(final Map<?,?> reduced, final Hints.Key key) {
         if (reduced != null) {
             final Object candidate = reduced.get(key);
             if (candidate instanceof Factory) {
@@ -204,14 +200,13 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
          */
         synchronized (ReferencingFactoryFinder.class) {
             if (cache == null) {
-                cache = new FactoryCreator(Arrays.asList(new Class[] {
+                cache = new FactoryCreator(Arrays.asList(new Class<?>[] {
                         ReferencingFactoryContainer.class
                 }));
                 cache.registerServiceProvider(new ReferencingFactoryContainer(null),
                         ReferencingFactoryContainer.class);
             }
-            return (ReferencingFactoryContainer) cache.getServiceProvider(
-                    ReferencingFactoryContainer.class, null, completed, null);
+            return cache.getServiceProvider(ReferencingFactoryContainer.class, null, completed, null);
         }
     }
 
@@ -230,7 +225,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
     /**
      * Put all factories available in this group into the specified map of hints.
      */
-    private void setHintsInto(final Map hints) {
+    private void setHintsInto(final Map<? super RenderingHints.Key, Object> hints) {
         if (  crsFactory != null) hints.put(Hints.           CRS_FACTORY,   crsFactory);
         if (   csFactory != null) hints.put(Hints.            CS_FACTORY,    csFactory);
         if (datumFactory != null) hints.put(Hints.         DATUM_FACTORY, datumFactory);
@@ -242,7 +237,8 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
      * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
      */
-    public Map getImplementationHints() {
+    @Override
+    public Map<RenderingHints.Key, ?> getImplementationHints() {
         synchronized (hints) {
             if (hints.isEmpty()) {
                 initialize();
@@ -318,8 +314,9 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * delegates the call to it. Otherwise this method scans all operations registered in the
      * math transform factory until a match is found.
      *
-     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
-     *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
+     * @param  name The case insensitive {@linkplain org.opengis.metadata.Identifier#getCode
+     *         identifier code} of the operation method to search for
+     *         (e.g. {@code "Transverse_Mercator"}).
      * @return The operation method.
      * @throws NoSuchIdentifierException if there is no operation method registered for the
      *         specified name.
@@ -401,7 +398,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws NoSuchIdentifierException, FactoryException
     {
-//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
+        lastMethod.remove();
         final MathTransformFactory mtFactory = getMathTransformFactory();
         final MathTransform transform = mtFactory.createParameterizedTransform(parameters);
         if (mtFactory instanceof DefaultMathTransformFactory) {
@@ -410,34 +407,6 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
         } else {
             // Not a geotools implementation. Will try to guess the method later.
             lastMethod.set(parameters.getDescriptor().getName().getCode());
-        }
-        return transform;
-    }
-
-    /**
-     * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of {@code createParameterizedTransform(...)} provides a way for
-     * the client to keep trace of any {@linkplain OperationMethod operation method}
-     * used by this factory. 
-     *
-     * @param  parameters The parameter values.
-     * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or {@code null} if none.
-     * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the method.
-     * @throws FactoryException if the object creation failed. This exception is thrown
-     *         if some required parameter has not been supplied, or has illegal value.
-     *
-     * @deprecated Replaced by {@link #createParameterizedTransform(ParameterValueGroup)}
-     *             followed by a call to {@link #getLastUsedMethod}.
-     */
-    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
-                                                      Collection          methods)
-            throws NoSuchIdentifierException, FactoryException
-    {
-        final MathTransform transform = createParameterizedTransform(parameters);
-        if (methods != null) {
-            methods.add(getLastUsedMethod());
         }
         return transform;
     }
@@ -535,39 +504,6 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
     }
 
     /**
-     * Creates a {@linkplain #createParameterizedTransform parameterized transform} from a base
-     * CRS to a derived CS. If the <code>"semi_major"</code> and <code>"semi_minor"</code>
-     * parameters are not explicitly specified, they will be inferred from the
-     * {@linkplain Ellipsoid ellipsoid} and added to {@code parameters}.
-     * In addition, this method performs axis switch as needed. 
-     *
-     * @param  baseCRS The source coordinate reference system.
-     * @param  parameters The parameter values for the transform.
-     * @param  derivedCS the target coordinate system.
-     * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or {@code null} if none.
-     * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the method.
-     * @throws FactoryException if the object creation failed. This exception is thrown
-     *         if some required parameter has not been supplied, or has illegal value.
-     *
-     * @deprecated Replaced by {@link #createBaseToDerived}
-     *             followed by a call to {@link #getLastUsedMethod}.
-     */
-    public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
-                                             final ParameterValueGroup       parameters,
-                                             final CoordinateSystem          derivedCS,
-                                             final Collection                methods)
-            throws NoSuchIdentifierException, FactoryException
-    {
-        final MathTransform transform = createBaseToDerived(baseCRS, parameters, derivedCS);
-        if (methods != null) {
-            methods.add(getLastUsedMethod());
-        }
-        return transform;
-    }
-
-    /**
      * Creates a projected coordinate reference system from a conversion.
      *
      * @param  properties Name and other properties to give to the new object.
@@ -579,7 +515,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @todo Current implementation creates directly a Geotools implementation, because there
      *       is not yet a suitable method in GeoAPI interfaces.
      */
-    public ProjectedCRS createProjectedCRS(      Map           properties,
+    public ProjectedCRS createProjectedCRS(Map<String,?>       properties,
                                            final GeographicCRS baseCRS,
                                            final Conversion    conversionFromBase,
                                            final CartesianCS   derivedCS)
@@ -599,9 +535,10 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
             if (!properties.containsKey(DefaultProjectedCRS.CONVERSION_TYPE_KEY)) {
                 method = getLastUsedMethod();
                 if (method instanceof MathTransformProvider) {
-                    properties = new HashMap(properties);
-                    properties.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
+                    final Map<String,Object> copy = new HashMap<String,Object>(properties);
+                    copy.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
                             ((MathTransformProvider) method).getOperationType());
+                    properties = copy;
                 }
             }
         }
@@ -621,7 +558,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public ProjectedCRS createProjectedCRS(Map                 properties,
+    public ProjectedCRS createProjectedCRS(Map<String,?>       properties,
                                            GeographicCRS          baseCRS,
                                            OperationMethod         method,
                                            ParameterValueGroup parameters,
@@ -671,7 +608,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
                 candidate instanceof  ProjectedCRS)
             {
                 if (horizontal == null) {
-                    horizontal = (SingleCRS) candidate;
+                    horizontal = candidate;
                     if (horizontal.getCoordinateSystem().getDimension() == 2) {
                         hi = i;
                         continue;

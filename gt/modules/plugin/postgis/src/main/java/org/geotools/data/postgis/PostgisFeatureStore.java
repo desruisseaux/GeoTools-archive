@@ -38,7 +38,7 @@ import org.geotools.data.jdbc.JDBCFeatureStore;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -512,7 +512,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     }
 
 	private FidFilter getEncodableFilter(Filter unEncodableFilter)
-        throws IOException, FactoryConfigurationError, IllegalAttributeException {
+        throws IOException, FactoryRegistryException, IllegalAttributeException {
         // this is very similar to getFidSet - the reason is so that we
         // don't spend time constructing geometries when we don't need
         // to, but we probably could get some better code reuse.

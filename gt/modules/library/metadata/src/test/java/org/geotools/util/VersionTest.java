@@ -55,7 +55,7 @@ public final class VersionTest extends TestCase {
      */
     public void testNumeric() {
         final Version version = new Version("6.11.2");
-        assertEquals("6.11.2",        version.toString());
+        assertEquals("6.11.2", version.toString());
         assertEquals( 6, version.getMajor());
         assertEquals(11, version.getMinor());
         assertEquals( 2, version.getRevision());
@@ -73,10 +73,10 @@ public final class VersionTest extends TestCase {
      */
     public void testAlphaNumeric() {
         final Version version = new Version("1.6.b2");
-        assertEquals("1.6.b2",        version.toString());
+        assertEquals("1.6.b2", version.toString());
         assertEquals( 1, version.getMajor());
         assertEquals( 6, version.getMinor());
-        assertEquals("b2",            version.getRevision());
+        assertEquals("b2", version.getRevision());
         assertSame(version.getRevision(), version.getComponent(2));
         assertNull(version.getComponent(3));
 

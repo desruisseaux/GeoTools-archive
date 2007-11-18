@@ -182,7 +182,7 @@ public final class FactoriesTest extends TestCase {
         out.println("create Coodinate Reference System....8: ");
         out.println(cartCS); // No WKT for coordinate systems
             
-        final Hints hints = new Hints(null);
+        final Hints hints = new Hints();
         hints.put(Hints.DATUM_FACTORY,          datumFactory);
         hints.put(Hints.CS_FACTORY,             csFactory);
         hints.put(Hints.CRS_FACTORY,            crsFactory);

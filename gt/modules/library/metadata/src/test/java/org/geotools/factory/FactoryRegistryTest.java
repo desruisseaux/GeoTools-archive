@@ -19,7 +19,6 @@ import java.util.*;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.geotools.resources.LazySet;
 
 
@@ -35,7 +34,6 @@ public final class FactoryRegistryTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -57,6 +55,7 @@ public final class FactoryRegistryTest extends TestCase {
      * Ensures that class {@link Hints} is loaded before {@link DummyFactory}.
      * It is not needed for normal execution, but Maven seems to mess with class loaders.
      */
+    @Override
     protected void setUp() {
         assertNotNull(Hints.DATUM_FACTORY.toString());
     }
@@ -77,11 +76,14 @@ public final class FactoryRegistryTest extends TestCase {
                                         final Factory factory2,
                                         final Factory factory3)
     {
+        @SuppressWarnings("unchecked")
+        final Set<Class<?>> categories = (Set) Collections.singleton(DummyFactory.class);
+        // The above line fails without the cast, I don't know why...
         final FactoryRegistry registry;
         if (creator) {
-            registry = new FactoryCreator(Collections.singleton(DummyFactory.class));
+            registry = new FactoryCreator(categories);
         } else {
-            registry = new FactoryRegistry(Collections.singleton(DummyFactory.class));
+            registry = new FactoryRegistry(categories);
         }
         registry.registerServiceProvider(factory1);
         registry.registerServiceProvider(factory2);
@@ -89,7 +91,9 @@ public final class FactoryRegistryTest extends TestCase {
         assertTrue(registry.setOrdering(DummyFactory.class, (DummyFactory)factory1, (DummyFactory)factory2));
         assertTrue(registry.setOrdering(DummyFactory.class, (DummyFactory)factory2, (DummyFactory)factory3));
         assertTrue(registry.setOrdering(DummyFactory.class, (DummyFactory)factory1, (DummyFactory)factory3));
-        final List factories = new ArrayList(new LazySet(registry.getServiceProviders(DummyFactory.class, null, null)));
+
+        final List<?> factories = new ArrayList<Object>(new LazySet<Object>(
+                registry.getServiceProviders(DummyFactory.class, null, null)));
         assertTrue(factories.contains(factory1));
         assertTrue(factories.contains(factory2));
         assertTrue(factories.contains(factory3));
@@ -126,7 +130,7 @@ public final class FactoryRegistryTest extends TestCase {
          * No hints. The fist factory should be selected.
          */
         hints   = null;
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("No preferences; should select the first factory. ", factory1, factory);
         /*
          * A hint compatible with one of our factories. Factory #1 declares explicitly that it uses
@@ -134,7 +138,7 @@ public final class FactoryRegistryTest extends TestCase {
          * indifferent. Since factory #1 is the first one in the list, it should be selected.
          */
         hints   = new Hints(Hints.KEY_INTERPOLATION, Hints.VALUE_INTERPOLATION_BILINEAR);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("First factory matches; it should be selected. ", factory1, factory);
         /*
          * A hint incompatible with all our factories. Factory #1 is the only one to defines
@@ -143,7 +147,7 @@ public final class FactoryRegistryTest extends TestCase {
          */
         hints = new Hints(Hints.KEY_INTERPOLATION, Hints.VALUE_INTERPOLATION_BICUBIC);
         try {
-            factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+            factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
             fail("Found factory "+factory+", while the hint should have been rejected.");
         } catch (FactoryNotFoundException exception) {
             // This is the expected exception. Continue...
@@ -156,7 +160,7 @@ public final class FactoryRegistryTest extends TestCase {
         final DummyFactory factory4 = new DummyFactory.Example4();
         registry.registerServiceProvider(factory4);
         assertTrue(registry.setOrdering(DummyFactory.class, factory1, factory4));
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("The new factory should be selected. ", factory4, factory);
 
         // ----------------------------
@@ -167,21 +171,22 @@ public final class FactoryRegistryTest extends TestCase {
          */
         DummyFactory explicit = new DummyFactory.Example3();
         hints   = new Hints(DummyFactory.DUMMY_FACTORY, explicit);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("The user-specified factory should have been selected. ", explicit, factory);
         /*
          * User specifies the expected implementation class rather than an instance.
          */
         hints   = new Hints(DummyFactory.DUMMY_FACTORY, DummyFactory.Example2.class);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("Factory of class #2 were requested. ", factory2, factory);
         /*
-         * Same as above, but with classes specified in an array. The 'Date.class' element is just
-         * a dummy value for testing the search a little bit further than the first element.
+         * Same as above, but with classes specified in an array.
          */
-        hints   = new Hints(DummyFactory.DUMMY_FACTORY, new Class[]
-                  {Date.class, DummyFactory.Example3.class, DummyFactory.Example2.class});
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        hints = new Hints(DummyFactory.DUMMY_FACTORY, new Class<?>[] {
+            DummyFactory.Example3.class,
+            DummyFactory.Example2.class
+        });
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("Factory of class #3 were requested. ", factory3, factory);
         /*
          * The following hint should be ignored by factory #1, since this factory doesn't have
@@ -189,7 +194,7 @@ public final class FactoryRegistryTest extends TestCase {
          * it should be selected.
          */
         hints   = new Hints(DummyFactory.INTERNAL_FACTORY, DummyFactory.Example2.class);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("Expected factory #1. ", factory1, factory);
         /*
          * If the user really wants some factory that do have a dependency to factory #2, he should
@@ -214,7 +219,7 @@ public final class FactoryRegistryTest extends TestCase {
          */
         hints = new Hints(DummyFactory.INTERNAL_FACTORY, DummyFactory.Example1.class);
         hints.add(implementations);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("Expected a factory using #1 internally. ", factory2, factory);
     }
 
@@ -237,11 +242,11 @@ public final class FactoryRegistryTest extends TestCase {
          * See comments in 'testGetProvider()' for explanation.
          */
         hints   = new Hints(Hints.KEY_INTERPOLATION, Hints.VALUE_INTERPOLATION_BILINEAR);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("First factory matches; it should be selected. ", factory1, factory);
 
         hints   = new Hints(DummyFactory.DUMMY_FACTORY, DummyFactory.Example2.class);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame("Factory of class #2 were requested. ", factory2, factory);
         /*
          * The following case was throwing an exception in testGetProvider(). It should fails again
@@ -251,7 +256,7 @@ public final class FactoryRegistryTest extends TestCase {
          */
         hints = new Hints(Hints.KEY_INTERPOLATION, Hints.VALUE_INTERPOLATION_BICUBIC);
         try {
-            factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+            factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
             fail("Found or created factory "+factory+", while it should not have been allowed.");
         } catch (FactoryNotFoundException exception) {
             // This is the expected exception. Continue...
@@ -266,7 +271,7 @@ public final class FactoryRegistryTest extends TestCase {
         final DummyFactory factory5 = new DummyFactory.Example5(null);
         registry.registerServiceProvider(factory5);
         assertTrue(registry.setOrdering(DummyFactory.class, factory1, factory5));
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertSame   ("An instance of Factory #5 should have been created.", factory5.getClass(), factory.getClass());
         assertNotSame("A NEW instance of Factory #5 should have been created", factory5, factory);
         /*
@@ -274,7 +279,7 @@ public final class FactoryRegistryTest extends TestCase {
          * It doesn't matter if this class is registered or not.
          */
         hints.put(DummyFactory.DUMMY_FACTORY, DummyFactory.Example4.class);
-        factory = (DummyFactory) registry.getServiceProvider(DummyFactory.class, null, hints, key);
+        factory = registry.getServiceProvider(DummyFactory.class, null, hints, key);
         assertEquals("An instance of Factory #4 should have been created.", DummyFactory.Example4.class, factory.getClass());
     }
 }

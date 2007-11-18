@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.AttributeExpression;
@@ -314,7 +314,7 @@ public class CrossesIntegrity extends RelationIntegrity
 	
 	
 	private Filter filterBBox(ReferencedEnvelope bBox, SimpleFeatureType ft)
-		throws FactoryConfigurationError, IllegalFilterException
+		throws FactoryRegistryException, IllegalFilterException
 	{
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);

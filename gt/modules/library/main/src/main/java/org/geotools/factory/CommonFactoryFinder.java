@@ -69,7 +69,7 @@ public final class CommonFactoryFinder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(CommonFactoryFinder.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class[] {
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
                     StyleFactory.class,
                     FilterFactory.class,
                     FeatureLockFactory.class,

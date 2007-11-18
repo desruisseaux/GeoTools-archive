@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.geometry;
 
-// J2SE direct dependencies
 import java.util.Arrays;
 
 import org.geotools.factory.FactoryCreator;
@@ -29,12 +28,11 @@ import org.opengis.geometry.aggregate.AggregateFactory;
 import org.opengis.geometry.complex.ComplexFactory;
 import org.opengis.geometry.coordinate.GeometryFactory;
 import org.opengis.geometry.primitive.PrimitiveFactory;
-import org.opengis.referencing.datum.DatumFactory;
 
 
 /**
  * Defines static methods used to access the application's default geometry factory implementations.
- * 
+ *
  * @since 2.5
  * @source $URL$
  * @version $Id$
@@ -60,7 +58,7 @@ public class GeometryFactoryFinder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(GeometryFactoryFinder.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class[] {
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
                     Precision.class,
                     PositionFactory.class,
                     GeometryFactory.class,
@@ -89,36 +87,36 @@ public class GeometryFactoryFinder {
         completed.add(hints);
         return completed;
     }*/
-    
+
     public static synchronized Precision getPrecision(Hints hints) throws FactoryRegistryException {
         return (Precision) getServiceRegistry().getServiceProvider( Precision.class, null, hints, Hints.PRECISION );
     }
-    
+
     public static synchronized PositionFactory getPositionFactory( Hints hints) throws FactoryRegistryException {
         return (PositionFactory) getServiceRegistry().getServiceProvider( PositionFactory.class, null, hints, Hints.POSITION_FACTORY );
     }
     /**
      * An implementation of {@link GeometryFactory} for the provided crs.
-     * 
+     *
      * @param hints A set of hints that *must* include a Hints.CRS key
      * @return a GeometryFactory set up to work with the indicated CRS
      * @throws FactoryRegistryException if no implementation was found or can be created for the
-     *         {@link DatumFactory} interface.
+     *         {@link GeometryFactory} interface.
      */
     public static synchronized GeometryFactory getGeometryFactory( Hints hints) throws FactoryRegistryException {
         return (GeometryFactory) getServiceRegistry().getServiceProvider( GeometryFactory.class, null, hints, Hints.GEOMETRY_FACTORY );
     }
-    
+
     public static synchronized ComplexFactory getComplexFactory(Hints hints) throws FactoryRegistryException {
         return (ComplexFactory) getServiceRegistry().getServiceProvider( ComplexFactory.class, null, hints, Hints.COMPLEX_FACTORY );
     }
-    
+
     public static synchronized AggregateFactory getAggregateFactory(Hints hints) throws FactoryRegistryException {
         return (AggregateFactory) getServiceRegistry().getServiceProvider( AggregateFactory.class, null, hints, Hints.AGGREGATE_FACTORY );
     }
-    
+
     public static synchronized PrimitiveFactory getPrimitiveFactory(Hints hints) throws FactoryRegistryException {
         return (PrimitiveFactory) getServiceRegistry().getServiceProvider( PrimitiveFactory.class, null, hints, Hints.PRIMITIVE_FACTORY );
     }
-    
+
 }

@@ -17,6 +17,7 @@ package org.geotools.factory;
 
 import java.util.Map;
 import java.util.Collections;
+import java.awt.RenderingHints;
 import junit.framework.Assert;
 
 
@@ -43,23 +44,24 @@ public interface DummyFactory extends InternalFactory {
     /**
      * A hint key for a {@code DummyFactory} instance.
      */
-    Hints.Key DUMMY_FACTORY = new Hints.ClassKey(DummyFactory.class.getName());
+    Hints.Key DUMMY_FACTORY = new Hints.ClassKey(DummyFactory.class);
 
     /**
      * A hint key for a {@code DummyFactory2} instance.
      */
-    Hints.Key INTERNAL_FACTORY = new Hints.ClassKey(InternalFactory.class.getName());
+    Hints.Key INTERNAL_FACTORY = new Hints.ClassKey(InternalFactory.class);
 
     /**
      * Dummy factory implementation #1.
      * This factory doesn't use any other factory.
      */
     final class Example1 implements DummyFactory {
+        @Override
         public String toString() {
             return "#1";
         }
 
-        public Map getImplementationHints() {
+        public Map<RenderingHints.Key, ?> getImplementationHints() {
             return Collections.singletonMap(Hints.KEY_INTERPOLATION,
                                             Hints.VALUE_INTERPOLATION_BILINEAR);
         }
@@ -70,12 +72,14 @@ public interface DummyFactory extends InternalFactory {
      * This factory uses factory #1.
      */
     final class Example2 implements DummyFactory {
+        @Override
         public String toString() {
             return "#2";
         }
 
-        public Map getImplementationHints() {
-            return Collections.singletonMap(INTERNAL_FACTORY, new Example1());
+        public Map<RenderingHints.Key, ?> getImplementationHints() {
+            final RenderingHints.Key key = INTERNAL_FACTORY;
+            return Collections.singletonMap(key, new Example1());
         }
     }
 
@@ -84,12 +88,14 @@ public interface DummyFactory extends InternalFactory {
      * This factory uses factory #2, which uses itself factory #1.
      */
     final class Example3 implements DummyFactory {
+        @Override
         public String toString() {
             return "#3";
         }
 
-        public Map getImplementationHints() {
-            return Collections.singletonMap(INTERNAL_FACTORY, new Example2());
+        public Map<RenderingHints.Key, ?> getImplementationHints() {
+            final RenderingHints.Key key = INTERNAL_FACTORY;
+            return Collections.singletonMap(key, new Example2());
         }
     }
 
@@ -98,11 +104,12 @@ public interface DummyFactory extends InternalFactory {
      * {@link FactoryRegistryTest} will not register this factory in same time than other ones.
      */
     final class Example4 implements DummyFactory {
+        @Override
         public String toString() {
             return "#4";
         }
 
-        public Map getImplementationHints() {
+        public Map<RenderingHints.Key, ?> getImplementationHints() {
             return Collections.singletonMap(Hints.KEY_INTERPOLATION,
                                             Hints.VALUE_INTERPOLATION_BICUBIC);
         }
@@ -126,11 +133,12 @@ public interface DummyFactory extends InternalFactory {
             }
         }
 
+        @Override
         public String toString() {
             return "#5";
         }
 
-        public Map getImplementationHints() {
+        public Map<RenderingHints.Key, ?> getImplementationHints() {
             return Collections.singletonMap(Hints.KEY_INTERPOLATION, value);
         }
     }

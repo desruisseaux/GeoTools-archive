@@ -4,7 +4,7 @@
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2006, Institut de Recherche pour le Développement
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,6 +19,7 @@ package org.geotools.image.io;
 
 import java.net.URLDecoder;
 import java.net.URL;
+import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +54,7 @@ public abstract class FileImageReader extends StreamImageReader {
      */
     private boolean isTemporary;
 
-    /** 
+    /**
      * Constructs a new image reader.
      *
      * @param provider The {@link ImageReaderSpi} that is invoking this constructor,
@@ -108,10 +109,18 @@ public abstract class FileImageReader extends StreamImageReader {
             ensureFileExists(inputFile);
             return inputFile;
         }
+        if (input instanceof URI) {
+            final URI sourceURI = (URI) input;
+            if (sourceURI.getScheme().equalsIgnoreCase("file")) {
+                inputFile = new File(sourceURI.getPath());
+                ensureFileExists(inputFile);
+                return inputFile;
+            }
+        }
         if (input instanceof URL) {
             final URL sourceURL = (URL) input;
             if (sourceURL.getProtocol().equalsIgnoreCase("file")) {
-                inputFile = new File(URLDecoder.decode(sourceURL.getFile(), getURLEncoding()));
+                inputFile = new File(URLDecoder.decode(sourceURL.getPath(), getURLEncoding()));
                 ensureFileExists(inputFile);
                 return inputFile;
             }
@@ -164,7 +173,7 @@ public abstract class FileImageReader extends StreamImageReader {
      * Returns {@code true} since image readers backed by {@link File}
      * object usually supports random access efficiently.
      */
-    //@Override
+    @Override
     public boolean isRandomAccessEasy(final int imageIndex) throws IOException {
         return true;
     }
@@ -172,7 +181,7 @@ public abstract class FileImageReader extends StreamImageReader {
     /**
      * Deletes the temporary file, if any.
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         if (inputFile != null) {
             if (isTemporary) {

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.IllegalAttributeException;
@@ -121,8 +121,8 @@ public final class FeatureUtilities {
      *
      * @deprecated Please use FeatureUtilities#wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader, GeneralParameterValue[] params)
      */
-    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader) 
-    	throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+    public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader)
+    	throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 				// create surrounding polygon
 				final PrecisionModel pm = new PrecisionModel();
 				final GeometryFactory gf = new GeometryFactory(pm, 0);
@@ -130,33 +130,33 @@ public final class FeatureUtilities {
 						.toRectangle2D();
 				final CoordinateReferenceSystem sourceCrs = CRSUtilities
 						.getCRS2D(gridCoverageReader.getCrs());
-		
+
 				final Coordinate[] coord = new Coordinate[5];
 				coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
 				coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
 				coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
 				coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
 				coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-		
+
 				// }
 				final LinearRing ring = gf.createLinearRing(coord);
 				final Polygon bounds = new Polygon(ring, null, gf);
-				
+
 				SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
 		        ftb.setName("GridCoverage");
 		        ftb.add("geom", Polygon.class, sourceCrs);
 		        ftb.add("grid", AbstractGridCoverage2DReader.class);
 		        SimpleFeatureType schema = ftb.buildFeatureType();
-		
+
 		        // create the feature
 		        SimpleFeature feature = SimpleFeatureBuilder.build(schema, new Object[] { bounds, gridCoverageReader }, null);
-		
+
 				final FeatureCollection collection = FeatureCollections.newCollection();
 				collection.add(feature);
-		
+
 				return collection;
 		}
-				
+
     /**
      * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
      * (temporary).
@@ -167,7 +167,7 @@ public final class FeatureUtilities {
      */
     public static FeatureCollection wrapGridCoverageReader(final AbstractGridCoverage2DReader gridCoverageReader,
 			GeneralParameterValue[] params) throws TransformException,
-			FactoryConfigurationError, SchemaException,
+			FactoryRegistryException, SchemaException,
 			IllegalAttributeException {
 
 		// create surrounding polygon
@@ -188,7 +188,7 @@ public final class FeatureUtilities {
 		// }
 		final LinearRing ring = gf.createLinearRing(coord);
 		final Polygon bounds = new Polygon(ring, null, gf);
-		
+
 		SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
         ftb.setName("GridCoverage");
         ftb.add("geom", Polygon.class, sourceCrs);
@@ -209,7 +209,7 @@ public final class FeatureUtilities {
 	/**
 	 * Converts a JTS {@link Polygon}, which represents a ROI, int an AWT
 	 * {@link java.awt.Polygon} by means of the provided {@link MathTransform}.
-	 * 
+	 *
 	 * @param roiInput
 	 *            the input ROI as a JTS {@link Polygon}.
 	 * @param worldToGridTransform
@@ -222,14 +222,14 @@ public final class FeatureUtilities {
 			MathTransform worldToGridTransform) throws TransformException {
 		return convertPolygonToPointArray(roiInput, worldToGridTransform, null);
 	}
-	
+
 	/**
 	 * Converts a JTS {@link Polygon}, which represents a ROI, int an AWT
 	 * {@link java.awt.Polygon} by means of the provided {@link MathTransform}.
-	 * 
+	 *
 	 * <p>
 	 * It also stores the points for this polygon into the provided {@link List}.
-	 * 
+	 *
 	 * @param roiInput
 	 *            the input ROI as a JTS {@link Polygon}.
 	 * @param worldToGridTransform

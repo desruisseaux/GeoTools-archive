@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -162,7 +162,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
              * construction time, which explain why it is correct to use {@link FactoryFinder}
              * with null hints here.
              */
-            final Hints hints = new Hints(null);
+            final Hints hints = new Hints();
             noForce(hints);
             authorityFactory = ReferencingFactoryFinder
                     .getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, hints);

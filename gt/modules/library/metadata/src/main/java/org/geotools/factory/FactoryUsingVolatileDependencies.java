@@ -44,26 +44,5 @@ package org.geotools.factory;
  *             done, {@link org.geotools.referencing.factory.AllAuthoritiesFactory} should
  *             implement this interface.
  */
-public class FactoryUsingVolatileDependencies extends AbstractFactory {
-    /**
-     * Constructs a factory with a default priority.
-     *
-     * @param hints The user-supplied hints.
-     */
-    public FactoryUsingVolatileDependencies(final Hints hints) {
-        super();
-        this.hints.putAll(hints);
-    }
-
-    /**
-     * Constructs a factory with the specified priority.
-     *
-     * @param hints The user-supplied hints.
-     * @param priority The priority for this factory, as a number between
-     *        {@link #MINIMUM_PRIORITY} and {@link #MAXIMUM_PRIORITY} inclusive.
-     */
-    public FactoryUsingVolatileDependencies(final Hints hints, final int priority) {
-        super(priority);
-        this.hints.putAll(hints);
-    }    
+public interface FactoryUsingVolatileDependencies extends Factory {
 }

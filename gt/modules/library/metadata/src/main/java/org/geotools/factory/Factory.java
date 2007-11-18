@@ -15,9 +15,8 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Map;
-import javax.imageio.spi.ServiceRegistry; // For javadoc
+import java.awt.RenderingHints;
 
 
 /**
@@ -29,9 +28,10 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * a <cite>service registry</cite>, which acts as a container for service implementations.</p>
  *
  * <p>Service registries don't need to be a Geotools implementation. They can be (but are not
- * limited to) any {@link ServiceRegistry} subclass. If the standard {@code ServiceRegistry}
- * (or its Geotools extension {@link FactoryRegistry}) is selected as a container for services,
- * then factory implementations should be declared as below (select only one way):</p>
+ * limited to) any {@link javax.imageio.spi.ServiceRegistry} subclass. If the standard
+ * {@code ServiceRegistry} (or its Geotools extension {@link FactoryRegistry}) is selected
+ * as a container for services, then factory implementations should be declared as below
+ * (select only one way):</p>
  *
  * <ul>
  *   <li><strong>Register for automatic discovery</strong></li>
@@ -125,5 +125,5 @@ public interface Factory {
      * @return The map of hints, or an {@linkplain java.util.Collections#EMPTY_MAP empty map}
      *         if none.
      */
-    Map/*<RenderingHints.Key,Object>*/ getImplementationHints();
+    Map<RenderingHints.Key, ?> getImplementationHints();
 }

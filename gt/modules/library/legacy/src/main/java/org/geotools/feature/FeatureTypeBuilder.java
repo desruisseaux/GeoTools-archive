@@ -26,7 +26,7 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
@@ -150,10 +150,10 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      *
      * @return A new FeatureTypeFactory instance.
      *
-     * @throws FactoryConfigurationError If there exists a configuration error.
+     * @throws FactoryRegistryException If there exists a configuration error.
      */
     public static FeatureTypeFactory newInstance(String typeName)
-        throws FactoryConfigurationError {
+        throws FactoryRegistryException {
         
         // warning not sure if CommonFactoryFinder is going to cache the instance or not?
         //

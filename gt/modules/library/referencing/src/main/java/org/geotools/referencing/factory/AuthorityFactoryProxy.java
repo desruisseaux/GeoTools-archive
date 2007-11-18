@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -75,7 +75,7 @@ abstract class AuthorityFactoryProxy {
      * The types that factories can be create. The most
      * specific types must appear first in this list.
      */
-    private static final Class/*<? extends IdentifiedObject>*/[] TYPES = {        
+    private static final Class/*<? extends IdentifiedObject>*/[] TYPES = {
         CoordinateOperation      .class,
         OperationMethod          .class,
         ParameterDescriptor      .class,
@@ -288,7 +288,7 @@ abstract class AuthorityFactoryProxy {
          */
         public IdentifiedObject create(final String code) throws FactoryException {
             try {
-                return (IdentifiedObject) method.invoke(factory, new String[] {code});
+                return (IdentifiedObject) method.invoke(factory, code);
             } catch (InvocationTargetException exception) {
                 final Throwable cause = exception.getCause();
                 if (cause instanceof FactoryException) {

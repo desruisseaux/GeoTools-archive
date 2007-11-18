@@ -15,6 +15,7 @@
  */
 package org.geotools.factory;
 
+import java.awt.RenderingHints;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -33,7 +34,6 @@ public final class AbstractFactoryTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -52,17 +52,39 @@ public final class AbstractFactoryTest extends TestCase {
     }
 
     /**
+     * A key for testing purpose.
+     */
+    private static class Key extends RenderingHints.Key {
+        Key(final int n) {
+            super(n);
+        }
+
+        @Override
+        public boolean isCompatibleValue(Object value) {
+            return true;
+        }
+
+    }
+
+    /**
      * Tests {@link AbstractFactory#equals}.
      */
     public void testEquals() {
+        final Key key1              = new Key(1 );
+        final Key key2              = new Key(2 );
+        final Key key3              = new Key(3 );
+        final Key key3_reference_f1 = new Key(31);
+        final Key key2_reference_f3 = new Key(23);
+        final Key key1_reference_f2 = new Key(12);
+
         final AbstractFactory f1 = new AbstractFactory();
         final AbstractFactory f2 = new AbstractFactory();
         final AbstractFactory f3 = new AbstractFactory();
-        f1.hints.put("Key 1",       "Value 1");
-        f2.hints.put("Key 2",       "Value 2");
-        f3.hints.put("Key 3 reference f1", f1);
-        f2.hints.put("Key 2 reference f3", f3);
-        f1.hints.put("Key 1 reference f2", f2);
+        f1.hints.put(key1,       "Value 1");
+        f2.hints.put(key2,       "Value 2");
+        f3.hints.put(key3_reference_f1, f1);
+        f2.hints.put(key2_reference_f3, f3);
+        f1.hints.put(key1_reference_f2, f2);
 
         assertFalse(f1.toString().length() == 0);
 
@@ -77,14 +99,14 @@ public final class AbstractFactoryTest extends TestCase {
         final AbstractFactory f1b = new AbstractFactory();
         final AbstractFactory f2b = new AbstractFactory();
         final AbstractFactory f3b = new AbstractFactory();
-        f1b.hints.put("Key 1",        "Value 1");
-        f2b.hints.put("Key 2",        "Value 2");
-        f3b.hints.put("Key 3 reference f1", f1b);
-        f2b.hints.put("Key 2 reference f3", f3b);
-        f1b.hints.put("Key 1 reference f2", f2b);
+        f1b.hints.put(key1,        "Value 1");
+        f2b.hints.put(key2,        "Value 2");
+        f3b.hints.put(key3_reference_f1, f1b);
+        f2b.hints.put(key2_reference_f3, f3b);
+        f1b.hints.put(key1_reference_f2, f2b);
         assertEquals(f2, f2b);
 
-        f1b.hints.put("Key 1", "Different value");
+        f1b.hints.put(key1, "Different value");
         assertFalse(f2.equals(f2b));
     }
 }

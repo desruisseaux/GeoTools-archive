@@ -15,15 +15,12 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
-import javax.imageio.spi.ServiceRegistry; // For javadoc
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -52,40 +49,47 @@ public class FactoryCreator extends FactoryRegistry {
     /**
      * List of factories already created. Used as a cache.
      */
-    private final Map/*<Class, List<Reference>>*/ cache = new HashMap();
+    private final Map<Class<?>, List<Reference<?>>> cache = new HashMap<Class<?>, List<Reference<?>>>();
 
     /**
      * Objects under construction for each implementation class.
      * Used by {@link #safeCreate} as a guard against infinite recursivity.
      */
-    private final Set/*<Class>*/ underConstruction = new HashSet();
+    private final Set<Class<?>> underConstruction = new HashSet<Class<?>>();
 
     /**
      * Constructs a new registry for the specified categories.
      *
      * @param categories The categories.
      */
-    public FactoryCreator(final Collection categories) {
+    public FactoryCreator(final Collection<Class<?>> categories) {
         super(categories);
     }
 
     /**
      * Returns the providers available in the cache. To be used by {@link FactoryRegistry}.
      */
-    final List/*<Reference>*/ getCachedProviders(final Class category) {
-        List c = (List) cache.get(category);
+    @Override
+    final <T> List<Reference<T>> getCachedProviders(final Class<T> category) {
+        List<Reference<?>> c = cache.get(category);
         if (c == null) {
-            c = new LinkedList();
+            c = new LinkedList<Reference<?>>();
             cache.put(category, c);
         }
-        return c;
+        @SuppressWarnings("unchecked")
+        final List<Reference<T>> cheat = (List) c;
+        /*
+         * Should be safe because we created an empty list, there is no other place where this
+         * list is created and from this point we can only insert elements restricted to type T.
+         */
+        return cheat;
     }
 
     /**
      * Caches the specified factory under the specified category.
      */
-    private void cache(final Class category, final Object factory) {
-        getCachedProviders(category).add(new WeakReference(factory));
+    private <T> void cache(final Class<T> category, final T factory) {
+        getCachedProviders(category).add(new WeakReference<T>(factory));
     }
 
     /**
@@ -104,10 +108,11 @@ public class FactoryCreator extends FactoryRegistry {
      *         provide suffisient information for creating a new factory.
      * @throws FactoryRegistryException if the factory can't be created for some other reason.
      */
-    public Object getServiceProvider(final Class     category,
-                                     final Filter    filter,
-                                     final Hints     hints,
-                                     final Hints.Key key)
+    @Override
+    public <T> T getServiceProvider(final Class<T>  category,
+                                    final Filter    filter,
+                                    final Hints     hints,
+                                    final Hints.Key key)
             throws FactoryRegistryException
     {
         final FactoryNotFoundException notFound;
@@ -121,7 +126,7 @@ public class FactoryCreator extends FactoryRegistry {
          * No existing factory found. Creates one using reflection. First, we
          * check if an implementation class was explicitly specified by the user.
          */
-        final Class[] types;
+        final Class<?>[] types;
         if (hints==null || key==null) {
             types = null;
         } else {
@@ -129,20 +134,20 @@ public class FactoryCreator extends FactoryRegistry {
             if (hint == null) {
                 types = null;
             } else {
-                if (hint instanceof Class[]) {
-                    types = (Class[]) hint;
+                if (hint instanceof Class<?>[]) {
+                    types = (Class<?>[]) hint;
                 } else {
-                    types = new Class[] {(Class) hint};
+                    types = new Class<?>[] {(Class<?>) hint};
                     // Should not fails, since non-class argument should
                     // have been accepted by 'getServiceProvider(...)'.
                 }
                 final int length = types.length;
                 for (int i=0; i<length; i++) {
-                    final Class type = types[i];
+                    final Class<?> type = types[i];
                     if (type!=null && category.isAssignableFrom(type)) {
                         final int modifiers = type.getModifiers();
                         if (!Modifier.isAbstract(modifiers)) {
-                            final Object candidate = createSafe(category, type, hints);
+                            final T candidate = createSafe(category, type, hints);
                             if (candidate == null) {
                                 continue;
                             }
@@ -162,16 +167,16 @@ public class FactoryCreator extends FactoryRegistry {
          * Note: all Factory objects should be fully constructed by now,
          * since the super-class has already iterated over all factories.
          */
-        for (final Iterator it=getUnfilteredProviders(category); it.hasNext();) {
-            final Object factory = it.next();
-            final Class implementation = factory.getClass();
+        for (final Iterator<T> it=getUnfilteredProviders(category); it.hasNext();) {
+            final T factory = it.next();
+            final Class<?> implementation = factory.getClass();
             if (types!=null && !isTypeOf(types, implementation)) {
                 continue;
             }
             if (filter!=null && !filter.filter(factory)) {
                 continue;
             }
-            final Object candidate;
+            final T candidate;
             try {
                 candidate = createSafe(category, implementation, hints);
             } catch (FactoryRegistryException exception) {
@@ -200,7 +205,7 @@ public class FactoryCreator extends FactoryRegistry {
     /**
      * Returns {@code true} if the specified implementation is one of the specified types.
      */
-    private static boolean isTypeOf(final Class[] types, final Class implementation) {
+    private static boolean isTypeOf(final Class<?>[] types, final Class<?> implementation) {
         for (int i=0; i<types.length; i++) {
             if (types[i].isAssignableFrom(implementation)) {
                 return true;
@@ -217,7 +222,7 @@ public class FactoryCreator extends FactoryRegistry {
      * of the same category. For example this is the case of
      * {@link org.geotools.referencing.operation.BufferedCoordinateOperationFactory}.
      */
-    private Object createSafe(final Class category, final Class implementation, final Hints hints) {
+    private <T> T createSafe(final Class<T> category, final Class<?> implementation, final Hints hints) {
         if (!underConstruction.add(implementation)) {
             return null;
         }
@@ -246,21 +251,23 @@ public class FactoryCreator extends FactoryRegistry {
      * @return The factory.
      * @throws FactoryRegistryException if the factory creation failed.
      */
-    protected Object createServiceProvider(final Class category,
-                                           final Class implementation,
-                                           final Hints hints)
+    protected <T> T createServiceProvider(final Class<T> category,
+                                          final Class<?> implementation,
+                                          final Hints hints)
             throws FactoryRegistryException
     {
         Throwable cause;
         try {
             try {
-                return implementation.getConstructor(HINTS_ARGUMENT).newInstance(new Object[]{hints});
+                return category.cast(implementation.getConstructor(HINTS_ARGUMENT)
+                                                   .newInstance(new Object[] {hints}));
             } catch (NoSuchMethodException exception) {
                 // Constructor do not exists or is not public. We will fallback on the no-arg one.
                 cause = exception;
             }
             try {
-                return implementation.getConstructor((Class[])null).newInstance((Object[])null);
+                return category.cast(implementation.getConstructor((Class[]) null)
+                                                   .newInstance((Object[]) null));
             } catch (NoSuchMethodException exception) {
                 // No constructor accessible. Do not store the cause (we keep the one above).
             }

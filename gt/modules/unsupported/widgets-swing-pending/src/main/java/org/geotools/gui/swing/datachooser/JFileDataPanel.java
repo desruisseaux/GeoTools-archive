@@ -31,7 +31,7 @@ import javax.swing.event.EventListenerList;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.gui.swing.i18n.TextBundle;
@@ -149,7 +149,7 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                             layers.add(layer);
                         } catch (TransformException ex) {
                             jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
-                        } catch (FactoryConfigurationError ex) {
+                        } catch (FactoryRegistryException ex) {
                             jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
                         } catch (SchemaException ex) {
                             jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));

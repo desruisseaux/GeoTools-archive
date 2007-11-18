@@ -30,7 +30,7 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
@@ -51,7 +51,7 @@ import org.opengis.filter.identity.FeatureId;
  * @source $URL$
  */
 public class WFSDataStoreWriteOnlineTest extends TestCase {
-    public void testEmpty() throws NoSuchElementException, IOException, IllegalAttributeException, FactoryConfigurationError{
+    public void testEmpty() throws NoSuchElementException, IOException, IllegalAttributeException, FactoryRegistryException{
 //        URL u = new URL("http://localhost:8080/geoserver/wfs");
 //        WFSDataStore ds = getDataStore(u);
 //        FeatureType ft = ds.getSchema("states");
@@ -191,7 +191,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	assertTrue(count2==count3);
     }
     
-    public static void doUpdate(DataStore ds,SimpleFeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
+    public static void doUpdate(DataStore ds,SimpleFeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryRegistryException, NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);

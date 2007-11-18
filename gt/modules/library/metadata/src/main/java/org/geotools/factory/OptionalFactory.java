@@ -15,9 +15,6 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
-import javax.imageio.spi.ServiceRegistry; // For javadoc
-
 
 /**
  * An optional factory that may not be available in all configurations.
@@ -35,8 +32,8 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * <p>
  * <ul>
  *   <li>When {@link FactoryRegistry#getServiceProvider} is invoked, it starts to iterate over all
- *       registered factories. If an {@linkplain ServiceRegistry#setOrdering ordering is set}, it
- *       is taken in account for the iteration order.</li>
+ *       registered factories. If an {@linkplain FactoryRegistry#setOrdering(Class,Object,Object)
+ *       ordering is set}, it is taken in account for the iteration order.</li>
  *   <li>If no suitable factory was found before the iterator reachs this optional factory, then
  *       {@link #isAvailable} is invoked. If it returns {@code true}, then this optional factory
  *       is processed like any other factories. Otherwise it is ignored.</li>

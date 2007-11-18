@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -20,7 +20,7 @@ import java.util.Collections;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 
@@ -54,10 +54,9 @@ public abstract class FilterFactoryFinder {
      *
      * @return An instance of the Filter factory.
      *
-     * @throws FactoryConfigurationError If a factory is not found.
+     * @throws FactoryRegistryException If the factory is not found.
      */
-    public static FilterFactory createFilterFactory()
-        throws FactoryConfigurationError {
+    public static FilterFactory createFilterFactory() throws FactoryRegistryException {
         Hints hints = GeoTools.getDefaultHints();
         return (FilterFactory) CommonFactoryFinder.getFilterFactory( hints );
     }

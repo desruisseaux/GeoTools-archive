@@ -15,6 +15,7 @@
  */
 package org.geotools.factory;
 
+import java.awt.RenderingHints;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class GeoToolsTest extends TestCase {
         final Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         assertFalse(hints.isEmpty());
 
-        Map map = new HashMap();
+        Map<RenderingHints.Key,Object> map = new HashMap<RenderingHints.Key,Object>();
         assertNull(map.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE));
         map = Collections.unmodifiableMap(map);
         assertFalse(map.isEmpty());
@@ -114,30 +115,38 @@ public class GeoToolsTest extends TestCase {
 
     /**
      * Tests the use of system properties.
-     *
-     * @todo Uncomment when we will be allowed to compile for J2SE 1.5.
-     *       Call to {@link System#clearProperty} is mandatory for this test.
      */
     public void testSystemHints() {
         Hints hints = GeoTools.getDefaultHints();
         assertNotNull(hints);
         assertTrue(hints.isEmpty());
-//        System.setProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER, "true");
-//        Hints.scanSystemProperties();
-//        try {
-//            hints = GeoTools.getDefaultHints();
-//            assertNotNull(hints);
-//            assertFalse(hints.isEmpty());
-//            assertEquals(1, hints.size());
-//            final Object value = hints.get(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
-//            assertTrue(value instanceof Boolean);
-//            assertTrue(((Boolean) value).booleanValue());
-//        } finally {
-//            System.clearProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
-//            assertNotNull(Hints.removeSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
-//        }
+        System.setProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER, "true");
+        Hints.scanSystemProperties();
+        try {
+            hints = GeoTools.getDefaultHints();
+            assertNotNull(hints);
+            assertFalse(hints.isEmpty());
+            assertEquals(1, hints.size());
+            final Object value = hints.get(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+            assertTrue(value instanceof Boolean);
+            assertTrue(((Boolean) value).booleanValue());
+        } finally {
+            System.clearProperty(GeoTools.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+            assertNotNull(Hints.removeSystemDefault(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER));
+        }
         hints = GeoTools.getDefaultHints();
         assertNotNull(hints);
         assertTrue(hints.isEmpty());
+    }
+
+    /**
+     * Tests {@link GeoTools#fixName} using simpliest name or no context.
+     * We avoid the tests that would require a real initial context.
+     */
+    public void testFixName() {
+        assertNull  (GeoTools.fixName(null));
+        assertEquals("simpleName", GeoTools.fixName("simpleName"));
+        assertEquals("jdbc:EPSG",  GeoTools.fixName(null, "jdbc:EPSG"));
+        assertEquals("jdbc/EPSG",  GeoTools.fixName(null, "jdbc/EPSG"));
     }
 }

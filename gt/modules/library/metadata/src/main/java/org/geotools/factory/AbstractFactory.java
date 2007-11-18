@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -28,10 +27,7 @@ import java.awt.RenderingHints;
 import javax.imageio.spi.ServiceRegistry;
 import javax.imageio.spi.RegisterableService;
 
-// OpenGIS dependencies
 import org.opengis.referencing.AuthorityFactory;
-
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -171,19 +167,21 @@ public class AbstractFactory implements Factory, RegisterableService {
      * <ul>
      *   <li>The primary use of this map is to check if this factory can be reused.
      *       It is not for creating new factories.</li>
-     *   <li>This map needs to allow null values, as of
+     *   <li>This map needs to allow {@code null} values, as of
      *       {@linkplain Factory#getImplementationHints implementation hints} contract.</li>
      * </ul>
      */
-    protected final Map hints = new LinkedHashMap();
+    protected final Map<RenderingHints.Key, Object> hints =
+            new LinkedHashMap<RenderingHints.Key, Object>();
 
     /**
      * An unmodifiable view of {@link #hints}. This is the actual map to be returned
      * by {@link #getImplementationHints}. Its content reflects the {@link #hints}
      * map even if the later is modified.
      */
-    private final Map/*<RenderingHints.Key,Object>*/ unmodifiableHints = Collections.unmodifiableMap(hints);
-    
+    private final Map<RenderingHints.Key, Object> unmodifiableHints =
+            Collections.unmodifiableMap(hints);
+
     /**
      * Creates a new factory with the {@linkplain #NORMAL_PRIORITY default priority}.
      */
@@ -200,8 +198,8 @@ public class AbstractFactory implements Factory, RegisterableService {
     protected AbstractFactory(final int priority) {
     	this.priority = priority;
         if (priority<MINIMUM_PRIORITY || priority>MAXIMUM_PRIORITY) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "priority", priority));
+            throw new IllegalArgumentException(
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "priority", priority));
         }
     }
 
@@ -219,12 +217,37 @@ public class AbstractFactory implements Factory, RegisterableService {
     }
 
     /**
+     * Adds the specified hints to this factory {@linkplain #hints}.
+     *
+     * @param map The hints to add.
+     * @return {@code true} if at least one value changed as a result of this call.
+     *
+     * @since 2.5
+     */
+    protected boolean addImplementationHints(final RenderingHints map) {
+        boolean changed = false;
+        if (map != null) {
+            for (final Map.Entry<?,?> entry : map.entrySet()) {
+                final Object key = entry.getKey();
+                if (key instanceof RenderingHints.Key) {
+                    final Object value = entry.getValue();
+                    final Object old = hints.put((RenderingHints.Key) key, value);
+                    if (!changed && !Utilities.equals(value, old)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+        return changed;
+    }
+
+    /**
      * Returns an {@linkplain Collections#unmodifiableMap unmodifiable} view of
      * {@linkplain #hints}.
      *
      * @return The map of hints, or an empty map if none.
      */
-    public Map getImplementationHints() {
+    public Map<RenderingHints.Key, ?> getImplementationHints() {
         return unmodifiableHints;
     }
 
@@ -289,6 +312,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      *
      * @since 2.3
      */
+    @Override
     public final int hashCode() {
         return getClass().hashCode() + (37 * priority);
     }
@@ -310,6 +334,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      *
      * @since 2.3
      */
+    @Override
     public final boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -331,9 +356,11 @@ public class AbstractFactory implements Factory, RegisterableService {
      *
      * @since 2.3
      */
+    @Override
     public String toString() {
         final String name = format(this);
-        final Map done = new IdentityHashMap(); // We don't want to rely on Factory.equals(...)
+        final Map<Factory,String> done = new IdentityHashMap<Factory,String>();
+        // We used IdentityHashMap above because we don't want to rely on Factory.equals(...)
         done.put(this, name);
         final String tree = format(getImplementationHints(), done);
         return name + System.getProperty("line.separator", "\n") + tree;
@@ -343,8 +370,8 @@ public class AbstractFactory implements Factory, RegisterableService {
      * Returns a string representation of the specified hints. This is used by
      * {@link Hints#toString} in order to share the code provided in this class.
      */
-    static String toString(final Map hints) {
-        return format(hints, new IdentityHashMap());
+    static String toString(final Map<?,?> hints) {
+        return format(hints, new IdentityHashMap<Factory, String>());
     }
 
     /**
@@ -362,7 +389,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      * Formats the specified hints. This method is just the starting
      * point for {@link #format(Writer, Map, String, Map)} below.
      */
-    private static String format(final Map hints, final Map done) {
+    private static String format(final Map<?,?> hints, final Map<Factory,String> done) {
         final Writer table;
         try {
             table = new TableWriter(null, " ");
@@ -377,17 +404,15 @@ public class AbstractFactory implements Factory, RegisterableService {
     /**
      * Formats recursively the tree. This method invoke itself.
      */
-    private static void format(final Writer  table,
-                               final Map     hints,
-                               final String  indent,
-                               final Map/*<Object,String>*/ done) throws IOException
+    private static void format(final Writer              table,
+                               final Map<?,?>            hints,
+                               final String              indent,
+                               final Map<Factory,String> done)
+            throws IOException
     {
-        final String[] keys   = new String[hints.size()];
-        final Object[] values = new Object[keys.length];
-        for (final Iterator it=hints.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String    key   = String.valueOf(entry.getKey());
-            Object    value = entry.getValue();
+        for (final Map.Entry<?,?> entry : hints.entrySet()) {
+            String key   = String.valueOf(entry.getKey());
+            Object value = entry.getValue();
             table.write(indent);
             table.write(key);
             table.write("\t= ");
@@ -395,7 +420,7 @@ public class AbstractFactory implements Factory, RegisterableService {
             if (value instanceof Factory) {
                 recursive = (Factory) value;
                 value = format(recursive);
-                final String previous = (String) done.put(recursive, key);
+                final String previous = done.put(recursive, key);
                 if (previous != null) {
                     done.put(recursive, previous);
                     table.write("(same as ");  // TODO: localize

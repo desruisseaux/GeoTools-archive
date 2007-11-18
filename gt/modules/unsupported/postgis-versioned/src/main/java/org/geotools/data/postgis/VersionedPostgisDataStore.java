@@ -60,7 +60,7 @@ import org.geotools.data.postgis.fidmapper.PostGISAutoIncrementFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -1300,7 +1300,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      *            The revision information
      * 
      * @return a new filter
-     * @throws FactoryConfigurationError
+     * @throws FactoryRegistryException
      * @throws IOException
      */
     Filter buildVersionedFilter(String featureTypeName, Filter filter, RevisionInfo ri)
@@ -1346,10 +1346,10 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      * @param filter
      * @return
      * @throws IOException
-     * @throws FactoryConfigurationError
+     * @throws FactoryRegistryException
      */
     protected Filter transformFidFilter(String featureTypeName, Filter filter) throws IOException,
-            FactoryConfigurationError {
+            FactoryRegistryException {
         SimpleFeatureType featureType = wrapped.getSchema(featureTypeName);
         VersionedFIDMapper mapper = (VersionedFIDMapper) wrapped.getFIDMapper(featureTypeName);
         FidTransformeVisitor transformer = new FidTransformeVisitor(FilterFactoryFinder
@@ -1367,7 +1367,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      * @param query
      * @param ri
      * @return
-     * @throws FactoryConfigurationError
+     * @throws FactoryRegistryException
      * @throws IOException
      */
     DefaultQuery buildVersionedQuery(Query query, RevisionInfo ri) throws IOException {

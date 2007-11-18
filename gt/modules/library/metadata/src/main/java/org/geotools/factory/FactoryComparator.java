@@ -15,12 +15,9 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Map;
-import java.util.Iterator;
-
-// Geotools dependencies
+import java.awt.RenderingHints;
 import org.geotools.resources.Utilities;
 
 
@@ -51,15 +48,14 @@ final class FactoryComparator {
      *
      * @param done An initially empty set. Used internally for preventing infinite recursivity.
      */
-    boolean compare(final Set done) {
+    boolean compare(final Set<FactoryComparator> done) {
         if (done.add(this)) {
-            final Map m1 = f1.getImplementationHints();
-            final Map m2 = f2.getImplementationHints();
+            final Map<RenderingHints.Key, ?> m1 = f1.getImplementationHints();
+            final Map<RenderingHints.Key, ?> m2 = f2.getImplementationHints();
             if (m1.size() != m2.size()) {
                 return false;
             }
-            for (final Iterator it=m1.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
+            for (final Map.Entry<RenderingHints.Key, ?> entry : m1.entrySet()) {
                 final Object key = entry.getKey();
                 final Object v1  = entry.getValue();
                 final Object v2  = m2.get(key);
@@ -82,6 +78,7 @@ final class FactoryComparator {
      * For internal use only. This implementation assumes that {@code f1.equals(f2)}
      * is symetric (i.e. equivalents to {@code f2.equals(f1)}).
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof FactoryComparator) {
             final FactoryComparator that = (FactoryComparator) object;
@@ -96,6 +93,7 @@ final class FactoryComparator {
      * {@link #equals(Object)}: use a commutative operation (addition here) and do not
      * multiply a term by some factor like the usual 37.
      */
+    @Override
     public int hashCode() {
         return System.identityHashCode(f1) + System.identityHashCode(f2);
     }

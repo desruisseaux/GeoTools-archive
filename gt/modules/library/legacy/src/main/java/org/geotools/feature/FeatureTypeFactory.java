@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -28,7 +28,7 @@ import org.geotools.feature.type.DefaultFeatureTypeBuilder;
 /**
  * Replaced with use of FeatureTypeBuilder to follow standard pattern
  * naming conventions.
- * 
+ *
  * @deprecated Please use FeatureTypeBuilder
  * @author Ian Schneider
  * @source $URL$
@@ -47,8 +47,8 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      * The service registry for this manager.
      * Will be initialized only when first needed.
      */
-    private static FactoryRegistry registry; 
-    
+    private static FactoryRegistry registry;
+
     /**
      * Returns the service registry. The registry will be created the first
      * time this method is invoked.
@@ -56,12 +56,12 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(FeatureTypeFactory.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class[] {
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
                     FeatureTypeFactory.class}));
         }
         return registry;
-    } 
-    
+    }
+
     /**
      * The most specific way to create a new FeatureType.
      *
@@ -75,17 +75,17 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      *
      * @return A new FeatureType created from the given arguments.
      *
-     * @throws FactoryConfigurationError If there are problems creating a
+     * @throws FactoryRegistryException If there are problems creating a
      *         factory.
      * @throws SchemaException If the AttributeTypes provided are invalid in
      *         some way.
      */
     public static FeatureType newFeatureType(AttributeType[] types,
-        String name, URI ns, boolean isAbstract, FeatureType[] superTypes) 
-        throws FactoryRegistryException, SchemaException { 
+        String name, URI ns, boolean isAbstract, FeatureType[] superTypes)
+        throws FactoryRegistryException, SchemaException {
             return newFeatureType(types, name, ns, isAbstract, superTypes, null);
     }
-        
+
     /**
      * The most specific way to create a new FeatureType.
      *
@@ -107,10 +107,10 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
     public static FeatureType newFeatureType(AttributeType[] types,
         String name, URI ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
         throws FactoryRegistryException, SchemaException {
-        
+
         return new DefaultFeatureType(name,ns, (List) Arrays.asList(types), (List) Arrays.asList(superTypes), (GeometryAttributeType) defaultGeometry);
     }
-    
+
     /**
          * The most specific way to create a new FeatureType.
          *
@@ -132,7 +132,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
         public static FeatureType newFeatureType(AttributeType[] types,
             String name, URI ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
             throws FactoryRegistryException, SchemaException {
-         
+
             List typeList = types == null ? null : (List) Arrays.asList(types);
 			List superTypeList = superTypes == null ? null : (List) Arrays.asList(superTypes);
 			return new DefaultFeatureType(name, ns, typeList, superTypeList, defaultGeometry);
@@ -232,11 +232,11 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      * from the given FeatureType. This is simply a convenience method for<br>
      * <code><pre>
      * FeatureTypeFactory factory = FeatureTypeFactory.newInstace();
-     * factory.importType(yourTypeHere); 
+     * factory.importType(yourTypeHere);
      * factory.setName(original.getName());
      * factory.setNamespace(original.getNamespace());
      * factory.setNillable(original.isNillable());
-     * factory.setDefaultGeometry(original.getDefaultGeometry()); 
+     * factory.setDefaultGeometry(original.getDefaultGeometry());
      * </pre></code>
      *
      * @param original The FeatureType to obtain information from.
@@ -249,7 +249,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      */
     public static FeatureTypeFactory createTemplate(FeatureType original)
         throws FactoryRegistryException {
-    	
+
     	FeatureTypeFactory builder = FeatureTypeFactory.newInstance(original.getTypeName());
         builder.importType(original);
         builder.setNamespace(original.getNamespace());
@@ -262,7 +262,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
         }
 
         return builder;
-    } 
+    }
 
     /**
      * Returns a string representation of this factory.
@@ -282,6 +282,6 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
 
         return "FeatureTypeFactory(" + getClass().getName() + ") [ " + types
         + " ]";
-    }  
+    }
 
 }

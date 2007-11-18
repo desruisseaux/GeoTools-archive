@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -94,7 +94,7 @@ public class FactoryFinder {
      * @return Set of available geometry factory implementations.
      */
     public static synchronized Set getGeometryFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(GeometryFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(GeometryFactory.class, null, null));
     }
 
     /**
@@ -118,7 +118,7 @@ public class FactoryFinder {
      * @return Set of available precision model implementations.
      */
     public static synchronized Set getPrecisionModels() {
-        return new LazySet(getServiceRegistry().getServiceProviders(PrecisionModel.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(PrecisionModel.class, null, null));
     }
 
     /**
@@ -143,7 +143,7 @@ public class FactoryFinder {
      * @return Set of available coordinate sequence factory implementations.
      */
     public static synchronized Set getCoordinateSequenceFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CoordinateSequenceFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(CoordinateSequenceFactory.class, null, null));
     }
 
     /**
@@ -173,7 +173,7 @@ public class FactoryFinder {
          * Creates a registry for JTS factories.
          */
         public Registry() {
-            super(Arrays.asList(new Class[] {
+            super(Arrays.asList(new Class<?>[] {
                     GeometryFactory.class,
                     PrecisionModel.class,
                     CoordinateSequenceFactory.class}));

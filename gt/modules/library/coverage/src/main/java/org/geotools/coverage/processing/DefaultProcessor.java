@@ -19,24 +19,19 @@
  */
 package org.geotools.coverage.processing;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-// JAI dependencies
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.TileCache;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.OperationNotFoundException;
@@ -44,7 +39,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
-// Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.factory.FactoryRegistry;
@@ -146,7 +140,9 @@ public class DefaultProcessor extends AbstractProcessor {
      * @param hints A set of additional rendering hints, or {@code null} if none.
      */
     public DefaultProcessor(final RenderingHints hints) {
-        registry = new FactoryRegistry(Collections.singleton(Operation.class));
+        registry = new FactoryRegistry(Arrays.asList(new Class<?>[] {
+            Operation.class
+        }));
         this.hints = new Hints(hints);
         this.hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
         this.hints.put(JAI.KEY_TRANSFORM_ON_COLORMAP,     Boolean.FALSE);
@@ -328,7 +324,7 @@ public class DefaultProcessor extends AbstractProcessor {
      * dynamically make new plug-ins available at runtime.
      */
     public synchronized void scanForPlugins() {
-        for (final Iterator it=registry.getServiceProviders(Operation.class); it.hasNext();) {
+        for (final Iterator it=registry.getServiceProviders(Operation.class, null, null); it.hasNext();) {
             final Operation operation = (Operation) it.next();
             final String name = operation.getName().trim();
             if (!operations.containsKey(name)) {

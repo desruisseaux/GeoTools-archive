@@ -42,7 +42,6 @@ public final class InternationalStringTest extends TestCase {
      * Run the suit from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -121,13 +120,14 @@ public final class InternationalStringTest extends TestCase {
     /**
      * Performs basic test on the given object.
      */
-    private void basicTests(final Comparable toTest) throws IOException, ClassNotFoundException {
+    private <T extends Comparable<T>> void basicTests(final T toTest)
+            throws IOException, ClassNotFoundException
+    {
         assertEquals("CompareTo: ", 0, toTest.compareTo(toTest));
         assertEquals("Equals:", toTest, toTest);
         if (toTest instanceof CharSequence) {
-            // TODO: Uncomment when we will be allowed to use J2SE 1.5
-//            assertEquals("CharSequence:", toTest.toString(),
-//                         new StringBuffer((CharSequence) toTest).toString());
+            assertEquals("CharSequence:", toTest.toString(),
+                    new StringBuffer((CharSequence) toTest).toString());
         }
         /*
          * Tests serialization

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.AttributeExpression;
@@ -368,7 +368,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 	
 	/** Try and Filter by the provided bbox, will default to Filter.EXCLUDE if null */
 	static public Filter filterBBox(Envelope bBox, SimpleFeatureType ft)
-		throws FactoryConfigurationError, IllegalFilterException
+		throws FactoryRegistryException, IllegalFilterException
 	{
 		if( bBox == null ){
 			return Filter.INCLUDE;

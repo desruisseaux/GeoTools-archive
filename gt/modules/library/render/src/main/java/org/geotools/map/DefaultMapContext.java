@@ -30,7 +30,7 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.memory.CollectionSource;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -295,7 +295,7 @@ public class DefaultMapContext implements MapContext {
 			this.addLayer(CoverageUtilities.wrapGc(gc), style);
 		} catch (TransformException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
-		} catch (FactoryConfigurationError e) {
+		} catch (FactoryRegistryException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
 		} catch (SchemaException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
@@ -318,7 +318,7 @@ public class DefaultMapContext implements MapContext {
 			this.addLayer(CoverageUtilities.wrapGcReader(reader), style);
 		} catch (TransformException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
-		} catch (FactoryConfigurationError e) {
+		} catch (FactoryRegistryException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
 		} catch (SchemaException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);

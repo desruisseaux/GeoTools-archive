@@ -77,7 +77,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/**
 	 * Constructor for a {@link GeoTiffWriter}.
-	 * 
+	 *
 	 * @param destination
 	 * @throws IOException
 	 */
@@ -88,7 +88,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/**
 	 * Constructor for a {@link GeoTiffWriter}.
-	 * 
+	 *
 	 * @param destination
 	 * @param hints
 	 * @throws IOException
@@ -123,7 +123,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// //
 		if (hints != null) {
 			if (super.hints == null)
-				this.hints = new Hints(null);
+				this.hints = new Hints();
 			hints.add(hints);
 		}
 
@@ -131,7 +131,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
 	 */
 	public Format getFormat() {
@@ -140,7 +140,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
 	 *      org.opengis.parameter.GeneralParameterValue[])
 	 */
@@ -214,12 +214,12 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * GeoTiff file we are writing or the ModelTransformation in case a more
 	 * general {@link AffineTransform} is needed to represent the raster space
 	 * to model space transform.
-	 * 
+	 *
 	 * <p>
 	 * This method works regardles of the nature fo the crs without making any
 	 * assumptions on the order or the direction of the axes, but checking them
 	 * from the supplied CRS.
-	 * 
+	 *
 	 * @see {@link http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html}
 	 * @see {@http://lists.maptools.org/pipermail/geotiff/2006-January/000212.html}
 	 * @param crs
@@ -232,7 +232,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * @param rasterToModel
 	 *            describes the {@link AffineTransform} between raster space and
 	 *            model space.
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException
 	 * @throws IOException
 	 * @throws TransformException
@@ -273,7 +273,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 				GeoTiffConstants.RasterPixelIsPoint);
 
 		// /////////////////////////////////////////////////////////////////////
-		//		
+		//
 		// AXES DIRECTION
 		//
 		// we need to understand how the axes of this gridcoverage are
@@ -287,7 +287,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		boolean lonFirst = XAffineTransform.getSwapXY(rasterToModel) != -1;
 
 		// /////////////////////////////////////////////////////////////////////
-		//		
+		//
 		// ROTATION
 		//
 		// If fthere is not rotation or shearing or flipping we have a simple
@@ -343,7 +343,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	/**
 	 * Writes the provided rendered image to the provided image output stream
 	 * using the supplied geotiff metadata.
-	 * 
+	 *
 	 * @param gtParams
 	 */
 	private boolean writeImage(final RenderedImage image,
@@ -390,7 +390,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 	 * Creates image metadata which complies to the GeoTIFFWritingUtilities
 	 * specification for the given image writer, image type and
 	 * GeoTIFFWritingUtilities metadata.
-	 * 
+	 *
 	 * @param writer
 	 *            the image writer, must not be null
 	 * @param type

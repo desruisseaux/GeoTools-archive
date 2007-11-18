@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -178,35 +178,35 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      */
     public ThreadedEpsgFactory(final Hints userHints, final int priority) {
         super(userHints, priority);
-        
+
         Object hint = userHints == null ? null : userHints.get( Hints.EPSG_DATA_SOURCE );
-            
+
         if( hint == null ){
           datasourceName = DATASOURCE_NAME;
           //datasourceName = GeoTools.fixName( DATASOURCE_NAME );
-          
+
           hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
         }
         else if( hint instanceof String ){
             datasourceName = (String) hint;
-            //datasourceName = GeoTools.fixName( datasourceName );            
-            
+            //datasourceName = GeoTools.fixName( datasourceName );
+
             hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
         }
         else if (hint instanceof Name ){
             Name name = (Name) hint;
             hints.put( Hints.EPSG_DATA_SOURCE, name );
-            
+
             datasourceName = name.toString();
             //datasourceName = GeoTools.fixName( name.toString() );
         }
         else if ( hint instanceof DataSource ){
             datasource = (DataSource) hint;
             hints.put( Hints.EPSG_DATA_SOURCE, datasource );
-            
+
             datasourceName = DATASOURCE_NAME;
-            //datasourceName = GeoTools.fixName( DATASOURCE_NAME );            
-        }        
+            //datasourceName = GeoTools.fixName( DATASOURCE_NAME );
+        }
         factories = FactoryGroup.createInstance(userHints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
     }
@@ -286,9 +286,9 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
      * @deprecated To be deleted after we removed the {@code org.geotools...DataSource} interface.
      */
     private static synchronized Iterator getDataSources() {
-        final Class category = org.geotools.referencing.factory.epsg.DataSource.class;
+        final Class<?> category = org.geotools.referencing.factory.epsg.DataSource.class;
         if (datasources == null) {
-            datasources = new FactoryRegistry(Collections.singleton(category));
+            datasources = new FactoryRegistry((java.util.Collection) Collections.singleton(category));
             datasources.scanForPlugins();
             datasources.setOrdering(category, new Comparator() {
                 public int compare(final Object f1, final Object f2) {

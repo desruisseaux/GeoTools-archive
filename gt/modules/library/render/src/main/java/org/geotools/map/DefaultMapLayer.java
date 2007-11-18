@@ -28,7 +28,7 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.memory.CollectionSource;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -177,10 +177,10 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param style
 	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
-	 * @throws FactoryConfigurationError 
+	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
-	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		this(CoverageUtilities.wrapGc(coverage), style, "");
 
@@ -196,11 +196,11 @@ public class DefaultMapLayer implements MapLayer {
 	 * 
 	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
-	 * @throws FactoryConfigurationError 
+	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
 	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style, String title)
-			throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+			throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		this(CoverageUtilities.wrapGcReader(reader), style, title);
 
@@ -216,12 +216,12 @@ public class DefaultMapLayer implements MapLayer {
 	 * 
 	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
-	 * @throws FactoryConfigurationError 
+	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
 	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style) 
 	  throws TransformException, 
-	         FactoryConfigurationError, 
+	         FactoryRegistryException, 
 	         SchemaException, 
 	         IllegalAttributeException {
 
@@ -238,11 +238,11 @@ public class DefaultMapLayer implements MapLayer {
 	 * @param title
 	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
-	 * @throws FactoryConfigurationError 
+	 * @throws FactoryRegistryException 
 	 * @throws TransformException 
 	 */
 	public DefaultMapLayer(GridCoverage coverage, Style style, String title)
-			throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+			throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 
 		this(CoverageUtilities.wrapGc(coverage), style, title);
 

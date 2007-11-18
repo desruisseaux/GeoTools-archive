@@ -21,7 +21,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -168,7 +168,7 @@ public class OGRDataStore extends AbstractDataStore {
 					parent != null ? new FeatureType[] { parent } : null);
 		} catch (FactoryException e) {
 			throw new DataSourceException("Could not determine geometry SRS", e);
-		} catch (FactoryConfigurationError e) {
+		} catch (FactoryRegistryException e) {
 			throw new DataSourceException("Could not create feature type", e);
 		} catch (SchemaException e) {
 			throw new DataSourceException("Could not create feature type", e);

@@ -33,7 +33,6 @@ public class FactoryIteratorProviderTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -55,7 +54,7 @@ public class FactoryIteratorProviderTest extends TestCase {
      * Creates a new, initially empty, factory registry.
      */
     private static FactoryRegistry createRegistry() {
-        return new FactoryRegistry(Arrays.asList(new Class[] {
+        return new FactoryRegistry(Arrays.asList(new Class<?>[] {
             DummyFactory.class
         }));
     }
@@ -67,14 +66,14 @@ public class FactoryIteratorProviderTest extends TestCase {
      * @throws FactoryRegistryException if a factory can't be returned for some other reason.
      */
     private static DummyFactory getFactory(final FactoryRegistry registry,
-                                           final Class/*<? extends DummyFactory>*/ type)
+                                           final Class<? extends DummyFactory> type)
             throws FactoryRegistryException
     {
         Hints hints = null;
         if (type != null) {
             hints = new Hints(DummyFactory.DUMMY_FACTORY, type);
         }
-        return (DummyFactory) registry.getServiceProvider(DummyFactory.class,
+        return registry.getServiceProvider(DummyFactory.class,
                 null, hints, DummyFactory.DUMMY_FACTORY);
     }
 

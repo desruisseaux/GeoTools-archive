@@ -17,7 +17,7 @@ package org.geotools.filter.function.math;
 
 import junit.framework.TestCase;
 
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterFactoryImpl;
@@ -149,7 +149,7 @@ public class FilterFunction_Test extends TestCase {
                         .sin(1.5707963267948966), ((Double) sinFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -232,7 +232,7 @@ public class FilterFunction_Test extends TestCase {
                         .cos(1.5707963267948966), ((Double) cosFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -315,7 +315,7 @@ public class FilterFunction_Test extends TestCase {
                         .tan(1.5707963267948966), ((Double) tanFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -413,7 +413,7 @@ public class FilterFunction_Test extends TestCase {
                         ((Double) atan2Function.getValue(null)).doubleValue(),
                         0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -500,7 +500,7 @@ public class FilterFunction_Test extends TestCase {
                         .sqrt(1.5707963267948966), ((Double) sqrtFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -595,7 +595,7 @@ public class FilterFunction_Test extends TestCase {
                         .pow(1.5707963267948966, 1.0), ((Double) powFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -643,7 +643,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("min of (1.5707963267948966,1.0):", (int) Math.min(
                     1.5707963267948966, 1.0), ((Integer) min4Function
                     .getValue(null)).intValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -692,7 +692,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("min of (1.5707963267948966,1.0):", (long) Math.min(
                     1.5707963267948966, 1.0), ((Long) min_2Function
                     .getValue(null)).longValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -745,7 +745,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("min of (1.5707963267948966,1.0):", (float) Math.min(
                     1.5707963267948966, 1.0), ((Float) min_3Function
                     .getValue(null)).floatValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -841,7 +841,7 @@ public class FilterFunction_Test extends TestCase {
                         .min(1.5707963267948966, 1.0), ((Double) min_Function
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -889,7 +889,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("max of (1.5707963267948966,1.0):", (int) Math.max(
                     1.5707963267948966, 1.0), ((Integer) max4Function
                     .getValue(null)).intValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -938,7 +938,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("max of (1.5707963267948966,1.0):", (long) Math.max(
                     1.5707963267948966, 1.0), ((Long) max_2Function
                     .getValue(null)).longValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -991,7 +991,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("max of (1.5707963267948966,1.0):", (float) Math.max(
                     1.5707963267948966, 1.0), ((Float) max_3Function
                     .getValue(null)).floatValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1087,7 +1087,7 @@ public class FilterFunction_Test extends TestCase {
                         .max(1.5707963267948966, 1.0), ((Double) max_Function
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1128,7 +1128,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("abs of (1.5707963267948966):", (int) Math
                     .abs(1.5707963267948966), ((Integer) absFunction
                     .getValue(null)).intValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1170,7 +1170,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("abs of (1.5707963267948966):", (long) Math
                     .abs(1.5707963267948966), ((Long) abs_2Function
                     .getValue(null)).longValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1216,7 +1216,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("abs of (1.5707963267948966):", (float) Math
                     .abs(1.5707963267948966), ((Float) abs_3Function
                     .getValue(null)).floatValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1304,7 +1304,7 @@ public class FilterFunction_Test extends TestCase {
                         .abs(1.5707963267948966), ((Double) abs_4Function
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1415,7 +1415,7 @@ public class FilterFunction_Test extends TestCase {
                         ((Double) IEEEremainderFunction.getValue(null))
                                 .doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1502,7 +1502,7 @@ public class FilterFunction_Test extends TestCase {
                         .acos(1.5707963267948966), ((Double) acosFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1589,7 +1589,7 @@ public class FilterFunction_Test extends TestCase {
                         .asin(1.5707963267948966), ((Double) asinFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1676,7 +1676,7 @@ public class FilterFunction_Test extends TestCase {
                         .atan(1.5707963267948966), ((Double) atanFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1763,7 +1763,7 @@ public class FilterFunction_Test extends TestCase {
                         .ceil(1.5707963267948966), ((Double) ceilFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1846,7 +1846,7 @@ public class FilterFunction_Test extends TestCase {
                         .exp(1.5707963267948966), ((Double) expFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -1934,7 +1934,7 @@ public class FilterFunction_Test extends TestCase {
                         .floor(1.5707963267948966), ((Double) floorFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2017,7 +2017,7 @@ public class FilterFunction_Test extends TestCase {
                         .log(1.5707963267948966), ((Double) logFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2033,7 +2033,7 @@ public class FilterFunction_Test extends TestCase {
                     .getArgCount());
 
             Expression[] expressions = new Expression[0];
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2120,7 +2120,7 @@ public class FilterFunction_Test extends TestCase {
                         .rint(1.5707963267948966), ((Double) rintFunction
                         .getValue(null)).doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2166,7 +2166,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("round of (1.5707963267948966):", (int) Math
                     .round(1.5707963267948966), ((Integer) roundFunction
                     .getValue(null)).intValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2212,7 +2212,7 @@ public class FilterFunction_Test extends TestCase {
             assertEquals("round of (1.5707963267948966):", (long) Math
                     .round(1.5707963267948966), ((Long) round_2Function
                     .getValue(null)).longValue(), 0.00001);
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2308,7 +2308,7 @@ public class FilterFunction_Test extends TestCase {
                         ((Double) toDegreesFunction.getValue(null))
                                 .doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -2404,7 +2404,7 @@ public class FilterFunction_Test extends TestCase {
                         ((Double) toRadiansFunction.getValue(null))
                                 .doubleValue(), 0.00001);
             }
-        } catch (FactoryConfigurationError e) {
+        } catch (FactoryRegistryException e) {
             e.printStackTrace();
             fail("Unexpected exception: " + e.getMessage());
         }

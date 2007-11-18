@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -31,22 +31,22 @@ import org.opengis.referencing.FactoryException;
 
 /**
  * Enable programs to find all available datastore implementations.
- * 
+ *
  * <p>
  * In order to be located by this finder datasources must provide an
  * implementation of the {@link DataStoreFactorySpi} interface.
  * </p>
- * 
+ *
  * <p>
  * In addition to implementing this interface datasouces should have a services
  * file:<br/><code>META-INF/services/org.geotools.data.DataStoreFactorySpi</code>
  * </p>
- * 
+ *
  * <p>
  * The file should contain a single line which gives the full name of the
  * implementing class.
  * </p>
- * 
+ *
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeDataStoreFacotry</code>
  * </p>
@@ -55,13 +55,13 @@ import org.opengis.referencing.FactoryException;
 public final class DataStoreFinder {
 	/** The logger for the filter module. */
     protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data");
-    
+
 	/**
 	 * The service registry for this manager. Will be initialized only when
 	 * first needed.
 	 */
 	private static FactoryRegistry registry;
-    
+
 	//Singleton pattern
     private DataStoreFinder() {
     }
@@ -82,9 +82,9 @@ public final class DataStoreFinder {
      *         attached to the specified resource without errors.
      */
     public static synchronized DataStore getDataStore(Map params) throws IOException {
-        Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);
+        Iterator ps = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null, null);
         DataStoreFactorySpi fac;
-        
+
         IOException canProcessButNotAvailable = null;
         while (ps.hasNext()) {
         	fac = (DataStoreFactorySpi) ps.next();
@@ -92,7 +92,7 @@ public final class DataStoreFinder {
             try {
                 canProcess = fac.canProcess(params);
             } catch (Throwable t) {
-                LOGGER.log( Level.WARNING, "Problem asking "+fac.getDisplayName()+" if it can process request:"+t, t );                
+                LOGGER.log( Level.WARNING, "Problem asking "+fac.getDisplayName()+" if it can process request:"+t, t );
                 // Protect against DataStores that don't carefully code canProcess
                 continue;
             }
@@ -101,20 +101,20 @@ public final class DataStoreFinder {
                 try {
                     isAvailable = fac.isAvailable();
                 } catch (Throwable t) {
-                    LOGGER.log( Level.WARNING, "Difficulity checking if "+fac.getDisplayName()+" is available:"+t, t );                
+                    LOGGER.log( Level.WARNING, "Difficulity checking if "+fac.getDisplayName()+" is available:"+t, t );
                     // Protect against DataStores that don't carefully code isAvailable
                     continue;
-                }                
+                }
                 if( isAvailable ){
                     try {
                         return fac.createDataStore(params);
                     }
                     catch (IOException couldNotConnect ){
                         canProcessButNotAvailable = couldNotConnect;
-                        LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but could not connect", couldNotConnect );                                                
+                        LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but could not connect", couldNotConnect );
                     }
                 }
-                else {                    
+                else {
                     canProcessButNotAvailable = new IOException( fac.getDisplayName()+" should be used, but is not availble. Have you installed the required drivers or jar files?");
                     LOGGER.log( Level.WARNING, fac.getDisplayName()+" should be used, but is not availble", canProcessButNotAvailable );
                 }
@@ -130,15 +130,15 @@ public final class DataStoreFinder {
      * Finds all implemtaions of DataStoreFactory which have registered using
      * the services mechanism, regardless weather it has the appropriate
      * libraries on the classpath.
-     * 
+     *
      * @return An iterator over all discovered datastores which have registered
      *         factories
      */
     public static synchronized Iterator getAllDataStores() {
         Set availableDS = new HashSet(5);
-        return getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);        
+        return getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null, null);
     }
-    
+
     /**
      * Finds all implemtaions of DataStoreFactory which have registered using
      * the services mechanism, and that have the appropriate libraries on the
@@ -149,7 +149,7 @@ public final class DataStoreFinder {
      */
     public static synchronized Iterator getAvailableDataStores() {
         Set availableDS = new HashSet(5);
-        Iterator it = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);
+        Iterator it = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class, null, null);
         DataStoreFactorySpi dsFactory;
         while (it.hasNext()) {
         	dsFactory = (DataStoreFactorySpi) it.next();
@@ -161,7 +161,7 @@ public final class DataStoreFinder {
 
         return availableDS.iterator();
     }
-    
+
 	/**
 	 * Returns the service registry. The registry will be created the first time
 	 * this method is invoked.
@@ -170,11 +170,11 @@ public final class DataStoreFinder {
 		assert Thread.holdsLock(DataStoreFinder.class);
 		if (registry == null) {
 			registry = new FactoryCreator(Arrays
-					.asList(new Class[] { DataStoreFactorySpi.class }));
+					.asList(new Class<?>[] { DataStoreFactorySpi.class }));
 		}
 		return registry;
 	}
-	
+
 	/**
 	 * Scans for factory plug-ins on the application class path. This method is
 	 * needed because the application class path can theoretically change, or
@@ -186,8 +186,8 @@ public final class DataStoreFinder {
 	 * at runtime.
 	 */
 	public static synchronized void scanForPlugins() {
-		
+
 		getServiceRegistry().scanForPlugins();
-		
+
 	}
 }

@@ -35,7 +35,7 @@ public final class LazySet<E> extends AbstractSet<E> {
     /**
      * The iterator to use for filling this set.
      */
-    private final Iterator<E> iterator;
+    private final Iterator<? extends E> iterator;
 
     /**
      * The elements in this set. This array will grown as needed.
@@ -53,7 +53,7 @@ public final class LazySet<E> extends AbstractSet<E> {
      * Iteration in the given iterator will occurs only when needed.
      */
     @SuppressWarnings("unchecked")
-    public LazySet(final Iterator<E> iterator) {
+    public LazySet(final Iterator<? extends E> iterator) {
         this.iterator = iterator;
         elements = (E[]) new Object[4];
     }

@@ -346,11 +346,11 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     public void testFind() throws FactoryException {
         final CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory(
                 "EPSG", new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
-        
+
         assertTrue(factory instanceof AbstractAuthorityFactory);
         AbstractAuthorityFactory findable = (AbstractAuthorityFactory) factory;
         final IdentifiedObjectFinder finder = findable.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
-        
+
         /*
          * We tested in DefaultFactoryTest that WGS84 is not found when searching
          * directly in DefaultFactory. Now we perform the same search through the
@@ -377,7 +377,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
                 "    SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n" +
                 "  PRIMEM[\"Greenwich\", 0.0],\n" +
                 "  UNIT[\"degree\", 0.017453292519943295],\n" +
-                "  AXIS[\"Geodetic latitude\", NORTH],\n" + 
+                "  AXIS[\"Geodetic latitude\", NORTH],\n" +
                 "  AXIS[\"Geodetic longitude\", EAST]]";
         final CoordinateReferenceSystem search   = CRS.parseWKT(wkt);
         final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326", false);
@@ -388,7 +388,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
 
         finder.setFullScanAllowed(true);
         find = finder.find(search);
-        final CoordinateReferenceSystem crs = (CoordinateReferenceSystem) search;
+        final CoordinateReferenceSystem crs = (CoordinateReferenceSystem) find;
         assertNotNull("Should find the CRS despite the different axis order.", find);
         assertEquals("Expected a left-handed CS.", -90, getAngle(crs), EPS);
         assertFalse(CRS.equalsIgnoreMetadata(find, DefaultGeographicCRS.WGS84));

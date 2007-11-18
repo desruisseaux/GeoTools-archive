@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,7 +28,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
@@ -44,7 +42,6 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
@@ -138,7 +135,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * The service registry for finding {@link MathTransformProvider} implementations.
      */
     private final FactoryRegistry registry;
-    
+
     /**
      * Constructs a default {@link MathTransform math transform} factory.
      */
@@ -153,7 +150,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * @param categories The providers categories, as implementations
      *                   of {@link MathTransformProvider}.
      */
-    private DefaultMathTransformFactory(final Class[] categories) {
+    private DefaultMathTransformFactory(final Class<?>[] categories) {
         registry = new FactoryRegistry(Arrays.asList(categories));
     }
 
@@ -202,7 +199,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         public MethodFilter(final Class type) {
             this.type = type;
         }
- 
+
         /**
          * Returns {@code true} if the specified element should be included. If the type is
          * unknown, conservatively returns {@code true}.
@@ -269,7 +266,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         }
         final Iterator providers = registry.getServiceProviders(MathTransformProvider.class, null, HINTS);
         while (providers.hasNext()) {
-            provider = (MathTransformProvider) providers.next();            
+            provider = (MathTransformProvider) providers.next();
             if (provider.nameMatches(method)) {
                 return lastProvider = provider;
             }
@@ -277,7 +274,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         throw new NoSuchIdentifierException(Errors.format(
                   ErrorKeys.NO_TRANSFORM_FOR_CLASSIFICATION_$1, method), method);
     }
-    
+
     /**
      * Returns the default parameter values for a math transform using the given method.
      * The method argument is the name of any operation method returned by the
@@ -358,7 +355,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * Creates a transform from a group of parameters and add the method used to a list.
      * This variant of {@code createParameterizedTransform(...)} provides a way for
      * the client to keep trace of any {@linkplain OperationMethod operation method}
-     * used by this factory. 
+     * used by this factory.
      *
      * @param  parameters The parameter values.
      * @param  methods A collection where to add the operation method that apply to the transform,
@@ -402,7 +399,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
 //        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
         return (MathTransform) pool.unique(ProjectiveTransform.create(matrix));
     }
-    
+
     /**
      * Creates a transform by concatenating two existing transforms.
      * A concatenated transform acts in the same way as applying two
@@ -478,7 +475,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      */
     public MathTransform createFromXML(String xml) throws FactoryException {
         throw new FactoryException("Not yet implemented.");
-    }    
+    }
 
     /**
      * Creates a math transform object from a

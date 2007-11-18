@@ -88,7 +88,7 @@ public final class Transform3DTest extends TestCase {
         // ----------------------------------------------------------
         // Gets factories to be used for all object creations
         // ----------------------------------------------------------
-        final Hints                          hints = new Hints(null);
+        final Hints                          hints = new Hints();
         final CSFactory                  csFactory = ReferencingFactoryFinder.getCSFactory                 (hints);
         final CRSFactory                crsFactory = ReferencingFactoryFinder.getCRSFactory                (hints);
         final DatumFactory            datumFactory = ReferencingFactoryFinder.getDatumFactory              (hints);

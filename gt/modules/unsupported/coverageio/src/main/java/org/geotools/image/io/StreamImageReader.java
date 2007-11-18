@@ -17,10 +17,10 @@
 package org.geotools.image.io;
 
 import java.io.*; // Many imports, including some for javadoc only.
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
@@ -48,9 +48,9 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * created by {@link #getInputStream} or similar methods in subclasses.
      * <p>
      * This field is never equals to the user-specified {@linkplain #input input}, since the
-     * usual {@link ImageReader} contract is to <strong>not</strong> close the user-provided
-     * stream. It is set to a non-null value only if a stream has been created from an other
-     * user object like {@link File} or {@link URL}.
+     * usual {@link javax.imageio.ImageReader} contract is to <strong>not</strong> close the
+     * user-provided stream. It is set to a non-null value only if a stream has been created
+     * from an other user object like {@link File} or {@link URL}.
      *
      * @see #getInputStream
      * @see org.geotools.image.io.text.TextImageReader#getReader
@@ -97,7 +97,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * @see #getInput
      * @see #getInputStream
      */
-    //@Override
+    @Override
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
                          final boolean ignoreMetadata)
@@ -184,6 +184,9 @@ public abstract class StreamImageReader extends GeographicImageReader {
             } else if (input instanceof File) {
                 stream = new FileInputStream((File) input);
                 closeOnReset = stream;
+            } else if (input instanceof URI) {
+                stream = ((URI) input).toURL().openStream();
+                closeOnReset = stream;
             } else if (input instanceof URL) {
                 stream = ((URL) input).openStream();
                 closeOnReset = stream;
@@ -213,7 +216,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
      *
      * @see #closeOnReset
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         if (closeOnReset != null) {
             // TODO: replace the remaining of this block by the following line
@@ -249,7 +252,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * created by a previous call to {@link #getInputStream}, it will be {@linkplain #close
      * closed} before to reset this reader.
      */
-    //@Override
+    @Override
     public void reset() {
         closeSilently();
         super.reset();
@@ -260,7 +263,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * by a previous call to {@link #getInputStream}, it will be {@linkplain #close closed}
      * before to dispose this reader.
      */
-    //@Override
+    @Override
     public void dispose() {
         closeSilently();
         super.dispose();
@@ -269,7 +272,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
     /**
      * Closes the streams. This method is automatically invoked by the garbage collector.
      */
-    //@Override
+    @Override
     protected void finalize() throws Throwable {
         close();
         super.finalize();
@@ -292,6 +295,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
          */
         private static final Class[] INPUT_TYPES = new Class[] {
             File.class,
+            URI.class,
             URL.class,
             URLConnection.class,
             InputStream.class,

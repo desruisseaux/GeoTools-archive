@@ -122,7 +122,7 @@ public abstract class GeographicImageReader extends ImageReader {
      *                        in ascending order from this input source.
      * @param ignoreMetadata  If {@code true}, metadata may be ignored during reads.
      */
-    //@Override
+    @Override
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
                          final boolean ignoreMetadata)
@@ -305,7 +305,7 @@ public abstract class GeographicImageReader extends ImageReader {
      * @return A set of suggested image types for decoding the current given image.
      * @throws IOException If an error occurs reading the format information from the input source.
      */
-    public Iterator getImageTypes(final int imageIndex) throws IOException {
+    public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
         return Collections.singleton(getRawImageType(imageIndex)).iterator();
     }
 
@@ -323,7 +323,7 @@ public abstract class GeographicImageReader extends ImageReader {
      * @return The image type (never {@code null}).
      * @throws IOException If an error occurs reading the format information from the input source.
      */
-    //@Override
+    @Override
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
         return getRawImageType(imageIndex, getDefaultReadParam(), null);
     }
@@ -573,7 +573,7 @@ public abstract class GeographicImageReader extends ImageReader {
                     final boolean isZeroValid = (minimum <= 0 && maximum >= 0);
                     boolean collapsePadValues = false;
                     if (nodataValues != null && nodataValues.length != 0) {
-                        final double[] sorted = (double[]) nodataValues.clone();
+                        final double[] sorted = nodataValues.clone();
                         Arrays.sort(sorted);
                         double minFill = sorted[0];
                         double maxFill = minFill;
@@ -809,7 +809,8 @@ public abstract class GeographicImageReader extends ImageReader {
                             final int width, final int height, final SampleConverter[] converters)
             throws IOException
     {
-        final Set spi = Collections.singleton(getRawImageType(imageIndex, parameters, converters));
+        final ImageTypeSpecifier type = getRawImageType(imageIndex, parameters, converters);
+        final Set<ImageTypeSpecifier> spi = Collections.singleton(type);
         return getDestination(parameters, spi.iterator(), width, height);
     }
 
@@ -822,7 +823,7 @@ public abstract class GeographicImageReader extends ImageReader {
      * @todo Replace the return type by {@link GeographicImageReadParam} when we will
      *       be allowed to compile for J2SE 1.5.
      */
-    //@Override
+    @Override
     public ImageReadParam getDefaultReadParam() {
         return new GeographicImageReadParam(this);
     }
@@ -843,7 +844,7 @@ public abstract class GeographicImageReader extends ImageReader {
      * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
      * @throws IOException if an error occurs during reading.
      */
-    //@Override
+    @Override
     public BufferedImage read(final int imageIndex) throws IOException {
         return read(imageIndex, getDefaultReadParam());
     }

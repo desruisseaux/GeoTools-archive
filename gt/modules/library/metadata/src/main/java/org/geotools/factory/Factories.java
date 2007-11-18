@@ -15,19 +15,15 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Iterator;
 import java.util.Set;
 import java.util.LinkedHashSet;
-
-// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
 /**
  * Utility methods that apply to all {@linkplain FactoryRegistry factory registries}.
  *
- * @since 2.4 PENDING PROPOSAL
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -35,7 +31,7 @@ import org.geotools.resources.XArray;
  * @deprecated Consider moving those methods to {@link GeoTools}. We should also remove
  *             {@link FactoryRegistry#globalConfiguration} and relies on listeners instead.
  */
-public final class Factories {
+final class Factories {
     /**
      * The system-wide configuration. This is the instance configured by
      * the public static methods provided in this class.
@@ -113,7 +109,7 @@ public final class Factories {
         }
         // Note: newProviders may be null.
         return (FactoryIteratorProvider[]) XArray.resize(newProviders, count);
-    }    
+    }
 
     /**
      * Adds an alternative way to search for factory implementations. {@link FactoryRegistry} has

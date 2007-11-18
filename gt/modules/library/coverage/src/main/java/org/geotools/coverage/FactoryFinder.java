@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, Geotools Project Management Committee (PMC)
- * 
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -15,11 +15,9 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.Set;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
@@ -58,7 +56,7 @@ public final class FactoryFinder {
     private static FactoryRegistry getServiceRegistry() {
         assert Thread.holdsLock(FactoryFinder.class);
         if (registry == null) {
-            registry = new FactoryCreator(Arrays.asList(new Class[] {
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
                     GridCoverageFactory.class}));
         }
         return registry;
@@ -82,17 +80,6 @@ public final class FactoryFinder {
     {
         return (GridCoverageFactory) getServiceRegistry().getServiceProvider(
                 GridCoverageFactory.class, null, hints, null);
-    }
-
-    /**
-     * Returns a set of all available implementations for the {@link GridCoverageFactory} interface.
-     *
-     * @return Set of available grid coverage factory implementations.
-     *
-     * @deprecated Use {@link #getGridCoverageFactories(Hints)} instead.
-     */
-    public static synchronized Set getGridCoverageFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(GridCoverageFactory.class));
     }
 
     /**

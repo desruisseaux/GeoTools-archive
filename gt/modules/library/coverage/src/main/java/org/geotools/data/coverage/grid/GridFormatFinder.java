@@ -32,26 +32,26 @@ import org.opengis.coverage.grid.GridCoverage;
 
 /**
  * Enable programs to find all available grid format implementations.
- * 
+ *
  * <p>
  * In order to be located by this finder datasources must provide an
  * implementation of the {@link GridFormatFactorySpi} interface.
  * </p>
- * 
+ *
  * <p>
  * In addition to implementing this interface datasouces should have a services
  * file:<br/><code>META-INF/services/org.geotools.data.GridFormatFactorySpi</code>
  * </p>
- * 
+ *
  * <p>
  * The file should contain a single line which gives the full name of the
  * implementing class.
  * </p>
- * 
+ *
  * <p>
  * Example:<br/><code>org.geotools.data.mytype.MyTypeGridFormatFactory</code>
  * </p>
- * 
+ *
  * @author Simone Giannecchini
  * @deprecated use
  *             {@link org.geotools.coverage.grid.io.GridFormatFinder}
@@ -75,7 +75,7 @@ public final class GridFormatFinder {
 	 * Finds all avalaible implementations of {@link GridFormatFactorySpi} which
 	 * have registered using the services mechanism, and that have the
 	 * appropriate libraries on the classpath.
-	 * 
+	 *
 	 * @return An unmodifiable {@link Set} of all discovered datastores which
 	 *         have registered factories, and whose available method returns
 	 *         true.
@@ -83,7 +83,7 @@ public final class GridFormatFinder {
 	public static synchronized Set getAvailableFormats() {
 		// get all GridFormatFactorySpi implementations
 		Iterator it = getServiceRegistry().getServiceProviders(
-				GridFormatFactorySpi.class);
+				GridFormatFactorySpi.class, null, null);
 		final Set formats= new HashSet(5);
 		GridFormatFactorySpi spi;
 		while (it.hasNext()) {
@@ -103,7 +103,7 @@ public final class GridFormatFinder {
 		assert Thread.holdsLock(GridFormatFinder.class);
 		if (registry == null) {
 			registry = new FactoryCreator(Arrays
-					.asList(new Class[] { GridFormatFactorySpi.class }));
+					.asList(new Class<?>[] { GridFormatFactorySpi.class }));
 		}
 		return registry;
 	}
@@ -119,25 +119,25 @@ public final class GridFormatFinder {
 	 * at runtime.
 	 */
 	public static synchronized void scanForPlugins() {
-		
+
 		getServiceRegistry().scanForPlugins();
-		
+
 	}
 
 	/**
 	 * Returns an array with all available {@link GridFormatFactorySpi}
 	 * implementations.
-	 * 
+	 *
 	 * <p>
 	 * It can be used toget basic information about all the available
 	 * {@link GridCoverage} plugins. Note that this method finds all the
 	 * implemented plugins but returns only the availaible one.
-	 * 
+	 *
 	 * <p>
 	 * A plugin could be implemented but not availaible due to missing
 	 * dependencies.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return an array with all available {@link GridFormatFactorySpi}
 	 *         implementations.
 	 */
@@ -155,7 +155,7 @@ public final class GridFormatFinder {
 	/**
 	 * Returns all the {@link Format}s that can read the supplied
 	 * {@link Object} o.
-	 * 
+	 *
 	 * @param o
 	 *            is the object to search a {@link Format} that is able to read
 	 * @return an unmodifiable {@link Set} comprising all the {@link Format}
@@ -187,14 +187,14 @@ public final class GridFormatFinder {
 	 * Returns a {@link Format} that is able to read a certain object. If no
 	 * {@link Format} is able to read such an {@link Object} we return an
 	 * {@link UnknownFormat} object.
-	 * 
+	 *
 	 * <p>
 	 * It is worth to point out that this method will try to convert each format
 	 * implementation to {@link AbstractGridFormat} because the original
 	 * {@link Format} interface did not allow for an accept method hence we had
 	 * to subclass the interface to add such method and we did so by the
 	 * {@link AbstractGridFormat} abstract class.
-	 * 
+	 *
 	 * @param o
 	 *            the object to check for acceptance.
 	 * @return an {@link AbstractGridFormat} that has stated to accept this

@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
 import java.io.File;
 import java.util.Arrays;
@@ -31,9 +30,10 @@ import javax.naming.Name;
 import javax.sql.DataSource;
 
 import org.opengis.util.InternationalString;
-
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -66,7 +66,7 @@ public final class Hints extends RenderingHints {
     /**
      * A set of system-wide hints to use by default.
      */
-    private static final Hints GLOBAL = new Hints(Collections.EMPTY_MAP);
+    private static final Hints GLOBAL = new Hints();
 
     /**
      * {@code true} if {@link #scanSystemProperties} needs to be invoked.
@@ -477,6 +477,14 @@ public final class Hints extends RenderingHints {
      */
     public static final Key FORCE_STANDARD_AXIS_UNITS = new Key(Boolean.class);
 
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                         Caches                         ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
     /**
      * Policy to use for caching referencing objects. Valid values are:
      * <p>
@@ -485,7 +493,7 @@ public final class Hints extends RenderingHints {
      *       weak references}. This option does not actually cache the objects since the garbage
      *       collector cleans weak references aggressively, but it allows sharing the instances
      *       already created and still in use.</li>
-     *   <li>{@code "fixed") for holding a fixed number of values specified by CACHE_LIMIT
+     *   <li>{@code "fixed") for holding a fixed number of values specified by {@link #CACHE_LIMIT}.
      *   <li>{@code "all"} for holding values through strong references.</li>
      *   <li>{@code "none"} for disabling the cache.</li>
      * </ul>
@@ -503,23 +511,26 @@ public final class Hints extends RenderingHints {
     public static final IntegerKey CACHE_LIMIT = new IntegerKey(50);
 
     /**
-     * The maximum number of active AuthorityFactories (default 2). 
+     * The maximum number of active {@linkplain org.opengis.referencing.AuthorityFactory authority
+     * factories}. The default is the {@linkplain Runtime#availableProcessors number of available
+     * processors} plus one.
      * <p>
-     * This hint is treated as an absolute LIMIT for AbstractAuthorityMediator
-     * instances such as as HsqlDialectEpsgMediator. As such this will be the
-     * absolute limit on the number of database connections the mediator will
-     * make use of. When non-positive there is no limit to the number of
-     * connections used.
+     * This hint is treated as an absolute <strong>limit</strong> for
+     * {@link org.geotools.referencing.factory.AbstractAuthorityMediator} instances such as
+     * {@link org.geotools.referencing.factory.epsg.HsqlDialectEpsgMediator}. As such this
+     * will be the absolute limit on the number of database connections the mediator will
+     * make use of.
      * <p>
      * When this limit it reached, code will be forced to block while waiting
      * for a connection to become available.
      * <p>
      * When this value is non positive their is no limit to the number of
-     * active authority factories deployed!
-     * 
+     * active authority factories deployed.
+     *
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_MAX_ACTIVE = new IntegerKey(2);
+    public static final IntegerKey AUTHORITY_MAX_ACTIVE =
+            new IntegerKey(Runtime.getRuntime().availableProcessors() + 1);
 
     /**
      * Minimum number of objects required before the evictor will begin
@@ -528,7 +539,7 @@ public final class Hints extends RenderingHints {
      * around.
      * <p>
      * In practice this value indicates the number of database connections
-     * the application will hold open "just in case". 
+     * the application will hold open "just in case".
      * <p>
      * Recomendations:
      * <ul>
@@ -686,7 +697,16 @@ public final class Hints extends RenderingHints {
     public static final Key PRIMITIVE_FACTORY = new Key("org.opengis.geometry.primitive.PrimitiveFactory");
     public static final Key GEOMETRY_VALIDATE = new Key(Boolean.class);
 
-    
+
+
+    /**
+     * Constructs an initially empty set of hints.
+     *
+     * @since 2.5
+     */
+    public Hints() {
+        super(null);
+    }
 
     /**
      * Constructs a new object with the specified key/value pair.
@@ -695,99 +715,78 @@ public final class Hints extends RenderingHints {
      * @param value The value of the hint property specified with {@code key}.
      */
     public Hints(final RenderingHints.Key key, final Object value) {
-        super(key, value);
+        super(null); // Don't use 'super(key,value)' because it doesn't check validity.
+        super.put(key, value);
     }
 
     /**
      * Constructs a new object with two key/value pair.
      *
-     * @param key1   The key for the first pair
-     * @param value1 The value for the first pair
-     * @param key2   The key2 for the second pair
-     * @param value2 The value2 for the second pair
+     * @param key1   The key for the first pair.
+     * @param value1 The value for the first pair.
+     * @param key2   The key2 for the second pair.
+     * @param value2 The value2 for the second pair.
+     *
+     * @since 2.4
      */
-    public Hints(final RenderingHints.Key key1, final Object value1, final RenderingHints.Key key2, final Object value2) {
-        this( fromPairs( new Object[]{ key1, value1, key2, value2 } ) );
+    public Hints(final RenderingHints.Key key1, final Object value1,
+                 final RenderingHints.Key key2, final Object value2)
+    {
+        this     (key1, value1);
+        super.put(key2, value2);
     }
 
     /**
      * Constructs a new object with key/value pairs from an array.
      *
-     * @param pairs
-     *            An array containing pairs of RenderingHints keys and values
+     * @param key1   The key for the first pair.
+     * @param value1 The value for the first pair.
+     * @param pairs  An array containing additional pairs of keys and values.
+     *
+     * @since 2.4
+     *
+     * @deprecated The {@code Object[]} argument was a kind of substitution for variable-length
+     *             arguments. In order to avoid confusion, it is safer to use the later.
      */
+    @Deprecated
     public Hints(final RenderingHints.Key key1, final Object value1, final Object[] pairs) {
-        this(fromPairs(key1, value1, pairs));
+        this(key1, value1);
+        fromPairs(pairs);
     }
 
     /**
      * Constructs a new object from key/value pair.
-     * <p>
-     * This method is intended for use with Java5:
-     * <code>new Hints( Hints.BUFFER_LIMIT,1,Hints.BUFFER_POLICY,"weak" )</code>
      *
-     * @param pairs
-     *            Key value pairs
+     * @param key1   The key for the first pair.
+     * @param value1 The value for the first pair.
+     * @param key2   The key2 for the second pair.
+     * @param value2 The value2 for the second pair.
+     * @param pairs  Additional pairs of keys and values.
+     *
+     * @since 2.4
      */
     public Hints(final RenderingHints.Key key1, final Object value1,
-            final RenderingHints.Key key2, final Object value2, Object[] pairs) {
-        this(fromPairs(key1, value1, key2, value2, pairs));
+                 final RenderingHints.Key key2, final Object value2,
+                 final Object... pairs)
+    {
+        this(key1, value1, key2, value2);
+        fromPairs(pairs);
     }
 
     /**
-     * Utility method used to organize pairs into a Map.
+     * Utility method used to copy (key,value) pairs into this Hints map.
      *
-     * @param pairs
-     *            An array of Key/Value pairs
-     * @return Map<Key,Value>
-     * @throws ClassCastException
-     *             if Key/Value pairs do not match
+     * @param  pairs An array of Key/Value pairs.
+     * @throws IllegalArgumentException if a value is illegal.
      */
-    private static Map fromPairs(RenderingHints.Key key1, Object value1,
-            Object[] pairs) {
-        Map map = fromPairs(pairs);
-        map.put(key1, value1);
-        return map;
-    }
-
-    /**
-     * Utility method used to organize pairs into a Map.
-     *
-     * @param pairs
-     *            An array of Key/Value pairs
-     * @return Map<Key,Value>
-     * @throws ClassCastException
-     *             if Key/Value pairs do not match
-     */
-    private static Map fromPairs(RenderingHints.Key key1, Object value1,
-            RenderingHints.Key key2, Object value2, Object[] pairs) {
-        Map map = fromPairs(pairs);
-        map.put(key1, value1);
-        map.put(key2, value2);
-        return map;
-    }
-
-    /**
-     * Utility method used to organize pairs into a Map.
-     *
-     * @param pairs
-     *            An array of Key/Value pairs
-     * @return Map<Key,Value>
-     * @throws ClassCastException
-     *             if Key/Value pairs do not match
-     */
-    private static Map fromPairs(Object[] pairs) {
-        Map map = new HashMap();
-        for (int i = 0; i < pairs.length; i += 2) {
-            Key key = (Key) pairs[i];
-            Object value = pairs[i+1];
-            if (key.isCompatibleValue(value)) {
-                throw new ClassCastException(key + " requires "
-                        + key.getValueClass() + " - could cast " + value);
-            }
-            map.put(key, value);
+    private void fromPairs(final Object[] pairs) throws IllegalArgumentException {
+        if ((pairs.length & 1) != 0) {
+            throw new IllegalArgumentException(
+                    Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1, pairs.length));
         }
-        return map;
+        for (int i=0; i<pairs.length; i += 2) {
+            super.put(pairs[i], pairs[i+1]);
+        }
     }
 
     /**
@@ -797,7 +796,20 @@ public final class Hints extends RenderingHints {
      * @param hints A map of key/value pairs to initialize the hints, or
      *              {@code null} if the object should be empty.
      */
-    public Hints(final Map hints) {
+    public Hints(final Map<? extends RenderingHints.Key, ?> hints) {
+        super(stripNonKeys(hints));
+    }
+
+    /**
+     * Constructs a new object with keys and values initialized from the
+     * specified hints (which may be null).
+     *
+     * @param hints A map of key/value pairs to initialize the hints, or
+     *              {@code null} if the object should be empty.
+     * 
+     * @since 2.5
+     */
+    public Hints(final RenderingHints hints) {
         super(stripNonKeys(hints));
     }
 
@@ -805,18 +817,27 @@ public final class Hints extends RenderingHints {
      * Returns a map with the same hints than the specified one, minus every (key,value)
      * pairs where the key is not an instance of {@link RenderingHints.Key}. If the given
      * map contains only valid keys, then it is returned unchanged.
+     * 
+     * @param  hints The map of hints to filter.
+     * @return A map with filtered hints.
      */
-    static Map stripNonKeys(final Map hints) {
+    static Map<RenderingHints.Key, Object> stripNonKeys(final Map<?,?> hints) {
         if (hints == null) {
             return null;
         }
-        Map filtered = hints;
+        /*
+         * We cheat in the next line since the map may contains illegal key. However when this
+         * method will finish, we garantee that it will contains only RenderingHints.Key keys,
+         * provided there is no concurrent changes in an other thread.
+         */
+        @SuppressWarnings("unchecked")
+        Map<RenderingHints.Key, Object> filtered = (Map) hints;
         for (final Iterator it=hints.keySet().iterator(); it.hasNext();) {
             final Object key = it.next();
             if (!(key instanceof RenderingHints.Key)) {
                 if (filtered == hints) {
-                    // Copy the map only if needed.
-                    filtered = new HashMap(hints);
+                    // Copies the map only if needed.
+                    filtered = new HashMap<RenderingHints.Key, Object>(filtered);
                 }
                 filtered.remove(key);
             }
@@ -971,16 +992,17 @@ public final class Hints extends RenderingHints {
      *
      * @since 2.4
      */
+    @Override
     public String toString() {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuilder buffer = new StringBuilder("Hints:"); // TODO: localize
         buffer.append(lineSeparator).append(AbstractFactory.toString(this));
-        Map extra = null;
+        Map<?,?> extra = null;
         final boolean changed;
         synchronized (GLOBAL) {
             changed = ensureSystemDefaultLoaded();
             if (!GLOBAL.isEmpty()) {
-                extra = new HashMap(GLOBAL);
+                extra = new HashMap<Object,Object>(GLOBAL);
             }
         }
         if (changed) {
@@ -1007,7 +1029,7 @@ public final class Hints extends RenderingHints {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static class Key/*<T>*/ extends RenderingHints.Key {
+    public static class Key extends RenderingHints.Key {
         /**
          * The number of key created up to date.
          */
@@ -1024,15 +1046,14 @@ public final class Hints extends RenderingHints {
          * {@link #JAI_INSTANCE} key for example, in order to avoid JAI dependencies in applications
          * that do not need it.
          */
-        private transient Class/*<T>*/ valueClass;
+        private transient Class<?> valueClass;
 
         /**
          * Constructs a new key for values of the given class.
          *
-         * @param classe
-         *            The base class for all valid values.
+         * @param classe The base class for all valid values.
          */
-        public Key(final Class/*<T>*/ classe) {
+        public Key(final Class<?> classe) {
             this(classe.getName());
             valueClass = classe;
         }
@@ -1042,8 +1063,7 @@ public final class Hints extends RenderingHints {
          * specified by name instead of a {@link Class} object. This allows to
          * defer class loading until needed.
          *
-         * @param className
-         *            Name of base class for all valid values.
+         * @param className Name of base class for all valid values.
          */
         Key(final String className) {
             super(count());
@@ -1062,7 +1082,7 @@ public final class Hints extends RenderingHints {
         /**
          * Returns the expected class for values stored under this key.
          */
-        public Class/*<T>*/ getValueClass() {
+        public Class<?> getValueClass() {
             if (valueClass == null) {
                 try {
                     valueClass = Class.forName(className);
@@ -1103,10 +1123,11 @@ public final class Hints extends RenderingHints {
          * representation is mostly for debugging purpose. The default
          * implementation tries to infer the key name using reflection.
          */
+        @Override
         public String toString() {
             int t = 0;
             while (true) {
-                final Class type;
+                final Class<?> type;
                 switch (t++) {
                     case 0:  type = Hints.class;      break;
                     case 1:  type = getValueClass();  break;
@@ -1140,14 +1161,13 @@ public final class Hints extends RenderingHints {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static final class ClassKey/*<T>*/ extends Key/*<T>*/ {
+    public static final class ClassKey extends Key {
         /**
          * Constructs a new key for values of the given class.
          *
-         * @param classe
-         *            The base class for all valid values.
+         * @param classe The base class for all valid values.
          */
-        public ClassKey(final Class/*<T>*/ classe) {
+        public ClassKey(final Class<?> classe) {
             super(classe);
         }
 
@@ -1156,8 +1176,7 @@ public final class Hints extends RenderingHints {
          * specified by name instead of a {@link Class} object. This allows to
          * defer class loading until needed.
          *
-         * @param className
-         *            Name of base class for all valid values.
+         * @param className Name of base class for all valid values.
          */
         ClassKey(final String className) {
             super(className);
@@ -1179,22 +1198,43 @@ public final class Hints extends RenderingHints {
             if (value == null) {
                 return false;
             }
-            if (value instanceof Class[]) {
-                final Class[] types = (Class[]) value;
-                for (int i = 0; i < types.length; i++) {
+            /*
+             * If the value is an array of classes, invokes this method recursively
+             * in order to check the validity of each elements in the array.
+             */
+            if (value instanceof Class<?>[]) {
+                final Class<?>[] types = (Class<?>[]) value;
+                for (int i=0; i<types.length; i++) {
                     if (!isCompatibleValue(types[i])) {
                         return false;
                     }
                 }
                 return types.length != 0;
             }
-            final Class type;
-            if (value instanceof Class) {
-                type = (Class) value;
-            } else {
-                type = value.getClass();
+            /*
+             * If the value is a class, checks if it is assignable to the expected value class.
+             * As a special case, if the value is not assignable but is an abstract class while
+             * we expected an interface, we will accept this class anyway because the some sub-
+             * classes may implement the interface (we dont't really know). For example the
+             * AbstractAuthorityFactory class doesn't implements the CRSAuthorityFactory interface,
+             * but sub-classe of it do. We make this relaxation in order to preserve compatibility,
+             * but maybe we will make the check stricter in the future.
+             */
+            if (value instanceof Class<?>) {
+                final Class<?> type = (Class<?>) value;
+                final Class<?> expected = getValueClass();
+                if (expected.isAssignableFrom(type)) {
+                    return true;
+                }
+                if (expected.isInterface() && !type.isInterface()) {
+                    final int modifiers = type.getModifiers();
+                    if (Modifier.isAbstract(modifiers) && !Modifier.isFinal(modifiers)) {
+                        return true;
+                    }
+                }
+                return false;
             }
-            return getValueClass().isAssignableFrom(type);
+            return super.isCompatibleValue(value);
         }
     }
 
@@ -1217,8 +1257,7 @@ public final class Hints extends RenderingHints {
         /**
          * Creates a new key for {@link File} value.
          *
-         * @param writable
-         *          {@code true} if write operations need to be allowed.
+         * @param writable {@code true} if write operations need to be allowed.
          */
         public FileKey(final boolean writable) {
             super(File.class);
@@ -1329,7 +1368,7 @@ public final class Hints extends RenderingHints {
         /**
          * The set of options allowed.
          */
-        private final Set options;
+        private final Set<String> options;
 
         /**
          * {@code true} if the {@code "*"} wildcard was given in the set of options.
@@ -1338,47 +1377,10 @@ public final class Hints extends RenderingHints {
 
         /**
          * Creates a new key for a configuration option.
-         *
-         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
          */
-        public OptionKey(String option1, String option2) {
-            this(new String[] {option1, option2});
-        }
-
-        /**
-         * Creates a new key for a configuration option.
-         *
-         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
-         */
-        public OptionKey(String option1, String option2, String option3) {
-            this(new String[] {option1, option2, option3});
-        }
-
-        /**
-         * Creates a new key for a configuration option.
-         *
-         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
-         */
-        public OptionKey(String option1, String option2, String option3, String option4) {
-            this(new String[] {option1, option2, option4});
-        }
-
-        /**
-         * Creates a new key for a configuration option.
-         *
-         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
-         */
-        public OptionKey(String option1, String option2, String option3, String option4, String option5) {
-            this(new String[] {option1, option2, option4, option5});
-        }
-        /**
-         * Creates a new key for a configuration option.
-         *
-         * @todo Replace by variable arguments length when we will be allowed to compile for J2SE 1.5.
-         */
-        public OptionKey(final String[] alternatives) {
+        public OptionKey(final String... alternatives) {
             super(String.class);
-            final Set options = new TreeSet(Arrays.asList(alternatives));
+            final Set<String> options = new TreeSet<String>(Arrays.asList(alternatives));
             this.wildcard = options.remove("*");
             this.options  = Collections.unmodifiableSet(options);
         }
@@ -1386,7 +1388,7 @@ public final class Hints extends RenderingHints {
         /**
          * Returns the set of available options.
          */
-        public Set getOptions() {
+        public Set<String> getOptions() {
             return options;
         }
 

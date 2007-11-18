@@ -32,7 +32,6 @@ public final class RangeSetTest extends TestCase {
      * Run the suit from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 

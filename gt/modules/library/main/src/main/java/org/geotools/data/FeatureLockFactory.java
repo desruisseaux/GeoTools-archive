@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -20,7 +20,7 @@ import java.util.Collections;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 
 /**
  * This specifies the interface to create FeatureLocks.
@@ -38,16 +38,15 @@ import org.geotools.factory.FactoryConfigurationError;
 public abstract class FeatureLockFactory implements Factory {
     /** A cached factory to create FeatureLocks. */
     private static FeatureLockFactory factory = null;
-    
+
     /**
      * Gets an instance of the FeatureLockFactory.
      *
      * @return A FeatureLockFactory instance.
      *
-     * @throws FactoryConfigurationError If there exists a configuration error.
+     * @throws FactoryRegistryException If there exists a configuration error.
      */
-    public static FeatureLockFactory getInstance()
-        throws FactoryConfigurationError {
+    public static FeatureLockFactory getInstance() throws FactoryRegistryException {
         if (factory == null) {
             factory = CommonFactoryFinder.getFeatureLockFactory( null );
         }
@@ -69,7 +68,7 @@ public abstract class FeatureLockFactory implements Factory {
      * <p>
      * To aid in tracing your may wish to supply your own name,
      * rather than <code>LockID<code>, for use in lock generation.</p>
-     * 
+     *
      * @param duration FeatureLock duration in seconds
      */
     public static FeatureLock generate(long duration) {
@@ -78,7 +77,7 @@ public abstract class FeatureLockFactory implements Factory {
 
     /**
      * Generates a new FeatureLock for use.
-     * 
+     *
      * The lock will be of the form:
      * <table border=1 width="100%" background="gray"><code><pre>
      * {name}{number}
@@ -94,7 +93,7 @@ public abstract class FeatureLockFactory implements Factory {
      */
     public static FeatureLock generate(String name, long duration){
         return getInstance().createLock(name, duration);
-    } 
+    }
 
     protected abstract FeatureLock createLock(String name, long duration);
 

@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.Iterator;
 
 
@@ -45,5 +44,5 @@ public interface FactoryIteratorProvider {
      * @param  category The category for the factories to be returned.
      * @return Factories that implement the specified category.
      */
-    Iterator/*<T>*/ iterator(final Class/*<T>*/ category);
+    <T> Iterator<T> iterator(final Class<T> category);
 }

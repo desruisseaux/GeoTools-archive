@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -24,7 +23,6 @@ import java.lang.ref.Reference;
 import java.awt.RenderingHints;
 import javax.imageio.spi.ServiceRegistry;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -33,10 +31,10 @@ import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
- * A registry for factories, organized by categories (usualy by <strong>interface</strong>).
- * For example <code>{@link org.opengis.referencing.crs.CRSFactory}.class</code> is a category,
- * and <code>{@link org.opengis.referencing.operation.MathTransformFactory}.class</code>
- * is an other category.
+ * A registry for factories, organized by categories (usualy by <strong>interface</strong>). For
+ * example <code>{@linkplain org.opengis.referencing.crs.CRSFactory}.class</code> is a category,
+ * and <code>{@linkplain org.opengis.referencing.operation.MathTransformFactory}.class</code> is
+ * an other category.
  * <p>
  * For each category, implementations are registered in a file placed in the
  * {@code META-INF/services/} directory, as specified in the {@link ServiceRegistry}
@@ -67,8 +65,8 @@ import org.geotools.resources.i18n.LoggingKeys;
  * @author Richard Gould
  * @author Jody Garnett
  *
- * @see org.geotools.referencing.FactoryFinder
- * @see org.geotools.coverage.FactoryFinder
+ * @see org.geotools.referencing.ReferencingFactoryFinder
+ * @see org.geotools.coverage.CoverageFactoryFinder
  */
 public class FactoryRegistry extends ServiceRegistry {
     /**
@@ -98,44 +96,28 @@ public class FactoryRegistry extends ServiceRegistry {
      * as a guard against infinite recursivity (i.e. when a factory to be scanned request
      * an other dependency of the same category).
      */
-    private final Set/*<Class>*/ scanningCategories = new HashSet();
+    private final Set<Class<?>> scanningCategories = new HashSet<Class<?>>();
 
     /**
      * Factories under testing for availability. This is used by
      * {@link #isAvailable} as a guard against infinite recursivity.
      */
-    private final Set/*<Class<? extends OptionalFactory>>*/ testingAvailability = new HashSet();
+    private final Set<Class<? extends OptionalFactory>> testingAvailability =
+            new HashSet<Class<? extends OptionalFactory>>();
 
     /**
      * Factories under testing for hints compatibility. This is used by
      * {@link #usesAcceptableHints} as a guard against infinite recursivity.
      */
-    private final Set/*<Class<? extends Factory>>*/ testingHints = new HashSet();
+    private final Set<Factory> testingHints = new HashSet<Factory>();
 
     /**
      * Constructs a new registry for the specified categories.
      *
      * @param categories The categories.
      */
-    public FactoryRegistry(final Collection categories) {
-        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        super((Iterator) categories.iterator());
-    }
-
-    /**
-     * Returns the providers in the registry for the specified category. Providers that are
-     * not {@linkplain OptionalFactory#isAvailable available} will be ignored. This method
-     * will {@linkplain #scanForPlugins() scan for plugins} the first time it is invoked for
-     * the given category.
-     *
-     * @param category The category to look for. Usually an interface class
-     *                 (not the actual implementation class).
-     * @return Factories ready to use for the specified category.
-     *
-     * @deprecated Replaced by {@link #getServiceProviders(Class, Filter, Hints)}.
-     */
-    public Iterator getServiceProviders(final Class category) {
-        return getServiceProviders(category, null, null);
+    public FactoryRegistry(final Collection<Class<?>> categories) {
+        super(categories.iterator());
     }
 
     /**
@@ -152,7 +134,7 @@ public class FactoryRegistry extends ServiceRegistry {
      *
      * @since 2.3
      */
-    public Iterator getServiceProviders(final Class category, final Filter filter, final Hints hints) {
+    public <T> Iterator<T> getServiceProviders(final Class<T> category, final Filter filter, final Hints hints) {
         /*
          * The implementation of this method is very similar to the 'getUnfilteredProviders'
          * one except for filter handling. See the comments in 'getUnfilteredProviders' for
@@ -165,11 +147,11 @@ public class FactoryRegistry extends ServiceRegistry {
         }
         final Filter hintsFilter = new Filter() {
             public boolean filter(final Object provider) {
-                return isAcceptable(provider, category, hints, filter);
+                return isAcceptable(category.cast(provider), category, hints, filter);
             }
         };
         synchronizeIteratorProviders();
-        Iterator iterator = getServiceProviders(category, hintsFilter, true);
+        Iterator<T> iterator = getServiceProviders(category, hintsFilter, true);
         if (!iterator.hasNext()) {
             scanForPlugins(getClassLoaders(), category);
             iterator = getServiceProviders(category, hintsFilter, true);
@@ -191,8 +173,10 @@ public class FactoryRegistry extends ServiceRegistry {
      * <p>
      * <b>Note:</b>
      * {@link #synchronizeIteratorProviders} should also be invoked once before this method.
+     *
+     * @todo Use Hints to match Constructor.
      */
-    final Iterator getUnfilteredProviders(final Class category) { //TODO: Use Hints to match Constructor
+    final <T> Iterator<T> getUnfilteredProviders(final Class<T> category) {
         if (!scanningCategories.isEmpty()) {
             /*
              * The 'scanningCategories' map is almost always empty, so we use the above 'isEmpty()'
@@ -208,7 +192,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 throw new RecursiveSearchException(category);
             }
         }
-        Iterator iterator = getServiceProviders(category, true);
+        Iterator<T> iterator = getServiceProviders(category, true);
         if (!iterator.hasNext()) {
             /*
              * No plugin. This method is probably invoked the first time for the specified
@@ -247,8 +231,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * @see #getServiceProviders(Class, Filter, Hints)
      * @see FactoryCreator#getServiceProvider
      */
-    public Object getServiceProvider(final Class category, final Filter filter,
-                                     Hints hints, final Hints.Key key)
+    public <T> T getServiceProvider(final Class<T> category, final Filter filter,
+                                    Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
         synchronizeIteratorProviders();
@@ -267,12 +251,12 @@ public class FactoryRegistry extends ServiceRegistry {
              */
             debug("ENTRY", category, key, null, null);
         }
-        Class implementation = null;
+        Class<?> implementation = null;
         if (key != null) {
             /*
              * Sanity check: make sure that the key class is appropriate for the category.
              */
-            final Class valueClass = key.getValueClass();
+            final Class<?> valueClass = key.getValueClass();
             if (!category.isAssignableFrom(valueClass)) {
                 if (debug) {
                     debug("THROW", category, key, "unexpected type:", valueClass);
@@ -293,7 +277,7 @@ public class FactoryRegistry extends ServiceRegistry {
                         if (debug) {
                             debug("RETURN", category, key, "return hint as provided.", null);
                         }
-                        return hint;
+                        return category.cast(hint);
                     }
                     /*
                      * Before to pass the hints to the private 'getServiceImplementation' method,
@@ -323,15 +307,15 @@ public class FactoryRegistry extends ServiceRegistry {
                      * if the hint was not an array) will be tried using the "normal" path
                      * (oustide the loop) in order to get the error message in case of failure.
                      */
-                    if (hint instanceof Class[]) {
-                        final Class[] types = (Class[]) hint;
+                    if (hint instanceof Class<?>[]) {
+                        final Class<?>[] types = (Class<?>[]) hint;
                         final int length = types.length;
                         for (int i=0; i<length-1; i++) {
-                            final Class type = types[i];
+                            final Class<?> type = types[i];
                             if (debug) {
                                 debug("CHECK", category, key, "consider hint[" + i + ']', type);
                             }
-                            final Object candidate = getServiceImplementation(category, type, filter, hints);
+                            final T candidate = getServiceImplementation(category, type, filter, hints);
                             if (candidate != null) {
                                 if (debug) {
                                     debug("RETURN", category, key, "found implementation", candidate.getClass());
@@ -343,7 +327,7 @@ public class FactoryRegistry extends ServiceRegistry {
                             implementation = types[length-1]; // Last try to be done below.
                         }
                     } else {
-                        implementation = (Class) hint;
+                        implementation = (Class<?>) hint;
                     }
                 }
             }
@@ -351,7 +335,7 @@ public class FactoryRegistry extends ServiceRegistry {
         if (debug && implementation != null) {
             debug("CHECK", category, key, "consider hint[last]", implementation);
         }
-        final Object candidate = getServiceImplementation(category, implementation, filter, hints);
+        final T candidate = getServiceImplementation(category, implementation, filter, hints);
         if (candidate != null) {
             if (debug) {
                 debug("RETURN", category, key, "found implementation", candidate.getClass());
@@ -366,7 +350,7 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Log a debug message for {@link #getServiceProvider} method. Note: we are not required
+     * Logs a debug message for {@link #getServiceProvider} method. Note: we are not required
      * to insert the method name ({@code "GetServiceProvider"}) in the message because it is
      * part of the informations already stored by {@link LogRecord}, and formatted by the
      * default {@link java.util.logging.SimpleFormatter}.
@@ -378,7 +362,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param message  Optional message, or {@code null} if none.
      * @param type     Optional class to format after the message, or {@code null}.
      */
-    private static void debug(final String status, final Class category,
+    private static void debug(final String status, final Class<?> category,
                               final Hints.Key key, final String message, final Class type)
     {
         final StringBuilder buffer = new StringBuilder(status);
@@ -401,7 +385,7 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Search the first implementation in the registery matching the specified conditions.
+     * Searchs the first implementation in the registery matching the specified conditions.
      * This method is invoked only by the {@link #getServiceProvider(Class, Filter, Hints,
      * Hints.Key)} public method above; there is no recursivity there. This method do not
      * creates new instance if no matching factory is found.
@@ -412,11 +396,11 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param  hints          A {@linkplain Hints map of hints}, or {@code null} if none.
      * @return A factory for the specified category and hints, or {@code null} if none.
      */
-    private Object getServiceImplementation(final Class category, final Class implementation,
-                                            final Filter filter,  final Hints hints)
+    private <T> T getServiceImplementation(final Class<T> category, final Class<?> implementation,
+                                           final Filter filter, final Hints hints)
     {
-        for (final Iterator/*<Object>*/ it=getUnfilteredProviders(category); it.hasNext();) {
-            final Object candidate = it.next();
+        for (final Iterator<T> it=getUnfilteredProviders(category); it.hasNext();) {
+            final T candidate = it.next();
             // Implementation class must be tested before 'isAcceptable'
             // in order to avoid StackOverflowError in some situations.
             if (implementation!=null && !implementation.isInstance(candidate)) {
@@ -427,14 +411,14 @@ public class FactoryRegistry extends ServiceRegistry {
             }
             return candidate;
         }
-        final List/*<Reference>*/ cached = getCachedProviders(category);
+        final List<Reference<T>> cached = getCachedProviders(category);
         if (cached != null) {
             /*
              * Checks if a factory previously created by FactoryCreator could fit. This
              * block should never be executed if this instance is not a FactoryCreator.
              */
-            for (final Iterator/*<Reference>*/ it=cached.iterator(); it.hasNext();) {
-                final Object candidate = ((Reference) it.next()).get();
+            for (final Iterator<Reference<T>> it=cached.iterator(); it.hasNext();) {
+                final T candidate = it.next().get();
                 if (candidate == null) {
                     it.remove();
                     continue;
@@ -455,7 +439,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * Returns the providers available in the cache, or {@code null} if none.
      * To be overridden by {@link FactoryCreator} only.
      */
-    List/*<Reference>*/ getCachedProviders(final Class category) {
+    <T> List<Reference<T>> getCachedProviders(final Class<T> category) {
         return null;
     }
 
@@ -474,10 +458,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param filter    The optional filter, or {@code null}.
      * @return {@code true} if the {@code factory} meets the user requirements.
      */
-    final boolean isAcceptable(final Object candidate,
-                               final Class  category,
-                               final Hints  hints,
-                               final Filter filter)
+    final <T> boolean isAcceptable(final T candidate, final Class<T> category,
+                                   final Hints hints, final Filter filter)
     {
         if (filter!=null && !filter.filter(candidate)) {
             return false;
@@ -493,7 +475,7 @@ public class FactoryRegistry extends ServiceRegistry {
         }
         if (hints != null) {
             if (candidate instanceof Factory) {
-                if (!usesAcceptableHints((Factory) candidate, category, hints, (Set) null)) {
+                if (!usesAcceptableHints((Factory) candidate, category, hints, (Set<Factory>) null)) {
                     return false;
                 }
             }
@@ -517,10 +499,10 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param alreadyDone Should be {@code null} except on recursive calls (for internal use only).
      * @return {@code true} if the {@code factory} meets the hints requirements.
      */
-    private boolean usesAcceptableHints(final Factory factory,
-                                        final Class   category,
-                                        final Hints   hints,
-                                        Set/*<Factory>*/ alreadyDone)
+    private boolean usesAcceptableHints(final Factory  factory,
+                                        final Class<?> category,
+                                        final Hints    hints,
+                                        Set<Factory>   alreadyDone)
     {
         /*
          * Ask for implementation hints with special care against infinite recursivity.
@@ -537,7 +519,7 @@ public class FactoryRegistry extends ServiceRegistry {
         if (!testingHints.add(factory)) {
             return false;
         }
-        final Map implementationHints;
+        final Map<RenderingHints.Key, ?> implementationHints;
         try {
             implementationHints = Hints.stripNonKeys(factory.getImplementationHints());
         } finally {
@@ -553,8 +535,7 @@ public class FactoryRegistry extends ServiceRegistry {
          * We got the implementation hints. Now tests their compatibility.
          */
         Hints remaining = null;
-        for (final Iterator it=implementationHints.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry entry = (Map.Entry) it.next();
+        for (final Map.Entry<?,?> entry : implementationHints.entrySet()) {
             final Object    key   = entry.getKey();
             final Object    value = entry.getValue();
             final Object expected = hints.get(key);
@@ -563,22 +544,18 @@ public class FactoryRegistry extends ServiceRegistry {
                  * We have found a hint that matter. Check if the
                  * available factory meets the user's criterions.
                  */
-                if (expected instanceof Class) {
-                    if (!((Class) expected).isInstance(value)) {
+                if (expected instanceof Class<?>) {
+                    if (!((Class<?>) expected).isInstance(value)) {
                         return false;
                     }
-                } else if (expected instanceof Class[]) {
-                    final Class[] types = (Class[]) expected;
-                    int i=0;
+                } else if (expected instanceof Class<?>[]) {
+                    final Class<?>[] types = (Class<?>[]) expected;
+                    int i = 0;
                     do if (i >= types.length) return false;
                     while (!types[i++].isInstance(value));
                 } else if (!expected.equals(value)) {
                     return false;
                 }
-            }
-            // User check (overridable).
-            if (!isAcceptable(value, category, hints)) {
-                return false;
             }
             /*
              * Checks recursively in factory dependencies, if any. Note that the dependencies
@@ -598,7 +575,7 @@ public class FactoryRegistry extends ServiceRegistry {
             if (value instanceof Factory) {
                 final Factory dependency = (Factory) value;
                 if (alreadyDone == null) {
-                    alreadyDone = new HashSet();
+                    alreadyDone = new HashSet<Factory>();
                 }
                 if (!alreadyDone.contains(dependency)) {
                     alreadyDone.add(factory);
@@ -606,7 +583,7 @@ public class FactoryRegistry extends ServiceRegistry {
                         remaining = new Hints(hints);
                         remaining.keySet().removeAll(implementationHints.keySet());
                     }
-                    final Class type;
+                    final Class<?> type;
                     if (key instanceof Hints.Key) {
                         type = ((Hints.Key) key).getValueClass();
                     } else {
@@ -643,7 +620,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param hints    The user requirements, or {@code null} if none.
      * @return {@code true} if the {@code provider} meets the user requirements.
      */
-    protected boolean isAcceptable(final Object provider, final Class category, final Hints hints) {
+    protected <T> boolean isAcceptable(final T provider, final Class<T> category, final Hints hints) {
         return true;
     }
 
@@ -655,7 +632,7 @@ public class FactoryRegistry extends ServiceRegistry {
             return true;
         }
         final OptionalFactory factory = (OptionalFactory) provider;
-        final Class type = factory.getClass();
+        final Class<? extends OptionalFactory> type = factory.getClass();
         if (!testingAvailability.add(type)) {
             throw new RecursiveSearchException(type);
         }
@@ -682,8 +659,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * If some more classloaders should be scanned, they shall be added into the code
      * of this method.
      */
-    public final Set getClassLoaders() {
-        final Set loaders = new HashSet();
+    public final Set<ClassLoader> getClassLoaders() {
+        final Set<ClassLoader> loaders = new HashSet<ClassLoader>();
         for (int i=0; i<4; i++) {
             final ClassLoader loader;
             try {
@@ -709,9 +686,8 @@ public class FactoryRegistry extends ServiceRegistry {
          * have an other form of redundancie. A class loader may be the parent of an
          * other one. Try to remove those dependencies.
          */
-        final ClassLoader[] asArray = (ClassLoader[]) loaders.toArray(new ClassLoader[loaders.size()]);
-        final int length = asArray.length;
-        for (int i=0; i<length; i++) {
+        final ClassLoader[] asArray = loaders.toArray(new ClassLoader[loaders.size()]);
+        for (int i=0; i<asArray.length; i++) {
             ClassLoader loader = asArray[i];
             try {
                 while ((loader=loader.getParent()) != null) {
@@ -723,7 +699,7 @@ public class FactoryRegistry extends ServiceRegistry {
             }
         }
         if (loaders.isEmpty()) {
-            LOGGER.warning("No class loaders available");
+            LOGGER.warning("No class loaders available.");
         }
         return loaders;
     }
@@ -739,9 +715,9 @@ public class FactoryRegistry extends ServiceRegistry {
      * available at runtime.
      */
     public void scanForPlugins() {
-        final Set loaders = getClassLoaders();
-        for (final Iterator categories=getCategories(); categories.hasNext();) {
-            final Class category = (Class) categories.next();
+        final Set<ClassLoader> loaders = getClassLoaders();
+        for (final Iterator<Class<?>> categories=getCategories(); categories.hasNext();) {
+            final Class<?> category = categories.next();
             scanForPlugins(loaders, category);
         }
     }
@@ -753,7 +729,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param loader The class loader to use.
      * @param category The category to scan for plug-ins.
      */
-    private void scanForPlugins(final Collection/*<ClassLoader>*/ loaders, final Class category) {
+    private <T> void scanForPlugins(final Collection<ClassLoader> loaders, final Class<T> category) {
         if (!scanningCategories.add(category)) {
             throw new RecursiveSearchException(category);
         }
@@ -763,8 +739,7 @@ public class FactoryRegistry extends ServiceRegistry {
             /*
              * First, scan META-INF/services directories (the default mechanism).
              */
-            for (final Iterator it=loaders.iterator(); it.hasNext();) {
-                final ClassLoader loader = (ClassLoader) it.next();
+            for (final ClassLoader loader : loaders) {
                 newServices |= register(lookupProviders(category, loader), category, message);
                 newServices |= registerFromSystemProperty(loader, category, message);
             }
@@ -773,7 +748,7 @@ public class FactoryRegistry extends ServiceRegistry {
              */
             final FactoryIteratorProvider[] fip = Factories.getIteratorProviders();
             for (int i=0; i<fip.length; i++) {
-                final Iterator it = fip[i].iterator(category);
+                final Iterator<T> it = fip[i].iterator(category);
                 if (it != null) {
                     newServices |= register(it, category, message);
                 }
@@ -800,13 +775,13 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param message   A buffer where to write the logging message.
      * @return {@code true} if at least one factory has been registered.
      */
-    private boolean register(final Iterator/*<T>*/ factories, final Class/*<T>*/ category,
-                             final StringBuilder message)
+    private <T> boolean register(final Iterator<T> factories, final Class<T> category,
+                                 final StringBuilder message)
     {
         boolean newServices = false;
         final String lineSeparator = System.getProperty("line.separator", "\n");
         while (factories.hasNext()) {
-            Object factory;
+            T factory;
             try {
                 factory = factories.next();
             } catch (OutOfMemoryError error) {
@@ -845,12 +820,12 @@ public class FactoryRegistry extends ServiceRegistry {
                 loadingFailure(category, error, true);
                 continue;
             }
-            final Class factoryClass = factory.getClass();
+            final Class<? extends T> factoryClass = factory.getClass().asSubclass(category);
             /*
              * If the factory implements more than one interface and an instance were
              * already registered, reuse the same instance instead of duplicating it.
              */
-            final Object replacement = getServiceProviderByClass(factoryClass);
+            final T replacement = getServiceProviderByClass(factoryClass);
             if (replacement != null) {
                 factory = replacement;
                 // Need to register anyway, because the category may not be the same.
@@ -880,41 +855,44 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param message  A buffer where to write the logging message.
      * @return {@code true} if at least one factory has been registered.
      */
-    private boolean registerFromSystemProperty(final ClassLoader loader, final Class category,
-                                               final StringBuilder message)
+    private <T> boolean registerFromSystemProperty(final ClassLoader loader,
+            final Class<T> category, final StringBuilder message)
     {
         boolean newServices = false;
         try {
             final String classname = System.getProperty(category.getName());
             if (classname != null) try {
-                final Class factoryClass = loader.loadClass(classname);
-                Object factory = getServiceProviderByClass(factoryClass);
-                if (factory == null) try {
-                    factory = factoryClass.newInstance();
-                    if (registerServiceProvider(factory, category)) {
-                        message.append(System.getProperty("line.separator", "\n"));
-                        message.append("  ");
-                        message.append(factoryClass.getName());
-                        newServices = true;
+                final Class<?> candidate = loader.loadClass(classname);
+                if (category.isAssignableFrom(candidate)) {
+                    final Class<? extends T> factoryClass = candidate.asSubclass(category);
+                    T factory = getServiceProviderByClass(factoryClass);
+                    if (factory == null) try {
+                        factory = factoryClass.newInstance();
+                        if (registerServiceProvider(factory, category)) {
+                            message.append(System.getProperty("line.separator", "\n"));
+                            message.append("  ");
+                            message.append(factoryClass.getName());
+                            newServices = true;
+                        }
+                    } catch (IllegalAccessException exception) {
+                        throw new FactoryRegistryException(Errors.format(
+                                ErrorKeys.CANT_CREATE_FACTORY_$1, classname), exception);
+                    } catch (InstantiationException exception) {
+                        throw new FactoryRegistryException(Errors.format(
+                                ErrorKeys.CANT_CREATE_FACTORY_$1, classname), exception);
                     }
-                } catch (IllegalAccessException exception) {
-                    throw new FactoryRegistryException(Errors.format(
-                            ErrorKeys.CANT_CREATE_FACTORY_$1, classname), exception);
-                } catch (InstantiationException exception) {
-                    throw new FactoryRegistryException(Errors.format(
-                            ErrorKeys.CANT_CREATE_FACTORY_$1, classname), exception);
-                }
-                /*
-                 * Put this factory in front of every other factories (including the ones loaded
-                 * in previous class loaders, which is why we don't inline this ordering in the
-                 * 'register' loop). Note: if some factories were not yet registered, they will
-                 * not be properly ordered. Since this code exists more for compatibility reasons
-                 * than as a commited API, we ignore this short comming for now.
-                 */
-                for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
-                    final Object other = it.next();
-                    if (other != factory) {
-                        setOrdering(category, factory, other);
+                    /*
+                     * Put this factory in front of every other factories (including the ones loaded
+                     * in previous class loaders, which is why we don't inline this ordering in the
+                     * 'register' loop). Note: if some factories were not yet registered, they will
+                     * not be properly ordered. Since this code exists more for compatibility reasons
+                     * than as a commited API, we ignore this short comming for now.
+                     */
+                    for (final Iterator<T> it=getServiceProviders(category, false); it.hasNext();) {
+                        final T other = it.next();
+                        if (other != factory) {
+                            setOrdering(category, factory, other);
+                        }
                     }
                 }
             } catch (ClassNotFoundException exception) {
@@ -932,7 +910,7 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * Invoked when a factory can't be loaded. Log a warning, but do not stop the process.
      */
-    private static void loadingFailure(final Class category, final Throwable error,
+    private static void loadingFailure(final Class<?> category, final Throwable error,
                                        final boolean showStackTrace)
     {
         final String         name = Utilities.getShortName(category);
@@ -955,7 +933,7 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * Prepares a message to be logged if any provider has been registered.
      */
-    private static StringBuilder getLogHeader(final Class category) {
+    private static StringBuilder getLogHeader(final Class<?> category) {
         return new StringBuilder(Logging.getResources(null).getString(
                 LoggingKeys.FACTORY_IMPLEMENTATIONS_$1, Utilities.getShortName(category)));
     }
@@ -983,8 +961,8 @@ public class FactoryRegistry extends ServiceRegistry {
         if (newProviders == null) {
             return;
         }
-        for (final Iterator categories=getCategories(); categories.hasNext();) {
-            final Class category = (Class) categories.next();
+        for (final Iterator<Class<?>> categories=getCategories(); categories.hasNext();) {
+            final Class<?> category = categories.next();
             if (getServiceProviders(category, false).hasNext()) {
                 /*
                  * Register immediately the factories only if some other factories were already
@@ -996,15 +974,21 @@ public class FactoryRegistry extends ServiceRegistry {
                  * automatically scanForPlugins().
                  */
                 for (int i=0; i<newProviders.length; i++) {
-                    final FactoryIteratorProvider provider = newProviders[i];
-                    final Iterator it = provider.iterator(category);
-                    if (it != null) {
-                        final StringBuilder message = getLogHeader(category);
-                        if (register(it, category, message)) {
-                            log("synchronizeIteratorProviders", message);
-                        }
-                    }
+                    register(newProviders[i], category);
                 }
+            }
+        }
+    }
+
+    /**
+     * Registers every factories from the specified provider for the given category.
+     */
+    private <T> void register(final FactoryIteratorProvider provider, final Class<T> category) {
+        final Iterator<T> it = provider.iterator(category);
+        if (it != null) {
+            final StringBuilder message = getLogHeader(category);
+            if (register(it, category, message)) {
+                log("synchronizeIteratorProviders", message);
             }
         }
     }
@@ -1024,13 +1008,13 @@ public class FactoryRegistry extends ServiceRegistry {
      * @return {@code true} if at least one ordering setting has been modified as a consequence
      *         of this call.
      */
-    public boolean setOrdering(final Class category, final Comparator comparator) {
+    public <T> boolean setOrdering(final Class<T> category, final Comparator<T> comparator) {
         boolean set = false;
-        final List previous = new ArrayList();
-        for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
-            final Object f1 = it.next();
+        final List<T> previous = new ArrayList<T>();
+        for (final Iterator<T> it=getServiceProviders(category, false); it.hasNext();) {
+            final T f1 = it.next();
             for (int i=previous.size(); --i>=0;) {
-                final Object f2 = previous.get(i);
+                final T f2 = previous.get(i);
                 final int c;
                 try {
                     c = comparator.compare(f1, f2);
@@ -1067,26 +1051,36 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param service1 Filter for the preferred factory.
      * @param service2 Filter for the factory to which {@code service1} is preferred.
      */
-    public boolean setOrdering(final Class  base,
-                               final boolean set,
-                               final Filter service1,
-                               final Filter service2)
+    public <T> boolean setOrdering(final Class<T> base, final boolean set,
+                                   final Filter service1, final Filter service2)
     {
         boolean done = false;
-        for (final Iterator categories=getCategories(); categories.hasNext();) {
-            final Class category = (Class) categories.next();
-            if (base.isAssignableFrom(category)) {
-                Object impl1 = null;
-                Object impl2 = null;
-                for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
-                    final Object factory = it.next();
-                    if (service1.filter(factory)) impl1 = factory;
-                    if (service2.filter(factory)) impl2 = factory;
-                    if (impl1!=null && impl2!=null && impl1!=impl2) {
-                        if (set) done |=   setOrdering(category, impl1, impl2);
-                        else     done |= unsetOrdering(category, impl1, impl2);
-                    }
-                }
+        for (final Iterator<Class<?>> categories=getCategories(); categories.hasNext();) {
+            final Class<?> candidate = categories.next();
+            if (base.isAssignableFrom(candidate)) {
+                final Class<? extends T> category = candidate.asSubclass(base);
+                done |= setOrUnsetOrdering(category, set, service1, service2);
+            }
+        }
+        return done;
+    }
+
+    /**
+     * Helper method for the above.
+     */
+    private <T> boolean setOrUnsetOrdering(final Class<T> category, final boolean set,
+                                           final Filter service1, final Filter service2)
+    {
+        boolean done = false;
+        T impl1 = null;
+        T impl2 = null;
+        for (final Iterator<? extends T> it=getServiceProviders(category, false); it.hasNext();) {
+            final T factory = it.next();
+            if (service1.filter(factory)) impl1 = factory;
+            if (service2.filter(factory)) impl2 = factory;
+            if (impl1!=null && impl2!=null && impl1!=impl2) {
+                if (set) done |=   setOrdering(category, impl1, impl2);
+                else     done |= unsetOrdering(category, impl1, impl2);
             }
         }
         return done;

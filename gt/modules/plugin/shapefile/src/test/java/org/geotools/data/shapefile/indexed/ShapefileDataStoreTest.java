@@ -39,7 +39,7 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
@@ -228,7 +228,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     private ArrayList performQueryComparison(
             IndexedShapefileDataStore indexedDS,
             IndexedShapefileDataStore baselineDS, ReferencedEnvelope newBounds)
-            throws FactoryConfigurationError, IllegalFilterException,
+            throws FactoryRegistryException, IllegalFilterException,
             IOException {
         FeatureCollection features;
         FeatureIterator indexIter;

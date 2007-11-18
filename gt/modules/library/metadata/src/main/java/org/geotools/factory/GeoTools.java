@@ -15,26 +15,23 @@
  */
 package org.geotools.factory;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-// Geotools dependencies
 import org.geotools.resources.XMath;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.util.logging.CommonsLoggerFactory;
-import org.geotools.util.logging.Log4JLoggerFactory;
 import org.geotools.util.logging.LoggerFactory;
 import org.geotools.util.logging.Logging;
 import org.geotools.util.Version;
@@ -45,24 +42,20 @@ import org.geotools.util.Version;
  * in a system-wide basis through {@linkplain System#getProperties system properties}, some
  * of them are declared as {@link String} constants in this class.
  * <p>
- * There are two aspects to the configuration of GeoTools:
+ * There are many aspects to the configuration of GeoTools:
  * <ul>
- * <li>Default Settings: Are handled as the Hints returned by {@link getDefaultHints()}, the default values
- * can be provided by your code, or specified using system properties.
- * <li>Integration JNDI: Telling the GeoTools library about the facilities of your application, or application
- * container takes several forms. This class provides the {@link initContext( InitialContext ) } method
- * allowing you to tell GeoTools about the JNDI context you would like it to use.
- * <li>Intergration Plugins: If you are hosting GeoTools in a alternate plugin system such as Spring or OSGi you will need to hunt down the FactoryFinders and
- * register additional "FactoryIterators" you would like GeoTools to search using the {@link addFactoryIteratorProvider} method.
+ *   <li>Default Settings: Are handled as the Hints returned by {@link #getDefaultHints()}, the
+ *       default values can be provided in application code, or specified using system properties.</li>
+ *   <li>Integration JNDI: Telling the GeoTools library about the facilities of an application,
+ *       or application container takes several forms. This class provides the
+ *       {@link #init(InitialContext)} method allowing to tell GeoTools about the JNDI
+ *       context to use.</li>
+ *   <li>Integration Plugins: If hosting GeoTools in a alternate plugin system such as Spring
+ *       or OSGi, application may needs to hunt down the {@code FactoryFinder}s and register
+ *       additional "Factory Iterators" for GeoTools to search using the
+ *       {@link #addFactoryIteratorProvider} method.</li>
  * </ul>
- * <h3>JNDI Integration</h3>
- * This class provides a {@linkplain InitialContext initial context} for <cite>Java Naming and Directory
- * Interfaces</cite> (JNDI) in Geotools. This classes provides a central place where initial
- * context can been found for the Geotools library. This context is used for example by the
- * {@linkplain org.geotools.referencing.factory.epsg.ThreadedEpsgFactory EPSG factory} in order to
- * find connection parameters to an EPSG database. Using JNDI, such connection parameters can
- * be set in a J2EE environment.
- * 
+ *
  * @since 2.4
  * @source $URL$
  * @version $Id$
@@ -73,7 +66,7 @@ public final class GeoTools {
     /**
      * The current GeoTools version. The separator character must be the dot.
      */
-    private static final Version VERSION = new Version("2.4.SNAPSHOT");
+    private static final Version VERSION = new Version("2.5.SNAPSHOT");
 
     /**
      * Object to inform about system-wide configuration changes.
@@ -87,7 +80,8 @@ public final class GeoTools {
      * a hint key. This field must be declared before any call to the {@link #bind}
      * method.
      */
-    private static final Map/*<String, RenderingHints.Key>*/ BINDINGS = new HashMap();
+    private static final Map<String, RenderingHints.Key> BINDINGS =
+            new HashMap<String, RenderingHints.Key>();
 
     /**
      * The {@linkplain System#getProperty(String) system property} key for the default value to be
@@ -166,7 +160,7 @@ public final class GeoTools {
      */
     private static void bind(final String property, final RenderingHints.Key key) {
         synchronized (BINDINGS) {
-            final RenderingHints.Key old = (RenderingHints.Key) BINDINGS.put(property, key);
+            final RenderingHints.Key old = BINDINGS.put(property, key);
             if (old == null) {
                 return;
             }
@@ -186,7 +180,7 @@ public final class GeoTools {
 
     /**
      * Sets the global {@linkplain LoggerFactory logger factory}.
-     * 
+     *
      * This method is the same as {@code Logging.GEOTOOLS.setLoggerFactory(factory)}.
      * GeoTools ships with support for
      * <A HREF="http://jakarta.apache.org/commons/logging/">Commons-logging</A> and
@@ -212,11 +206,11 @@ public final class GeoTools {
      *       framework is available, then every logging message in the {@code org.geotools}
      *       namespace sent to the Java {@linkplain java.util.logging.Logger logger} are
      *       redirected to Commons-logging.</li>
-     * 
+     *
      *   <li>Otherwise if the <A HREF="http://logging.apache.org/log4j">Log4J</A> framework is
      *       available, then every logging message in the {@code org.geotools} namespace sent
      *       to the Java {@linkplain java.util.logging.Logger logger} are redirected to Log4J.</li>
-     * 
+     *
      *   <li>Otherwise, the Java logging {@linkplain java.util.logging.Formatter formatter} for
      *       console output is replaced by a {@linkplain org.geotools.util.logging.MonolineFormatter
      *       monoline formatter}.</li>
@@ -231,14 +225,14 @@ public final class GeoTools {
      * overwriting may not be wanted for every situations.
      * <p>
      * Example of typical invocation in a Geoserver environment:
-     * 
+     *
      * <blockquote><pre>
-     * Hints hints = new Hints(null);
+     * Hints hints = new Hints();
      * hints.put({@linkplain Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}, Boolean.TRUE);
      * hints.put({@linkplain Hints#FORCE_AXIS_ORDER_HONORING}, "http");
      * GeoTools.init(hints);
      * </pre></blockquote>
-     * 
+     *
      * @see Logging#setLoggerFactory(String)
      * @see Logging#forceMonolineConsoleOutput
      * @see Hints#putSystemDefault
@@ -263,16 +257,19 @@ public final class GeoTools {
             Hints.putSystemDefault(hints);
         }
     }
-    
+
     /**
      * Forces the initial context for test cases, or as needed.
-     * 
+     *
      * @see #getInitialContext
      *
      * @since 2.4
      */
-    public static synchronized void init(final InitialContext applicationContext) {
-        context = applicationContext;
+    public static void init(final InitialContext applicationContext) {
+        synchronized (GeoTools.class) {
+            context = applicationContext;
+        }
+        fireConfigurationChanged();
     }
 
     /**
@@ -289,9 +286,8 @@ public final class GeoTools {
         assert Thread.holdsLock(hints);
         boolean changed = false;
         synchronized (BINDINGS) {
-            for (final Iterator it=BINDINGS.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
-                final String propertyKey = (String) entry.getKey();
+            for (final Map.Entry<String, RenderingHints.Key> entry : BINDINGS.entrySet()) {
+                final String propertyKey = entry.getKey();
                 final String property;
                 try {
                     property = System.getProperty(propertyKey);
@@ -308,9 +304,9 @@ public final class GeoTools {
                      * sense for Boolean and Number, which are the only types that we convert here).
                      */
                     Object value = property;
-                    final RenderingHints.Key hintKey = (RenderingHints.Key) entry.getValue();
+                    final RenderingHints.Key hintKey = entry.getValue();
                     if (hintKey.getClass().equals(Hints.Key.class)) {
-                        final Class type = ((Hints.Key) hintKey).getValueClass();
+                        final Class<?> type = ((Hints.Key) hintKey).getValueClass();
                         if (type.equals(Boolean.class)) {
                             value = Boolean.valueOf(property);
                         } else if (Number.class.isAssignableFrom(type)) try {
@@ -393,6 +389,66 @@ public final class GeoTools {
     }
 
     /**
+     * Converts a GeoTools name to the syntax used by the {@linkplain #getInitialContext
+     * GeoTools JNDI context}. Names may be constructed in a variety of ways depending on
+     * the implementation of {@link InitialContext}. GeoTools uses {@code "jdbc:EPSG"}
+     * internally, but many implementaitons use the form {@code "jdbc/EPSG"}. Calling
+     * this method before use will set the name right.
+     *
+     * @param  name Name of the form {@code "jdbc:EPSG"}, or {@code null}.
+     * @return Name fixed up with {@link Context#composeName(String,String)},
+     *         or {@code null} if the given name was null.
+     *
+     * @since 2.4
+     */
+    public static String fixName(final String name) {
+        return fixName(null, name, null);
+    }
+
+    /**
+     * Converts a GeoTools name to the syntax used by the specified JNDI context.
+     * This method is similar to {@link #fixName(String)}, but uses the specified
+     * context instead of the GeoTools one.
+     *
+     * @param  context The context to use, or {@code null} if none.
+     * @param  name Name of the form {@code "jdbc:EPSG"}, or {@code null}.
+     * @return Name fixed up with {@link Context#composeName(String,String)},
+     *         or {@code null} if the given name was null.
+     *
+     * @since 2.4
+     */
+    public static String fixName(final Context context, final String name) {
+        return (context != null) ? fixName(context, name, null) : name;
+    }
+
+    /**
+     * Implementation of {@code fixName} method. If the context is {@code null}, then
+     * the {@linkplain #getInitialContext GeoTools initial context} will be fetch only
+     * when first needed.
+     */
+    private static String fixName(Context context, final String name, final Hints hints) {
+        String fixed = null;
+        if (name != null) {
+            final StringTokenizer tokens = new StringTokenizer(name, ":/");
+            while (tokens.hasMoreTokens()) {
+                final String part = tokens.nextToken();
+                if (fixed == null) {
+                    fixed = part;
+                } else try {
+                    if (context == null) {
+                        context = getInitialContext(hints);
+                    }
+                    fixed = context.composeName(fixed, part);
+                } catch (NamingException e) {
+                    Logging.unexpectedException("org.geotools.factory", GeoTools.class, "fixName", e);
+                    return name;
+                }
+            }
+        }
+        return fixed;
+    }
+
+    /**
      * Adds an alternative way to search for factory implementations. {@link FactoryRegistry} has
      * a default mechanism bundled in it, which uses the content of all {@code META-INF/services}
      * directories found on the classpath. This {@code addFactoryIteratorProvider} method allows
@@ -455,60 +511,6 @@ public final class GeoTools {
         final Hints hints = getDefaultHints();
         if (hints!=null && !hints.isEmpty()) {
             arguments.out.println(hints);
-        }
-    }
-    
-    public static String fixName( String name ) {
-        try {
-            return fixName( getInitialContext(null), name );
-        } catch (NamingException e) {
-            return name;
-        }
-    }
-    /**
-     * We need to that names defined for use in GeoTools end up being useful to the
-     * InitialContext in question.
-     * <p>
-     * Names may be strung togehter in a varity of ways depending on the implementation
-     * of InitialContext. In GeoTools we use "jdbc:EPSG" internally, but many implementaitons
-     * use the form "jdbc/EPSG". Calling this method before use will set you right.
-     * </p>
-     * @param context
-     * @param name Name of the form "jdbc:EPSG"
-     * @return name fixed up with InitialContext.composeName( string, string )
-     */
-    public static String fixName( InitialContext context, String name ) {
-        try {
-            if( context == null || name == null ) {
-                return name;
-            }
-            if( name.indexOf(':') != -1 ){
-                String fixed = null;
-                for( String part : name.split(":")){
-                    if( fixed == null ){
-                        fixed = part;
-                    }
-                    else {                   
-                        fixed = context.composeName( fixed, part );                    
-                    }
-                }
-                return fixed;
-            }
-            if( name.indexOf('/') != -1 ){
-                String fixed = null;
-                for( String part : name.split("/")){
-                    if( fixed == null ){
-                        fixed = part;
-                    }
-                    else {                   
-                        fixed = context.composeName( fixed, part );                    
-                    }
-                }
-                return fixed;
-            }
-            return name;
-        } catch (NamingException e) {
-            return name;
         }
     }
 }
