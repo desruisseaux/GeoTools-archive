@@ -18,6 +18,7 @@ package org.geotools.gml2.bindings;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -264,20 +265,39 @@ public class GML2ParsingUtils {
 
     public static CoordinateReferenceSystem crs(Node node) {
         if (node.getAttribute("srsName") != null) {
-            URI srs = (URI) node.getAttributeValue("srsName");
+            URI srs = null;
+            Object raw = node.getAttributeValue("srsName");
 
-            //TODO: JD, this is a hack until GEOT-1136 has been resolved
-            if ("http".equals(srs.getScheme()) && "www.opengis.net".equals(srs.getAuthority())
-                    && "/gml/srs/epsg.xml".equals(srs.getPath()) && (srs.getFragment() != null)) {
+            if (raw instanceof URI) {
+                srs = (URI) raw;
+            } else if (raw instanceof String) {
+                //try to parse into a uri
                 try {
-                    return CRS.decode("EPSG:" + srs.getFragment());
-                } catch (Exception e) {
-                    //no nothing, will fail belows
+                    srs = new URI((String) raw);
+                } catch (URISyntaxException e) {
+                    //failed, continue on
+                }
+            }
+
+            if (srs != null) {
+                //TODO: JD, this is a hack until GEOT-1136 has been resolved
+                if ("http".equals(srs.getScheme()) && "www.opengis.net".equals(srs.getAuthority())
+                        && "/gml/srs/epsg.xml".equals(srs.getPath()) && (srs.getFragment() != null)) {
+                    try {
+                        return CRS.decode("EPSG:" + srs.getFragment());
+                    } catch (Exception e) {
+                        //failed, try as straight up uri
+                        try {
+                            return CRS.decode(srs.toString());
+                        } catch (Exception e1) {
+                            //failed again, do nothing ,should fail below as well
+                        }
+                    }
                 }
             }
 
             try {
-                return CRS.decode(srs.toString());
+                return CRS.decode(raw.toString());
             } catch (Exception e) {
                 throw new RuntimeException("Could not create crs: " + srs, e);
             }
