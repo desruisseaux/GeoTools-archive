@@ -125,6 +125,9 @@ public class NumericConverterFactory implements ConverterFactory {
 		    } else if (source instanceof String) {
 		        String s = (String) source;
 		        
+		        //ensure we trim any space off the string
+		        s = s.trim();
+		        
 		        //textual
                 if ( Long.class.equals( target ) ) {
                     return new Long(s);

@@ -121,6 +121,11 @@ public class NumericConverterFactoryTest extends TestCase {
 		assertEquals( BigInteger.valueOf( 127 ), convert( new BigDecimal( 127.127 ), BigInteger.class ) );
 		
 	}
+
+	public void testStringToInteger() throws Exception {
+	    assertEquals( new Integer(127), convert( "127", Integer.class ) );
+	    assertEquals( new Integer(127), convert( " 127 ", Integer.class ) );
+	}
 	
 	Object convert( Object source, Class target ) throws Exception {
 		return factory.createConverter( source.getClass(), target, null ).convert( source, target );
