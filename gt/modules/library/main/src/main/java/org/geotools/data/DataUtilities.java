@@ -1358,31 +1358,21 @@ public class DataUtilities {
         tb.setNamespaceURI(namespace);
         
         String[] types = typeSpec.split(",");
-        int geometryIndex = -1; // records * specified goemetry 
+         
         AttributeDescriptor attributeType;
-        GeometryDescriptor geometryAttribute = null; // records guess 
-
+        
         for (int i = 0; i < types.length; i++) {
+            boolean defaultGeometry = types[i].startsWith("*");
             if (types[i].startsWith("*")) {
                 types[i] = types[i].substring(1);
-                geometryIndex = i;
             }
 
             attributeType = createAttribute(types[i]);
             tb.add(attributeType);
-
-            if ((geometryAttribute == null)
-                    && attributeType instanceof GeometryDescriptor) {
-                if (geometryIndex == -1) {
-                    geometryAttribute = (GeometryDescriptor) attributeType;
-                } else if (geometryIndex == i) {
-                    geometryAttribute = (GeometryDescriptor) attributeType;
-                }
+            
+            if ( defaultGeometry ) {
+                tb.setDefaultGeometry(attributeType.getLocalName());
             }
-        }
-
-        if (geometryAttribute != null) {
-            tb.setDefaultGeometry(geometryAttribute.getLocalName());
         }
 
         return tb.buildFeatureType();
