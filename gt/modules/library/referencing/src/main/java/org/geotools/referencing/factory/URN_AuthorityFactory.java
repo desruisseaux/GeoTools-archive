@@ -95,7 +95,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @param userHints The hints to be given to backing factories.
      */
     public URN_AuthorityFactory(final Hints userHints) {
-        this(new AllAuthoritiesFactory(userHints));
+        this(HTTP_AuthorityFactory.getFactory(userHints));
     }
 
     /**
@@ -295,7 +295,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
     protected AuthorityFactory createVersionedFactory(final Version version)
             throws FactoryException
     {
-        final Hints hints = factory.getUserHints();
+        final Hints hints = new Hints(factory.getImplementationHints());
         hints.put(Hints.VERSION, version);
         final List factories = Arrays.asList(new AuthorityFactory[] {
             new AllAuthoritiesFactory(hints),

@@ -54,7 +54,7 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
      * Creates a new authority factory with the specified hints.
      */
     DefaultAuthorityFactory(final Hints hints) {
-        super(new ManyAuthoritiesFactory(hints, ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
+        super(new ManyAuthoritiesFactory(ReferencingFactoryFinder.getCRSAuthorityFactories(hints)));
     }
 
     /**

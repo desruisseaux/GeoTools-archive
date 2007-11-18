@@ -178,4 +178,16 @@ public class UnnamedExtensionTest extends TestCase {
         CoordinateReferenceSystem crs = CRS.decode("epsg:42304");
         assertNotNull(crs);
     }
+
+    /**
+     * Tests the extensions through a URI.
+     * 
+     * @see http://jira.codehaus.org/browse/GEOT-1563
+     */
+    public void testURI() throws FactoryException {
+        final String id = "100001";
+        final CoordinateReferenceSystem crs = CRS.decode("EPSG:" + id);
+        assertSame(crs, CRS.decode("urn:x-ogc:def:crs:EPSG:6.11.2:" + id));
+        assertSame(crs, CRS.decode("http://www.opengis.net/gml/srs/epsg.xml#" + id));
+    }
 }

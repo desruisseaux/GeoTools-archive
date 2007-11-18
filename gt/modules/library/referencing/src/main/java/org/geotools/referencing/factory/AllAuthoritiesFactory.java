@@ -38,12 +38,11 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
- * An authority factory that delegates the object creation to an other factory
- * determined from the authority name in the code. This factory performs the same
- * work than its {@linkplain ManyAuthoritiesFactory super-class}, except that it
- * additionnally queries the authority factories provided by
+ * An authority factory that delegates the object creation to an other factory determined
+ * from the authority name in the code. This is similar to {@link ManyAuthoritiesFactory}
+ * except that the set of factories is determined by calls to
  * <code>ReferencingFactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSAuthorityFactory
- * getCRSAuthorityFactory}("EPSG", hints)</code>.
+ * get<var>Foo</var>AuthorityFactory}(<var>authority</var>, {@linkplain #hints hints})</code>.
  * <p>
  * This class is not registered in {@link ReferencingFactoryFinder}. If this "authority" factory
  * is wanted, then users need to refer explicitly to the {@link #DEFAULT} constant or to create
@@ -62,18 +61,17 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
     public static AllAuthoritiesFactory DEFAULT = new AllAuthoritiesFactory(null);
 
     /**
-     * User-supplied hints provided at construction time.
-     * Its content may or may not be identical to {@link #hints}.
+     * The authority names. Used in order to detect changes in the set of registered factories.
      */
-    private final Hints userHints;
+    private Collection/*<String>*/ authorityNames;
 
     /**
      * Creates a new factory using the specified hints.
      *
-     * @param userHints An optional set of hints, or {@code null} if none.
+     * @param hints An optional set of hints, or {@code null} if none.
      */
-    public AllAuthoritiesFactory(final Hints userHints) {
-        this(userHints, null);
+    public AllAuthoritiesFactory(final Hints hints) {
+        this(hints, null);
     }
 
     /**
@@ -89,14 +87,16 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * fallbacks}, to be tried in iteration order only if the first acceptable factory failed to
      * create the requested object.
      *
-     * @param userHints An optional set of hints, or {@code null} if none.
+     * @param hints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
+     *
+     * @deprecated This constructor will be removed in GeoTools 2.5.
      */
-    public AllAuthoritiesFactory(final Hints userHints,
+    public AllAuthoritiesFactory(final Hints hints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories)
     {
-        this(userHints, factories, (char) 0);
+        this(hints, factories, (char) 0);
     }
 
     /**
@@ -104,19 +104,19 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * separator. The optional {@code factories} collection is handled as in the
      * {@linkplain #AllAuthoritiesFactory(Hints, Collection) constructor above}.
      *
-     * @param userHints An optional set of hints, or {@code null} if none.
+     * @param hints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
      * @param separator The separator between the authority name and the code.
      *
-     * @deprecated Override the {@link #getSeparator} method instead.
+     * @deprecated This constructor will be removed in GeoTools 2.5.
      */
-    public AllAuthoritiesFactory(final Hints userHints,
+    public AllAuthoritiesFactory(final Hints hints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories,
                                  final char separator)
     {
-        super(userHints, factories, separator);
-        this.userHints = new Hints(userHints);
+        super(hints, factories, separator);
+        addImplementationHints(hints);
     }
 
     /**
@@ -126,13 +126,33 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      */
     //@Override
     public Set/*<String>*/ getAuthorityNames() {
-        final Set names = super.getAuthorityNames();
-        names.addAll(ReferencingFactoryFinder.getAuthorityNames());
-        return names;
+        // Do not use 'authorityNames' since it may be out-of-date.
+        return ReferencingFactoryFinder.getAuthorityNames();
     }
 
     /**
-     * Returns a factory for the specified authority, type and hints.
+     * Returns the factories to be used by {@link ManyAuthoritiesFactory}. If the registered
+     * factories changed since the last time this method has been invoked, then this method
+     * recreate the set.
+     */
+    //@Override
+    synchronized Collection/*<AuthorityFactory>*/ getFactories() {
+        final Collection/*<String>*/ authorities = ReferencingFactoryFinder.getAuthorityNames();
+        if (authorities != authorityNames) {
+            authorityNames = authorities;
+            final Hints hints = getHints();
+            final Set/*<AuthorityFactory>*/ factories = new LinkedHashSet();
+            factories.addAll(ReferencingFactoryFinder.getCRSAuthorityFactories                (hints));
+            factories.addAll(ReferencingFactoryFinder.getCSAuthorityFactories                 (hints));
+            factories.addAll(ReferencingFactoryFinder.getDatumAuthorityFactories              (hints));
+            factories.addAll(ReferencingFactoryFinder.getCoordinateOperationAuthorityFactories(hints));
+            setFactories(factories);
+        }
+        return super.getFactories();
+    }
+
+    /**
+     * Returns a factory for the specified authority and type.
      */
     //@Override
     final AuthorityFactory fromFactoryRegistry(final String authority,
@@ -140,25 +160,23 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
             throws FactoryRegistryException
     {
         if (CRSAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCRSAuthorityFactory(authority, userHints);
+            return ReferencingFactoryFinder.getCRSAuthorityFactory(authority, getHints());
         } else if (CSAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCSAuthorityFactory(authority, userHints);
+            return ReferencingFactoryFinder.getCSAuthorityFactory(authority, getHints());
         } else if (DatumAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getDatumAuthorityFactory(authority, userHints);
+            return ReferencingFactoryFinder.getDatumAuthorityFactory(authority, getHints());
         } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
+            return ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, getHints());
         } else {
             return super.fromFactoryRegistry(authority, type);
         }
     }
 
     /**
-     * Returns a copy of the hints specified by the user at construction time. It may or may
-     * not be the same than the {@linkplain #getImplementationHints implementation hints} for
-     * this class.
+     * Returns a copy of the hints specified by the user at construction time.
      */
-    final Hints getUserHints() {
-        return new Hints(userHints);
+    private Hints getHints() {
+        return hints.isEmpty() ? null : new Hints(hints);
     }
 
     /**

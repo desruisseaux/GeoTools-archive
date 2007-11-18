@@ -75,7 +75,7 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      * @param userHints The hints to be given to backing factories.
      */
     public HTTP_AuthorityFactory(final Hints userHints) {
-        this(new AllAuthoritiesFactory(userHints));
+        this(getFactory(userHints));
     }
 
     /**
@@ -112,6 +112,15 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
             }
         }
         return new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+    }
+
+    /**
+     * Returns a factory from the specified hints. Used by {@link URN_AuthorityFactory}
+     * constructor as well.
+     */
+    static AllAuthoritiesFactory getFactory(final Hints hints) {
+        return (hints == null || hints.isEmpty()) ? AllAuthoritiesFactory.DEFAULT :
+            new AllAuthoritiesFactory(hints);
     }
 
     /**

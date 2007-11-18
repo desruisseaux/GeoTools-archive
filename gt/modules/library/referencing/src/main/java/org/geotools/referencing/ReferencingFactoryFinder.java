@@ -149,6 +149,14 @@ public class ReferencingFactoryFinder {
      * Returns the names of all currently registered authorities.
      */
     public static synchronized Set/*<String>*/ getAuthorityNames() {
+        /*
+         * IMPORTANT: Return the same Set instance (unmodifiable) as long as there is no change
+         * in the list of registered factories, and create a new instance in case of changes.
+         * 'add/removeAuthorityFactory(...)' and 'scanForPlugins()' methods reset 'authorityNames'
+         * to null, which will cause the creation of a new Set instance. Some implementations like
+         * AllAuthoritiesFactory rely on this behavior as a way to be notified of registration
+         * changes for clearing their cache.
+         */
         if (authorityNames == null) {
             authorityNames = new LinkedHashSet();
             final Hints hints = null;

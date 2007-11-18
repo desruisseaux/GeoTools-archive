@@ -54,7 +54,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * by {@code "EPSG:"}, then this class delegates the object creation to one of the authority
  * factories provided to the constructor.
  * <p>
- * This class is not registered in {@link GeometryFactoryFinder}, because it is not a real
+ * This class is not registered in {@link ReferencingFactoryFinder}, because it is not a real
  * authority factory. There is not a single authority name associated to this factory, but rather
  * a set of names determined from all available authority factories.
  *
@@ -90,10 +90,10 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     };
 
     /**
-     * A set of user-specified factories to try before to delegate to
-     * {@link GeometryFactoryFinder}, or {@code null} if none.
+     * The set of user-specified factories, or {@code null} if none.
+     * This field should be modified by {@link #setFactories} only.
      */
-    private final Collection/*<AuthorityFactory>*/ factories;
+    private Collection/*<AuthorityFactory>*/ factories;
 
     /**
      * The separator between the authority name and the code.
@@ -111,26 +111,39 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * Creates a new factory using the specified hints.
      *
      * @param userHints An optional set of hints, or {@code null} if none.
+     *
+     * @deprecated Use {@link #ManyAuthoritiesFactory(Collection)}.
      */
     public ManyAuthoritiesFactory(final Hints userHints) {
         this(userHints, null);
     }
 
     /**
-     * Creates a new factory using the specified hints and a set of user factories.
-     * Any call to a {@code createFoo(code)} method will scan the supplied factories
-     * in their iteration order. The first factory implementing the appropriate interface
-     * and having the expected {@linkplain AuthorityFactory#getAuthority authority name}
-     * will be used.
+     * Creates a new factory using the specified set of user factories. Any call to a
+     * {@code createFoo(code)} method will scan the supplied factories in their iteration
+     * order. The first factory implementing the appropriate interface and having the expected
+     * {@linkplain AuthorityFactory#getAuthority authority name} will be used.
      * <p>
      * If the {@code factories} collection contains more than one factory for the same authority
      * and interface, then all additional factories will be {@linkplain FallbackAuthorityFactory
      * fallbacks}, to be tried in iteration order only if the first acceptable factory failed to
      * create the requested object.
      *
+     * @param factories A set of user-specified factories to try before to delegate
+     *        to {@link GeometryFactoryFinder}.
+     */
+    public ManyAuthoritiesFactory(final Collection/*<? extends AuthorityFactory>*/ factories) {
+        this(null, factories, (char) 0);
+    }
+
+    /**
+     * Creates a new factory using the specified hints and a set of user factories.
+     *
      * @param userHints An optional set of hints, or {@code null} if none.
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link GeometryFactoryFinder}.
+     *
+     * @deprecated Use {@link #ManyAuthoritiesFactory(Collection)}.
      */
     public ManyAuthoritiesFactory(final Hints userHints,
             final Collection/*<? extends AuthorityFactory>*/ factories)
@@ -158,9 +171,24 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
                 }
             }
             this.factories = createFallbacks(factories);
-        } else {
-            this.factories = null;
         }
+    }
+
+    /**
+     * Returns the factories. This method should not be public since it returns directly the
+     * internal instance. This method is to be overriden by {@link AllAuthoritiesFactory} only.
+     */
+    Collection/*<AuthorityFactory>*/ getFactories() {
+        return factories;
+    }
+
+    /**
+     * Sets the factories. This method is invoked by the {@link AllAuthoritiesFactory} subclass
+     * only. No one else should invoke this method, since factories should be immutable.
+     */
+    final void setFactories(final Collection/*<AuthorityFactory>*/ factories) {
+        assert Thread.holdsLock(this);
+        this.factories = createFallbacks(factories);
     }
 
     /**
@@ -333,6 +361,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      */
     public Set/*<String>*/ getAuthorityNames() {
         final Set names = new HashSet();
+        final Collection/*<AuthorityFactory>*/ factories = getFactories();
         if (factories != null) {
             for (final Iterator it=factories.iterator(); it.hasNext();) {
                 final AuthorityFactory factory = (AuthorityFactory) it.next();
@@ -353,13 +382,13 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     }
 
     /**
-     * Returns the direct dependencies. Current implemenation returns the internal structure
+     * Returns the direct dependencies. Current implementation returns the internal structure
      * because we know that this package will not modifies it. But if the method become public,
      * we will need to returns a unmodifiable view.
      */
     //@Override
     Collection/*<?>*/ dependencies() {
-        return factories;
+        return getFactories();
     }
 
     /**
@@ -410,7 +439,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     /**
      * Returns a factory for the specified authority, or {@code null} if none.
      * To be overriden by {@link AllAuthoritiesFactory} in order to search among
-     * factories registered on a system-wide basis
+     * factories registered on a system-wide basis.
      *
      * @param  authority The authority to query.
      * @param  type The interface to be implemented.
@@ -443,6 +472,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
         ensureNonNull("code", code);
         String authority = null;
         FactoryRegistryException cause = null;
+        final Collection/*<AuthorityFactory>*/ factories = getFactories();
         final char separator = getSeparator(code);
         for (int split = code.lastIndexOf(separator); split >= 0;
                  split = code.lastIndexOf(separator, split-1))
@@ -818,7 +848,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
          * Returns the user-supplied factories.
          */
         final Collection getFactories() {
-            return ((ManyAuthoritiesFactory) getProxy().getAuthorityFactory()).factories;
+            return ((ManyAuthoritiesFactory) getProxy().getAuthorityFactory()).getFactories();
         }
 
         /**
