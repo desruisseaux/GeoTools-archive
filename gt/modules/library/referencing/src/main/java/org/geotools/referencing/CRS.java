@@ -58,6 +58,7 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -416,6 +417,35 @@ public final class CRS {
         return getAuthorityFactory(longitudeFirst).createCoordinateReferenceSystem(code);
     }
 
+    /**
+     * Determines the epsg from a crs object.
+     * <p>
+     * If the crs does not have an {@link Identifier} which corresponds to the 
+     * EPSG authority, this method will return <code>null</code>.
+     * </p>
+     * @param crs The coordinate reference system instance, must not be <code>null</code>.
+     * 
+     * @return The epsg integer code for the crs, or <code>null</code> if none
+     * exists. 
+     *
+     * @since 2.5
+     */
+    public static Integer getEPSGCode(CoordinateReferenceSystem crs) {
+        if (crs == null) {
+            return null;
+        }
+
+        for (Iterator i = crs.getIdentifiers().iterator(); i.hasNext();) {
+            Identifier id = (Identifier) i.next();
+
+            if ((id.getAuthority() != null)
+                    && id.getAuthority().getTitle().equals(Citations.EPSG.getTitle())) {
+                return Integer.parseInt(id.getCode());
+            }
+        }
+
+        return null;
+    }
     /**
      * Parses a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
