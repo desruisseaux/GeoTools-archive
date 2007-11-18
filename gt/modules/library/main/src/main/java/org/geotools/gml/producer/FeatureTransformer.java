@@ -490,7 +490,7 @@ public class FeatureTransformer extends TransformerBase {
                             i++) {
                         AttributeDescriptor descriptor = t.getAttribute(i);
                         Object value = f.getAttribute(i);
-                        handleAttribute( descriptor, i );
+                        handleAttribute( descriptor, value );
                     }
                     endFeature(f);
                 }
