@@ -25,19 +25,20 @@ import org.geotools.map.event.MapLayerListEvent;
  *
  * @author Johann Sorel
  */
-public class SingleBufferPane extends MapBufferPane {
+class SingleBufferPane extends MapBufferPane {
 
     private Thread thread = null;
     private BufferComponent comp = new BufferComponent();
     private DefaultMap2D map;
     private boolean mustupdate = false;
 
+    //optimize with hardware doublebuffer, also called backbuffer
     SingleBufferPane(DefaultMap2D map) {
         this.map = map;
+
     }
 
     private void fit() {
-
         if (thread != null && thread.isAlive()) {
             mustupdate = true;
         } else {
@@ -48,7 +49,7 @@ public class SingleBufferPane extends MapBufferPane {
 
     }
 
-    public void redraw() {
+    public void redraw(boolean complete) {
         fit();
     }
 
@@ -91,47 +92,43 @@ public class SingleBufferPane extends MapBufferPane {
     }
 
     //------------------------PRIVATES CLASSES----------------------------------
-    
-    
-    private class DrawingThread extends Thread{
-              
+    private class DrawingThread extends Thread {
+
         @Override
-        public void run(){
-            
+        public void run() {
             raiseNB();
             while (mustupdate) {
                 mustupdate = false;
                 MapContext context = map.context;
-                if (context != null) {                    
-                    System.out.println("->update");
+                if (context != null && map.getMapArea() != null) {
                     comp.setBuffer(map.createBufferImage(context));
-                }                
+                }
             }
-            lowerNB();            
-        }      
+            lowerNB();
+        }
+    };
+         
+
+        private class BufferComponent extends JComponent {
+
+            private BufferedImage img;
+
+            public void setBuffer(BufferedImage buf) {
+                img = buf;
+                revalidate();
+                repaint();
+            }
+            
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (img != null) {
+                    g.drawImage(img, 0, 0, this);
+                }
+            }       
+        };
         
-    };
-    
-    
-    
-    
-    private class BufferComponent extends JComponent {
-
-        private BufferedImage img;
-
-        public void setBuffer(BufferedImage buf) {
-            img = buf;
-            revalidate();
-            repaint();
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (img != null) {
-                g.drawImage(img, 0, 0, this);
-            }
-        }
-    };
+        
+        
 }
     
     

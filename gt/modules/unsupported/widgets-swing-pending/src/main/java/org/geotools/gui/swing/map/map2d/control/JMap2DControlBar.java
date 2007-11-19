@@ -15,34 +15,49 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
+import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
+import javax.swing.plaf.DimensionUIResource;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
+import org.geotools.gui.swing.map.map2d.listener.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DMapAreaEvent;
 
 /**
  * @author johann sorel
  */
-public class JMap2DControlBar extends JPanel {
+public class JMap2DControlBar extends JPanel implements Map2DListener {
 
-    private NavigableMap2D navigationMap;
-    private SelectableMap2D selectionMap;
-    private final JToggleButton zoomin = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_in"));
-    private final JToggleButton zoomout = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_out"));
-    private final JToggleButton zoompan = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_pan"));
-    private final JToggleButton zoomall = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_all"));
-    private final JToggleButton select = buildToggleButton(IconBundle.getResource().getIcon("16_select"));
+    private final List<Envelope> mapAreas = new ArrayList<Envelope>();
+    private Envelope lastMapArea = null;
+    private Map2D map = null;
+    private final JButton gui_zoomAll = buildButton(IconBundle.getResource().getIcon("16_zoom_all"));
+    private final JButton gui_nextArea = buildButton(IconBundle.getResource().getIcon("16_next_maparea"));
+    private final JButton gui_previousArea = buildButton(IconBundle.getResource().getIcon("16_previous_maparea"));
+    private final JToggleButton gui_zoomIn = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_in"));
+    private final JToggleButton gui_zoomOut = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_out"));
+    private final JToggleButton gui_zoomPan = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_pan"));
+    private final JToggleButton gui_select = buildToggleButton(IconBundle.getResource().getIcon("16_select"));
+    private final JButton gui_refresh = buildButton(IconBundle.getResource().getIcon("16_data_reload"));
 
     /**
      * Creates a new instance of DefaultLightMapPaneToolBar
@@ -52,128 +67,264 @@ public class JMap2DControlBar extends JPanel {
     }
 
     public JMap2DControlBar(Map pane) {
-        super(new FlowLayout(FlowLayout.LEFT));
+        super(new FlowLayout(FlowLayout.LEFT,0,0));
+        //super( new GridLayout(1,8));
+        getInsets().set(0, 0,0,0);
         setMap(pane);
         init();
     }
 
     private void init() {
-        
+
         ButtonGroup bg = new ButtonGroup();
-        bg.add(zoomin);
-        bg.add(zoomout);
-        bg.add(zoompan);
-        bg.add(zoomall);
-        bg.add(select);
+        bg.add(gui_zoomIn);
+        bg.add(gui_zoomOut);
+        bg.add(gui_zoomPan);
+        bg.add(gui_select);
+
+        gui_zoomAll.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (map != null) {
+
+                    try {
+                        map.setMapArea(map.getContext().getLayerBounds());
+                        map.refresh();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+            }
+        });
+
+        gui_nextArea.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if(lastMapArea != null){
+                    int index = mapAreas.indexOf(lastMapArea);
+                    
+                    index++;
+                    if(index<mapAreas.size()){
+                        map.setMapArea(mapAreas.get(index));
+                        map.refresh();
+                    }
+                    if(index == mapAreas.size()-1){
+                        gui_nextArea.setEnabled(false);
+                    }                    
+                }
+            }
+        });
+        
+        gui_previousArea.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                
+                if(lastMapArea != null){
+                    int index = mapAreas.indexOf(lastMapArea);
+                    
+                    index--;
+                    if(index>=0){
+                        map.setMapArea(mapAreas.get(index));
+                        map.refresh();
+                    }
+                    if(index == 0){
+                        gui_previousArea.setEnabled(false);
+                    }                    
+                }
+            }
+        });
         
         
-        zoomin.addActionListener(new ActionListener() {
+        gui_zoomIn.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        if (navigationMap != null) {
-                            navigationMap.setActionState(MapConstants.ACTION_STATE.ZOOM_IN);
-                        }
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                if (map != null) {
+                    ((NavigableMap2D) map).setActionState(MapConstants.ACTION_STATE.ZOOM_IN);
+                }
+            }
+        });
 
-        zoomout.addActionListener(new ActionListener() {
+        gui_zoomOut.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        if (navigationMap != null) {
-                            navigationMap.setActionState(MapConstants.ACTION_STATE.ZOOM_OUT);
-                        }
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                if (map != null) {
+                    ((NavigableMap2D) map).setActionState(MapConstants.ACTION_STATE.ZOOM_OUT);
+                }
+            }
+        });
 
-        zoompan.addActionListener(new ActionListener() {
+        gui_zoomPan.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        if (navigationMap != null) {
-                            navigationMap.setActionState(MapConstants.ACTION_STATE.PAN);
-                        }
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                if (map != null) {
+                    ((NavigableMap2D) map).setActionState(MapConstants.ACTION_STATE.PAN);
+                }
+            }
+        });
 
-        zoomall.addActionListener(new ActionListener() {
+        gui_select.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        if (navigationMap != null) {
+            public void actionPerformed(ActionEvent e) {
+                if (map != null) {
+                    ((SelectableMap2D) map).setActionState(MapConstants.ACTION_STATE.SELECT);
+                }
+            }
+        });
 
-                            try {
-                                navigationMap.setMapArea(navigationMap.getContext().getLayerBounds());
-                                navigationMap.refresh();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
+        gui_refresh.addActionListener(new ActionListener() {
 
-                        }
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                if (map != null) {
+                     map.refresh();
+                }
+            }
+        });
 
-        select.addActionListener(new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        selectionMap.setActionState(MapConstants.ACTION_STATE.SELECT);
-                    }
-                });
+        add(gui_zoomAll);
+        add(gui_refresh);
+        add(gui_previousArea);
+        add(gui_nextArea);
+        add(gui_zoomIn);
+        add(gui_zoomOut);
+        add(gui_zoomPan);
+        add(gui_select);
 
-        add(zoomall);
-        add(zoomin);
-        add(zoomout);
-        add(zoompan);
-        add(select);
+    }
+
+    private final int largeur =  2;
+    
+    private JButton buildButton(ImageIcon img) {
+        JButton but = new JButton(img);
+        but.setBorder(new EmptyBorder(largeur,largeur,largeur,largeur));
+        but.setBorderPainted(false);
+        but.setContentAreaFilled(false);
+        but.setPreferredSize(new Dimension(25,25));
+        but.setOpaque(false);
+        return but;
     }
 
     private JToggleButton buildToggleButton(ImageIcon img) {
         JToggleButton but = new JToggleButton(img);
-        but.setBorder(new EmptyBorder(2, 2, 2, 2));
-       
-        //but.setBorderPainted(false);
+        but.setBorder(new EmptyBorder(largeur,largeur,largeur,largeur));
+        but.setPreferredSize(new Dimension(25,25));
+        but.setBorderPainted(true);
         //but.setContentAreaFilled(false);
         //but.setOpaque(false);
         return but;
     }
 
     public void setMap(Map pane) {
-        if (pane instanceof NavigableMap2D) {
-            this.navigationMap = (NavigableMap2D) pane;
-            zoomall.setEnabled(true);
-            zoomin.setEnabled(true);
-            zoomout.setEnabled(true);
-            zoompan.setEnabled(true);
-            
-            switch(navigationMap.getActionState()){
-                case ZOOM_IN :
-                    zoomin.setSelected(true);
-                    break;
-                case ZOOM_OUT :
-                    zoomall.setSelected(true);
-                    break;
-                case PAN :
-                    zoompan.setSelected(true);
-                    break;
-                case SELECT :
-                    select.setSelected(true);
-                    break;
-                case EDIT :
-                    break;
-            }
-            
 
-            if (pane instanceof SelectableMap2D) {
-                this.selectionMap = (SelectableMap2D) pane;
-                select.setEnabled(true);
-            } else {
-                select.setEnabled(false);
-            }
-
-        } else {
-            zoomall.setEnabled(false);
-            zoomin.setEnabled(false);
-            zoomout.setEnabled(false);
-            zoompan.setEnabled(false);
-            select.setEnabled(false);
+        if (map != null) {
+            map.removeMap2DListener(this);
+            lastMapArea = map.getMapArea();
         }
 
+        if (pane instanceof Map2D) {
+            map = (Map2D) pane;
+            map.addMap2DListener(this);
+            gui_refresh.setEnabled(true);
+
+            if (pane instanceof NavigableMap2D) {
+                NavigableMap2D navigationMap = (NavigableMap2D) pane;
+                gui_zoomAll.setEnabled(true);
+                gui_zoomIn.setEnabled(true);
+                gui_zoomOut.setEnabled(true);
+                gui_zoomPan.setEnabled(true);
+
+                switch (navigationMap.getActionState()) {
+                    case ZOOM_IN:
+                        gui_zoomIn.setSelected(true);
+                        break;
+                    case ZOOM_OUT:
+                        gui_zoomAll.setSelected(true);
+                        break;
+                    case PAN:
+                        gui_zoomPan.setSelected(true);
+                        break;
+                    case SELECT:
+                        gui_select.setSelected(true);
+                        break;
+                    case EDIT:
+                        break;
+                }
+
+                if (pane instanceof SelectableMap2D) {
+                    gui_select.setEnabled(true);
+                } else {
+                    gui_select.setEnabled(false);
+                }
+            } else {
+                gui_zoomAll.setEnabled(false);
+                gui_zoomIn.setEnabled(false);
+                gui_zoomOut.setEnabled(false);
+                gui_zoomPan.setEnabled(false);
+            }
+        } else {
+            map = null;
+            gui_refresh.setEnabled(false);
+        }
+
+        gui_nextArea.setEnabled(false);
+        gui_previousArea.setEnabled(false);
+
+    }
+
+    //-----------------------Map2DListener--------------------------------------
+    public void mapAreaChanged(Map2DMapAreaEvent event) {
+        
+        while (mapAreas.size() > 10) {
+            mapAreas.remove(0);
+        }
+        
+        Envelope newMapArea = event.getNewMapArea();
+        lastMapArea = newMapArea;
+
+        if (mapAreas.contains(newMapArea)) {
+
+            if (mapAreas.size() > 1) {
+                
+                int position = mapAreas.indexOf(newMapArea);
+                
+                if(position == 0){
+                    gui_previousArea.setEnabled(false);
+                    gui_nextArea.setEnabled(true);
+                }else if(position == mapAreas.size()-1){                    
+                    gui_previousArea.setEnabled(true);
+                    gui_nextArea.setEnabled(false);
+                }else{
+                    gui_previousArea.setEnabled(true);
+                    gui_nextArea.setEnabled(true);
+                }
+                                
+            } else {
+                gui_previousArea.setEnabled(false);
+                gui_nextArea.setEnabled(false);
+            }
+
+            
+        } else {
+            mapAreas.add(newMapArea);
+            
+            if (mapAreas.size() > 1) {
+                gui_previousArea.setEnabled(true);
+                gui_nextArea.setEnabled(false);
+            }else{
+                gui_previousArea.setEnabled(false);
+                gui_nextArea.setEnabled(false);
+            }
+        }
+
+
+
+
+    }
+
+    public void mapContextChanged(Map2DContextEvent event) {
+        mapAreas.clear();
+        gui_nextArea.setEnabled(false);
+        gui_previousArea.setEnabled(false);
     }
 }

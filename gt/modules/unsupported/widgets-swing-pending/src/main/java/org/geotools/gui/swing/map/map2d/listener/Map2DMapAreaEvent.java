@@ -13,31 +13,34 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d;
 
-import java.util.Observable;
-import javax.swing.JComponent;
-import org.geotools.map.event.MapLayerListEvent;
+package org.geotools.gui.swing.map.map2d.listener;
+
+import com.vividsolutions.jts.geom.Envelope;
+import java.util.EventObject;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
  * @author Johann Sorel
  */
-public abstract class MapBufferPane extends Observable{
+public class Map2DMapAreaEvent extends EventObject{
 
-        
-    public abstract void redraw(boolean complete);
-
-    public abstract void layerChanged(MapLayerListEvent event);
-
-    public abstract void layerDeleted(MapLayerListEvent event);
-
-    public abstract void layerAdded(MapLayerListEvent event);
-
-    public abstract void layerMoved(MapLayerListEvent event);
-        
-    public abstract JComponent getComponent();
+    private Envelope oldEnvelope = null;
+    private Envelope newEnvelope = null;
     
     
-    
+    public Map2DMapAreaEvent(Map2D map, Envelope oldone, Envelope newone){
+        super(map);
+        oldEnvelope = oldone;
+        newEnvelope = newone;
+    }
+
+    public Envelope getPreviousMapArea() {
+        return oldEnvelope;
+    }
+
+    public Envelope getNewMapArea() {
+        return newEnvelope;
+    }
 }

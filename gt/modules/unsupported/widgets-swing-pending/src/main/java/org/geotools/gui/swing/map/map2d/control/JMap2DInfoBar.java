@@ -5,8 +5,12 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.RenderingHints;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.DefaultMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
@@ -15,21 +19,22 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author johann Sorel
  */
-public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeListener {
+public class JMap2DInfoBar extends javax.swing.JPanel {
 
     private Map2D map;
-
+    
+    
     /** Creates new form JMap2DInfoBar */
     public JMap2DInfoBar() {
-
         initComponents();
+        
+                        
     }
 
     public void setMap(Map map) {
 
         if (map instanceof Map2D) {
             this.map = (Map2D) map;
-            this.map.getContext().addPropertyChangeListener(this);
         }
 
         init();
@@ -68,6 +73,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
         jPanel1 = new javax.swing.JPanel();
         jrb_multi = new javax.swing.JRadioButton();
         jrb_single = new javax.swing.JRadioButton();
+        gui_config = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -94,26 +100,38 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
             .add(jPanel1Layout.createSequentialGroup()
                 .add(2, 2, 2)
                 .add(jrb_single)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jrb_multi)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(jrb_multi)
-                .add(jrb_single))
+                .add(jrb_single)
+                .add(jrb_multi))
         );
+
+        gui_config.setIcon(IconBundle.getResource().getIcon("16_map2d_optimize"));
+        gui_config.setEnabled(false);
+        gui_config.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gui_configActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(layout.createSequentialGroup()
+                .add(gui_config)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(gui_config)
         );
     }// </editor-fold>//GEN-END:initComponents
     private void jrb_singleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_singleActionPerformed
@@ -130,11 +148,23 @@ public class JMap2DInfoBar extends javax.swing.JPanel implements PropertyChangeL
         }
     }//GEN-LAST:event_jrb_multiActionPerformed
 
-    public void propertyChange(PropertyChangeEvent evt) {
-        init();
-    }
+    private void gui_configActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_configActionPerformed
+        if(map != null){
+            JPopupMenu pop = new JPopupMenu();
+            
+            
+
+            
+            
+            pop.getHeight();
+        }
+        
+        
+}//GEN-LAST:event_gui_configActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton gui_config;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JRadioButton jrb_multi;
     private javax.swing.JRadioButton jrb_single;

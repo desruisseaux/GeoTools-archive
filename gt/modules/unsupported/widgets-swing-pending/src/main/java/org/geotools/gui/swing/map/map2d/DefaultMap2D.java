@@ -31,6 +31,10 @@ import java.util.Observer;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.EventListenerList;
+import org.geotools.gui.swing.map.map2d.listener.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
+import org.geotools.gui.swing.map.map2d.listener.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.overLayer.WaitingOverLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -48,32 +52,27 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
-    public static enum BUFFER_TYPE{
+    public static enum BUFFER_TYPE {
+
         SINGLE_BUFFER,
         MULTI_BUFFER
-    };
-    
-    
+    }
 //    protected GraphicsConfiguration GC ;
-    
+    protected final EventListenerList MAP2DLISTENERS = new EventListenerList();
     protected final Map2D THIS_MAP;
-    protected int NEXT_OVER_LAYER_INDEX = 12;    
-    protected GTRenderer renderer;    
+    protected int NEXT_OVER_LAYER_INDEX = 12;
+    protected GTRenderer renderer;
     protected MapContext context;
     protected Envelope mapArea;
-    protected MapContext buffercontext = new OneLayerContext();
     protected JLayeredPane layerPane = new JLayeredPane();
     protected MapBufferPane bufferPane = new MultiBufferPane(this);
     protected WaitingOverLayer waitingPane = new WaitingOverLayer();
-    
     private final MapLayerListListener mapLayerListlistener;
+    private final MapContext buffercontext = new OneLayerContext();
     private BUFFER_TYPE type = null;
-    private Rectangle mapRectangle = null;
+    private Rectangle mapRectangle = new Rectangle(1, 1);
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
-    private boolean changed = true;
-    private boolean reset = true;
-    
 
     public DefaultMap2D() {
         this(new ShapefileRenderer());
@@ -84,14 +83,14 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         this.THIS_MAP = this;
         mapLayerListlistener = new MapLayerListListen();
         setLayout(new GridLayout(1, 1));
-        layerPane.setLayout(new BufferLayout());    
-        
+        layerPane.setLayout(new BufferLayout());
+
         setMapBufferType(BUFFER_TYPE.SINGLE_BUFFER);
-                
+
         layerPane.add(waitingPane, new Integer(NEXT_OVER_LAYER_INDEX));
         NEXT_OVER_LAYER_INDEX++;
         add(layerPane);
-        
+
 //        GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
 //        GraphicsDevice[] devices = gEnv.getScreenDevices();
 //
@@ -100,19 +99,32 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 //            GC = devices[0].getDefaultConfiguration();
 //            }
 //        
-        
+
         opimizeRenderer();
     }
 
     private void opimizeRenderer() {
-        
+
         Map rendererParams = new HashMap();
         rendererParams.put("optimizedDataLoadingEnabled", new Boolean(true));
         rendererParams.put("maxFiltersToSendToDatastore", new Integer(20));
         rendererParams.put(ShapefileRenderer.SCALE_COMPUTATION_METHOD_KEY, ShapefileRenderer.SCALE_OGC);
-        RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
-        renderer.setJava2DHints(rh);
         renderer.setRendererHints(rendererParams);
+
+        RenderingHints rh;
+        rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        renderer.setJava2DHints(rh);
+        rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        renderer.setJava2DHints(rh);
+        rh = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+        renderer.setJava2DHints(rh);
+        rh = new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+        renderer.setJava2DHints(rh);
+        rh = new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+        renderer.setJava2DHints(rh);
+        rh = new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE);
+        renderer.setJava2DHints(rh);
+
 
 //if(){
 //rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_STRING);
@@ -120,10 +132,6 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 // rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_OUTLINE);
 //    }
 
-    }
-
-    protected void setChanged(boolean val) {
-        changed = val;
     }
 
     protected Envelope fixAspectRatio(Rectangle r, Envelope mapArea) {
@@ -159,122 +167,100 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         return new Envelope(ll, ur);
     }
 
-    protected BufferedImage createBufferImage(MapLayer layer) {
+    protected synchronized BufferedImage createBufferImage(MapLayer layer) {
 
 
         buffercontext.clearLayerList();
 
-        try {
-            buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
-        } catch (Exception e) {
-        }
+        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+            try {
+                buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+            } catch (Exception e) {
+            }
 
-        buffercontext.addLayer(layer);
-        renderer.setContext(buffercontext);
-        
-        //NOT OPTIMIZED
-        if(mapRectangle == null){
-            mapRectangle = new Rectangle(1,1);
-        }
-        
-        BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D ig = buf.createGraphics();
-        
-        //GC ACCELERATION        
+            buffercontext.addLayer(layer);
+            renderer.setContext(buffercontext);
+
+            //NOT OPTIMIZED
+            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D ig = buf.createGraphics();
+
+            //GC ACCELERATION        
 //        BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height,BufferedImage.TYPE_INT_ARGB);
 //        Graphics2D ig = buf.createGraphics();
-                
-        renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
 
-        return buf;
-    }
-
-    protected BufferedImage createBufferImage(MapContext context) {
-        BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D ig = buf.createGraphics();
-        renderer.setContext(context);
-        renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
-        return buf;
-    }
-
-    protected void redraw(boolean withRepaint) {
-
-        if ((renderer == null) || (mapArea == null)) {
-            return;
+            renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+            return buf;
+        } else {
+            return null;
         }
 
-        Rectangle r = getBounds();
-        mapRectangle = new Rectangle(r.width, r.height);
+    }
 
-        if (!r.equals(oldRect) || reset) {
-            if (reset) {
-                try {
-                    mapArea = context.getLayerBounds();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            /* either the viewer size has changed or we've done a reset */
-            changed = true; /* note we need to redraw */
-            reset = false;
-            oldRect = r; /* store what the current size is */
+    protected synchronized BufferedImage createBufferImage(MapContext context) {
 
-            if (mapArea == null) {
-                bufferPane.redraw();
-                return;
+        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D ig = buf.createGraphics();
+            renderer.setContext(context);
+            renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+            return buf;
+        } else {
+            return null;
+        }
+
+    }
+
+    private void redraw(boolean complete) {
+        boolean changed = false;
+
+        if ( renderer != null && mapArea != null ) {
+                        
+            Rectangle newRect = getBounds();
+            mapRectangle = new Rectangle(newRect.width, newRect.height);
+
+            if (!newRect.equals(oldRect)) {
+                changed = true;         
+                oldRect = newRect;
+                mapArea = fixAspectRatio(newRect, mapArea);
             }
 
-            mapArea = fixAspectRatio(r, mapArea);
+            if ( !(mapArea.equals(oldMapArea)) && !( Double.isNaN(mapArea.getMinX())) ) {
+                changed = true;                
+                oldMapArea = mapArea;
+                context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
+            }
+
+            if (changed || complete) {
+                changed = false;
+                //System.out.println("la2");
+                bufferPane.redraw(complete);
+            }
         }
-
-        if (!mapArea.equals(oldMapArea)) { /* did the map extent change? */
-            changed = true;
-            oldMapArea = mapArea;
-            //          when we tell the context that the bounds have changed WMSLayers
-            // can refresh them selves
-            context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
-        }
-
-        if (changed) {
-            changed = false;
-            bufferPane.redraw();
-        }
-
-        if (withRepaint) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    revalidate();
-                    repaint();
-                }
-            });
-        }
-
-
     }
 
-    public void setMapBufferType(BUFFER_TYPE type){
-        if(this.type != type){
+    public void setMapBufferType(BUFFER_TYPE type) {
+        if (this.type != type) {
             this.type = type;
             bufferPane.deleteObserver(this);
             layerPane.remove(bufferPane.getComponent());
-                        
-            if(type == BUFFER_TYPE.MULTI_BUFFER){
+
+            if (type == BUFFER_TYPE.MULTI_BUFFER) {
                 bufferPane = new MultiBufferPane(this);
-            }else{
+            } else {
                 bufferPane = new SingleBufferPane(this);
             }
             bufferPane.addObserver(this);
-            bufferPane.redraw();
-            
+            bufferPane.redraw(false);
+
             layerPane.add(bufferPane.getComponent(), new Integer(11));
         }
     }
-    
-    public BUFFER_TYPE getBufferType(){
+
+    public BUFFER_TYPE getBufferType() {
         return type;
     }
-    
+
     @Override
     public void paintComponent(Graphics g) {
         redraw(false);
@@ -297,12 +283,35 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         bufferPane.layerMoved(event);
     }
 
+    private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
+        Map2DMapAreaEvent mce = new Map2DMapAreaEvent(this, oldone, newone);
+
+        Map2DListener[] lst = getMap2DListeners();
+
+        for (Map2DListener l : lst) {
+            l.mapAreaChanged(mce);
+        }
+
+    }
+
+    private void fireMapContextChanged(MapContext oldcontext, MapContext newContext) {
+        Map2DContextEvent mce = new Map2DContextEvent(this, oldcontext, newContext);
+
+        Map2DListener[] lst = getMap2DListeners();
+
+        for (Map2DListener l : lst) {
+            l.mapContextChanged(mce);
+        }
+
+    }
+
     //-----------------------MAP2D----------------------------------------------    
     public void setContext(MapContext context) {
         if (this.context != null) {
             this.context.removeMapLayerListListener(mapLayerListlistener);
         }
 
+        fireMapContextChanged(this.context, context);
         this.context = context;
 
         if (context != null) {
@@ -312,6 +321,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         if (renderer != null) {
             renderer.setContext(this.context);
         }
+
         refresh();
     }
 
@@ -328,7 +338,15 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     }
 
     public void setMapArea(Envelope mapArea) {
-        this.mapArea = mapArea;
+        
+        if (mapArea != null) {
+            Rectangle r = getBounds();
+            Envelope newArea = fixAspectRatio(r, mapArea);
+
+            fireMapAreaChanged(this.mapArea, newArea);
+            this.mapArea = newArea;
+            redraw(false);
+        }
     }
 
     public Envelope getMapArea() {
@@ -356,7 +374,6 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     }
 
     public void refresh() {
-        reset = true;
         redraw(true);
     }
 
@@ -371,6 +388,18 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         } else {
             waitingPane.setDrawing(false);
         }
+    }
+
+    public void addMap2DListener(Map2DListener listener) {
+        MAP2DLISTENERS.add(Map2DListener.class, listener);
+    }
+
+    public void removeMap2DListener(Map2DListener listener) {
+        MAP2DLISTENERS.remove(Map2DListener.class, listener);
+    }
+
+    public Map2DListener[] getMap2DListeners() {
+        return MAP2DLISTENERS.getListeners(Map2DListener.class);
     }
 
     //---------------------- PRIVATE CLASSES------------------------------------    

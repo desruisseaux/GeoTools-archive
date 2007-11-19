@@ -73,7 +73,7 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
     }
     
     private void doMouseSelection(double mx, double my) {
-        
+        if(mapArea != null){
         Rectangle bounds = getBounds();
         double width = mapArea.getWidth();
         double height = mapArea.getHeight();
@@ -92,11 +92,12 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
         Geometry geometry = gf.createPolygon(lr1, lr2);
         
         findFeature(geometry);
+        }
     }
     
     
     private void doMouseSelection(double mx, double my, double ex, double ey) {
-        
+        if(mapArea != null){
         Rectangle bounds = getBounds();
         double width = mapArea.getWidth();
         double height = mapArea.getHeight();
@@ -113,6 +114,7 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
         Geometry geometry = gf.createPolygon(lr1, lr2);
         
         findFeature(geometry);
+        }
     }
     
     

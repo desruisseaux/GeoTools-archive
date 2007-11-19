@@ -16,13 +16,12 @@
 package org.geotools.gui.swing.demo;
 
 import java.awt.GridLayout;
-import java.awt.RenderingHints;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -57,7 +56,6 @@ import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.JServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.DefaultSelectableMap2D;
-import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
@@ -92,23 +90,15 @@ public class DemoAll extends javax.swing.JFrame {
         map = new DefaultSelectableMap2D(new ShapefileRenderer());
         map.getComponent().setOpaque(false);
         
-        MapContext context = buildContext();
+        final MapContext context = buildContext();
         initTree(tree,map);
-
         
-        map.setContext(context);
-        
-        
+                
         pan_mappane.setLayout(new GridLayout(1, 1));
         pan_mappane.add(map);
 
-        try {
-            map.setMapArea(map.getContext().getLayerBounds());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        map.revalidate();
-
+        
+        
         tree.addContext(context);
 
         lightcontrol.setMap(map);
@@ -129,6 +119,21 @@ public class DemoAll extends javax.swing.JFrame {
             }
 
             public void contextMoved(TreeContextEvent event) {
+            }
+        });
+        
+        
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                map.setContext(context);
+                
+                try {
+            map.setMapArea(map.getContext().getLayerBounds());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
             }
         });
 
@@ -311,16 +316,18 @@ public class DemoAll extends javax.swing.JFrame {
         );
         pan_mappaneLayout.setVerticalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 403, Short.MAX_VALUE)
+            .add(0, 413, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout jpanel8Layout = new org.jdesktop.layout.GroupLayout(jpanel8);
         jpanel8.setLayout(jpanel8Layout);
         jpanel8Layout.setHorizontalGroup(
             jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(lightcontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
             .add(infopanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
             .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jpanel8Layout.createSequentialGroup()
+                .add(lightcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(297, Short.MAX_VALUE))
         );
         jpanel8Layout.setVerticalGroup(
             jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)

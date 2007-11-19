@@ -19,7 +19,7 @@ package org.geotools.gui.swing.map.map2d;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Component;
 import org.geotools.gui.swing.map.Map;
-import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.map.MapContext;
 import org.geotools.renderer.GTRenderer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -44,5 +44,12 @@ public interface Map2D extends Map{
             
     public void refresh();
     public Component getComponent();
+    
+    
+    public void addMap2DListener(Map2DListener listener);
+    public void removeMap2DListener(Map2DListener listener);
+    public Map2DListener[] getMap2DListeners();
+    
+    
     
 }

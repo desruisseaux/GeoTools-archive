@@ -38,6 +38,7 @@ class MultiBufferPane extends MapBufferPane {
     private MapContext oldcontext = null;
     private Thread thread = null;
     private boolean mustupdate = false;
+    private boolean complete = false;
 
     MultiBufferPane(DefaultMap2D map) {
         this.map = map;
@@ -49,8 +50,9 @@ class MultiBufferPane extends MapBufferPane {
     }
 
 
-    public void redraw() {
-
+    public void redraw(boolean complete) {
+        this.complete = complete;
+        
         if (thread != null && thread.isAlive()) {
             mustupdate = true;
         } else {
@@ -154,9 +156,9 @@ class MultiBufferPane extends MapBufferPane {
 
                 MapContext context = map.context;
                 if (context != null) {
-                    if (getBufferSize() != context.getLayerCount() || context != oldcontext) {
+                    if (complete || getBufferSize() != context.getLayerCount() || context != oldcontext) {
                         oldcontext = context;
-
+                        complete = false;
                         int contextsize = map.context.getLayerCount();
 
                         stock.clear();

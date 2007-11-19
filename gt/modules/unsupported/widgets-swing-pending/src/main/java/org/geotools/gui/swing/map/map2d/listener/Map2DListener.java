@@ -13,31 +13,19 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d;
 
-import java.util.Observable;
-import javax.swing.JComponent;
-import org.geotools.map.event.MapLayerListEvent;
+package org.geotools.gui.swing.map.map2d.listener;
+
+import java.util.EventListener;
 
 /**
  *
  * @author Johann Sorel
  */
-public abstract class MapBufferPane extends Observable{
+public interface Map2DListener extends EventListener{
 
-        
-    public abstract void redraw(boolean complete);
-
-    public abstract void layerChanged(MapLayerListEvent event);
-
-    public abstract void layerDeleted(MapLayerListEvent event);
-
-    public abstract void layerAdded(MapLayerListEvent event);
-
-    public abstract void layerMoved(MapLayerListEvent event);
-        
-    public abstract JComponent getComponent();
+    public void mapAreaChanged(Map2DMapAreaEvent event);
     
-    
+    public void mapContextChanged(Map2DContextEvent event);
     
 }
