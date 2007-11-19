@@ -1,1 +1,0 @@
-mvn  install:install-file  -DgroupId=ncsa.hdf -DartifactId=hdflib -Dversion=1.0-SNAPSHOT -Dpackaging=jar -Dfile=hdflib.jar
