@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -125,10 +126,16 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     }
     
     public void testLoadChineseChars() throws Exception {
-        FeatureCollection fc = loadFeatures(CHINESE, Charset.forName("GB18030"), null);
-        SimpleFeature first = fc.features().next();
-        String s = (String) first.getAttribute("NAME");
-        assertEquals("\u9ed1\u9f99\u6c5f\u7701", first.getAttribute("NAME"));
+        try {
+            FeatureCollection fc = loadFeatures(CHINESE, Charset.forName("GB18030"), null);
+            SimpleFeature first = fc.features().next();
+            String s = (String) first.getAttribute("NAME");
+            assertEquals("\u9ed1\u9f99\u6c5f\u7701", first.getAttribute("NAME"));
+        }
+        catch( UnsupportedCharsetException no){
+            // this JDK has not been installed with the required
+            // lanaguage
+        }
     }
     
     public void testNamespace() throws Exception {
