@@ -930,17 +930,12 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
         if (Transaction.AUTO_COMMIT != transaction) {
             synchronized (this) {
-                Transaction.State s = transaction.getState(connectionPool);
+                state = (ArcTransactionState) transaction.getState(connectionPool);
 
-                if (!(s instanceof ArcTransactionState)) {
-                    if (s != null) {
-                        transaction.removeState(this);
-                    }
-
-                    state = new ArcTransactionState(this);
-                    transaction.putState(this, state);
-                } else {
-                    state = (ArcTransactionState) s;
+                                if( state == null ){
+                                    // start a transaction
+                  state = new ArcTransactionState(this);
+                  transaction.putState(connectionPool, state);
                 }
             }
         }
@@ -962,18 +957,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      */
     public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
             throws IOException {
-        ArcTransactionState state = null;
-
-        if (Transaction.AUTO_COMMIT != transaction) {
-            synchronized (this) {
-                state = (ArcTransactionState) transaction.getState(this);
-
-                if (state == null) {
-                    state = new ArcTransactionState(this);
-                    transaction.putState(this, state);
-                }
-            }
-        }
+        ArcTransactionState state = getArcTransactionState( transaction );
 
         SeLayer layer;
         FIDReader fidStrategy;
