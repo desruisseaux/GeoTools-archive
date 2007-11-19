@@ -418,35 +418,6 @@ public final class CRS {
     }
 
     /**
-     * Determines the epsg from a crs object.
-     * <p>
-     * If the crs does not have an {@link Identifier} which corresponds to the 
-     * EPSG authority, this method will return <code>null</code>.
-     * </p>
-     * @param crs The coordinate reference system instance, must not be <code>null</code>.
-     * 
-     * @return The epsg integer code for the crs, or <code>null</code> if none
-     * exists. 
-     *
-     * @since 2.5
-     */
-    public static Integer getEPSGCode(CoordinateReferenceSystem crs) {
-        if (crs == null) {
-            return null;
-        }
-
-        for (Iterator i = crs.getIdentifiers().iterator(); i.hasNext();) {
-            Identifier id = (Identifier) i.next();
-
-            if ((id.getAuthority() != null)
-                    && id.getAuthority().getTitle().equals(Citations.EPSG.getTitle())) {
-                return Integer.parseInt(id.getCode());
-            }
-        }
-
-        return null;
-    }
-    /**
      * Parses a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite></A> (WKT) into a CRS object. This convenience method is a
@@ -727,6 +698,27 @@ public final class CRS {
         return object1!=null && object1.equals(object2);
     }
 
+    /**
+     * Determines the epsg from a crs object.
+     * <p>
+     * If the crs does not have an {@link Identifier} which corresponds to the 
+     * EPSG authority, this method will return <code>null</code>.
+     * </p>
+     * @param crs The coordinate reference system instance, must not be <code>null</code>.
+     * 
+     * @return The epsg integer code for the crs, or <code>null</code> if none
+     * exists. 
+     *
+     * @since 2.5
+     */
+    public static Integer getEPSGCode(CoordinateReferenceSystem crs) {
+        Identifier id = AbstractIdentifiedObject.getIdentifier(crs, Citations.EPSG);
+        if ( id != null ) {
+            return Integer.parseInt(id.getCode());
+        }
+        return null;
+    }
+    
     /**
      * Looks up an identifier for the specified object. This method searchs in registered factories
      * for an object {@linkplain #equalsIgnoreMetadata equals, ignoring metadata}, to the specified
