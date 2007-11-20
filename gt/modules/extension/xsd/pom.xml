@@ -98,7 +98,7 @@
     <module>sld</module>
     <module>kml</module>
     <module>ows</module>
-    <module>wfs</module>
+    <!--module>wfs</module-->
   </modules>
 
 </project>
