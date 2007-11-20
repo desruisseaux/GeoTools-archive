@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -475,6 +476,19 @@ public class Encoder {
                         }
                         //if multiple we have a problem
                         else if (matches.size() > 0) {
+                            if (logger.isLoggable(Level.FINE)) {
+                                StringBuffer msg = new StringBuffer(
+                                        "Found multiple non-abstract bindings for ");
+                                msg.append(entry.element.getName()).append(": ");
+
+                                for (Iterator m = matches.iterator(); m.hasNext();) {
+                                    msg.append(m.next().getClass().getName());
+                                    msg.append(", ");
+                                }
+
+                                logger.fine(msg.toString());
+                            }
+
                             //try sorting by the type of the binding
                             Collections.sort(matches,
                                 new Comparator() {
@@ -493,26 +507,25 @@ public class Encoder {
                                             return 1;
                                         }
 
+                                        //use binding comparability
+                                        if (b1 instanceof Comparable) {
+                                            return ((Comparable) b1).compareTo(b2);
+                                        }
+
+                                        if (b2 instanceof Comparable) {
+                                            return -1 * ((Comparable) b2).compareTo(b1);
+                                        }
+
                                         return 0;
                                     }
                                 });
-
-                            //if first two are not equal we are cool
-                            Binding b1 = (Binding) ((Object[]) matches.get(0))[1];
-                            Binding b2 = (Binding) ((Object[]) matches.get(1))[1];
-
-                            if (!b1.getType().equals(b2.getType())) {
-                                entry.element = (XSDElementDeclaration) ((Object[]) matches.get(0))[0];
-                            } else {
-                                //nothing more we can do, cant determine the best binding to 
-                                //match to the abstract element
-                                String msg = "Found multiple non-abstract bindings for "
-                                    + entry.element.getName();
-                                throw new IllegalStateException(msg);
-                            }
                         }
 
-                        //if zero, just use the absttract element
+                        if (matches.size() > 0) {
+                            entry.element = (XSDElementDeclaration) ((Object[]) matches.get(0))[0];
+                        }
+
+                        //if zero, just use the abstract element
                     }
                 }
 
