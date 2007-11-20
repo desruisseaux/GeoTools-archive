@@ -87,4 +87,17 @@ public class MultiPolygonPropertyTypeBinding extends AbstractComplexBinding {
 
         return null;
     }
+
+    /**
+     * Implements compare too against MultiSurfaceTypeBinidng because the two are
+     * bound to the same class, Polygon. This causes a conflict in the encoder. Since
+     * this binding is deprecated, MultiSurfacePropertyTypeBinding always wins.
+     */
+    public int compareTo(Object o) {
+        if (o instanceof MultiSurfacePropertyTypeBinding) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }

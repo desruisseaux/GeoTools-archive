@@ -49,7 +49,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class MultiPolygonTypeBinding extends AbstractComplexBinding {
+public class MultiPolygonTypeBinding extends AbstractComplexBinding implements Comparable {
     GeometryFactory gFactory;
 
     public MultiPolygonTypeBinding(GeometryFactory gFactory) {
@@ -104,5 +104,18 @@ public class MultiPolygonTypeBinding extends AbstractComplexBinding {
         }
 
         return null;
+    }
+
+    /**
+     * Implement comparable because both MultiPolygonBinding and MultiSurfaceBinding
+     * are bound to the same class, MultiPolygon. Since MultiPolygon is deprecated
+     * by gml3 MultiSurface always wins.
+     */
+    public int compareTo(Object o) {
+        if (o instanceof MultiSurfaceTypeBinding) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
