@@ -361,7 +361,9 @@ public class ShapefileRenderer implements GTRenderer {
                 Set modifiedFIDs = processTransaction(graphics, bbox, mt, datastore, transaction,
                         typeName, query, ruleList, elseRuleList, scaleRange, layerId);
 
-                processShapefile(graphics, datastore, bbox,screenSize, mt, info, type, query, ruleList,
+                // don't try to read the shapefile if there is nothing to draw
+                if(ruleList.size() > 0 || elseRuleList.size() > 0)
+                	processShapefile(graphics, datastore, bbox,screenSize, mt, info, type, query, ruleList,
                         elseRuleList, modifiedFIDs, scaleRange, layerId);
             }
         }
