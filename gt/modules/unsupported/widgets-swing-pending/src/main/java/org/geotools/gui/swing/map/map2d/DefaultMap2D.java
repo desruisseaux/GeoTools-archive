@@ -30,7 +30,6 @@ import java.util.Observable;
 import java.util.Observer;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import org.geotools.gui.swing.map.map2d.listener.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
@@ -52,10 +51,10 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
-    public static enum BUFFER_TYPE {
-
+    public static enum BUFFER_TYPE {        
         SINGLE_BUFFER,
-        MULTI_BUFFER
+        MULTI_BUFFER,
+        MERGE_BUFFER
     }
 //    protected GraphicsConfiguration GC ;
     protected final EventListenerList MAP2DLISTENERS = new EventListenerList();
@@ -90,7 +89,6 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         layerPane.add(waitingPane, new Integer(NEXT_OVER_LAYER_INDEX));
         NEXT_OVER_LAYER_INDEX++;
         add(layerPane);
-
 //        GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
 //        GraphicsDevice[] devices = gEnv.getScreenDevices();
 //
@@ -245,11 +243,18 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
             bufferPane.deleteObserver(this);
             layerPane.remove(bufferPane.getComponent());
 
-            if (type == BUFFER_TYPE.MULTI_BUFFER) {
-                bufferPane = new MultiBufferPane(this);
-            } else {
-                bufferPane = new SingleBufferPane(this);
+            switch(type){
+                case SINGLE_BUFFER :
+                    bufferPane = new SingleBufferPane(this);
+                    break;
+                case MULTI_BUFFER :
+                    bufferPane = new MultiBufferPane(this);
+                    break;
+                case MERGE_BUFFER :
+                    bufferPane = new MultiMergeBufferPane(this);
+                    break;
             }
+            
             bufferPane.addObserver(this);
             bufferPane.redraw(false);
 

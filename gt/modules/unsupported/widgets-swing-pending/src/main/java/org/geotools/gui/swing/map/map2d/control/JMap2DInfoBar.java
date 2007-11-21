@@ -45,18 +45,27 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
         if( map instanceof DefaultMap2D ){
             jrb_multi.setEnabled(true);
             jrb_single.setEnabled(true);
+            jrb_merge.setEnabled(true);
             DefaultMap2D dm = (DefaultMap2D) map;
             
             DefaultMap2D.BUFFER_TYPE type = dm.getBufferType();
             
-            if(type == DefaultMap2D.BUFFER_TYPE.SINGLE_BUFFER){
-                jrb_single.setSelected(true);
-            }else{
-                jrb_multi.setSelected(true);
+            switch(type){
+                case SINGLE_BUFFER :
+                    jrb_single.setSelected(true);
+                    break;
+                case MULTI_BUFFER :
+                    jrb_multi.setSelected(true);
+                    break;
+                case MERGE_BUFFER :
+                    jrb_merge.setSelected(true);
+                    break;
             }
+            
         }else{
             jrb_multi.setEnabled(false);
             jrb_single.setEnabled(false);
+            jrb_merge.setEnabled(false);
         }
 
     }
@@ -73,6 +82,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         jrb_multi = new javax.swing.JRadioButton();
         jrb_single = new javax.swing.JRadioButton();
+        jrb_merge = new javax.swing.JRadioButton();
         gui_config = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -93,6 +103,14 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
             }
         });
 
+        buttonGroup1.add(jrb_merge);
+        jrb_merge.setText("Merge Buffer");
+        jrb_merge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrb_mergeActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -102,13 +120,16 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
                 .add(jrb_single)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jrb_multi)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jrb_merge)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                 .add(jrb_single)
-                .add(jrb_multi))
+                .add(jrb_multi)
+                .add(jrb_merge))
         );
 
         gui_config.setIcon(IconBundle.getResource().getIcon("16_map2d_optimize"));
@@ -130,8 +151,8 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
             .add(gui_config)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
     private void jrb_singleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_singleActionPerformed
@@ -162,10 +183,18 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
         
 }//GEN-LAST:event_gui_configActionPerformed
 
+    private void jrb_mergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_mergeActionPerformed
+        if( map instanceof DefaultMap2D ){
+            DefaultMap2D dm = (DefaultMap2D) map; 
+            dm.setMapBufferType(DefaultMap2D.BUFFER_TYPE.MERGE_BUFFER);
+        }
+    }//GEN-LAST:event_jrb_mergeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton gui_config;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jrb_merge;
     private javax.swing.JRadioButton jrb_multi;
     private javax.swing.JRadioButton jrb_single;
     // End of variables declaration//GEN-END:variables
