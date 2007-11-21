@@ -16,13 +16,11 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-// Geotools dependencies
 import org.geotools.resources.XMath;
 
 
@@ -50,14 +48,6 @@ public abstract class XAffineTransform extends AffineTransform {
     private static final long serialVersionUID = 5215291166450556451L;
 
     /**
-     * Tolerance value for floating point comparisons.
-     *
-     * @deprecated To be removed after we removed the deprecated {@link #round(AffineTransform)}
-     *             method (replaced by {@link #round(AffineTransform,double)}).
-     */
-    public static final double EPS = 1E-6;
-
-    /**
      * Constructs a new {@code XAffineTransform} that is a
      * copy of the specified {@code AffineTransform} object.
      */
@@ -66,111 +56,124 @@ public abstract class XAffineTransform extends AffineTransform {
     }
 
     /**
-     * Check if the caller is allowed to change this {@code XAffineTransform} state.
+     * Checks if the caller is allowed to change this {@code XAffineTransform} state.
      * If this method is defined to thrown an exception in all case, then this
      * {@code XAffineTransform} is immutable.
      */
     protected abstract void checkPermission();
 
     /**
-     * Check for {@linkplain #checkPermission permission} before translating this transform.
+     * Checks for {@linkplain #checkPermission permission} before translating this transform.
      */
+    @Override
     public void translate(double tx, double ty) {
         checkPermission();
         super.translate(tx, ty);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before rotating this transform.
+     * Checks for {@linkplain #checkPermission permission} before rotating this transform.
      */
+    @Override
     public void rotate(double theta) {
         checkPermission();
         super.rotate(theta);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before rotating this transform.
+     * Checks for {@linkplain #checkPermission permission} before rotating this transform.
      */
+    @Override
     public void rotate(double theta, double x, double y) {
         checkPermission();
         super.rotate(theta, x, y);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before scaling this transform.
+     * Checks for {@linkplain #checkPermission permission} before scaling this transform.
      */
+    @Override
     public void scale(double sx, double sy) {
         checkPermission();
         super.scale(sx, sy);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before shearing this transform.
+     * Checks for {@linkplain #checkPermission permission} before shearing this transform.
      */
+    @Override
     public void shear(double shx, double shy) {
         checkPermission();
         super.shear(shx, shy);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setToIdentity() {
         checkPermission();
         super.setToIdentity();
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setToTranslation(double tx, double ty) {
         checkPermission();
         super.setToTranslation(tx, ty);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setToRotation(double theta) {
         checkPermission();
         super.setToRotation(theta);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setToRotation(double theta, double x, double y) {
         checkPermission();
         super.setToRotation(theta, x, y);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setToScale(double sx, double sy) {
         checkPermission();
         super.setToScale(sx, sy);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setToShear(double shx, double shy) {
         checkPermission();
         super.setToShear(shx, shy);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setTransform(AffineTransform Tx) {
         checkPermission();
         super.setTransform(Tx);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before setting this transform.
+     * Checks for {@linkplain #checkPermission permission} before setting this transform.
      */
+    @Override
     public void setTransform(double m00, double m10,
                              double m01, double m11,
                              double m02, double m12) {
@@ -179,25 +182,27 @@ public abstract class XAffineTransform extends AffineTransform {
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before concatenating this transform.
+     * Checks for {@linkplain #checkPermission permission} before concatenating this transform.
      */
+    @Override
     public void concatenate(AffineTransform Tx) {
         checkPermission();
         super.concatenate(Tx);
     }
 
     /**
-     * Check for {@linkplain #checkPermission permission} before concatenating this transform.
+     * Checks for {@linkplain #checkPermission permission} before concatenating this transform.
      */
+    @Override
     public void preConcatenate(AffineTransform Tx) {
         checkPermission();
         super.preConcatenate(Tx);
     }
 
     /**
-     * Check whether or not this {@code XAffineTransform} is the identity by
+     * Checks whether or not this {@code XAffineTransform} is the identity by
      * using the provided {@code tolerance}.
-     * 
+     *
      * @param tolerance The tolerance to use for this check.
      * @return {@code true} if the transform is identity, {@code false} otherwise.
      *
@@ -222,7 +227,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * [ 0.0                    0.999999999999999999999  0.0 ]
      * [ 0.0                    0.0                      1.0 ]
      * </pre></blockquote>
-     *   
+     *
      * @param tr The affine transform to be checked for identity.
      * @param tolerance The tolerance value to use when checking for identity.
      * return {@code true} if this tranformation is close enough to the
@@ -258,6 +263,9 @@ public abstract class XAffineTransform extends AffineTransform {
      *                  rectangle will be created.
      *
      * @return The direct transform of the {@code bounds} rectangle.
+     *
+     * @see org.geotools.referencing.CRS#transform(
+     *      org.opengis.referencing.operation.MathTransform2D, Rectangle2D, Rectangle2D)
      */
     public static Rectangle2D transform(final AffineTransform transform,
                                         final Rectangle2D     bounds,
@@ -490,22 +498,6 @@ public abstract class XAffineTransform extends AffineTransform {
                                                    final double  x, final double  y)
     {
         return new AffineTransform(sx, 0, 0, sy, (1-sx)*x, (1-sy)*y);
-    }
-
-    /**
-     * Checks whether the matrix coefficients are close to whole numbers.
-     * If this is the case, these coefficients will be rounded up to the
-     * nearest whole numbers. This rounding up is useful, for example, for
-     * speeding up image displays.  Above all, it is efficient when we know that
-     * a matrix has a chance of being close to the similarity matrix.
-     * <p>
-     * It is crucial to note that this method uses a default rounding threshold 
-     * whose value is held by the field {@link #EPS} which is {@value #EPS}.
-     *
-     * @deprecated Use {@link #round(AffineTransform, double)} instead.
-     */
-    public static void round(final AffineTransform tr) {
-        round(tr, EPS);
     }
 
     /**

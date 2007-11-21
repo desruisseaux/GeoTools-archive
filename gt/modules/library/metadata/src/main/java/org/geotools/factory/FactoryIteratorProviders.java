@@ -22,21 +22,20 @@ import org.geotools.resources.XArray;
 
 
 /**
- * Utility methods that apply to all {@linkplain FactoryRegistry factory registries}.
+ * The list of registered {@linkplain FactoryIteratorProvider factory iterator providers}.
  *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Consider moving those methods to {@link GeoTools}. We should also remove
- *             {@link FactoryRegistry#globalConfiguration} and relies on listeners instead.
+ * @todo Consider removing {@link FactoryRegistry#globalConfiguration} and use listeners instead.
  */
-final class Factories {
+final class FactoryIteratorProviders {
     /**
      * The system-wide configuration. This is the instance configured by
      * the public static methods provided in this class.
      */
-    private static final Factories GLOBAL = new Factories();
+    private static final FactoryIteratorProviders GLOBAL = new FactoryIteratorProviders();
 
     /**
      * Incremented every time a modification is performed.
@@ -47,19 +46,19 @@ final class Factories {
      * Alternative scanning methods used by {@link FactoryRegistry#scanForPlugins(Collection,Class)}
      * in addition of the default lookup mechanism. Will be created only when first needed.
      */
-    private Set/*<FactoryIteratorProvider>*/ iteratorProviders;
+    private Set<FactoryIteratorProvider> iteratorProviders;
 
     /**
      * Creates an initially empty set of factories.
      */
-    Factories() {
+    FactoryIteratorProviders() {
     }
 
     /**
      * Synchronizes the content of the {@link #iteratorProviders} map with the {@linkplain #GLOBAL
      * global} one. New providers are returned for later {@linkplain FactoryRegistry#register
      * registration}. Note that this method is typically invoked in a different thread than
-     * {@link Factories} public static method calls.
+     * {@link FactoryIteratorProviders} public static method calls.
      *
      * @return The new iterators providers {@linkplain #addFactoryIteratorProvider added} since
      *         the last time this method was invoked, or {@code null} if none.
@@ -80,20 +79,20 @@ final class Factories {
                 throw new AssertionError(modifications);
             }
             /*
-             * If  'Factories.removeFactoryIteratorProvider(...)'  has been invoked since the last
-             * time this method was run, then synchronize 'iteratorProviders' accordingly. Current
+             * If 'removeFactoryIteratorProvider(...)' has been invoked since the last time
+             * this method was run, then synchronize 'iteratorProviders' accordingly. Current
              * implementation do not unregister the factories that were created by those iterators.
              */
             if (iteratorProviders != null) {
                 iteratorProviders.retainAll(GLOBAL.iteratorProviders);
             } else if (!GLOBAL.iteratorProviders.isEmpty()) {
-                iteratorProviders = new LinkedHashSet();
+                iteratorProviders = new LinkedHashSet<FactoryIteratorProvider>();
             }
             /*
-             * If 'Factories.addFactoryIteratorProvider(...)' has been invoked since the last
-             * time this method was run, then synchronize 'iteratorProviders' accordingly. We
-             * keep trace of new providers in order to allow 'FactoryRegistry' to use them for
-             * a immediate scanning.
+             * If 'addFactoryIteratorProvider(...)' has been invoked since the last time
+             * this method was run, then synchronize 'iteratorProviders' accordingly. We
+             * keep trace of new providers in order to allow 'FactoryRegistry' to use them
+             * for a immediate scanning.
              */
             int remaining = GLOBAL.iteratorProviders.size();
             for (final Iterator it=GLOBAL.iteratorProviders.iterator(); it.hasNext();) {
@@ -108,7 +107,7 @@ final class Factories {
             }
         }
         // Note: newProviders may be null.
-        return (FactoryIteratorProvider[]) XArray.resize(newProviders, count);
+        return XArray.resize(newProviders, count);
     }
 
     /**
@@ -118,13 +117,11 @@ final class Factories {
      * to specify additional discovery algorithms. It may be useful in the context of some
      * frameworks that use the <cite>constructor injection</cite> pattern, like the
      * <a href="http://www.springframework.org/">Spring framework</a>.
-     *
-     * @deprecated Moved to {@link GeoTools} class.
      */
     public static void addFactoryIteratorProvider(FactoryIteratorProvider provider) {
         synchronized (GLOBAL) {
             if (GLOBAL.iteratorProviders == null) {
-                GLOBAL.iteratorProviders = new LinkedHashSet();
+                GLOBAL.iteratorProviders = new LinkedHashSet<FactoryIteratorProvider>();
             }
             if (GLOBAL.iteratorProviders.add(provider)) {
                 GLOBAL.modifications++;
@@ -136,8 +133,6 @@ final class Factories {
      * Removes a provider that was previously {@linkplain #addFactoryIteratorProvider added}.
      * Note that factories already obtained from the specified provider will not be
      * {@linkplain FactoryRegistry#deregisterServiceProvider deregistered} by this method.
-     *
-     * @deprecated Moved to {@link GeoTools} class.
      */
     public static void removeFactoryIteratorProvider(FactoryIteratorProvider provider) {
         synchronized (GLOBAL) {
@@ -158,7 +153,7 @@ final class Factories {
             if (GLOBAL.iteratorProviders == null) {
                 return new FactoryIteratorProvider[0];
             }
-            return (FactoryIteratorProvider[]) GLOBAL.iteratorProviders.toArray(
+            return GLOBAL.iteratorProviders.toArray(
                     new FactoryIteratorProvider[GLOBAL.iteratorProviders.size()]);
         }
     }

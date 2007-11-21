@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,18 +15,14 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
@@ -36,11 +32,9 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -216,7 +210,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * Returns the direct dependencies. The returned list contains the backing store and the
      * fallback specified at construction time, or the exception if they can't be obtained.
      */
-    //@Override
+    @Override
     Collection/*<?>*/ dependencies() {
         final Collection/*<?>*/ dep = super.dependencies();
         dep.add(fallback);
@@ -622,7 +616,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
             }
         }
     }
-    
+
     /**
      * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      */
@@ -736,7 +730,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
-     * Creates a parameter descriptor from a code. 
+     * Creates a parameter descriptor from a code.
      */
     public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
         try {
@@ -752,7 +746,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
-     * Creates an operation method from a code. 
+     * Creates an operation method from a code.
      */
     public OperationMethod createOperationMethod(final String code) throws FactoryException {
         try {
@@ -768,7 +762,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     }
 
     /**
-     * Creates an operation from a single operation code. 
+     * Creates an operation from a single operation code.
      */
     public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
         try {
@@ -860,7 +854,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         /**
          * Returns the identifier of the specified object, or {@code null} if none.
          */
-        //@Override
+        @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             String candidate = finder.findIdentifier(object);
             if (candidate == null) {

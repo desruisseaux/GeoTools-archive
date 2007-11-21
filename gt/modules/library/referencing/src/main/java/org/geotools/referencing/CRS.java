@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,25 +15,21 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Map;
-import java.util.List;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-// OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
@@ -49,7 +45,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 
-// Geotools dependencies
 import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
@@ -69,6 +64,7 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.Version;
+import org.geotools.util.GenericName;
 import org.geotools.util.logging.Logging;
 import org.geotools.util.UnsupportedImplementationException;
 
@@ -101,6 +97,12 @@ public final class CRS {
     private static final String LOGGER = "org.geotools.referencing";
 
     /**
+     * A map with {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} set to {@link Boolean#TRUE}.
+     */
+    private static final Hints FORCE_LONGITUDE_FIRST_AXIS_ORDER = new Hints(
+            Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+
+    /**
      * A factory for CRS creation with (<var>latitude</var>, <var>longitude</var>) axis order
      * (unless otherwise specified in system property). Will be created only when first needed.
      */
@@ -122,9 +124,11 @@ public final class CRS {
      */
     private static CoordinateOperationFactory lenientFactory;
 
+    /**
+     * Registers a listener automatically invoked when the system-wide configuration changed.
+     */
     static {
         GeoTools.addChangeListener(new ChangeListener() {
-            // Automatically invoked when the system-wide configuration changed.
             public void stateChanged(ChangeEvent e) {
                 synchronized (CRS.class) {
                     defaultFactory = null;
@@ -238,15 +242,19 @@ public final class CRS {
      * @since 2.4
      */
     public static Version getVersion(final String authority) throws FactoryRegistryException {
-        Object factory = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, null);
-        final Set guard = new HashSet(); // Safety against never-ending recursivity.
-        while (factory instanceof Factory && guard.add(factory)) {
-            final Map hints = ((Factory) factory).getImplementationHints();
+        Object candidate = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, null);
+        final Set<Factory> guard = new HashSet<Factory>();
+        while (candidate instanceof Factory) {
+            final Factory factory = (Factory) candidate;
+            if (!guard.add(factory)) {
+                break; // Safety against never-ending recursivity.
+            }
+            final Map hints = factory.getImplementationHints();
             final Object version = hints.get(Hints.VERSION);
             if (version instanceof Version) {
                 return (Version) version;
             }
-            factory = hints.get(Hints.CRS_AUTHORITY_FACTORY);
+            candidate = hints.get(Hints.CRS_AUTHORITY_FACTORY);
         }
         return null;
     }
@@ -263,7 +271,7 @@ public final class CRS {
      * this particular factory is ignored. Please be aware of the following potential issues:
      * <p>
      * <ul>
-     *   <li>If there is more than one EPSG databases (for example an 
+     *   <li>If there is more than one EPSG databases (for example an
      *       {@linkplain org.geotools.referencing.factory.epsg.AccessDataSource Access} and a
      *       {@linkplain org.geotools.referencing.factory.epsg.PostgreDataSource PostgreSQL} ones),
      *       then this method will connect to all of them even if their content are identical.</li>
@@ -275,7 +283,7 @@ public final class CRS {
      *   <li>For any code <var>c</var> in the returned set, there is no warranty that
      *       <code>{@linkplain #decode decode}(c)</code> will use the same authority
      *       factory than the one that formatted <var>c</var>.</li>
-     *   
+     *
      *   <li>This method doesn't report connection problems since it doesn't throw any exception.
      *       {@link FactoryException}s are logged as warnings and otherwise ignored.</li>
      * </ul>
@@ -339,7 +347,7 @@ public final class CRS {
      *
      * @see #getSupportedCodes
      * @see org.geotools.referencing.factory.AllAuthoritiesFactory#createCoordinateReferenceSystem
-     */ 
+     */
     public static CoordinateReferenceSystem decode(final String code)
             throws NoSuchAuthorityCodeException, FactoryException
     {
@@ -470,7 +478,7 @@ public final class CRS {
                  */
                 envelope = null;
                 unexpectedException("getEnvelope", exception);
-            }        
+            }
         }
         return envelope;
     }
@@ -558,7 +566,7 @@ public final class CRS {
      * @since 2.4
      */
     public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
-        if (crs instanceof SingleCRS && crs.getCoordinateSystem().getDimension()==2) {
+        if (crs instanceof SingleCRS && crs.getCoordinateSystem().getDimension() == 2) {
             CoordinateReferenceSystem base = crs;
             while (base instanceof GeneralDerivedCRS) {
                 base = ((GeneralDerivedCRS) base).getBaseCRS();
@@ -569,10 +577,9 @@ public final class CRS {
             }
         }
         if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c=
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final SingleCRS candidate = getHorizontalCRS((CoordinateReferenceSystem) it.next());
+            final CompoundCRS cp = (CompoundCRS) crs;
+            for (final CoordinateReferenceSystem c : cp.getCoordinateReferenceSystems()) {
+                final SingleCRS candidate = getHorizontalCRS(c);
                 if (candidate != null) {
                     return candidate;
                 }
@@ -592,10 +599,9 @@ public final class CRS {
             return (ProjectedCRS) crs;
         }
         if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final ProjectedCRS candidate = getProjectedCRS((CoordinateReferenceSystem) it.next());
+            final CompoundCRS cp = (CompoundCRS) crs;
+            for (final CoordinateReferenceSystem c : cp.getCoordinateReferenceSystems()) {
+                final ProjectedCRS candidate = getProjectedCRS(c);
                 if (candidate != null) {
                     return candidate;
                 }
@@ -615,10 +621,9 @@ public final class CRS {
             return (VerticalCRS) crs;
         }
         if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final VerticalCRS candidate = getVerticalCRS((CoordinateReferenceSystem) it.next());
+            final CompoundCRS cp = (CompoundCRS) crs;
+            for (final CoordinateReferenceSystem c : cp.getCoordinateReferenceSystems()) {
+                final VerticalCRS candidate = getVerticalCRS(c);
                 if (candidate != null) {
                     return candidate;
                 }
@@ -638,10 +643,9 @@ public final class CRS {
             return (TemporalCRS) crs;
         }
         if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final TemporalCRS candidate = getTemporalCRS((CoordinateReferenceSystem) it.next());
+            final CompoundCRS cp = (CompoundCRS) crs;
+            for (final CoordinateReferenceSystem c : cp.getCoordinateReferenceSystems()) {
+                final TemporalCRS candidate = getTemporalCRS(c);
                 if (candidate != null) {
                     return candidate;
                 }
@@ -662,10 +666,9 @@ public final class CRS {
             return ((GeodeticDatum) datum).getEllipsoid();
         }
         if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final Ellipsoid candidate = getEllipsoid((CoordinateReferenceSystem) it.next());
+            final CompoundCRS cp = (CompoundCRS) crs;
+            for (final CoordinateReferenceSystem c : cp.getCoordinateReferenceSystems()) {
+                final Ellipsoid candidate = getEllipsoid(c);
                 if (candidate != null) {
                     return candidate;
                 }
@@ -699,27 +702,6 @@ public final class CRS {
     }
 
     /**
-     * Determines the epsg from a crs object.
-     * <p>
-     * If the crs does not have an {@link Identifier} which corresponds to the 
-     * EPSG authority, this method will return <code>null</code>.
-     * </p>
-     * @param crs The coordinate reference system instance, must not be <code>null</code>.
-     * 
-     * @return The epsg integer code for the crs, or <code>null</code> if none
-     * exists. 
-     *
-     * @since 2.5
-     */
-    public static Integer getEPSGCode(CoordinateReferenceSystem crs) {
-        Identifier id = AbstractIdentifiedObject.getIdentifier(crs, Citations.EPSG);
-        if ( id != null ) {
-            return Integer.parseInt(id.getCode());
-        }
-        return null;
-    }
-    
-    /**
      * Looks up an identifier for the specified object. This method searchs in registered factories
      * for an object {@linkplain #equalsIgnoreMetadata equals, ignoring metadata}, to the specified
      * object. If such object is found, then its identifier is returned. Otherwise this method
@@ -730,7 +712,7 @@ public final class CRS {
      * some {@linkplain AuthorityFactory authority factories} instead of all registered onez, or
      * if the full {@linkplain IdentifiedObject identified object} is wanted instead of only its
      * identifier.
-     * 
+     *
      * @param  object The object (usually a {@linkplain CoordinateReferenceSystem coordinate
      *         reference system}) looked up.
      * @param  fullScan If {@code true}, an exhaustive full scan against all registered objects
@@ -759,109 +741,86 @@ public final class CRS {
     }
 
     /**
-     * Looks up an identifier for the specified coordinate reference system.
-     * 
-     * @param crs the coordinate reference system looked up.
-     * @param authorities the authority that we should look up the identifier into. 
-     *         If {@code null} the search will to be performed against all authorities.
-     * @param fullScan if {@code true}, an exhaustive full scan against all registered CRS
-     *         will be performed (may be slow). Otherwise only a fast lookup based on embedded
-     *         identifiers and names will be performed.
-     * @return The identifier, or {@code null} if not found.
+     * Looks up an identifier of the specified authority for the given
+     * {@linkplain CoordinateReferenceSystem coordinate reference system}). This method is similar
+     * to <code>{@linkplain #lookupIdentifier(IdentifiedObject, boolean) lookupIdentifier}(object,
+     * fullScan)</code> except that the search is performed only among the factories of the given
+     * authority.
+     * <p>
+     * If the CRS does not have an {@linkplain ReferenceIdentifier identifier} which corresponds
+     * to the {@linkplain Citations#EPSG EPSG} authority, then:
+     * <ul>
+     *   <li>if {@code fullScan} is {@code true}, then this method scans the factories in search
+     *       for an object {@linkplain #equalsIgnoreMetadata equals, ignoring metadata}, to the
+     *       given object. If one is found, its identifier is returned.</li>
+     *   <li>Otherwise (if {@code fullScan} is {@code false} or if no identifier was found in the
+     *       previous step), this method returns {@code null}.</li>
+     * </ul>
      *
-     * @since 2.3.1
+     * @param  authority The authority for the code to search.
+     * @param  crs The coordinate reference system instance, or {@code null}.
+     * @return The CRS identifier, or {@code null} if none was found.
+     * @throws FactoryException if an error occured while searching for the identifier.
      *
-     * @deprecated Replaced by {@link #lookupIdentifier(IdentifiedObject, boolean)},
-     *             which should be faster since it tries to leverage database index.
+     * @since 2.5
      */
-    public static String lookupIdentifier(final CoordinateReferenceSystem crs,
-                                          Set/*<String>*/ authorities,
-                                          final boolean fullScan)
+    public static String lookupIdentifier(final Citation authority,
+            final CoordinateReferenceSystem crs, final boolean fullScan)
+            throws FactoryException
     {
-        // gather the authorities we're considering
-        if (authorities == null) {
-            authorities = getSupportedAuthorities(false);
+        ReferenceIdentifier id = AbstractIdentifiedObject.getIdentifier(crs, authority);
+        if (id != null) {
+            return id.getCode();
         }
-        // first check if one of the identifiers can be used to spot directly
-        // a CRS (and check it's actually equal to one in the db)
-        for (Iterator it = crs.getIdentifiers().iterator(); it.hasNext();) {
-            final Identifier id = (Identifier) it.next();
-            final CoordinateReferenceSystem candidate;
-            try {
-                candidate = CRS.decode(id.toString());
-            } catch (FactoryException e) {
-                // the identifier was not recognized, no problem, let's go on
+        for (final CRSAuthorityFactory factory : ReferencingFactoryFinder
+                .getCRSAuthorityFactories(FORCE_LONGITUDE_FIRST_AXIS_ORDER))
+        {
+            if (!Citations.identifierMatches(factory.getAuthority(), authority)) {
                 continue;
             }
-            if (equalsIgnoreMetadata(candidate, crs)) {
-                String identifier = getSRSFromCRS(candidate, authorities);
-                if (identifier != null) {
-                    return identifier;
-                }
+            if (!(factory instanceof AbstractAuthorityFactory)) {
+                continue;
             }
-        }
-        
-        // try a quick name lookup
-        try {
-            CoordinateReferenceSystem candidate = CRS.decode(crs.getName().toString());
-            if (equalsIgnoreMetadata(candidate, crs)) {
-                String identifier = getSRSFromCRS(candidate, authorities);
-                if (identifier != null) {
-                    return identifier;
-                }
-            }
-        } catch (Exception e) {
-            // the name was not recognized, no problem, let's go on
-        }
-        
-        // here we exhausted the quick paths, bail out if the user does not want a full scan
-        if (!fullScan) {
-            return null;
-        }
-        // a direct lookup did not work, let's try a full scan of known CRS then
-        // TODO: implement a smarter method in the actual EPSG authorities, which may
-        // well be this same loop if they do have no other search capabilities
-        for (Iterator itAuth = authorities.iterator(); itAuth.hasNext();) {
-            String authority = (String) itAuth.next();
-            Set codes = CRS.getSupportedCodes(authority);
-            for (Iterator itCodes = codes.iterator(); itCodes.hasNext();) {
-                String code = (String) itCodes.next();
-                try {
-                    final CoordinateReferenceSystem candidate;
-                    if (code.indexOf(':') == -1) {
-                        candidate = CRS.decode(authority + ':' + code);
-                    } else {
-                        candidate = CRS.decode(code);
-                    }
-                    if (CRS.equalsIgnoreMetadata(candidate, crs)) {
-                        return getSRSFromCRS(candidate, Collections.singleton(authority));
-                    }
-                } catch (Exception e) {
-                    // some CRS cannot be decoded properly
-                }
+            final AbstractAuthorityFactory f = (AbstractAuthorityFactory) factory;
+            final IdentifiedObjectFinder finder = f.getIdentifiedObjectFinder(crs.getClass());
+            finder.setFullScanAllowed(fullScan);
+            final String code = finder.findIdentifier(crs);
+            if (code != null) {
+                return code;
             }
         }
         return null;
     }
 
     /**
-     * Scans the identifiers list looking for an EPSG id
+     * Looks up an EPSG code for the given {@linkplain CoordinateReferenceSystem
+     * coordinate reference system}). This is a convenience method for <code>{@linkplain
+     * #lookupIdentifier(Citations, IdentifiedObject, boolean) lookupIdentifier}({@linkplain
+     * Citations#EPSG}, crs, fullScan)</code> except that code is parsed as an integer.
      *
-     * @deprecated Used by deprecated methods only.
+     * @param  crs The coordinate reference system instance, or {@code null}.
+     * @return The CRS identifier, or {@code null} if none was found.
+     * @throws FactoryException if an error occured while searching for the identifier.
+     *
+     * @since 2.5
      */
-    private static String getSRSFromCRS(final CoordinateReferenceSystem crs, final Set authorities) {
-        for (Iterator itAuth = authorities.iterator(); itAuth.hasNext();) {
-            final String authority = (String) itAuth.next();
-            final String prefix = authority + ":";
-            for (Iterator itIdent = crs.getIdentifiers().iterator(); itIdent.hasNext();) {
-                NamedIdentifier id = (NamedIdentifier) itIdent.next();
-                String idName = id.toString();
-                if(idName.startsWith(prefix))
-                    return idName;
+    public static Integer lookupEpsgCode(final CoordinateReferenceSystem crs, final boolean fullScan)
+            throws FactoryException
+    {
+        final String identifier = lookupIdentifier(Citations.EPSG, crs, fullScan);
+        if (identifier != null) {
+            final int split = identifier.lastIndexOf(GenericName.DEFAULT_SEPARATOR);
+            final String code = identifier.substring(split + 1);
+            // The above code works even if the separator was not found, since in such case
+            // split == -1, which implies a call to substring(0) which returns 'identifier'.
+            try {
+                return Integer.parseInt(code);
+            } catch (NumberFormatException e) {
+                throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_IDENTIFIER_$1, identifier), e);
             }
         }
         return null;
-    } 
+    }
 
 
     /////////////////////////////////////////////////
@@ -889,7 +848,7 @@ public final class CRS {
      * CRS.{@linkplain #decode decode}("EPSG:42102"),
      * CRS.{@linkplain #decode decode}("EPSG:4326") );
      * </blockquote></code>
-     * 
+     *
      * @param  sourceCRS The source CRS.
      * @param  targetCRS The target CRS.
      * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
@@ -911,7 +870,7 @@ public final class CRS {
      * then this method will not throw a "<cite>Bursa-Wolf parameters required</cite>"
      * exception during datum shifts if the Bursa-Wolf paramaters are not specified.
      * Instead it will assume a no datum shift.
-     * 
+     *
      * @param  sourceCRS The source CRS.
      * @param  targetCRS The target CRS.
      * @param  lenient {@code true} if the math transform should be created even when there is
@@ -950,6 +909,8 @@ public final class CRS {
      * @throws TransformException if a transform failed.
      *
      * @since 2.4
+     *
+     * @see #transform(CoordinateOperation, Envelope)
      */
     public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
             throws TransformException
@@ -1054,6 +1015,8 @@ public final class CRS {
      * @throws TransformException if a transform failed.
      *
      * @since 2.4
+     *
+     * @see #transform(MathTransform, Envelope)
      */
     public static GeneralEnvelope transform(final CoordinateOperation operation, final Envelope envelope)
             throws TransformException
@@ -1184,7 +1147,7 @@ public final class CRS {
         }
         return transformed;
     }
-    
+
     /**
      * Transforms a rectangular envelope using the given {@linkplain MathTransform math transform}.
      * The transformation is only approximative. Invoking this method is equivalent to invoking the
@@ -1207,6 +1170,10 @@ public final class CRS {
      * @throws TransformException if a transform failed.
      *
      * @since 2.4
+     *
+     * @see #transform(CoordinateOperation, Rectangle2D, Rectangle2D)
+     * @see org.geotools.referencing.operation.matrix.XAffineTransform#transform(
+     *      java.awt.geom.AffineTransform, Rectangle2D, Rectangle2D)
      */
     public static Rectangle2D transform(final MathTransform2D transform,
                                         final Rectangle2D     envelope,
@@ -1221,6 +1188,7 @@ public final class CRS {
      * opportunity to save the projected center coordinate. This method sets {@code point} to
      * the center of the source envelope projected to the target CRS.
      */
+    @SuppressWarnings("fallthrough")
     private static Rectangle2D transform(final MathTransform2D transform,
                                          final Rectangle2D     envelope,
                                                Rectangle2D     destination,
@@ -1244,14 +1212,14 @@ public final class CRS {
              *
              * (note: center must be last)
              */
-            point.x = (i&1)==0 ? envelope.getMinX() : envelope.getMaxX();
-            point.y = (i&2)==0 ? envelope.getMinY() : envelope.getMaxY();
+            point.x = (i & 1) == 0 ? envelope.getMinX() : envelope.getMaxX();
+            point.y = (i & 2) == 0 ? envelope.getMinY() : envelope.getMaxY();
             switch (i) {
                 case 5: // fall through
-                case 6: point.x=envelope.getCenterX(); break;
-                case 8: point.x=envelope.getCenterX(); // fall through
+                case 6: point.x = envelope.getCenterX(); break;
+                case 8: point.x = envelope.getCenterX(); // fall through
                 case 7: // fall through
-                case 4: point.y=envelope.getCenterY(); break;
+                case 4: point.y = envelope.getCenterY(); break;
             }
             if (point != transform.transform(point, point)) {
                 throw new UnsupportedImplementationException(transform.getClass());
@@ -1291,6 +1259,10 @@ public final class CRS {
      * @throws TransformException if a transform failed.
      *
      * @since 2.4
+     *
+     * @see #transform(MathTransform2D, Rectangle2D, Rectangle2D)
+     * @see org.geotools.referencing.operation.matrix.XAffineTransform#transform(
+     *      java.awt.geom.AffineTransform, Rectangle2D, Rectangle2D)
      */
     public static Rectangle2D transform(final CoordinateOperation operation,
                                         final Rectangle2D         envelope,
@@ -1441,7 +1413,7 @@ public final class CRS {
      *       database.</p>
      * </blockquote>
      *
-     * <strong>Examples</strong> (assuming that {@code "CRS"} is a shortcut for 
+     * <strong>Examples</strong> (assuming that {@code "CRS"} is a shortcut for
      * {@code "java org.geotools.referencing.CRS"}):
      *
      * <blockquote>

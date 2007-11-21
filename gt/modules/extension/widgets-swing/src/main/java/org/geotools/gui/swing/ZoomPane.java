@@ -44,16 +44,12 @@ import org.geotools.gui.swing.event.ZoomChangeListener;
 import java.awt.Shape;
 import java.awt.Point;
 import java.awt.Insets;
-import java.awt.Polygon;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.RectangularShape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -76,19 +72,15 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
 // User interface (Swing)
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JComponent;
-import javax.swing.JViewport;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.AbstractButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.ScrollPaneLayout;
 import javax.swing.BoundedRangeModel;
 import javax.swing.plaf.ComponentUI;
 
@@ -195,8 +187,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * which manage the zooms. For example, to zoom in, we must write
  * <code>{@link #getActionMap() getActionMap()}.get("ZoomIn")</code>.
  *
- * <p><strong>Note: {@link JScrollPane} objects are not suitable for adding scrollbars to a
- * {@code ZoomPane}object.</strong> Instead, use {@link #createScrollPane}. Once again, all
+ * <p><strong>Note: {@link javax.swing.JScrollPane} objects are not suitable for adding scrollbars
+ * to a {@code ZoomPane}object.</strong> Instead, use {@link #createScrollPane}. Once again, all
  * movements performed by the user through the scrollbars will be translated by calls to
  * {@link #transform}.</p>
  *
@@ -206,6 +198,11 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @author Martin Desruisseaux
  */
 public abstract class ZoomPane extends JComponent implements DeformableViewer {
+    /**
+     * Small number for floating point comparaisons.
+     */
+    private static final double EPS = 1E-6;
+
     /**
      * Minimum width and height of this component.
      */
@@ -364,7 +361,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * The even indexes indicate the keystroke whilst the odd indexes indicate the modifier
      * (CTRL or SHIFT for example). To obtain the {@link KeyStroke} object for a numbered action
      * <var>i</var>, we can use the following code:
-     * 
+     *
      * <blockquote><pre>
      * final int key=DEFAULT_KEYBOARD[(i << 1)+0];
      * final int mdf=DEFAULT_KEYBOARD[(i << 1)+1];
@@ -545,7 +542,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
 
     /**
      * Affine transform containing zoom factors, translations and rotations. During the
-     * painting of a component, this affine transform should be combined with a call to 
+     * painting of a component, this affine transform should be combined with a call to
      * <code>{@link Graphics2D#transform(AffineTransform) Graphics2D.transform}(zoom)</code>.
      */
     protected final AffineTransform zoom = new AffineTransform();
@@ -574,7 +571,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     /**
      * Rectangle representing the logical coordinates of the visible region. This information is
      * used to keep the same region when the size or position of the component changes. Initially,
-     * this rectangle is empty. It will only stop being empty if {@link #reset} is called and 
+     * this rectangle is empty. It will only stop being empty if {@link #reset} is called and
      * {@link #getPreferredArea} and {@link #getZoomableBounds} have both returned valid coordinates.
      *
      * @see #getVisibleArea
@@ -982,7 +979,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
                          (mask & SCALE_Y    ) != 0 ? sy                   : 1);
         change.translate((mask & TRANSLATE_X) != 0 ? -source.getCenterX() : 0,
                          (mask & TRANSLATE_Y) != 0 ? -source.getCenterY() : 0);
-        XAffineTransform.round(change);
+        XAffineTransform.round(change, EPS);
         return change;
     }
 
@@ -1000,7 +997,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private final Rectangle getZoomableBounds() {
         return cachedBounds = getZoomableBounds(cachedBounds);
     }
-    
+
     /**
      * Returns the bounding box (in pixel coordinates) of the zoomable area. This method is similar
      * to {@link #getBounds(Rectangle)}, except that the zoomable area may be smaller than the whole
@@ -1108,7 +1105,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     public void transform(final AffineTransform change) {
         if (!change.isIdentity()) {
             zoom.concatenate(change);
-            XAffineTransform.round(zoom);
+            XAffineTransform.round(zoom, EPS);
             fireZoomChanged(change);
             repaint(getZoomableBounds());
             zoomIsReset = false;
@@ -1143,7 +1140,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             }
             logical.concatenate(change);
             logical.concatenate(zoom);
-            XAffineTransform.round(logical);
+            XAffineTransform.round(logical, EPS);
             transform(logical);
         }
     }
@@ -1277,7 +1274,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             }
         }
         change.concatenate(zoom);
-        XAffineTransform.round(change);
+        XAffineTransform.round(change, EPS);
         transform(change);
     }
 
@@ -1312,7 +1309,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      *       {@code oldZoom} and {@code newZoom} are the affine transforms of the old and new zoom
      *       respectively. Therefore, the relation
      * <code>newZoom=oldZoom.{@link AffineTransform#concatenate concatenate}(change)</code>
-     *       must be respected (to within rounding errors). <strong>Note: This method can modify 
+     *       must be respected (to within rounding errors). <strong>Note: This method can modify
      *       {@code change}</strong> to combine several consecutive calls of {@code fireZoomChanged}
      *       in a single transformation.
      */
@@ -1354,7 +1351,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     /**
      * Method called automatically after the user selects an area with the mouse. The default
      * implementation zooms to the selected {@code area}. Derived classes can redefine this method
-     * in order to carry out another action. 
+     * in order to carry out another action.
      *
      * @param area Area selected by the user, in logical coordinates.
      */
@@ -1374,8 +1371,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * parameters not related to its position (e.g. corner rounding in a rectangle
      * {@link java.awt.geom.RoundRectangle2D}).
      * <p>
-     * The returned shape will generally be from a class derived from {@link RectangularShape},
-     * but can also be from the class {@link Line2D}. <strong>Any other class risks firing a
+     * The returned shape will generally be from a class derived from
+     * {@link java.awt.geom.RectangularShape}, but can also be from the class
+     * {@link java.awt.geom.Line2D}. <strong>Any other class risks firing a
      * {@link ClassCastException} at execution</strong>.
      *
      * The default implementation always returns a {@link java.awt.geom.Rectangle2D} object.
@@ -1383,8 +1381,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * @param  point Logical coordinates of the mouse at the moment the button is pressed. This
      *         information can be used by derived classes that wish to consider the mouse position
      *         before choosing a geometric shape.
-     * @return Shape from the class {link RectangularShape} or {link Line2D}, or {@code null} to
-     *         indicate that we do not want to select with the mouse.
+     * @return Shape from the class {link java.awt.geom.RectangularShape} or
+     *         {link java.awt.geom.Line2D}, or {@code null} to indicate that
+     *         we do not want to select with the mouse.
      */
     protected Shape getMouseSelectionShape(final Point2D point) {
         return new Rectangle2D.Float();
@@ -1401,7 +1400,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     /**
      * Specifies whether or not the magnifying glass is allowed to be displayed on this component.
      * Calling this method with the value {@code false} will hide the magnifying glass, delete the
-     * choice "Display magnifying glass" from the contextual menu and lead to all calls to 
+     * choice "Display magnifying glass" from the contextual menu and lead to all calls to
      * <code>{@link #setMagnifierVisible setMagnifierVisible}(true)</code> being ignored.
      */
     public void setMagnifierEnabled(final boolean enabled) {
@@ -1614,7 +1613,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Menu with a position.  This class retains the exact coordinates of the 
+     * Menu with a position.  This class retains the exact coordinates of the
      * place the user clicked when this menu was invoked.
      *
      * @author Martin Desruisseaux
@@ -1793,8 +1792,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * The scroll panel for {@link ZoomPane}. The standard {@link JScrollPane}
-     * class is not used because it is difficult to get {@link JViewport} to
+     * The scroll panel for {@link ZoomPane}. The standard {@link javax.swing.JScrollPane}
+     * class is not used because it is difficult to get {@link javax.swing.JViewport} to
      * cooperate with transformations already handled by {@link ZoomPane#zoom}.
      *
      * @version $Id$
@@ -1962,9 +1961,9 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     }
 
     /**
-     * Object responsible for synchronizing a {@link JScrollPane} object with scrollbars.
-     * Whilst not generally useful, it would be possible to synchronize several pairs of
-     * {@link BoundedRangeModel} objects on one {@code ZoomPane} object.
+     * Object responsible for synchronizing a {@link javax.swing.JScrollPane} object with
+     * scrollbars. Whilst not generally useful, it would be possible to synchronize several
+     * pairs of {@link BoundedRangeModel} objects on one {@code ZoomPane} object.
      *
      * @author Martin Desruisseaux
      * @version $Id$

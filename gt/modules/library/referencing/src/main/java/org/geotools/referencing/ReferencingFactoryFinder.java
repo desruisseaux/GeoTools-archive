@@ -21,7 +21,6 @@ import java.io.Writer;
 import java.util.Set;
 import java.util.Locale;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import javax.imageio.spi.ServiceRegistry;
@@ -94,7 +93,7 @@ public class ReferencingFactoryFinder {
     /**
      * The authority names. Will be created only when first needed.
      */
-    private static Set/*<String>*/ authorityNames;
+    private static Set<String> authorityNames;
 
     /**
      * Do not allows any instantiation of this class.
@@ -148,7 +147,7 @@ public class ReferencingFactoryFinder {
     /**
      * Returns the names of all currently registered authorities.
      */
-    public static synchronized Set/*<String>*/ getAuthorityNames() {
+    public static synchronized Set<String> getAuthorityNames() {
         /*
          * IMPORTANT: Return the same Set instance (unmodifiable) as long as there is no change
          * in the list of registered factories, and create a new instance in case of changes.
@@ -158,10 +157,10 @@ public class ReferencingFactoryFinder {
          * changes for clearing their cache.
          */
         if (authorityNames == null) {
-            authorityNames = new LinkedHashSet();
+            authorityNames = new LinkedHashSet<String>();
             final Hints hints = null;
 loop:       for (int i=0; ; i++) {
-                final Set/*<AuthorityFactory>*/ factories;
+                final Set<? extends AuthorityFactory> factories;
                 switch (i) {
                     case 0:  factories = getCRSAuthorityFactories(hints);                 break;
                     case 1:  factories = getCSAuthorityFactories(hints);                  break;
@@ -169,9 +168,19 @@ loop:       for (int i=0; ; i++) {
                     case 3:  factories = getCoordinateOperationAuthorityFactories(hints); break;
                     default: break loop;
                 }
-                for (final Iterator it=factories.iterator(); it.hasNext();) {
-                    final Citation authority = ((AuthorityFactory) it.next()).getAuthority();
-                    authorityNames.addAll(authority.getIdentifiers());
+                for (final AuthorityFactory factory : factories) {
+                    final Citation authority = factory.getAuthority();
+                    if (authority != null) {
+                        authorityNames.add(Citations.getIdentifier(authority));
+                    }
+                    // Temporary workaround for a GeoTools bug (wrong type in the collection).
+                    if (authority instanceof org.geotools.metadata.iso.citation.CitationImpl) {
+                        final org.geotools.metadata.iso.citation.CitationImpl impl =
+                                (org.geotools.metadata.iso.citation.CitationImpl) authority;
+                        for (final Object code : impl.getIdentifiers()) {
+                            authorityNames.add(code.toString());
+                        }
+                    }
                 }
             }
             authorityNames = Collections.unmodifiableSet(authorityNames);
@@ -186,9 +195,11 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available factory implementations.
      */
-    private static synchronized Set/*<T>*/ getFactories(final Class/*<T extends Factory>*/ type, Hints hints) {
+    private static synchronized <T extends Factory>
+            Set<T> getFactories(final Class<T> type, Hints hints)
+    {
         hints = addDefaultHints(hints);
-        return new LazySet(getServiceRegistry().getServiceProviders(type, null, hints));
+        return new LazySet<T>(getServiceRegistry().getServiceProviders(type, null, hints));
     }
 
     /**
@@ -201,12 +212,11 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         specified interface.
      */
-    private static synchronized Factory /*T*/ getFactory(final Class/*<T extends Factory>*/ type,
-            Hints hints, final Hints.Key key)
-            throws FactoryRegistryException
+    private static synchronized <T extends Factory> T getFactory(final Class<T> type,
+            Hints hints, final Hints.Key key) throws FactoryRegistryException
     {
         hints = addDefaultHints(hints);
-        return (Factory) getServiceRegistry().getServiceProvider(type, null, hints, key);
+        return getServiceRegistry().getServiceProvider(type, null, hints, key);
     }
 
     /**
@@ -224,14 +234,12 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         specfied interface.
      */
-    private static synchronized AuthorityFactory /*T*/ getAuthorityFactory(
-            final Class/*<T extends AuthorityFactory>*/ type, final String authority,
-            Hints hints, final Hints.Key key)
+    private static synchronized <T extends AuthorityFactory> T getAuthorityFactory(
+            final Class<T> type, final String authority, Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
         hints = addDefaultHints(hints);
-        return (AuthorityFactory) getServiceRegistry().getServiceProvider(
-                type, new AuthorityFilter(authority), hints, key);
+        return getServiceRegistry().getServiceProvider(type, new AuthorityFilter(authority), hints, key);
     }
 
     /**
@@ -247,7 +255,7 @@ loop:       for (int i=0; ; i++) {
      *         {@link DatumFactory} interface.
      */
     public static DatumFactory getDatumFactory(final Hints hints) throws FactoryRegistryException {
-        return (DatumFactory) getFactory(DatumFactory.class, hints, Hints.DATUM_FACTORY);
+        return getFactory(DatumFactory.class, hints, Hints.DATUM_FACTORY);
     }
 
     /**
@@ -256,7 +264,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available datum factory implementations.
      */
-    public static Set getDatumFactories(final Hints hints) {
+    public static Set<DatumFactory> getDatumFactories(final Hints hints) {
         return getFactories(DatumFactory.class, hints);
     }
 
@@ -273,7 +281,7 @@ loop:       for (int i=0; ; i++) {
      *         {@link CSFactory} interface.
      */
     public static CSFactory getCSFactory(final Hints hints) throws FactoryRegistryException {
-        return (CSFactory) getFactory(CSFactory.class, hints, Hints.CS_FACTORY);
+        return getFactory(CSFactory.class, hints, Hints.CS_FACTORY);
     }
 
     /**
@@ -282,7 +290,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate system factory implementations.
      */
-    public static Set getCSFactories(final Hints hints) {
+    public static Set<CSFactory> getCSFactories(final Hints hints) {
         return getFactories(CSFactory.class, hints);
     }
 
@@ -299,7 +307,7 @@ loop:       for (int i=0; ; i++) {
      *         {@link CRSFactory} interface.
      */
     public static CRSFactory getCRSFactory(final Hints hints) throws FactoryRegistryException {
-        return (CRSFactory) getFactory(CRSFactory.class, hints, Hints.CRS_FACTORY);
+        return getFactory(CRSFactory.class, hints, Hints.CRS_FACTORY);
     }
 
     /**
@@ -308,7 +316,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate reference system factory implementations.
      */
-    public static Set getCRSFactories(final Hints hints) {
+    public static Set<CRSFactory> getCRSFactories(final Hints hints) {
         return getFactories(CRSFactory.class, hints);
     }
 
@@ -333,8 +341,8 @@ loop:       for (int i=0; ; i++) {
     public static CoordinateOperationFactory getCoordinateOperationFactory(final Hints hints)
             throws FactoryRegistryException
     {
-        return (CoordinateOperationFactory) getFactory(CoordinateOperationFactory.class,
-                hints, Hints.COORDINATE_OPERATION_FACTORY);
+        return getFactory(CoordinateOperationFactory.class, hints,
+                Hints.COORDINATE_OPERATION_FACTORY);
     }
 
     /**
@@ -344,7 +352,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate operation factory implementations.
      */
-    public static Set getCoordinateOperationFactories(final Hints hints) {
+    public static Set<CoordinateOperationFactory> getCoordinateOperationFactories(final Hints hints) {
         return getFactories(CoordinateOperationFactory.class, hints);
     }
 
@@ -365,8 +373,8 @@ loop:       for (int i=0; ; i++) {
                                                                  final Hints  hints)
             throws FactoryRegistryException
     {
-        return (DatumAuthorityFactory) getAuthorityFactory(DatumAuthorityFactory.class,
-                authority, hints, Hints.DATUM_AUTHORITY_FACTORY);
+        return getAuthorityFactory(DatumAuthorityFactory.class, authority, hints,
+                Hints.DATUM_AUTHORITY_FACTORY);
     }
 
     /**
@@ -376,7 +384,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available datum authority factory implementations.
      */
-    public static Set getDatumAuthorityFactories(final Hints hints) {
+    public static Set<DatumAuthorityFactory> getDatumAuthorityFactories(final Hints hints) {
         return getFactories(DatumAuthorityFactory.class, hints);
     }
 
@@ -403,8 +411,8 @@ loop:       for (int i=0; ; i++) {
                                                            final Hints  hints)
             throws FactoryRegistryException
     {
-        return (CSAuthorityFactory) getAuthorityFactory(CSAuthorityFactory.class,
-                authority, hints, Hints.CS_AUTHORITY_FACTORY);
+        return getAuthorityFactory(CSAuthorityFactory.class, authority, hints,
+                Hints.CS_AUTHORITY_FACTORY);
     }
 
     /**
@@ -413,7 +421,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate system authority factory implementations.
      */
-    public static Set getCSAuthorityFactories(final Hints hints) {
+    public static Set<CSAuthorityFactory> getCSAuthorityFactories(final Hints hints) {
         return getFactories(CSAuthorityFactory.class, hints);
     }
 
@@ -451,8 +459,8 @@ loop:       for (int i=0; ; i++) {
                                                              final Hints  hints)
             throws FactoryRegistryException
     {
-        return (CRSAuthorityFactory) getAuthorityFactory(CRSAuthorityFactory.class,
-                authority, hints, Hints.CRS_AUTHORITY_FACTORY);
+        return getAuthorityFactory(CRSAuthorityFactory.class, authority, hints,
+                Hints.CRS_AUTHORITY_FACTORY);
     }
 
     /**
@@ -465,7 +473,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate reference system authority factory implementations.
      */
-    public static Set getCRSAuthorityFactories(final Hints hints) {
+    public static Set<CRSAuthorityFactory> getCRSAuthorityFactories(final Hints hints) {
         return getFactories(CRSAuthorityFactory.class, hints);
     }
 
@@ -486,8 +494,7 @@ loop:       for (int i=0; ; i++) {
             final String authority, final Hints hints)
             throws FactoryRegistryException
     {
-        return (CoordinateOperationAuthorityFactory) getAuthorityFactory(
-                CoordinateOperationAuthorityFactory.class, authority, hints,
+        return getAuthorityFactory(CoordinateOperationAuthorityFactory.class, authority, hints,
                 Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY);
     }
 
@@ -498,7 +505,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available coordinate operation authority factory implementations.
      */
-    public static Set getCoordinateOperationAuthorityFactories(final Hints hints) {
+    public static Set<CoordinateOperationAuthorityFactory> getCoordinateOperationAuthorityFactories(final Hints hints) {
         return getFactories(CoordinateOperationAuthorityFactory.class, hints);
     }
 
@@ -517,8 +524,7 @@ loop:       for (int i=0; ; i++) {
     public static MathTransformFactory getMathTransformFactory(final Hints hints)
             throws FactoryRegistryException
     {
-        return (MathTransformFactory) getFactory(MathTransformFactory.class, hints,
-                Hints.MATH_TRANSFORM_FACTORY);
+        return getFactory(MathTransformFactory.class, hints, Hints.MATH_TRANSFORM_FACTORY);
     }
 
     /**
@@ -528,7 +534,7 @@ loop:       for (int i=0; ; i++) {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return Set of available math transform factory implementations.
      */
-    public static Set getMathTransformFactories(final Hints hints) {
+    public static Set<MathTransformFactory> getMathTransformFactories(final Hints hints) {
         return getFactories(MathTransformFactory.class, hints);
     }
 

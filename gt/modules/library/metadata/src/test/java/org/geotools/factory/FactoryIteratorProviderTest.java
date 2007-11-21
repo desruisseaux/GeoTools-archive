@@ -22,7 +22,7 @@ import junit.framework.TestSuite;
 
 
 /**
- * Tests {@link FactoryIteratorProvider} addition in {@link Factories}.
+ * Tests {@link FactoryIteratorProvider} addition in {@link FactoryIteratorProviders}.
  *
  * @source $URL$
  * @version $Id$
@@ -97,7 +97,7 @@ public class FactoryIteratorProviderTest extends TestCase {
          */
         final FactoryIteratorProvider provider1 = new DummyFactoryIteratorProvider(true);
         try {
-            Factories.addFactoryIteratorProvider(provider1);
+            FactoryIteratorProviders.addFactoryIteratorProvider(provider1);
             assertNotNull(getFactory(registry, null));
             DummyFactory factory;
 
@@ -122,7 +122,7 @@ public class FactoryIteratorProviderTest extends TestCase {
              */
             final FactoryIteratorProvider provider2 = new DummyFactoryIteratorProvider(false);
             try {
-                Factories.addFactoryIteratorProvider(provider2);
+                FactoryIteratorProviders.addFactoryIteratorProvider(provider2);
                 factory = getFactory(registry, DummyFactory.Example1.class);
                 assertEquals(DummyFactory.Example1.class, factory.getClass());
                 factory = getFactory(registry, DummyFactory.Example2.class);
@@ -132,10 +132,10 @@ public class FactoryIteratorProviderTest extends TestCase {
                 factory = getFactory(registry, DummyFactory.Example4.class);
                 assertEquals(DummyFactory.Example4.class, factory.getClass());
             } finally {
-                Factories.removeFactoryIteratorProvider(provider2);
+                FactoryIteratorProviders.removeFactoryIteratorProvider(provider2);
             }
         } finally {
-            Factories.removeFactoryIteratorProvider(provider1);
+            FactoryIteratorProviders.removeFactoryIteratorProvider(provider1);
         }
         /*
          * Tests with a new registry, which should be empty.

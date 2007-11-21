@@ -255,6 +255,7 @@ public final class GeoTools {
         }
         if (hints != null) {
             Hints.putSystemDefault(hints);
+            // fireConfigurationChanged() is invoked in the above method call.
         }
     }
 
@@ -457,7 +458,7 @@ public final class GeoTools {
      * <a href="http://www.springframework.org/">Spring framework</a>.
      */
     public static void addFactoryIteratorProvider(final FactoryIteratorProvider provider) {
-        Factories.addFactoryIteratorProvider(provider);
+        FactoryIteratorProviders.addFactoryIteratorProvider(provider);
     }
 
     /**
@@ -466,7 +467,7 @@ public final class GeoTools {
      * {@linkplain FactoryRegistry#deregisterServiceProvider deregistered} by this method.
      */
     public static void removeFactoryIteratorProvider(final FactoryIteratorProvider provider) {
-        Factories.removeFactoryIteratorProvider(provider);
+        FactoryIteratorProviders.removeFactoryIteratorProvider(provider);
     }
 
     /**

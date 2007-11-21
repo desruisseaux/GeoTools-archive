@@ -16,6 +16,7 @@
 package org.geotools.factory;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.IdentityHashMap;
@@ -217,7 +218,10 @@ public class AbstractFactory implements Factory, RegisterableService {
     }
 
     /**
-     * Adds the specified hints to this factory {@linkplain #hints}.
+     * Adds the specified hints to this factory {@linkplain #hints}. This method can be used
+     * as a replacement for <code>{@linkplain #hints}.putAll(map)</code> when the map is an
+     * instance of {@link Hints} - the above was allowed in Java 4, but is no longuer allowed
+     * since Java 5 and parameterized types.
      *
      * @param map The hints to add.
      * @return {@code true} if at least one value changed as a result of this call.
@@ -225,6 +229,19 @@ public class AbstractFactory implements Factory, RegisterableService {
      * @since 2.5
      */
     protected boolean addImplementationHints(final RenderingHints map) {
+        /*
+         * Do NOT change the parameter signature to Map<?,?>. We want to keep type safety.
+         * Use hints.putAll(...) if you have a Map<RenderingHints.Key,?>,  or this method
+         * if you have a RenderingHints map. Furthermore this method implementation needs
+         * the garantee that the map do not contains null value (otherwise the 'changed'
+         * computation could be inacurate) - this condition is enforced by RenderingHints
+         * but not by Map.
+         *
+         * The implementation below strips non-RenderingHints.Key as a paranoiac check,
+         * which should not be necessary since RenderingHints implementation prevented
+         * that. If the parameter was changed to Map<?,?>, the stripping would be more
+         * likely and could surprise the user since it is performed without warnings.
+         */
         boolean changed = false;
         if (map != null) {
             for (final Map.Entry<?,?> entry : map.entrySet()) {
@@ -341,8 +358,10 @@ public class AbstractFactory implements Factory, RegisterableService {
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final AbstractFactory that = (AbstractFactory) object;
-            return this.priority == that.priority &&
-                   new FactoryComparator(this, that).compare(new HashSet());
+            if (this.priority == that.priority) {
+                final Set<FactoryComparator> comparators = new HashSet<FactoryComparator>();
+                return new FactoryComparator(this, that).compare(comparators);
+            }
         }
         return false;
     }

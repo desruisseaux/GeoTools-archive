@@ -15,21 +15,17 @@
  */
 package org.geotools.referencing.factory.wms;
 
-// J2SE dependencies
 import java.util.Collection;
 import java.util.logging.Level;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.ReferencingFactoryFinder;
 

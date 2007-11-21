@@ -94,6 +94,8 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
      *
      * @param  authority The authority factory under creation.
      * @return The hints to use (may be {@code null}).
+     *
+     * @deprecated Should not looks at system hints; this is {@link ReferencingFactoryFinder}'s job.
      */
     static Hints defaultAxisOrderHints(final String authority) {
         final Object value = Hints.getSystemDefault(Hints.FORCE_AXIS_ORDER_HONORING);

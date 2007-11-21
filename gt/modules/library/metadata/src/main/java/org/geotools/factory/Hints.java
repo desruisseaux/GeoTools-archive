@@ -337,7 +337,8 @@ public final class Hints extends RenderingHints {
      *
      * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
-    public static final OptionKey DATUM_SHIFT_METHOD = new OptionKey("Molodenski","Abridged_Molodenski","Geocentric","*");
+    public static final OptionKey DATUM_SHIFT_METHOD = new OptionKey(
+            "Molodenski","Abridged_Molodenski","Geocentric","*");
 
     /**
      * Tells if {@linkplain org.opengis.referencing.operation.CoordinateOperation coordinate
@@ -806,7 +807,7 @@ public final class Hints extends RenderingHints {
      *
      * @param hints A map of key/value pairs to initialize the hints, or
      *              {@code null} if the object should be empty.
-     * 
+     *
      * @since 2.5
      */
     public Hints(final RenderingHints hints) {
@@ -817,7 +818,7 @@ public final class Hints extends RenderingHints {
      * Returns a map with the same hints than the specified one, minus every (key,value)
      * pairs where the key is not an instance of {@link RenderingHints.Key}. If the given
      * map contains only valid keys, then it is returned unchanged.
-     * 
+     *
      * @param  hints The map of hints to filter.
      * @return A map with filtered hints.
      */

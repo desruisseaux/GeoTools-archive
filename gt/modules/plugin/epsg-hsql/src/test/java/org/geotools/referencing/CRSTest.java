@@ -15,17 +15,14 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -35,11 +32,9 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.GeoTools;
 import org.geotools.resources.Arguments;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 
 
@@ -126,7 +121,7 @@ public class CRSTest extends TestCase {
 
     /**
      * Tests again EPSG:4326, but forced to (longitude, latitude) axis order.
-     * 
+     *
      * @todo Partially uncomment since we are allowed to compile for J2SE 1.5, but doesn't work
      *       as it did prior some changes in the referencing module. Need to investigate why.
      */
@@ -155,13 +150,16 @@ public class CRSTest extends TestCase {
         CoordinateReferenceSystem crs = getED50("ED50");
         assertEquals("Should find without scan thanks to the name.", "EPSG:4230",
                      CRS.lookupIdentifier(crs, false));
+        assertEquals(Integer.valueOf(4230), CRS.lookupEpsgCode(crs, false));
 
         crs = getED50("ED50 with unknown name");
         assertNull("Should not find the CRS without a scan.",
                    CRS.lookupIdentifier(crs, false));
+        assertEquals(null, CRS.lookupEpsgCode(crs, false));
 
         assertEquals("With scan allowed, should find the CRS.", "EPSG:4230",
                      CRS.lookupIdentifier(crs, true));
+        assertEquals(Integer.valueOf(4230), CRS.lookupEpsgCode(crs, true));
     }
 
     /**
@@ -201,7 +199,7 @@ public class CRSTest extends TestCase {
         CoordinateReferenceSystem crs2default = CRS.decode("EPSG:4326");
         MathTransform tDefault = CRS.findMathTransform(crs1default, crs2default);
         assertTrue("WSG84 transformed to WSG84 should be Identity", tDefault.isIdentity());
-        
+
         CoordinateReferenceSystem crs1force = CRS.decode("EPSG:4326",true);
         CoordinateReferenceSystem crs2force = CRS.decode("EPSG:4326",true);
         MathTransform tForce = CRS.findMathTransform(crs1force, crs2force);

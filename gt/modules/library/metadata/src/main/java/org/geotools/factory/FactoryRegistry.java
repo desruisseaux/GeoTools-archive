@@ -80,16 +80,14 @@ public class FactoryRegistry extends ServiceRegistry {
     private static final Level DEBUG_LEVEL = Level.FINEST;
 
     /**
-     * A copy of the global configuration set through {@link Factories} static methods. We keep
-     * a copy in every {@code FactoryRegistry} instance in order to compare against the master
-     * {@link Factories#GLOBAL} and detect if the configuration changed since the last time this
-     * registry was used.
+     * A copy of the global configuration defined through {@link FactoryIteratorProviders}
+     * static methods. We keep a copy in every {@code FactoryRegistry} instance in order to
+     * compare against the master {@link FactoryIteratorProviders#GLOBAL} and detect if the
+     * configuration changed since the last time this registry was used.
      *
      * @see #synchronizeIteratorProviders
-     *
-     * @deprecated Use listeners instead.
      */
-    private final Factories globalConfiguration = new Factories();
+    private final FactoryIteratorProviders globalConfiguration = new FactoryIteratorProviders();
 
     /**
      * Categories under scanning. This is used by {@link #scanForPlugins(Collection,Class)}
@@ -746,7 +744,7 @@ public class FactoryRegistry extends ServiceRegistry {
             /*
              * Next, query the user-provider iterators, if any.
              */
-            final FactoryIteratorProvider[] fip = Factories.getIteratorProviders();
+            final FactoryIteratorProvider[] fip = FactoryIteratorProviders.getIteratorProviders();
             for (int i=0; i<fip.length; i++) {
                 final Iterator<T> it = fip[i].iterator(category);
                 if (it != null) {
@@ -949,11 +947,12 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Synchronizes the content of the {@link #globalConfiguration} with {@link Factories#GLOBAL}.
-     * New providers are {@linkplain #register registered} immediately. Note that this method is
-     * typically invoked in a different thread than {@link Factories} method calls.
+     * Synchronizes the content of the {@link #globalConfiguration} with
+     * {@link FactoryIteratorProviders#GLOBAL}. New providers are {@linkplain #register registered}
+     * immediately. Note that this method is typically invoked in a different thread than
+     * {@link FactoryIteratorProviders} method calls.
      *
-     * @see Factories#addFactoryIteratorProvider
+     * @see FactoryIteratorProviders#addFactoryIteratorProvider
      */
     private void synchronizeIteratorProviders() {
         final FactoryIteratorProvider[] newProviders =
