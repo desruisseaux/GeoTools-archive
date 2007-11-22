@@ -20,8 +20,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
+import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 
@@ -41,12 +45,12 @@ import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.esri.sde.sdk.client.SeTable;
 
 /**
- * Exersices the ArcSDE Java API to ensure our assumptions are correct.
+ * Exercises the ArcSDE Java API to ensure our assumptions are correct.
  * 
  * <p>
  * Some of this tests asserts the information from the documentation found on <a
  * href="http://arcsdeonline.esri.com">arcsdeonline </a>, and others are needed
- * to validate our assumptions in the API behavoir due to the very little
+ * to validate our assumptions in the API behavior due to the very little
  * documentation ESRI provides about the less obvious things.
  * </p>
  * 
@@ -60,22 +64,59 @@ public class ArcSDEJavaApiTest extends TestCase {
 			.getPackage().getName());
 
 	/** utility to load test parameters and build a datastore with them */
-	private TestData testData;
+	private static TestData testData;
 
 	private SeConnection conn;
 	private ArcSDEConnectionPool pool;
 	
 	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param args
-	 *            DOCUMENT ME!
+	 * Runs this test suite
 	 */
 	public static void main(String[] args) {
 		junit.textui.TestRunner.run(ArcSDEJavaApiTest.class);
 	}
 
 	/**
+     * Builds a test suite for all this class' tests with per suite
+     * initialization directed to {@link #oneTimeSetUp()} and per suite clean up
+     * directed to {@link #oneTimeTearDown()}
+     * 
+     * @return
+     */
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
+        suite.addTestSuite(ArcSDEJavaApiTest.class);
+
+        TestSetup wrapper = new TestSetup(suite) {
+            protected void setUp() throws Exception {
+                oneTimeSetUp();
+            }
+
+            protected void tearDown() {
+                oneTimeTearDown();
+            }
+        };
+        return wrapper;
+    }
+
+    private static void oneTimeSetUp() throws Exception {
+        testData = new TestData();
+        testData.setUp();
+        if (ArcSDEDataStoreFactory.getSdeClientVersion() == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY){
+            throw new RuntimeException("Don't run the test-suite with the dummy jar.  " +
+            		"Make sure the real ArcSDE jars are on your classpath.");
+        }
+        final boolean insertTestData = true;
+		testData.createTempTable(insertTestData);
+    }
+
+    private static void oneTimeTearDown() {
+        boolean cleanTestTable = true;
+        boolean cleanPool = true;
+        testData.tearDown(cleanTestTable, cleanPool);
+    }
+
+    /**
 	 * loads {@code test-data/testparams.properties} into a Properties object, wich is
 	 * used to obtain test tables names and is used as parameter to find the DataStore
 	 * 
@@ -84,8 +125,10 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.testData = new TestData();
-		this.testData.setUp();
+        //facilitates running a single test at a time (eclipse lets you do this and it's very useful)
+        if (testData == null) {
+            oneTimeSetUp();
+        }
 		this.pool = this.testData.getDataStore().getConnectionPool();
 		this.conn = this.pool.getConnection();
 	}
@@ -98,12 +141,19 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		this.testData.tearDown(false, true); //this also closes the connection
-		this.testData = null;
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		conn = null;
+		pool = null;
 	}
 
 	public void testNullSQLConstruct() throws Exception {
-		String[] columns = { "POP_ADMIN" };
+		String[] columns = { TestData.TEST_TABLE_COLS[0] };
 		SeSqlConstruct sql = null;
 
 		try {
@@ -112,19 +162,22 @@ public class ArcSDEJavaApiTest extends TestCase {
 			rowQuery.execute();
 			fail("A null SeSqlConstruct should have thrown an exception!");
 		} catch (SeException e) {
-			LOGGER.fine("Null SqlConstruct throwed exception, it's OK");
+			assertTrue(true);
 		}
 	}
 
 	public void testEmptySQLConstruct() throws Exception {
-		String typeName = this.testData.getPolygon_table();
-
-		String[] columns = { "POP_ADMIN" };
+		String typeName = testData.getTemp_table();
+		String[] columns = { TestData.TEST_TABLE_COLS[0] };
 		SeSqlConstruct sql = new SeSqlConstruct(typeName);
 
 		SeQuery rowQuery = new SeQuery(conn, columns, sql);
-		rowQuery.prepareQuery();
-		rowQuery.execute();
+		try {
+			rowQuery.prepareQuery();
+			rowQuery.execute();
+		} finally {
+			rowQuery.close();
+		}
 	}
 
 	/**
@@ -135,20 +188,16 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testGetBoundsWhileFetchingRows() throws Exception {
 		try {
-			ArcSDEConnectionPool pool = this.testData.getDataStore()
-					.getConnectionPool();
-			String typeName = this.testData.getPolygon_table();
-			String where = "POP_ADMIN < 270000";
-
-			String[] columns = { "POP_ADMIN" };
-			SeSqlConstruct sql = new SeSqlConstruct(typeName, where);
+			final String typeName = testData.getTemp_table();
+			final String[] columns = { TestData.TEST_TABLE_COLS[0] };
+			final SeSqlConstruct sql = new SeSqlConstruct(typeName);
 
 			SeQueryInfo qInfo = new SeQueryInfo();
 			qInfo.setConstruct(sql);
 
 			// add a bounding box filter and verify both spatial and non spatial
 			// constraints affects the COUNT statistics
-			SeExtent extent = new SeExtent(-68, -55, -63, -52);
+			SeExtent extent = new SeExtent(-180, -90, -170, -80);
 
 			SeLayer layer = pool.getSdeLayer(typeName);
 			SeShape filterShape = new SeShape(layer.getCoordRef());
@@ -209,25 +258,25 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 */
 	public void testCalculateCount() throws Exception {
 		try {
-			String typeName = this.testData.getPolygon_table();
-			String where = "POP_ADMIN < 270000";
+			String typeName = testData.getTemp_table();
+			String where = "INT32_COL < 5";
 			int expCount = 4;
 
-			String[] columns = { "POP_ADMIN" };
+			String[] columns = { "INT32_COL" };
 			SeSqlConstruct sql = new SeSqlConstruct(typeName, where);
 			SeQuery query = new SeQuery(conn, columns, sql);
 			SeQueryInfo qInfo = new SeQueryInfo();
 			qInfo.setConstruct(sql);
 
 			SeTable.SeTableStats tableStats = query.calculateTableStatistics(
-					"POP_ADMIN", SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
+					"INT32_COL", SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
 
 			assertEquals(expCount, tableStats.getCount());
 			query.close();
 
 			// add a bounding box filter and verify both spatial and non spatial
 			// constraints affects the COUNT statistics
-			SeExtent extent = new SeExtent(-68, -55, -63, -52);
+			SeExtent extent = new SeExtent(-180, -90, -170, -80);
 
 			SeLayer layer = pool.getSdeLayer(typeName);
 			SeShape filterShape = new SeShape(layer.getCoordRef());
@@ -242,8 +291,8 @@ public class ArcSDEJavaApiTest extends TestCase {
 
 			query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatFilters);
 
-			expCount = 2;
-			tableStats = query.calculateTableStatistics("POP_ADMIN",
+			expCount = 1;
+			tableStats = query.calculateTableStatistics("INT32_COL",
 					SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
 
 			int resultCount = tableStats.getCount();
@@ -254,46 +303,6 @@ public class ArcSDEJavaApiTest extends TestCase {
 			e.printStackTrace();
 			throw e;
 		}
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @throws SeException
-	 *             DOCUMENT ME!
-	 */
-	public void testGenericSeCoordinateReferenceLimits() throws SeException {
-		SeCoordinateReference crs = TestData.getGenericCoordRef();
-		LOGGER.fine("CRS constraints: " + crs.getXYEnvelope() + ", presision: "
-				+ crs.getXYUnits());
-
-		SDEPoint[] ptArray = new SDEPoint[2];
-		SeShape shape = new SeShape(crs);
-		ptArray[0] = new SDEPoint(0.0, 0.0);
-
-		// find the lower limit of separation between coordinates
-		double shift = 1.0;
-
-		try {
-			while (true) {
-				ptArray[1] = new SDEPoint(shift, shift);
-				shape.generateLine(2, 1, new int[] { 0 }, ptArray);
-				shift /= 10;
-			}
-		} catch (SeException e) {
-			LOGGER.fine("Lower limit: " + String.valueOf(10 * shift));
-		}
-
-		int numPts = 5;
-		ptArray = new SDEPoint[numPts];
-		ptArray[0] = new SDEPoint(-1, 0);
-		ptArray[1] = new SDEPoint(0, 1);
-		ptArray[2] = new SDEPoint(1, 0);
-		ptArray[3] = new SDEPoint(0, -1);
-		ptArray[4] = new SDEPoint(-1, 0);
-
-		SeShape polygon = new SeShape(crs);
-		polygon.generatePolygon(numPts, 1, new int[] { 0 }, ptArray);
 	}
 
 	/**
@@ -824,4 +833,12 @@ public class ArcSDEJavaApiTest extends TestCase {
 		}
 	} // End method createBaseTable
 
+	
+	/**
+	 * Does a query over a non autocommit transaction return
+	 * the added/modified features and hides the deleted ones? 
+	 */
+	public void testTransactionStateRead(){
+		
+	}
 }
