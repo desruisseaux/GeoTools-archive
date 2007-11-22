@@ -98,6 +98,7 @@ public abstract class ArcSDEGeometryBuilder {
 
 	static {
 		builders.put(Geometry.class, GenericGeometryBuilder.getInstance());
+		builders.put(GeometryCollection.class, GenericGeometryBuilder.getInstance());
 		builders.put(Point.class, PointBuilder.getInstance());
 		builders.put(MultiPoint.class, MultiPointBuilder.getInstance());
 		builders.put(LineString.class, LineStringBuilder.getInstance());

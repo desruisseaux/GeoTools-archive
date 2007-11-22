@@ -188,7 +188,7 @@ public class ArcSDEConnectionPool {
      * Ensures proper closure of connection pool at this object's finalization
      * stage.
      */
-    public void finalize() {
+    protected void finalize() {
         close();
     }
 
@@ -517,7 +517,7 @@ public class ArcSDEConnectionPool {
         /** DOCUMENT ME! */
         private ArcSDEConnectionConfig config;
         
-        private ArrayList invalidConnections = new ArrayList();
+        private List<SeConnection> invalidConnections = new ArrayList<SeConnection>(2);
 
         /**
          * Creates a new SeConnectionFactory object.
@@ -531,7 +531,7 @@ public class ArcSDEConnectionPool {
         }
         
         public void markObjectInvalid(Object o) {
-            invalidConnections.add(o);
+            invalidConnections.add((SeConnection) o);
         }
         /**
          * Called whenever a new instance is needed.

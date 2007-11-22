@@ -16,7 +16,9 @@
  */
 package org.geotools.arcsde;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +53,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     private static final String FACTORY_DESCRIPTION = "ESRI(tm) ArcSDE 8.x and 9.x";
     
     /** DOCUMENT ME! */
-    private static Param[] paramMetadata = new Param[10];
+    private static List<Param> paramMetadata = new ArrayList<Param>(10);
     
     
     public static final int JSDE_VERSION_DUMMY = -1;
@@ -59,43 +61,44 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     public static final int JSDE_VERSION_91 = 1;
     public static final int JSDE_VERSION_92 = 2;
     
-    public static int JSDE_CLIENT_VERSION;
+    private static int JSDE_CLIENT_VERSION;
     
     static {
-        paramMetadata[0] = new Param("namespace", String.class,
-                "namespace associated to this data store", false);
-        paramMetadata[1] = new Param("dbtype", String.class,
-                "fixed value. Must be \"arcsde\"", true, "arcsde");
-        paramMetadata[2] = new Param("server", String.class,
-                "sever name where the ArcSDE gateway is running", true);
-        paramMetadata[3] = new Param(
+        paramMetadata.add(new Param("namespace", String.class,
+                "namespace associated to this data store", false));
+        paramMetadata.add(new Param("dbtype", String.class,
+                "fixed value. Must be \"arcsde\"", true, "arcsde"));
+        paramMetadata.add(new Param("server", String.class,
+                "sever name where the ArcSDE gateway is running", true));
+        paramMetadata.add(new Param(
                 "port",
                 Integer.class,
                 "port number in wich the ArcSDE server is listening for connections.Generally it's 5151",
-                true, new Integer(5151));
-        paramMetadata[4] = new Param(
+                true, Integer.valueOf(5151)));
+        paramMetadata.add(new Param(
                 "instance",
                 String.class,
-                "the specific database to connect to. Only applicable to certain databases. Value ignored if not applicable.",
-                false);
-        paramMetadata[5] = new Param("user", String.class,
-                "name of a valid database user account.", true);
-        paramMetadata[6] = new Param("password", String.class,
-                "the database user's password.", true);
+                "the specific database to connect to. Only applicable to " +
+                "certain databases. Value ignored if not applicable.",
+                false));
+        paramMetadata.add(new Param("user", String.class,
+                "name of a valid database user account.", true));
+        paramMetadata.add(new Param("password", String.class,
+                "the database user's password.", true));
         
         // optional parameters:
-        paramMetadata[7] = new Param("pool.minConnections", Integer.class,
-                "Minimun number of open connections", false, new Integer(
-                ArcSDEConnectionPool.DEFAULT_CONNECTIONS));
-        paramMetadata[8] = new Param("pool.maxConnections", Integer.class,
+        paramMetadata.add(new Param("pool.minConnections", Integer.class,
+                "Minimun number of open connections", false, Integer.valueOf(
+                ArcSDEConnectionPool.DEFAULT_CONNECTIONS)));
+        paramMetadata.add(new Param("pool.maxConnections", Integer.class,
                 "Maximun number of open connections (will not work if < 2)",
                 false,
-                new Integer(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS));
-        paramMetadata[9] = new Param(
+                Integer.valueOf(ArcSDEConnectionPool.DEFAULT_MAX_CONNECTIONS)));
+        paramMetadata.add(new Param(
                 "pool.timeOut",
                 Integer.class,
                 "Milliseconds to wait for an available connection before failing to connect",
-                false, new Integer(ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME));
+                false, Integer.valueOf(ArcSDEConnectionPool.DEFAULT_MAX_WAIT_TIME)));
         
         //determine which JSDE api we're running against
         determineJsdeVersion();
@@ -152,19 +155,13 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     }
     
     /**
-     * DOCUMENT ME!
-     *
-     * @param map
-     *            DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws UnsupportedOperationException
-     *             DOCUMENT ME!
+     * @throws UnsupportedOperationException always as the operation is not supported
+     * @see DataStoreFactorySpi#createNewDataStore(Map)
      */
     public DataStore createNewDataStore(java.util.Map map) {
         throw new UnsupportedOperationException(
-                "ArcSDE DataStore does not supports the creation of new databases. This should be done through database's specific tools");
+                "ArcSDE DataStore does not supports the creation of new databases. " +
+                "This should be done through database's specific tools");
     }
     
     /**
@@ -193,7 +190,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      *         defined by <code>params</code>
      *
      * @throws java.io.IOException
-     *             if somthing goes wrong creating the datastore.
+     *             if something goes wrong creating the datastore.
      */
     public DataStore createDataStore(Map params) throws java.io.IOException {
         if (JSDE_CLIENT_VERSION == JSDE_VERSION_DUMMY) {
@@ -242,7 +239,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     /**
      * Display name for this DataStore Factory
      *
-     * @return DOCUMENT ME!
+     * @return <code>"ArcSDE"</code>
      */
     public String getDisplayName() {
         return "ArcSDE";
@@ -335,7 +332,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      * @see DataStoreFactorySpi#getParametersInfo()
      */
     public DataStoreFactorySpi.Param[] getParametersInfo() {
-        return paramMetadata;
+        return paramMetadata.toArray(new Param[paramMetadata.size()]);
     }
 
     /**
@@ -344,4 +341,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
     }
+
+	public static int getSdeClientVersion() {
+		return JSDE_CLIENT_VERSION;
+	}
 }

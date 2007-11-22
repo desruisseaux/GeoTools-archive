@@ -303,7 +303,7 @@ public class ArcSDERasterReader extends ImageReader {
                 BufferedImage subtile = destination.getSubimage(destImageOffsetX, destImageOffsetY, destImageTileWidth, destImageTileHeight); 
                 destinationSubTile = subtile.getRaster();
                 
-                final Integer curBandId = new Integer((int)curTile.getBandId().longValue());
+                final Integer curBandId = Integer.valueOf((int)curTile.getBandId().longValue());
                 final int targetBand = ((Integer)bandMapper.get(curBandId)).intValue();
                 bandCopier.copyPixelData(curTile, destinationSubTile, curTileOffsetX, curTileOffsetY, targetBand);
                 

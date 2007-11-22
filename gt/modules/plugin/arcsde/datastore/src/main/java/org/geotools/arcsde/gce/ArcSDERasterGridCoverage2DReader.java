@@ -336,7 +336,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                             (maxImageX > _levelZeroPRP.x && minImageX < _levelZeroPRP.x)
                     ) {
                         LOGGER.warning("Using pyramid level 1 to render this request, as the data is unavailable at a negatively indexed tile.");
-                        return createCoverage(requestedEnvelope, requestedDim, new Integer(1));
+                        return createCoverage(requestedEnvelope, requestedDim, Integer.valueOf(1));
                     } else if (maxImageY > _levelZeroPRP.y && maxImageX > _levelZeroPRP.x) {
                         // we're on the south side of the PRP...need to shift everything up
                         sourceRegion.translate(_levelZeroPRP.x * -1, _levelZeroPRP.y * -1);
@@ -462,7 +462,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         if (idx == -1) {
             throw new IllegalArgumentException("ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
         } else {
-            sdeUser = sdeUrl.substring(0, idx).toString();
+            sdeUser = sdeUrl.substring(0, idx);
             sdeUrl.delete(0, idx);
         }
 
@@ -470,7 +470,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         if (idx == -1) {
             throw new IllegalArgumentException("ArcSDE Raster URL must be of the form sde://user:pass@sdehost:port/[dbname]#rasterTableName");
         } else {
-            sdePass = sdeUrl.substring(1, idx).toString();
+            sdePass = sdeUrl.substring(1, idx);
             sdeUrl.delete(0, idx);
         }
 
@@ -670,7 +670,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             SeRasterBand[] sdeBands = rasterAttributes.getBands();
             bandInfo = new HashMap();
             for (int i = 0; i < sdeBands.length; i++) {
-                bandInfo.put(new Long(sdeBands[i].getId().longValue()), ArcSDERasterBandCopier.getInstance(rasterAttributes.getPixelType(),pyramidInfo.tileHeight, pyramidInfo.tileWidth));
+                bandInfo.put(Long.valueOf(sdeBands[i].getId().longValue()), ArcSDERasterBandCopier.getInstance(rasterAttributes.getPixelType(),pyramidInfo.tileHeight, pyramidInfo.tileWidth));
             }
             
             for (int i = 0; i < rasterAttributes.getNumBands(); i++) {

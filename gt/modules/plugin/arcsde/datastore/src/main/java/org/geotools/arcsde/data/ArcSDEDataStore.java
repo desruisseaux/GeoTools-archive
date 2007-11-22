@@ -669,22 +669,17 @@ public class ArcSDEDataStore extends AbstractDataStore {
                 }
             };
         } catch (SchemaException ex) {
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new DataSourceException("Types do not match: " + ex.getMessage(), ex);
         } catch (IOException e) {
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
             throw e;
         } catch (Exception t) {
+            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
+        }finally{
             if (sdeQuery != null) {
                 sdeQuery.close();
             }
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
-            throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
         }
 
         return reader;
@@ -1010,7 +1005,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
      * to be real bound of the features
      * </p>
      * 
-     * @param query
+     * @param query non null query and query.getTypeName()
      * 
      * @return the bounds, or null if too expensive
      * 
@@ -1020,7 +1015,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
         LOGGER.fine("getBounds");
 
         Envelope ev;
-        if (query == null || query.getFilter().equals(Filter.INCLUDE)) {
+        if (query.getFilter().equals(Filter.INCLUDE)) {
             LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
             // we're really asking for a bounds of the WHOLE layer,
             // let's just ask SDE metadata for that, rather than doing an

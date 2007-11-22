@@ -253,7 +253,7 @@ public class ArcSDEConnectionConfig {
 	 */
 	private static final Integer getInt(Object value, int defaultValue) {
 		if (value == null) {
-			return new Integer(defaultValue);
+			return Integer.valueOf(defaultValue);
 		}
 
 		String sVal = String.valueOf(value);
@@ -261,7 +261,7 @@ public class ArcSDEConnectionConfig {
 		try {
 			return Integer.valueOf(sVal);
 		} catch (NumberFormatException ex) {
-			return new Integer(defaultValue);
+			return Integer.valueOf(defaultValue);
 		}
 	}
 
@@ -310,8 +310,6 @@ public class ArcSDEConnectionConfig {
 
 		if (databaseName == null || databaseName.length() == 0) {
 			LOGGER.warning("No database name specified");
-			databaseName = "";
-			// throwIllegal(INSTANCE_NAME_PARAM, databaseName);
 		}
 
 		if (userName.length() == 0) {

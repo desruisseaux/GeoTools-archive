@@ -82,20 +82,20 @@ public class ArcSDEAdapter {
     private static final Map java2SDETypes = new HashMap();
 
     static {
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_NSTRING), String.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_STRING), String.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT16), Short.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT32), Integer.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INT64), Long.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT32), Float.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT64), Double.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_DATE), Date.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_NSTRING), String.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_STRING), String.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_INT16), Short.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_INT32), Integer.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_INT64), Long.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_FLOAT32), Float.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_FLOAT64), Double.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_DATE), Date.class);
         // @TODO: not at all, only for capable open table with GeoServer
-	sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_BLOB),byte[].class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_BLOB),byte[].class);
         // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_CLOB),
         // String.class);
         // @Tested for view
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_UUID),String.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_UUID),String.class);
         // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_XML),
         // org.w3c.dom.Document.class);
 
@@ -103,10 +103,10 @@ public class ArcSDEAdapter {
         // compatibility
         // though the assigned int codes matched their new counterparts, I let
         // them here as a reminder
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_SMALLINT), Short.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_INTEGER), Integer.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_FLOAT), Float.class);
-        sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_DOUBLE), Double.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_SMALLINT), Short.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_INTEGER), Integer.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_FLOAT), Float.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_DOUBLE), Double.class);
 
         /**
          * By now keep using the deprecated constants (TYPE_INTEGER, etc.),
@@ -355,7 +355,7 @@ public class ArcSDEAdapter {
             defValue = null;
             fieldLen = seColumns[i].getSize();
 
-            final Integer sdeType = new Integer(colDef.getType());
+            final Integer sdeType = Integer.valueOf(colDef.getType());
 
             if (sdeType.intValue() == SeColumnDefinition.TYPE_SHAPE) {
                 CoordinateReferenceSystem crs = null;

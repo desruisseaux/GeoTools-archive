@@ -311,8 +311,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 				update.close();
 
 			}
-		} catch (Exception e) {
-			
+		} catch (SeException e) {
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
 			if (LOGGER.isLoggable(Level.FINE)) {
 				e.printStackTrace();
@@ -333,9 +332,11 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @throws IOException
 	 */
 	public boolean hasNext() throws IOException {
-		int size = this.features.size();
-
-		return ((this.features != null) && (size > 0) && ((this.currentIndex + 1) < size));
+		if(features == null){
+			return false;
+		}
+		final int size = features.size();
+		return ((size > 0) && ((this.currentIndex + 1) < size));
 	}
 
 	/**
@@ -395,7 +396,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 				// documentation. 1 indicates an ArcSDE managed field.
 				if (this.columnDefinitions[i].getRowIdType() != 1) {
 					columnList.add(attributeTypes.get(i).getLocalName().toUpperCase());
-					indexes.add(new Integer(i));
+					indexes.add(Integer.valueOf(i));
 				}
 			}
 
