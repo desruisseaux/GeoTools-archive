@@ -36,7 +36,6 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
@@ -44,12 +43,12 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -225,30 +224,10 @@ public class TestData {
 	/**
 	 * DOCUMENT ME!
 	 * 
-	 * @param conProps
-	 *            The conProps to set.
-	 */
-	public void setConProps(Properties conProps) {
-		this.conProps = conProps;
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 * 
 	 * @return Returns the line_table.
 	 */
 	public String getLine_table() {
 		return this.line_table;
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param line_table
-	 *            The line_table to set.
-	 */
-	public void setLine_table(String line_table) {
-		this.line_table = line_table;
 	}
 
 	/**
@@ -287,34 +266,15 @@ public class TestData {
 	/**
 	 * DOCUMENT ME!
 	 * 
-	 * @param point_table
-	 *            The point_table to set.
-	 */
-	public void setPoint_table(String point_table) {
-		this.point_table = point_table;
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 * 
 	 * @return Returns the polygon_table.
 	 */
 	public String getPolygon_table() {
 		return this.polygon_table;
 	}
-
+	
 	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param polygon_table
-	 *            The polygon_table to set.
-	 */
-	public void setPolygon_table(String polygon_table) {
-		this.polygon_table = polygon_table;
-	}
-
-	/**
-	 * DOCUMENT ME!
+	 * Gracefully deletes the temp table hiding any exception (no problem if it
+	 * does not exist)
 	 */
 	public void deleteTempTable() {
 		// only if the datastore was used
@@ -329,7 +289,8 @@ public class TestData {
 	}
 
 	/**
-	 * DOCUMENT ME!
+	 * Gracefully deletes the temp table hiding any exception (no problem if it
+	 * does not exist)
 	 * 
 	 * @param pool
 	 *            DOCUMENT ME!
@@ -399,7 +360,7 @@ public class TestData {
 	private static SeColumnDefinition[] createBaseTable(SeConnection conn,
 			SeTable table, SeLayer layer, String configKeyword)
 			throws SeException {
-		SeColumnDefinition[] colDefs = new SeColumnDefinition[6];
+		SeColumnDefinition[] colDefs = new SeColumnDefinition[7];
 
 		if (configKeyword == null)
 			configKeyword = "DEFAULTS";
@@ -410,18 +371,21 @@ public class TestData {
 		 * one database to another.
 		 */
 		boolean isNullable = true;
-
-		colDefs[0] = new SeColumnDefinition(TEST_TABLE_COLS[0],
+		
+		//first column to be SDE managed feature id
+		colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
+		
+		colDefs[1] = new SeColumnDefinition(TEST_TABLE_COLS[0],
 				SeColumnDefinition.TYPE_INTEGER, 10, 0, isNullable);
-		colDefs[1] = new SeColumnDefinition(TEST_TABLE_COLS[1],
+		colDefs[2] = new SeColumnDefinition(TEST_TABLE_COLS[1],
 				SeColumnDefinition.TYPE_SMALLINT, 4, 0, isNullable);
-		colDefs[2] = new SeColumnDefinition(TEST_TABLE_COLS[2],
+		colDefs[3] = new SeColumnDefinition(TEST_TABLE_COLS[2],
 				SeColumnDefinition.TYPE_FLOAT, 5, 2, isNullable);
-		colDefs[3] = new SeColumnDefinition(TEST_TABLE_COLS[3],
-				SeColumnDefinition.TYPE_DOUBLE, 15, 4, isNullable);
-		colDefs[4] = new SeColumnDefinition(TEST_TABLE_COLS[4],
+		colDefs[4] = new SeColumnDefinition(TEST_TABLE_COLS[3],
+				SeColumnDefinition.TYPE_DOUBLE, 25, 4, isNullable);
+		colDefs[5] = new SeColumnDefinition(TEST_TABLE_COLS[4],
 				SeColumnDefinition.TYPE_STRING, 25, 0, isNullable);
-		colDefs[5] = new SeColumnDefinition(TEST_TABLE_COLS[5],
+		colDefs[6] = new SeColumnDefinition(TEST_TABLE_COLS[5],
 				SeColumnDefinition.TYPE_DATE, 1, 0, isNullable);
 
 		/*
@@ -429,6 +393,19 @@ public class TestData {
 		 * keywords are defined in the dbtune table.
 		 */
 		table.create(colDefs, configKeyword);
+		
+		/*
+		 * Register the column to be used as feature id and managed by sde
+		 */
+		{
+			SeRegistration reg = new SeRegistration(conn, table.getName());
+			LOGGER.fine("setting rowIdColumnName to ROW_ID in table "
+					+ reg.getTableName());
+			reg.setRowIdColumnName("ROW_ID");
+			final int rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
+			reg.setRowIdColumnType(rowIdColumnType);
+			reg.alter();
+		}
 
 		/*
 		 * Define the attributes of the spatial column
@@ -530,12 +507,12 @@ public class TestData {
 		 */
 		String[] columns = new String[7];
 
-		columns[0] = colDefs[0].getName(); // INT32 column
-		columns[1] = colDefs[1].getName(); // INT16 column
-		columns[2] = colDefs[2].getName(); // FLOAT32 column
-		columns[3] = colDefs[3].getName(); // FLOAT64 column
-		columns[4] = colDefs[4].getName(); // String column
-		columns[5] = colDefs[5].getName(); // Date column
+		columns[0] = colDefs[1].getName(); // INT32 column
+		columns[1] = colDefs[2].getName(); // INT16 column
+		columns[2] = colDefs[3].getName(); // FLOAT32 column
+		columns[3] = colDefs[4].getName(); // FLOAT64 column
+		columns[4] = colDefs[5].getName(); // String column
+		columns[5] = colDefs[6].getName(); // Date column
 		columns[6] = "SHAPE"; // Shape column
 
 		SeInsert insert = new SeInsert(conn);
@@ -550,6 +527,7 @@ public class TestData {
 		try {
 			for (int i = 1; i <= shapes.length; i++) {
 				SeRow row = insert.getRowToSet();
+				//col #0 is the sde managed row id
 				row.setInteger(0, Integer.valueOf(i));
 				row.setShort(1, Short.valueOf((short) i));
 				row.setFloat(2, new Float(i / 10.0F));
@@ -558,11 +536,6 @@ public class TestData {
 				cal.set(Calendar.DAY_OF_MONTH, i);
 				row.setTime(5, cal);
 				SeShape seShape = shapes[i - 1];
-				Geometry geometry = null;
-				if(seShape != null){
-					ArcSDEGeometryBuilder b = ArcSDEGeometryBuilder.builderFor(geoms[i - 1].getClass());
-					geometry = b.construct(seShape);
-				}
 				row.setShape(6, seShape);
 
 				insert.execute();
