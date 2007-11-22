@@ -16,6 +16,7 @@
  */
 package org.geotools.arcsde.data;
 
+import com.esri.sde.sdk.client.SeException;
 import com.vividsolutions.jts.geom.*;
 
 import junit.framework.TestCase;
@@ -180,9 +181,10 @@ public class ArcSDEOldStyleFiltersTest extends TestCase {
      * </p>
      *
      * @throws IOException DOCUMENT ME!
+     * @throws SeException 
      * @throws SchemaException DOCUMENT ME!
      */
-    public void testCreateSchema() throws IOException {
+    public void testCreateSchema() throws IOException, SeException {
         SimpleFeatureType type;
 
         String typeName = this.testData.getTemp_table();

@@ -31,6 +31,7 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsEqualTo;
 
+import com.esri.sde.sdk.client.SeException;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -67,7 +68,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         super.setUp();
         this.testData = new TestData();
         this.testData.setUp();
-        if (ArcSDEDataStoreFactory.JSDE_CLIENT_VERSION == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY)
+        if (ArcSDEDataStoreFactory.getSdeClientVersion() == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY)
             throw new RuntimeException("Don't run the test-suite with the dummy jar.  Make sure the real ArcSDE jars are on your classpath.");
     }
 
@@ -89,7 +90,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      */
     public void testDeleteByFID() throws Exception {
         testData.createTempTable(true);
-
+        
         DataStore ds = testData.getDataStore();
         String typeName = testData.getTemp_table();
 
@@ -191,8 +192,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      *
      * @throws IOException DOCUMENT ME!
      * @throws SchemaException DOCUMENT ME!
+     * @throws SeException 
      */
-    public void testCreateSchema() throws IOException, SchemaException {
+    public void testCreateSchema() throws IOException, SchemaException, SeException {
         SimpleFeatureType type;
         
         String typeName = this.testData.getTemp_table();
@@ -351,9 +353,8 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         assertEquals(msg, features.size(), featureAddedEventCount[0]);*/
     }
     
-    public void testCreateNillableShapeSchema() throws IOException, SchemaException {
+    public void testCreateNillableShapeSchema() throws IOException, SchemaException, SeException {
         SimpleFeatureType type;
-        AttributeDescriptor[] atts = new AttributeDescriptor[2];
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
             LOGGER.fine("Unqualifying type name to create schema.");
@@ -379,7 +380,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         this.testData.deleteTempTable(ds.getConnectionPool());
     }
     
-    public void testWriteAndUpdateNullShapes() throws IOException, SchemaException {
+    public void testWriteAndUpdateNullShapes() throws IOException, SchemaException, SeException {
         SimpleFeatureType type;
         String typeName = this.testData.getTemp_table();
         if(typeName.indexOf('.') != -1){
@@ -411,7 +412,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             FeatureWriter writer = ds.getFeatureWriter(this.testData.getTemp_table(),
                     Transaction.AUTO_COMMIT);
             SimpleFeature f = writer.next();
-            f.setAttribute(0, new Integer(1));
+            f.setAttribute(0, Integer.valueOf(1));
         
             writer.write();
             writer.close();

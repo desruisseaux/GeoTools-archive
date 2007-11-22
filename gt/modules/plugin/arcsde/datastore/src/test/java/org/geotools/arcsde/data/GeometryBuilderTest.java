@@ -488,11 +488,13 @@ public class GeometryBuilderTest extends TestCase {
         Geometry g;
         String line = null;
 
+        BufferedReader reader = null;
+        InputStream in = null;
         try {
             LOGGER.fine("loading test data test-data/" + resource);
 
-            InputStream in = org.geotools.test.TestData.openStream(null, resource);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			in = org.geotools.test.TestData.openStream(null, resource);
+			reader = new BufferedReader(new InputStreamReader(in));
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -512,6 +514,13 @@ public class GeometryBuilderTest extends TestCase {
             LOGGER.severe("cant load test data " + resource + ": "
                 + ex.getMessage());
             throw ex;
+        }finally{
+        	if(reader != null){
+        		reader.close();
+        	}
+        	if(in != null){
+        		in.close();
+        	}
         }
 
         return (Geometry[]) testGeoms.toArray(new Geometry[0]);

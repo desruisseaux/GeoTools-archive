@@ -219,11 +219,11 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
             // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
             // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
             // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
 
@@ -259,8 +259,6 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.",
                     RasterTestUtils.imageEquals(image,
                             imgPrefix+"3.png"));
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();
@@ -291,11 +289,11 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
             // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
             // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
             // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
 
@@ -346,8 +344,6 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.",
                     RasterTestUtils.imageEquals(image,
                             imgPrefix+"3.png"));
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (scon != null)
                 scon.close();
@@ -379,11 +375,11 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
             // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
             // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
             // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
 
@@ -419,8 +415,6 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.",
                     RasterTestUtils.imageEquals(image,
                             imgPrefix+"3.png"));
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (scon != null)
                 scon.close();
@@ -452,11 +446,11 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
             // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
             // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
             // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
 
@@ -507,8 +501,6 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.",
                     RasterTestUtils.imageEquals(image,
                             imgPrefix+"3.png"));
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();
@@ -538,9 +530,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             scon = pool.getConnection();
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
 
@@ -588,9 +580,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             scon = pool.getConnection();
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
 
@@ -612,8 +604,6 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.",
                     RasterTestUtils.imageEquals(image,
                             imgPrefix+"1.png"));
-        } catch (Exception e) {
-            throw e;
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();

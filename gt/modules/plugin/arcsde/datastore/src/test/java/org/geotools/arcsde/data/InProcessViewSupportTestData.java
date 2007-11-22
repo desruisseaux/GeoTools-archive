@@ -53,6 +53,8 @@ public class InProcessViewSupportTestData {
 
     public static final String CHILD_UNQUALIFIED = "GT_SDE_TEST_CHILD";
 
+    private static CoordinateReferenceSystem testCrs;
+
     public static String MASTER;
 
     public static String CHILD;
@@ -204,7 +206,7 @@ public class InProcessViewSupportTestData {
             SDEPoint[] points = { new SDEPoint(i, i) };
             shape.generatePoint(1, points);
 
-            row.setInteger(0, new Integer(i));
+            row.setInteger(0, Integer.valueOf(i));
             row.setString(1, "name" + i);
             row.setShape(2, shape);
             insert.execute();
@@ -262,8 +264,8 @@ public class InProcessViewSupportTestData {
 
                 SeRow row = insert.getRowToSet();
 
-                row.setInteger(0, new Integer(childId));
-                row.setInteger(1, new Integer(master));
+                row.setInteger(0, Integer.valueOf(childId));
+                row.setInteger(1, Integer.valueOf(master));
                 row.setString(2, "child" + (childId));
                 row.setString(3, "description" + (childId));
                 insert.execute();
@@ -280,7 +282,4 @@ public class InProcessViewSupportTestData {
 
         conn.commitTransaction();
     }
-
-    public static CoordinateReferenceSystem testCrs;
-
 }

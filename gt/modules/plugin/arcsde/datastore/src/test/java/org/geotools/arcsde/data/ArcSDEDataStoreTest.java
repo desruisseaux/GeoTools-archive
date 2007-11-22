@@ -130,7 +130,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     private static void oneTimeSetUp() throws IOException {
         testData = new TestData();
         testData.setUp();
-        if (ArcSDEDataStoreFactory.JSDE_CLIENT_VERSION == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY)
+        if (ArcSDEDataStoreFactory.getSdeClientVersion() == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY)
             throw new RuntimeException("Don't run the test-suite with the dummy jar.  Make sure the real ArcSDE jars are on your classpath.");
     }
 

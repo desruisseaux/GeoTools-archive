@@ -208,11 +208,11 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
 
             SeRasterBand[] bands = rasterAttrFourBand.getBands();
             HashMap bandMapper = new HashMap();
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
             // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
             // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
             int[] opaque;
@@ -286,9 +286,6 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
                     RasterTestUtils.imageEquals(image,
                             conProps.getProperty("testReadOffsetImage.image")));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
         } finally {
             if (scon != null && !scon.isClosed())
                 scon.close();
@@ -306,16 +303,16 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             SeRasterBand[] bands = rasterAttrFourBand.getBands();
             HashMap bandMapper = new HashMap();
             // red band
-            bandMapper.put(new Integer((int) bands[0].getId().longValue()), new Integer(0));
+            bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
             // blue band
-            bandMapper.put(new Integer((int) bands[1].getId().longValue()), new Integer(1));
+            bandMapper.put(Integer.valueOf((int) bands[1].getId().longValue()), Integer.valueOf(1));
             // green band
-            bandMapper.put(new Integer((int) bands[2].getId().longValue()), new Integer(2));
+            bandMapper.put(Integer.valueOf((int) bands[2].getId().longValue()), Integer.valueOf(2));
 
             BufferedImage image;
             int[] opaque;
 
-            ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+            ArcSDERasterImageReadParam rParam;
             
             rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] {1, 2, 3} );
@@ -364,7 +361,7 @@ public class ArcSDEImageIOReaderFunctionalTest extends TestCase {
             BufferedImage image;
             int[] opaque;
 
-            ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
+            ArcSDERasterImageReadParam rParam;
             
             rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] {1, 2, 3} );

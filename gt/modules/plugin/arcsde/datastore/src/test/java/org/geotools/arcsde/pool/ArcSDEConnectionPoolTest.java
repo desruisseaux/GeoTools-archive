@@ -196,9 +196,9 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         //availability
         Map params = new HashMap(this.connectionParameters);
         params.put(ArcSDEConnectionConfig.MIN_CONNECTIONS_PARAM,
-            new Integer(MIN_CONNECTIONS));
+        		Integer.valueOf(MIN_CONNECTIONS));
         params.put(ArcSDEConnectionConfig.MAX_CONNECTIONS_PARAM,
-            new Integer(MAX_CONNECTIONS));
+        		Integer.valueOf(MAX_CONNECTIONS));
 
         createPool(params);
 
@@ -224,8 +224,8 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         //availability
         Map params = new HashMap(this.connectionParameters);
         params.put(ArcSDEConnectionConfig.MIN_CONNECTIONS_PARAM,
-            new Integer(MIN_CONNECTIONS));
-        params.put(ArcSDEConnectionConfig.MAX_CONNECTIONS_PARAM, new Integer(1));
+        		Integer.valueOf(MIN_CONNECTIONS));
+        params.put(ArcSDEConnectionConfig.MAX_CONNECTIONS_PARAM, Integer.valueOf(1));
 
         //this MUST fail, since maxConnections is lower than minConnections
         try {
@@ -255,9 +255,9 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         Map params = new HashMap(this.connectionParameters);
         params.put(ArcSDEConnectionConfig.MIN_CONNECTIONS_PARAM,
-            new Integer(MIN_CONNECTIONS));
+        		Integer.valueOf(MIN_CONNECTIONS));
         params.put(ArcSDEConnectionConfig.MAX_CONNECTIONS_PARAM,
-            new Integer(MAX_CONNECTIONS));
+        		Integer.valueOf(MAX_CONNECTIONS));
         
         createPool(params);
 
