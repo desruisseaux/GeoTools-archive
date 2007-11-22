@@ -118,9 +118,9 @@ public class ArcSDEDataStore extends AbstractDataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * Connection pool as provided during construction.
      * 
-     * @return DOCUMENT ME!
+     * @return Connection Pool (as provided during construction)
      */
     public ArcSDEConnectionPool getConnectionPool() {
         return this.connectionPool;
@@ -131,7 +131,7 @@ public class ArcSDEDataStore extends AbstractDataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * List of type names; should be a list of all feature classes.
      * 
      * @return the list of full qualified feature class names on the ArcSDE
      *         database this DataStore works on. An ArcSDE full qualified class
@@ -617,16 +617,13 @@ public class ArcSDEDataStore extends AbstractDataStore {
 
     /**
      * GR: this method is called from inside getFeatureReader(Query ,Transaction )
-     * to allow subclasses return an optimized FeatureReader wich supports the
+     * to allow subclasses return an optimized FeatureReader which supports the
      * filter and attributes truncation specified in <code>query</code>
      * 
      * <p>
      * A subclass that supports the creation of such an optimized FeatureReader
-     * shold override this method. Otherwise, it just returns
+     * should override this method. Otherwise, it just returns
      * <code>getFeatureReader(typeName)</code>
-     * </p>
-     * 
-     * <p>
      * </p>
      * 
      * @param typeName
@@ -761,10 +758,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * Used to modify features using Transaction AUTO_COMMIT.
+     * <p>
+     * It is recommended that you use a Transaction.
      * 
      * @param typeName
-     * 
      * @return FeatureWriter over contents of typeName
      * 
      * @throws IOException
@@ -785,7 +783,6 @@ public class ArcSDEDataStore extends AbstractDataStore {
         } finally {
             conn.close();
         }
-
         return new ArcSDEFeatureWriter(this, fidStrategy, null, layer);
     }
 

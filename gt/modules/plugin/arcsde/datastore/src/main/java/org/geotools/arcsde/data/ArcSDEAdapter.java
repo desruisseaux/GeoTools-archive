@@ -666,31 +666,25 @@ public class ArcSDEAdapter {
      * SeColumnDefinition, given by its column type
      * (SeColumnDefinition.SE_STRING, etc).
      * 
-     * <p>
-     * </p>
-     * 
      * @author Gabriel Roldan, Axios Engineering
      * @version $Revision: 1.4 $
      */
     private static class SdeTypeDef {
-        /** DOCUMENT ME! */
+        /** A magic number provided by SeColumnDefinition (example SeColumnDefinition.TYPE_STRING) */
         final int colDefType;
 
-        /** DOCUMENT ME! */
+        /** size (probably field size?) */
         final int size;
 
-        /** DOCUMENT ME! */
+        /** scale */
         final int scale;
 
         /**
          * Creates a new SdeTypeDef object.
          * 
-         * @param colDefType
-         *            DOCUMENT ME!
-         * @param size
-         *            DOCUMENT ME!
-         * @param scale
-         *            DOCUMENT ME!
+         * @param colDefType Constant provided by SeColumnDefinition
+         * @param size Field size
+         * @param scale Field scale
          */
         public SdeTypeDef(int colDefType, int size, int scale) {
             this.colDefType = colDefType;
@@ -699,9 +693,9 @@ public class ArcSDEAdapter {
         }
 
         /**
-         * DOCUMENT ME!
+         * Text representation
          * 
-         * @return DOCUMENT ME!
+         * @return Text represenation for debugging
          */
         public String toString() {
             return "SdeTypeDef[colDefType=" + this.colDefType + ", size=" + this.size + ", scale=" + this.scale + "]";
