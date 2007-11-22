@@ -71,13 +71,10 @@ class TableQualifier {
             // we'll replace the table schema name by
             // databaseName.userName
             String qualifiedSchema = databaseName;
-
-            if (schema != null) {
-                // use the "user" name provided
-                qualifiedSchema += ("." + schema);
-            } else {
-                // use this connection's user name
-                qualifiedSchema += ("." + userName);
+            if("".equals(qualifiedSchema)){
+            	qualifiedSchema = userName;
+            }else{
+            	qualifiedSchema += ("." + userName);
             }
 
             qualifiedTable.setSchemaName(qualifiedSchema);
