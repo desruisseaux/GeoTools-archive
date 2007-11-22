@@ -32,8 +32,6 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
 import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeDBTune;
-import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeRelease;
 import com.esri.sde.sdk.pe.PeCoordinateSystem;
 import com.esri.sde.sdk.pe.PeFactory;
@@ -170,7 +168,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     }
     
     /**
-     * crates an SdeDataSource based on connection parameters holded in
+     * crates an SdeDataSource based on connection parameters held in
      * <code>params</code>.
      *
      * <p>
@@ -179,7 +177,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      * <ul>
      * <li><b>dbtype </b>: MUST be <code>"arcsde"</code></li>
      * <li><b>server </b>: machine name where ArcSDE is running</li>
-     * <li><b>port </b>: por number where ArcSDE listens for connections on
+     * <li><b>port </b>: port number where ArcSDE listens for connections on
      * server</li>
      * <li><b>instance </b>: database instance name to connect to</li>
      * <li><b>user </b>: database user name with at least reading privileges
@@ -334,9 +332,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     }
     
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @see DataStoreFactorySpi#getParametersInfo()
      */
     public DataStoreFactorySpi.Param[] getParametersInfo() {
         return paramMetadata;
