@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -46,7 +46,7 @@ import org.geotools.resources.i18n.Errors;
  * Parser for {@linkplain MathTransform math transform}
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite> (WKT)</A> of math transform.
- * 
+ *
  * @since 2.0
  * @source $URL$
  * @version $Id$
@@ -57,7 +57,7 @@ import org.geotools.resources.i18n.Errors;
 public class MathTransformParser extends AbstractParser {
     /**
      * The factory to use for creating math transforms.
-     */   
+     */
     protected final MathTransformFactory mtFactory;
 
     /**
@@ -72,14 +72,14 @@ public class MathTransformParser extends AbstractParser {
      * @see #getOperationMethod
      */
     private OperationMethod lastMethod;
-    
+
     /**
      * Constructs a parser using the default set of symbols.
      */
     public MathTransformParser() {
         this(Symbols.DEFAULT);
     }
-    
+
     /**
      * Constructs a parser using the specified set of symbols
      * and the default factories.
@@ -91,7 +91,7 @@ public class MathTransformParser extends AbstractParser {
     public MathTransformParser(final Symbols symbols) {
         this(symbols, ReferencingFactoryFinder.getMathTransformFactory(null));
     }
-    
+
     /**
      * Constructs a parser for the specified set of symbols and factory.
      *
@@ -127,7 +127,7 @@ public class MathTransformParser extends AbstractParser {
     protected Object parse(final Element element) throws ParseException {
         return parseMathTransform(element, true);
     }
-    
+
     /**
      * Parses the next element (a {@link MathTransform}) in the specified
      * <cite>Well Know Text</cite> (WKT) tree.
@@ -155,7 +155,7 @@ public class MathTransformParser extends AbstractParser {
         }
         return null;
     }
-    
+
     /**
      * Parses a "PARAM_MT" element. This element has the following pattern:
      *
@@ -167,7 +167,7 @@ public class MathTransformParser extends AbstractParser {
      * @return The "PARAM_MT" element as an {@link MathTransform} object.
      * @throws ParseException if the "PARAM_MT" element can't be parsed.
      */
-    private MathTransform parseParamMT(final Element parent) throws ParseException {     
+    private MathTransform parseParamMT(final Element parent) throws ParseException {
         final Element element = parent.pullElement("PARAM_MT");
         classification = element.pullString("classification");
         final ParameterValueGroup parameters;
@@ -208,11 +208,11 @@ public class MathTransformParser extends AbstractParser {
             throw element.parseFailed(exception, null);
         }
         if (mtFactory instanceof DefaultMathTransformFactory) {
-            lastMethod = ((DefaultMathTransformFactory) mtFactory).getLastUsedMethod();
+            lastMethod = ((DefaultMathTransformFactory) mtFactory).getLastMethodUsed();
         }
         return transform;
-    }    
-    
+    }
+
     /**
      * Parses a "INVERSE_MT" element. This element has the following pattern:
      *
@@ -224,7 +224,7 @@ public class MathTransformParser extends AbstractParser {
      * @return The "INVERSE_MT" element as an {@link MathTransform} object.
      * @throws ParseException if the "INVERSE_MT" element can't be parsed.
      */
-    private MathTransform parseInverseMT(final Element parent) throws ParseException {       
+    private MathTransform parseInverseMT(final Element parent) throws ParseException {
         final Element element = parent.pullElement("INVERSE_MT");
         try {
             final MathTransform transform;
@@ -236,7 +236,7 @@ public class MathTransformParser extends AbstractParser {
             throw element.parseFailed(exception, null);
         }
     }
-    
+
     /**
      * Parses a "PASSTHROUGH_MT" element. This element has the following pattern:
      *
@@ -257,9 +257,9 @@ public class MathTransformParser extends AbstractParser {
             return mtFactory.createPassThroughTransform(firstAffectedOrdinate, transform, 0);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
-        }   
-    }  
-        
+        }
+    }
+
     /**
      * Parses a "CONCAT_MT" element. This element has the following pattern:
      *
@@ -271,7 +271,7 @@ public class MathTransformParser extends AbstractParser {
      * @return The "CONCAT_MT" element as an {@link MathTransform} object.
      * @throws ParseException if the "CONCAT_MT" element can't be parsed.
      */
-    private MathTransform parseConcatMT(final Element parent) throws ParseException {       
+    private MathTransform parseConcatMT(final Element parent) throws ParseException {
         final Element element = parent.pullElement("CONCAT_MT");
         MathTransform transform = parseMathTransform(element, true);
         MathTransform optionalTransform;

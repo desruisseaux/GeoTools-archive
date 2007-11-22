@@ -107,12 +107,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * @param  factories The factories to wrap, in iteration order.
      * @throws FactoryNotFoundException if the collection doesn't contains at least one element.
      * @throws ClassCastException if {@code type} is illegal.
-     *
-     * @todo Use generic types when we will be allowed to compile for J2SE 1.5 (the return type
-     *       should be T).
      */
-    public static AuthorityFactory create(final Class/*<T extends AuthorityFactory>*/ type,
-                                          final Collection/*<T>*/ factories)
+    public static <T extends AuthorityFactory> T create(final Class<T> type, final Collection<T> factories)
             throws FactoryNotFoundException, ClassCastException
     {
         ensureNonNull("type", type);
@@ -121,9 +117,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
             throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
                     Utilities.getShortName(type)));
         }
-        return create(false, interfaceMask(type), factories.iterator());
-        // TODO: use the following line when we will be allowed to compile for J2SE 1.5.
-        // return type.cast(...);
+        return type.cast(create(false, interfaceMask(type), factories.iterator()));
     }
 
     /**
@@ -139,7 +133,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      *
      * @since 2.4
      */
-    public static AuthorityFactory create(final Collection factories)
+    public static AuthorityFactory create(final Collection<? extends AuthorityFactory> factories)
             throws FactoryNotFoundException
     {
         ensureNonNull("factories", factories);
@@ -161,10 +155,10 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * @param factories The factories to chain.
      */
     private static AuthorityFactory create(final boolean automatic, int interfaceMask,
-                                           final Iterator/*<AuthorityFactory>*/ factories)
+                                           final Iterator<? extends AuthorityFactory> factories)
             throws FactoryNotFoundException
     {
-        AuthorityFactory primary = (AuthorityFactory) factories.next();
+        AuthorityFactory primary = factories.next();
         if (factories.hasNext()) {
             AuthorityFactory fallback = create(true, interfaceMask, factories);
             while (fallback != primary) { // Paranoiac check
@@ -211,8 +205,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * fallback specified at construction time, or the exception if they can't be obtained.
      */
     @Override
-    Collection/*<?>*/ dependencies() {
-        final Collection/*<?>*/ dep = super.dependencies();
+    Collection<? super AuthorityFactory> dependencies() {
+        final Collection<? super AuthorityFactory> dep = super.dependencies();
         dep.add(fallback);
         return dep;
     }
@@ -222,8 +216,9 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * returns the union of the authority codes from the <cite>primary</cite> and the
      * <cite>fallback</cite> factories.
      */
-    public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
-        final Set codes = new LinkedHashSet(super.getAuthorityCodes(type));
+    @Override
+    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
+        final Set<String> codes = new LinkedHashSet<String>(super.getAuthorityCodes(type));
         codes.addAll(fallback.getAuthorityCodes(type));
         return codes;
     }
@@ -231,6 +226,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a description for the object identified by the specified code.
      */
+    @Override
     public InternationalString getDescriptionText(final String code) throws FactoryException {
         try {
             return super.getDescriptionText(code);
@@ -247,6 +243,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns an arbitrary object from a code.
      */
+    @Override
     public IdentifiedObject createObject(final String code) throws FactoryException {
         try {
             return super.createObject(code);
@@ -263,6 +260,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns an arbitrary {@linkplain org.opengis.referencing.datum.Datum datum} from a code.
      */
+    @Override
     public org.opengis.referencing.datum.Datum createDatum(final String code) throws FactoryException {
         try {
             return super.createDatum(code);
@@ -279,6 +277,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain EngineeringDatum engineering datum} from a code.
      */
+    @Override
     public EngineeringDatum createEngineeringDatum(final String code) throws FactoryException {
         try {
             return super.createEngineeringDatum(code);
@@ -295,6 +294,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain ImageDatum image datum} from a code.
      */
+    @Override
     public ImageDatum createImageDatum(final String code) throws FactoryException {
         try {
             return super.createImageDatum(code);
@@ -311,6 +311,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain VerticalDatum vertical datum} from a code.
      */
+    @Override
     public VerticalDatum createVerticalDatum(final String code) throws FactoryException {
         try {
             return super.createVerticalDatum(code);
@@ -327,6 +328,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain TemporalDatum temporal datum} from a code.
      */
+    @Override
     public TemporalDatum createTemporalDatum(final String code) throws FactoryException {
         try {
             return super.createTemporalDatum(code);
@@ -343,6 +345,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain GeodeticDatum geodetic datum} from a code.
      */
+    @Override
     public GeodeticDatum createGeodeticDatum(final String code) throws FactoryException {
         try {
             return super.createGeodeticDatum(code);
@@ -359,6 +362,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns an {@linkplain Ellipsoid ellipsoid} from a code.
      */
+    @Override
     public Ellipsoid createEllipsoid(final String code) throws FactoryException {
         try {
             return super.createEllipsoid(code);
@@ -375,6 +379,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain PrimeMeridian prime meridian} from a code.
      */
+    @Override
     public PrimeMeridian createPrimeMeridian(final String code) throws FactoryException {
         try {
             return super.createPrimeMeridian(code);
@@ -391,6 +396,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain Extent extent} (usually an area of validity) from a code.
      */
+    @Override
     public Extent createExtent(final String code) throws FactoryException {
         try {
             return super.createExtent(code);
@@ -407,6 +413,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns an arbitrary {@linkplain CoordinateSystem coordinate system} from a code.
      */
+    @Override
     public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
         try {
             return super.createCoordinateSystem(code);
@@ -423,6 +430,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a cartesian coordinate system from a code.
      */
+    @Override
     public CartesianCS createCartesianCS(final String code) throws FactoryException {
         try {
             return super.createCartesianCS(code);
@@ -439,6 +447,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a polar coordinate system from a code.
      */
+    @Override
     public PolarCS createPolarCS(final String code) throws FactoryException {
         try {
             return super.createPolarCS(code);
@@ -455,6 +464,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a cylindrical coordinate system from a code.
      */
+    @Override
     public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
         try {
             return super.createCylindricalCS(code);
@@ -471,6 +481,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a spherical coordinate system from a code.
      */
+    @Override
     public SphericalCS createSphericalCS(final String code) throws FactoryException {
         try {
             return super.createSphericalCS(code);
@@ -487,6 +498,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates an ellipsoidal coordinate system from a code.
      */
+    @Override
     public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
         try {
             return super.createEllipsoidalCS(code);
@@ -503,6 +515,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a vertical coordinate system from a code.
      */
+    @Override
     public VerticalCS createVerticalCS(final String code) throws FactoryException {
         try {
             return super.createVerticalCS(code);
@@ -519,6 +532,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a temporal coordinate system from a code.
      */
+    @Override
     public TimeCS createTimeCS(final String code) throws FactoryException {
         try {
             return super.createTimeCS(code);
@@ -535,6 +549,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
      */
+    @Override
     public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
@@ -553,6 +568,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns an {@linkplain Unit unit} from a code.
      */
+    @Override
     public Unit createUnit(final String code) throws FactoryException {
         try {
             return super.createUnit(code);
@@ -570,6 +586,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system}
      * from a code.
      */
+    @Override
     public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
@@ -588,6 +605,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a 3D coordinate reference system from a code.
      */
+    @Override
     public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
         try {
             return super.createCompoundCRS(code);
@@ -604,6 +622,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a derived coordinate reference system from a code.
      */
+    @Override
     public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
         try {
             return super.createDerivedCRS(code);
@@ -620,6 +639,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      */
+    @Override
     public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
         try {
             return super.createEngineeringCRS(code);
@@ -636,6 +656,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
      */
+    @Override
     public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
         try {
             return super.createGeographicCRS(code);
@@ -652,6 +673,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain GeocentricCRS geocentric coordinate reference system} from a code.
      */
+    @Override
     public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
         try {
             return super.createGeocentricCRS(code);
@@ -668,6 +690,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain ImageCRS image coordinate reference system} from a code.
      */
+    @Override
     public ImageCRS createImageCRS(final String code) throws FactoryException {
         try {
             return super.createImageCRS(code);
@@ -684,6 +707,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
      */
+    @Override
     public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
         try {
             return super.createProjectedCRS(code);
@@ -700,6 +724,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
      */
+    @Override
     public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
         try {
             return super.createTemporalCRS(code);
@@ -716,6 +741,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
      */
+    @Override
     public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
         try {
             return super.createVerticalCRS(code);
@@ -732,6 +758,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates a parameter descriptor from a code.
      */
+    @Override
     public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
         try {
             return super.createParameterDescriptor(code);
@@ -748,6 +775,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates an operation method from a code.
      */
+    @Override
     public OperationMethod createOperationMethod(final String code) throws FactoryException {
         try {
             return super.createOperationMethod(code);
@@ -764,6 +792,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates an operation from a single operation code.
      */
+    @Override
     public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
         try {
             return super.createCoordinateOperation(code);
@@ -780,8 +809,9 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Creates an operation from coordinate reference system codes.
      */
-    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
-                                        final String sourceCode, final String targetCode)
+    @Override
+    public Set<CoordinateOperation> createFromCoordinateReferenceSystemCodes(
+            final String sourceCode, final String targetCode)
             throws FactoryException
     {
         try {
@@ -803,8 +833,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      *
      * @since 2.4
      */
-    //@Override
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
+    @Override
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(Class<? extends IdentifiedObject> type)
             throws FactoryException
     {
         return new Finder(type);
@@ -823,7 +853,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         /**
          * Creates a finder for the underlying backing store.
          */
-        Finder(final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException {
+        Finder(final Class<? extends IdentifiedObject> type) throws FactoryException {
             super(type);
         }
 
@@ -840,7 +870,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         /**
          * Lookups for the specified object.
          */
-        //@Override
+        @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate = finder.find(object);
             if (candidate == null) {
@@ -899,10 +929,10 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a mask that represent the implemented interfaces.
      */
-    private static int interfaceMask(final Collection/*<? extends AuthorityFactory>*/ factories) {
+    private static int interfaceMask(final Collection<? extends AuthorityFactory> factories) {
         int mask = 0;
-        for (final Iterator it=factories.iterator(); it.hasNext();) {
-            mask |= interfaceMask((AuthorityFactory) it.next());
+        for (final AuthorityFactory factory : factories) {
+            mask |= interfaceMask(factory);
         }
         return mask;
     }
@@ -917,7 +947,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
      * Returns a mask that represent the implemented interface.
      */
-    private static int interfaceMask(final Class/*<? extends AuthorityFactory>*/ type) {
+    private static int interfaceMask(final Class<? extends AuthorityFactory> type) {
         int mask = 0; // Will be a set of bit flags, as set below.
         if (CoordinateOperationAuthorityFactory.class.isAssignableFrom(type)) mask |= 1;
         if (                 CSAuthorityFactory.class.isAssignableFrom(type)) mask |= 2;

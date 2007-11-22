@@ -47,10 +47,10 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.referencing.factory.FactoryNotFoundException;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -126,7 +126,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
     /**
      * The factories to be given to the backing store.
      */
-    private final FactoryGroup factories;
+    private final ReferencingFactoryContainer factories;
 
     /**
      * The context where to register {@link #datasource}, or {@code null} if it should
@@ -207,7 +207,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
             datasourceName = DATASOURCE_NAME;
             //datasourceName = GeoTools.fixName( DATASOURCE_NAME );
         }
-        factories = FactoryGroup.createInstance(userHints);
+        factories = ReferencingFactoryContainer.instance(userHints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
     }
 

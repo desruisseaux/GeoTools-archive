@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -56,8 +56,8 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.ReferencingFactory;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.Utilities;
@@ -145,7 +145,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      *
      * @see #getFactoryGroup
      */
-    private final FactoryGroup factories;
+    private final ReferencingFactoryContainer factories;
 
     /**
      * The underlying math transform factory. This factory is used
@@ -196,7 +196,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     public AbstractCoordinateOperationFactory(final Hints userHints, final int priority) {
         super(priority);
-        factories = FactoryGroup.createInstance(userHints);
+        factories = ReferencingFactoryContainer.instance(userHints);
         mtFactory = factories.getMathTransformFactory();
     }
 
@@ -211,9 +211,9 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     {
         super(priority);
         if (factory instanceof AbstractCoordinateOperationFactory) {
-            factories = ((AbstractCoordinateOperationFactory) factory).getFactoryGroup();
+            factories = ((AbstractCoordinateOperationFactory) factory).getFactoryContainer();
         } else {
-            factories = FactoryGroup.createInstance(hints);
+            factories = ReferencingFactoryContainer.instance(hints);
         }
         mtFactory = factories.getMathTransformFactory();
     }
@@ -240,7 +240,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     void initializeHints() {
         assert Thread.holdsLock(hints);
-        final FactoryGroup factories = getFactoryGroup();
+        final ReferencingFactoryContainer factories = getFactoryContainer();
         final Map factoryGroupHints = factories.getImplementationHints();
         hints.putAll(factoryGroupHints);
     }
@@ -257,7 +257,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     /**
      * Returns the set of helper methods on factories.
      */
-    final FactoryGroup getFactoryGroup() {
+    final ReferencingFactoryContainer getFactoryContainer() {
         return factories;
     }
 
@@ -374,8 +374,8 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
                                   final ParameterValueGroup       parameters)
             throws FactoryException
     {
-        final Map          properties = getProperties(name);
-        final FactoryGroup  factories = getFactoryGroup();
+        final Map properties = getProperties(name);
+        final ReferencingFactoryContainer factories = getFactoryContainer();
         final MathTransform transform = factories.createParameterizedTransform(parameters);
         final OperationMethod  method = factories.getLastUsedMethod();
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
@@ -667,7 +667,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
         }
         return null;
     }
-    
+
     /**
      * Returns a temporary name for object derived from the specified one.
      *

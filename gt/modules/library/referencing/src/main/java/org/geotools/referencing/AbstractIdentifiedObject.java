@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -28,29 +27,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.AuthorityFactory;
-import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
-import org.opengis.util.LocalName;
 import org.opengis.util.ScopedName;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.Utilities;
@@ -63,13 +55,14 @@ import org.geotools.util.NameFactory;
 
 
 /**
- * A base class for metadata applicable to reference system objects.
- * When {@link AuthorityFactory} is used to create an object, the
+ * A base class for metadata applicable to reference system objects. When
+ * {@link org.opengis.referencing.AuthorityFactory} is used to create an object, the
  * {@linkplain ReferenceIdentifier#getAuthority authority} and
  * {@linkplain ReferenceIdentifier#getCode authority code} values are set to the authority
- * name of the factory object, and the authority code supplied by the client, respectively.
- * When {@link ObjectFactory} creates an object, the {@linkplain #getName() name} is set to
- * the value supplied by the client and all of the other metadata items are left empty.
+ * name of the factory object, and the authority code supplied by the client, respectively. When
+ * {@link org.opengis.referencing.ObjectFactory} creates an object, the {@linkplain #getName()
+ * name} is set to the value supplied by the client and all of the other metadata items are left
+ * empty.
  * <p>
  * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
  * instantiate it. Typical applications should create instances of the most specific subclass with
@@ -107,16 +100,26 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * </pre></blockquote>
      */
     public static final GenericName[] EMPTY_ALIAS_ARRAY = new GenericName[0];
-   
+
     /**
      * A comparator for sorting identified objects by {@linkplain #getName() name}.
      */
-    public static final Comparator NAME_COMPARATOR = new NameComparator();
-    private static final class NameComparator implements Comparator, Serializable {
-        public int compare(final Object o1, final Object o2) {
-            return doCompare(((IdentifiedObject) o1).getName().getCode(),
-                             ((IdentifiedObject) o2).getName().getCode());
+    public static final Comparator<IdentifiedObject> NAME_COMPARATOR = new NameComparator();
+
+    /**
+     * {@link #NAME_COMPARATOR} implementation as a named class (rather than anonymous)
+     * for more predictable serialization.
+     */
+    private static final class NameComparator implements Comparator<IdentifiedObject>, Serializable {
+        /** For cross-version compatibility. */
+        private static final long serialVersionUID = -6605097017814062198L;
+
+        /** Compares the given identified objects for order. */
+        public int compare(final IdentifiedObject o1, final IdentifiedObject o2) {
+            return doCompare(o1.getName().getCode(), o2.getName().getCode());
         }
+
+        /** Canonicalizes to the singleton on deserialization. */
         protected Object readResolve() throws ObjectStreamException {
             return NAME_COMPARATOR;
         }
@@ -125,20 +128,27 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     /**
      * A comparator for sorting identified objects by {@linkplain #getIdentifiers identifiers}.
      */
-    public static final Comparator IDENTIFIER_COMPARATOR = new IdentifierComparator();
-    private static final class IdentifierComparator implements Comparator, Serializable {
-        public int compare(final Object o1, final Object o2) {
-            Collection/*<ReferenceIdentifier>*/ a1 = ((IdentifiedObject)o1).getIdentifiers();
-            Collection/*<ReferenceIdentifier>*/ a2 = ((IdentifiedObject)o2).getIdentifiers();
-            if (a1 == null) a1 = Collections.EMPTY_SET;
-            if (a2 == null) a2 = Collections.EMPTY_SET;
-            final Iterator i1 = a1.iterator();
-            final Iterator i2 = a2.iterator();
+    public static final Comparator<IdentifiedObject> IDENTIFIER_COMPARATOR = new IdentifierComparator();
+
+    /**
+     * {@link #IDENTIFIER_COMPARATOR} implementation as a named class (rather than anonymous)
+     * for more predictable serialization.
+     */
+    private static final class IdentifierComparator implements Comparator<IdentifiedObject>, Serializable {
+        /** For cross-version compatibility. */
+        private static final long serialVersionUID = -7315726806679993522L;
+
+        /** Compares the given identified objects for order. */
+        public int compare(final IdentifiedObject o1, final IdentifiedObject o2) {
+            Collection<ReferenceIdentifier> a1 = o1.getIdentifiers();
+            Collection<ReferenceIdentifier> a2 = o2.getIdentifiers();
+            if (a1 == null) a1 = Collections.emptySet();
+            if (a2 == null) a2 = Collections.emptySet();
+            final Iterator<ReferenceIdentifier> i1 = a1.iterator();
+            final Iterator<ReferenceIdentifier> i2 = a2.iterator();
             boolean n1, n2;
             while ((n1=i1.hasNext()) & (n2=i2.hasNext())) {  // Really '&', not '&&'
-                final int c = doCompare(((ReferenceIdentifier) i1.next()).getCode(),
-                                        ((ReferenceIdentifier) i2.next()).getCode());
-                // TODO: remove (ReferenceIdentifier) cast once we will be allowed to compile for J2SE 1.5.
+                final int c = doCompare(i1.next().getCode(), i2.next().getCode());
                 if (c != 0) {
                     return c;
                 }
@@ -147,6 +157,8 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
             if (n2) return -1;
             return 0;
         }
+
+        /** Canonicalizes to the singleton on deserialization. */
         protected Object readResolve() throws ObjectStreamException {
             return IDENTIFIER_COMPARATOR;
         }
@@ -174,13 +186,13 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     /**
      * An alternative name by which this object is identified.
      */
-    private final Collection/*<GenericName>*/ alias;
+    private final Collection<GenericName> alias;
 
     /**
      * An identifier which references elsewhere the object's defining information.
      * Alternatively an identifier by which this object can be referenced.
      */
-    private final Set/*<ReferenceIdentifier>*/ identifiers;
+    private final Set<ReferenceIdentifier> identifiers;
 
     /**
      * Comments on or information about this object, or {@code null} if none.
@@ -262,7 +274,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    public AbstractIdentifiedObject(final Map properties) throws IllegalArgumentException {
+    public AbstractIdentifiedObject(final Map<String,?> properties) throws IllegalArgumentException {
         this(properties, null, null);
     }
 
@@ -286,9 +298,9 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    protected AbstractIdentifiedObject(final Map properties,
-                                       final Map subProperties,
-                                       final String[] localizables)
+    protected AbstractIdentifiedObject(final Map<String,?>      properties,
+                                       final Map<String,Object> subProperties,
+                                       final String[]           localizables)
             throws IllegalArgumentException
     {
         ensureNonNull("properties", properties);
@@ -324,7 +336,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 case  1126917133: if (key.equalsIgnoreCase("positionalAccuracy")) key="positionalAccuracy"; break;
                 case  1127093059: if (key.equalsIgnoreCase("realizationEpoch"))   key="realizationEpoch";   break;
                 case -1109785975: if (key.equalsIgnoreCase("validArea"))          key="validArea";          break;
-                
+
                 // -------------------------------------
                 // "name": String or ReferenceIdentifier
                 // -------------------------------------
@@ -499,13 +511,16 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * An alternative name by which this object is identified.
-     *         
+     *
      * @return The aliases, or an empty array if there is none.
      *
      * @see #getName(Citation)
      */
-    public Collection/*<GenericName>*/ getAlias() {
-        return (alias!=null) ? alias : Collections.EMPTY_SET;
+    public Collection<GenericName> getAlias() {
+        if (alias == null) {
+            return Collections.emptySet();
+        }
+        return alias;
     }
 
     /**
@@ -516,14 +531,17 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @see #getIdentifier(Citation)
      */
-    public Set/*<ReferenceIdentifier>*/ getIdentifiers() {
-        return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
+    public Set<ReferenceIdentifier> getIdentifiers() {
+        if (identifiers == null) {
+            return Collections.emptySet();
+        }
+        return identifiers;
     }
 
     /**
      * Comments on or information about this object, including data source information.
      */
-    public InternationalString getRemarks(){       
+    public InternationalString getRemarks(){
         return remarks;
     }
 
@@ -734,8 +752,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * the search in the following order, regardless of any authority:
      * <ul>
      *   <li>The {@linkplain #getName() primary name} of this object</li>
-     *   <li>The {@linkplain ScopedName fully qualified name} of an alias</li>
-     *   <li>The {@linkplain LocalName local name} of an alias</li>
+     *   <li>The {@linkplain org.opengis.util.ScopedName fully qualified name} of an alias</li>
+     *   <li>The {@linkplain org.opengis.util.LocalName local name} of an alias</li>
      * </ul>
      *
      * @param  name The name to compare.
@@ -811,13 +829,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         }
         return false;
     }
-    
+
     /**
      * Compares the specified object with this object for equality.
      *
      * @param  object The other object (may be {@code null}).
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public final boolean equals(final Object object) {
         return (object instanceof AbstractIdentifiedObject) &&
                 equals((AbstractIdentifiedObject)object, true);
@@ -927,8 +946,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compares two collectionss of OpenGIS's {@code IdentifiedObject} objects for equality.
-     * The comparaison take order in account, which make it more appropriate for {@link List}
+     * Compares two collectionss of OpenGIS's {@code IdentifiedObject} objects for equality. The
+     * comparaison take order in account, which make it more appropriate for {@link java.util.List}
      * or {@link LinkedHashSet} comparaisons. This convenience method is provided for
      * implementation of {@code equals} method in subclasses.
      *
@@ -938,8 +957,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both collections are equal.
      */
-    protected static boolean equals(final Collection/*<? extends IdentifiedObject>*/ collection1,
-                                    final Collection/*<? extends IdentifiedObject>*/ collection2,
+    protected static boolean equals(final Collection<? extends IdentifiedObject> collection1,
+                                    final Collection<? extends IdentifiedObject> collection2,
                                     final boolean compareMetadata)
     {
         if (collection1 == collection2) {
@@ -948,13 +967,10 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         if (collection1==null || collection2==null) {
             return false;
         }
-        final Iterator it1 = collection1.iterator();
-        final Iterator it2 = collection2.iterator();
+        final Iterator<? extends IdentifiedObject> it1 = collection1.iterator();
+        final Iterator<? extends IdentifiedObject> it2 = collection2.iterator();
         while (it1.hasNext()) {
-            if (!it2.hasNext() ||
-                !equals((IdentifiedObject) it1.next(),
-                        (IdentifiedObject) it2.next(), compareMetadata))
-            {
+            if (!it2.hasNext() || !equals(it1.next(), it2.next(), compareMetadata)) {
                 return false;
             }
         }
@@ -974,7 +990,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         }
         return c1.compareTo(c2);
     }
-    
+
     /**
      * Returns a hash value for this identified object. {@linkplain #getName() Name},
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
@@ -986,6 +1002,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         // Subclasses need to overrides this!!!!
         return (int)serialVersionUID ^ getClass().hashCode();
@@ -1008,9 +1025,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             case 1:  return Collections.singleton(array[0]);
             default: return Collections.unmodifiableSet(new LinkedHashSet(Arrays.asList(array)));
         }
-        
+
     }
-    
+
     /**
      * Makes sure that an argument is non-null. This is a
      * convenience method for subclass constructors.
@@ -1027,7 +1044,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         ErrorKeys.NULL_ARGUMENT_$1, name), name, object);
         }
     }
-    
+
     /**
      * Makes sure an array element is non-null. This is
      * a convenience method for subclass constructors.
@@ -1045,7 +1062,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         ErrorKeys.NULL_ARGUMENT_$1, name+'['+index+']'), name, array);
         }
     }
-    
+
     /**
      * Makes sure that the specified unit is a temporal one.
      * This is a convenience method for subclass constructors.
@@ -1058,7 +1075,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_TEMPORAL_UNIT_$1, unit));
         }
     }
-    
+
     /**
      * Makes sure that the specified unit is a linear one.
      * This is a convenience method for subclass constructors.
@@ -1071,7 +1088,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NON_LINEAR_UNIT_$1, unit));
         }
     }
-    
+
     /**
      * Makes sure that the specified unit is an angular one.
      * This is a convenience method for subclass constructors.

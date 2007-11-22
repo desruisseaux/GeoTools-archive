@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,26 +19,21 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.parameter.Parameters;
-import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
@@ -54,7 +49,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * Definition of an algorithm used to perform a coordinate operation. Most operation
  * methods use a number of operation parameters, although some coordinate conversions
  * use none. Each coordinate operation using the method assigns values to these parameters.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -175,19 +170,6 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
-     * Utility method used to kludge {@code GeneralParameterDescriptor[]}
-     * into a {@code ParameterDescriptorGroup}.
-     * This is a work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private static ParameterDescriptorGroup toGroup(final Map properties,
-                                                    final GeneralParameterDescriptor[] parameters)
-    {
-        return (parameters==null || parameters.length==0) ? null :
-               new DefaultParameterDescriptorGroup(properties, parameters);
-    }
-
-    /**
      * Constructs an operation method from a set of properties and a descriptor group.
      * The properties given in argument follow the same rules than for the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
@@ -211,20 +193,20 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
      * @param parameters The set of parameters, or {@code null} if none.
      */
-    public DefaultOperationMethod(final Map properties,
+    public DefaultOperationMethod(final Map<String,?> properties,
                                   final int sourceDimensions,
                                   final int targetDimensions,
                                   final ParameterDescriptorGroup parameters)
     {
-        this(properties, new HashMap(), sourceDimensions, targetDimensions, parameters);
+        this(properties, new HashMap<String,Object>(), sourceDimensions, targetDimensions, parameters);
     }
 
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultOperationMethod(final Map properties,
-                                   final Map subProperties,
+    private DefaultOperationMethod(final Map<String,?> properties,
+                                   final Map<String,Object> subProperties,
                                    final int sourceDimensions,
                                    final int targetDimensions,
                                    ParameterDescriptorGroup parameters)
@@ -295,7 +277,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * subclass (with protected access) will overrides this method with a more conservative default
      * value.
      */
-    Class getOperationType() {
+    Class<? extends Operation> getOperationType() {
         return Projection.class;
     }
 
@@ -309,6 +291,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -328,6 +311,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     /**
      * Returns a hash code value for this operation method.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID + sourceDimensions + 37*targetDimensions;
         if (parameters != null) {
@@ -335,7 +319,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
         }
         return code;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -344,6 +328,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         if (Projection.class.isAssignableFrom(getOperationType())) {
             return "PROJECTION";

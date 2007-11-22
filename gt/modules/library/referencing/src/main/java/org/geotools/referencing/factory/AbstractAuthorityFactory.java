@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,12 +19,10 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Collections;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
@@ -36,8 +34,6 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.GenericName;
 
-// Geotools dependencies
-import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -128,7 +124,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      * of {@link Datum}, {@link CoordinateSystem}, {@link CoordinateReferenceSystem} or
      * {@link CoordinateOperation}. The default implementation always throw an exception.
      * Subclasses should override this method if they are capable to automatically detect
-     * the object type from its code. 
+     * the object type from its code.
      *
      * @param  code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -557,7 +553,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
             throw noSuchAuthorityCode(DerivedCRS.class, code, exception);
         }
     }
-    
+
     /**
      * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      *
@@ -680,7 +676,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Creates a parameter descriptor from a code. 
+     * Creates a parameter descriptor from a code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -698,7 +694,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Creates an operation method from a code. 
+     * Creates an operation method from a code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -716,7 +712,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Creates an operation from a single operation code. 
+     * Creates an operation from a single operation code.
      *
      * @param code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -754,11 +750,11 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      *
      * @since 2.2
      */
-    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
-                                        final String sourceCode, final String targetCode)
+    public Set<CoordinateOperation> createFromCoordinateReferenceSystemCodes(
+            final String sourceCode, final String targetCode)
             throws FactoryException
     {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
@@ -778,8 +774,8 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      *
      * @since 2.4
      */
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(
-            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(Class<? extends IdentifiedObject> type)
+            throws FactoryException
     {
         return new IdentifiedObjectFinder(this, type);
     }

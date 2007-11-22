@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -20,16 +20,10 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
-import java.util.Locale;
 import java.util.prefs.Preferences;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.referencing.cs.CoordinateSystem;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -75,12 +69,13 @@ public class Formattable {
      * the same string similar than {@link #toWKT()}, except that no exception is thrown if
      * the string contains non-standard keywords. For example the
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
-     * specification</A> do not defines any keyword for {@linkplain CoordinateSystem coordinate
-     * system} objects. If this object is an instance of
-     * {@link org.geotools.referencing.cs.DefaultCartesianCS}, then the WKT will
-     * be formatted as <code>"CartesianCS[AXIS["</code>...<code>"], AXIS["</code>...<code>"],
+     * specification</A> do not defines any keyword for
+     * {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate system} objects. If this
+     * object is an instance of {@link org.geotools.referencing.cs.DefaultCartesianCS}, then the
+     * WKT will be formatted as <code>"CartesianCS[AXIS["</code>...<code>"], AXIS["</code>...<code>"],
      * </code><i>etc.</i><code>]"</code>.
      */
+    @Override
     public String toString() {
         return toWKT(Citations.OGC, getIndentation(), false);
     }
@@ -190,7 +185,7 @@ public class Formattable {
             }
         }
     }
-     
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well

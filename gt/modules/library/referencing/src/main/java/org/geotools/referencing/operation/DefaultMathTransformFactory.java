@@ -21,19 +21,21 @@ package org.geotools.referencing.operation;
 
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
+import javax.units.Unit;
+import javax.units.ConversionException;
 
-import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
@@ -45,9 +47,12 @@ import org.opengis.referencing.operation.Projection;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
+import org.geotools.parameter.Parameters;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.factory.ReferencingFactory;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -55,6 +60,7 @@ import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.CanonicalSet;
@@ -123,13 +129,13 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     /**
      * The operation method for the last transform created.
      */
-    private final ThreadLocal/*<OperationMethod>*/ lastMethod = new ThreadLocal();
+    private final ThreadLocal<OperationMethod> lastMethod;
 
     /**
      * A pool of math transform. This pool is used in order to
      * returns instance of existing math transforms when possible.
      */
-    private final CanonicalSet pool = new CanonicalSet();
+    private final CanonicalSet<MathTransform> pool;
 
     /**
      * The service registry for finding {@link MathTransformProvider} implementations.
@@ -140,7 +146,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * Constructs a default {@link MathTransform math transform} factory.
      */
     public DefaultMathTransformFactory() {
-        this(new Class[] {MathTransformProvider.class});
+        this(new Class<?>[] {MathTransformProvider.class});
     }
 
     /**
@@ -151,7 +157,9 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      *                   of {@link MathTransformProvider}.
      */
     private DefaultMathTransformFactory(final Class<?>[] categories) {
-        registry = new FactoryRegistry(Arrays.asList(categories));
+        registry   = new FactoryRegistry(Arrays.asList(categories));
+        lastMethod = new ThreadLocal<OperationMethod>();
+        pool       = CanonicalSet.newInstance(MathTransform.class);
     }
 
     /**
@@ -161,6 +169,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      *
      * @return The vendor for this factory implementation.
      */
+    @Override
     public Citation getVendor() {
         return Citations.GEOTOOLS;
     }
@@ -179,8 +188,8 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * @see #getDefaultParameters
      * @see #createParameterizedTransform
      */
-    public Set/*<OperationMethod>*/ getAvailableMethods(final Class type) {
-        return new LazySet(registry.getServiceProviders(MathTransformProvider.class,
+    public Set<OperationMethod> getAvailableMethods(final Class type) {
+        return new LazySet<OperationMethod>(registry.getServiceProviders(MathTransformProvider.class,
                 (type!=null) ? new MethodFilter(type) : null, HINTS));
     }
 
@@ -191,12 +200,12 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         /**
          * The expected type ({@code Projection.class}) for projections).
          */
-        private final Class type;
+        private final Class<? extends Operation> type;
 
         /**
          * Constructs a filter for the set of math operations methods.
          */
-        public MethodFilter(final Class type) {
+        public MethodFilter(final Class<? extends Operation> type) {
             this.type = type;
         }
 
@@ -206,7 +215,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
          */
         public boolean filter(final Object element) {
             if (element instanceof MathTransformProvider) {
-                final Class t = ((MathTransformProvider) element).getOperationType();
+                final Class<? extends Operation> t = ((MathTransformProvider) element).getOperationType();
                 if (t!=null && !type.isAssignableFrom(t)) {
                     return false;
                 }
@@ -222,16 +231,17 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      *
      * @see #createParameterizedTransform
      *
-     * @since 2.4
+     * @since 2.5
      */
-    public OperationMethod getLastUsedMethod() {
-        return (OperationMethod) lastMethod.get();
+    public OperationMethod getLastMethodUsed() {
+        return lastMethod.get();
     }
 
     /**
      * Returns the operation method for the specified name.
      *
-     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
+     * @param  name The case insensitive
+     *         {@linkplain org.opengis.metadata.Identifier#getCode identifier code}
      *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
      * @return The operation method.
      * @throws NoSuchIdentifierException if there is no operation method registered for the
@@ -239,9 +249,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      *
      * @since 2.2
      */
-    public OperationMethod getOperationMethod(final String name)
-            throws NoSuchIdentifierException
-    {
+    public OperationMethod getOperationMethod(String name) throws NoSuchIdentifierException {
         return getProvider(name);
     }
 
@@ -251,22 +259,28 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
      * or any of the alias in a given locale.
      *
-     * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
+     * @param  method The case insensitive
+     *         {@linkplain org.opengis.metadata.Identifier#getCode identifier code}
      *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
      * @return The math transform provider.
      * @throws NoSuchIdentifierException if there is no provider registered for the specified
      *         method.
      */
-    private synchronized MathTransformProvider getProvider(final String method)
-            throws NoSuchIdentifierException
-    {
-        MathTransformProvider provider = lastProvider; // Avoid synchronization
+    private MathTransformProvider getProvider(final String method) throws NoSuchIdentifierException {
+        /*
+         * Copies the 'lastProvider' reference in order to avoid synchronization. This is safe
+         * because copy of object references are atomic operations.  Note that this is not the
+         * deprecated "double check" idiom since we are not creating new objects, but checking
+         * for existing ones.
+         */
+        MathTransformProvider provider = lastProvider;
         if (provider!=null && provider.nameMatches(method)) {
             return provider;
         }
-        final Iterator providers = registry.getServiceProviders(MathTransformProvider.class, null, HINTS);
+        final Iterator<MathTransformProvider> providers =
+                registry.getServiceProviders(MathTransformProvider.class, null, HINTS);
         while (providers.hasNext()) {
-            provider = (MathTransformProvider) providers.next();
+            provider = providers.next();
             if (provider.nameMatches(method)) {
                 return lastProvider = provider;
             }
@@ -302,8 +316,98 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     }
 
     /**
-     * Creates a transform from a group of parameters. The method name is inferred from
-     * the {@linkplain ParameterDescriptorGroup#getName parameter group name}. Example:
+     * Creates a {@linkplain #createParameterizedTransform parameterized transform} from a base
+     * CRS to a derived CS. If the {@code "semi_major"} and {@code "semi_minor"} parameters are
+     * not explicitly specified, they will be inferred from the {@linkplain Ellipsoid ellipsoid}
+     * and added to {@code parameters}. In addition, this method performs axis switch as needed.
+     * <p>
+     * The {@linkplain OperationMethod operation method} used can be obtained by a call to
+     * {@link #getLastUsedMethod}.
+     *
+     * @param  baseCRS The source coordinate reference system.
+     * @param  parameters The parameter values for the transform.
+     * @param  derivedCS the target coordinate system.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     */
+    public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
+                                             final ParameterValueGroup       parameters,
+                                             final CoordinateSystem          derivedCS)
+            throws NoSuchIdentifierException, FactoryException
+    {
+        /*
+         * If the user's parameter do not contains semi-major and semi-minor axis length, infers
+         * them from the ellipsoid. This is a convenience service since the user often omit those
+         * parameters (because they duplicate datum information).
+         */
+        final Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(baseCRS);
+        if (ellipsoid != null) {
+            final Unit axisUnit = ellipsoid.getAxisUnit();
+            Parameters.ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit, false);
+            Parameters.ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit, false);
+        }
+        /*
+         * Computes matrix for swapping axis and performing units conversion.
+         * There is one matrix to apply before projection on (longitude,latitude)
+         * coordinates, and one matrix to apply after projection on (easting,northing)
+         * coordinates.
+         */
+        final CoordinateSystem sourceCS = baseCRS.getCoordinateSystem();
+        final Matrix swap1, swap3;
+        try {
+            swap1 = AbstractCS.swapAndScaleAxis(sourceCS, AbstractCS.standard(sourceCS));
+            swap3 = AbstractCS.swapAndScaleAxis(AbstractCS.standard(derivedCS), derivedCS);
+        } catch (IllegalArgumentException cause) {
+            // User-specified axis don't match.
+            throw new FactoryException(cause);
+        } catch (ConversionException cause) {
+            // A Unit conversion is non-linear.
+            throw new FactoryException(cause);
+        }
+        /*
+         * Prepares the concatenation of the matrix computed above and the projection.
+         * Note that at this stage, the dimensions between each step may not be compatible.
+         * For example the projection (step2) is usually two-dimensional while the source
+         * coordinate system (step1) may be three-dimensional if it has a height.
+         */
+        MathTransform step1 = createAffineTransform(swap1);
+        MathTransform step3 = createAffineTransform(swap3);
+        MathTransform step2 = createParameterizedTransform(parameters);
+        // IMPORTANT: From this point, 'createParameterizedTransform' should not be invoked
+        //            anymore, directly or indirectly, in order to preserve the 'lastMethod'
+        //            value. It will be checked by the last assert before return.
+        /*
+         * If the target coordinate system has a height, instructs the projection to pass
+         * the height unchanged from the base CRS to the target CRS. After this block, the
+         * dimensions of 'step2' and 'step3' should match.
+         */
+        final int numTrailingOrdinates = step3.getSourceDimensions() - step2.getTargetDimensions();
+        if (numTrailingOrdinates > 0) {
+            step2 = createPassThroughTransform(0, step2, numTrailingOrdinates);
+        }
+        /*
+         * If the source CS has a height but the target CS doesn't, drops the extra coordinates.
+         * After this block, the dimensions of 'step1' and 'step2' should match.
+         */
+        final int sourceDim = step1.getTargetDimensions();
+        final int targetDim = step2.getSourceDimensions();
+        if (sourceDim > targetDim) {
+            final Matrix drop = MatrixFactory.create(targetDim+1, sourceDim+1);
+            drop.setElement(targetDim, sourceDim, 1);
+            step1 = createConcatenatedTransform(createAffineTransform(drop), step1);
+        }
+        final MathTransform transform = createConcatenatedTransform(
+                createConcatenatedTransform(step1, step2), step3);
+        assert AbstractIdentifiedObject.nameMatches(parameters.getDescriptor(), getLastMethodUsed());
+        return transform;
+    }
+
+    /**
+     * Creates a transform from a group of parameters. The method name is inferred from the
+     * {@linkplain org.opengis.parameter.ParameterDescriptorGroup#getName parameter group name}.
+     * Example:
      *
      * <blockquote><pre>
      * ParameterValueGroup p = factory.getDefaultParameters("Transverse_Mercator");
@@ -325,56 +429,31 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws NoSuchIdentifierException, FactoryException
     {
-//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
-        final String classification = parameters.getDescriptor().getName().getCode();
-        final MathTransformProvider provider = getProvider(classification);
-        OperationMethod method = provider;
         MathTransform transform;
+        OperationMethod method = null;
         try {
-            parameters = provider.ensureValidValues(parameters);
-            transform  = provider.createMathTransform(parameters);
-        } catch (IllegalArgumentException exception) {
-            /*
-             * Catch only exceptions which may be the result of improper parameter
-             * usage (e.g. a value out of range). Do not catch exception caused by
-             * programming errors (e.g. null pointer exception).
-             */
-            throw new FactoryException(exception);
-        }
-        if (transform instanceof MathTransformProvider.Delegate) {
-            final MathTransformProvider.Delegate delegate = (MathTransformProvider.Delegate) transform;
-            method    = delegate.method;
-            transform = delegate.transform;
-        }
-        transform = (MathTransform) pool.unique(transform);
-        lastMethod.set(method);
-        return transform;
-    }
-
-    /**
-     * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of {@code createParameterizedTransform(...)} provides a way for
-     * the client to keep trace of any {@linkplain OperationMethod operation method}
-     * used by this factory.
-     *
-     * @param  parameters The parameter values.
-     * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or {@code null} if none.
-     * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the method.
-     * @throws FactoryException if the object creation failed. This exception is thrown
-     *         if some required parameter has not been supplied, or has illegal value.
-     *
-     * @deprecated Replaced by {@link #createParameterizedTransform(ParameterValueGroup)}
-     *             followed by a call to {@link #getLastUsedMethod}.
-     */
-    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
-                                                      Collection          methods)
-            throws NoSuchIdentifierException, FactoryException
-    {
-        MathTransform transform = createParameterizedTransform(parameters);
-        if (methods != null) {
-            methods.add(lastMethod.get());
+            final String classification = parameters.getDescriptor().getName().getCode();
+            final MathTransformProvider provider = getProvider(classification);
+            method = provider;
+            try {
+                parameters = provider.ensureValidValues(parameters);
+                transform  = provider.createMathTransform(parameters);
+            } catch (IllegalArgumentException exception) {
+                /*
+                 * Catch only exceptions which may be the result of improper parameter
+                 * usage (e.g. a value out of range). Do not catch exception caused by
+                 * programming errors (e.g. null pointer exception).
+                 */
+                throw new FactoryException(exception);
+            }
+            if (transform instanceof MathTransformProvider.Delegate) {
+                final MathTransformProvider.Delegate delegate = (MathTransformProvider.Delegate) transform;
+                method    = delegate.method;
+                transform = delegate.transform;
+            }
+            transform = pool.unique(transform);
+        } finally {
+            lastMethod.set(method); // May be null in case of failure, which is intented.
         }
         return transform;
     }
@@ -396,8 +475,8 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     public MathTransform createAffineTransform(final Matrix matrix)
             throws FactoryException
     {
-//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
-        return (MathTransform) pool.unique(ProjectiveTransform.create(matrix));
+        lastMethod.remove();
+        return pool.unique(ProjectiveTransform.create(matrix));
     }
 
     /**
@@ -419,14 +498,14 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
                                                      final MathTransform transform2)
             throws FactoryException
     {
-//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
+        lastMethod.remove();
         MathTransform tr;
         try {
             tr = ConcatenatedTransform.create(transform1, transform2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        tr = (MathTransform) pool.unique(tr);
+        tr = pool.unique(tr);
         return tr;
     }
 
@@ -453,7 +532,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
                                                     final int numTrailingOrdinates)
             throws FactoryException
     {
-//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
+        lastMethod.remove();
         MathTransform tr;
         try {
             tr = PassThroughTransform.create(firstAffectedOrdinate,
@@ -462,7 +541,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        tr = (MathTransform) pool.unique(tr);
+        tr = pool.unique(tr);
         return tr;
     }
 
@@ -567,7 +646,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
          */
         final Arguments arguments = new Arguments(args);
         final boolean printAll = arguments.getFlag("-all");
-        Class type = null;
+        Class<? extends Operation> type = null;
         if (arguments.getFlag("-projections")) type = Projection.class;
         if (arguments.getFlag("-conversions")) type = Conversion.class;
         args = arguments.getRemainingArguments(1);
@@ -575,32 +654,31 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
             final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
             final ParameterWriter writer = new ParameterWriter(arguments.out);
             writer.setLocale(arguments.locale);
-            Set transforms = Collections.EMPTY_SET;
+            Set<OperationMethod> methods = Collections.emptySet();
             if (printAll || args.length==0) {
-                final Set scopes = new HashSet();
+                final Set<String> scopes = new HashSet<String>();
 //              scopes.add("OGC");  // Omitted because usually the same than 'identifier'.
                 scopes.add("EPSG");
                 scopes.add("Geotools"); // Limit the number of columns to output.
-                transforms = new TreeSet(AbstractIdentifiedObject.NAME_COMPARATOR);
-                transforms.addAll(factory.getAvailableMethods(type));
-                writer.summary(transforms, scopes);
+                methods = new TreeSet<OperationMethod>(AbstractIdentifiedObject.NAME_COMPARATOR);
+                methods.addAll(factory.getAvailableMethods(type));
+                writer.summary(methods, scopes);
             }
             if (!printAll) {
                 if (args.length == 0) {
-                    transforms = Collections.EMPTY_SET;
+                    methods = Collections.emptySet();
                 } else {
-                    transforms = Collections.singleton(factory.getProvider(args[0]));
+                    methods = Collections.singleton((OperationMethod) factory.getProvider(args[0]));
                 }
             }
             /*
              * Iterates through all math transform to print. It may be a singleton
              * if the user ask for a specific math transform.
              */
-            final Iterator it = transforms.iterator();
             final String lineSeparator = System.getProperty("line.separator", "\n");
-            while (it.hasNext()) {
+            for (final OperationMethod method : methods) {
                 arguments.out.write(lineSeparator);
-                writer.format((OperationMethod) it.next());
+                writer.format(method);
             }
         } catch (NoSuchIdentifierException exception) {
             arguments.err.println(exception.getLocalizedMessage());

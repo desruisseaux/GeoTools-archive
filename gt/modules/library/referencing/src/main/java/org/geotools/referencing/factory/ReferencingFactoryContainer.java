@@ -106,31 +106,6 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
     private final ThreadLocal<Object> lastMethod = new ThreadLocal<Object>();
 
     /**
-     * Constructs an instance using the specified factories. If any factory is null,
-     * a default instance will be created by {@link ReferencingFactoryFinder} when first needed.
-     *
-     * @param datumFactory The {@linkplain Datum datum} factory.
-     * @param    csFactory The {@linkplain CoordinateSystem coordinate system} factory.
-     * @param   crsFactory The {@linkplain CoordinateReferenceSystem coordinate reference system}
-     *                     factory.
-     * @param    mtFactory The {@linkplain MathTransform math transform} factory.
-     *
-     * @deprecated Use {@link #createInstance} instead. The fate of this constructor is
-     *             incertain. It may be removed in Geotools 2.4, or refactored as a new
-     *             {@code createInstance} convenience method.
-     */
-    public ReferencingFactoryContainer(final DatumFactory      datumFactory,
-                                       final CSFactory            csFactory,
-                                       final CRSFactory          crsFactory,
-                                       final MathTransformFactory mtFactory)
-    {
-        this.datumFactory = datumFactory;
-        this.csFactory    =    csFactory;
-        this.crsFactory   =   crsFactory;
-        this.mtFactory    =    mtFactory;
-    }
-
-    /**
      * Creates an instance from the specified hints. This constructor recognizes the
      * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
      * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
@@ -322,6 +297,9 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *         specified name.
      *
      * @see DefaultMathTransformFactory#getOperationMethod
+     *
+     * @deprecated Use {@link DefaultMathTransformFactory#getOperationMethod}. This method
+     *             was inefficient for other implementations.
      */
     public OperationMethod getOperationMethod(final String name)
             throws NoSuchIdentifierException
@@ -355,7 +333,9 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @return The operation method for the last call to a {@code create} method, or
      *         {@code null} if none.
      *
-     * @see DefaultMathTransformFactory#getLastUsedMethod
+     * @see MathTransformFactory#getLastMethodUsed
+     *
+     * @deprecated Moved to the {@link MathTransformFactory} interface.
      */
     public OperationMethod getLastUsedMethod() {
         final Object candidate = lastMethod.get();
@@ -394,6 +374,8 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *         if some required parameter has not been supplied, or has illegal value.
      *
      * @see MathTransformFactory#createParameterizedTransform
+     *
+     * @deprecated Uses the {@link MathTransformFactory} interface.
      */
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws NoSuchIdentifierException, FactoryException
@@ -403,7 +385,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
         final MathTransform transform = mtFactory.createParameterizedTransform(parameters);
         if (mtFactory instanceof DefaultMathTransformFactory) {
             // Special processing for Geotools implementation.
-            lastMethod.set(((DefaultMathTransformFactory) mtFactory).getLastUsedMethod());
+            lastMethod.set(((DefaultMathTransformFactory) mtFactory).getLastMethodUsed());
         } else {
             // Not a geotools implementation. Will try to guess the method later.
             lastMethod.set(parameters.getDescriptor().getName().getCode());
@@ -427,6 +409,10 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
      *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @see MathTransformFactory#createBaseToDerived
+     *
+     * @deprecated Moved to the {@link MathTransformFactory} interface.
      */
     public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
                                              final ParameterValueGroup       parameters,

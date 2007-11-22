@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,7 +13,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *    
+ *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -59,7 +59,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * {@code createFoo(String)} methods first looks if a previously created object
  * exists for the given code. If such an object exists, it is returned. Otherwise,
  * the object creation is delegated to the {@linkplain AbstractAuthorityFactory authority factory}
- * specified at creation time, and the result is cached in this buffered factory. 
+ * specified at creation time, and the result is cached in this buffered factory.
  * <p>
  * Objects are cached by strong references, up to the amount of objects specified at
  * construction time. If a greater amount of objects are cached, the oldest ones will
@@ -100,7 +100,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      */
     private final Map findPool = new WeakHashMap();
 
-    
+
     /**
      * Constructs an instance wrapping the specified factory with a default number
      * of entries to keep by strong reference.
@@ -190,8 +190,8 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
      * Returns the direct dependencies. The returned list contains the backing store
      * specified at construction time, or the exception if it can't be obtained.
      */
-    //@Override
-    Collection/*<?>*/ dependencies() {
+    @Override
+    Collection<? super AuthorityFactory> dependencies() {
         Object factory;
         try {
             factory = getBackingStore();
@@ -745,7 +745,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
         objectCache.put(key, crs);
         return crs;
     }
-    
+
     /**
      * Returns an engineering coordinate reference system from a code.
      */
@@ -873,7 +873,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
     }
 
     /**
-     * Returns a parameter descriptor from a code. 
+     * Returns a parameter descriptor from a code.
      */
     public synchronized ParameterDescriptor createParameterDescriptor(final String code)
             throws FactoryException
@@ -891,7 +891,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
     }
 
     /**
-     * Returns an operation method from a code. 
+     * Returns an operation method from a code.
      */
     public synchronized OperationMethod createOperationMethod(final String code)
             throws FactoryException
@@ -909,7 +909,7 @@ public class ThreadedAuthorityFactory extends AbstractAuthorityFactory implement
     }
 
     /**
-     * Returns an operation from a single operation code. 
+     * Returns an operation from a single operation code.
      */
     public synchronized CoordinateOperation createCoordinateOperation(final String code)
             throws FactoryException

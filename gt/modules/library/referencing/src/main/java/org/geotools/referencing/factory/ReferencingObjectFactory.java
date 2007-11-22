@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,13 +19,11 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies and extensions
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -35,9 +33,7 @@ import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
-import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -46,9 +42,7 @@ import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
-import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.util.CanonicalSet;
-
 
 
 /**
@@ -76,7 +70,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * This set is used in order to return a pre-existing object instead of creating a
      * new one.
      */
-    private final CanonicalSet pool = new CanonicalSet();
+    private final CanonicalSet<IdentifiedObject> pool;
 
     /**
      * Constructs a default factory. This method is public in order to allows instantiations
@@ -90,6 +84,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * </pre></blockquote>
      */
     public ReferencingObjectFactory() {
+        pool = CanonicalSet.newInstance(IdentifiedObject.class);
     }
 
 
@@ -109,10 +104,10 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  unit Linear units of ellipsoid axes.
      * @throws FactoryException if the object creation failed.
      */
-    public Ellipsoid createEllipsoid(Map    properties,
-                                     double semiMajorAxis,
-                                     double semiMinorAxis,
-                                     Unit   unit) throws FactoryException
+    public Ellipsoid createEllipsoid(Map<String,?> properties,
+                                     double     semiMajorAxis,
+                                     double     semiMinorAxis,
+                                     Unit       unit) throws FactoryException
     {
         Ellipsoid ellipsoid;
         try {
@@ -134,8 +129,8 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  unit Linear units of major axis.
      * @throws FactoryException if the object creation failed.
      */
-    public Ellipsoid createFlattenedSphere(Map    properties,
-                                           double semiMajorAxis,
+    public Ellipsoid createFlattenedSphere(Map<String,?> properties,
+                                           double     semiMajorAxis,
                                            double inverseFlattening,
                                            Unit   unit) throws FactoryException
     {
@@ -151,16 +146,16 @@ public class ReferencingObjectFactory extends ReferencingFactory
     }
 
     /**
-     * Creates a prime meridian, relative to Greenwich. 
+     * Creates a prime meridian, relative to Greenwich.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  longitude Longitude of prime meridian in supplied angular units East of Greenwich.
      * @param  angularUnit Angular units of longitude.
      * @throws FactoryException if the object creation failed.
      */
-    public PrimeMeridian createPrimeMeridian(Map    properties,
-                                             double longitude,
-                                             Unit   angularUnit) throws FactoryException
+    public PrimeMeridian createPrimeMeridian(Map<String,?> properties,
+                                             double        longitude,
+                                             Unit          angularUnit) throws FactoryException
     {
         PrimeMeridian meridian;
         try {
@@ -173,14 +168,14 @@ public class ReferencingObjectFactory extends ReferencingFactory
     }
 
     /**
-     * Creates geodetic datum from ellipsoid and (optionaly) Bursa-Wolf parameters. 
+     * Creates geodetic datum from ellipsoid and (optionaly) Bursa-Wolf parameters.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  ellipsoid Ellipsoid to use in new geodetic datum.
      * @param  primeMeridian Prime meridian to use in new geodetic datum.
      * @throws FactoryException if the object creation failed.
      */
-    public GeodeticDatum createGeodeticDatum(Map           properties,
+    public GeodeticDatum createGeodeticDatum(Map<String,?> properties,
                                              Ellipsoid     ellipsoid,
                                              PrimeMeridian primeMeridian) throws FactoryException
     {
@@ -201,7 +196,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  type The type of this vertical datum (often geoidal).
      * @throws FactoryException if the object creation failed.
      */
-    public VerticalDatum createVerticalDatum(Map         properties,
+    public VerticalDatum createVerticalDatum(Map<String,?> properties,
                                              VerticalDatumType type) throws FactoryException
     {
         VerticalDatum datum;
@@ -221,7 +216,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  origin The date and time origin of this temporal datum.
      * @throws FactoryException if the object creation failed.
      */
-    public TemporalDatum createTemporalDatum(Map properties,
+    public TemporalDatum createTemporalDatum(Map<String,?> properties,
                                              Date origin) throws FactoryException
     {
         TemporalDatum datum;
@@ -240,7 +235,8 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  properties Name and other properties to give to the new object.
      * @throws FactoryException if the object creation failed.
      */
-    public EngineeringDatum createEngineeringDatum(Map properties) throws FactoryException
+    public EngineeringDatum createEngineeringDatum(Map<String,?> properties)
+            throws FactoryException
     {
         EngineeringDatum datum;
         try {
@@ -260,8 +256,8 @@ public class ReferencingObjectFactory extends ReferencingFactory
      *         with the image data attributes.
      * @throws FactoryException if the object creation failed.
      */
-    public ImageDatum createImageDatum(Map         properties,
-                                       PixelInCell pixelInCell) throws FactoryException
+    public ImageDatum createImageDatum(Map<String,?> properties,
+                                       PixelInCell   pixelInCell) throws FactoryException
     {
         ImageDatum datum;
         try {
@@ -290,7 +286,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  unit The coordinate axis unit.
      * @throws FactoryException if the object creation failed.
      */
-    public CoordinateSystemAxis createCoordinateSystemAxis(Map           properties,
+    public CoordinateSystemAxis createCoordinateSystemAxis(Map<String,?> properties,
                                                            String        abbreviation,
                                                            AxisDirection direction,
                                                            Unit          unit) throws FactoryException
@@ -313,7 +309,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
      */
-    public CartesianCS createCartesianCS(Map             properties,
+    public CartesianCS createCartesianCS(Map<String,?>   properties,
                                          CoordinateSystemAxis axis0,
                                          CoordinateSystemAxis axis1) throws FactoryException
     {
@@ -336,7 +332,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public CartesianCS createCartesianCS(Map             properties,
+    public CartesianCS createCartesianCS(Map<String,?>   properties,
                                          CoordinateSystemAxis axis0,
                                          CoordinateSystemAxis axis1,
                                          CoordinateSystemAxis axis2) throws FactoryException
@@ -359,7 +355,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
      */
-    public AffineCS createAffineCS(Map             properties,
+    public AffineCS createAffineCS(Map<String,?>   properties,
                                    CoordinateSystemAxis axis0,
                                    CoordinateSystemAxis axis1) throws FactoryException
     {
@@ -382,7 +378,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public AffineCS createAffineCS(Map             properties,
+    public AffineCS createAffineCS(Map<String,?>   properties,
                                    CoordinateSystemAxis axis0,
                                    CoordinateSystemAxis axis1,
                                    CoordinateSystemAxis axis2) throws FactoryException
@@ -405,7 +401,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
      */
-    public PolarCS createPolarCS(Map             properties,
+    public PolarCS createPolarCS(Map<String,?>   properties,
                                  CoordinateSystemAxis axis0,
                                  CoordinateSystemAxis axis1) throws FactoryException
     {
@@ -428,7 +424,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public CylindricalCS createCylindricalCS(Map            properties,
+    public CylindricalCS createCylindricalCS(Map<String,?>   properties,
                                              CoordinateSystemAxis axis0,
                                              CoordinateSystemAxis axis1,
                                              CoordinateSystemAxis axis2) throws FactoryException
@@ -452,7 +448,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public SphericalCS createSphericalCS(Map             properties,
+    public SphericalCS createSphericalCS(Map<String,?>   properties,
                                          CoordinateSystemAxis axis0,
                                          CoordinateSystemAxis axis1,
                                          CoordinateSystemAxis axis2) throws FactoryException
@@ -475,7 +471,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
      */
-    public EllipsoidalCS createEllipsoidalCS(Map             properties,
+    public EllipsoidalCS createEllipsoidalCS(Map<String,?>   properties,
                                              CoordinateSystemAxis axis0,
                                              CoordinateSystemAxis axis1) throws FactoryException
     {
@@ -498,7 +494,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public EllipsoidalCS createEllipsoidalCS(Map             properties,
+    public EllipsoidalCS createEllipsoidalCS(Map<String,?>   properties,
                                              CoordinateSystemAxis axis0,
                                              CoordinateSystemAxis axis1,
                                              CoordinateSystemAxis axis2) throws FactoryException
@@ -520,7 +516,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis The axis.
      * @throws FactoryException if the object creation failed.
      */
-    public VerticalCS createVerticalCS(Map            properties,
+    public VerticalCS createVerticalCS(Map<String,?>  properties,
                                        CoordinateSystemAxis axis) throws FactoryException
     {
         VerticalCS cs;
@@ -540,7 +536,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis The axis.
      * @throws FactoryException if the object creation failed.
      */
-    public TimeCS createTimeCS(Map            properties,
+    public TimeCS createTimeCS(Map<String,?>  properties,
                                CoordinateSystemAxis axis) throws FactoryException
     {
         TimeCS cs;
@@ -560,7 +556,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis The axis.
      * @throws FactoryException if the object creation failed.
      */
-    public LinearCS createLinearCS(Map            properties,
+    public LinearCS createLinearCS(Map<String,?>  properties,
                                    CoordinateSystemAxis axis) throws FactoryException
     {
         LinearCS cs;
@@ -581,7 +577,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
      */
-    public UserDefinedCS createUserDefinedCS(Map             properties,
+    public UserDefinedCS createUserDefinedCS(Map<String,?>   properties,
                                              CoordinateSystemAxis axis0,
                                              CoordinateSystemAxis axis1) throws FactoryException
     {
@@ -604,7 +600,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  axis2 The third  axis.
      * @throws FactoryException if the object creation failed.
      */
-    public UserDefinedCS createUserDefinedCS(Map             properties,
+    public UserDefinedCS createUserDefinedCS(Map<String,?>   properties,
                                              CoordinateSystemAxis axis0,
                                              CoordinateSystemAxis axis1,
                                              CoordinateSystemAxis axis2) throws FactoryException
@@ -636,7 +632,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  elements ordered array of {@code CoordinateReferenceSystem} objects.
      * @throws FactoryException if the object creation failed.
      */
-    public CompoundCRS createCompoundCRS(Map                       properties,
+    public CompoundCRS createCompoundCRS(Map<String,?>             properties,
                                          CoordinateReferenceSystem[] elements) throws FactoryException
     {
         CompoundCRS crs;
@@ -650,16 +646,16 @@ public class ReferencingObjectFactory extends ReferencingFactory
     }
 
     /**
-     * Creates a engineering coordinate reference system. 
+     * Creates a engineering coordinate reference system.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  datum Engineering datum to use in created CRS.
      * @param  cs The coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public EngineeringCRS createEngineeringCRS(Map         properties,
+    public EngineeringCRS createEngineeringCRS(Map<String,?> properties,
                                                EngineeringDatum datum,
-                                               CoordinateSystem    cs) throws FactoryException
+                                               CoordinateSystem cs) throws FactoryException
     {
         EngineeringCRS crs;
         try {
@@ -670,18 +666,18 @@ public class ReferencingObjectFactory extends ReferencingFactory
         crs = (EngineeringCRS) pool.unique(crs);
         return crs;
     }
-    
+
     /**
-     * Creates an image coordinate reference system. 
+     * Creates an image coordinate reference system.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  datum Image datum to use in created CRS.
      * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public ImageCRS createImageCRS(Map    properties,
-                                   ImageDatum  datum,
-                                   AffineCS       cs) throws FactoryException
+    public ImageCRS createImageCRS(Map<String,?> properties,
+                                   ImageDatum    datum,
+                                   AffineCS      cs) throws FactoryException
     {
         ImageCRS crs;
         try {
@@ -694,16 +690,16 @@ public class ReferencingObjectFactory extends ReferencingFactory
     }
 
     /**
-     * Creates a temporal coordinate reference system. 
+     * Creates a temporal coordinate reference system.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  datum Temporal datum to use in created CRS.
      * @param  cs The Temporal coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public TemporalCRS createTemporalCRS(Map      properties,
+    public TemporalCRS createTemporalCRS(Map<String,?> properties,
                                          TemporalDatum datum,
-                                         TimeCS           cs) throws FactoryException
+                                         TimeCS        cs) throws FactoryException
     {
         TemporalCRS crs;
         try {
@@ -716,16 +712,16 @@ public class ReferencingObjectFactory extends ReferencingFactory
     }
 
     /**
-     * Creates a vertical coordinate reference system. 
+     * Creates a vertical coordinate reference system.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  datum Vertical datum to use in created CRS.
      * @param  cs The Vertical coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public VerticalCRS createVerticalCRS(Map     properties,
+    public VerticalCRS createVerticalCRS(Map<String,?> properties,
                                          VerticalDatum datum,
-                                         VerticalCS       cs) throws FactoryException
+                                         VerticalCS    cs) throws FactoryException
     {
         VerticalCRS crs;
         try {
@@ -746,9 +742,9 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  cs The cartesian coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public GeocentricCRS createGeocentricCRS(Map      properties,
+    public GeocentricCRS createGeocentricCRS(Map<String,?> properties,
                                              GeodeticDatum datum,
-                                             CartesianCS      cs) throws FactoryException
+                                             CartesianCS   cs) throws FactoryException
     {
         GeocentricCRS crs;
         try {
@@ -769,9 +765,9 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  cs The spherical coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public GeocentricCRS createGeocentricCRS(Map      properties,
+    public GeocentricCRS createGeocentricCRS(Map<String,?> properties,
                                              GeodeticDatum datum,
-                                             SphericalCS      cs) throws FactoryException
+                                             SphericalCS   cs) throws FactoryException
     {
         GeocentricCRS crs;
         try {
@@ -793,9 +789,9 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  cs The ellipsoidal coordinate system for the created CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public GeographicCRS createGeographicCRS(Map      properties,
+    public GeographicCRS createGeographicCRS(Map<String,?> properties,
                                              GeodeticDatum datum,
-                                             EllipsoidalCS    cs) throws FactoryException
+                                             EllipsoidalCS cs) throws FactoryException
     {
         GeographicCRS crs;
         try {
@@ -829,7 +825,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  derivedCS The coordinate system for the derived CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public DerivedCRS createDerivedCRS(Map                 properties,
+    public DerivedCRS createDerivedCRS(Map<String,?>       properties,
                                        OperationMethod         method,
                                        CoordinateReferenceSystem base,
                                        MathTransform    baseToDerived,
@@ -844,7 +840,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         crs = (DerivedCRS) pool.unique(crs);
         return crs;
     }
-    
+
     /**
      * Creates a projected coordinate reference system from a transform.
      * <p>
@@ -853,7 +849,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
      * change of axis order}, if needed. The {@link ReferencingFactoryContainer} class provides
      * conveniences methods for this task.
-     * 
+     *
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
      *         projection}.
@@ -862,7 +858,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public ProjectedCRS createProjectedCRS(Map              properties,
+    public ProjectedCRS createProjectedCRS(Map<String,?>    properties,
                                            OperationMethod      method,
                                            GeographicCRS          base,
                                            MathTransform baseToDerived,
@@ -906,8 +902,9 @@ public class ReferencingObjectFactory extends ReferencingFactory
         //       synchronize.
         if (parser == null) {
             final Hints hints = new Hints(getImplementationHints());
-            parser = new Parser(Symbols.DEFAULT, ReferencingFactoryFinder.getDatumFactory(hints), this, this,
-                                                 ReferencingFactoryFinder.getMathTransformFactory(hints));
+            parser = new Parser(Symbols.DEFAULT,
+                    ReferencingFactoryFinder.getDatumFactory(hints), this, this,
+                    ReferencingFactoryFinder.getMathTransformFactory(hints));
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2007, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,11 +16,8 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.*;
-import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
@@ -29,8 +26,6 @@ import org.opengis.referencing.operation.*;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 
-// Geotools dependencies
-import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.metadata.iso.citation.Citations;
@@ -71,7 +66,8 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * constructors. Must be consistent with the types expected by the
      * {@link AllAuthoritiesFactory#fromFactoryRegistry(String, Class)} method.
      */
-    private static final Class[] FACTORY_TYPES = new Class[] {
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends AuthorityFactory>[] FACTORY_TYPES = new Class[] {
         CRSAuthorityFactory.class,
         DatumAuthorityFactory.class,
         CSAuthorityFactory.class,
@@ -82,7 +78,8 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * The types created by {@link #FACTORY_TYPES}. For each type {@code OBJECT_TYPES[i]},
      * the factory to be used must be {@code FACTORY_TYPES[i]}.
      */
-    private static final Class[] OBJECT_TYPES = new Class[] {
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends IdentifiedObject>[] OBJECT_TYPES = new Class[] {
         CoordinateReferenceSystem.class,
         Datum.class,
         CoordinateSystem.class,
@@ -93,30 +90,12 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * The set of user-specified factories, or {@code null} if none.
      * This field should be modified by {@link #setFactories} only.
      */
-    private Collection/*<AuthorityFactory>*/ factories;
-
-    /**
-     * The separator between the authority name and the code.
-     *
-     * @deprecated Remove this field after we removed the deprecated constructor.
-     */
-    private final char separator;
+    private Collection<AuthorityFactory> factories;
 
     /**
      * Guard against infinite recursivity in {@link #getAuthorityCodes}.
      */
-    private final ThreadLocal/*<Boolean>*/ inProgress = new ThreadLocal();
-
-    /**
-     * Creates a new factory using the specified hints.
-     *
-     * @param userHints An optional set of hints, or {@code null} if none.
-     *
-     * @deprecated Use {@link #ManyAuthoritiesFactory(Collection)}.
-     */
-    public ManyAuthoritiesFactory(final Hints userHints) {
-        this(userHints, null);
-    }
+    private final ThreadLocal<Boolean> inProgress;
 
     /**
      * Creates a new factory using the specified set of user factories. Any call to a
@@ -132,37 +111,9 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link GeometryFactoryFinder}.
      */
-    public ManyAuthoritiesFactory(final Collection/*<? extends AuthorityFactory>*/ factories) {
-        this(null, factories, (char) 0);
-    }
-
-    /**
-     * Creates a new factory using the specified hints and a set of user factories.
-     *
-     * @param userHints An optional set of hints, or {@code null} if none.
-     * @param factories A set of user-specified factories to try before to delegate
-     *        to {@link GeometryFactoryFinder}.
-     *
-     * @deprecated Use {@link #ManyAuthoritiesFactory(Collection)}.
-     */
-    public ManyAuthoritiesFactory(final Hints userHints,
-            final Collection/*<? extends AuthorityFactory>*/ factories)
-    {
-        this(userHints, factories, (char) 0);
-    }
-
-    /**
-     * Creates a new factory using the specified hints, user factories and name
-     * separator.
-     *
-     * @deprecated Override the {@link #getSeparator} method instead.
-     */
-    ManyAuthoritiesFactory(final Hints userHints,
-                           final Collection/*<? extends AuthorityFactory>*/ factories,
-                           final char separator)
-    {
+    public ManyAuthoritiesFactory(final Collection<? extends AuthorityFactory> factories) {
         super(NORMAL_PRIORITY);
-        this.separator = separator;
+        inProgress = new ThreadLocal<Boolean>();
         if (factories!=null && !factories.isEmpty()) {
             for (final Iterator it=factories.iterator(); it.hasNext();) {
                 final Object factory = it.next();
@@ -178,7 +129,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * Returns the factories. This method should not be public since it returns directly the
      * internal instance. This method is to be overriden by {@link AllAuthoritiesFactory} only.
      */
-    Collection/*<AuthorityFactory>*/ getFactories() {
+    Collection<AuthorityFactory> getFactories() {
         return factories;
     }
 
@@ -186,7 +137,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * Sets the factories. This method is invoked by the {@link AllAuthoritiesFactory} subclass
      * only. No one else should invoke this method, since factories should be immutable.
      */
-    final void setFactories(final Collection/*<AuthorityFactory>*/ factories) {
+    final void setFactories(final Collection<AuthorityFactory> factories) {
         assert Thread.holdsLock(this);
         this.factories = createFallbacks(factories);
     }
@@ -195,8 +146,8 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * If more than one factory is found for the same authority and interface,
      * then wraps them as a chain of {@link FallbackAuthorityFactory}.
      */
-    private static Collection/*<AuthorityFactory>*/ createFallbacks(
-            final Collection/*<? extends AuthorityFactory>*/ factories)
+    private static Collection<AuthorityFactory> createFallbacks(
+            final Collection<? extends AuthorityFactory> factories)
     {
         /*
          * 'authorities' Will contains the set of all authorities found without duplicate values
@@ -205,9 +156,9 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
          */
         int authorityCount = 0;
         final Citation[] authorities = new Citation[factories.size()];
-        final List[] factoriesByAuthority = new List[authorities.length];
-        for (final Iterator it=factories.iterator(); it.hasNext();) {
-            final AuthorityFactory factory = (AuthorityFactory) it.next();
+        @SuppressWarnings("unchecked")
+        final List<AuthorityFactory>[] factoriesByAuthority = new List[authorities.length];
+        for (final AuthorityFactory factory : factories) {
             /*
              * Check if the authority has already been meet previously. If the authority is found
              * then 'authorityIndex' is set to its index. Otherwise the new authority is added to
@@ -222,10 +173,10 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
                     break;
                 }
             }
-            final List/*<AuthorityFactory>*/ list;
+            final List<AuthorityFactory> list;
             if (authorityIndex == authorityCount) {
                 authorities[authorityCount++] = authority;
-                factoriesByAuthority[authorityIndex] = list = new ArrayList(4);
+                factoriesByAuthority[authorityIndex] = list = new ArrayList<AuthorityFactory>(4);
             } else {
                 list = factoriesByAuthority[authorityIndex];
             }
@@ -236,15 +187,15 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
         /*
          * For each authority, chains the factories into a FallbackAuthorityFactory object.
          */
-        final ArrayList/*<AuthorityFactory>*/ result = new ArrayList();
-        final List/*<AuthorityFactory>*/ buffer = new ArrayList(4);
+        final ArrayList<AuthorityFactory> result = new ArrayList<AuthorityFactory>();
+        final List<AuthorityFactory> buffer = new ArrayList<AuthorityFactory>(4);
         for (int i=0; i<authorityCount; i++) {
-            final Collection list = factoriesByAuthority[i];
+            final Collection<AuthorityFactory> list = factoriesByAuthority[i];
             while (!list.isEmpty()) {
                 AuthorityFactory primary = null;
                 boolean needOtherChains = false;
-                for (final Iterator it=list.iterator(); it.hasNext();) {
-                    final AuthorityFactory fallback = (AuthorityFactory) it.next();
+                for (final Iterator<AuthorityFactory> it=list.iterator(); it.hasNext();) {
+                    final AuthorityFactory fallback = it.next();
                     if (primary == null) {
                         primary = fallback;
                     } else if (!FallbackAuthorityFactory.chainable(primary, fallback)) {
@@ -269,7 +220,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * {@linkplain #getAuthorityCodes authority codes}, returns {@code true}. This method is
      * for {@link FallbackAuthorityFactory} internal use only.
      */
-    //@Override
+    @Override
     boolean sameAuthorityCodes(final AuthorityFactory factory) {
         // We don't want to inherit AuthorityFactoryAdapter implementation here.
         return factory == this;
@@ -286,10 +237,6 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * are {@code "://"}. But this heuristic rule may change in future implementations.
      */
     protected char getSeparator(String code) {
-        if (separator != 0) {
-            // Remove this block after we removed the deprecated separator field.
-            return separator;
-        }
         code = code.trim();
         final int length = code.length();
         for (int i=0; i<length; i++) {
@@ -344,6 +291,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * Returns the vendor responsible for creating this factory implementation.
      * The default implementation returns {@linkplain Citations#GEOTOOLS Geotools}.
      */
+    @Override
     public Citation getVendor() {
         return Citations.GEOTOOLS;
     }
@@ -352,6 +300,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * Returns the organization or party responsible for definition and maintenance of the
      * database. The default implementation returns a citation with title "All".
      */
+    @Override
     public Citation getAuthority() {
         return ALL;
     }
@@ -359,13 +308,12 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
     /**
      * Returns the authority names of every factories given at construction time.
      */
-    public Set/*<String>*/ getAuthorityNames() {
-        final Set names = new HashSet();
-        final Collection/*<AuthorityFactory>*/ factories = getFactories();
+    public Set<String> getAuthorityNames() {
+        final Set<String> names = new HashSet<String>();
+        final Collection<AuthorityFactory> factories = getFactories();
         if (factories != null) {
-            for (final Iterator it=factories.iterator(); it.hasNext();) {
-                final AuthorityFactory factory = (AuthorityFactory) it.next();
-                names.addAll(factory.getAuthority().getIdentifiers());
+            for (final AuthorityFactory factory : factories) {
+                names.add(Citations.getIdentifier(factory.getAuthority()));
             }
         }
         return names;
@@ -376,6 +324,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      *
      * @throws FactoryException if a failure occured while fetching the engine description.
      */
+    @Override
     public String getBackingStoreDescription() throws FactoryException {
         // We have no authority code, so we can't pick a particular factory.
         return null;
@@ -386,8 +335,8 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * because we know that this package will not modifies it. But if the method become public,
      * we will need to returns a unmodifiable view.
      */
-    //@Override
-    Collection/*<?>*/ dependencies() {
+    @Override
+    Collection<? super AuthorityFactory> dependencies() {
         return getFactories();
     }
 
@@ -417,8 +366,8 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * that fit the given type. The factories are added to the specified set.
      */
     final void fromFactoryRegistry(final String authority,
-                                   final Class/*<? extends AuthorityFactory>*/ type,
-                                   final Set/*<AuthorityFactory>*/ addTo)
+                                   final Class<? extends AuthorityFactory> type,
+                                   final Set<AuthorityFactory> addTo)
     {
         for (int i=0; i<OBJECT_TYPES.length; i++) {
             if (OBJECT_TYPES[i].isAssignableFrom(type)) {
@@ -447,8 +396,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @throws FactoryRegistryException if there is no factory registered for the supplied
      *         authority and hints.
      */
-    AuthorityFactory fromFactoryRegistry(final String authority,
-                                         final Class/*<? extends AuthorityFactory>*/ type)
+    <T extends AuthorityFactory> T fromFactoryRegistry(final String authority, final Class<T> type)
             throws FactoryRegistryException
     {
         return null;
@@ -464,15 +412,14 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @return The factory.
      * @throws NoSuchAuthorityCodeException if no suitable factory were found.
      */
-    //@Override
-    final AuthorityFactory getAuthorityFactory(final Class/*<T extends AuthorityFactory>*/ type,
-                                               final String code)
+    @Override
+    final <T extends AuthorityFactory> T getAuthorityFactory(final Class<T> type, final String code)
             throws NoSuchAuthorityCodeException
     {
         ensureNonNull("code", code);
         String authority = null;
         FactoryRegistryException cause = null;
-        final Collection/*<AuthorityFactory>*/ factories = getFactories();
+        final Collection<AuthorityFactory> factories = getFactories();
         final char separator = getSeparator(code);
         for (int split = code.lastIndexOf(separator); split >= 0;
                  split = code.lastIndexOf(separator, split-1))
@@ -489,14 +436,13 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
              */
             authority = code.substring(0, split).trim();
             if (factories != null) {
-                for (final Iterator it=factories.iterator(); it.hasNext();) {
-                    final AuthorityFactory factory = (AuthorityFactory) it.next();
+                for (final AuthorityFactory factory : factories) {
                     if (type.isAssignableFrom(factory.getClass())) {
                         if (Citations.identifierMatches(factory.getAuthority(), authority)) {
-                            return factory;
+                            return type.cast(factory);
                         }
                     }
-                }    
+                }
             }
             /*
              * No suitable user-supplied factory. Now query FactoryFinder.
@@ -509,8 +455,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
                 continue;
             }
             if (factory != null) {
-                return /*type.cast*/(factory);
-                // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+                return type.cast(factory);
             }
         }
         /*
@@ -554,7 +499,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @return The authority factory.
      * @throws NoSuchAuthorityCodeException if no authority name has been found.
      */
-    //@Override
+    @Override
     protected AuthorityFactory getAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
@@ -568,12 +513,11 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @return The authority factory.
      * @throws NoSuchAuthorityCodeException if no authority name has been found.
      */
-    //@Override
+    @Override
     protected DatumAuthorityFactory getDatumAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        return (DatumAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(DatumAuthorityFactory.class, code);
+        return getAuthorityFactory(DatumAuthorityFactory.class, code);
     }
 
     /**
@@ -583,12 +527,11 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @return The authority factory.
      * @throws NoSuchAuthorityCodeException if no authority name has been found.
      */
-    //@Override
+    @Override
     protected CSAuthorityFactory getCSAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        return (CSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(CSAuthorityFactory.class, code);
+        return getAuthorityFactory(CSAuthorityFactory.class, code);
     }
 
     /**
@@ -598,12 +541,11 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @return The authority factory.
      * @throws NoSuchAuthorityCodeException if no authority name has been found.
      */
-    //@Override
+    @Override
     protected CRSAuthorityFactory getCRSAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        return (CRSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(CRSAuthorityFactory.class, code);
+        return getAuthorityFactory(CRSAuthorityFactory.class, code);
     }
 
     /**
@@ -613,12 +555,11 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      * @return The authority factory.
      * @throws NoSuchAuthorityCodeException if no authority name has been found.
      */
-    //@Override
+    @Override
     protected CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
             throws NoSuchAuthorityCodeException
     {
-        return (CoordinateOperationAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(CoordinateOperationAuthorityFactory.class, code);
+        return getAuthorityFactory(CoordinateOperationAuthorityFactory.class, code);
     }
 
     /**
@@ -630,29 +571,30 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
      */
-    public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
+    @Override
+    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
         if (Boolean.TRUE.equals(inProgress.get())) {
             /*
              * 'getAuthorityCodes' is invoking itself (indirectly). Returns an empty set in order
              * to avoid infinite recursivity. Note that the end result (the output of the caller)
              * will usually not be empty.
              */
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
-        final Set/*<String>*/ codes = new LinkedHashSet();
-        final Set/*<AuthorityFactory>*/ done = new HashSet();
+        final Set<String> codes = new LinkedHashSet<String>();
+        final Set<AuthorityFactory> done = new HashSet<AuthorityFactory>();
         done.add(this); // Safety for avoiding recursive calls.
         inProgress.set(Boolean.TRUE);
         try {
-            for (final Iterator it=getAuthorityNames().iterator(); it.hasNext();) {
-                final String authority = ((String) it.next()).trim();
+            for (String authority : getAuthorityNames()) {
+                authority = authority.trim();
                 final char separator = getSeparator(authority);
                 /*
                  * Prepares a buffer with the "AUTHORITY:" part in "AUTHORITY:NUMBER".
                  * We will reuse this buffer in order to prefix the authority name in
                  * front of every codes.
                  */
-                final StringBuffer code = new StringBuffer(authority);
+                final StringBuilder code = new StringBuilder(authority);
                 int codeBase = code.length();
                 if (codeBase != 0 && code.charAt(codeBase - 1) != separator) {
                     code.append(separator);
@@ -669,7 +611,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
                     if (!OBJECT_TYPES[i].isAssignableFrom(type)) {
                         continue;
                     }
-                    final Class factoryType = FACTORY_TYPES[i];
+                    final Class<? extends AuthorityFactory> factoryType = FACTORY_TYPES[i];
                     final AuthorityFactory factory;
                     try {
                         factory = getAuthorityFactory(factoryType, dummyCode);
@@ -701,8 +643,8 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
                             continue scanForType;
                         }
                     }
-                    for (final Iterator it2=factory.getAuthorityCodes(type).iterator(); it2.hasNext();) {
-                        String candidate = ((String) it2.next()).trim();
+                    for (String candidate : factory.getAuthorityCodes(type)) {
+                        candidate = candidate.trim();
                         if (candidate.length() < codeBase ||
                             Character.isLetterOrDigit (candidate.charAt(codeBase-1)) ||
                            !authority.equalsIgnoreCase(candidate.substring(0, codeBase-1)))
@@ -717,8 +659,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
                 }
             }
         } finally {
-            inProgress.set(Boolean.FALSE);
-            // TODO: use inProgress.remove() when we will be allowed to compile for J2SE 1.5.
+            inProgress.remove();
         }
         return codes;
     }
@@ -732,8 +673,9 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
      */
+    @Override
     public InternationalString getDescriptionText(final String code) throws FactoryException {
-        final Set/*<AuthorityFactory>*/ done = new HashSet();
+        final Set<AuthorityFactory> done = new HashSet<AuthorityFactory>();
         done.add(this); // Safety for avoiding recursive calls.
         FactoryException failure = null;
         for (int type=0; type<FACTORY_TYPES.length; type++) {
@@ -780,8 +722,9 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
      * @see #createEllipsoid
      * @see #createUnit
      */
+    @Override
     public IdentifiedObject createObject(final String code) throws FactoryException {
-        final Set/*<AuthorityFactory>*/ done = new HashSet();
+        final Set<AuthorityFactory> done = new HashSet<AuthorityFactory>();
         done.add(this); // Safety for avoiding recursive calls.
         FactoryException failure = null;
         for (int type=0; type<FACTORY_TYPES.length; type++) {
@@ -824,8 +767,8 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
      * Returns a finder which can be used for looking up unidentified objects.
      * The default implementation delegates the lookups to the underlying factories.
      */
-    //@Override
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
+    @Override
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(Class<? extends IdentifiedObject> type)
             throws FactoryException
     {
         return new Finder(this, type);
@@ -839,7 +782,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
          * Creates a finder for the specified type.
          */
         protected Finder(final ManyAuthoritiesFactory factory,
-                         final Class/*<? extends IdentifiedObject>*/ type)
+                         final Class<? extends IdentifiedObject> type)
         {
             super(factory, type);
         }
@@ -847,18 +790,18 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
         /**
          * Returns the user-supplied factories.
          */
-        final Collection getFactories() {
+        final Collection<AuthorityFactory> getFactories() {
             return ((ManyAuthoritiesFactory) getProxy().getAuthorityFactory()).getFactories();
         }
 
         /**
          * Returns the next finder in the specified set of factories, or {@code null} if none.
          */
-        final IdentifiedObjectFinder next(final Iterator/*<AuthorityFactory>*/ it)
+        final IdentifiedObjectFinder next(final Iterator<AuthorityFactory> it)
                 throws FactoryException
         {
             while (it.hasNext()) {
-                final AuthorityFactory factory = (AuthorityFactory) it.next();
+                final AuthorityFactory factory = it.next();
                 if (exclude(factory)) {
                     continue;
                 }
@@ -869,7 +812,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
                         finder.setFullScanAllowed(isFullScanAllowed());
                         return finder;
                     }
-                }                
+                }
             }
             return null;
         }
@@ -877,7 +820,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
         /**
          * Lookups for the specified object.
          */
-        //@Override
+        @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             /*
              * Try to create from the identifier before to scan over every factories,
@@ -888,10 +831,10 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
             if (candidate != null) {
                 return candidate;
             }
-            final Collection factories = getFactories();
+            final Collection<AuthorityFactory> factories = getFactories();
             if (factories != null) {
                 IdentifiedObjectFinder finder;
-                final Iterator it = factories.iterator();
+                final Iterator<AuthorityFactory> it = factories.iterator();
                 while ((finder = next(it)) != null) {
                     candidate = finder.find(object);
                     if (candidate != null) {
@@ -905,7 +848,7 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
         /**
          * Returns the identifier of the specified object, or {@code null} if none.
          */
-        //@Override
+        @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             /*
              * Try to create from the identifier for the same reason than find(IdentifiedObject).
@@ -916,10 +859,10 @@ scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
             if (candidate != null) {
                 return candidate.getName().toString();
             }
-            final Collection factories = getFactories();
+            final Collection<AuthorityFactory> factories = getFactories();
             if (factories != null) {
                 IdentifiedObjectFinder finder;
-                final Iterator it = factories.iterator();
+                final Iterator<AuthorityFactory> it = factories.iterator();
                 while ((finder = next(it)) != null) {
                     final String id = finder.findIdentifier(object);
                     if (id != null) {

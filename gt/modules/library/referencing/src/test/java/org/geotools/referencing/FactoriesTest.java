@@ -58,10 +58,9 @@ import org.opengis.util.ScopedName;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.DatumAliases;
-import org.geotools.referencing.factory.GeotoolsFactory;
+import org.geotools.referencing.factory.ReferencingObjectFactory;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.cs.DefaultCartesianCS;
-import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -181,13 +180,13 @@ public final class FactoriesTest extends TestCase {
         out.println();
         out.println("create Coodinate Reference System....8: ");
         out.println(cartCS); // No WKT for coordinate systems
-            
+
         final Hints hints = new Hints();
         hints.put(Hints.DATUM_FACTORY,          datumFactory);
         hints.put(Hints.CS_FACTORY,             csFactory);
         hints.put(Hints.CRS_FACTORY,            crsFactory);
         hints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
-        
+
         final ReferencingFactoryContainer container = new ReferencingFactoryContainer(hints);
         assertSame(datumFactory, container.getDatumFactory());
         assertSame(csFactory,    container.getCSFactory());
@@ -263,7 +262,7 @@ public final class FactoriesTest extends TestCase {
         final String           name2 = "NTF (Paris meridian)";
         final Ellipsoid    ellipsoid = DefaultEllipsoid.WGS84;
         final PrimeMeridian meridian = DefaultPrimeMeridian.GREENWICH;
-        DatumFactory         factory = new GeotoolsFactory();
+        DatumFactory         factory = new ReferencingObjectFactory();
         final Map         properties = Collections.singletonMap("name", name1);
         GeodeticDatum datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
         assertTrue(datum.getAlias().isEmpty());

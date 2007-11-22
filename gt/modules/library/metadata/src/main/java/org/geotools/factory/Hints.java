@@ -499,7 +499,7 @@ public final class Hints extends RenderingHints {
      *   <li>{@code "none"} for disabling the cache.</li>
      * </ul>
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final OptionKey CACHE_POLICY = new OptionKey("weak", "all", "fixed","none","default");
 
@@ -507,7 +507,7 @@ public final class Hints extends RenderingHints {
      * The recommended maximum number of referencing objects to hold in a
      * {@linkplain org.opengis.referencing.AuthorityFactory authority factory}.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey CACHE_LIMIT = new IntegerKey(50);
 
@@ -528,7 +528,7 @@ public final class Hints extends RenderingHints {
      * When this value is non positive their is no limit to the number of
      * active authority factories deployed.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey AUTHORITY_MAX_ACTIVE =
             new IntegerKey(Runtime.getRuntime().availableProcessors() + 1);
@@ -549,7 +549,7 @@ public final class Hints extends RenderingHints {
      * </ul>
      * To agree with J2EE conventions you will want this value to be zero.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey AUTHORITY_MIN_IDLE = new IntegerKey(1);
 
@@ -570,7 +570,7 @@ public final class Hints extends RenderingHints {
      * pool at any time. When negative, there is no limit to the number of
      * objects that may be idle at one time.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey AUTHORITY_MAX_IDLE = new IntegerKey(2);
 
@@ -578,7 +578,7 @@ public final class Hints extends RenderingHints {
      * When the evictor is run, if more time (in milliseconds) than the value in
      * {@code AUTHORITY_MIN_EVICT_IDLETIME} has passed, then the worker is destroyed.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(2 * 60 * 1000);
 
@@ -587,14 +587,14 @@ public final class Hints extends RenderingHints {
      * value will be destroyed if and only if the number of idle workers exceeds
      * AUTHORITY_MIN_IDLE.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(10 * 1000);
 
     /**
      * Time in milliseconds to wait between eviction runs.
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(5 * 1000);
 

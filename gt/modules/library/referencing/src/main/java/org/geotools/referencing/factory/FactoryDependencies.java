@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
  *    (C) 2007, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -172,16 +172,16 @@ public class FactoryDependencies {
      * Returns the dependencies as a tree.
      */
     public TreeNode asTree() {
-        return createTree(factory, new HashSet());
+        return createTree(factory, new HashSet<Factory>());
     }
 
     /**
      * Returns the dependencies for the specified factory.
      */
-    private MutableTreeNode createTree(final Factory factory, final Set/*<Factory>*/ done) {
+    private MutableTreeNode createTree(final Factory factory, final Set<Factory> done) {
         final DefaultMutableTreeNode root = createNode(factory);
         if (factory instanceof ReferencingFactory) {
-            final Collection dep = ((ReferencingFactory) factory).dependencies();
+            final Collection<?> dep = ((ReferencingFactory) factory).dependencies();
             if (dep != null) {
                 for (final Iterator it=dep.iterator(); it.hasNext();) {
                     final Object element = it.next();

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -114,7 +114,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                                  final int targetDimensions,
                                  final ParameterDescriptorGroup parameters)
     {
-        super(properties, sourceDimensions, targetDimensions, parameters);        
+        super(properties, sourceDimensions, targetDimensions, parameters);
     }
 
     /**
@@ -141,7 +141,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Subclass should overrides this methods and returns the appropriate
      * OpenGIS interface type (<strong>not</strong> the implementation type).
      */
-    public Class getOperationType() {
+    @Override
+    public Class<? extends Operation> getOperationType() {
         return Operation.class;
     }
 
@@ -418,7 +419,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
                 if (search.equals(candidate.getDescriptor())) {
                     return (ParameterValue) candidate;
                 }
-            }        
+            }
         }
         return null;
     }
@@ -523,6 +524,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final Class type = getOperationType();
         if (Projection.class.isAssignableFrom(type)) {

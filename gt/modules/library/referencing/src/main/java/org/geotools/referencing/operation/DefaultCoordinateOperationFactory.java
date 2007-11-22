@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -49,7 +49,7 @@ import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.Matrix4;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -421,7 +421,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                 }
             }
         }
-        final CRSFactory crsFactory = getFactoryGroup().getCRSFactory();
+        final CRSFactory crsFactory = getFactoryContainer().getCRSFactory();
         return crsFactory.createGeocentricCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
@@ -456,7 +456,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * The specified geographic coordinate system doesn't use standard axis
          * (EAST, NORTH) or the greenwich meridian. Create a new one meeting those criterions.
          */
-        final CRSFactory crsFactory = getFactoryGroup().getCRSFactory();
+        final CRSFactory crsFactory = getFactoryContainer().getCRSFactory();
         return crsFactory.createGeographicCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
@@ -690,7 +690,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         }
         return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);
     }
-    
+
     /**
      * Creates an operation between two vertical coordinate reference systems.
      * The default implementation checks if both CRS use the same datum, and
@@ -872,7 +872,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          */
         final CartesianCS STANDARD = DefaultCartesianCS.GEOCENTRIC;
         final GeocentricCRS stepCRS;
-        final CRSFactory crsFactory = getFactoryGroup().getCRSFactory();
+        final CRSFactory crsFactory = getFactoryContainer().getCRSFactory();
         if (getGreenwichLongitude(targetPM) == 0) {
             stepCRS = crsFactory.createGeocentricCRS(
                       getTemporaryName(targetCRS), targetDatum, STANDARD);
@@ -915,7 +915,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * to perform the tedious  ProjectedCRS --> GeographicCRS --> ProjectedCRS  chain.
          * We can apply a much shorter conversion using only an affine transform.
          *
-         * This shorter path is essential for proper working of 
+         * This shorter path is essential for proper working of
          * createOperationStep(GeographicCRS,ProjectedCRS).
          */
         final Matrix linear = createLinearConversion(sourceCRS, targetCRS);
@@ -970,7 +970,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         }
         return concatenate(step1, step2);
     }
-    
+
     /**
      * Creates an operation from a projected to a geographic coordinate reference system.
      * The default implementation constructs the following operation chain:
@@ -1218,7 +1218,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * needed. It may also be a geodetic datum change, in which case the height is part
          * of computation. Try to convert the source CRS into a 3D-geodetic CRS.
          */
-        final CoordinateReferenceSystem source3D = getFactoryGroup().toGeodetic3D(sourceCRS);
+        final CoordinateReferenceSystem source3D = getFactoryContainer().toGeodetic3D(sourceCRS);
         if (source3D != sourceCRS) {
             return createOperation(source3D, targetCRS);
         }
@@ -1228,7 +1228,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          */
         throw new OperationNotFoundException(getErrorMessage(sourceCRS, targetCRS));
     }
-    
+
     /**
      * Creates an operation from a single to a compound coordinate reference system.
      *
@@ -1250,7 +1250,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * 'sourceCRS' is a 3D-geodetic CRS and 'targetCRS' is a 2D + 1D one. Test for this case.
          * Otherwise, the 'createOperationStep' invocation will throws the appropriate exception.
          */
-        final CoordinateReferenceSystem target3D = getFactoryGroup().toGeodetic3D(targetCRS);
+        final CoordinateReferenceSystem target3D = getFactoryContainer().toGeodetic3D(targetCRS);
         if (target3D != targetCRS) {
             return createOperation(sourceCRS, target3D);
         }
@@ -1286,7 +1286,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          */
         for (int i=0; i<targets.length; i++) {
             if (needsGeodetic3D(sources, targets[i])) {
-                final FactoryGroup factories = getFactoryGroup();
+                final ReferencingFactoryContainer factories = getFactoryContainer();
                 final CoordinateReferenceSystem source3D = factories.toGeodetic3D(sourceCRS);
                 final CoordinateReferenceSystem target3D = factories.toGeodetic3D(targetCRS);
                 if (source3D!=sourceCRS || target3D!=targetCRS) {
@@ -1379,8 +1379,10 @@ search: for (int j=0; j<targets.length; j++) {
          * for any target coordinates.
          */
         assert count == targets.length : count;
-        while (count!=0 && steps[--count].getMathTransform().isIdentity());
-        final FactoryGroup factories = getFactoryGroup();
+        while (count!=0 && steps[--count].getMathTransform().isIdentity()) {
+            // Intentionnaly empty.
+        }
+        final ReferencingFactoryContainer factories = getFactoryContainer();
         CoordinateOperation operation = null;
         CoordinateReferenceSystem sourceStepCRS = sourceCRS;
         final XMatrix select = MatrixFactory.create(dimensions+1, indices.length+1);
@@ -1503,7 +1505,7 @@ search: for (int j=0; j<targets.length; j++) {
         return horizontal && vertical &&
                (shift || targetCRS.getCoordinateSystem().getDimension()>=3);
     }
-    
+
 
 
 

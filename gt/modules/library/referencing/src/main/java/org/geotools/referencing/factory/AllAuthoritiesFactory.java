@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,13 +16,11 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -31,7 +29,6 @@ import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -63,7 +60,7 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
     /**
      * The authority names. Used in order to detect changes in the set of registered factories.
      */
-    private Collection/*<String>*/ authorityNames;
+    private Collection<String> authorityNames;
 
     /**
      * Creates a new factory using the specified hints.
@@ -71,51 +68,7 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * @param hints An optional set of hints, or {@code null} if none.
      */
     public AllAuthoritiesFactory(final Hints hints) {
-        this(hints, null);
-    }
-
-    /**
-     * Creates a new factory using the specified hints and a set of user factories.
-     * If {@code factories} is not null, then any call to a {@code createFoo(code)} method will
-     * first scan the supplied factories in their iteration order. The first factory implementing
-     * the appropriate interface and having the expected {@linkplain AuthorityFactory#getAuthority
-     * authority name} will be used. Only if no suitable factory is found, then this class delegates
-     * to {@link ReferencingFactoryFinder}.
-     * <p>
-     * If the {@code factories} collection contains more than one factory for the same authority
-     * and interface, then all additional factories will be {@linkplain FallbackAuthorityFactory
-     * fallbacks}, to be tried in iteration order only if the first acceptable factory failed to
-     * create the requested object.
-     *
-     * @param hints An optional set of hints, or {@code null} if none.
-     * @param factories A set of user-specified factories to try before to delegate
-     *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
-     *
-     * @deprecated This constructor will be removed in GeoTools 2.5.
-     */
-    public AllAuthoritiesFactory(final Hints hints,
-                                 final Collection/*<? extends AuthorityFactory>*/ factories)
-    {
-        this(hints, factories, (char) 0);
-    }
-
-    /**
-     * Creates a new factory using the specified hints, user factories and name
-     * separator. The optional {@code factories} collection is handled as in the
-     * {@linkplain #AllAuthoritiesFactory(Hints, Collection) constructor above}.
-     *
-     * @param hints An optional set of hints, or {@code null} if none.
-     * @param factories A set of user-specified factories to try before to delegate
-     *        to {@link ReferencingFactoryFinder}, or {@code null} if none.
-     * @param separator The separator between the authority name and the code.
-     *
-     * @deprecated This constructor will be removed in GeoTools 2.5.
-     */
-    public AllAuthoritiesFactory(final Hints hints,
-                                 final Collection/*<? extends AuthorityFactory>*/ factories,
-                                 final char separator)
-    {
-        super(hints, factories, separator);
+        super(null);
         addImplementationHints(hints);
     }
 
@@ -124,8 +77,8 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      *
      * @since 2.4
      */
-    //@Override
-    public Set/*<String>*/ getAuthorityNames() {
+    @Override
+    public Set<String> getAuthorityNames() {
         // Do not use 'authorityNames' since it may be out-of-date.
         return ReferencingFactoryFinder.getAuthorityNames();
     }
@@ -135,13 +88,13 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      * factories changed since the last time this method has been invoked, then this method
      * recreate the set.
      */
-    //@Override
-    synchronized Collection/*<AuthorityFactory>*/ getFactories() {
-        final Collection/*<String>*/ authorities = ReferencingFactoryFinder.getAuthorityNames();
+    @Override
+    synchronized Collection<AuthorityFactory> getFactories() {
+        final Collection<String> authorities = ReferencingFactoryFinder.getAuthorityNames();
         if (authorities != authorityNames) {
             authorityNames = authorities;
             final Hints hints = getHints();
-            final Set/*<AuthorityFactory>*/ factories = new LinkedHashSet();
+            final Set<AuthorityFactory> factories = new LinkedHashSet<AuthorityFactory>();
             factories.addAll(ReferencingFactoryFinder.getCRSAuthorityFactories                (hints));
             factories.addAll(ReferencingFactoryFinder.getCSAuthorityFactories                 (hints));
             factories.addAll(ReferencingFactoryFinder.getDatumAuthorityFactories              (hints));
@@ -154,22 +107,23 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
     /**
      * Returns a factory for the specified authority and type.
      */
-    //@Override
-    final AuthorityFactory fromFactoryRegistry(final String authority,
-                                               final Class/*<? extends AuthorityFactory>*/ type)
+    @Override
+    final <T extends AuthorityFactory> T fromFactoryRegistry(final String authority, final Class<T> type)
             throws FactoryRegistryException
     {
+        final AuthorityFactory f;
         if (CRSAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCRSAuthorityFactory(authority, getHints());
+            f = ReferencingFactoryFinder.getCRSAuthorityFactory(authority, getHints());
         } else if (CSAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCSAuthorityFactory(authority, getHints());
+            f = ReferencingFactoryFinder.getCSAuthorityFactory(authority, getHints());
         } else if (DatumAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getDatumAuthorityFactory(authority, getHints());
+            f = ReferencingFactoryFinder.getDatumAuthorityFactory(authority, getHints());
         } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-            return ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, getHints());
+            f = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(authority, getHints());
         } else {
-            return super.fromFactoryRegistry(authority, type);
+            f = super.fromFactoryRegistry(authority, type);
         }
+        return type.cast(f);
     }
 
     /**
@@ -185,8 +139,8 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
      *
      * @since 2.4
      */
-    //@Override
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
+    @Override
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(Class<? extends IdentifiedObject> type)
             throws FactoryException
     {
         return new Finder(this, type);
@@ -200,7 +154,7 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
          * Creates a finder for the specified type.
          */
         protected Finder(final ManyAuthoritiesFactory factory,
-                         final Class/*<? extends IdentifiedObject>*/ type)
+                         final Class<? extends IdentifiedObject> type)
         {
             super(factory, type);
         }
@@ -208,16 +162,15 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
         /**
          * Returns all factories to try.
          */
-        private Set/*<AuthorityFactory>*/ fromFactoryRegistry() {
+        private Set<AuthorityFactory> fromFactoryRegistry() {
             final ManyAuthoritiesFactory factory = (ManyAuthoritiesFactory) getProxy().getAuthorityFactory();
-            final Class/*<? extends AuthorityFactory>*/ type = getProxy().getType();
-            final Set factories = new LinkedHashSet();
-            for (final Iterator it=ReferencingFactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
-                final String authority = (String) it.next();
+            final Class<? extends AuthorityFactory> type = getProxy().getType();
+            final Set<AuthorityFactory> factories = new LinkedHashSet<AuthorityFactory>();
+            for (final String authority : ReferencingFactoryFinder.getAuthorityNames()) {
                 factory.fromFactoryRegistry(authority, type, factories);
             }
             // Removes the factories already tried by super-class.
-            final Collection done = getFactories();
+            final Collection<AuthorityFactory> done = getFactories();
             if (done != null) {
                 factories.removeAll(done);
             }
@@ -227,14 +180,14 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
         /**
          * Lookups for the specified object.
          */
-        //@Override
+        @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate = super.find(object);
             if (candidate != null) {
                 return candidate;
             }
             IdentifiedObjectFinder finder;
-            final Iterator it = fromFactoryRegistry().iterator();
+            final Iterator<AuthorityFactory> it = fromFactoryRegistry().iterator();
             while ((finder = next(it)) != null) {
                 candidate = finder.find(object);
                 if (candidate != null) {
@@ -247,14 +200,14 @@ public class AllAuthoritiesFactory extends ManyAuthoritiesFactory {
         /**
          * Returns the identifier of the specified object, or {@code null} if none.
          */
-        //@Override
+        @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             String candidate = super.findIdentifier(object);
             if (candidate != null) {
                 return candidate;
             }
             IdentifiedObjectFinder finder;
-            final Iterator it = fromFactoryRegistry().iterator();
+            final Iterator<AuthorityFactory> it = fromFactoryRegistry().iterator();
             while ((finder = next(it)) != null) {
                 candidate = finder.findIdentifier(object);
                 if (candidate != null) {

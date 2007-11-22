@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Map;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -41,7 +39,6 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
@@ -85,38 +82,26 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * The underlying {@linkplain Datum datum} authority factory,
      * or {@code null} if none.
-     *
-     * @deprecated Use {@link #getDatumAuthorityFactory} instead.
-     *             This field will become private in Geotools 2.5.
      */
-    protected final DatumAuthorityFactory datumFactory;
+    final DatumAuthorityFactory datumFactory;
 
     /**
      * The underlying {@linkplain CoordinateSystem coordinate system} authority factory,
      * or {@code null} if none.
-     *
-     * @deprecated Use {@link #getCSAuthorityFactory} instead.
-     *             This field will become private in Geotools 2.5.
      */
-    protected final CSAuthorityFactory csFactory;
+    final CSAuthorityFactory csFactory;
 
     /**
      * The underlying {@linkplain CoordinateReferenceSystem coordinate reference system}
      * authority factory, or {@code null} if none.
-     *
-     * @deprecated Use {@link #getCRSAuthorityFactory} instead.
-     *             This field will become private in Geotools 2.5.
      */
-    protected final CRSAuthorityFactory crsFactory;
+    final CRSAuthorityFactory crsFactory;
 
     /**
      * The underlying {@linkplain CoordinateOperation coordinate operation} authority factory,
      * or {@code null} if none.
-     *
-     * @deprecated Use {@link #getCoordinateOperationAuthorityFactory} instead.
-     *             This field will become private in Geotools 2.5.
      */
-    protected final CoordinateOperationAuthorityFactory operationFactory;
+    final CoordinateOperationAuthorityFactory operationFactory;
 
     /**
      * A set of low-level factories to be used if none were found in {@link #datumFactory},
@@ -160,7 +145,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * For {@link FallbackAuthorityFactory} constructor only.
      */
     AuthorityFactoryAdapter(final AuthorityFactory factory, final AuthorityFactory fallback) {
-        this((factory  instanceof   CRSAuthorityFactory) ?   (CRSAuthorityFactory) factory  : 
+        this((factory  instanceof   CRSAuthorityFactory) ?   (CRSAuthorityFactory) factory  :
              (fallback instanceof   CRSAuthorityFactory) ?   (CRSAuthorityFactory) fallback : null,
              (factory  instanceof    CSAuthorityFactory) ?    (CSAuthorityFactory) factory  :
              (fallback instanceof    CSAuthorityFactory) ?    (CSAuthorityFactory) fallback : null,
@@ -330,9 +315,9 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * Returns the direct dependencies. The returned list contains the backing store specified
      * at construction time, or the exception if the backing store can't be obtained.
      */
-    //@Override
-    Collection/*<?>*/ dependencies() {
-        final List/*<?>*/ dep = new ArrayList(4);
+    @Override
+    Collection<? super AuthorityFactory> dependencies() {
+        final List<Object> dep = new ArrayList<Object>(4);
         Object factory;
         try {
             factory = getAuthorityFactory(null);
@@ -350,7 +335,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * expect only a simple check, so we don't invoke the {@code getFooAuthorityFactory(...)}
      * methods.
      */
-    //@Override
+    @Override
     boolean sameAuthorityCodes(final AuthorityFactory factory) {
         if (!isCodeMethodOverriden()) {
             /*
@@ -401,6 +386,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * checks the availability of CRS, CS, datum and operation authority factories specified
      * at construction time.
      */
+    @Override
     public boolean isAvailable() {
         return isAvailable(      crsFactory) &&
                isAvailable(       csFactory) &&
@@ -509,6 +495,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @throws FactoryException if a failure occured while fetching the engine description.
      */
+    @Override
     public String getBackingStoreDescription() throws FactoryException {
         final AbstractAuthorityFactory factory = getGeotoolsFactory(null, null);
         return (factory != null) ? factory.getBackingStoreDescription() : null;
@@ -517,6 +504,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns the vendor responsible for creating this factory implementation.
      */
+    @Override
     public Citation getVendor() {
         return getAuthorityFactory().getVendor();
     }
@@ -531,10 +519,10 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Returns the set of authority code for the specified type.
-     * 
+     *
      * @todo We should returns the union of authority codes from all underlying factories.
      */
-    public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
+    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
         return getAuthorityFactory(null).getAuthorityCodes(type);
     }
 
@@ -553,6 +541,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @see #createEllipsoid
      * @see #createUnit
      */
+    @Override
     public IdentifiedObject createObject(final String code) throws FactoryException {
         return replaceObject(getAuthorityFactory(code).createObject(toBackingFactoryCode(code)));
     }
@@ -564,6 +553,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @see #createVerticalDatum
      * @see #createTemporalDatum
      */
+    @Override
     public Datum createDatum(final String code) throws FactoryException {
         return replace(getDatumAuthorityFactory(code).createDatum(toBackingFactoryCode(code)));
     }
@@ -573,6 +563,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #createEngineeringCRS
      */
+    @Override
     public EngineeringDatum createEngineeringDatum(final String code) throws FactoryException {
         return (EngineeringDatum) replace(getDatumAuthorityFactory(code).
                 createEngineeringDatum(toBackingFactoryCode(code)));
@@ -583,6 +574,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #createImageCRS
      */
+    @Override
     public ImageDatum createImageDatum(final String code) throws FactoryException {
         return (ImageDatum) replace(getDatumAuthorityFactory(code).
                 createImageDatum(toBackingFactoryCode(code)));
@@ -593,6 +585,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #createVerticalCRS
      */
+    @Override
     public VerticalDatum createVerticalDatum(final String code) throws FactoryException {
         return (VerticalDatum) replace(getDatumAuthorityFactory(code).
                 createVerticalDatum(toBackingFactoryCode(code)));
@@ -603,6 +596,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #createTemporalCRS
      */
+    @Override
     public TemporalDatum createTemporalDatum(final String code) throws FactoryException {
         return (TemporalDatum) replace(getDatumAuthorityFactory(code).
                 createTemporalDatum(toBackingFactoryCode(code)));
@@ -616,6 +610,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @see #createGeographicCRS
      * @see #createProjectedCRS
      */
+    @Override
     public GeodeticDatum createGeodeticDatum(final String code) throws FactoryException {
         return (GeodeticDatum) replace(getDatumAuthorityFactory(code).
                 createGeodeticDatum(toBackingFactoryCode(code)));
@@ -626,6 +621,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #createGeodeticDatum
      */
+    @Override
     public Ellipsoid createEllipsoid(final String code) throws FactoryException {
         return getDatumAuthorityFactory(code).createEllipsoid(toBackingFactoryCode(code));
     }
@@ -635,6 +631,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @see #createGeodeticDatum
      */
+    @Override
     public PrimeMeridian createPrimeMeridian(final String code) throws FactoryException {
         return getDatumAuthorityFactory(code).createPrimeMeridian(toBackingFactoryCode(code));
     }
@@ -642,6 +639,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns a {@linkplain Extent extent} (usually an area of validity) from a code.
      */
+    @Override
     public Extent createExtent(final String code) throws FactoryException {
         return getGeotoolsFactory("createExtent", code).createExtent(toBackingFactoryCode(code));
     }
@@ -649,6 +647,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns an arbitrary {@linkplain CoordinateSystem coordinate system} from a code.
      */
+    @Override
     public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
         return replace(getCSAuthorityFactory(code).
                 createCoordinateSystem(toBackingFactoryCode(code)));
@@ -657,6 +656,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a cartesian coordinate system from a code.
      */
+    @Override
     public CartesianCS createCartesianCS(final String code) throws FactoryException {
         return (CartesianCS) replace(getCSAuthorityFactory(code).
                 createCartesianCS(toBackingFactoryCode(code)));
@@ -665,6 +665,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a polar coordinate system from a code.
      */
+    @Override
     public PolarCS createPolarCS(final String code) throws FactoryException {
         return (PolarCS) replace(getCSAuthorityFactory(code).
                 createPolarCS(toBackingFactoryCode(code)));
@@ -673,6 +674,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a cylindrical coordinate system from a code.
      */
+    @Override
     public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
         return (CylindricalCS) replace(getCSAuthorityFactory(code).
                 createCylindricalCS(toBackingFactoryCode(code)));
@@ -681,6 +683,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a spherical coordinate system from a code.
      */
+    @Override
     public SphericalCS createSphericalCS(final String code) throws FactoryException {
         return (SphericalCS) replace(getCSAuthorityFactory(code).
                 createSphericalCS(toBackingFactoryCode(code)));
@@ -689,6 +692,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates an ellipsoidal coordinate system from a code.
      */
+    @Override
     public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
         return (EllipsoidalCS) replace(getCSAuthorityFactory(code).
                 createEllipsoidalCS(toBackingFactoryCode(code)));
@@ -697,6 +701,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a vertical coordinate system from a code.
      */
+    @Override
     public VerticalCS createVerticalCS(final String code) throws FactoryException {
         return (VerticalCS) replace(getCSAuthorityFactory(code).
                 createVerticalCS(toBackingFactoryCode(code)));
@@ -705,6 +710,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a temporal coordinate system from a code.
      */
+    @Override
     public TimeCS createTimeCS(final String code) throws FactoryException {
         return (TimeCS) replace(getCSAuthorityFactory(code).
                 createTimeCS(toBackingFactoryCode(code)));
@@ -713,6 +719,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
      */
+    @Override
     public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
@@ -723,6 +730,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns an {@linkplain Unit unit} from a code.
      */
+    @Override
     public Unit createUnit(final String code) throws FactoryException {
         return replace(getCSAuthorityFactory(code).
                 createUnit(toBackingFactoryCode(code)));
@@ -738,6 +746,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @see #createTemporalCRS
      * @see #createCompoundCRS
      */
+    @Override
     public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
@@ -748,6 +757,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a 3D coordinate reference system from a code.
      */
+    @Override
     public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
         return (CompoundCRS) replace(getCRSAuthorityFactory(code).
                 createCompoundCRS(toBackingFactoryCode(code)));
@@ -756,14 +766,16 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a derived coordinate reference system from a code.
      */
+    @Override
     public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
         return (DerivedCRS) replace(getCRSAuthorityFactory(code).
                 createDerivedCRS(toBackingFactoryCode(code)));
     }
-    
+
     /**
      * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      */
+    @Override
     public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
         return (EngineeringCRS) replace(getCRSAuthorityFactory(code).
                 createEngineeringCRS(toBackingFactoryCode(code)));
@@ -772,6 +784,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
      */
+    @Override
     public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
         return (GeographicCRS) replace(getCRSAuthorityFactory(code).
                 createGeographicCRS(toBackingFactoryCode(code)));
@@ -780,6 +793,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns a {@linkplain GeocentricCRS geocentric coordinate reference system} from a code.
      */
+    @Override
     public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
         return (GeocentricCRS) replace(getCRSAuthorityFactory(code).
                 createGeocentricCRS(toBackingFactoryCode(code)));
@@ -788,6 +802,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a {@linkplain ImageCRS image coordinate reference system} from a code.
      */
+    @Override
     public ImageCRS createImageCRS(final String code) throws FactoryException {
         return (ImageCRS) replace(getCRSAuthorityFactory(code).
                 createImageCRS(toBackingFactoryCode(code)));
@@ -796,6 +811,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
      */
+    @Override
     public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
         return (ProjectedCRS) replace(getCRSAuthorityFactory(code).
                 createProjectedCRS(toBackingFactoryCode(code)));
@@ -804,6 +820,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
      */
+    @Override
     public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
         return (TemporalCRS) replace(getCRSAuthorityFactory(code).
                 createTemporalCRS(toBackingFactoryCode(code)));
@@ -812,6 +829,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
      */
+    @Override
     public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
         return (VerticalCRS) replace(getCRSAuthorityFactory(code).
                 createVerticalCRS(toBackingFactoryCode(code)));
@@ -820,6 +838,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates a parameter descriptor from a code.
      */
+    @Override
     public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
         return getGeotoolsFactory("createParameterDescriptor", code).
                 createParameterDescriptor(toBackingFactoryCode(code));
@@ -828,6 +847,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates an operation method from a code.
      */
+    @Override
     public OperationMethod createOperationMethod(final String code) throws FactoryException {
         return getGeotoolsFactory("createOperationMethod", code).
                 createOperationMethod(toBackingFactoryCode(code));
@@ -836,6 +856,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates an operation from a single operation code.
      */
+    @Override
     public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
         return replace(getCoordinateOperationAuthorityFactory(code).
                 createCoordinateOperation(toBackingFactoryCode(code)));
@@ -844,9 +865,9 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Creates an operation from coordinate reference system codes.
      */
-    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
-                                        final String sourceCode, final String targetCode)
-            throws FactoryException
+    @Override
+    public Set<CoordinateOperation> createFromCoordinateReferenceSystemCodes(
+            final String sourceCode, final String targetCode) throws FactoryException
     {
         final CoordinateOperationAuthorityFactory factory, check;
         factory = getCoordinateOperationAuthorityFactory(sourceCode);
@@ -862,7 +883,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
             record.setSourceClassName(AuthorityFactoryAdapter.class.getName());
             LOGGER.log(record);
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         return factory.createFromCoordinateReferenceSystemCodes(
                 toBackingFactoryCode(sourceCode), toBackingFactoryCode(targetCode));
@@ -874,8 +895,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      *
      * @since 2.4
      */
-    //@Override
-    public IdentifiedObjectFinder getIdentifiedObjectFinder(final Class/*<? extends IdentifiedObject>*/ type)
+    @Override
+    public IdentifiedObjectFinder getIdentifiedObjectFinder(Class<? extends IdentifiedObject> type)
             throws FactoryException
     {
         return new Finder(type);
@@ -901,7 +922,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
          *
          * @throws FactoryException if an error occured while creating a derived object.
          */
-        //@Override
+        @Override
         protected IdentifiedObject deriveEquivalent(final IdentifiedObject candidate,
                                                     final IdentifiedObject model)
                 throws FactoryException
@@ -959,24 +980,24 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @throws IllegalArgumentException if the specified {@code type} is invalid.
      * @throws FactoryException if no suitable factory were found.
      */
-    AuthorityFactory getAuthorityFactory(final Class/*<T extends AuthorityFactory>*/ type,
-                                         final String code)
+    @SuppressWarnings("unchecked")
+    <T extends AuthorityFactory> T getAuthorityFactory(final Class<T> type, final String code)
             throws FactoryException
     {
+        final AuthorityFactory f;
         if (CRSAuthorityFactory.class.equals(type)) {
-            return getCRSAuthorityFactory(code);
+            f = getCRSAuthorityFactory(code);
+        } else if (CSAuthorityFactory.class.equals(type)) {
+            f = getCSAuthorityFactory(code);
+        } else if (DatumAuthorityFactory.class.equals(type)) {
+            f = getDatumAuthorityFactory(code);
+        } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
+            f = getCoordinateOperationAuthorityFactory(code);
+        } else {
+            throw new IllegalArgumentException(
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
         }
-        if (CSAuthorityFactory.class.equals(type)) {
-            return getCSAuthorityFactory(code);
-        }
-        if (DatumAuthorityFactory.class.equals(type)) {
-            return getDatumAuthorityFactory(code);
-        }
-        if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-            return getCoordinateOperationAuthorityFactory(code);
-        }
-        throw new IllegalArgumentException(
-                Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
+        return type.cast(f);
     }
 
     /**
@@ -1156,8 +1177,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * Returns {@code true} if the {@link #toBackingFactoryCode} method is overriden.
      */
     final boolean isCodeMethodOverriden() {
-        final Class[] arguments = new Class[] {String.class};
-        for (Class type=getClass(); !AuthorityFactoryAdapter.class.equals(type); type=type.getSuperclass()) {
+        final Class<?>[] arguments = new Class[] {String.class};
+        for (Class<?> type=getClass(); !AuthorityFactoryAdapter.class.equals(type); type=type.getSuperclass()) {
             try {
                 type.getDeclaredMethod("toBackingFactoryCode", arguments);
             } catch (NoSuchMethodException e) {

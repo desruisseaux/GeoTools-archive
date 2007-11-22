@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Locale;
 
-// OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.spatial.PixelOrientation;
@@ -42,9 +40,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -78,7 +75,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
     /**
      * Helpers methods for 2D CRS creation. Will be constructed only when first needed.
      */
-    private static FactoryGroup FACTORY_GROUP;
+    private static ReferencingFactoryContainer FACTORIES;
 
     /**
      * The offset for various pixel orientations. Keys must be upper-case names.
@@ -413,14 +410,14 @@ public class GridGeometry2D extends GeneralGridGeometry {
             return null;
         }
         final CoordinateReferenceSystem crs = super.getCoordinateReferenceSystem();
-        if (FACTORY_GROUP == null) {
-            FACTORY_GROUP = FactoryGroup.createInstance(null);
-            // No need to synchronize: this is not a big deal
-            // if two FactoryGroup instances are created.
+        if (FACTORIES == null) {
+            FACTORIES = ReferencingFactoryContainer.instance(null);
+            // No need to synchronize: this is not a big deal if
+            // two ReferencingFactoryContainer instances are created.
         }
         final CoordinateReferenceSystem crs2D;
         try {
-            crs2D = FACTORY_GROUP.separate(crs, new int[] {axisDimensionX, axisDimensionY});
+            crs2D = FACTORIES.separate(crs, new int[] {axisDimensionX, axisDimensionY});
         } catch (FactoryException exception) {
             final InvalidGridGeometryException e = new InvalidGridGeometryException(
                     Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()));

@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies and extensions
 import java.util.List;
 import java.util.Iterator;
 import java.awt.geom.AffineTransform;
@@ -24,16 +23,11 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.SingleCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -44,13 +38,9 @@ import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.measure.AngleFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
@@ -59,8 +49,6 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -81,13 +69,6 @@ public final class CRSUtilities {
      * Do not allow creation of instances of this class.
      */
     private CRSUtilities() {
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
-        return CRS.equalsIgnoreMetadata(object1, object2);
     }
 
     /**
@@ -151,7 +132,21 @@ public final class CRSUtilities {
         }
         return unit;
     }
-    
+
+    /**
+     * Returns the components of the specified CRS, or {@code null} if none.
+     */
+    private static List<CoordinateReferenceSystem> getComponents(CoordinateReferenceSystem crs) {
+        if (crs instanceof CompoundCRS) {
+            final List<CoordinateReferenceSystem> components;
+            components = ((CompoundCRS) crs).getCoordinateReferenceSystems();
+            if (!components.isEmpty()) {
+                return components;
+            }
+        }
+        return null;
+    }
+
     /**
      * Returns the dimension of the first coordinate reference system of the given type. The
      * {@code type} argument must be a subinterface of {@link CoordinateReferenceSystem}.
@@ -163,21 +158,17 @@ public final class CRSUtilities {
      * @return The dimension range of the specified CRS type, or {@code -1} if none.
      * @throws IllegalArgumentException if the {@code type} is not legal.
      */
-    public static int getDimensionOf(final CoordinateReferenceSystem crs, final Class type)
+    public static int getDimensionOf(final CoordinateReferenceSystem crs,
+            final Class<? extends CoordinateReferenceSystem> type)
             throws IllegalArgumentException
     {
-        if (!CoordinateReferenceSystem.class.isAssignableFrom(type)) {
-            throw new IllegalArgumentException(type.getName());
-        }
         if (type.isAssignableFrom(crs.getClass())) {
             return 0;
         }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+        final List<CoordinateReferenceSystem> c = getComponents(crs);
+        if (c != null) {
             int offset = 0;
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final CoordinateReferenceSystem ci = (CoordinateReferenceSystem) it.next();
+            for (final CoordinateReferenceSystem ci : c) {
                 final int index = getDimensionOf(ci, type);
                 if (index >= 0) {
                     return index + offset;
@@ -206,16 +197,12 @@ public final class CRSUtilities {
                                                 new Integer(lower<0 ? lower : upper)));
         }
         while (lower!=0 || upper!=dimension) {
-            if (!(crs instanceof CompoundCRS)) {
+            final List<CoordinateReferenceSystem> c = getComponents(crs);
+            if (c == null) {
                 return null;
             }
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            if (c==null || c.isEmpty()) {
-                return null;
-            }
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                crs = (CoordinateReferenceSystem) it.next();
+            for (final Iterator<CoordinateReferenceSystem> it=c.iterator(); it.hasNext();) {
+                crs = it.next();
                 dimension = crs.getCoordinateSystem().getDimension();
                 if (lower < dimension) {
                     break;
@@ -245,48 +232,16 @@ public final class CRSUtilities {
     {
         if (crs != null) {
             while (crs.getCoordinateSystem().getDimension() != 2) {
-                if (!(crs instanceof CompoundCRS)) {
+                final List<CoordinateReferenceSystem> c = getComponents(crs);
+                if (c == null) {
                     throw new TransformException(Errors.format(
                               ErrorKeys.CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
                               crs.getName().toString()));
                 }
-                final List/*<CoordinateReferenceSystem>*/ c =
-                        ((CompoundCRS)crs).getCoordinateReferenceSystems();
-                if (c==null || c.isEmpty()) {
-                    return null;
-                }
-                crs = (CoordinateReferenceSystem) c.get(0);
+                crs = c.get(0);
             }
         }
         return crs;
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
-        return CRS.getHorizontalCRS(crs);
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static ProjectedCRS getProjectedCRS(final CoordinateReferenceSystem crs) {
-        return CRS.getProjectedCRS(crs);
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static VerticalCRS getVerticalCRS(final CoordinateReferenceSystem crs) {
-        return CRS.getVerticalCRS(crs);
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static TemporalCRS getTemporalCRS(final CoordinateReferenceSystem crs) {
-        return CRS.getTemporalCRS(crs);
     }
 
     /**
@@ -297,51 +252,20 @@ public final class CRSUtilities {
     }
 
     /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static Ellipsoid getEllipsoid(final CoordinateReferenceSystem crs) {
-        return CRS.getEllipsoid(crs);
-    }
-
-    /**
      * Returns the ellipsoid used by the specified coordinate reference system, providing that
      * the two first dimensions use an instance of {@link GeographicCRS}. Otherwise (i.e. if the
      * two first dimensions are not geographic), returns {@code null}.
      */
     public static Ellipsoid getHeadGeoEllipsoid(CoordinateReferenceSystem crs) {
         while (!(crs instanceof GeographicCRS)) {
-            if (crs instanceof CompoundCRS) {
-                final List/*<CoordinateReferenceSystem>*/ c =
-                        ((CompoundCRS)crs).getCoordinateReferenceSystems();
-                if (c!=null && !c.isEmpty()) {
-                    crs = (CoordinateReferenceSystem) c.get(0);
-                    continue;
-                }
+            final List<CoordinateReferenceSystem> c = getComponents(crs);
+            if (c == null) {
+                return null;
             }
-            return null;
+            crs = c.get(0);
         }
         // Remove first cast when covariance will be allowed (J2SE 1.5).
         return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
-            throws TransformException
-    {
-        return CRS.transform(transform, envelope);
-    }
-
-    /**
-     * @deprecated Moved into the {@link CRS} class.
-     */
-    public static Rectangle2D transform(final MathTransform2D transform,
-                                        final Rectangle2D     source,
-                                        final Rectangle2D     dest)
-            throws TransformException
-    {
-        return CRS.transform(transform, source, dest);
     }
 
     /**
@@ -417,7 +341,7 @@ public final class CRSUtilities {
         dest.setLocation(P2.getX()-P1.getX(), P2.getY()-P1.getY());
         return dest;
     }
-    
+
     /**
      * Returns a character string for the specified geographic area. The string will have the
      * form "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". If a map projection is required in

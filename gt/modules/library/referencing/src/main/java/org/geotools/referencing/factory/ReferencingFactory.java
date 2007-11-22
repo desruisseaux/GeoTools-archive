@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 
 import org.geotools.factory.AbstractFactory;
@@ -132,7 +133,7 @@ public class ReferencingFactory extends AbstractFactory implements Factory {
      * <p>
      * The default implementation always returns an empty set.
      */
-    Collection<?> dependencies() {
-        return Collections.EMPTY_SET;
+    Collection<? super AuthorityFactory> dependencies() {
+        return Collections.emptySet();
     }
 }

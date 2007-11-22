@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,13 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Collection;
+import java.awt.RenderingHints;
 
-// OpenGIS dependencies
 import org.opengis.referencing.*;
-
-// Geotools dependencies
 import org.geotools.factory.Hints;
 
 
@@ -101,7 +98,8 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
      * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints. Other values
      * may be provided as well, at implementation choice.
      */
-    public Map getImplementationHints() {
+    @Override
+    public Map<RenderingHints.Key,?> getImplementationHints() {
         synchronized (hints) { // Note: avoid lock on public object.
             if (!hintsInitialized) {
                 hintsInitialized = true;
@@ -114,10 +112,10 @@ public abstract class DirectAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * Returns the direct {@linkplain Factory factory} dependencies.
      */
-    //@Override
-    Collection/*<?>*/ dependencies() {
+    @Override
+    Collection<? super AuthorityFactory> dependencies() {
         if (factories != null) {
-            final Set dependencies = new LinkedHashSet(8);
+            final Set<Object> dependencies = new LinkedHashSet<Object>(8);
             dependencies.add(factories.getCRSFactory());
             dependencies.add(factories.getCSFactory());
             dependencies.add(factories.getDatumFactory());
