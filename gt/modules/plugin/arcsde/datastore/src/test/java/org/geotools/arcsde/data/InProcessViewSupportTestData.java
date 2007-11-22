@@ -83,8 +83,8 @@ public class InProcessViewSupportTestData {
                 + ".MASTER_ID = " + MASTER_UNQUALIFIED + ".ID ORDER BY " + MASTER_UNQUALIFIED
                 + ".ID";
 
-        MASTER = conn.getDatabaseName() + "." + conn.getUser() + "." + MASTER_UNQUALIFIED;
-        CHILD = conn.getDatabaseName() + "." + conn.getUser() + "." + CHILD_UNQUALIFIED;
+        MASTER = conn.getUser() + "." + MASTER_UNQUALIFIED;
+        CHILD = conn.getUser() + "." + CHILD_UNQUALIFIED;
         createMasterTable(conn);
         createChildTable(conn);
         
