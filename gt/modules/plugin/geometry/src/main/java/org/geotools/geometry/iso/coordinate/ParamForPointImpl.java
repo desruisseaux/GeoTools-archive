@@ -17,6 +17,7 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.util.Set;
 import java.util.ArrayList;
 
 import org.opengis.geometry.DirectPosition;
@@ -40,6 +41,14 @@ public class ParamForPointImpl extends ArrayList<Double> implements
 	 */
 	public ParamForPointImpl(GenericCurve genericCurve) {
 		this.genericCurve = genericCurve;
+	}
+
+	public Set<Number> getDistances() {
+		// TODO semantic SJ, JR
+		// TODO implementation
+		// TODO test
+		// TODO documentation
+		return null;
 	}
 
 	public double getDistance() {
