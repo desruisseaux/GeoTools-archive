@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-// Miscellaneous
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
@@ -35,7 +34,7 @@ import java.util.Locale;
  * @author Martin Desruisseaux
  *
  * @todo Replace all {@code resize} methods by {@code Arrays.copyOf} when we will be allowed to
- *       compile for JSE 6.0.
+ *       compile for Java 6.
  */
 public final class XArray {
     /**
@@ -59,10 +58,11 @@ public final class XArray {
      * @return Table of the same type as {@code array}, of length
      *         {@code length} and containing the data from {@code array}.
      */
-    private static Object doResize(final Object array, final int length) {
+    private static <T> T doResize(final T array, final int length) {
         final int current = array == null ? 0 : Array.getLength(array);
         if (current != length) {
-            final Object newArray=Array.newInstance(array.getClass().getComponentType(), length);
+            @SuppressWarnings("unchecked")
+            final T newArray = (T) Array.newInstance(array.getClass().getComponentType(), length);
             System.arraycopy(array, 0, newArray, 0, Math.min(current, length));
             return newArray;
         } else {
@@ -85,9 +85,8 @@ public final class XArray {
      * @return Table of the same type as {@code array}, of length
      *         {@code length} and containing the data from {@code array}.
      */
-    @SuppressWarnings("unchecked")
     public static <E> E[] resize(final E[] array, final int length) {
-        return (E[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -106,7 +105,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static double[] resize(final double[] array, final int length) {
-        return (double[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -125,7 +124,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static float[] resize(final float[] array, final int length) {
-        return (float[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -144,7 +143,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static long[] resize(final long[] array, final int length) {
-        return (long[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -163,7 +162,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static int[] resize(final int[] array, final int length) {
-        return (int[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -182,7 +181,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static short[] resize(final short[] array, final int length) {
-        return (short[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -201,7 +200,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static byte[] resize(final byte[] array, final int length) {
-        return (byte[]) doResize(array, length);
+        return doResize(array, length);
     }
 
    /**
@@ -220,7 +219,7 @@ public final class XArray {
     *         {@code length} and containing the data from {@code array}.
     */
     public static char[] resize(final char[] array, final int length) {
-        return (char[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -239,7 +238,7 @@ public final class XArray {
      *         {@code length} and containing the data from {@code array}.
      */
     public static boolean[] resize(final boolean[] array, final int length) {
-        return (boolean[]) doResize(array, length);
+        return doResize(array, length);
     }
 
     /**
@@ -253,12 +252,13 @@ public final class XArray {
      *                extracted elements.  This method can directly return
      *                {@code dst}, but most often it returns a newly created table.
      */
-    private static Object doRemove(final Object array, final int index, final int length) {
+    private static <T> T doRemove(final T array, final int index, final int length) {
         if (length == 0) {
             return array;
         }
-        int   arrayLength     = Array.getLength(array);
-        final Object newArray = Array.newInstance(array.getClass().getComponentType(), arrayLength-=length);
+        int arrayLength = Array.getLength(array);
+        @SuppressWarnings("unchecked")
+        final T newArray = (T) Array.newInstance(array.getClass().getComponentType(), arrayLength -= length);
         System.arraycopy(array, 0,            newArray, 0,                 index);
         System.arraycopy(array, index+length, newArray, index, arrayLength-index);
         return newArray;
@@ -275,9 +275,8 @@ public final class XArray {
      *                extracted elements.  This method can directly return
      *                {@code dst}, but most often it returns a newly created table.
      */
-    @SuppressWarnings("unchecked")
     public static <E> E[] remove(final E[] array, final int index, final int length) {
-        return (E[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
    /**
@@ -292,7 +291,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static double[] remove(final double[] array, final int index, final int length) {
-        return (double[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
    /**
@@ -307,7 +306,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static float[] remove(final float[] array, final int index, final int length) {
-        return (float[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -322,7 +321,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static long[] remove(final long[] array, final int index, final int length) {
-        return (long[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -337,7 +336,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static int[] remove(final int[] array, final int index, final int length) {
-        return (int[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -352,7 +351,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static short[] remove(final short[] array, final int index, final int length) {
-        return (short[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -367,7 +366,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static byte[] remove(final byte[] array, final int index, final int length) {
-        return (byte[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -382,7 +381,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static char[] remove(final char[] array, final int index, final int length) {
-        return (char[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -397,7 +396,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static boolean[] remove(final boolean[] array, final int index, final int length) {
-        return (boolean[]) doRemove(array, index, length);
+        return doRemove(array, index, length);
     }
 
     /**
@@ -413,12 +412,13 @@ public final class XArray {
      *                additional space. This method can directly return
      *                {@code dst}, but most often it returns a newly created table.
      */
-    private static Object doInsert(final Object array, final int index, final int length) {
+    private static <T> T doInsert(final T array, final int index, final int length) {
         if (length == 0) {
             return array;
         }
         final int arrayLength = Array.getLength(array);
-        final Object newArray = Array.newInstance(array.getClass().getComponentType(), arrayLength+length);
+        @SuppressWarnings("unchecked")
+        final T newArray = (T) Array.newInstance(array.getClass().getComponentType(), arrayLength + length);
         System.arraycopy(array, 0,     newArray, 0,            index            );
         System.arraycopy(array, index, newArray, index+length, arrayLength-index);
         return newArray;
@@ -436,9 +436,8 @@ public final class XArray {
      *                additional space. This method can directly return
      *                {@code dst}, but most often it returns a newly created table.
      */
-    @SuppressWarnings("unchecked")
     public static <E> E[] insert(final E[] array, final int index, final int length) {
-        return (E[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -454,7 +453,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static double[] insert(final double[] array, final int index, final int length) {
-        return (double[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -470,7 +469,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static float[] insert(final float[] array, final int index, final int length) {
-        return (float[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -486,7 +485,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static long[] insert(final long[] array, final int index, final int length) {
-        return (long[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -502,7 +501,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static int[] insert(final int[] array, final int index, final int length) {
-        return (int[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -518,7 +517,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static short[] insert(final short[] array, final int index, final int length) {
-        return (short[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -534,7 +533,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static byte[] insert(final byte[] array, final int index, final int length) {
-        return (byte[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -550,7 +549,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static char[] insert(final char[] array, final int index, final int length) {
-        return (char[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -566,7 +565,7 @@ public final class XArray {
      *                {@code dst}, but most often it returns a newly created table.
      */
     public static boolean[] insert(final boolean[] array, final int index, final int length) {
-        return (boolean[]) doInsert(array, index, length);
+        return doInsert(array, index, length);
     }
 
     /**
@@ -584,14 +583,17 @@ public final class XArray {
      *                method can directly return {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
-    private static Object doInsert(final Object src, final int src_pos,
-                                   final Object dst, final int dst_pos, final int length)
+    // Returns type should be T, but it doesn't seem to work with Java 5.
+    // Revisit when we will be allowed to compile for Java 6 (it does work for the later).
+    private static <T> Object doInsert(final T src, final int src_pos,
+                                       final T dst, final int dst_pos, final int length)
     {
         if (length == 0) {
             return dst;
         }
-        final int   dstLength = Array.getLength(dst);
-        final Object newArray = Array.newInstance(dst.getClass().getComponentType(), dstLength+length);
+        final int dstLength = Array.getLength(dst);
+        @SuppressWarnings("unchecked")
+        final T newArray = (T) Array.newInstance(dst.getClass().getComponentType(), dstLength+length);
         System.arraycopy(dst, 0,       newArray, 0,              dst_pos          );
         System.arraycopy(src, src_pos, newArray, dst_pos,        length           );
         System.arraycopy(dst, dst_pos, newArray, dst_pos+length, dstLength-dst_pos);
@@ -613,10 +615,10 @@ public final class XArray {
      *                method can directly return {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
-    @SuppressWarnings("unchecked")
     public static <E> E[] insert(final E[] src, final int src_pos,
                                  final E[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (E[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -638,6 +640,7 @@ public final class XArray {
     public static double[] insert(final double[] src, final int src_pos,
                                   final double[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (double[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -659,6 +662,7 @@ public final class XArray {
     public static float[] insert(final float[] src, final int src_pos,
                                  final float[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (float[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -680,6 +684,7 @@ public final class XArray {
     public static long[] insert(final long[] src, final int src_pos,
                                 final long[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (long[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -701,6 +706,7 @@ public final class XArray {
     public static int[] insert(final int[] src, final int src_pos,
                                final int[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (int[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -722,6 +728,7 @@ public final class XArray {
     public static short[] insert(final short[] src, final int src_pos,
                                  final short[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (short[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -744,6 +751,7 @@ public final class XArray {
     public static byte[] insert(final byte[] src, final int src_pos,
                                 final byte[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (byte[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -765,6 +773,7 @@ public final class XArray {
     public static char[] insert(final char[] src, final int src_pos,
                                 final char[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (char[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -786,6 +795,7 @@ public final class XArray {
     public static boolean[] insert(final boolean[] src, final int src_pos,
                                    final boolean[] dst, final int dst_pos, final int length)
     {
+        // Following cast is required for Java 5 (remove with Java 6).
         return (boolean[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 

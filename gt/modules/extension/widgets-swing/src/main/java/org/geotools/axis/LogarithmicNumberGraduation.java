@@ -17,7 +17,6 @@
  */
 package org.geotools.axis;
 
-// Dependencies
 import java.util.Locale;
 import javax.units.Unit;
 
@@ -47,6 +46,7 @@ public class LogarithmicNumberGraduation extends NumberGraduation {
      * Constructs or reuses an iterator. This method override
      * the default {@link NumberGraduation} implementation.
      */
+    @Override
     NumberIterator getTickIterator(final TickIterator reuse, final Locale locale) {
         if (reuse instanceof LogarithmicNumberIterator) {
             final NumberIterator it = (NumberIterator) reuse;

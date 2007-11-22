@@ -17,9 +17,7 @@
  */
 package org.geotools.axis;
 
-// Dependencies
 import java.util.Locale;
-
 import org.geotools.resources.XMath;
 
 
@@ -60,13 +58,14 @@ final class LogarithmicNumberIterator extends NumberIterator {
      * @param visualTickSpacing Espace à laisser visuellement entre deux marques de graduation.
      *                          Cet espace doit être exprimé en pixels ou en points (1/72 de pouce).
      */
+    @Override
     protected void init(final double minimum,
                         final double maximum,
                         final float  visualLength,
                         final float  visualTickSpacing)
     {
-        final double logMin = XMath.log10(minimum);
-        final double logMax = XMath.log10(maximum);
+        final double logMin = Math.log10(minimum);
+        final double logMax = Math.log10(maximum);
         super.init(logMin, logMax, visualLength, visualTickSpacing);
         scale  = (maximum-minimum) / (logMax-logMin);
         offset = minimum - scale*logMin;
@@ -76,6 +75,7 @@ final class LogarithmicNumberIterator extends NumberIterator {
      * Returns the position where to draw the current tick. The
      * position is scaled from the graduation's minimum to maximum.
      */
+    @Override
     public double currentPosition() {
         return super.currentPosition() * scale + offset;
     }
@@ -84,6 +84,7 @@ final class LogarithmicNumberIterator extends NumberIterator {
      * Retourne la valeur de la graduation courante. Cette méthode
      * peut être appelée pour une graduation majeure ou mineure.
      */
+    @Override
     public double currentValue() {
         return XMath.pow10(super.currentValue());
     }

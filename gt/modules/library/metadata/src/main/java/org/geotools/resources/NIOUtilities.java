@@ -29,9 +29,9 @@ import org.geotools.util.logging.Logging;
  * @since 2.0
  * @source $URL$
  * @version $Id$
- * @author Andres Aimes
+ * @author Andrea Aimes
  */
-public class NIOUtilities {
+public final class NIOUtilities {
     /**
      * {@code true} if a warning has already been logged.
      */
@@ -39,11 +39,8 @@ public class NIOUtilities {
 
     /**
      * Do not allows instantiation of this class.
-     *
-     * @todo This constructor will become private when {@code NIOBufferUtils}
-     *       will have been removed.
      */
-    protected NIOUtilities() {
+    private NIOUtilities() {
     }
 
     /**

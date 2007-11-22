@@ -17,15 +17,13 @@
  */
 package org.geotools.axis;
 
-// Date and time
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.geotools.io.TableWriter;
 
 
 /**
@@ -670,25 +668,39 @@ final class DateIterator implements TickIterator {
     /**
      * Returns a string representation of this iterator. Used for debugging purpose only.
      */
+    @Override
     public String toString() {
-        if (true) {
-            // Note: in this particular case, using PrintWriter with 'println' generates
-            //       less bytecodes than chaining StringBuffer.append(...) calls.
-            final StringWriter  buf = new StringWriter();
-            final PrintWriter   out = new PrintWriter(buf);
-            final DateFormat format = DateFormat.getDateTimeInstance();
-            format.setTimeZone(calendar.getTimeZone());
-            out.print("Minimum      = "); out.println(format.format(new Date(minimum)));
-            out.print("Maximum      = "); out.println(format.format(new Date(maximum)));
-            out.print("Increment    = "); out.print(increment/(24*3600000f));    out.println(" days");
-            out.print("Tick inc.    = "); out.print(   tickAdd); out.print(' '); out.println(getFieldName(   tickField));
-            out.print("SubTick inc. = "); out.print(subTickAdd); out.print(' '); out.println(getFieldName(subTickField));
-            out.print("Next tick    = "); out.println(format.format(new Date(   nextTick)));
-            out.print("Next subtick = "); out.println(format.format(new Date(nextSubTick)));
-            out.flush();
-            return buf.toString();
-        } else {
-            return super.toString();
-        }
+        final TableWriter out = new TableWriter(null, " ");
+        final DateFormat format = DateFormat.getDateTimeInstance();
+        format.setTimeZone(calendar.getTimeZone());
+
+        out.write("Minimum\t=\t");
+        out.write(format.format(new Date(minimum)));
+
+        out.write("\nMaximum\t=\t");
+        out.write(format.format(new Date(maximum)));
+
+        out.write("\nIncrement\t=\t");
+        out.write(String.valueOf(increment / (24*3600000f)));
+        out.write(" days");
+
+        out.write("\nTick inc.\t=\t");
+        out.write(tickAdd);
+        out.write(' ');
+        out.write(getFieldName(tickField));
+
+        out.write("\nSubTick inc.\t=\t");
+        out.write(subTickAdd);
+        out.write(' ');
+        out.write(getFieldName(subTickField));
+
+        out.write("\nNext tick\t=\t");
+        out.write(format.format(new Date(nextTick)));
+
+        out.write("\nNext subtick\t=\t");
+        out.write(format.format(new Date(nextSubTick)));
+        out.write('\n');
+
+        return out.toString();
     }
 }

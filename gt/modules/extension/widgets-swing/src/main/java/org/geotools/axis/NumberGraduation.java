@@ -17,13 +17,12 @@
  */
 package org.geotools.axis;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Locale;
+import static java.lang.Double.doubleToLongBits;
 
-// Units dependencies
 import javax.units.Unit;
 import javax.units.Converter;
 import javax.units.ConversionException;
@@ -54,7 +53,7 @@ public class NumberGraduation extends AbstractGraduation {
     private double maximum = 10;
 
     /**
-     * Construct a graduation with the supplied units.
+     * Constructs a graduation with the supplied units.
      *
      * @param unit The axis's units, or {@code null} if unknow.
      */
@@ -63,7 +62,7 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Set the minimum value for this graduation. If the new minimum is greater
+     * Sets the minimum value for this graduation. If the new minimum is greater
      * than the current maximum, then the maximum will also be set to a value
      * greater than or equals to the minimum.
      *
@@ -80,15 +79,15 @@ public class NumberGraduation extends AbstractGraduation {
         ensureFinite("minimum", value);
         double old = minimum;
         minimum    = value;
-        final Double valueObject = new Double(value);
-        listenerList.firePropertyChange("minimum", new Double(old), valueObject);
+        final Double valueObject = value;
+        listenerList.firePropertyChange("minimum", old, valueObject);
         if (maximum < value) {
             old = maximum;
             maximum = value;
-            listenerList.firePropertyChange("maximum", new Double(old), valueObject);
+            listenerList.firePropertyChange("maximum", old, valueObject);
             return true;
         }
-        return Double.doubleToLongBits(value) != Double.doubleToLongBits(old);
+        return doubleToLongBits(value) != doubleToLongBits(old);
     }
 
     /**
@@ -107,19 +106,19 @@ public class NumberGraduation extends AbstractGraduation {
         ensureFinite("maximum", value);
         double old = maximum;
         maximum    = value;
-        final Double valueObject = new Double(value);
-        listenerList.firePropertyChange("maximum", new Double(old), valueObject);
+        final Double valueObject = value;
+        listenerList.firePropertyChange("maximum", old, valueObject);
         if (minimum > value) {
             old = minimum;
             minimum = value;
-            listenerList.firePropertyChange("minimum", new Double(old), valueObject);
+            listenerList.firePropertyChange("minimum", old, valueObject);
             return true;
         }
-        return Double.doubleToLongBits(value) != Double.doubleToLongBits(old);
+        return doubleToLongBits(value) != doubleToLongBits(old);
     }
 
     /**
-     * Returns the minimal value for this graduation 
+     * Returns the minimal value for this graduation
      *
      * @return The minimal value in {@link #getUnit} units.
      *
@@ -146,7 +145,7 @@ public class NumberGraduation extends AbstractGraduation {
 
     /**
      * Returns the graduation's range. This is equivalents to computing
-     * <code>{@link #getMaximum}-{@link #getMinimum}</code>.
+     * <code>{@linkplain #getMaximum} - {@linkplain #getMinimum}</code>.
      */
     public synchronized double getRange() {
         return (maximum-minimum);
@@ -160,14 +159,14 @@ public class NumberGraduation extends AbstractGraduation {
         final Double oldMin;
         final Double oldMax;
         synchronized (this) {
-            oldMin  = new Double(minimum);
-            oldMax  = new Double(maximum);
-            this.minimum = Math.min(min, max);
-            this.maximum = Math.max(min, max);
+            oldMin  = minimum;
+            oldMax  = maximum;
+            minimum = Math.min(min, max);
+            maximum = Math.max(min, max);
             setUnit(unit);
         }
-        listenerList.firePropertyChange("minimum", oldMin,  new Double(min));
-        listenerList.firePropertyChange("maximum", oldMax,  new Double(max));
+        listenerList.firePropertyChange("minimum", oldMin,  min);
+        listenerList.firePropertyChange("maximum", oldMax,  max);
     }
 
     /**
@@ -178,6 +177,7 @@ public class NumberGraduation extends AbstractGraduation {
      *        If null, minimum and maximum values are not converted.
      * @throws ConversionException if units are not convertible.
      */
+    @Override
     public synchronized void setUnit(final Unit newUnit) throws ConversionException {
         double min = minimum;
         double max = maximum;
@@ -198,7 +198,7 @@ public class NumberGraduation extends AbstractGraduation {
     public Format getFormat() {
         return NumberFormat.getNumberInstance(getLocale());
     }
-    
+
     /**
      * Returns an iterator object that iterates along the graduation ticks and provides access to
      * the graduation values. If an optional {@link RenderingHints} is specified, tick locations are
@@ -219,7 +219,7 @@ public class NumberGraduation extends AbstractGraduation {
         final float visualTickSpacing = getVisualTickSpacing(hints);
         double minimum = this.minimum;
         double maximum = this.maximum;
-        if (!(minimum<maximum)) {
+        if (!(minimum < maximum)) {  // Uses '!' for catching NaN.
             minimum = (minimum+maximum)*0.5-0.5;
             maximum = minimum+1;
         }
@@ -246,14 +246,15 @@ public class NumberGraduation extends AbstractGraduation {
      * Compares this graduation with the specified object for equality.
      * This method do not compare registered listeners.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         if (super.equals(object)) {
             final NumberGraduation that = (NumberGraduation) object;
-            return Double.doubleToLongBits(this.minimum) == Double.doubleToLongBits(that.minimum) &&
-                   Double.doubleToLongBits(this.maximum) == Double.doubleToLongBits(that.maximum);
+            return doubleToLongBits(this.minimum) == doubleToLongBits(that.minimum) &&
+                   doubleToLongBits(this.maximum) == doubleToLongBits(that.maximum);
         }
         return false;
     }
@@ -261,9 +262,10 @@ public class NumberGraduation extends AbstractGraduation {
     /**
      * Returns a hash value for this graduation.
      */
+    @Override
     public int hashCode() {
-        final long code = Double.doubleToLongBits(minimum) +
-                       37*Double.doubleToLongBits(maximum);
+        final long code = doubleToLongBits(minimum) +
+                     37 * doubleToLongBits(maximum);
         return (int)code ^ (int)(code >>> 32) ^ super.hashCode();
     }
 }

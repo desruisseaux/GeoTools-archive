@@ -17,11 +17,8 @@
  */
 package org.geotools.axis;
 
-// J2SE dependencies
 import java.text.NumberFormat;
 import java.util.Locale;
-
-// Geotools dependencies
 import org.geotools.resources.XMath;
 
 
@@ -175,8 +172,8 @@ class NumberIterator implements TickIterator {
          * des dizaines, centaines ou autre et on ramènera temporairement
          * ce pas à l'ordre des unitées.
          */
-        double increment = (maximum-minimum)*(visualTickSpacing/visualLength);
-        final double factor = XMath.pow10((int)Math.floor(XMath.log10(increment)));
+        double increment = (maximum - minimum) * (visualTickSpacing / visualLength);
+        final double factor = XMath.pow10((int) Math.floor(Math.log10(increment)));
         increment /= factor;
         if (Double.isNaN(increment) || Double.isInfinite(increment) || increment==0) {
             this.minimum      = minimum;

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,26 +16,20 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies and extensions
 import javax.vecmath.Point3d;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.operation.TestTransform;
-import org.geotools.resources.XMath;
 
 
 /**
@@ -225,7 +219,7 @@ public final class GeocentricTransformTest extends TestTransform {
                                                ellipsoid.getAxisUnit());
                 double orthodromic = ellip.orthodromicDistance(array0[base+0], array0[base+1],
                                                                array0[base+3], array0[base+4]);
-                orthodromic = XMath.hypot(orthodromic, array0[base+2]-array0[base+5]);
+                orthodromic = Math.hypot(orthodromic, array0[base+2] - array0[base+5]);
                 if (i<orthodromicDistance.length) {
                     assertEquals("Orthodromic distance["+i+']', orthodromicDistance[i], orthodromic, 0.1);
                 }

@@ -17,7 +17,6 @@
  */
 package org.geotools.axis;
 
-// Graphics and geometry
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -28,27 +27,23 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.IllegalPathStateException;
 import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-// Other J2SE dependencies and extensions
-import java.util.Map;
 import java.util.Locale;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.io.Serializable;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.units.Unit;
+import static java.lang.Double.isNaN;
+import static java.lang.Double.NaN;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
 
-// Geotools dependencies
-import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -297,7 +292,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * (1/72 of inch).
      */
     public synchronized double getLength() {
-        return XMath.hypot(getX1()-getX2(), getY1()-getY2());
+        return Math.hypot(getX1() - getX2(), getY1() - getY2());
     }
 
     /**
@@ -390,8 +385,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * the axis line, graduation and labels. If an optional {@link AffineTransform}
      * is specified, the coordinates returned in the iteration are transformed accordingly.
      */
-    public java.awt.geom.PathIterator getPathIterator(final AffineTransform transform) {
-        return getPathIterator(transform, java.lang.Double.NaN);
+    @Override
+    public PathIterator getPathIterator(final AffineTransform transform) {
+        return getPathIterator(transform, NaN);
     }
 
     /**
@@ -400,8 +396,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * the axis line, graduation and labels. If an optional {@link AffineTransform}
      * is specified, the coordinates returned in the iteration are transformed accordingly.
      */
-    public synchronized java.awt.geom.PathIterator getPathIterator(final AffineTransform transform,
-                                                                   final double flatness)
+    @Override
+    public synchronized PathIterator getPathIterator(final AffineTransform transform,
+                                                     final double flatness)
     {
         if (isPainting) {
             if (iterator != null) {
@@ -411,7 +408,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             }
             return iterator;
         }
-        return new PathIterator(transform, flatness);
+        return new CompletePathIterator(transform, flatness);
     }
 
     /**
@@ -547,7 +544,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * include controls for label fonts and colors. Some of the keys and their associated values
      * are defined in the {@link Graduation} interface.
      *
-     * @param  key The key corresponding to the hint to get. 
+     * @param  key The key corresponding to the hint to get.
      * @return An object representing the value for the specified hint key, or {@code null}
      *         if no value is associated to the specified key.
      *
@@ -606,8 +603,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     /**
      * Returns a string representation of this axis.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append("[\"");
         buffer.append(graduation.getTitle(true));
         buffer.append("\"]");
@@ -704,10 +702,10 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
                 final Graduation my = yAxis.getGraduation();
                 double ox = mx.getRange();
                 double oy = my.getRange();
-                double exi = ((double) xAxis.getX2() - (double) xAxis.getX1()) / ox;
-                double exj = ((double) xAxis.getY2() - (double) xAxis.getY1()) / ox;
-                double eyi = ((double) yAxis.getX2() - (double) yAxis.getX1()) / oy;
-                double eyj = ((double) yAxis.getY2() - (double) yAxis.getY1()) / oy;
+                double exi = (xAxis.getX2() - xAxis.getX1()) / ox;
+                double exj = (xAxis.getY2() - xAxis.getY1()) / ox;
+                double eyi = (yAxis.getX2() - yAxis.getX1()) / oy;
+                double eyj = (yAxis.getY2() - yAxis.getY1()) / oy;
                 ox = mx.getMinimum();
                 oy = my.getMinimum();
                 return new AffineTransform(exi, exj, eyi, eyj,
@@ -817,7 +815,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          *        {@link Graphics2D#getFontRenderContext}.
          */
         public TickIterator(final FontRenderContext fontContext) {
-            this.hints = new RenderingHints((Map) Axis2D.this.hints);
+            this.hints = new RenderingHints(null);
+            this.hints.putAll(Axis2D.this.hints);
             this.fontContext = fontContext;
             refresh();
         }
@@ -1070,9 +1069,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             /////////////////////////////////////
             //// Compute unit vector (ux,uy) ////
             /////////////////////////////////////
-            double ux = (double) x2 - (double) x1;
-            double uy = (double) y2 - (double) y1;
-            double ul = Math.sqrt(ux*ux + uy*uy);
+            double ux = x2 - x1;
+            double uy = y2 - y1;
+            double ul = Math.hypot(ux, uy);
             ux /= ul;
             uy /= ul;
             //////////////////////////////////////////////
@@ -1162,7 +1161,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
                 final double     dy = getY2()-getY1();
                 final double  range = graduation.getRange();
                 final double length = Math.sqrt(dx*dx + dy*dy);
-                hints.put(Graduation.VISUAL_AXIS_LENGTH, new java.lang.Double(length));
+                hints.put(Graduation.VISUAL_AXIS_LENGTH, length);
 
                 this.scaleX   =  dx/range;
                 this.scaleY   =  dy/range;
@@ -1223,7 +1222,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private class TickPathIterator extends TickIterator implements java.awt.geom.PathIterator {
+    private class TickPathIterator extends TickIterator implements PathIterator {
         /**
          * Transformation affine à appliquer sur les données. Il doit s'agir d'une transformation
          * affine appropriée pour l'écriture de texte (généralement en pixels ou en points). Il ne
@@ -1316,6 +1315,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Repositione l'itérateur au début de la graduation
          * en conservant la transformation affine actuelle.
          */
+        @Override
         public final void rewind() {
             rewind(transform);
         }
@@ -1361,6 +1361,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * along the primary direction of traversal as long as there are
          * more points in that direction.
          */
+        @Override
         public void next() {
             switch (nextType) {
                 default: { // Should not happen
@@ -1422,17 +1423,17 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final class PathIterator extends TickPathIterator {
+    private final class CompletePathIterator extends TickPathIterator {
         /**
          * Controle le remplacement des courbes par des droites. La valeur
-         * {@link Double#NaN} indique qu'un tel remplacement n'a pas lieu.
+         * {@link java.lang.Double#NaN} indique qu'un tel remplacement n'a pas lieu.
          */
         private final double flatness;
 
         /**
          * Chemin de l'étiquette {@link #label}.
          */
-        private java.awt.geom.PathIterator path;
+        private PathIterator path;
 
         /**
          * Etiquette de graduation à tracer.
@@ -1467,9 +1468,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          *        texte (généralement en pixels ou en points). Il ne s'agit <u>pas</u>
          *        de la transformation affine créée par {@link Axis2D#createAffineTransform}.
          * @param flatness Contrôle le remplacement des courbes par des droites. La valeur
-         *        {@link Double#NaN} indique qu'un tel remplacement ne doit pas être fait.
+         *        {@link java.lang.Double#NaN} indique qu'un tel remplacement ne doit pas être fait.
          */
-        public PathIterator(final AffineTransform transform, final double flatness) {
+        public CompletePathIterator(final AffineTransform transform, final double flatness) {
             super(transform);
             this.flatness = flatness;
         }
@@ -1477,14 +1478,15 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Retourne un itérateur balayant la forme géométrique spécifiée.
          */
-        private java.awt.geom.PathIterator getPathIterator(final Shape shape) {
-            return java.lang.Double.isNaN(flatness) ? shape.getPathIterator(transform)
-                                                    : shape.getPathIterator(transform, flatness);
+        private PathIterator getPathIterator(final Shape shape) {
+            return isNaN(flatness) ? shape.getPathIterator(transform)
+                                   : shape.getPathIterator(transform, flatness);
         }
 
         /**
          * Lance une exception; cet itérateur n'est conçu pour n'être utilisé qu'une seule fois.
          */
+        @Override
         public void rewind(final AffineTransform transform) {
             throw new UnsupportedOperationException();
         }
@@ -1492,6 +1494,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Tests if the iteration is complete.
          */
+        @Override
         public boolean isDone() {
             return (path!=null) ? path.isDone() : super.isDone();
         }
@@ -1499,6 +1502,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Returns the coordinates and type of the current path segment in the iteration.
          */
+        @Override
         public int currentSegment(final float[] coords) {
             return (path!=null) ? path.currentSegment(coords) : super.currentSegment(coords);
         }
@@ -1506,6 +1510,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /**
          * Returns the coordinates and type of the current path segment in the iteration.
          */
+        @Override
         public int currentSegment(final double[] coords) {
             return (path!=null) ? path.currentSegment(coords) : super.currentSegment(coords);
         }
@@ -1514,6 +1519,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Moves the iterator to the next segment of the path forwards along the primary
          * direction of traversal as long as there are more points in that direction.
          */
+        @Override
         public void next() {
             if (path != null) {
                 path.next();
@@ -1562,6 +1568,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * Méthode appelée automatiquement par {@link #next} pour
          * indiquer qu'il faudra se préparer à tracer une étiquette.
          */
+        @Override
         protected void prepareLabel() {
             if (isMajorTick()) {
                 final GlyphVector glyphs = currentLabelGlyphs();

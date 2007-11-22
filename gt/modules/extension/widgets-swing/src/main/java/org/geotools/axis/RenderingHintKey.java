@@ -17,7 +17,6 @@
  */
 package org.geotools.axis;
 
-// Rendering hints
 import java.awt.RenderingHints;
 
 
@@ -33,12 +32,12 @@ final class RenderingHintKey extends RenderingHints.Key {
     /**
      * The required base class.
      */
-    private final Class type;
+    private final Class<?> type;
 
     /**
      * Construct a rendering hint key.
      */
-    protected RenderingHintKey(final Class type, final int key) {
+    protected RenderingHintKey(final Class<?> type, final int key) {
         super(key);
         this.type = type;
     }

@@ -24,10 +24,8 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -35,8 +33,6 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
-import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.NamedIdentifier;
@@ -45,12 +41,12 @@ import org.geotools.metadata.iso.citation.Citations;
 
 /**
  * Provides the transform equations for the Oblique Stereographic (EPSG code 9809).
- * The formulas used below are not from the EPSG, but rather those of the 
- * "Oblique Stereographic Alternative" in the {@code libproj4} package 
- * written by Gerald Evenden. His work is acknowledged here and greatly appreciated. 
+ * The formulas used below are not from the EPSG, but rather those of the
+ * "Oblique Stereographic Alternative" in the {@code libproj4} package
+ * written by Gerald Evenden. His work is acknowledged here and greatly appreciated.
  * <p>
- * 
- * The forward equations used in {@code libproj4} are the same as those given in the 
+ *
+ * The forward equations used in {@code libproj4} are the same as those given in the
  * UNB reports for the Double Stereographic. The inverse equations are similar,
  * but use different methods to iterate for the latitude.
  * <p>
@@ -96,13 +92,13 @@ public class ObliqueStereographic extends StereographicUSGS {
 
     /*
      * Contstants used in the forward and inverse gauss methods.
-     */ 
+     */
     private final double C, K, ratexp;
 
     /*
      * Constants for the EPSG stereographic transform.
      */
-    private final double phic0, cosc0, sinc0, R2; 
+    private final double phic0, cosc0, sinc0, R2;
 
     /**
      * Constructs an oblique stereographic projection (EPSG equations).
@@ -111,7 +107,7 @@ public class ObliqueStereographic extends StereographicUSGS {
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     protected ObliqueStereographic(final ParameterValueGroup parameters)
-            throws ParameterNotFoundException 
+            throws ParameterNotFoundException
     {
         this(parameters, Provider.PARAMETERS);
     }
@@ -125,13 +121,13 @@ public class ObliqueStereographic extends StereographicUSGS {
      */
     ObliqueStereographic(final ParameterValueGroup parameters,
                          final ParameterDescriptorGroup descriptor)
-            throws ParameterNotFoundException 
+            throws ParameterNotFoundException
     {
         super(parameters, descriptor);
 
         // Compute constants
         final double sphi = Math.sin(latitudeOfOrigin);
-        double       cphi = Math.cos(latitudeOfOrigin);  
+        double       cphi = Math.cos(latitudeOfOrigin);
         cphi  *= cphi;
         R2     = 2.0 * Math.sqrt(1-excentricitySquared) / (1-excentricitySquared * sphi * sphi);
         C      = Math.sqrt(1. + excentricitySquared * cphi * cphi / (1. - excentricitySquared));
@@ -139,7 +135,7 @@ public class ObliqueStereographic extends StereographicUSGS {
         sinc0  = Math.sin(phic0);
         cosc0  = Math.cos(phic0);
         ratexp = 0.5 * C * excentricity;
-        K      = Math.tan(0.5 * phic0 + Math.PI/4) / 
+        K      = Math.tan(0.5 * phic0 + Math.PI/4) /
                     (Math.pow(Math.tan(0.5 * latitudeOfOrigin + Math.PI/4), C) *
                      srat(excentricity * sphi, ratexp));
     }
@@ -149,8 +145,9 @@ public class ObliqueStereographic extends StereographicUSGS {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
+    @Override
     protected Point2D transformNormalized(double x, double y, Point2D ptDst)
-            throws ProjectionException 
+            throws ProjectionException
     {
         // Compute using USGS formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
@@ -177,13 +174,14 @@ public class ObliqueStereographic extends StereographicUSGS {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
+    @Override
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
-            throws ProjectionException 
+            throws ProjectionException
     {
         // Compute using USGS formulas, for comparaison later.
         assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
-        final double rho = XMath.hypot(x, y);
+        final double rho = Math.hypot(x, y);
         if (Math.abs(rho) < EPSILON) {
             x = 0.0;
             y = phic0;
@@ -198,7 +196,7 @@ public class ObliqueStereographic extends StereographicUSGS {
                 y = (y < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
             } else {
                 y = Math.asin(y);
-            }           
+            }
         }
 
         // Begin pj_inv_gauss(...) method inlined
@@ -277,7 +275,7 @@ public class ObliqueStereographic extends StereographicUSGS {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -286,7 +284,7 @@ public class ObliqueStereographic extends StereographicUSGS {
         /**
          * Creates the general case.
          */
-        //@Override
+        @Override
         MathTransform createMathTransform(final ParameterValueGroup parameters,
                                           final ParameterDescriptorGroup descriptor)
                 throws ParameterNotFoundException

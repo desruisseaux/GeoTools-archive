@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,23 +19,19 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collections;
 import java.util.Map;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.Ellipsoid;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -98,19 +94,19 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      */
     public static final DefaultEllipsoid SPHERE =
             createEllipsoid("SPHERE", 6371000, 6371000, SI.METER);
-    
+
     /**
      * The equatorial radius.
      * @see #getSemiMajorAxis
      */
     private final double semiMajorAxis;
-    
+
     /**
      * The polar radius.
      * @see #getSemiMinorAxis
      */
     private final double semiMinorAxis;
-    
+
     /**
      * The inverse of the flattening value, or {@link Double#POSITIVE_INFINITY}
      * if the ellipsoid is a sphere.
@@ -118,19 +114,19 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @see #getInverseFlattening
      */
     private final double inverseFlattening;
-    
+
     /**
      * Tells if the Inverse Flattening definitive for this ellipsoid.
      *
      * @see #isIvfDefinitive
      */
     private final boolean ivfDefinitive;
-    
+
     /**
      * The units of the semi-major and semi-minor axis values.
      */
     private final Unit unit;
-    
+
     /**
      * Constructs a new ellipsoid with the same values than the specified one.
      * This copy constructor provides a way to wrap an arbitrary implementation into a
@@ -222,7 +218,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
                        semiMajorAxis/(semiMajorAxis-semiMinorAxis), false, unit);
         }
     }
-    
+
     /**
      * Constructs a new ellipsoid using the specified axis length and inverse flattening value.
      *
@@ -240,7 +236,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
         return createFlattenedSphere(Collections.singletonMap(NAME_KEY, name),
                                      semiMajorAxis, inverseFlattening, unit);
     }
-    
+
     /**
      * Constructs a new ellipsoid using the specified axis length and
      * inverse flattening value. The properties map is given unchanged to the
@@ -288,7 +284,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
                                    ellipsoid.getAxisUnit());
         }
     }
-    
+
     /**
      * Checks the argument validity. Argument {@code value} should be greater than zero.
      *
@@ -334,7 +330,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     public double getSemiMinorAxis() {
         return semiMinorAxis;
     }
-    
+
     /**
      * The ratio of the distance between the center and a focus of the ellipse
      * to the length of its semimajor axis. The eccentricity can alternately be
@@ -385,7 +381,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     public boolean isSphere() {
         return semiMajorAxis == semiMinorAxis;
     }
-    
+
     /**
      * Returns the orthodromic distance between two geographic coordinates.
      * The orthodromic distance is the shortest distance between two points
@@ -399,7 +395,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     public double orthodromicDistance(final Point2D P1, final Point2D P2) {
         return orthodromicDistance(P1.getX(), P1.getY(), P2.getX(), P2.getY());
     }
-    
+
     /**
      * Returns the orthodromic distance between two geographic coordinates.
      * The orthodromic distance is the shortest distance between two points
@@ -452,7 +448,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
             final double cx = Math.cos(x);
             tu1 = cu2*sx;
             tu2 = baz - su1*cu2*cx;
-            final double sy = XMath.hypot(tu1, tu2);
+            final double sy = Math.hypot(tu1, tu2);
             final double cy = s*cx + faz;
             final double y = Math.atan2(sy, cy);
             final double SA = s*sx/sy;
@@ -466,7 +462,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
             double d = x;
             x = ((e*cy*c+cz)*sy*c+y)*SA;
             x = (1-c)*x*F + x2-x1;
-            
+
             if (Math.abs(d-x) <= EPS) {
                 if (false) {
                     // 'faz' and 'baz' are forward azimuths at both points.
@@ -501,7 +497,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
                   format.format(new GeneralDirectPosition(Math.toDegrees(x1),Math.toDegrees(y1))),
                   format.format(new GeneralDirectPosition(Math.toDegrees(x2),Math.toDegrees(y2)))));
     }
-    
+
     /**
      * Compare this ellipsoid with the specified object for equality.
      *
@@ -510,6 +506,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -524,7 +521,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this ellipsoid. {@linkplain #getName Name},
      * {@linkplain #getRemarks remarks} and the like are not taken in account.
@@ -535,6 +532,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         long longCode = 37*Double.doubleToLongBits(semiMajorAxis);
         if (ivfDefinitive) {
@@ -544,7 +542,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
         }
         return (((int)(longCode >>> 32)) ^ (int)longCode);
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -553,6 +551,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "SPHEROID"
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final double ivf = getInverseFlattening();
         formatter.append(getAxisUnit().getConverterTo(SI.METER).convert(getSemiMajorAxis()));

@@ -17,7 +17,6 @@
  */
 package org.geotools.axis;
 
-// Miscellaneous
 import java.util.Locale;
 
 
@@ -39,7 +38,7 @@ public interface TickIterator {
     /**
      * Tests if the iterator has more ticks.
      */
-    public abstract boolean hasNext();
+    boolean hasNext();
 
     /**
      * Tests if the current tick is a major one.
@@ -47,7 +46,7 @@ public interface TickIterator {
      * @return {@code true} if current tick is a major tick,
      *         or {@code false} if it is a minor tick.
      */
-    public abstract boolean isMajorTick();
+    boolean isMajorTick();
 
     /**
      * Returns the position where to draw the current tick.  The position is scaled
@@ -55,12 +54,12 @@ public interface TickIterator {
      * than {@link #currentValue}. The mean exception is for logarithmic graduation,
      * in which the tick position is not proportional to the tick value.
      */
-    public abstract double currentPosition();
+    double currentPosition();
 
     /**
      * Returns the value for current tick. The current tick may be major or minor.
      */
-    public abstract double currentValue();
+    double currentValue();
 
     /**
      * Returns the label for current tick. This method is usually invoked
@@ -68,28 +67,28 @@ public interface TickIterator {
      * This method returns {@code null} if it can't produces a label
      * for current tick.
      */
-    public abstract String currentLabel();
+    String currentLabel();
 
     /**
      * Moves the iterator to the next minor or major tick.
      */
-    public abstract void next();
+    void next();
 
     /**
      * Moves the iterator to the next major tick. This move
      * ignore any minor ticks between current position and
      * the next major tick.
      */
-    public abstract void nextMajor();
+    void nextMajor();
 
     /**
      * Reset the iterator on its first tick.
      * All other properties are left unchanged.
      */
-    public abstract void rewind();
+    void rewind();
 
     /**
      * Returns the locale used for formatting tick labels.
      */
-    public abstract Locale getLocale();
+    Locale getLocale();
 }

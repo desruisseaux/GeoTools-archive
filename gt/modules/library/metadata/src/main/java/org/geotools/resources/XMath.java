@@ -17,7 +17,6 @@
 package org.geotools.resources;
 
 import java.text.ChoiceFormat;
-
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -41,6 +40,8 @@ public final class XMath {
     /**
      * Natural logarithm of 10.
      * Approximately equal to 2.302585.
+     *
+     * @deprecated Was for {@link #log10} internal usage only.
      */
     public static final double LN10 = 2.3025850929940456840179914546844;
 
@@ -61,37 +62,26 @@ public final class XMath {
     }
 
     /**
-     * Combute the cubic root of the specified value. This is method will be removed if
-     * <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4633024.html">RFE
-     * 4633024</A> is implemented.
+     * Computes the hypotenuse (<code>sqrt(x²+y²)</code>).
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
-     */
-    public static double cbrt(final double x) {
-        return Math.pow(x, 1.0/3);
-    }
-
-    /**
-     * Compute the hypotenuse (<code>sqrt(x²+y²)</code>).
-     *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @deprecated Replaced by {@link Math#hypot}.
      */
     public static double hypot(final double x, final double y) {
         return Math.sqrt(x*x + y*y);
     }
 
     /**
-     * Compute the logarithm in base 10. See
+     * Computes the logarithm in base 10. See
      * http://developer.java.sun.com/developer/bugParade/bugs/4074599.html.
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @deprecated Replaced by {@link Math#log10}.
      */
     public static double log10(final double x) {
         return Math.log(x) / LN10;
     }
 
     /**
-     * Compute 10 power <var>x</var>.
+     * Computes 10 power <var>x</var>.
      */
     public static double pow10(final double x) {
         final int ix = (int) x;
@@ -103,7 +93,7 @@ public final class XMath {
     }
 
     /**
-     * Compute <var>x</var> to the power of 10. This computation is very fast
+     * Computes <var>x</var> to the power of 10. This computation is very fast
      * for small power of 10 but has some rounding error issues (see
      * http://developer.java.sun.com/developer/bugParade/bugs/4358794.html).
      */
@@ -130,7 +120,7 @@ public final class XMath {
              *       We hope that the current workaround is only temporary.
              *       (see http://developer.java.sun.com/developer/bugParade/bugs/4358794.html).
              */
-            return Double.parseDouble("1E"+x);
+            return Double.parseDouble("1E" + x);
         } catch (NumberFormatException exception) {
             return StrictMath.pow(10, x);
         }
@@ -142,15 +132,12 @@ public final class XMath {
      *     0 if <var>x</var> is null or {@code NaN} and
      *    +1 if <var>x</var> is positive.
      *
-     * @todo Consider removing this method when we will be allowed to use J2SE 1.5.
-     *       Note: the J2SE 1.5 method is actually not an exact replacement (it
-     *       returns a double type instead, which may lead to tricky issues relative
-     *       to NaN and negative zero).
+     * @see Math#signum(double)
      */
     public static int sgn(final double x) {
-        if (x>0) return +1;
-        if (x<0) return -1;
-        else     return  0;
+        if (x > 0) return +1;
+        if (x < 0) return -1;
+        else       return  0;
     }
 
     /**
@@ -159,12 +146,12 @@ public final class XMath {
      *     0 if <var>x</var> is null or {@code NaN} and
      *    +1 if <var>x</var> is positive.
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @see Math#signum(float)
      */
     public static int sgn(final float x) {
-        if (x>0) return +1;
-        if (x<0) return -1;
-        else     return  0;
+        if (x > 0) return +1;
+        if (x < 0) return -1;
+        else       return  0;
     }
 
     /**
@@ -172,13 +159,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
-     *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static int sgn(long x) {
-        if (x>0) return +1;
-        if (x<0) return -1;
-        else     return  0;
+        if (x > 0) return +1;
+        if (x < 0) return -1;
+        else       return  0;
     }
 
     /**
@@ -186,13 +171,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
-     *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static int sgn(int x) {
-        if (x>0) return +1;
-        if (x<0) return -1;
-        else     return  0;
+        if (x > 0) return +1;
+        if (x < 0) return -1;
+        else       return  0;
     }
 
     /**
@@ -200,13 +183,11 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
-     *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static short sgn(short x) {
-        if (x>0) return (short) +1;
-        if (x<0) return (short) -1;
-        else     return (short)  0;
+        if (x > 0) return (short) +1;
+        if (x < 0) return (short) -1;
+        else       return (short)  0;
     }
 
     /**
@@ -214,17 +195,15 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
-     *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static byte sgn(byte x) {
-        if (x>0) return (byte) +1;
-        if (x<0) return (byte) -1;
-        else     return (byte)  0;
+        if (x > 0) return (byte) +1;
+        if (x < 0) return (byte) -1;
+        else       return (byte)  0;
     }
 
     /**
-     * Round the specified value, providing that the difference between the original value and
+     * Rounds the specified value, providing that the difference between the original value and
      * the rounded value is not greater than the specified amount of floating point units. This
      * method can be used for hiding floating point error likes 2.9999999996.
      *
@@ -248,7 +227,7 @@ public final class XMath {
     }
 
     /**
-     * Try to remove at least {@code n} fraction digits in the string representation of
+     * Tries to remove at least {@code n} fraction digits in the string representation of
      * the specified value. This method try small changes to {@code value}, by adding or
      * substracting a maximum of 4 ulps. If there is no small change that remove at least
      * {@code n} fraction digits, then the value is returned unchanged. This method is
@@ -276,7 +255,7 @@ public final class XMath {
     }
 
     /**
-     * Count the fraction digits in the string representation of
+     * Counts the fraction digits in the string representation of
      * the specified value. This method is equivalent to a call to
      * <code>{@linkplain Double#toString(double) Double#toString}(value)</code>
      * and counting the number of digits after the decimal separator.
@@ -292,7 +271,9 @@ public final class XMath {
             upper = asText.length();
             power = 0;
         }
-        while ((asText.charAt(--upper)) == '0');
+        while ((asText.charAt(--upper)) == '0') {
+            // Intentionnaly blank.
+        }
         return Math.max(upper - asText.indexOf('.') - power, 0);
     }
 
@@ -302,7 +283,7 @@ public final class XMath {
      * If NaN, returns same value. This code is an adaptation of
      * {@link java.text.ChoiceFormat#nextDouble}.
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @todo Remove this method when we will be allowed to use Java 6.
      */
     private static float next(final float f, final boolean positive) {
         final int SIGN             = 0x80000000;
@@ -345,7 +326,7 @@ public final class XMath {
      * Finds the least float greater than <var>f</var>.
      * If {@code NaN}, returns same value.
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @todo Remove this method when we will be allowed to use Java 6.
      */
     public static float next(final float f) {
         return next(f, true);
@@ -355,7 +336,7 @@ public final class XMath {
      * Finds the greatest float less than <var>f</var>.
      * If {@code NaN}, returns same value.
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @todo Remove this method when we will be allowed to use Java 6.
      */
     public static float previous(final float f) {
         return next(f, false);
@@ -367,7 +348,7 @@ public final class XMath {
      *
      * @see java.text.ChoiceFormat#nextDouble
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @todo Remove this method when we will be allowed to use Java 6.
      */
     public static double next(final double f) {
         return ChoiceFormat.nextDouble(f);
@@ -379,7 +360,7 @@ public final class XMath {
      *
      * @see java.text.ChoiceFormat#previousDouble
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @todo Remove this method when we will be allowed to use Java 6.
      */
     public static double previous(final double f) {
         return ChoiceFormat.previousDouble(f);
@@ -507,18 +488,16 @@ public final class XMath {
      *
      * @param  type The type (may be {@code null}).
      * @return The number of bits, or 0 if unknow.
-     *
-     * @todo Use the predefined constants when we will be allowed to use J2SE 1.5.
      */
     public static int getBitCount(final Class type) {
-        if (Double   .class.equals(type)) return 64;
-        if (Float    .class.equals(type)) return 32;
-        if (Long     .class.equals(type)) return 64;
-        if (Integer  .class.equals(type)) return 32;
-        if (Short    .class.equals(type)) return 16;
-        if (Byte     .class.equals(type)) return  8;
-        if (Character.class.equals(type)) return 16;
-        if (Boolean  .class.equals(type)) return  1;
+        if (Double   .class.equals(type)) return Double   .SIZE;
+        if (Float    .class.equals(type)) return Float    .SIZE;
+        if (Long     .class.equals(type)) return Long     .SIZE;
+        if (Integer  .class.equals(type)) return Integer  .SIZE;
+        if (Short    .class.equals(type)) return Short    .SIZE;
+        if (Byte     .class.equals(type)) return Byte     .SIZE;
+        if (Character.class.equals(type)) return Character.SIZE;
+        if (Boolean  .class.equals(type)) return 1;
         return 0;
     }
 
@@ -555,19 +534,20 @@ public final class XMath {
      *
      * @since 2.4
      */
-    public static /*T*/ Object valueOf(final Class/*<T>*/ type, final String value)
+    @SuppressWarnings("unchecked")
+    public static <T> T valueOf(final Class<T> type, final String value)
             throws IllegalArgumentException, NumberFormatException
     {
         if (value == null) {
             return null;
         }
-        if (Double   .class.equals(type)) return Double .valueOf(value);
-        if (Float    .class.equals(type)) return Float  .valueOf(value);
-        if (Long     .class.equals(type)) return Long   .valueOf(value);
-        if (Integer  .class.equals(type)) return Integer.valueOf(value);
-        if (Short    .class.equals(type)) return Short  .valueOf(value);
-        if (Byte     .class.equals(type)) return Byte   .valueOf(value);
-        if (Boolean  .class.equals(type)) return Boolean.valueOf(value);
+        if (Double   .class.equals(type)) return (T) Double .valueOf(value);
+        if (Float    .class.equals(type)) return (T) Float  .valueOf(value);
+        if (Long     .class.equals(type)) return (T) Long   .valueOf(value);
+        if (Integer  .class.equals(type)) return (T) Integer.valueOf(value);
+        if (Short    .class.equals(type)) return (T) Short  .valueOf(value);
+        if (Byte     .class.equals(type)) return (T) Byte   .valueOf(value);
+        if (Boolean  .class.equals(type)) return (T) Boolean.valueOf(value);
         throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 }

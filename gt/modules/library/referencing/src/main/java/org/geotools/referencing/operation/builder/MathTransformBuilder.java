@@ -488,7 +488,7 @@ public abstract class MathTransformBuilder {
             }
         }
         if (length > 0) {
-            final int digits = Math.max(0, 3 - (int) Math.ceil(XMath.log10(length)));
+            final int digits = Math.max(0, 3 - (int) Math.ceil(Math.log10(length)));
             if (digits < 16) {
                 format.setMinimumFractionDigits(digits);
                 format.setMaximumFractionDigits(digits);
@@ -613,7 +613,7 @@ public abstract class MathTransformBuilder {
                         ErrorKeys.MISMATCHED_DIMENSION_$3, label + '[' + i + ']',
                         new Integer(pointDim), new Integer(dimension)));
             }
-            crs = getCoordinateReferenceSystem(point, crs);           
+            crs = getCoordinateReferenceSystem(point, crs);
         }
         if (crs != null) {
             final CoordinateSystem cs = crs.getCoordinateSystem();
@@ -672,7 +672,7 @@ public abstract class MathTransformBuilder {
     /**
      * Calculates the math transform immediately.
      *
-     * @return Math transform from {@link #setMappedPositions MappedPosition}. 
+     * @return Math transform from {@link #setMappedPositions MappedPosition}.
      * @throws FactoryException if the math transform can't be created.
      */
     protected abstract MathTransform computeMathTransform() throws FactoryException;
@@ -681,7 +681,7 @@ public abstract class MathTransformBuilder {
      * Returns the calculated math transform. This method {@linkplain #computeMathTransform the math
      * transform} the first time it is requested.
      *
-     * @return Math transform from {@link #setMappedPositions MappedPosition}. 
+     * @return Math transform from {@link #setMappedPositions MappedPosition}.
      * @throws FactoryException if the math transform can't be created.
      */
     public final MathTransform getMathTransform() throws FactoryException {

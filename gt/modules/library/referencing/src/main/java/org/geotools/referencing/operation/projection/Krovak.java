@@ -18,7 +18,6 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
-import javax.units.SI;
 import javax.units.Unit;
 
 import org.opengis.parameter.ParameterDescriptor;
@@ -30,7 +29,6 @@ import org.opengis.referencing.operation.MathTransform;
 
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -55,25 +53,25 @@ import org.geotools.resources.i18n.Errors;
  * value of projected coordinates should (and in <var>y</var>, <var>x</var>
  * order in Krovak) be positive the 'Axis' parameter for projection should be
  * defined explicitly like this (in wkt):</p>
- * 
- * <pre>PROJCS["S-JTSK (Ferro) / Krovak",  
- *         .                                                              
- *         .                                                              
+ *
+ * <pre>PROJCS["S-JTSK (Ferro) / Krovak",
  *         .
- *                                                                       
- *     PROJECTION["Krovak"]                                         
- *     PARAMETER["semi_major", 6377397.155],  
- *     PARAMETER["semi_minor", 6356078.963],                   
- *     UNIT["meter",1.0],                                  
- *     AXIS["x", WEST],                     
- *     AXIS["y", SOUTH]]                                              
+ *         .
+ *         .
+ *
+ *     PROJECTION["Krovak"]
+ *     PARAMETER["semi_major", 6377397.155],
+ *     PARAMETER["semi_minor", 6356078.963],
+ *     UNIT["meter",1.0],
+ *     AXIS["x", WEST],
+ *     AXIS["y", SOUTH]]
  *     </pre>Axis in Krovak:
- * <pre>                                                              
- *   y<------------------+                                                                                                  
- *                       |                                             
- *    Czech. Rep.        | 
- *                       |                                                                   
- *                       x                              
+ * <pre>
+ *   y<------------------+
+ *                       |
+ *    Czech. Rep.        |
+ *                       |
+ *                       x
  * </pre>
  * <p>By default, the axis are 'easting, northing' so the values of projected coordinates
  * are negative (and in <var>y</var>, <var>x</var> order in Krovak - it is cold
@@ -105,7 +103,7 @@ public class Krovak extends MapProjection {
      * Maximum number of iterations for iterative computations.
      */
     private static final int MAXIMUM_ITERATIONS = 15;
-    
+
     /**
      * When to stop the iteration.
      */
@@ -188,6 +186,7 @@ public class Krovak extends MapProjection {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final Collection expected = getParameterDescriptors().descriptors();
         final ParameterValueGroup values = super.getParameterValues();
@@ -236,7 +235,7 @@ public class Krovak extends MapProjection {
             throws ProjectionException
     {
         // x -> southing, y -> westing
-        final double ro  = XMath.hypot(x, y);
+        final double ro  = Math.hypot(x, y);
         final double eps = Math.atan2(-x, -y);
         final double d   = eps / n;
         final double s   = 2 * (Math.atan(Math.pow(ro0/ro, 1/n) * tanS2) - s45);
@@ -364,7 +363,7 @@ public class Krovak extends MapProjection {
                 });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -373,6 +372,7 @@ public class Krovak extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
+        @Override
         public Class getOperationType() {
             return ConicProjection.class;
         }
@@ -394,15 +394,17 @@ public class Krovak extends MapProjection {
     /**
      * Returns a hash value for this projection.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(azimuth) ^
                           Double.doubleToLongBits(pseudoStandardParallel);
         return ((int)code ^ (int)(code >>> 32)) + 37*super.hashCode();
     }
-    
+
     /**
      * Compares the specified object with this map projection for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization

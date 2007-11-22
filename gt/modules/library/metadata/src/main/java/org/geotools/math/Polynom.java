@@ -18,9 +18,7 @@ package org.geotools.math;
 
 import java.io.Serializable;
 import java.util.Arrays;
-
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XMath;
 
 
 /**
@@ -69,8 +67,10 @@ public class Polynom implements Serializable {
      */
     public Polynom(final double[] c) {
         int n = c.length;
-        while (n!=0 && c[--n]==0);
-        if (n==0) {
+        while (n != 0 && c[--n] == 0) {
+            // Empty on purpose.
+        }
+        if (n == 0) {
             this.c = NO_REAL_ROOT;
         } else {
             this.c = new double[n];
@@ -169,7 +169,7 @@ public class Polynom implements Serializable {
                             roots[1]*roots[2] - c1) < 1E-6;
             return roots;
         } else {
-            double e = XMath.cbrt(Math.sqrt(-d) + Math.abs(R));
+            double e = Math.cbrt(Math.sqrt(-d) + Math.abs(R));
             if (R > 0) {
                 e = -e;
             }
@@ -213,7 +213,9 @@ public class Polynom implements Serializable {
      */
     public static double[] roots(final double[] c) {
         int n = c.length;
-        while (n!=0 && c[--n]==0);
+        while (n != 0 && c[--n] == 0) {
+            // Empty on purpose.
+        }
         switch (n) {
             case 0:  return NO_REAL_ROOT;
             case 1:  return new double[] {-c[0]/c[1]};

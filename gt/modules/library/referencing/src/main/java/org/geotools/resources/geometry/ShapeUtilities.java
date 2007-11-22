@@ -16,20 +16,14 @@
  */
 package org.geotools.resources.geometry;
 
-// J2SE dependencies
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
-
-// Geotools dependencies
-import org.geotools.resources.XMath;
 
 
 /**
@@ -409,7 +403,7 @@ public final class ShapeUtilities {
                  */
                 final double rx2 = x2;
                 final double ry2 = y2;
-                x2 = XMath.hypot(x2,y2);
+                x2 = Math.hypot(x2,y2);
                 y2 = (x1*rx2 + y1*ry2)/x2; // use 'y2' as a temporary variable for 'x1'
                 y1 = (y1*rx2 - x1*ry2)/x2;
                 x1 = y2;

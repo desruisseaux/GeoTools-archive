@@ -37,7 +37,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
-import javax.swing.event.InternalFrameListener; // For javadoc
 
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -85,8 +84,8 @@ public final class SwingUtilities {
      * @param  listener A listener to receives frame events.  If non-null, then this listener will
      *         be registered to whatever kind of frame this method will constructs. In the special
      *         case where this method constructs an {@linkplain JInternalFrame internal frame} and
-     *         the {@code listener} is not an instance of {@link InternalFrameListener}, then
-     *         this method will wrap the {@code listener} into an {@code InternalFrameListener}.
+     *         the {@code listener} is not an instance of {@link javax.swing.event.InternalFrameListener},
+     *         then this method will wrap the {@code listener} into an {@code InternalFrameListener}.
      * @return The frame. This frame is not initially visible. The method
      *         {@code Component.setVisible(true)} must be invoked in order to show the frame.
      */

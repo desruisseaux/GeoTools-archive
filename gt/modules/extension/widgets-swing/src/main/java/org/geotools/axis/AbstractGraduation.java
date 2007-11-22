@@ -17,19 +17,15 @@
  */
 package org.geotools.axis;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.Locale;
 
-// Units dependencies
 import javax.units.Unit;
 import javax.units.ConversionException;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -197,9 +193,9 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Adds a {@link PropertyChangeListener} to the listener list. The listener is
-     * registered for all properties. A {@link PropertyChangeEvent} will get fired
-     * in response to setting a property, such as {@link #setTitle} or {@link #setLocale}.
+     * Adds a {@link PropertyChangeListener} to the listener list. The listener is registered
+     * for all properties. A {@link java.beans.PropertyChangeEvent} will get fired in response
+     * to setting a property, such as {@link #setTitle} or {@link #setLocale}.
      */
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
         listenerList.addPropertyChangeListener(listener);
@@ -295,6 +291,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
      * Compares this graduation with the specified object for equality.
      * This method do not compare listeners registered in {@link #listenerList}.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final AbstractGraduation that = (AbstractGraduation) object;
@@ -308,8 +305,9 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     /**
      * Returns a hash value for this graduation.
      */
+    @Override
     public int hashCode() {
-        int code = (int)serialVersionUID;
+        int code = (int) serialVersionUID;
         if (title != null) {
             code ^= title.hashCode();
         }

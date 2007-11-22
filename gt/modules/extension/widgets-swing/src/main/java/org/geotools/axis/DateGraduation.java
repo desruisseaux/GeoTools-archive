@@ -17,21 +17,17 @@
  */
 package org.geotools.axis;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
-import java.beans.PropertyChangeEvent;
 import java.text.DateFormat;
 import java.text.Format;
 import java.util.Date;
 import java.util.TimeZone;
 
-// Units dependencies
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.Converter;
 import javax.units.ConversionException;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -271,6 +267,7 @@ public class DateGraduation extends AbstractGraduation {
     /**
      * Returns a string representation of the time zone for this graduation.
      */
+    @Override
     String getSymbol() {
         return getTimeZone().getDisplayName();
     }
@@ -283,6 +280,7 @@ public class DateGraduation extends AbstractGraduation {
      *             are not converted.
      * @throws ConversionException if the specified unit is not a time unit.
      */
+    @Override
     public void setUnit(final Unit unit) throws ConversionException {
         ensureTimeUnit(unit);
         fromMillis = null;
@@ -298,8 +296,8 @@ public class DateGraduation extends AbstractGraduation {
      * iterators may choose to show or hide hours, minutes and seconds.
      */
     public Format getFormat() {
-        final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                                                                 DateFormat.SHORT, getLocale());
+        final DateFormat format = DateFormat.getDateTimeInstance(
+                DateFormat.SHORT, DateFormat.SHORT, getLocale());
         format.setTimeZone(timezone);
         return format;
     }
@@ -325,7 +323,7 @@ public class DateGraduation extends AbstractGraduation {
         final float visualTickSpacing = getVisualTickSpacing(hints);
         long minimum = this.minimum;
         long maximum = this.maximum;
-        if (!(minimum<maximum)) {
+        if (!(minimum < maximum)) { // Uses '!' for catching NaN.
             minimum = (minimum+maximum)/2 - 12*60*60*1000L;
             maximum = minimum + 24*60*60*1000L;
         }
@@ -342,8 +340,8 @@ public class DateGraduation extends AbstractGraduation {
     }
 
     /**
-     * Support for reporting property changes. This method can be called when a
-     * property has changed. It will send the appropriate {@link PropertyChangeEvent}
+     * Support for reporting property changes. This method can be called when a property
+     * has changed. It will send the appropriate {@link java.beans.PropertyChangeEvent}
      * to any registered {@link PropertyChangeListeners}.
      *
      * @param propertyName The property whose value has changed.
@@ -362,6 +360,7 @@ public class DateGraduation extends AbstractGraduation {
      * Compares this graduation with the specified object for equality.
      * This method do not compare registered listeners.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -378,6 +377,7 @@ public class DateGraduation extends AbstractGraduation {
     /**
      * Returns a hash value for this graduation.
      */
+    @Override
     public int hashCode() {
         final long lcode = minimum + 37*maximum;
         int code = (int)lcode ^ (int)(lcode >>> 32);

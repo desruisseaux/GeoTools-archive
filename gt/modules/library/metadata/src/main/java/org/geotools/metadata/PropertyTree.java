@@ -15,8 +15,6 @@
  */
 package org.geotools.metadata;
 
-// J2SE dependencies
-import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
@@ -28,11 +26,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-// OpenGIS dependencies
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.OptionalDependencies;
@@ -171,7 +166,7 @@ final class PropertyTree {
             final Object value = entry.getValue();
             if (!PropertyAccessor.isEmpty(value)) {
                 final String name = localize((String) entry.getKey());
-                final DefaultMutableTreeNode child = 
+                final DefaultMutableTreeNode child =
                         OptionalDependencies.createTreeNode(name, value, true);
                 append(child, value);
                 branch.add(child);
@@ -192,7 +187,7 @@ final class PropertyTree {
             precision = PRECISION;
             final double v = Math.abs(value.doubleValue());
             if (v > 0) {
-                final int digits = (int) XMath.log10(v);
+                final int digits = (int) Math.log10(v);
                 if (Math.abs(digits) >= PRECISION) {
                     // TODO: Switch to exponential notation when a convenient API will be available in J2SE.
                     return value.toString();

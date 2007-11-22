@@ -145,30 +145,19 @@ compare:for (int i=0; i<c1.length; i++) {
      *
      * @param  classe The object class (may be {@code null}).
      * @return A short class name for the specified object.
-     *
-     * @todo Consider replacing by {@link Class#getSimpleName} when we will
-     *       be allowed to compile for J2SE 1.5.
      */
     public static String getShortName(Class<?> classe) {
         if (classe == null) {
             return "<*>";
         }
-        int dimension = 0;
-        Class el;
-        while ((el = classe.getComponentType()) != null) {
-            classe = el;
-            dimension++;
-        }
-        String name = classe.getName();
-        final int lower = name.lastIndexOf('.');
-        final int upper = name.length();
-        name = name.substring(lower+1, upper).replace('$','.');
-        if (dimension != 0) {
-            StringBuffer buffer = new StringBuffer(name);
+        String name = classe.getSimpleName();
+        Class<?> enclosing = classe.getEnclosingClass();
+        if (enclosing != null) {
+            final StringBuilder buffer = new StringBuilder();
             do {
-                buffer.append("[]");
-            } while (--dimension != 0);
-            name = buffer.toString();
+                buffer.insert(0, '.').insert(0, enclosing.getSimpleName());
+            } while ((enclosing = enclosing.getEnclosingClass()) != null);
+            name = buffer.append(name).toString();
         }
         return name;
     }

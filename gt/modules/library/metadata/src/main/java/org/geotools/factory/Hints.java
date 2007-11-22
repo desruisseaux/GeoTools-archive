@@ -576,27 +576,27 @@ public final class Hints extends RenderingHints {
 
     /**
      * When the evictor is run, if more time (in milliseconds) than the value in
-     * AUTHORITY_MIN_EVICT_IDLETIME has passed, then the worker is destroyed.
+     * {@code AUTHORITY_MIN_EVICT_IDLETIME} has passed, then the worker is destroyed.
      *
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(2 * 60 * 000);
+    public static final IntegerKey AUTHORITY_MIN_EVICT_IDLETIME = new IntegerKey(2 * 60 * 1000);
 
     /**
      * When the evictor is run, workers which have been idle for more than this
-     * value will be destroyed iff the number of idle workers exceeds
+     * value will be destroyed if and only if the number of idle workers exceeds
      * AUTHORITY_MIN_IDLE.
      *
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(10 * 000);
+    public static final IntegerKey AUTHORITY_SOFTMIN_EVICT_IDLETIME = new IntegerKey(10 * 1000);
 
     /**
      * Time in milliseconds to wait between eviction runs.
      *
      * @since 2.4
      */
-    public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(5 * 000);
+    public static final IntegerKey AUTHORITY_TIME_BETWEEN_EVICTION_RUNS = new IntegerKey(5 * 1000);
 
     /**
      * Version number of the requested service. This hint is used for example in order to get

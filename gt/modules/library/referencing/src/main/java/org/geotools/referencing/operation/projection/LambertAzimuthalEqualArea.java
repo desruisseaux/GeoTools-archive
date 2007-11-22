@@ -22,28 +22,20 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import javax.units.NonSI;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
-import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.XMath;
 
 
 /**
@@ -68,10 +60,10 @@ import org.geotools.resources.XMath;
 public class LambertAzimuthalEqualArea extends MapProjection {
     /** Maximum difference allowed when comparing real numbers. */
     private static final double EPSILON = 1E-7;
-    
+
     /** Epsilon for the comparaison of small quantities. */
     private static final double FINE_EPSILON = 1E-10;
-    
+
     /** Epsilon for the comparaison of latitudes. */
     private static final double EPSILON_LATITUDE = 1E-10;
 
@@ -179,6 +171,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         final ParameterValueGroup values = super.getParameterValues();
         final Collection expected = getParameterDescriptors().descriptors();
@@ -261,6 +254,8 @@ public class LambertAzimuthalEqualArea extends MapProjection {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
      * and stores the result in {@code ptDst}.
      */
+    @Override
+    @SuppressWarnings("fallthrough")
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
             throws ProjectionException
     {
@@ -270,7 +265,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             case OBLIQUE: {
                 x /= dd;
                 y *= dd;
-                final double rho = XMath.hypot(x, y);
+                final double rho = Math.hypot(x, y);
                 if (rho < FINE_EPSILON) {
                     lambda = 0.0;
                     phi = latitudeOfOrigin;
@@ -350,6 +345,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
          * (units in radians) and stores the result in {@code ptDst} (linear distance
          * on a unit sphere).
          */
+        @Override
         protected Point2D transformNormalized(final double lambda, final double phi, Point2D ptDst)
                 throws ProjectionException
         {
@@ -417,6 +413,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
          * and stores the result in {@code ptDst} using equations for a sphere.
          */
+        @Override
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
@@ -424,7 +421,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             double lambda, phi;
-            final double rh = XMath.hypot(x, y);
+            final double rh = Math.hypot(x, y);
             phi = rh * 0.5;
             if (phi > 1.0) {
                 throw toleranceError();
@@ -470,7 +467,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 return ptDst;
             }
             return new Point2D.Double(lambda, phi);
-        }      
+        }
     }
 
     /**
@@ -584,7 +581,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
         public MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
-            return isSpherical(parameters) ? new Spherical(parameters) : 
+            return isSpherical(parameters) ? new Spherical(parameters) :
                     new LambertAzimuthalEqualArea(parameters);
         }
     }
