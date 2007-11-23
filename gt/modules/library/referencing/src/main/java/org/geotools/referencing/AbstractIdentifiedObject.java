@@ -167,12 +167,22 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     /**
      * A comparator for sorting identified objects by {@linkplain #getRemarks remarks}.
      */
-    public static final Comparator REMARKS_COMPARATOR = new RemarksComparator();
-    private static final class RemarksComparator implements Comparator, Serializable {
-        public int compare(final Object o1, final Object o2) {
-            return doCompare(((IdentifiedObject) o1).getRemarks(),
-                             ((IdentifiedObject) o2).getRemarks());
+    public static final Comparator<IdentifiedObject> REMARKS_COMPARATOR = new RemarksComparator();
+
+    /**
+     * {@link #REMARKS_COMPARATOR} implementation as a named class (rather than anonymous)
+     * for more predictable serialization.
+     */
+    private static final class RemarksComparator implements Comparator<IdentifiedObject>, Serializable {
+        /** For cross-version compatibility. */
+        private static final long serialVersionUID = -6675419613224162715L;
+
+        /** Compares the given identified objects for order. */
+        public int compare(final IdentifiedObject o1, final IdentifiedObject o2) {
+            return doCompare(o1.getRemarks(), o2.getRemarks());
         }
+
+        /** Canonicalizes to the singleton on deserialization. */
         protected Object readResolve() throws ObjectStreamException {
             return REMARKS_COMPARATOR;
         }
@@ -226,38 +236,38 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #NAME_KEY "name"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.IdentifiedObject#NAME_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link ReferenceIdentifier}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getName()}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #ALIAS_KEY "alias"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.IdentifiedObject#ALIAS_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}, <code>{@linkplain String}[]</code>,
      *     {@link GenericName} or <code>{@linkplain GenericName}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getAlias}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#AUTHORITY_KEY "authority"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.metadata.Identifier#AUTHORITY_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link ReferenceIdentifier#getAuthority} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#CODESPACE_KEY "version"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.ReferenceIdentifier#CODESPACE_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link ReferenceIdentifier#getCodeSpace} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link ReferenceIdentifier#VERSION_KEY "version"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.ReferenceIdentifier#VERSION_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link ReferenceIdentifier#getVersion} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #IDENTIFIERS_KEY "identifiers"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.IdentifiedObject#IDENTIFIERS_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link ReferenceIdentifier} or <code>{@linkplain ReferenceIdentifier}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getIdentifiers}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #REMARKS_KEY "remarks"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.IdentifiedObject#REMARKS_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getRemarks}</td>
      *   </tr>
@@ -486,13 +496,20 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
          */
         String key=null; Object value=null;
         try {
-            key=        NAME_KEY; this.name        =       (ReferenceIdentifier)   (value=name);
-            key=       ALIAS_KEY; this.alias       = asSet((GenericName[])         (value=alias));
-            key= IDENTIFIERS_KEY; this.identifiers = asSet((ReferenceIdentifier[]) (value=identifiers));
-            key=     REMARKS_KEY; this.remarks     =       (InternationalString)   (value=remarks);
+            key = NAME_KEY;
+            this.name = (ReferenceIdentifier) (value = name);
+
+            key = ALIAS_KEY;
+            this.alias = asSet((GenericName[]) (value = alias));
+
+            key = IDENTIFIERS_KEY;
+            this.identifiers = asSet((ReferenceIdentifier[]) (value = identifiers));
+
+            key = REMARKS_KEY;
+            this.remarks = (InternationalString) (value = remarks);
         } catch (ClassCastException exception) {
             InvalidParameterValueException e = new InvalidParameterValueException(Errors.format(
-                                   ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
@@ -553,7 +570,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @param  info The identified object to view as a properties map.
      * @return An view of the identified object as an immutable map.
      */
-    public static Map getProperties(final IdentifiedObject info) {
+    public static Map<String,?> getProperties(final IdentifiedObject info) {
         return new Properties(info);
     }
 
@@ -578,8 +595,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         is not going to have any declared authority.
      * @return An view of the identified object as a mutable map.
      */
-    public static Map getProperties(final IdentifiedObject info, final Citation authority) {
-        final Map properties = new HashMap(getProperties(info));
+    public static Map<String,Object> getProperties(final IdentifiedObject info, final Citation authority) {
+        final Map<String,Object> properties = new HashMap<String,Object>(getProperties(info));
         properties.put(NAME_KEY, new NamedIdentifier(authority, info.getName().getCode()));
         properties.remove(IDENTIFIERS_KEY);
         return properties;
@@ -981,7 +998,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * Compares two objects for order. Any object may be null. This method is
      * used for implementation of {@link #NAME_COMPARATOR} and its friends.
      */
-    private static int doCompare(final Comparable c1, final Comparable c2) {
+    private static <E extends Comparable<E>> int doCompare(final E c1, final E c2) {
         if (c1 == null) {
             return (c2==null) ? 0 : -1;
         }
@@ -1016,16 +1033,15 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @param  array The array to copy in a set. May be {@code null}.
      * @return A set containing the array elements, or {@code null} if none or empty.
      */
-    protected static Set asSet(final Object[] array) {
+    protected static <E> Set<E> asSet(final E[] array) {
         if (array == null) {
             return null;
         }
         switch (array.length) {
             case 0:  return null;
             case 1:  return Collections.singleton(array[0]);
-            default: return Collections.unmodifiableSet(new LinkedHashSet(Arrays.asList(array)));
+            default: return Collections.unmodifiableSet(new LinkedHashSet<E>(Arrays.asList(array)));
         }
-
     }
 
     /**

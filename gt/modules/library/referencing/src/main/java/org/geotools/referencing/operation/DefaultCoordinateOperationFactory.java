@@ -19,14 +19,12 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.vecmath.SingularMatrixException;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -36,7 +34,6 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
@@ -465,6 +462,9 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * by Greenwich. This datum is processed in a special way by {@link #equalsIgnorePrimeMeridian}.
      */
     private static final class TemporaryDatum extends DefaultGeodeticDatum {
+        /** For cros-version compatibility. */
+        private static final long serialVersionUID = -8964199103509187219L;
+
         /** The wrapped datum. */
         private final GeodeticDatum datum;
 
@@ -483,6 +483,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         }
 
         /** Compares this datum with the specified object for equality. */
+        @Override
         public boolean equals(final AbstractIdentifiedObject object,
                               final boolean compareMetadata)
         {

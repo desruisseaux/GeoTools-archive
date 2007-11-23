@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,15 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import java.util.HashMap;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
@@ -86,7 +83,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param cs The coordinate system.
      */
-    public AbstractCRS(final Map properties, final CoordinateSystem cs) {
+    public AbstractCRS(final Map<String,?> properties, final CoordinateSystem cs) {
         super(properties);
         ensureNonNull("cs", cs);
         this.coordinateSystem = cs;
@@ -102,7 +99,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * were formatted in different locales.
      */
     static Map name(final int key) {
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         final InternationalString name = Vocabulary.formatInternational(key);
         properties.put(NAME_KEY,  name.toString());
         properties.put(ALIAS_KEY, name);
@@ -155,6 +152,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final AbstractCRS that = (AbstractCRS) object;
@@ -162,7 +160,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this CRS. {@linkplain #getName Name},
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
@@ -174,10 +172,11 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ coordinateSystem.hashCode();
     }
-    
+
     /**
      * Formats the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -193,6 +192,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type (e.g. {@code "GEOGCS"}).
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatDefaultWKT(formatter);
         // Will declares the WKT as invalid.

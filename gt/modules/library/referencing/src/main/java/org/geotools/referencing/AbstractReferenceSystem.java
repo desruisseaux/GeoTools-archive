@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,12 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.util.HashMap;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.ReferenceSystem;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -107,15 +103,15 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      *   </tr>
      * </table>
      */
-    public AbstractReferenceSystem(final Map properties) {
-        this(properties, new HashMap());
+    public AbstractReferenceSystem(final Map<String,?> properties) {
+        this(properties, new HashMap<String,Object>());
     }
 
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private AbstractReferenceSystem(final Map properties, final Map subProperties) {
+    private AbstractReferenceSystem(final Map<String,?> properties, final Map<String,Object> subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         validArea = (Extent)              subProperties.get(VALID_AREA_KEY);
         scope     = (InternationalString) subProperties.get(SCOPE_KEY);
@@ -148,6 +144,7 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {

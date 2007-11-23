@@ -99,7 +99,7 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
      * Table of weak references.
      */
     private Entry[] table;
-    
+
     /**
      * The type of the elements in this set.
      */
@@ -133,7 +133,7 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
 
     /**
      * Constructs a {@code WeakHashSet}.
-     * 
+     *
      * @deprecated Use {@link WeakHashSet(Class)}.
      */
     @SuppressWarnings("unchecked")
@@ -143,9 +143,9 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
 
     /**
      * Constructs a {@code WeakHashSet}.
-     * 
+     *
      * @param type The type of the element to be included in this set.
-     * 
+     *
      * @since 2.5
      */
     public WeakHashSet(final Class<E> type) {
@@ -165,10 +165,10 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
 //      table = new Entry[size];
         table = (Entry[]) Array.newInstance(Entry.class, size);
     }
-    
+
     /**
      * Returns the element type.
-     * 
+     *
      * @since 2.5
      */
     public Class<E> getElementType() {
@@ -357,11 +357,12 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
      * &nbsp;  return object;
      * </pre></blockquote>
      */
-    final E intern(final E obj, final int operation) {
+    final <T extends E> T intern(final T obj, final int operation) {
         assert Thread.holdsLock(this);
         assert WeakCollectionCleaner.DEFAULT.isAlive();
         assert valid() : count;
         if (obj != null) {
+            assert obj.equals(obj) : obj;
             /*
              * Check if {@code obj} is already contained in this
              * {@code WeakHashSet}. If yes, returns the element.
@@ -375,7 +376,10 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
                         if (operation == REMOVE) {
                             e.clear();
                         }
-                        return candidate;
+                        assert candidate.getClass().equals(obj.getClass()) : candidate;
+                        @SuppressWarnings("unchecked")
+                        final T result = (T) candidate;
+                        return result;
                     }
                 }
                 // Do not remove the null element; lets ReferenceQueue do its job
@@ -395,7 +399,7 @@ public class WeakHashSet<E> extends AbstractSet<E> implements CheckedCollection<
             }
         }
         assert valid();
-        return (operation==INTERN) ? obj : null;
+        return (operation == INTERN) ? obj : null;
     }
 
     /**

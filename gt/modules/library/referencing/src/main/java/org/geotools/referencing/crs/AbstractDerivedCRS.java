@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2003, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,8 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
-import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.GeneralDerivedCRS;
@@ -37,10 +34,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
-import org.geotools.parameter.Parameters;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.operation.DefaultOperation;
 import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
@@ -103,7 +97,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      *       because {@link org.geotools.referencing.operation.AbstractCoordinateOperation}
      *       lives in a different package.
      */
-    public static final ThreadLocal/*<Boolean>*/ _COMPARING = new ThreadLocal();
+    public static final ThreadLocal<Boolean> _COMPARING = new ThreadLocal<Boolean>();
 
     /**
      * The base coordinate reference system.
@@ -133,7 +127,8 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     /**
      * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
      * The properties are given unchanged to the
-     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
+     * {@linkplain org.geotools.referencing.AbstractReferenceSystem#AbstractReferenceSystem(Map)
+     * super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object.
      * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
@@ -146,7 +141,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      *         {@code baseToDerived} don't match the dimension of {@code base}
      *         and {@code derivedCS} respectively.
      */
-    protected AbstractDerivedCRS(final Map                 properties,
+    protected AbstractDerivedCRS(final Map<String,?>       properties,
                                  final Conversion  conversionFromBase,
                                  final CoordinateReferenceSystem base,
                                  final MathTransform    baseToDerived,
@@ -159,7 +154,13 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
         this.baseCRS = base;
         checkDimensions(base, baseToDerived, derivedCS);
         DefaultOperationMethod.checkDimensions(conversionFromBase.getMethod(), baseToDerived);
-        final Class typeHint = (Class) properties.get(CONVERSION_TYPE_KEY); // May be null.
+        final Class<?> c = (Class<?>) properties.get(CONVERSION_TYPE_KEY);
+        final Class<? extends Conversion> typeHint;
+        if (c != null) {
+            typeHint = c.asSubclass(Conversion.class);
+        } else {
+            typeHint = null;
+        }
         this.conversionFromBase = DefaultConversion.create(
             /* definition */ conversionFromBase,
             /* sourceCRS  */ base,
@@ -169,9 +170,9 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     }
 
     /**
-     * Constructs a derived CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
-     * The following optional properties are also understood:
+     * Constructs a derived CRS from a set of properties. The properties are given unchanged to the
+     * {@linkplain org.geotools.referencing.AbstractReferenceSystem#AbstractReferenceSystem(Map)
+     * super-class constructor}. The following optional properties are also understood:
      * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -205,8 +206,10 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * @throws MismatchedDimensionException if the source and target dimension of
      *         {@code baseToDerived} don't match the dimension of {@code base}
      *         and {@code derivedCS} respectively.
+     *
+     * @deprecated Create explicitly a {@link DefiningConversion} instead.
      */
-    protected AbstractDerivedCRS(final Map                 properties,
+    protected AbstractDerivedCRS(final Map<String,?>       properties,
                                  final OperationMethod         method,
                                  final CoordinateReferenceSystem base,
                                  final MathTransform    baseToDerived,
@@ -291,6 +294,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -302,7 +306,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
                  * Avoid never-ending recursivity: Conversion has a 'targetCRS' field (inherited from
                  * the AbstractCoordinateOperation super-class) that is set to this AbstractDerivedCRS.
                  */
-                final Boolean comparing = (Boolean) _COMPARING.get();
+                final Boolean comparing = _COMPARING.get();
                 if (comparing!=null && comparing.booleanValue()) {
                     return true;
                 }
@@ -313,19 +317,19 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
                                   compareMetadata);
                 } finally {
                     _COMPARING.set(Boolean.FALSE);
-                    // TODO: use _COMPARING.remove() when we will be allowed to compile for J2SE 1.5.
                 }
             }
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this derived CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         /*
          * Do not invoke 'conversionFromBase.hashCode()' in order to avoid a never-ending loop.
@@ -335,7 +339,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
          */
         return (int)serialVersionUID ^ baseCRS.hashCode() ^ conversionFromBase.getName().hashCode();
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -344,15 +348,14 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type, which is {@code "FITTED_CS"}.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         MathTransform inverse = conversionFromBase.getMathTransform();
         try {
             inverse = inverse.inverse();
         } catch (NoninvertibleTransformException exception) {
-            // TODO: provide a more accurate error message. Use J2SE 1.5 constructor.
-            IllegalStateException e = new IllegalStateException(exception.getLocalizedMessage());
-            e.initCause(exception);
-            throw e;
+            // TODO: provide a more accurate error message.
+            throw new IllegalStateException(exception.getLocalizedMessage(), exception);
         }
         formatter.append(inverse);
         formatter.append(baseCRS);

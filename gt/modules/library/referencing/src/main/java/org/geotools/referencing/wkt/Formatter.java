@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2004, Institut de Recherche pour le Développement
  *
@@ -20,19 +20,16 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies and extensions
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Locale;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
@@ -48,7 +45,6 @@ import org.opengis.util.CodeList;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -81,7 +77,8 @@ public class Formatter {
      *
      * @see #authorityAllowed
      */
-    private static final Class[] AUTHORITY_EXCLUDE = {
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends IdentifiedObject>[] AUTHORITY_EXCLUDE = new Class[] {
         CoordinateSystemAxis.class
     };
 
@@ -186,7 +183,7 @@ public class Formatter {
      * Non-null if the WKT is invalid. If non-null, then this field contains the interface class
      * of the problematic part (e.g. {@link org.opengis.referencing.crs.EngineeringCRS}).
      */
-    private Class/*<?>*/ unformattable;
+    private Class<?> unformattable;
 
     /**
      * Warning that may be produced during WKT formatting, or {@code null} if none.
@@ -301,11 +298,10 @@ public class Formatter {
                 return;
             }
         } while (Character.isWhitespace(c) || c==symbols.space);
-        buffer.append(symbols.separator);
-        buffer.append(symbols.space);
+        buffer.append(symbols.separator).append(symbols.space);
         if (newLine && indentation != 0) {
-            buffer.append(System.getProperty("line.separator", "\n"));
-            buffer.append(Utilities.spaces(margin));
+            buffer.append(System.getProperty("line.separator", "\n"))
+                  .append(Utilities.spaces(margin));
             lineChanged = true;
         }
     }
@@ -337,9 +333,7 @@ public class Formatter {
             if (c != null) {
                 setColor(c);
             }
-            buffer.append(symbols.quote);
-            buffer.append(getName(info));
-            buffer.append(symbols.quote);
+            buffer.append(symbols.quote).append(getName(info)).append(symbols.quote);
             if (c != null) {
                 resetColor();
             }
@@ -385,12 +379,11 @@ public class Formatter {
                  */
                 InternationalString inter = authority.getTitle();
                 String title = (inter!=null) ? inter.toString(symbols.locale) : null;
-                for (final Iterator it=authority.getAlternateTitles().iterator(); it.hasNext();) {
-                    inter = (InternationalString) it.next();
-                    if (inter != null) {
-                        final String candidate = inter.toString(symbols.locale);
+                for (final InternationalString alt : authority.getAlternateTitles()) {
+                    if (alt != null) {
+                        final String candidate = alt.toString(symbols.locale);
                         if (candidate != null) {
-                            if (title==null || candidate.length()<title.length()) {
+                            if (title==null || candidate.length() < title.length()) {
                                 title = candidate;
                             }
                         }
@@ -398,17 +391,17 @@ public class Formatter {
                 }
                 if (title != null) {
                     appendSeparator(lineChanged);
-                    buffer.append("AUTHORITY");
-                    buffer.append(symbols.open);
-                    buffer.append(symbols.quote);
-                    buffer.append(title);
-                    buffer.append(symbols.quote);
+                    buffer.append("AUTHORITY")
+                          .append(symbols.open)
+                          .append(symbols.quote)
+                          .append(title)
+                          .append(symbols.quote);
                     final String code = identifier.getCode();
                     if (code != null) {
-                        buffer.append(symbols.separator);
-                        buffer.append(symbols.quote);
-                        buffer.append(code);
-                        buffer.append(symbols.quote);
+                        buffer.append(symbols.separator)
+                              .append(symbols.quote)
+                              .append(code)
+                              .append(symbols.quote);
                     }
                     buffer.append(symbols.close);
                 }
@@ -473,13 +466,13 @@ public class Formatter {
      */
     public void append(final GeneralParameterValue parameter) {
         if (parameter instanceof ParameterValueGroup) {
-            for (final Iterator it=((ParameterValueGroup)parameter).values().iterator(); it.hasNext();) {
-                append((GeneralParameterValue) it.next());
+            for (final GeneralParameterValue param : ((ParameterValueGroup)parameter).values()) {
+                append(param);
             }
         }
         if (parameter instanceof ParameterValue) {
             final ParameterValue param = (ParameterValue) parameter;
-            // Covariance: Remove cast if covariance is allowed.
+            // Remove cast when we will be allowed to compile for J2SE 1.5.
             final ParameterDescriptor descriptor = (ParameterDescriptor) param.getDescriptor();
             final Unit valueUnit = descriptor.getUnit();
             Unit unit = valueUnit;
@@ -496,12 +489,9 @@ public class Formatter {
             final int stop = buffer.length();
             buffer.append(symbols.open);
             setColor(PARAMETER_COLOR);
-            buffer.append(symbols.quote);
-            buffer.append(getName(descriptor));
-            buffer.append(symbols.quote);
+            buffer.append(symbols.quote).append(getName(descriptor)).append(symbols.quote);
             resetColor();
-            buffer.append(symbols.separator);
-            buffer.append(symbols.space);
+            buffer.append(symbols.separator).append(symbols.space);
             if (unit != null) {
                 double value;
                 try {
@@ -510,8 +500,7 @@ public class Formatter {
                     // May happen if a parameter is mandatory (e.g. "semi-major")
                     // but no value has been set for this parameter.
                     if (colorEnabled) {
-                        buffer.insert(stop, X364.BACKGROUND_DEFAULT);
-                        buffer.insert(start, ERROR_COLOR);
+                        buffer.insert(stop, X364.BACKGROUND_DEFAULT).insert(start, ERROR_COLOR);
                     }
                     warning = exception.getLocalizedMessage();
                     value = Double.NaN;
@@ -541,8 +530,7 @@ public class Formatter {
             final int length = Array.getLength(value);
             for (int i=0; i<length; i++) {
                 if (i != 0) {
-                    buffer.append(symbols.separator);
-                    buffer.append(symbols.space);
+                    buffer.append(symbols.separator).append(symbols.space);
                 }
                 appendObject(Array.get(value, i));
             }
@@ -552,9 +540,7 @@ public class Formatter {
         if (value instanceof Number) {
             format((Number) value);
         } else {
-            buffer.append(symbols.quote);
-            buffer.append(value);
-            buffer.append(symbols.quote);
+            buffer.append(symbols.quote).append(value).append(symbols.quote);
         }
     }
 
@@ -583,8 +569,7 @@ public class Formatter {
     public void append(final Unit unit) {
         if (unit != null) {
             appendSeparator(lineChanged);
-            buffer.append("UNIT");
-            buffer.append(symbols.open);
+            buffer.append("UNIT").append(symbols.open);
             setColor(UNIT_COLOR);
             buffer.append(symbols.quote);
             if (NonSI.DEGREE_ANGLE.equals(unit)) {
@@ -617,9 +602,7 @@ public class Formatter {
      */
     public void append(final String text) {
         appendSeparator(false);
-        buffer.append(symbols.quote);
-        buffer.append(text);
-        buffer.append(symbols.quote);
+        buffer.append(symbols.quote).append(text).append(symbols.quote);
     }
 
     /**
@@ -637,7 +620,7 @@ public class Formatter {
     }
 
     /**
-     * Format an integer number.
+     * Formats an integer number.
      */
     private void format(final int number) {
         setColor(INTEGER_COLOR);
@@ -649,7 +632,7 @@ public class Formatter {
     }
 
     /**
-     * Format a floating point number.
+     * Formats a floating point number.
      */
     private void format(final double number) {
         setColor(NUMBER_COLOR);
@@ -693,10 +676,9 @@ public class Formatter {
     public Identifier getIdentifier(final IdentifiedObject info) {
         Identifier first = null;
         if (info != null) {
-            final Collection/*<Identifier>*/ identifiers = info.getIdentifiers();
+            final Collection<? extends Identifier> identifiers = info.getIdentifiers();
             if (identifiers != null) {
-                for (final Iterator it=identifiers.iterator(); it.hasNext();) {
-                    final Identifier id = (Identifier) it.next();
+                for (final Identifier id : identifiers) {
                     if (authorityMatches(id.getAuthority())) {
                         return id;
                     }
@@ -717,7 +699,7 @@ public class Formatter {
         if (authority == citation) {
             return true;
         }
-        return (citation != null) && 
+        return (citation != null) &&
                authority.getTitle().toString(Locale.US).equalsIgnoreCase(
                 citation.getTitle().toString(Locale.US));
     }
@@ -734,7 +716,7 @@ public class Formatter {
     public String getName(final IdentifiedObject info) {
         final Identifier name = info.getName();
         if (!authorityMatches(name.getAuthority())) {
-            final Collection/*<GenericName>*/ aliases = info.getAlias();
+            final Collection<GenericName> aliases = info.getAlias();
             if (aliases != null) {
                 /*
                  * The main name doesn't matches. Search in alias. We will first
@@ -742,8 +724,7 @@ public class Formatter {
                  * Geotools implementation). Otherwise, we will look at the
                  * scope in generic name.
                  */
-                for (final Iterator it=aliases.iterator(); it.hasNext();) {
-                    final GenericName alias = (GenericName) it.next();
+                for (final GenericName alias : aliases) {
                     if (alias instanceof Identifier) {
                         final Identifier candidate = (Identifier) alias;
                         if (authorityMatches(candidate.getAuthority())) {
@@ -752,8 +733,7 @@ public class Formatter {
                     }
                 }
                 final String title = authority.getTitle().toString(Locale.US);
-                for (final Iterator it=aliases.iterator(); it.hasNext();) {
-                    final GenericName alias = (GenericName) it.next();
+                for (final GenericName alias : aliases) {
                     final GenericName scope = alias.getScope();
                     if (scope != null) {
                         if (title.equalsIgnoreCase(scope.toString())) {
@@ -761,7 +741,7 @@ public class Formatter {
                         }
                     }
                 }
-            }    
+            }
         }
         return name.getCode();
     }
@@ -851,23 +831,15 @@ public class Formatter {
      *
      * @since 2.4
      */
-    public void setInvalidWKT(final Class unformattable) {
+    public void setInvalidWKT(final Class<?> unformattable) {
         this.unformattable = unformattable;
         invalidWKT = true;
     }
 
     /**
-     * Set a flag marking the current WKT as not strictly compliant to the WKT specification.
-     *
-     * @deprecated Replaced by {@link #setInvalidWKT(Class)}.
-     */
-    public void setInvalidWKT() {
-        setInvalidWKT(IdentifiedObject.class);
-    }
-
-    /**
      * Returns the WKT in its current state.
      */
+    @Override
     public String toString() {
         return buffer.toString();
     }

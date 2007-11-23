@@ -78,7 +78,7 @@ public class CanonicalSet<E> extends WeakHashSet<E> {
      *
      * @see #unique(Object)
      */
-    public synchronized E get(final E object) {
+    public synchronized <T extends E> T get(final T object) {
         return intern(object, GET);
     }
 
@@ -99,7 +99,7 @@ public class CanonicalSet<E> extends WeakHashSet<E> {
      * return object;
      * </pre></blockquote>
      */
-    public synchronized E unique(final E object) {
+    public synchronized <T extends E> T unique(final T object) {
         return intern(object, INTERN);
     }
 

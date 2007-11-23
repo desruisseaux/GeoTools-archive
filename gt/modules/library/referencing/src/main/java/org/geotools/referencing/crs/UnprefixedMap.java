@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,14 +16,9 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
 import java.util.Iterator;
 import java.util.Map;
-
-// OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
-
-// Geotools dependencies
 import org.geotools.util.DerivedMap;
 
 
@@ -38,8 +33,12 @@ import org.geotools.util.DerivedMap;
  * @author Martin Desruisseaux
  *
  * @since 2.0
+ *
+ * @deprecated Remove after we deleted the deprecated constructors from {@link DefaultDerivedCRS}
+ *             and {@code DefaultProjectedCRS}.
  */
-final class UnprefixedMap extends DerivedMap {
+@SuppressWarnings("serial")
+final class UnprefixedMap extends DerivedMap<String,String,Object> {
     /**
      * The prefix to remove for this map.
      */
@@ -59,7 +58,7 @@ final class UnprefixedMap extends DerivedMap {
      * @param prefix The prefix to remove from the keys in the base map.
      */
     public UnprefixedMap(final Map base, final String prefix) {
-        super(base);
+        super(base, String.class);
         this.prefix = prefix.trim();
         final String  nameKey = this.prefix + IdentifiedObject. NAME_KEY;
         final String aliasKey = this.prefix + IdentifiedObject.ALIAS_KEY;
@@ -88,9 +87,9 @@ final class UnprefixedMap extends DerivedMap {
      * @return The key that this view should contains instead of {@code key},
      *         or {@code null}.
      */
-    protected Object baseToDerived(final Object key) {
+    protected String baseToDerived(final String key) {
         final int length = prefix.length();
-        final String textualKey = key.toString().trim();
+        final String textualKey = key.trim();
         if (textualKey.regionMatches(true, 0, prefix, 0, length)) {
             return textualKey.substring(length).trim();
         }
@@ -106,8 +105,8 @@ final class UnprefixedMap extends DerivedMap {
      * @param  key A key in this map.
      * @return The key stored in the {@linkplain #base} map.
      */
-    protected Object derivedToBase(final Object key) {
-        final String textualKey = key.toString().trim();
+    protected String derivedToBase(final String key) {
+        final String textualKey = key.trim();
         if (isPlainKey(textualKey)) {
             return textualKey;
         }

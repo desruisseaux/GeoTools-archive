@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,8 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -37,7 +35,6 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
@@ -97,7 +94,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      * @param method    The operation method.
      */
-    public DefaultOperation(final Map                      properties,
+    public DefaultOperation(final Map<String,?>            properties,
                             final CoordinateReferenceSystem sourceCRS,
                             final CoordinateReferenceSystem targetCRS,
                             final MathTransform             transform,
@@ -125,19 +122,20 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      *
      * @see DefaultConversion#create
      */
-    public static CoordinateOperation create(final Map                      properties,
+    public static CoordinateOperation create(final Map<String,?>            properties,
                                              final CoordinateReferenceSystem sourceCRS,
                                              final CoordinateReferenceSystem targetCRS,
                                              final MathTransform             transform,
                                              final OperationMethod           method,
-                                                   Class                     type)
+                                             Class<? extends CoordinateOperation> type)
     {
         if (method != null) {
             if (method instanceof MathTransformProvider) {
-                final Class candidate = ((MathTransformProvider) method).getOperationType();
+                final Class<? extends Operation> candidate =
+                        ((MathTransformProvider) method).getOperationType();
                 if (candidate != null) {
                     if (type==null || type.isAssignableFrom(candidate)) {
-                        type = candidate;
+                        type = candidate.asSubclass(type);
                     }
                 }
             }
@@ -205,8 +203,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      *         provide information about parameters.
      */
     private static ParameterValueGroup getParameterValues(final MathTransform mt,
-                                                          final ParameterDescriptorGroup descriptor,
-                                                          boolean required)
+            final ParameterDescriptorGroup descriptor, boolean required)
     {
         if (mt instanceof ConcatenatedTransform) {
             final ConcatenatedTransform ct = (ConcatenatedTransform) mt;
@@ -238,6 +235,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final DefaultOperation that = (DefaultOperation) object;
@@ -277,6 +275,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
     /**
      * Returns a hash code value for this operation method.
      */
+    @Override
     public int hashCode() {
         return super.hashCode() ^ method.hashCode();
     }
@@ -284,6 +283,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final String name = super.formatWKT(formatter);
         append(formatter, method, "METHOD");

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,11 +15,8 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
-import java.util.Iterator;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -27,7 +24,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.OperationNotFoundException;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.resources.Utilities;
@@ -44,7 +40,7 @@ import org.geotools.referencing.ReferencingFactoryFinder;
  * In most cases, users should not need to create an instance of this class explicitly. An instance
  * of {@code BufferedCoordinateOperationFactory} should be automatically registered and returned
  * by {@link ReferencingFactoryFinder} in default Geotools configuration.
- * 
+ *
  * @since 2.3
  * @version $Id$
  * @source $URL$
@@ -89,6 +85,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
         /**
          * Returns the hash code value.
          */
+        @Override
         public int hashCode() {
             return hash;
         }
@@ -100,6 +97,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
          * {@code equalsIgnoreMetadata}, because metadata matter since they are attributes of the
          * {@link CoordinateOperation} object to be created.
          */
+        @Override
         public boolean equals(final Object object) {
             if (object == this) {
                 return true;
@@ -126,7 +124,8 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
      * be different for the same ({@code sourceCRS}, {@code targetCRS}) pair dependending of
      * hint values like {@link Hints#LENIENT_DATUM_SHIFT}.
      */
-    private final Map/*<CRSPair, CoordinateOperation>*/ pool = new SoftValueHashMap();
+    private final Map<CRSPair, CoordinateOperation> pool =
+            new SoftValueHashMap<CRSPair, CoordinateOperation>();
 
     /**
      * Creates a buffered factory wrapping the {@linkplain AuthorityBackedFactory default one}.
@@ -193,8 +192,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
      * Returns a backing factory from the specified hints.
      */
     private static CoordinateOperationFactory getBackingFactory(final Hints hints) {
-        for (final Iterator it=ReferencingFactoryFinder.getCoordinateOperationFactories(hints).iterator(); it.hasNext();) {
-            final CoordinateOperationFactory candidate = (CoordinateOperationFactory) it.next();
+        for (final CoordinateOperationFactory candidate : ReferencingFactoryFinder.getCoordinateOperationFactories(hints)) {
             if (!(candidate instanceof BufferedCoordinateOperationFactory)) {
                 return candidate;
             }
@@ -221,7 +219,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
      * be initialized. The {@link Hints#COORDINATE_OPERATION_FACTORY} can not always be provided
      * at construction time, because the backing factory may be lazily created.
      */
-    // @Override
+    @Override
     void initializeHints() {
         super.initializeHints();
         hints.put(Hints.COORDINATE_OPERATION_FACTORY, getBackingFactory());
@@ -250,7 +248,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
         final CRSPair key = new CRSPair(sourceCRS, targetCRS);
         CoordinateOperation op;
         synchronized (hints) { // This lock is indirectly required by getBackingFactory().
-            op = (CoordinateOperation) pool.get(key);
+            op = pool.get(key);
             if (op == null) {
                 op = getBackingFactory().createOperation(sourceCRS, targetCRS);
                 pool.put(key, op);
@@ -265,8 +263,7 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
      * {@linkplain CoordinateOperationFactory coordinate operation factory} specified at
      * construction time with no caching.
      *
-     * @todo Consider if we should cache the operations for this method too. As of Geotools 2.3,
-     *       this is not needed since Geotools doesn't implement this method yet.
+     * @deprecated Will be removed.
      */
     public CoordinateOperation createOperation(final CoordinateReferenceSystem sourceCRS,
                                                final CoordinateReferenceSystem targetCRS,

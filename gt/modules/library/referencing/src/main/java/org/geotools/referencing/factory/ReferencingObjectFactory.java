@@ -22,19 +22,18 @@ package org.geotools.referencing.factory;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
+import java.util.HashMap;
 import javax.units.Unit;
 
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
+import org.opengis.parameter.ParameterValueGroup;
 
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.wkt.Parser;
@@ -42,6 +41,7 @@ import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.util.CanonicalSet;
 
 
@@ -60,10 +60,15 @@ public class ReferencingObjectFactory extends ReferencingFactory
         implements CSFactory, DatumFactory, CRSFactory, BufferedFactory
 {
     /**
+     * The math transform factory. Will be created only when first needed.
+     */
+    private MathTransformFactory mtFactory;
+
+    /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.
      */
-    private transient Parser parser;
+    private Parser parser;
 
     /**
      * Set of weak references to existing objects (identifiers, CRS, Datum, whatever).
@@ -78,13 +83,70 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * not instantiate this factory directly, but use one of the following lines instead:
      *
      * <blockquote><pre>
-     * {@linkplain DatumFactory} factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getDatumFactory getDatumFactory(null)};
-     * {@linkplain CSFactory}    factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCSFactory    getCSFactory(null)};
-     * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSFactory   getCRSFactory(null)};
+     * {@linkplain DatumFactory} factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getDatumFactory getDatumFactory}null);
+     * {@linkplain CSFactory}    factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCSFactory    getCSFactory}(null);
+     * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSFactory   getCRSFactory}(null);
      * </pre></blockquote>
      */
     public ReferencingObjectFactory() {
+        this(null);
+    }
+
+    /**
+     * Constructs a factory with the specified hints. Users should not instantiate this
+     * factory directly, but use one of the following lines instead:
+     *
+     * <blockquote><pre>
+     * {@linkplain DatumFactory} factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getDatumFactory getDatumFactory}(hints);
+     * {@linkplain CSFactory}    factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCSFactory    getCSFactory}(hints);
+     * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain ReferencingFactoryFinder#getCRSFactory   getCRSFactory}(hints);
+     * </pre></blockquote>
+     *
+     * @since 2.5
+     */
+    public ReferencingObjectFactory(final Hints hints) {
         pool = CanonicalSet.newInstance(IdentifiedObject.class);
+        if (hints != null && !hints.isEmpty()) {
+            /*
+             * Creates the dependencies (MathTransform factory, WKT parser...) now because
+             * we need to process user's hints. Then, we will keep only the relevant hints.
+             */
+            mtFactory = ReferencingFactoryFinder.getMathTransformFactory(hints);
+            final DatumFactory datumFactory = ReferencingFactoryFinder.getDatumFactory(hints);
+            createParser(datumFactory, mtFactory);
+            addHints(datumFactory);
+            addHints(mtFactory);
+        }
+    }
+
+    /**
+     * Copies the hints from the supplied factory. Note that we do not expose the factories
+     * themself (at the contrary of what we usually do) because it is a little bit strange
+     * to declare that this factory depends on an other {@link DatumFactory}. It is only a
+     * trick for getting the WKT paser to work with aliases.
+     *
+     * @todo We should remove this trick if we can. Possible alternatives may be: make
+     *       DatumAliases to implements CRSFactory with appropriate createWKT(String)
+     *       method; move the createWKT(String) method out of CRSFactory interface.
+     */
+    private void addHints(final Object factory) {
+        if (factory instanceof Factory) {
+            hints.putAll(((Factory) factory).getImplementationHints());
+        }
+    }
+
+    /**
+     * Returns the math transform factory for internal usage only. The hints given to
+     * {@link ReferencingFactoryFinder} must be null, since the non-null case should
+     * have been handled by the constructor.
+     *
+     * @see #createParser
+     */
+    private synchronized MathTransformFactory getMathTransformFactory() {
+        if (mtFactory == null) {
+            mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
+        }
+        return mtFactory;
     }
 
 
@@ -116,7 +178,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) pool.unique(ellipsoid);
+        ellipsoid = pool.unique(ellipsoid);
         return ellipsoid;
     }
 
@@ -141,7 +203,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) pool.unique(ellipsoid);
+        ellipsoid = pool.unique(ellipsoid);
         return ellipsoid;
     }
 
@@ -163,7 +225,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        meridian = (PrimeMeridian) pool.unique(meridian);
+        meridian = pool.unique(meridian);
         return meridian;
     }
 
@@ -185,7 +247,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (GeodeticDatum) pool.unique(datum);
+        datum = pool.unique(datum);
         return datum;
     }
 
@@ -205,7 +267,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (VerticalDatum) pool.unique(datum);
+        datum = pool.unique(datum);
         return datum;
     }
 
@@ -225,7 +287,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (TemporalDatum) pool.unique(datum);
+        datum = pool.unique(datum);
         return datum;
     }
 
@@ -244,7 +306,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (EngineeringDatum) pool.unique(datum);
+        datum = pool.unique(datum);
         return datum;
     }
 
@@ -265,7 +327,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (ImageDatum) pool.unique(datum);
+        datum = pool.unique(datum);
         return datum;
     }
 
@@ -297,7 +359,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        axis = (CoordinateSystemAxis) pool.unique(axis);
+        axis = pool.unique(axis);
         return axis;
     }
 
@@ -319,7 +381,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CartesianCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -343,7 +405,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CartesianCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -365,7 +427,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (AffineCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -389,7 +451,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (AffineCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -411,7 +473,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (PolarCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -435,7 +497,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CylindricalCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -459,7 +521,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (SphericalCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -481,7 +543,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (EllipsoidalCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -505,7 +567,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (EllipsoidalCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -525,7 +587,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (VerticalCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -545,7 +607,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (TimeCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -565,7 +627,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (LinearCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -587,7 +649,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (UserDefinedCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -611,7 +673,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (UserDefinedCS) pool.unique(cs);
+        cs = pool.unique(cs);
         return cs;
     }
 
@@ -641,7 +703,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (CompoundCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -663,7 +725,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (EngineeringCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -685,7 +747,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (ImageCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -707,7 +769,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (TemporalCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -729,7 +791,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (VerticalCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -752,7 +814,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeocentricCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -775,7 +837,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeocentricCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -799,7 +861,7 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeographicCRS) pool.unique(crs);
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -824,6 +886,9 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Use {@link CoordinateOperationFactory#createDefiningConversion} followed by
+     *             {@link #createDerivedCRS} instead.
      */
     public DerivedCRS createDerivedCRS(Map<String,?>       properties,
                                        OperationMethod         method,
@@ -837,7 +902,36 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (DerivedCRS) pool.unique(crs);
+        crs = pool.unique(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a derived coordinate reference system from a conversion.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  baseCRS Coordinate reference system to base projection on.
+     * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
+     * @param  derivedCS The coordinate system for the derived CRS.
+     * @throws FactoryException if the object creation failed.
+     *
+     * @since 2.5
+     */
+    public DerivedCRS createDerivedCRS(Map<String,?>          properties,
+                                       CoordinateReferenceSystem baseCRS,
+                                       Conversion     conversionFromBase,
+                                       CoordinateSystem        derivedCS) throws FactoryException
+    {
+        DerivedCRS crs;
+        final ParameterValueGroup parameters = conversionFromBase.getParameterValues();
+        final MathTransformFactory mtFactory = getMathTransformFactory();
+        final MathTransform mt = mtFactory.createBaseToDerived(baseCRS, parameters, derivedCS);
+        try {
+            crs = new DefaultDerivedCRS(properties, conversionFromBase, baseCRS, mt, derivedCS);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -857,6 +951,9 @@ public class ReferencingObjectFactory extends ReferencingFactory
      * @param  baseToDerived The transform from the geographic to the projected CRS.
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Use {@link CoordinateOperationFactory#createDefiningConversion} followed by
+     *             {@link #createProjectedCRS} instead.
      */
     public ProjectedCRS createProjectedCRS(Map<String,?>    properties,
                                            OperationMethod      method,
@@ -870,7 +967,55 @@ public class ReferencingObjectFactory extends ReferencingFactory
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (ProjectedCRS) pool.unique(crs);
+        crs = pool.unique(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a projected coordinate reference system from a conversion.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  baseCRS Geographic coordinate reference system to base projection on.
+     * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
+     * @param  derivedCS The coordinate system for the projected CRS.
+     * @throws FactoryException if the object creation failed.
+     *
+     * @since 2.5
+     */
+    public ProjectedCRS createProjectedCRS(Map<String,?> properties,
+                                           GeographicCRS baseCRS,
+                                           Conversion    conversionFromBase,
+                                           CartesianCS   derivedCS) throws FactoryException
+    {
+        ProjectedCRS crs;
+        final ParameterValueGroup parameters = conversionFromBase.getParameterValues();
+        final MathTransformFactory mtFactory = getMathTransformFactory();
+        final MathTransform mt = mtFactory.createBaseToDerived(baseCRS, parameters, derivedCS);
+        OperationMethod method = conversionFromBase.getMethod();
+        if (!(method instanceof MathTransformProvider)) {
+            /*
+             * Our Geotools implementation of DefaultProjectedCRS may not be able to detect
+             * the conversion type (PlanarProjection, CylindricalProjection, etc.)  because
+             * we rely on the Geotools-specific MathTransformProvider for that. We will try
+             * to help it with the optional "conversionType" hint,  providing that the user
+             * do not already provides this hint.
+             */
+            if (!properties.containsKey(DefaultProjectedCRS.CONVERSION_TYPE_KEY)) {
+                method = mtFactory.getLastMethodUsed();
+                if (method instanceof MathTransformProvider) {
+                    final Map<String,Object> copy = new HashMap<String,Object>(properties);
+                    copy.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
+                            ((MathTransformProvider) method).getOperationType());
+                    properties = copy;
+                }
+            }
+        }
+        try {
+            crs = new DefaultProjectedCRS(properties, conversionFromBase, baseCRS, mt, derivedCS);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = pool.unique(crs);
         return crs;
     }
 
@@ -888,8 +1033,6 @@ public class ReferencingObjectFactory extends ReferencingFactory
 
     /**
      * Creates a coordinate reference system object from a string.
-     * The <A HREF="../doc-files/WKT.html">definition for WKT</A>
-     * is shown using Extended Backus Naur Form (EBNF).
      *
      * @param  wkt Coordinate system encoded in Well-Known Text format.
      * @throws FactoryException if the object creation failed.
@@ -897,14 +1040,13 @@ public class ReferencingObjectFactory extends ReferencingFactory
     public synchronized CoordinateReferenceSystem createFromWKT(final String wkt)
             throws FactoryException
     {
-        // Note: while this factory is thread safe, the WKT parser is not.
-        //       Since we share a single instance of this parser, we must
-        //       synchronize.
+        /*
+         * Note: while this factory is thread safe, the WKT parser is not.
+         * Since we share a single instance of this parser, we must synchronize.
+         */
         if (parser == null) {
-            final Hints hints = new Hints(getImplementationHints());
-            parser = new Parser(Symbols.DEFAULT,
-                    ReferencingFactoryFinder.getDatumFactory(hints), this, this,
-                    ReferencingFactoryFinder.getMathTransformFactory(hints));
+            createParser(ReferencingFactoryFinder.getDatumFactory(null),
+                    getMathTransformFactory());
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);
@@ -915,5 +1057,14 @@ public class ReferencingObjectFactory extends ReferencingFactory
             }
             throw new FactoryException(exception);
         }
+    }
+
+    /**
+     * Creates inconditionnaly the WKT parser. This is factored out as a single private method
+     * for making easier to spot the places in this code that need to create the parser and the
+     * datum-alias patch.
+     */
+    private void createParser(final DatumFactory datumFactory, final MathTransformFactory mtFactory) {
+        parser = new Parser(Symbols.DEFAULT, datumFactory, this, this, mtFactory);
     }
 }

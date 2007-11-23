@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.ReferenceIdentifier;
@@ -38,8 +36,8 @@ import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
 import org.opengis.util.NameSpace;
 import org.opengis.util.ScopedName;
+import static org.opengis.referencing.IdentifiedObject.REMARKS_KEY;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -83,15 +81,10 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     private static final long serialVersionUID = 8474731565582774497L;
 
     /**
-     * @todo Replace by static import once we are allowed to compile for J2SE 1.5.
-     */
-    private static final String REMARKS_KEY = org.opengis.referencing.IdentifiedObject.REMARKS_KEY;
-
-    /**
      * A pool of {@link LocalName} values for given {@link InternationalString}.
      * Will be constructed only when first needed.
      */
-    private static Map SCOPES;
+    private static Map<CharSequence,GenericName> SCOPES;
 
     /**
      * Identifier code or name, optionally from a controlled list or pattern
@@ -178,7 +171,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    public NamedIdentifier(final Map properties) throws IllegalArgumentException {
+    public NamedIdentifier(final Map<String,?> properties) throws IllegalArgumentException {
         this(properties, true);
     }
 
@@ -226,11 +219,11 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static Map toMap(final Citation authority,
-                             final String   code,
-                             final String   version)
+    private static Map<String,?> toMap(final Citation authority,
+                                       final String   code,
+                                       final String   version)
     {
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         if (authority != null) properties.put(AUTHORITY_KEY, authority);
         if (code      != null) properties.put(     CODE_KEY, code     );
         if (version   != null) properties.put(  VERSION_KEY, version  );
@@ -250,7 +243,9 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    NamedIdentifier(final Map properties, final boolean standalone) throws IllegalArgumentException {
+    NamedIdentifier(final Map<String,?> properties, final boolean standalone)
+            throws IllegalArgumentException
+    {
         ensureNonNull("properties", properties);
         Object code      = null;
         Object codespace = null;
@@ -269,9 +264,8 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
          */
         String key   = null;
         Object value = null;
-        for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
-            final Map.Entry entry = (Map.Entry) it.next();
-            key   = ((String) entry.getKey()).trim().toLowerCase();
+        for (final Map.Entry<String,?> entry : properties.entrySet()) {
+            key   = entry.getKey().trim().toLowerCase();
             value = entry.getValue();
             /*
              * Note: String.hashCode() is part of J2SE specification,
@@ -298,7 +292,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
                         continue;
                     }
                     break;
-                    
+
                 }
                 case 351608024: {
                     if (key.equals(VERSION_KEY)) {
@@ -373,8 +367,8 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
             key= AUTHORITY_KEY; this.authority = (Citation)            (value=authority);
             key=   REMARKS_KEY; this.remarks   = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
-            InvalidParameterValueException e = new InvalidParameterValueException(Errors.format(
-                                   ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
+            InvalidParameterValueException e = new InvalidParameterValueException(
+                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
@@ -411,7 +405,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
 
     /**
      * Name or identifier of the person or organization responsible for namespace.
-     * 
+     *
      * @return The codespace, or {@code null} if not available.
      */
     public String getCodeSpace() {
@@ -480,9 +474,9 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
         GenericName scope;
         synchronized (NamedIdentifier.class) {
             if (SCOPES == null) {
-                SCOPES = new WeakValueHashMap();
+                SCOPES = new WeakValueHashMap<CharSequence,GenericName>();
             }
-            scope = (GenericName) SCOPES.get(title);
+            scope = SCOPES.get(title);
             if (scope == null) {
                 scope = new org.geotools.util.LocalName(title);
                 SCOPES.put(title, scope);
@@ -497,10 +491,9 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     private static InternationalString getShortestTitle(final Citation authority) {
         InternationalString title = authority.getTitle();
         int length = title.length();
-        final Collection alt = authority.getAlternateTitles();
+        final Collection<? extends InternationalString> alt = authority.getAlternateTitles();
         if (alt != null) {
-            for (final Iterator it=alt.iterator(); it.hasNext();) {
-                final InternationalString candidate = (InternationalString) it.next();
+            for (final InternationalString candidate : alt) {
                 final int candidateLength = candidate.length();
                 if (candidateLength>0 && candidateLength<length) {
                     title = candidate;
@@ -561,7 +554,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     /**
      * Returns a view of this object as a local name. The local name returned by this method
      * will have the same {@linkplain LocalName#getScope scope} than this generic name.
-     * 
+     *
      * @deprecated Replaced by {@link #name()}.
      */
     public LocalName asLocalName() {
@@ -580,7 +573,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     /**
      * Returns the scope (name space) of this generic name. If this name has no scope
      * (e.g. is the root), then this method returns {@code null}.
-     * 
+     *
      * @deprecated Replaced by {@link #scope()}.
      */
     public GenericName getScope() {
@@ -601,7 +594,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * Each element in this list is like a directory name in a file path name.
      * The length of this sequence is the generic name depth.
      */
-    public List getParsedNames() {
+    public List<LocalName> getParsedNames() {
         return getName().getParsedNames();
     }
 
@@ -627,7 +620,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     /**
      * Returns a view of this object as a scoped name,
      * or {@code null} if this name has no scope.
-     * 
+     *
      * @deprecated Replaced by {@link #toFullyQualifiedName()}.
      */
     public ScopedName asScopedName() {
@@ -650,6 +643,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * is local-independant. It contains all elements listed by {@link #getParsedNames}
      * separated by an arbitrary character (usually {@code :} or {@code /}).
      */
+    @Override
     public String toString() {
         return getName().toString();
     }
@@ -666,6 +660,7 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     /**
      * Compares this identifier with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final NamedIdentifier that = (NamedIdentifier) object;
@@ -681,8 +676,9 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
     /**
      * Returns a hash code value for this identifier.
      */
+    @Override
     public int hashCode() {
-        int hash = (int)serialVersionUID;
+        int hash = (int) serialVersionUID;
         if (code != null) {
             hash ^= code.hashCode();
         }

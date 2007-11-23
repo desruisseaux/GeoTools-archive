@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,8 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
@@ -31,7 +29,7 @@ import org.opengis.referencing.operation.SingleOperation;
 
 /**
  * A single (not {@linkplain DefaultConcatenatedOperation concatenated}) coordinate operation.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -65,7 +63,7 @@ public class DefaultSingleOperation extends AbstractCoordinateOperation implemen
      * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
      *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      */
-    public DefaultSingleOperation(final Map                      properties,
+    public DefaultSingleOperation(final Map<String,?>            properties,
                                   final CoordinateReferenceSystem sourceCRS,
                                   final CoordinateReferenceSystem targetCRS,
                                   final MathTransform             transform)

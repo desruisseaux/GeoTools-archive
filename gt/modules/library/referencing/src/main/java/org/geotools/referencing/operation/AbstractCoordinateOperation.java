@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies and extensions
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,7 +27,6 @@ import java.util.Map;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.Result;
 import org.opengis.metadata.quality.QuantitativeResult;
@@ -47,7 +45,6 @@ import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.AbstractDerivedCRS;
@@ -84,7 +81,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  */
 public class AbstractCoordinateOperation extends AbstractIdentifiedObject
-                                      implements CoordinateOperation
+        implements CoordinateOperation
 {
     /**
      * Serial number for interoperability with different versions.
@@ -125,7 +122,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * Estimate(s) of the impact of this operation on point accuracy, or {@code null}
      * if none.
      */
-    private final Collection/*<PositionalAccuracy>*/ positionalAccuracy;
+    private final Collection<PositionalAccuracy> positionalAccuracy;
 
     /**
      * Area in which this operation is valid, or {@code null} if not available.
@@ -168,7 +165,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * The properties given in argument follow the same rules than for the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      * Additionally, the following properties are understood by this construtor:
-     * <br><br>
+     * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>
@@ -176,46 +173,47 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #OPERATION_VERSION_KEY "operationVersion"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#OPERATION_VERSION_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getOperationVersion}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #POSITIONAL_ACCURACY_KEY "positionalAccuracy"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#POSITIONAL_ACCURACY_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;<code>{@linkplain PositionalAccuracy}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getPositionalAccuracy}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VALID_AREA_KEY "validArea"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#VALID_AREA_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #SCOPE_KEY "scope"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#SCOPE_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
      * </table>
      *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param sourceCRS The source CRS.
      * @param targetCRS The target CRS.
      * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
      *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      */
-    public AbstractCoordinateOperation(final Map                      properties,
+    public AbstractCoordinateOperation(final Map<String,?>            properties,
                                        final CoordinateReferenceSystem sourceCRS,
                                        final CoordinateReferenceSystem targetCRS,
                                        final MathTransform             transform)
     {
-        this(properties, new HashMap(), sourceCRS, targetCRS, transform);
+        this(properties, new HashMap<String,Object>(), sourceCRS, targetCRS, transform);
     }
 
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private AbstractCoordinateOperation(final Map properties, final Map subProperties,
+    private AbstractCoordinateOperation(final Map<String,?>            properties,
+                                        final Map<String,Object>    subProperties,
                                         final CoordinateReferenceSystem sourceCRS,
                                         final CoordinateReferenceSystem targetCRS,
                                         final MathTransform             transform)
@@ -229,7 +227,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
         if (positionalAccuracy==null || positionalAccuracy.length==0) {
             positionalAccuracy = null;
         } else {
-            positionalAccuracy = (PositionalAccuracy[]) positionalAccuracy.clone();
+            positionalAccuracy = positionalAccuracy.clone();
             for (int i=0; i<positionalAccuracy.length; i++) {
                 ensureNonNull(POSITIONAL_ACCURACY_KEY, positionalAccuracy, i);
             }
@@ -249,7 +247,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     }
 
     /**
-     * Check if a reference coordinate system has the expected number of dimensions.
+     * Checks if a reference coordinate system has the expected number of dimensions.
      *
      * @param name     The argument name.
      * @param crs      The coordinate reference system to check.
@@ -300,8 +298,11 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      *
      * @see #getAccuracy()
      */
-    public Collection/*<PositionalAccuracy>*/ getPositionalAccuracy() {
-        return (positionalAccuracy!=null) ? positionalAccuracy : Collections.EMPTY_SET;
+    public Collection<PositionalAccuracy> getPositionalAccuracy() {
+        if (positionalAccuracy == null) {
+            return Collections.emptySet();
+        }
+        return positionalAccuracy;
     }
 
     /**
@@ -366,7 +367,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
         for (final Iterator it=accuracies.iterator(); it.hasNext();) {
             final Collection results = ((PositionalAccuracy) it.next()).getResults();
             for (final Iterator it2 = results.iterator(); it2.hasNext();) {
-                final Result accuracy = (Result) it2.next(); 
+                final Result accuracy = (Result) it2.next();
                 if (accuracy instanceof QuantitativeResult) {
                     final QuantitativeResult quantity = (QuantitativeResult) accuracy;
                     final Collection r = quantity.getValues();
@@ -377,7 +378,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                                 final Number d = (Number) i.next();
                                 if (d != null) {
                                     double value = d.doubleValue();
-                                    value = unit.getConverterTo(SI.METER).convert(value); 
+                                    value = unit.getConverterTo(SI.METER).convert(value);
                                     return value;
                                 }
                             }
@@ -442,7 +443,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     public InternationalString getScope() {
         return scope;
     }
-    
+
     /**
      * Gets the math transform. The math transform will transform positions in the
      * {@linkplain #getSourceCRS source coordinate reference system} into positions
@@ -459,7 +460,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * @return The most specific GeoAPI interface
      *         (e.g. <code>{@linkplain Transformation}.class</code>).
      */
-    public static Class getType(final CoordinateOperation object) {
+    public static Class<? extends CoordinateOperation> getType(final CoordinateOperation object) {
         if (object instanceof        Transformation) return        Transformation.class;
         if (object instanceof       ConicProjection) return       ConicProjection.class;
         if (object instanceof CylindricalProjection) return CylindricalProjection.class;
@@ -480,6 +481,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -502,7 +504,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                  * Avoid never-ending recursivity: AbstractDerivedCRS has a 'conversionFromBase'
                  * field that is set to this AbstractCoordinateOperation.
                  */
-                final Boolean comparing = (Boolean) AbstractDerivedCRS._COMPARING.get();
+                final Boolean comparing = AbstractDerivedCRS._COMPARING.get();
                 if (comparing!=null && comparing.booleanValue()) {
                     return true;
                 }
@@ -511,7 +513,6 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                     return equals(this.targetCRS, that.targetCRS, compareMetadata);
                 } finally {
                     AbstractDerivedCRS._COMPARING.set(Boolean.FALSE);
-                    // TODO: use _COMPARING.remove() when we will be allowed to compile for J2SE 1.5.
                 }
             }
         }
@@ -521,6 +522,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     /**
      * Returns a hash code value for this coordinate operation.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         if (sourceCRS != null) code ^= sourceCRS.hashCode();
@@ -537,6 +539,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         append(formatter, sourceCRS, "SOURCE");
         append(formatter, targetCRS, "TARGET");
@@ -551,12 +554,14 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * @param object    The object to append, or {@code null} if none.
      * @param type      The label to put in front of the object name.
      */
+    @SuppressWarnings("serial")
     static void append(final Formatter formatter, final IdentifiedObject object, final String type) {
         if (object != null) {
-            final Map properties = new HashMap(4);
+            final Map<String,Object> properties = new HashMap<String,Object>(4);
             properties.put(IdentifiedObject.NAME_KEY,        formatter.getName(object));
             properties.put(IdentifiedObject.IDENTIFIERS_KEY, formatter.getIdentifier(object));
             formatter.append((IdentifiedObject) new AbstractIdentifiedObject(properties) {
+                @Override
                 protected String formatWKT(final Formatter formatter) {
                     /*
                      * Do not invoke super.formatWKT(formatter), since it doesn't do anything

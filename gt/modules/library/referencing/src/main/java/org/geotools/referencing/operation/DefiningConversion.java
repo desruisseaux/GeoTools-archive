@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,28 +19,27 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.Collections;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.operation.OperationMethod;
 import org.geotools.referencing.wkt.Formatter;
 
 
 /**
- * A conversion used for the definition of a {@linkplain GeneralDerivedCRS derived CRS}
- * (including projections). This conversion has no source and target CRS, and no math
+ * A conversion used for the definition of a {@linkplain org.opengis.referencing.crs.GeneralDerivedCRS
+ * derived CRS} (including projections). This conversion has no source and target CRS, and no math
  * transform. Those elements are created by the derived CRS itself.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Matthias Basler
+ *
+ * @see org.opengis.referencing.operation.CoordinateOperationFactory#createDefiningConversion
  */
 public class DefiningConversion extends DefaultConversion {
     /**
@@ -87,7 +86,7 @@ public class DefiningConversion extends DefaultConversion {
      * @param method The operation method.
      * @param parameters The parameter values.
      */
-    public DefiningConversion(final Map                 properties,
+    public DefiningConversion(final Map<String,?>       properties,
                               final OperationMethod     method,
                               final ParameterValueGroup parameters)
     {
@@ -99,6 +98,7 @@ public class DefiningConversion extends DefaultConversion {
     /**
      * Returns the parameter values.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         return (ParameterValueGroup) parameters.clone();
     }
@@ -106,6 +106,7 @@ public class DefiningConversion extends DefaultConversion {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final String name = super.formatWKT(formatter);
         formatter.append(parameters);

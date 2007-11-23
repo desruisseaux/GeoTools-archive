@@ -16,16 +16,13 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
@@ -34,7 +31,6 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.*;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.factory.FactoryRegistryException;
@@ -90,7 +86,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
     /**
      * Used as a guard against infinite recursivity.
      */
-    private final ThreadLocal/*<Boolean>*/ processing = new ThreadLocal();
+    private final ThreadLocal<Boolean> processing = new ThreadLocal<Boolean>();
 
     /**
      * Creates a new factory backed by a default EPSG authority factory.
@@ -190,7 +186,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      *
      * @since 2.3
      */
-    // @Override
+    @Override
     protected CoordinateOperation createFromDatabase(final CoordinateReferenceSystem sourceCRS,
                                                      final CoordinateReferenceSystem targetCRS)
     {
@@ -302,7 +298,6 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                         source  = sourceCRS;
                     } finally {
                         processing.set(Boolean.FALSE);
-                        // TODO: use processing.remove() when we will be allowed to compile for J2SE 1.5.
                     } else {
                         prepend = null;
                     }
@@ -312,7 +307,6 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                         target = targetCRS;
                     } finally {
                         processing.set(Boolean.FALSE);
-                        // TODO: use processing.remove() when we will be allowed to compile for J2SE 1.5.
                     } else {
                         append = null;
                     }
@@ -377,8 +371,8 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
          * single operation and append to the last single operation.
          */
         if (operation instanceof ConcatenatedOperation) {
-            final List/*<CoordinateOperation>*/ c = ((ConcatenatedOperation) operation).getOperations();
-            final CoordinateOperation[] op = (CoordinateOperation[]) c.toArray(new CoordinateOperation[c.size()]);
+            final List<SingleOperation> c = ((ConcatenatedOperation) operation).getOperations();
+            final CoordinateOperation[] op = c.toArray(new CoordinateOperation[c.size()]);
             if (op.length != 0) {
                 final CoordinateOperation first = op[0];
                 if (op.length == 1) {

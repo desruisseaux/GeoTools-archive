@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,14 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.datum.Datum;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.wkt.Formatter;
 
 
@@ -90,16 +86,17 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
     }
 
     /**
-     * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class
-     * constructor}.
+     * Constructs a coordinate reference system from a set of properties.
+     * The properties are given unchanged to the
+     * {@linkplain org.geotools.referencing.AbstractReferenceSystem#AbstractReferenceSystem(Map)
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public AbstractSingleCRS(final Map      properties,
-                             final Datum         datum,
+    public AbstractSingleCRS(final Map<String,?> properties,
+                             final Datum datum,
                              final CoordinateSystem cs)
     {
         super(properties, cs);
@@ -150,6 +147,7 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final AbstractSingleCRS that = (AbstractSingleCRS) object;
@@ -157,7 +155,7 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this CRS. {@linkplain #getName Name},
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
@@ -169,14 +167,15 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return super.hashCode() ^ datum.hashCode();
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    //@Override
+    @Override
     final void formatDefaultWKT(final Formatter formatter) {
         formatter.append(datum);
         super.formatDefaultWKT(formatter);

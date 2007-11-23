@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,32 +19,28 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.CoordinateOperation;
 
-// Geotools dependencies
 import org.geotools.util.MapEntry;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 
 
 /**
- * An immutable map fetching all properties from the specified identified object.
- * Calls to {@code get} methods are forwarded to the appropriate
- * {@link IdentifiedObject} method.
+ * An immutable map fetching all properties from the specified identified object. Calls
+ * to {@code get} methods are forwarded to the appropriate {@link IdentifiedObject} method.
  *
  * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class Properties extends AbstractMap {
+final class Properties extends AbstractMap<String,Object> {
     /**
      * The object where all properties come from.
      */
@@ -53,8 +49,8 @@ final class Properties extends AbstractMap {
     /**
      * The entries set. Will be constructed only when first needed.
      */
-    private transient Set entries;
-    
+    private transient Set<Entry<String,Object>> entries;
+
     /**
      * Creates new properties from the specified identified object.
      */
@@ -66,6 +62,7 @@ final class Properties extends AbstractMap {
     /**
      * Returns true if this map contains a mapping for the specified key.
      */
+    @Override
     public boolean containsKey(final Object key) {
         return get(key) != null;
     }
@@ -74,6 +71,7 @@ final class Properties extends AbstractMap {
      * Returns the value to which this map maps the specified key.
      * Returns null if the map contains no mapping for this key.
      */
+    @Override
     public Object get(final Object key) {
         if (key instanceof String) {
             final String s = ((String) key).trim();
@@ -125,13 +123,14 @@ final class Properties extends AbstractMap {
     /**
      * Returns a set view of the mappings contained in this map.
      */
-    public Set entrySet() {
+    @Override
+    public Set<Entry<String,Object>> entrySet() {
         if (entries == null) {
-            entries = new HashSet(Math.round(KEYS.length/0.75f)+1, 0.75f);
+            entries = new HashSet<Entry<String,Object>>(Math.round(KEYS.length / 0.75f) + 1, 0.75f);
             for (int i=0; i<KEYS.length; i++) {
                 final Object value = get(i);
                 if (value != null) {
-                    entries.add(new MapEntry(KEYS[i], value));
+                    entries.add(new MapEntry<String,Object>(KEYS[i], value));
                 }
             }
             entries = Collections.unmodifiableSet(entries);

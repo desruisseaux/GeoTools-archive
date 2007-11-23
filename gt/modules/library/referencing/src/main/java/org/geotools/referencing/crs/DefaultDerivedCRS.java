@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,9 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.DerivedCRS;
@@ -32,8 +30,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
-import org.geotools.referencing.AbstractReferenceSystem;        // For javadoc
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 
 
@@ -81,6 +77,8 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      * @throws MismatchedDimensionException if the source and target dimension of
      *         {@code baseToDeviced} don't match the dimension of {@code base}
      *         and {@code derivedCS} respectively.
+     *
+     * @deprecated Create explicitly a {@link DefiningConversion} instead.
      */
     public DefaultDerivedCRS(final String                    name,
                              final OperationMethod         method,
@@ -110,8 +108,10 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      * @throws MismatchedDimensionException if the source and target dimension of
      *         {@code baseToDeviced} don't match the dimension of {@code base}
      *         and {@code derivedCS} respectively.
+     *
+     * @deprecated Create explicitly a {@link DefiningConversion} instead.
      */
-    public DefaultDerivedCRS(final Map                 properties,
+    public DefaultDerivedCRS(final Map<String,?>       properties,
                              final OperationMethod         method,
                              final CoordinateReferenceSystem base,
                              final MathTransform    baseToDerived,
@@ -122,9 +122,9 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
     }
 
     /**
-     * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
-     * The properties are given unchanged to the
-     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
+     * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}. The
+     * properties are given unchanged to the {@linkplain AbstractDerivedCRS#AbstractDerivedCRS(Map,
+     * Conversion, CoordinateReferenceSystem, MathTransform, CoordinateSystem) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object.
      * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
@@ -137,7 +137,7 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      *         {@code baseToDerived} don't match the dimension of {@code base}
      *         and {@code derivedCS} respectively.
      */
-    public DefaultDerivedCRS(final Map                 properties,
+    public DefaultDerivedCRS(final Map<String,?>       properties,
                              final Conversion  conversionFromBase,
                              final CoordinateReferenceSystem base,
                              final MathTransform    baseToDerived,
@@ -146,13 +146,14 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
     {
         super(properties, conversionFromBase, base, baseToDerived, derivedCS);
     }
-    
+
     /**
      * Returns a hash value for this derived CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }

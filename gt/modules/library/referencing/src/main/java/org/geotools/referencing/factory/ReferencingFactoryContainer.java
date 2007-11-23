@@ -375,7 +375,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      *
      * @see MathTransformFactory#createParameterizedTransform
      *
-     * @deprecated Uses the {@link MathTransformFactory} interface.
+     * @deprecated Use the {@link MathTransformFactory} interface instead.
      */
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws NoSuchIdentifierException, FactoryException
@@ -498,8 +498,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      *
-     * @todo Current implementation creates directly a Geotools implementation, because there
-     *       is not yet a suitable method in GeoAPI interfaces.
+     * @deprecated Moved to the {@link CRSFactory} interface.
      */
     public ProjectedCRS createProjectedCRS(Map<String,?>       properties,
                                            final GeographicCRS baseCRS,
@@ -543,6 +542,9 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
      * @param  parameters The parameter values to give to the projection.
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Use {@link CRSFactory#createDefiningConversion} followed by
+     *             {@link CRSFactory#createProjectedCRS} instead.
      */
     public ProjectedCRS createProjectedCRS(Map<String,?>       properties,
                                            GeographicCRS          baseCRS,
@@ -649,7 +651,7 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
         axis[classic ? 0 : 1] = cs.getAxis(0);
         axis[classic ? 1 : 2] = cs.getAxis(1);
         axis[classic ? 2 : 0] = vertical.getCoordinateSystem().getAxis(0);
-        final Map csName, crsName;
+        final Map<String,?> csName, crsName;
         if (crs != null) {
             csName  = AbstractIdentifiedObject.getProperties(crs.getCoordinateSystem());
             crsName = AbstractIdentifiedObject.getProperties(crs);
@@ -714,12 +716,11 @@ public class ReferencingFactoryContainer extends ReferencingFactory {
          */
         if (crs instanceof CompoundCRS) {
             int count=0, lowerDimension=0, lowerIndex=0;
-            final List/*<CoordinateReferenceSystem>*/ sources;
+            final List<CoordinateReferenceSystem> sources;
             final CoordinateReferenceSystem[] targets;
             sources = ((CompoundCRS) crs).getCoordinateReferenceSystems();
             targets = new CoordinateReferenceSystem[sources.size()];
-search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
-                final CoordinateReferenceSystem source = (CoordinateReferenceSystem) it.next();
+search:     for (final CoordinateReferenceSystem source : sources) {
                 final int upperDimension = lowerDimension + source.getCoordinateSystem().getDimension();
                 /*
                  * 'source' CRS applies to dimension 'lowerDimension' inclusive to 'upperDimension'
@@ -754,7 +755,7 @@ search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
                 return targets[0];
             }
             return getCRSFactory().createCompoundCRS(getTemporaryName(crs),
-                    (CoordinateReferenceSystem[]) XArray.resize(targets, count));
+                    XArray.resize(targets, count));
         }
         /*
          * TODO: Implement other cases here (3D-GeographicCRS, etc.).
@@ -768,7 +769,7 @@ search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
     /**
      * Returns a temporary name for object derived from the specified one.
      */
-    private static Map getTemporaryName(final IdentifiedObject source) {
+    private static Map<String,?> getTemporaryName(final IdentifiedObject source) {
         return Collections.singletonMap(IdentifiedObject.NAME_KEY,
                                         source.getName().getCode() + " (3D)");
     }

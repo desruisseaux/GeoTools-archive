@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,27 +19,18 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
+import org.opengis.referencing.operation.*; // We use almost all of them.
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.Projection;
-import org.opengis.referencing.operation.PlanarProjection;
-import org.opengis.referencing.operation.CylindricalProjection;
-import org.opengis.referencing.operation.ConicProjection;
 
 
 /**
  * An operation on coordinates that does not include any change of Datum. The best-known
  * example of a coordinate conversion is a map projection. The parameters describing
  * coordinate conversions are defined rather than empirically derived. Note that some
- * conversions have no parameters. 
- *  
+ * conversions have no parameters.
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -76,44 +67,20 @@ public class DefaultConversion extends DefaultOperation implements Conversion {
      * Constructs a conversion from a set of properties. The properties given in argument
      * follow the same rules than for the {@link AbstractCoordinateOperation} constructor.
      *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param sourceCRS The source CRS.
      * @param targetCRS The target CRS.
      * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
      *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      * @param method    The operation method.
      */
-    public DefaultConversion(final Map                       properties,
+    public DefaultConversion(final Map<String,?>             properties,
                              final CoordinateReferenceSystem sourceCRS,
                              final CoordinateReferenceSystem targetCRS,
                              final MathTransform             transform,
                              final OperationMethod           method)
     {
         super(properties, sourceCRS, targetCRS, transform, method);
-    }
-
-    /**
-     * Returns a conversion from the specified {@linkplain DefiningConversion defining conversion}.
-     * This method may constructs instance of {@link DefaultPlanarProjection} or
-     * {@link DefaultCylindricalProjection} among others.
-     *
-     * @param definition The defining conversion.
-     * @param sourceCRS The source CRS.
-     * @param targetCRS The target CRS.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
-     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
-     *
-     * @see DefaultOperation#create
-     *
-     * @deprecated Replaced by {@link #create(Conversion, CoordinateReferenceSystem,
-     *             CoordinateReferenceSystem, MathTransform, Class)}.
-     */
-    public static Conversion create(final Conversion               definition,
-                                    final CoordinateReferenceSystem sourceCRS,
-                                    final CoordinateReferenceSystem targetCRS,
-                                    final MathTransform             transform)
-    {
-        return create(definition, sourceCRS, targetCRS, transform, null);
     }
 
     /**
@@ -143,12 +110,12 @@ public class DefaultConversion extends DefaultOperation implements Conversion {
                                     final CoordinateReferenceSystem sourceCRS,
                                     final CoordinateReferenceSystem targetCRS,
                                     final MathTransform             transform,
-                                    final Class/*<? extends Conversion>*/ typeHint)
+                                    final Class<? extends Conversion> typeHint)
     {
-        Class type = getType(definition);
+        Class<? extends CoordinateOperation> type = getType(definition);
         final OperationMethod method = definition.getMethod();
         if (method instanceof MathTransformProvider) {
-            final Class candidate = ((MathTransformProvider) method).getOperationType();
+            final Class<? extends Operation> candidate = ((MathTransformProvider) method).getOperationType();
             if (candidate != null) {
                 if (type.isAssignableFrom(candidate)) {
                     type = candidate;
