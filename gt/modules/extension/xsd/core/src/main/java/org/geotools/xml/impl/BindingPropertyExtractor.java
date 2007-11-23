@@ -16,8 +16,6 @@
 package org.geotools.xml.impl;
 
 import org.apache.commons.collections.MultiHashMap;
-import org.apache.commons.collections.MultiMap;
-import org.eclipse.xsd.XSDAnnotation;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDParticle;
@@ -30,12 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.PropertyExtractor;
-import org.geotools.xml.Schemas;
 
 
 /**
