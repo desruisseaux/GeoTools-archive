@@ -1,7 +1,6 @@
 package org.geotools.feature.type;
 
 import java.util.List;
-import java.util.Set;
 
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AssociationType;

@@ -58,8 +58,7 @@ public class FeatureFactoryImpl implements FeatureFactory {
     }
     
     public Association createAssociation(Attribute related, AssociationDescriptor descriptor) {
-        throw new UnsupportedOperationException();
-    	//return new AssociationImpl(related,descriptor);
+        return new AssociationImpl(related,descriptor);
     }
 	
 	public Attribute createAttribute( Object value, AttributeDescriptor descriptor, String id ) {
