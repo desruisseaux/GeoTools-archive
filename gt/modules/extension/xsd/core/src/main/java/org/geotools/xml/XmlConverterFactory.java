@@ -65,7 +65,13 @@ public class XmlConverterFactory implements ConverterFactory {
                     target, null);
 
             if (converter != null) {
-                Object converted = converter.convert(source, target);
+                Object converted = null;
+
+                try {
+                    converter.convert(source, target);
+                } catch (Exception e) {
+                    //ignore
+                }
 
                 if (converted != null) {
                     return converted;
