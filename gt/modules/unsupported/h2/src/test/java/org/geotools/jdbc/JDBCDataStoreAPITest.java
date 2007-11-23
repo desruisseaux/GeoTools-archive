@@ -320,8 +320,9 @@ public abstract class JDBCDataStoreAPITest extends JDBCTestSupport {
         }
 
         try {
+            assertFalse( reader1.hasNext() );
             reader1.next();
-            fail("next should fail with an NoSuchElementException");
+                fail("next should fail with an NoSuchElementException");
         } catch (Exception expectedNoElement) {
             // this is new to me, I had expected an IOException
         }

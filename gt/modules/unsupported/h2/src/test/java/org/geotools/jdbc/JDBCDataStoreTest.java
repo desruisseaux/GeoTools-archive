@@ -28,8 +28,8 @@ import com.vividsolutions.jts.geom.Point;
 public abstract class JDBCDataStoreTest extends JDBCTestSupport {
 
    public void testGetNames() throws IOException {
-		String[] typeNames = dataStore.getTypeNames();
-		assertTrue( new HashSet( Arrays.asList(typeNames) ).contains("ft1"));
+       String[] typeNames = dataStore.getTypeNames();
+       assertTrue( new HashSet( Arrays.asList(typeNames) ).contains("ft1"));
 	}
 	
 	public void testGetSchema() throws Exception {
@@ -67,13 +67,16 @@ public abstract class JDBCDataStoreTest extends JDBCTestSupport {
           try {
               StringBuffer sql = new StringBuffer();
               sql.append( "SELECT * FROM ");
-              dataStore.getSQLDialect().encodeTableName("geotools", sql);
-              sql.append( "." );
-              dataStore.getSQLDialect().encodeSchemaName("ft2", sql);
+              if ( dataStore.getDatabaseSchema() != null ) {
+                  dataStore.getSQLDialect().encodeSchemaName(dataStore.getDatabaseSchema(), sql);    
+                  sql.append( "." );
+              }
+              
+              dataStore.getSQLDialect().encodeTableName("ft2", sql);
               st.executeQuery( sql.toString() );   
           }
           catch( SQLException e ) {
-              fail( "table ft2 does not exist");
+              throw e;
           }
           
 		st.close();

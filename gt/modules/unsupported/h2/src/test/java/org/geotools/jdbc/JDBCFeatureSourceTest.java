@@ -12,6 +12,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 
 public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
 
@@ -122,5 +124,47 @@ public abstract class JDBCFeatureSourceTest extends JDBCTestSupport {
         assertEquals( new Integer( 1 ), feature.getAttribute(1) );
     }
     
+    public void testGetFeaturesWithSort() throws Exception {
+        FilterFactory ff = dataStore.getFilterFactory();
+        SortBy sort = ff.sort("stringProperty", SortOrder.ASCENDING);
+        DefaultQuery query = new DefaultQuery();
+        query.setSortBy( new SortBy[]{ sort } );
     
+        FeatureCollection features = featureSource.getFeatures(query);
+        assertEquals( 3, features.size() );
+        
+        Iterator iterator = features.iterator();
+        assertTrue( iterator.hasNext() );
+        
+        SimpleFeature f = (SimpleFeature) iterator.next();
+        assertEquals( "one", f.getAttribute( "stringProperty" ));
+        
+        assertTrue( iterator.hasNext() );
+        f = (SimpleFeature) iterator.next();
+        assertEquals( "two", f.getAttribute( "stringProperty" ));
+        
+        assertTrue( iterator.hasNext() );
+        f = (SimpleFeature) iterator.next();
+        assertEquals( "zero", f.getAttribute( "stringProperty" ));
+        
+        features.close( iterator );
+        
+        sort = ff.sort( "stringProperty", SortOrder.DESCENDING );
+        query.setSortBy(new SortBy[]{sort});
+        features = featureSource.getFeatures(query);
+        
+        iterator = features.iterator();
+        assertTrue( iterator.hasNext() );
+        
+        f = (SimpleFeature) iterator.next();
+        assertEquals( "zero", f.getAttribute( "stringProperty" ));
+        
+        assertTrue( iterator.hasNext() );
+        f = (SimpleFeature) iterator.next();
+        assertEquals( "two", f.getAttribute( "stringProperty" ));
+        
+        assertTrue( iterator.hasNext() );
+        f = (SimpleFeature) iterator.next();
+        assertEquals( "one", f.getAttribute( "stringProperty" ));
+    }
 }

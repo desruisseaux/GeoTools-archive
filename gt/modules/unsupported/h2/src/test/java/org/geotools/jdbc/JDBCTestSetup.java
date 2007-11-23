@@ -16,6 +16,7 @@ import javax.sql.DataSource;
  * <ol>
  *   <li>Create and configure the {@link DataSource} used to connect to the 
  *   underlying database
+ *   <li>Provide the dialect used to communicate with the underlying database
  *   <li>Populate the underlying database with the data used by the tests.
  * </ol>
  * </p>
@@ -42,6 +43,10 @@ public abstract class JDBCTestSetup {
     }
     
     protected void setUpData() throws Exception {
+        
+    }
+    
+    protected void setUpDataStore( JDBCDataStore dataStore ) {
         
     }
     
@@ -77,6 +82,7 @@ public abstract class JDBCTestSetup {
                 String line = null;
 
                 while ((line = reader.readLine()) != null) {
+                    System.out.println( line );
                     st.execute(line);
                 }
 

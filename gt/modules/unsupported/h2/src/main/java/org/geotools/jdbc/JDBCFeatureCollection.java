@@ -18,6 +18,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 
 /**
  * Contains some common state needed for all JDBCFeatureCollections.
@@ -35,6 +36,11 @@ public class JDBCFeatureCollection extends AbstractContentFeatureCollection {
 	 */
 	Filter filter;
 	Filter preFilter,postFilter;
+	
+	/**
+	 * sorting
+	 */
+	SortBy[] sort;
 	
 	public JDBCFeatureCollection( JDBCFeatureStore source, JDBCState state ) {
 		this( source, state, null );
@@ -60,6 +66,13 @@ public class JDBCFeatureCollection extends AbstractContentFeatureCollection {
 	}
 	
 	/**
+	 * Sets the sorting criteria for the feautre collection.
+	 */
+	public void setSort(SortBy[] sort) {
+        this.sort = sort;
+    }
+	
+	/**
 	 * @return The feature source the collection originates from.
 	 */
 	public JDBCFeatureStore getFeatureSource() {
@@ -83,7 +96,7 @@ public class JDBCFeatureCollection extends AbstractContentFeatureCollection {
     protected FeatureIterator createFeatureIterator() throws Exception {
         //build up a statement for the content
         JDBCDataStore dataStore = getFeatureSource().getDataStore();
-        String sql = dataStore.selectSQL( getFeatureSource().getSchema(), preFilter );
+        String sql = dataStore.selectSQL( getFeatureSource().getSchema(), preFilter, sort );
         JDBCDataStore.LOGGER.fine( sql );
         
         //create a statement and pass it off to the iterator
@@ -103,7 +116,7 @@ public class JDBCFeatureCollection extends AbstractContentFeatureCollection {
     protected FeatureIterator createFeatureWriter() throws Exception {
         //build up a statement for the content
         JDBCDataStore dataStore = getDataStore();
-        String sql = dataStore.selectSQL( getFeatureSource().getSchema(), preFilter );
+        String sql = dataStore.selectSQL( getFeatureSource().getSchema(), preFilter, sort );
         JDBCDataStore.LOGGER.fine( sql );
         
         //create a statement and pass it off to the iterator
@@ -122,7 +135,7 @@ public class JDBCFeatureCollection extends AbstractContentFeatureCollection {
     protected FeatureIterator createFeatureInserter() throws Exception {
         //build up a statement for the content
         JDBCDataStore dataStore = getDataStore();
-        String sql = dataStore.selectSQL( getFeatureSource().getSchema(), Filter.EXCLUDE );
+        String sql = dataStore.selectSQL( getFeatureSource().getSchema(), Filter.EXCLUDE, sort );
         JDBCDataStore.LOGGER.fine( sql );
         
         //create a statement and pass it off to the iterator

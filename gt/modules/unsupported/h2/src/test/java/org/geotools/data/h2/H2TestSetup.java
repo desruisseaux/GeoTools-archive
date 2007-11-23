@@ -3,6 +3,7 @@ package org.geotools.data.h2;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCTestSetup;
 import org.geotools.jdbc.SQLDialect;
 
@@ -35,42 +36,34 @@ public class H2TestSetup extends JDBCTestSetup {
             run ( "DROP TABLE \"geotools\".\"ft2\"; COMMIT;" );
         }
         catch( Exception e ) {}
+      
         try {
             run ( "DROP SCHEMA \"geotools\"; COMMIT;" );    
         }
         catch( Exception e ) {}
         
         //create some data
-        StringBuffer sb = new StringBuffer().append( "CREATE SCHEMA \"geotools\";" ); 
+        String sql = "CREATE SCHEMA \"geotools\";";
+        run( sql );
         
-//        sb.append( "CREATE TABLE \"geotools\".\"ft1\" " )
-//            .append( "(\"id\" int AUTO_INCREMENT(1) PRIMARY KEY , " )
-//            .append( "\"geometry\" OTHER, \"intProperty\" int, " ) 
-//            .append( "\"doubleProperty\" double, \"stringProperty\" varchar);" );
+        sql = "CREATE TABLE \"geotools\".\"ft1\" (" + 
+            "\"id\" int AUTO_INCREMENT(1) PRIMARY KEY, " + 
+            "\"geometry\" BLOB, \"intProperty\" int, " + 
+            "\"doubleProperty\" double, \"stringProperty\" varchar" + 
+        ")";
+        run( sql );
+
+        sql = "INSERT INTO \"geotools\".\"ft1\" VALUES (" + 
+            "0,GeomFromText('POINT(0 0)',4326), 0, 0.0,'zero');";
+        run( sql );
         
-        sb.append( "CREATE TABLE \"geotools\".\"ft1\" " )
-        .append( "(\"id\" int AUTO_INCREMENT(1) PRIMARY KEY , " )
-        .append( "\"geometry\" BLOB, \"intProperty\" int, " ) 
-        .append( "\"doubleProperty\" double, \"stringProperty\" varchar);" );
-//        sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-//            .append( "0,setSRID(GeometryFromText('POINT(0 0)'),4326), 0, 0.0,'zero');");
-//    
-//        sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-//            .append( "1,setSRID(GeometryFromText('POINT(1 1)'),4326), 1, 1.1,'one');");
-//
-//        sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-//            .append( "2,setSRID(GeometryFromText('POINT(2 2)'),4326), 2, 2.2,'two');");
-
-        sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-        .append( "0,GeomFromText('POINT(0 0)',4326), 0, 0.0,'zero');");
-
-    sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-        .append( "1,GeomFromText('POINT(1 1)',4326), 1, 1.1,'one');");
-
-    sb.append( "INSERT INTO \"geotools\".\"ft1\" VALUES (")
-        .append( "2,GeomFromText('POINT(2 2)',4326), 2, 2.2,'two');");
-    
-        run( sb.toString() );
+        sql = "INSERT INTO \"geotools\".\"ft1\" VALUES (" + 
+            "1,GeomFromText('POINT(1 1)',4326), 1, 1.1,'one');";
+        run( sql );
+        
+        sql = "INSERT INTO \"geotools\".\"ft1\" VALUES (" + 
+            "2,GeomFromText('POINT(2 2)',4326), 2, 2.2,'two');";
+        run( sql );
     }
 
     protected DataSource createDataSource() {
@@ -86,4 +79,5 @@ public class H2TestSetup extends JDBCTestSetup {
     protected SQLDialect createSQLDialect() {
         return new H2Dialect();
     }
+    
 }

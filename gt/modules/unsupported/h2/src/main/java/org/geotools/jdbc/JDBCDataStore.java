@@ -37,6 +37,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -112,7 +115,17 @@ public final class JDBCDataStore extends ContentDataStore {
      * filter capabilities of the datastore
      */
     protected FilterCapabilities filterCapabilities;
-
+    
+    /**
+     * flag controlling if the datastore is foreign-key aware
+     */
+    protected boolean foreignKeyAware = false;
+    
+    /**
+     * flag controlling if the datastore stores geometries using foreign keys 
+     * to a seperate geometry table.
+     */
+    protected boolean foreignKeyGeometries = false;
     /**
      * The dialect the datastore uses to generate sql statements in order to 
      * communicate with the underlying database.
@@ -199,6 +212,27 @@ public final class JDBCDataStore extends ContentDataStore {
         this.filterCapabilities = filterCapabilities;
     }
 
+    /**
+     * Flag determining if the datastore should process foreign keys or not.
+     * 
+     * @return <code>true</code> if the datastore is processing foreign keys, 
+     * otherwise <code>false</code>.
+     */
+    public boolean isForeignKeyAware() {
+        return foreignKeyAware;
+    }
+    
+    /**
+     * Sets Flag determining if the datastore should process foreign keys or not.
+     * 
+     * @param foreignKeyAware <code>true</code> if the datastore should process 
+     * foreign keys, otherwise <code>false</code>.
+     */
+    public void setForeignKeyAware(boolean foreignKeyAware) {
+        this.foreignKeyAware = foreignKeyAware;
+    }
+    
+    
     /**
      * The sql type to java type mappings that the datastore uses when reading
      * and writing objects to and from the database.
@@ -329,6 +363,8 @@ public final class JDBCDataStore extends ContentDataStore {
             finally {
                 closeSafe( st );
             }
+            
+            dialect.postCreateTable(databaseSchema, featureType.getTypeName(), cx);
         }
         catch( Exception e ) {
             String msg = "Error occurred creating table";
@@ -403,11 +439,17 @@ public final class JDBCDataStore extends ContentDataStore {
         List typeNames = new ArrayList();
         try {
             DatabaseMetaData metaData = cx.getMetaData();
-            ResultSet tables = metaData.getTables(null, databaseSchema, "%", null);
+            ResultSet tables = metaData.getTables(null, databaseSchema, "%", new String[]{ "TABLE" , "VIEW"});
             
             try {
                 while (tables.next()) {
                     String tableName = tables.getString("TABLE_NAME");
+                    
+                    //use the dialect to filter
+                    if ( !dialect.includeTable( tableName, cx ) ) {
+                        continue;
+                    }
+                    
                     typeNames.add(new Name(namespaceURI, tableName));
                 }    
             }
@@ -487,6 +529,7 @@ public final class JDBCDataStore extends ContentDataStore {
                                     
                                     sql.append( " WHERE 0=1" );
                                     
+                                    LOGGER.fine(sql.toString());
                                     ResultSet rs= st.executeQuery( sql.toString() );
                                     try {
                                         if ( rs.getMetaData().isAutoIncrement(1) ) {
@@ -940,7 +983,6 @@ public final class JDBCDataStore extends ContentDataStore {
         
         //encode anything post create table
         dialect.encodePostCreateTable( featureType.getTypeName(), sql );
-        sql.append(";");
         
         return sql.toString();
     }
@@ -948,7 +990,7 @@ public final class JDBCDataStore extends ContentDataStore {
     /**
      * Generates a 'SELECT * FROM' sql statement.
      */
-    protected String selectSQL( SimpleFeatureType featureType, Filter filter ) {
+    protected String selectSQL( SimpleFeatureType featureType, Filter filter, SortBy[] sort ) {
         StringBuffer sql = new StringBuffer();
         sql.append( "SELECT " );
         
@@ -984,6 +1026,7 @@ public final class JDBCDataStore extends ContentDataStore {
         sql.append( " FROM ");
         encodeTableName( featureType.getTypeName(), sql );
         
+        //filtering
         if ( filter != null ) {
             //encode filter
             try {
@@ -995,8 +1038,41 @@ public final class JDBCDataStore extends ContentDataStore {
             }
         }
         
+        //sorting
+        if ( sort != null && sort.length > 0 ) {
+            sql.append( " ORDER BY ");
+            for ( int i = 0; i < sort.length; i++ ) {
+                dialect.encodeColumnName( getPropertyName( featureType, sort[i].getPropertyName()) , sql);
+                if ( sort[i].getSortOrder() == SortOrder.DESCENDING ) {
+                    sql.append( " DESC");
+                }
+                else {
+                    sql.append( " ASC");
+                }
+                sql.append( "," );
+            }
+            sql.setLength(sql.length()-1);
+        }
+        
         return sql.toString();
         
+    }
+    
+    /**
+     * Helper method for executing a property name against a feature type.
+     * <p>
+     * This method will fall back on {@link PropertyName#getPropertyName()} if 
+     * it does not evaulate against the feature type.
+     * </p>
+     
+     */
+    protected String getPropertyName( SimpleFeatureType featureType, PropertyName propertyName ) {
+        AttributeDescriptor att = (AttributeDescriptor) propertyName.evaluate(featureType);
+        if ( att != null ) {
+            return att.getLocalName();
+        }
+        
+        return propertyName.getPropertyName();
     }
     
     /**
@@ -1006,10 +1082,18 @@ public final class JDBCDataStore extends ContentDataStore {
         StringBuffer sql = new StringBuffer();
         
         sql.append( "SELECT " );
-        
-        String geometryColumn = featureType.getDefaultGeometry().getLocalName();
-        dialect.encodeGeometryEnvelope( geometryColumn, sql );
 
+        //walk through all geometry attributes and build the query
+        for ( Iterator a = featureType.getAttributes().iterator(); a.hasNext(); ) {
+            AttributeDescriptor attribute = (AttributeDescriptor) a.next();
+            if ( attribute instanceof GeometryDescriptor ) {
+                String geometryColumn = featureType.getDefaultGeometry().getLocalName();
+                dialect.encodeGeometryEnvelope( geometryColumn, sql );
+                sql.append( ",");
+            }
+        }    
+        sql.setLength( sql.length()-1 );
+        
         sql.append( " FROM " );
         encodeTableName( featureType.getTypeName(), sql );
         
@@ -1266,6 +1350,7 @@ public final class JDBCDataStore extends ContentDataStore {
         toSQL.setFeatureType(featureType);
         toSQL.setSqlNameEscape( dialect.getNameEscape() );
         toSQL.setFIDMapper( mapper );
+        toSQL.setCapabilities(filterCapabilities);
         
         return toSQL;
     }

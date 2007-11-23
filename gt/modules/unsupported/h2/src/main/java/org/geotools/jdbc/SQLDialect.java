@@ -3,9 +3,11 @@ package org.geotools.jdbc;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -72,6 +74,27 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public abstract class SQLDialect {
 
     /**
+     * Determines if the specified table should be included in those published 
+     * by the datastore.
+     * <p>
+     * This method returns <code>true</code> if the table should be published as
+     * a feature type, otherwise it returns <code>false</code>. Subclasses should
+     * override this method, this default implementation returns <code>true<code>.
+     * </p>
+     * <p>
+     * A database connection is provided to the dialect but it should not be closed.
+     * However any statements objects or result sets that are instantiated from it
+     * must be closed.
+     * </p>
+     * @param tableName The name of the table.
+     * @param cx Database connection.
+     * 
+     */
+    public boolean includeTable( String tableName, Connection cx ) throws SQLException {
+        return true;
+    }
+    
+    /**
      * Registers the sql type name to java type mappings that the dialect uses when 
      * reading and writing objects to and from the database.
      * <p>
@@ -82,6 +105,28 @@ public abstract class SQLDialect {
      */
     public void registerSqlTypeNameToClassMappings( Map<String,Class<?>> mappings ) {
         //TODO: do the normal types
+    }
+    
+    /**
+     * Determines the class mapping for a particular column of a table.
+     * <p>
+     * Implementing this method is optional. It is used to allow database to 
+     * perform custom type mappings based on various column metadata. It is called
+     * before the mappings registered in {@link #registerSqlTypeToClassMappings(Map)}
+     * and {@link #registerSqlTypeNameToClassMappings(Map) are used to determine
+     * the mapping. Subclasses should implement as needed, this default implementation 
+     * returns <code>null</code>.
+     * </p>
+     * <p>
+     * The <tt>columnMetaData</tt> argument is provided from 
+     * {@link DatabaseMetaData#getColumns(String, String, String, String)}.
+     * </p>
+     * @param columnMetaData The column metadata
+     * 
+     * @return The class mapped to the to column, or <code>null</code>.
+     */
+    public Class<?> getMapping( ResultSet columnMetaData ) throws SQLException {
+        return null;
     }
     
     /**
@@ -183,10 +228,10 @@ public abstract class SQLDialect {
      * @return The mapped type of the column, or <code>null</code> if it can not
      * be inferred.
      */
-    public Class getMapping( String schemaName, String tableName, String columnName, Integer type, Connection cx )
-        throws SQLException {
-        return null;
-    }
+//    public final Class getMapping( String schemaName, String tableName, String columnName, Integer type, Connection cx )
+//        throws SQLException {
+//        return null;
+//    }
     
     
     /**
@@ -412,9 +457,13 @@ public abstract class SQLDialect {
      * <code>
      *   <pre>
      *   String wkt = rs.getString( column );
+     *   if ( wkt == null ) {
+     *     return null;
+     *   }
      *   return new WKTReader(factory).read( wkt );
      *   </pre>
      * </code>
+     * Note that implementations must handle <code>null</code> values.
      * </p>
      * <p>
      * The <tt>factory</tt> parameter should be used to instantiate any geometry 
@@ -424,20 +473,6 @@ public abstract class SQLDialect {
     public abstract Geometry decodeGeometryValue( GeometryDescriptor descriptor, ResultSet rs, String column, GeometryFactory factory ) 
         throws IOException, SQLException;
     
-   
-    /**
-     * Encodes anything post a CREATE TABLE statement.
-     * <p>
-     * This is appended to a CREATE TABLE statement after the column definitions.
-     * This default implementation does nothing, subclasses should override as 
-     * need be.
-     * </p>
-     */
-    public void encodePostCreateTable( String tableName , StringBuffer sql ) {
-        
-    }
-    
- 
     /**
      * Encodes the primary key definition in a CREATE TABLE statement.
      * <p>
@@ -452,10 +487,53 @@ public abstract class SQLDialect {
      * </p>
      * 
      */
-    public void encodePrimaryKey( String column, StringBuffer sql ) {
+    public abstract void encodePrimaryKey( String column, StringBuffer sql );
+    
+    /**
+     * Encodes anything post a CREATE TABLE statement.
+     * <p>
+     * This is appended to a CREATE TABLE statement after the column definitions.
+     * This default implementation does nothing, subclasses should override as 
+     * need be.
+     * </p>
+     */
+    public void encodePostCreateTable( String tableName , StringBuffer sql ) {
         
     }
-    
+ 
+    /**     
+     * Callback to execute any additional sql statements post a create table 
+     * statement.
+     * <p>
+     * This method should be implemented by subclasses that need to do some post
+     * processing on the database after a table has been created. Examples might 
+     * include:
+     * <ul>
+     *   <li>Creating a sequence for a primary key
+     *   <li>Registering geometry column metadata
+     *   <li>Creating a spatial index
+     * </ul>
+     * </p>
+     * <p>
+     * A common case is creating an auto incrementing sequence for the primary 
+     * key of a table. It should be noted that all tables created through the 
+     * datastore use the column "fid" as the primary key.
+     * </p>
+     * <p>
+     * A direct connection to the database is provided (<tt>cx</tt>). This 
+     * connection must not be closed, however any statements or result sets 
+     * instantiated from the connection must be closed.
+     * </p>
+     * @param schemaName The name of the schema, may be <code>null</code>.
+     * @param tableName The name of the table.
+     * @param cx Database connection.
+     * 
+     */
+    public void postCreateTable( String schemaName, String tableName, Connection cx )
+        throws SQLException {
+        
+    }
+ 
     /**
      * Encodes a value in an sql statement.
      * <p>

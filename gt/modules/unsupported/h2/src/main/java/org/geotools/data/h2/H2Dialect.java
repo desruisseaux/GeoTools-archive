@@ -46,6 +46,7 @@ public class H2Dialect extends SQLDialect {
         mappings.put(LineString.class, new Integer(Types.OTHER));
         mappings.put(Polygon.class, new Integer(Types.OTHER));
         */
+        //TODO: only map geometry?
         mappings.put(Geometry.class, new Integer(Types.BLOB));
         mappings.put(Point.class, new Integer(Types.BLOB));
         mappings.put(LineString.class, new Integer(Types.BLOB));
@@ -123,6 +124,9 @@ public class H2Dialect extends SQLDialect {
             ResultSet rs, String column, GeometryFactory factory) throws IOException, SQLException {
         
         byte[] bytes = rs.getBytes( column );
+        if ( bytes == null ) {
+            return null;
+        }
         try {
             return new WKBReader(factory).read( bytes );
         } 

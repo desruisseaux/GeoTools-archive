@@ -72,11 +72,7 @@ public abstract class JDBCTestSupport extends TestCase {
         if ( setup == null ) {
             setup = createTestSetup(); 
         }
-        
         setup.setUp();
-        
-        //do any further setup
-        setUpInternal();
         
         //initialize the database
         setup.initializeDatabase();
@@ -103,14 +99,12 @@ public abstract class JDBCTestSupport extends TestCase {
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
         dataStore.setFilterCapabilities(filterCapabilities);
+        
+        setup.setUpDataStore(dataStore);
     }
     
     protected abstract JDBCTestSetup createTestSetup();
    
-    protected final void setUpInternal() throws Exception {
-       
-    }
-    
     protected void tearDown() throws Exception {
     	super.tearDown();
     	

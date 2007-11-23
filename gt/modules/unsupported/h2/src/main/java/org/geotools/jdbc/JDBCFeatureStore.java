@@ -7,14 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
+import org.geotools.data.ContentFeatureCollection;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -142,62 +145,118 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
              */
             ResultSet columns = metaData.getColumns(null, databaseSchema, tableName, "%");
 
-            /*
-             *        <LI><B>TABLE_CAT</B> String => table catalog (may be <code>null</code>)
-             *        <LI><B>TABLE_SCHEM</B> String => table schema (may be <code>null</code>)
-             *        <LI><B>TABLE_NAME</B> String => table name
-             *        <LI><B>COLUMN_NAME</B> String => column name
-             *        <LI><B>KEY_SEQ</B> short => sequence number within primary key
-             *        <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
-             */
-            ResultSet primaryKeys = 
-                metaData.getPrimaryKeys(null, databaseSchema, tableName);
-
             try {
                 SQLDialect dialect = getDataStore().getSQLDialect();
+                
                 while (columns.next()) {
                     String name = columns.getString("COLUMN_NAME");
     
                     //do not include primary key in the type
-                    while (primaryKeys.next()) {
-                        String keyName = primaryKeys.getString("COLUMN_NAME");
-    
-                        if (name.equals(keyName)) {
-                            name = null;
-    
-                            break;
+                    /*
+                     *        <LI><B>TABLE_CAT</B> String => table catalog (may be <code>null</code>)
+                     *        <LI><B>TABLE_SCHEM</B> String => table schema (may be <code>null</code>)
+                     *        <LI><B>TABLE_NAME</B> String => table name
+                     *        <LI><B>COLUMN_NAME</B> String => column name
+                     *        <LI><B>KEY_SEQ</B> short => sequence number within primary key
+                     *        <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
+                     */
+                    ResultSet primaryKeys = 
+                        metaData.getPrimaryKeys(null, databaseSchema, tableName);
+                    
+                    try {
+                        while (primaryKeys.next()) {
+                            String keyName = primaryKeys.getString("COLUMN_NAME");
+        
+                            if (name.equals(keyName)) {
+                                name = null;
+        
+                                break;
+                            }
                         }
                     }
-    
-                    primaryKeys.beforeFirst();
-    
+                    finally {
+                        JDBCDataStore.closeSafe( primaryKeys );
+                    }
+                   
                     if (name == null) {
                         continue;
                     }
     
-                    //get the type
-                    int dataType = columns.getInt("DATA_TYPE");
-                    String typeName = columns.getString( "TYPE_NAME");
-                    
-                    //get the mapping from the integer type
-                    Class binding = getDataStore().getMapping(dataType);
-                    if ( binding == null ) {
-                        //not found, try getting from the data type name
-                        binding = getDataStore().getMapping( typeName );
+                    //check for foreign key
+                    if ( getDataStore().isForeignKeyAware() ) {
+                        //foreign key aware, any columns that are foreign keys
+                        // should be made associations
+                        //TODO: for now we assume the foreign key is always a 
+                        //single column
                         
-                        if ( binding == null ) {
-                            //not found, one last try, ask the dialect
-                            binding = dialect.getMapping( databaseSchema, tableName, name, dataType, cx);
+                       /*  <LI><B>PKTABLE_CAT</B> String => primary key table catalog 
+                        *      being imported (may be <code>null</code>)
+                        *  <LI><B>PKTABLE_SCHEM</B> String => primary key table schema
+                        *      being imported (may be <code>null</code>)
+                        *  <LI><B>PKTABLE_NAME</B> String => primary key table name
+                        *      being imported
+                        *  <LI><B>PKCOLUMN_NAME</B> String => primary key column name
+                        *      being imported
+                        *  <LI><B>FKTABLE_CAT</B> String => foreign key table catalog (may be <code>null</code>)
+                        *  <LI><B>FKTABLE_SCHEM</B> String => foreign key table schema (may be <code>null</code>)
+                        *  <LI><B>FKTABLE_NAME</B> String => foreign key table name
+                        *  <LI><B>FKCOLUMN_NAME</B> String => foreign key column name
+                        *  <LI><B>KEY_SEQ</B> short => sequence number within a foreign key
+                        *  <LI><B>UPDATE_RULE</B> short => What happens to a
+                        *       foreign key when the primary key is updated:
+                        *  <LI><B>DELETE_RULE</B> short => What happens to 
+                        *      the foreign key when primary is deleted.
+                        *  <LI><B>FK_NAME</B> String => foreign key name (may be <code>null</code>)
+                        *  <LI><B>PK_NAME</B> String => primary key name (may be <code>null</code>)
+                        *  <LI><B>DEFERRABILITY</B> short => can the evaluation of foreign key 
+                        *      constraints be deferred until commit
+                        */
+                        ResultSet foreignKeys = 
+                            metaData.getImportedKeys(null, databaseSchema, tableName);
+                        
+                        try {
+                            while( foreignKeys.next() ) {
+                                String keyName = foreignKeys.getString( "FKCOLUMN_NAME" );
+                                if ( name.equals( keyName ) ) {
+                                    String associatedTypeName = 
+                                        foreignKeys.getString("PKTABLE_NAME");
+                                    
+                                    //found, create a special mapping 
+                                    tb.userData( "jdbc.associatedTypeName", associatedTypeName )
+                                        .add( name, SimpleFeature.class );
+                                    continue;
+                                }
+                            }    
                         }
+                        finally {
+                            JDBCDataStore.closeSafe( foreignKeys );
+                        }
+                    }
+                    
+                    
+                    //figure out the type mapping
+                    
+                    //first ask the dialect
+                    Class binding = dialect.getMapping( columns );
+                   
+                    if ( binding == null ) {
+                        //determine from type mappings
+                        int dataType = columns.getInt("DATA_TYPE");
+                        binding = getDataStore().getMapping(dataType);
+                    }
+                    if ( binding == null ) {
+                        //determine from type name mappings
+                        String typeName = columns.getString( "TYPE_NAME");
+                        binding = getDataStore().getMapping( typeName );
                     }
                     
                     //if still not found, resort to Object
                     if ( binding == null ) {
-                        JDBCDataStore.LOGGER.warning("Could not find mapping for:" + dataType );
+                        JDBCDataStore.LOGGER.warning("Could not find mapping for:" + name );
                         binding = Object.class;
                     }
                     
-                    //if the binding is a geometry, try to figure out its srid
+                    //determine if this attribute is a geometry or not
                     if ( Geometry.class.isAssignableFrom( binding ) ) {
                         //add the attribute as a geometry, try to figure out 
                         // its srid first
@@ -214,7 +273,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                         tb.add( name, binding, srid );
                     }
                     else {
-                      //add the attribute
+                        //add the attribute
                         tb.add(name, binding);    
                     }
                     
@@ -224,7 +283,6 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
             }
             finally {
                 getDataStore().closeSafe( columns );
-                getDataStore().closeSafe( primaryKeys );
             }
            
         }
@@ -240,5 +298,13 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
 
     protected JDBCFeatureCollection filtered(ContentState state, Filter filter) {
         return new JDBCFeatureCollection( this, getState(), filter );
+    }
+    
+    protected JDBCFeatureCollection sorted(ContentState state, SortBy[] sort,
+            Filter filter) {
+        JDBCFeatureCollection collection = filtered( state, filter );
+        collection.setSort(sort);
+        
+        return collection;
     }
 }

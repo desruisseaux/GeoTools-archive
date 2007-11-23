@@ -3,11 +3,12 @@ package org.geotools.jdbc;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
 import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -16,6 +17,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -36,6 +39,10 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
      * geometry factory used to create geometry objects
 	 */
 	GeometryFactory geometryFactory;
+	/**
+	 * feature builder
+	 */
+	SimpleFeatureBuilder builder;
 	
 	public JDBCFeatureIterator( Statement st, SimpleFeatureType featureType, JDBCFeatureCollection collection ) {
 		super( st, featureType, collection );
@@ -62,6 +69,8 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 		    //use the datastore provided one
 	        geometryFactory = dataStore.getGeometryFactory();    
 		}
+		
+		builder = new SimpleFeatureBuilder( featureType );
 	}
 	
 	public boolean hasNext() {
@@ -82,7 +91,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 	    }
 		
 		//round up attributes
-		List attributes = new ArrayList();
+		//List attributes = new ArrayList();
 		for ( int i = 0; i < featureType.getAttributeCount(); i++ ) {
 			AttributeDescriptor type = featureType.getAttribute( i );
 			try {
@@ -98,19 +107,60 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 				    catch (IOException e) {
                         throw new RuntimeException( e );
                     }
+				}
+				
+				//is this an association?
+				if ( collection.getDataStore().isForeignKeyAware() && 
+			        SimpleFeature.class.equals( type.getType().getBinding() ) && 
+			        value != null ) {
 				    
-//				    //if the value is not of type Geometry, try to decode it
-//				    if ( value != null && !( value instanceof Geometry ) ) {
-//				        Object decoded;
-//                        try {
-//                            decoded = 
-//                        } 
-//                    
-//                        
-//				        if ( decoded != null ) {
-//				            value = decoded;
-//				        }
-//				    }
+				    //get the associated feature type name
+                    String associatedTypeName = 
+                        (String) type.getUserData().get( "jdbc.associatedTypeName" );
+                    
+				    //set the referenced id + typeName as user data
+				    builder.userData( "gml:id", value.toString() );
+				    builder.userData( "gml:featureTypeName", associatedTypeName );
+
+				    //check for the xlinkTraversalDepth hint
+				    Integer depth = 
+				        (Integer) collection.getHints().get( Hints.ASSOCIATION_TRAVERSAL_DEPTH );
+				    if ( depth == null ) {
+				        depth = new Integer(0);
+				    }
+				    if ( depth.intValue() < 1 ) {
+				        //dont traverse any further
+				        builder.add( null );
+				        continue;
+				    }
+				    
+				    //use the value as an the identifier in a query against the
+                    // referenced type
+				    DefaultQuery query = new DefaultQuery( associatedTypeName );
+
+                    Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer( depth.intValue()-1) );
+                    query.setHints( hints );
+                
+                    FilterFactory ff = collection.getDataStore().getFilterFactory();
+                    Id filter = ff.id( Collections.singleton(ff.featureId(value.toString())));
+                    query.setFilter( filter );
+                    
+				    try {
+				        //grab a reader and get the feature, there should only 
+				        // be one
+				        FeatureReader r = 
+				            collection.getDataStore().getFeatureReader(query, collection.getState().getTransaction() );
+                        try {
+                            r.hasNext();
+                            value = r.next();
+                        }
+                        finally {
+                            r.close();
+                        }
+                        
+				    } catch (IOException e) {
+                        throw new RuntimeException( e );
+                    }
 				}
 				
 				//if the value is not of the type of the binding, try to convert
@@ -129,7 +179,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 				    }
 				}
 				
-				attributes.add( value );
+				builder.add( value );
 			}
 			catch( SQLException e ) {
 				throw new RuntimeException( e );
@@ -162,8 +212,7 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 		
 		//create the feature
 		try {
-		    
-		    return SimpleFeatureBuilder.build( featureType, attributes, fid );
+		    return builder.buildFeature( fid );
 		} 
 		catch (IllegalAttributeException e) {
 			throw new RuntimeException( e );
