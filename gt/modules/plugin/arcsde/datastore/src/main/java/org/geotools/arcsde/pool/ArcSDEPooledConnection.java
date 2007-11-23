@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.pool.ObjectPool;
+import org.geotools.data.Transaction;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -41,6 +42,12 @@ public class ArcSDEPooledConnection extends SeConnection {
 	
 	private ArcSDEConnectionConfig config;
 	
+	private static int connectionCounter;
+	
+	private int connectionId;
+	
+	private boolean transactionInProgress;
+	
 	public ArcSDEPooledConnection(ObjectPool pool, ArcSDEConnectionConfig config) throws SeException {
 		super(	config.getServerName(),
 				config.getPortNumber().intValue(),
@@ -50,21 +57,51 @@ public class ArcSDEPooledConnection extends SeConnection {
 		this.config = config;
 		this.pool = pool;
 		this.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+		synchronized(ArcSDEPooledConnection.class){
+		    connectionCounter++;
+		    connectionId = connectionCounter;
+		}
+	}
+
+	public void startTransaction() throws SeException{
+	    super.startTransaction();
+	    transactionInProgress = true;
+	}
+	
+	public void commitTransaction() throws SeException{
+	    super.commitTransaction();
+	    transactionInProgress = false;
+	}
+	
+	public void rollbackTransaction() throws SeException{
+	    super.rollbackTransaction();
+	    transactionInProgress = false;
 	}
 	
 	/**
 	 * Doesn't close the connection, but returns itself to the
 	 * connection pool.
+	 * @throws IllegalStateException if close() is called while a transaction
+	 * is in progress
 	 * @see #destroy()
 	 */
-	public void close(){
+	public void close() throws IllegalStateException{
+	    if(transactionInProgress){
+	        throw new IllegalStateException("Transaction is in progress, should commit or rollback before closing");
+	    }
+	    
         try {
+            System.err.println("Close: returning connection " + toString() + " to pool");
             this.pool.returnObject(this);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 	}
 
+	public String toString(){
+	    return "ArcSDEPooledConnection[" + connectionId + "]";
+	}
+	
 	/**
 	 * Actually closes the connection
 	 */

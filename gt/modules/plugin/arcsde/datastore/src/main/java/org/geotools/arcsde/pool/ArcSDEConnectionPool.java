@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.geotools.data.DataSourceException;
 
@@ -228,7 +229,14 @@ public class ArcSDEConnectionPool {
         }
 
         try {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+            System.err.println("Looking connection for " + caller);
+            
             ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
+            
+            System.err.println("Returning connection " + ret);
+
             return ret;
         } catch (NoSuchElementException e) {
             LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);

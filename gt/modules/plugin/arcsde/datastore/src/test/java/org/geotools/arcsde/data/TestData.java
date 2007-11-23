@@ -182,6 +182,20 @@ public class TestData {
         }
     }
 
+    public SeTable getTempTable(){
+        if(tempTable == null){
+            throw new IllegalStateException("createTempTable() not called first");
+        }
+        return tempTable;
+    }
+    
+    public SeLayer getTempLayer(){
+        if(tempTableLayer == null){
+            throw new IllegalStateException("createTempTable() not called first");
+        }
+        return tempTableLayer;
+    }
+    
     /**
      * creates an ArcSDEDataStore using {@code test-data/testparams.properties}
      * as holder of datastore parameters
