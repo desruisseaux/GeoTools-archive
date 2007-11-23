@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -84,6 +85,7 @@ public class DemoAll extends javax.swing.JFrame {
 
     /** Creates new form DemoSwingGeowidgets */
     public DemoAll() {
+                
         initComponents();
         setLocationRelativeTo(null);
 

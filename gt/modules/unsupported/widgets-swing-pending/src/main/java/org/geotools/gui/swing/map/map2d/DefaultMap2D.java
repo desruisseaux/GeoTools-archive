@@ -19,6 +19,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -51,12 +53,14 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
-    public static enum BUFFER_TYPE {        
+    public static enum BUFFER_TYPE {
+
         SINGLE_BUFFER,
         MULTI_BUFFER,
-        MERGE_BUFFER
+        MERGE_BUFFER,
+        SINGLE_VOLATILE
     }
-//    protected GraphicsConfiguration GC ;
+    protected GraphicsConfiguration GC;
     protected final EventListenerList MAP2DLISTENERS = new EventListenerList();
     protected final Map2D THIS_MAP;
     protected int NEXT_OVER_LAYER_INDEX = 12;
@@ -69,7 +73,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     private final MapLayerListListener mapLayerListlistener;
     private final MapContext buffercontext = new OneLayerContext();
     private BUFFER_TYPE type = null;
-    private Rectangle mapRectangle = new Rectangle(1, 1);
+    protected Rectangle mapRectangle = new Rectangle(1, 1);
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
 
@@ -84,11 +88,15 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         setLayout(new GridLayout(1, 1));
         layerPane.setLayout(new BufferLayout());
 
-        setMapBufferType(BUFFER_TYPE.SINGLE_BUFFER);
+        setMapBufferType(BUFFER_TYPE.SINGLE_VOLATILE);
 
         layerPane.add(waitingPane, new Integer(NEXT_OVER_LAYER_INDEX));
         NEXT_OVER_LAYER_INDEX++;
         add(layerPane);
+
+        GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+
 //        GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
 //        GraphicsDevice[] devices = gEnv.getScreenDevices();
 //
@@ -98,7 +106,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 //            }
 //        
 
-        opimizeRenderer();
+    //opimizeRenderer();
     }
 
     private void opimizeRenderer() {
@@ -167,7 +175,6 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
     protected synchronized BufferedImage createBufferImage(MapLayer layer) {
 
-
         buffercontext.clearLayerList();
 
         if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
@@ -180,12 +187,12 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
             renderer.setContext(buffercontext);
 
             //NOT OPTIMIZED
-            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D ig = buf.createGraphics();
+//            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+//            Graphics2D ig = buf.createGraphics();
 
             //GC ACCELERATION        
-//        BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height,BufferedImage.TYPE_INT_ARGB);
-//        Graphics2D ig = buf.createGraphics();
+            BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
+            Graphics2D ig = buf.createGraphics();
 
             renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
             return buf;
@@ -194,6 +201,8 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         }
 
     }
+
+    
 
     protected synchronized BufferedImage createBufferImage(MapContext context) {
 
@@ -212,19 +221,19 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     private void redraw(boolean complete) {
         boolean changed = false;
 
-        if ( renderer != null && mapArea != null ) {
-                        
+        if (renderer != null && mapArea != null) {
+
             Rectangle newRect = getBounds();
             mapRectangle = new Rectangle(newRect.width, newRect.height);
 
             if (!newRect.equals(oldRect)) {
-                changed = true;         
+                changed = true;
                 oldRect = newRect;
                 mapArea = fixAspectRatio(newRect, mapArea);
             }
 
-            if ( !(mapArea.equals(oldMapArea)) && !( Double.isNaN(mapArea.getMinX())) ) {
-                changed = true;                
+            if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
+                changed = true;
                 oldMapArea = mapArea;
                 context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
             }
@@ -243,18 +252,21 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
             bufferPane.deleteObserver(this);
             layerPane.remove(bufferPane.getComponent());
 
-            switch(type){
-                case SINGLE_BUFFER :
+            switch (type) {
+                case SINGLE_BUFFER:
                     bufferPane = new SingleBufferPane(this);
                     break;
-                case MULTI_BUFFER :
+                case MULTI_BUFFER:
                     bufferPane = new MultiBufferPane(this);
                     break;
-                case MERGE_BUFFER :
+                case MERGE_BUFFER:
                     bufferPane = new MultiMergeBufferPane(this);
                     break;
+                case SINGLE_VOLATILE:
+                    bufferPane = new VolatileBufferPane(this);
+                    break;
             }
-            
+
             bufferPane.addObserver(this);
             bufferPane.redraw(false);
 
@@ -343,7 +355,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     }
 
     public void setMapArea(Envelope mapArea) {
-        
+
         if (mapArea != null) {
             Rectangle r = getBounds();
             Envelope newArea = fixAspectRatio(r, mapArea);

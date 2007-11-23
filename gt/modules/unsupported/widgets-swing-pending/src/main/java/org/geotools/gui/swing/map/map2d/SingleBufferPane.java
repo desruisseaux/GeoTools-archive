@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
@@ -49,6 +50,12 @@ class SingleBufferPane extends MapBufferPane {
 
     }
 
+     @Override
+    public JComponent getComponent() {
+        return comp;
+    }
+    
+    
     public void redraw(boolean complete) {
         fit();
     }
@@ -69,10 +76,6 @@ class SingleBufferPane extends MapBufferPane {
         fit();
     }
 
-    @Override
-    public JComponent getComponent() {
-        return comp;
-    }
     private int nb = 0;
 
     public void raiseNB() {
@@ -115,17 +118,18 @@ class SingleBufferPane extends MapBufferPane {
 
             public void setBuffer(BufferedImage buf) {
                 img = buf;
-                revalidate();
                 repaint();
             }
             
-            @Override
-            protected void paintComponent(Graphics g) {
+        @Override
+            public void paintComponent(Graphics g) {
                 if (img != null) {
                     g.drawImage(img, 0, 0, this);
                 }
             }       
         };
+
+   
         
         
         
