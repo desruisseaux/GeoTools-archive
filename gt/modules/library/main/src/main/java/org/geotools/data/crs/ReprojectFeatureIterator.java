@@ -25,6 +25,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.operation.MathTransform;
@@ -121,13 +122,18 @@ public class ReprojectFeatureIterator implements Iterator {
             throw new IllegalStateException("Reader has already been closed");
         }
 
+        //grab the next feature
         SimpleFeature next = reader.next();
-        List attributes = next.getAttributes();
-
+        
+        //copy it since we are going to modify it
+        next = SimpleFeatureBuilder.copy( next );
+        
         try {
-            for (int i = 0; i < attributes.size(); i++) {
-                if (attributes.get(i) instanceof Geometry) {
-                    attributes.set(i,transformer.transform((Geometry) attributes.get(i)));
+            for (Iterator p = next.getProperties().iterator(); p.hasNext(); ) {
+                Property prop = (Property) p.next();
+                if ( prop.getValue() instanceof Geometry ) {
+                    Geometry geometry = (Geometry) prop.getValue();
+                    prop.setValue( transformer.transform( geometry ) );
                 }
             }
         } catch (TransformException e) {
@@ -135,7 +141,7 @@ public class ReprojectFeatureIterator implements Iterator {
         }
 
         try {
-            return SimpleFeatureBuilder.build(schema, attributes, next.getID());
+            return next;
         } catch (IllegalAttributeException e) {
             throw (IllegalStateException) new IllegalStateException("Problem occured during reprojection").initCause(e);                    
         }
