@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
@@ -152,6 +153,16 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         }
 
         if (GML.boundedBy.equals(name)) {
+            BoundingBox bounds = feature.getBounds();
+
+            if (bounds.isEmpty()) {
+                //do a check for the case where the feature has no geometry 
+                // properties
+                if (feature.getDefaultGeometry() == null) {
+                    return null;
+                }
+            }
+
             return feature.getBounds();
         }
 
