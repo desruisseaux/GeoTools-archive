@@ -13,6 +13,7 @@ import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureStore;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.opengis.feature.Association;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -223,7 +224,7 @@ public final class JDBCFeatureStore extends ContentFeatureStore {
                                     
                                     //found, create a special mapping 
                                     tb.userData( "jdbc.associatedTypeName", associatedTypeName )
-                                        .add( name, SimpleFeature.class );
+                                        .add( name, Association.class );
                                     continue;
                                 }
                             }    

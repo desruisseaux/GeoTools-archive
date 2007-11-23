@@ -9,6 +9,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
+import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.ExcludeFilter;
@@ -95,6 +97,8 @@ public abstract class JDBCDataStoreFactory extends AbstractDataStoreFactory {
         //factories
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
+        dataStore.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
+        dataStore.setFeatureFactory( new FeatureFactoryImpl() );
         
         //filter capabilities
         dataStore.setFilterCapabilities(createFilterCapabilities());

@@ -4,6 +4,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
+import org.opengis.feature.Association;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -25,7 +26,7 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         AttributeDescriptor att = featureType.getAttribute("ft1");
         assertNotNull( att );
         
-        assertEquals( SimpleFeature.class, att.getType().getBinding() );
+        assertEquals( Association.class, att.getType().getBinding() );
     }
 
     public void testGetFeatures() throws Exception {
@@ -40,7 +41,10 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         assertTrue( reader.hasNext() );
         
         SimpleFeature feature = reader.next();
-        SimpleFeature associated = (SimpleFeature) feature.getAttribute( "ft1" );
+        Association association = (Association) feature.getAttribute( "ft1" );
+        assertEquals( "0", association.getUserData().get( "gml:id") );
+        
+        SimpleFeature associated = (SimpleFeature) association.getValue();
         assertNotNull( associated );
         
         assertEquals( "zero", associated.getAttribute("stringProperty"));
@@ -61,8 +65,8 @@ public abstract class JDBCForeignKeyTest extends JDBCTestSupport {
         assertTrue( reader.hasNext() );
         
         SimpleFeature feature = reader.next();
-        SimpleFeature associated = (SimpleFeature) feature.getAttribute( "ft1" );
-        assertNull( associated );
+        Association association = (Association) feature.getAttribute( "ft1" );
+        assertNull( association.getValue() );
         
         Property attribute = feature.getProperty("ft1");
         assertEquals( "0", attribute.getUserData().get( "gml:id") );

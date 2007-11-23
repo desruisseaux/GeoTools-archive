@@ -13,9 +13,14 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.util.Converters;
+import org.opengis.feature.Association;
+import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AssociationDescriptor;
+import org.opengis.feature.type.AssociationType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureTypeFactory;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -111,56 +116,77 @@ public class JDBCFeatureIterator extends JDBCFeatureIteratorSupport {
 				
 				//is this an association?
 				if ( collection.getDataStore().isForeignKeyAware() && 
-			        SimpleFeature.class.equals( type.getType().getBinding() ) && 
+			        Association.class.equals( type.getType().getBinding() ) && 
 			        value != null ) {
 				    
 				    //get the associated feature type name
                     String associatedTypeName = 
                         (String) type.getUserData().get( "jdbc.associatedTypeName" );
+                    SimpleFeatureType associatedType;
+                    try {
+                        associatedType = dataStore.getSchema(associatedTypeName);
+                    } 
+                    catch (IOException e) {
+                        throw new RuntimeException( e );
+                    }
                     
 				    //set the referenced id + typeName as user data
 				    builder.userData( "gml:id", value.toString() );
 				    builder.userData( "gml:featureTypeName", associatedTypeName );
 
-				    //check for the xlinkTraversalDepth hint
+				    //create an association
+                    FeatureTypeFactory tf = dataStore.getFeatureTypeFactory();
+                    AssociationType associationType = tf.createAssociationType(
+                        type.getName(), associatedType, false, Collections.EMPTY_LIST, null, null
+                    );
+                    AssociationDescriptor associationDescriptor = tf.createAssociationDescriptor(
+                        associationType, type.getName(), 1, 1, true
+                    );
+                    
+                    FeatureFactory f = dataStore.getFeatureFactory();
+                    Association association = f.createAssociation(null, associationDescriptor);
+                    association.getUserData().put( "gml:id", value.toString() );
+                    
+                    //check for the xlinkTraversalDepth hint, if not > 0 dont 
+                    // resolve the associated feature
 				    Integer depth = 
 				        (Integer) collection.getHints().get( Hints.ASSOCIATION_TRAVERSAL_DEPTH );
 				    if ( depth == null ) {
 				        depth = new Integer(0);
 				    }
-				    if ( depth.intValue() < 1 ) {
-				        //dont traverse any further
-				        builder.add( null );
-				        continue;
-				    }
-				    
-				    //use the value as an the identifier in a query against the
-                    // referenced type
-				    DefaultQuery query = new DefaultQuery( associatedTypeName );
+				    if ( depth.intValue() > 0 ) {
+				        //use the value as an the identifier in a query against the
+	                    // referenced type
+	                    DefaultQuery query = new DefaultQuery( associatedTypeName );
 
-                    Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer( depth.intValue()-1) );
-                    query.setHints( hints );
-                
-                    FilterFactory ff = collection.getDataStore().getFilterFactory();
-                    Id filter = ff.id( Collections.singleton(ff.featureId(value.toString())));
-                    query.setFilter( filter );
-                    
-				    try {
-				        //grab a reader and get the feature, there should only 
-				        // be one
-				        FeatureReader r = 
-				            collection.getDataStore().getFeatureReader(query, collection.getState().getTransaction() );
-                        try {
-                            r.hasNext();
-                            value = r.next();
-                        }
-                        finally {
-                            r.close();
-                        }
-                        
-				    } catch (IOException e) {
-                        throw new RuntimeException( e );
-                    }
+	                    Hints hints = new Hints(Hints.ASSOCIATION_TRAVERSAL_DEPTH, new Integer( depth.intValue()-1) );
+	                    query.setHints( hints );
+	                
+	                    FilterFactory ff = collection.getDataStore().getFilterFactory();
+	                    Id filter = ff.id( Collections.singleton(ff.featureId(value.toString())));
+	                    query.setFilter( filter );
+	                    
+	                    try {
+	                        //grab a reader and get the feature, there should only 
+	                        // be one
+	                        FeatureReader r = 
+	                            collection.getDataStore().getFeatureReader(query, collection.getState().getTransaction() );
+	                        try {
+	                            r.hasNext();
+	                            SimpleFeature associated = r.next();
+	                            association.setValue(associated);
+	                        }
+	                        finally {
+	                            r.close();
+	                        }
+	                        
+	                    } catch (IOException e) {
+	                        throw new RuntimeException( e );
+	                    }
+	                }
+				    
+	                //set the actual value to be the association				    
+				    value = association;
 				}
 				
 				//if the value is not of the type of the binding, try to convert

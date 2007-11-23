@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
+import org.geotools.feature.FeatureFactoryImpl;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.ExcludeFilter;
@@ -91,6 +93,7 @@ public abstract class JDBCTestSupport extends TestCase {
         filterCapabilities.addType(PropertyIsLike.class);
 
         //create the dataStore
+        //TODO: replace this with call to datastore factory
         dataStore = new JDBCDataStore();
         dataStore.setSQLDialect( setup.createSQLDialect() );
         dataStore.setNamespaceURI("http://www.geotools.org/test");
@@ -98,6 +101,8 @@ public abstract class JDBCTestSupport extends TestCase {
         dataStore.setDatabaseSchema("geotools");
         dataStore.setFilterFactory(new FilterFactoryImpl());
         dataStore.setGeometryFactory(new GeometryFactory());
+        dataStore.setFeatureFactory(new FeatureFactoryImpl());
+        dataStore.setFeatureTypeFactory( new FeatureTypeFactoryImpl());
         dataStore.setFilterCapabilities(filterCapabilities);
         
         setup.setUpDataStore(dataStore);
