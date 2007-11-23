@@ -62,7 +62,8 @@ public class GML2EncodingUtils {
             if ((axisOrder == LON_LAT) || (axisOrder == INAPPLICABLE)) {
                 return "http://www.opengis.net/gml/srs/epsg.xml#" + code;
             } else {
-                return "urn:x-ogc:def:crs:EPSG:6.11.2:" + code;
+                //return "urn:x-ogc:def:crs:EPSG:6.11.2:" + code;
+                return "urn:x-ogc:def:crs:EPSG:" + code;
             }
         }
 
