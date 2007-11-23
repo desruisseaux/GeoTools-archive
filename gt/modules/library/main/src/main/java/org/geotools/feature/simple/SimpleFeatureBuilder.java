@@ -3,6 +3,7 @@ package org.geotools.feature.simple;
 import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -163,9 +164,17 @@ public class SimpleFeatureBuilder {
      */
     public void init( SimpleFeature feature ) {
 		init();
-		for ( int i = 0; i < feature.getAttributeCount(); i++ ) {
-			add( feature.getAttribute( i ) );
+		for ( Iterator p = feature.getProperties().iterator(); p.hasNext(); ) {
+		    Property original = (Property) p.next();
+		    
+		    //add its value
+		    add( original.getValue() );
+		    
+		    //copy over the user data
+		    Attribute last = (Attribute) attributes().get( attributes().size() -1 );
+		    last.getUserData().putAll( original.getUserData() );
 		}
+		
 		//defaultGeometry = feature.getDefaultGeometryProperty();
 		//crs = feature.getType().getCRS();
 	}
