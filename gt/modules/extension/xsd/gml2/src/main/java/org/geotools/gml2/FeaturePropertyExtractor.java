@@ -19,6 +19,7 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDTypeDefinition;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -53,6 +54,13 @@ public class FeaturePropertyExtractor implements PropertyExtractor {
 
     public List properties(Object object, XSDElementDeclaration element) {
         SimpleFeature feature = (SimpleFeature) object;
+
+        //check if this was a resolved feature, if so dont return anything
+        // TODO: this is just a hack for our lame xlink implementation
+        if (feature.getUserData().get("xlink:id") != null) {
+            return Collections.EMPTY_LIST;
+        }
+
         SimpleFeatureType featureType = feature.getFeatureType();
 
         String namespace = featureType.getName().getNamespaceURI();
@@ -105,28 +113,6 @@ public class FeaturePropertyExtractor implements PropertyExtractor {
 
             //get the value
             Object attributeValue = feature.getAttribute(attribute.getName());
-
-            //special case for features
-            if (attributeValue == null) {
-                Property prop = feature.getProperty(attribute.getName());
-
-                if (SimpleFeature.class.equals(prop.getType().getBinding())) {
-                    //if the value is null, check for userData specifying the id 
-                    if (prop.getValue() == null) {
-                        String id = (String) prop.getUserData().get("gml:id");
-
-                        if (id != null) {
-                            //we have the id, so we can create a reference to 
-                            // object we dont have
-                            Reference ref = new Reference();
-                            ref.setXlink("#" + id);
-
-                            attributeValue = ref;
-                        }
-                    }
-                }
-            }
-
             properties.add(new Object[] { particle, attributeValue });
         }
 
