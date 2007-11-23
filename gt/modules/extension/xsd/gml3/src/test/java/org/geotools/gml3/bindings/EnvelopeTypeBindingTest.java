@@ -36,7 +36,8 @@ public class EnvelopeTypeBindingTest extends GML3TestSupport {
                                            .item(0);
         assertEquals("10.0 10.0", upperCorner.getFirstChild().getNodeValue());
 
-        assertEquals("urn:x-ogc:def:crs:EPSG:6.11.2:4326",
+        //assertEquals("urn:x-ogc:def:crs:EPSG:6.11.2:4326",
+        assertEquals("urn:x-ogc:def:crs:EPSG:4326",
             dom.getDocumentElement().getAttributeNS(null, "srsName"));
     }
 
