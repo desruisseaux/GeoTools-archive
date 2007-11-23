@@ -33,6 +33,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -112,6 +113,15 @@ import org.geotools.xml.impl.SchemaIndexImpl;
  *
  */
 public class Encoder {
+    /**
+     * Special name recognized by the encoder as a comment.
+     * <p>
+     * Bindings can return this name in {@link ComplexBinding#getProperties(Object)}
+     * to provide comments to be encoded.
+     * </p>
+     */
+    public static final QName COMMENT = new QName("http://www.geotools.org", "comment");
+
     /** the schema + index **/
     private XSDSchema schema;
     private SchemaIndex index;
@@ -292,6 +302,13 @@ public class Encoder {
     public void write(Object object, QName name, OutputStream out)
         throws IOException, SAXException {
         encode(object, name, out);
+    }
+
+    /**
+     * @return The document used as a factory to create dom nodes.
+     */
+    public Document getDocument() {
+        return doc;
     }
 
     /**
@@ -612,6 +629,15 @@ O:
                             XSDElementDeclaration child = (XSDElementDeclaration) particle
                                 .getContent();
 
+                            //check for a comment
+                            if ((child != null)
+                                    && (COMMENT.getNamespaceURI().equals(child.getTargetNamespace()))
+                                    && COMMENT.getLocalPart().equals(child.getName())) {
+                                comment(child.getElement());
+
+                                continue;
+                            }
+
                             if (child.isElementDeclarationReference()) {
                                 child = child.getResolvedElementDeclaration();
                             }
@@ -762,6 +788,17 @@ O:
 
         if (uri != null) {
             this.namespaces.declarePrefix("", uri);
+        }
+    }
+
+    protected void comment(Element element) throws SAXException, IOException {
+        if (serializer instanceof XMLSerializer) {
+            NodeList children = element.getChildNodes();
+
+            for (int i = 0; i < children.getLength(); i++) {
+                Node text = (Node) children.item(i);
+                ((XMLSerializer) serializer).comment(text.getNodeValue());
+            }
         }
     }
 

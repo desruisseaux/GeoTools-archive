@@ -17,10 +17,12 @@ package org.geotools.xml.impl;
 
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.eclipse.xsd.XSDAnnotation;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDParticle;
 import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,6 +30,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.Schemas;
@@ -102,6 +107,30 @@ O:
                 Map.Entry entry = (Map.Entry) e.next();
                 QName name = (QName) entry.getKey();
                 Collection values = (Collection) entry.getValue();
+
+                //check for comment
+                if (Encoder.COMMENT.equals(name)) {
+                    //create a dom element which text nodes for the comments
+                    Element comment = encoder.getDocument()
+                                             .createElement(Encoder.COMMENT.getLocalPart());
+
+                    for (Iterator v = values.iterator(); v.hasNext();) {
+                        comment.appendChild(encoder.getDocument().createTextNode(v.next().toString()));
+                    }
+
+                    XSDParticle particle = XSDFactory.eINSTANCE.createXSDParticle();
+
+                    XSDElementDeclaration elementDecl = XSDFactory.eINSTANCE
+                        .createXSDElementDeclaration();
+                    elementDecl.setTargetNamespace(Encoder.COMMENT.getNamespaceURI());
+                    elementDecl.setName(Encoder.COMMENT.getLocalPart());
+                    elementDecl.setElement(comment);
+
+                    particle.setContent(elementDecl);
+                    particles.put(name, particle);
+
+                    continue;
+                }
 
                 //find hte element 
                 XSDElementDeclaration elementDecl = encoder.getSchemaIndex()
