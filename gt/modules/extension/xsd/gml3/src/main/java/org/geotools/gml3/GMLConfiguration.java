@@ -62,6 +62,7 @@ import org.geotools.gml3.bindings.PointPropertyTypeBinding;
 import org.geotools.gml3.bindings.PointTypeBinding;
 import org.geotools.gml3.bindings.PolygonPropertyTypeBinding;
 import org.geotools.gml3.bindings.PolygonTypeBinding;
+import org.geotools.gml3.bindings.ReferenceTypeBinding;
 import org.geotools.gml3.bindings.SurfaceArrayPropertyTypeBinding;
 import org.geotools.gml3.bindings.SurfacePropertyTypeBinding;
 import org.geotools.gml3.smil.SMIL20Configuration;
@@ -168,6 +169,7 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentImplementation(GML.PolygonPropertyType,
             PolygonPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PolygonType, PolygonTypeBinding.class);
+        container.registerComponentImplementation(GML.ReferenceType, ReferenceTypeBinding.class);
         container.registerComponentImplementation(GML.SurfaceArrayPropertyType,
             SurfaceArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.SurfacePropertyType,
