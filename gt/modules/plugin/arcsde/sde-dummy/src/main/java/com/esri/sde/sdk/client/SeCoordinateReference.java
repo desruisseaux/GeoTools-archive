@@ -11,4 +11,5 @@ public class SeCoordinateReference {
 	public double getXYUnits(){return 0;}
 	public void setXY(int i, int j, int k){}
     public String getProjectionDescription() { return null; }
+    public void setPrecision(int precision){}
 }
