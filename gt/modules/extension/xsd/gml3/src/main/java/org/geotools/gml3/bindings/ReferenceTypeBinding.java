@@ -15,14 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
+import org.opengis.feature.Association;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.Name;
-import org.geotools.gml2.Reference;
 import org.geotools.gml3.GML;
 import org.geotools.xlink.XLINK;
 import org.geotools.xml.*;
@@ -66,7 +68,7 @@ public class ReferenceTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Reference.class;
+        return Association.class;
     }
 
     /**
@@ -83,11 +85,14 @@ public class ReferenceTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        if (object instanceof Reference) {
-            Reference ref = (Reference) object;
+        Association association = (Association) object;
 
+        if (association.getValue() == null) {
+            //non resolveed, return the xlink:href
             if (XLINK.HREF.equals(name)) {
-                return ref.getXlink();
+                String id = (String) association.getUserData().get("gml:id");
+
+                return "#" + id;
             }
         }
 
@@ -95,19 +100,22 @@ public class ReferenceTypeBinding extends AbstractComplexBinding {
     }
 
     public List getProperties(Object object) throws Exception {
-        if ((object != null) && !(object instanceof Reference)) {
-            //this means we have the actual object, not a reference
+        Association association = (Association) object;
+
+        if (association.getValue() != null) {
+            //associated value was resolved, return it
+            Object associated = association.getValue();
 
             //check for feature
-            if (object instanceof SimpleFeature) {
-                SimpleFeature feature = (SimpleFeature) object;
+            if (associated instanceof SimpleFeature) {
+                SimpleFeature feature = (SimpleFeature) associated;
                 Name typeName = feature.getType().getName();
                 QName name = new QName(typeName.getNamespaceURI(), typeName.getLocalPart());
 
                 List properties = new ArrayList();
 
                 //return a comment which is hte xlink href
-                properties.add(new Object[] { Encoder.COMMENT, "this is a comment" });
+                properties.add(new Object[] { Encoder.COMMENT, "#" + feature.getID() });
 
                 //first return the feature 
                 properties.add(new Object[] { name, feature });
