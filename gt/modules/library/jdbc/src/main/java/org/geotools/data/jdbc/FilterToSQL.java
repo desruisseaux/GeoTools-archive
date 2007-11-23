@@ -19,8 +19,12 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
@@ -60,6 +64,7 @@ import org.opengis.filter.expression.NilExpression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -269,6 +274,12 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         return capabilities; //maybe clone?  Make immutable somehow
     }
     
+    /**
+     * Sets the capabilities for the encoder.
+     */
+    public void setCapabilities(FilterCapabilities capabilities) {
+        this.capabilities = capabilities;
+    }
     
     
     // BEGIN IMPLEMENTING org.opengis.filter.FilterVisitor METHODS
@@ -556,12 +567,39 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
             }
         }
 
+        //case sensitivity
+        boolean matchCase = true;
+        if ( !filter.isMatchingCase() ) {
+            //we only do for = and !=
+            if ( filter instanceof PropertyIsEqualTo || 
+                    filter instanceof PropertyIsNotEqualTo ) {
+                //and only for strings
+                if ( String.class.equals( leftContext ) 
+                        || String.class.equals( rightContext ) ) {
+                    matchCase = false;
+                }
+            }
+        }
+        
         String type = (String) extraData;
 
         try {
-            left.accept(this, leftContext);
-            out.write(" " + type + " ");
-            right.accept(this, rightContext);
+            if ( matchCase ) {
+                left.accept(this, leftContext);
+                out.write(" " + type + " ");
+                right.accept(this, rightContext);
+            }
+            else {
+                //wrap both sides in "lower"
+                out.write( " lower("); 
+                left.accept(this, leftContext);
+                out.write( ")");
+                out.write(" " + type + " ");
+                out.write( " lower("); 
+                right.accept(this, rightContext);
+                out.write( ")");
+            }
+            
         } catch (java.io.IOException ioe) {
             throw new RuntimeException(IO_ERROR, ioe);
         }
@@ -602,9 +640,9 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
                 "Must set a fid mapper before trying to encode FIDFilters");
         }
 
-        FeatureId[] fids = (FeatureId[]) filter.getIdentifiers()
-            .toArray(new FeatureId[filter.getIdentifiers().size()]);
-        LOGGER.finer("Exporting FID=" + Arrays.asList(fids));
+        Set ids = filter.getIdentifiers();
+        
+        LOGGER.finer("Exporting FID=" + ids);
 
         // prepare column name array
         String[] colNames = new String[mapper.getColumnCount()];
@@ -613,9 +651,10 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
             colNames[i] = mapper.getColumnName(i);
         }
 
-        for (int i = 0; i < fids.length; i++) {
+        for (Iterator i = ids.iterator(); i.hasNext(); ) {
             try {
-                Object[] attValues = mapper.getPKAttributes(fids[i].getID());
+                Identifier id = (Identifier) i.next();
+                Object[] attValues = mapper.getPKAttributes(id.toString());
 
                 out.write("(");
 
@@ -632,7 +671,7 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
 
                 out.write(")");
 
-                if (i < (fids.length - 1)) {
+                if (i.hasNext()) {
                     out.write(" OR ");
                 }
             } catch (java.io.IOException e) {
@@ -703,10 +742,6 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     /**
      * Writes the SQL for the attribute Expression.
      * 
-     * NOTE:  This (default) implementation doesn't handle XPath at all.
-     * Not sure exactly how to do that in a general way.  How to map from the XPATH of the
-     * property name into a column or something?  Use propertyName.evaluate()?
-     *
      * @param expression the attribute to turn to SQL.
      *
      * @throws RuntimeException for io exception with writer
@@ -715,7 +750,26 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
         LOGGER.finer("exporting PropertyName");
         
         try {
-    		out.write(escapeName(expression.getPropertyName()));
+            //first evaluate expression against feautre type get the attribute, 
+            //  this handles xpath
+            AttributeDescriptor attribute = null;
+            try {
+                attribute = (AttributeDescriptor) expression.evaluate(featureType);
+            }
+            catch( Exception e ) {
+                //just log and fall back on just encoding propertyName straight up
+                String msg = "Error occured mapping " + expression + " to feature type";
+                LOGGER.log( Level.WARNING, msg, e );
+            }
+            if ( attribute != null ) {
+                //use the name of the attribute
+                out.write(escapeName(attribute.getLocalName()));
+            }
+            else {
+                //fall back to just encoding the properyt name
+                out.write(escapeName(expression.getPropertyName()));
+            }
+    		
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         }
@@ -774,6 +828,14 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
                     // sigle quotes must be escaped to have a valid sql string
                     String escaped = literal.toString().replaceAll("'", "''");
 					out.write( "'" + escaped + "'" );
+				}
+				else if ( Date.class.isAssignableFrom( target ) ) {
+				    //wrap a date in quotes so the datebase will parse
+				    out.write( "'" + literal.toString() + "'" );
+				}
+				else {
+				    //just use string value, no quotes
+				    out.write( literal.toString() );
 				}
 			}
 			else {
