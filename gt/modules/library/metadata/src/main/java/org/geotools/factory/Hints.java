@@ -698,7 +698,13 @@ public final class Hints extends RenderingHints {
     public static final Key PRIMITIVE_FACTORY = new Key("org.opengis.geometry.primitive.PrimitiveFactory");
     public static final Key GEOMETRY_VALIDATE = new Key(Boolean.class);
 
-
+    /**
+     * The maximum number of associations traversed in a datastore query.
+     * <p>
+     * This maps directly to the traversalXlinkDepth parameter in a wfs query.
+     * </p>
+     */
+    public static final Hints.Key ASSOCIATION_TRAVERSAL_DEPTH = new Key( Integer.class );
 
     /**
      * Constructs an initially empty set of hints.
