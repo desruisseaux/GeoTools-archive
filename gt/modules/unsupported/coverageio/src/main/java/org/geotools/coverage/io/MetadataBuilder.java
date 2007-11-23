@@ -87,7 +87,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.wkt.UnformattableObjectException;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
@@ -589,7 +589,7 @@ public class MetadataBuilder {
     /**
      * The factories to use for constructing ellipsoids, projections, coordinate reference systems...
      */
-    private final FactoryGroup factories;
+    private final ReferencingFactoryContainer factories;
 
     /**
      * The locale to use for formatting messages, or {@code null} for a default locale.
@@ -602,13 +602,13 @@ public class MetadataBuilder {
      * Constructs a new {@code MetadataBuilder} using default factories.
      */
     public MetadataBuilder() {
-        this(FactoryGroup.createInstance(null));
+        this(ReferencingFactoryContainer.instance(null));
     }
 
     /**
      * Constructs a new {@code MetadataBuilder} using the specified factories.
      */
-    public MetadataBuilder(final FactoryGroup factories) {
+    public MetadataBuilder(final ReferencingFactoryContainer factories) {
         this.factories = factories;
     }
 

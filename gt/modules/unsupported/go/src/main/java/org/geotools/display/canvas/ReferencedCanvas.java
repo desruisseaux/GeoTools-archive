@@ -68,9 +68,9 @@ import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.IdentityTransform;
@@ -173,7 +173,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * Factories for CRS objects creation, coordinate operations and math transforms.
      * Will be created when first needed. The actual instance is {@link #hints} dependent.
      */
-    private transient FactoryGroup crsFactories;
+    private transient ReferencingFactoryContainer crsFactories;
 
     /**
      * The coordinate operation factory. Will be created when first needed.
@@ -1014,7 +1014,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      */
     public final synchronized DerivedCRS getDisplayCRS() {
         if (displayCRS == null) try {
-            final FactoryGroup crsFactories;
+            final ReferencingFactoryContainer crsFactories;
             final CoordinateReferenceSystem objectiveCRS;
             final CoordinateSystem displayCS;
             final int sourceDim, targetDim;
@@ -1095,7 +1095,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     public final synchronized DerivedCRS getDeviceCRS() {
         final DerivedCRS displayCRS = getDisplayCRS();
         if (deviceCRS == null) try {
-            final FactoryGroup crsFactories;
+            final ReferencingFactoryContainer crsFactories;
             final CoordinateSystem deviceCS;
             final Matrix identity;
             final MathTransform mt;
@@ -1239,7 +1239,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             crs = getDisplayCRS();
             properties = displayProperties;
         }
-        final FactoryGroup crsFactories = getFactoryGroup();
+        final ReferencingFactoryContainer crsFactories = getFactoryGroup();
         final MathTransform mt = crsFactories.getMathTransformFactory().createAffineTransform(transform);
         crs = crsFactories.getCRSFactory().createDerivedCRS(properties, affineMethod,
                 crs.getBaseCRS(), mt, crs.getCoordinateSystem());
@@ -1436,10 +1436,10 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * @return The factory group (never {@code null}).
      * @throws FactoryException if the affine method can't be fetched.
      */
-    private FactoryGroup getFactoryGroup() throws FactoryException {
+    private ReferencingFactoryContainer getFactoryGroup() throws FactoryException {
         assert Thread.holdsLock(this);
         if (crsFactories == null) {
-            crsFactories = FactoryGroup.createInstance(hints);
+            crsFactories = ReferencingFactoryContainer.instance(hints);
             affineMethod = crsFactories.getOperationMethod("affine");
         }
         return crsFactories;

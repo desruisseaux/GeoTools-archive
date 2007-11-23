@@ -269,7 +269,7 @@ public class IndexedFidReader implements FIDReader {
         }
 
         if (!hasNext()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Feature could not be read; a the index may be invalid");
         }
 
         currentId = buffer.getLong();

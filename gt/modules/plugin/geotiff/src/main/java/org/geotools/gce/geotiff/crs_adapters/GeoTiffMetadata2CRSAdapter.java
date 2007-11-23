@@ -67,7 +67,6 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.AllAuthoritiesFactory;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;

@@ -66,7 +66,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.Format;
@@ -567,8 +567,8 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					parameters.parameter("scale_factor").setValue(1);
 					parameters.parameter("false_easting").setValue(0.0);
 					parameters.parameter("false_northing").setValue(0.0);
-					final FactoryGroup factories = FactoryGroup
-							.createInstance(null);
+					final ReferencingFactoryContainer factories =
+					    ReferencingFactoryContainer.instance(null);
 					final Map properties = Collections.singletonMap("name",
 							"WGS 84 / Antartic Polar Stereographic");
 

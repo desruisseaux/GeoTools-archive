@@ -50,7 +50,7 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.styling.Graphic;
@@ -717,7 +717,7 @@ public class DemoBase {
         }
         
         /* Projected CRS */
-        FactoryGroup fg = new FactoryGroup(null);
+        ReferencingFactoryContainer fg = ReferencingFactoryContainer.instance(null);
         try{
            projCRS = fg.createProjectedCRS(props,
                         org.geotools.referencing.crs.DefaultGeographicCRS.WGS84,

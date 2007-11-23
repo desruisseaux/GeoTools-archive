@@ -195,6 +195,7 @@ public class ShapefileRenderer implements GTRenderer {
     private MapContext context;
     LabelCache labelCache = new LabelCacheDefault();
     private ListenerList renderListeners = new ListenerList();
+    /** If we are caching styles; by default this is false */
     boolean caching = false;
     private double scaleDenominator;
     DbaseFileHeader dbfheader;
@@ -552,11 +553,15 @@ public class ShapefileRenderer implements GTRenderer {
 
                     boolean doElse = true;
 
-                    if (LOGGER.isLoggable(Level.FINER)) {
-                        LOGGER.fine("trying to read geometry ...");
-                    }
+                    
 
                     String nextFid = fidReader.next();
+                    if( nextFid == null){
+                        LOGGER.finer("Skipping invalid FID; Please regenerate your index.");
+                        continue;
+                    }
+                    LOGGER.finer("trying to read geometry ...");
+                    
                     if (modifiedFIDs.contains(nextFid)) {
                         shpreader.next();
                         if( dbfreader != null && !dbfreader.IsRandomAccessEnabled() )
@@ -568,7 +573,6 @@ public class ShapefileRenderer implements GTRenderer {
                     ShapefileReader.Record record = shpreader.next();
 
                     Object geom = record.shape();
-
                     if (geom == null) {
                         LOGGER.finest("skipping geometry");
                         if( dbfreader != null && !dbfreader.IsRandomAccessEnabled() )
@@ -1048,7 +1052,13 @@ public class ShapefileRenderer implements GTRenderer {
 
         for( int i = 0; i < objects.length; i++ ) {
             RenderListener listener = (RenderListener) objects[i];
-            listener.errorOccurred(e);
+            try {
+                listener.errorOccurred(e);
+            }
+            catch (RuntimeException ignore){
+                LOGGER.fine("Provided RenderListener could not handle error message:"+ignore );
+                LOGGER.throwing( getClass().getName(), "fireErrorEvent", ignore );
+            }
         }
     }
 
@@ -1071,16 +1081,16 @@ public class ShapefileRenderer implements GTRenderer {
     }
 
     /**
-     * DOCUMENT ME!
+     * True if we are caching styles.
      * 
-     * @return Returns the caching.
+     * @return <code>ture </code>if caching
      */
     public boolean isCaching() {
         return caching;
     }
 
     /**
-     * DOCUMENT ME!
+     * Set to true to cache styles.
      * 
      * @param caching The caching to set.
      */

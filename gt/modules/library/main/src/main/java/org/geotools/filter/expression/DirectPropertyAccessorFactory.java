@@ -31,13 +31,24 @@ public class DirectPropertyAccessorFactory implements PropertyAccessorFactory {
      * @author Jody Garnett (Refractions Research Inc)
      */
     static class DirectPropertyAccessor implements PropertyAccessor {
+        
         /**
          * We can handle *one* case and one case only 
          */
         public boolean canHandle(Object object, String xpath, Class target) {
-            return (object instanceof Property) &&
-                   ((Property)object).getName().getLocalPart().equals( xpath );
+            if( object instanceof Property ){
+                Property property = (Property) object;
+                if( property.getName() != null ){
+                    return property.getName().getLocalPart().equals( xpath );
+                }
+                else {
+                    // a property with no name? Is this the default geometry?
+                    return false;
+                }
+            }
+            return false;
         }
+        
         public Object get(Object object, String xpath, Class target)
                 throws IllegalArgumentException {
             return ((Property)object).getValue();
