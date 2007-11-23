@@ -33,6 +33,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 
@@ -228,7 +229,7 @@ public abstract class ContentFeatureSource implements FeatureSource {
      */
     public final ContentFeatureCollection getFeatures(Query query)
         throws IOException {
-        ContentFeatureCollection features = getFeatures(query.getFilter());
+        ContentFeatureCollection features = getFeatures(query.getFilter(),query.getSortBy());
         features.setHints( query.getHints() );
         
         if (query.getCoordinateSystemReproject() != null) {
@@ -249,8 +250,18 @@ public abstract class ContentFeatureSource implements FeatureSource {
         }
 
         if (query.getPropertyNames() != Query.ALL_NAMES) {
-            SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
-            features = new ReTypingFeatureCollection( features, retyped );
+            //do a check for the case were all the names are still specified, 
+            // manually
+            SimpleFeatureType schema = getSchema();
+            boolean same = schema.getAttributeCount() == query.getPropertyNames().length;
+            for ( int i = 0; i < schema.getAttributeCount() && same; i++ ) {
+                same = schema.getAttribute(i).getLocalName().equals( 
+                    query.getPropertyNames()[i]);
+            }
+            if ( !same ) {
+                SimpleFeatureType retyped = SimpleFeatureTypeBuilder.retype(getSchema(), query.getPropertyNames());
+                features = new ReTypingFeatureCollection( features, retyped );    
+            }
         }
         
         return features;
@@ -267,13 +278,21 @@ public abstract class ContentFeatureSource implements FeatureSource {
      */
     public final ContentFeatureCollection getFeatures(Filter filter)
         throws IOException {
-        if ((filter == null) || (filter == Filter.INCLUDE)) {
-            return all(entry.getState(transaction));
-        }
-
-        return filtered(entry.getState(transaction), filter);
+        return getFeatures( filter, (SortBy[]) null );
     }
 
+    public final ContentFeatureCollection getFeatures(Filter filter, SortBy[] sort) {
+        ContentState state = entry.getState(transaction);
+        boolean f = filter != null && filter != Filter.INCLUDE;
+        
+        if ( sort != null ) {
+            return f ? sorted( state, sort, filter ) : sorted( state, sort, null );
+        }
+        else {
+            return f ? filtered( state, filter ) : all( state );
+        }
+    }
+    
     /**
      * Adds an listener or observer to the feature source.
      * <p>
@@ -365,6 +384,21 @@ public abstract class ContentFeatureSource implements FeatureSource {
      */
     protected abstract ContentFeatureCollection filtered(ContentState state, Filter filter);
 
+    /**
+     * Returns a new feautre collection containing all the features of the 
+     * feature source sorted by a particular set of attributes.
+     * <p>
+     * This method accepts a filter optionally to filter returned content. This 
+     * parameter may be <code>null</code>, which which case no filtering should
+     * occur.
+     * </p>
+     * @param state The state the feature collection must work from.
+     * @param sort The sort criteria
+     * @param filter A filter, possibly <code>null</code>
+     * @return
+     */
+    protected abstract ContentFeatureCollection sorted(ContentState state, SortBy[] sort, Filter filter);
+    
     /**
      * FeatureList representing sorted content.
      * <p>
