@@ -390,7 +390,9 @@ public class ArcSDEAdapter {
             b.setName(attName);
             b.setNillable(isNilable);
             b.setDefaultValue(defValue);
-            b.setLength(fieldLen);
+            if(fieldLen > 0){
+            	b.setLength(fieldLen);
+            }
             b.setCRS(metadata);
             
             attDescriptors.add(b.buildDescriptor(attName));
@@ -576,8 +578,8 @@ public class ArcSDEAdapter {
      * shape's type.
      * 
      * @param shape
-     *            non <code>null</code> SeShape instance for which to infer
-     *            the matching geometry class
+     *            SeShape instance for which to infer
+     *            the matching geometry class, may be null
      * @return the Geometry subclass corresponding to the shape type
      * @throws SeException
      *             propagated if thrown by {@link SeShape#getType()}
@@ -590,10 +592,10 @@ public class ArcSDEAdapter {
     public static Class getGeometryTypeFromSeShape(SeShape shape) throws SeException {
         Class clazz = com.vividsolutions.jts.geom.Geometry.class;
         
-        int seShapeType = shape.getType();
+        final int seShapeType = shape == null? SeShape.TYPE_NIL : shape.getType();
         
         if (seShapeType == SeShape.TYPE_NIL) {
-            // do nothing
+            clazz = null;
         } else if (seShapeType == SeShape.TYPE_LINE || seShapeType == SeShape.TYPE_SIMPLE_LINE) {
             clazz = LineString.class;
         } else if (seShapeType == SeShape.TYPE_MULTI_LINE || seShapeType == SeShape.TYPE_MULTI_SIMPLE_LINE) {

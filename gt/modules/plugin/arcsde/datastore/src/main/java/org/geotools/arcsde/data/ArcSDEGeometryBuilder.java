@@ -509,21 +509,15 @@ public abstract class ArcSDEGeometryBuilder {
 		}
 
 		/**
-		 * DOCUMENT ME!
-		 * 
-		 * @param shape
-		 *            DOCUMENT ME!
-		 * 
-		 * @return DOCUMENT ME!
-		 * 
-		 * @throws SeException
-		 *             DOCUMENT ME!
-		 * @throws DataSourceException
-		 *             DOCUMENT ME!
+		 * @see ArcSDEGeometryBuilder#construct(SeShape)
 		 */
+		@Override
 		public Geometry construct(SeShape shape) throws SeException,
 				DataSourceException {
 			Class realGeomClass = ArcSDEAdapter.getGeometryTypeFromSeShape(shape);
+			if(realGeomClass == null){
+				return null;
+			}
 			ArcSDEGeometryBuilder realBuilder = builderFor(realGeomClass);
 
 			return realBuilder.construct(shape);

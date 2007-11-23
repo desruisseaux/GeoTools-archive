@@ -328,23 +328,14 @@ public class ArcSDEDataStore extends AbstractDataStore {
         if (featureType == null) {
             throw new NullPointerException("You have to provide a FeatureType instance");
         }
-        /*
-         * if(!(featureType instanceof FeatureType)){ throw new
-         * IllegalArgumentException("ArcSDE datastore supports only
-         * SimpleFeatureType"); }
-         */
 
         if (featureType.getDefaultGeometry() == null) {
             throw new IllegalArgumentException(
-                    "FeatureType must have at least a geometry attribute");
+                    "FeatureType must have at least one geometry attribute");
         }
 
-        final String nonQualifiedTypeName = featureType.getTypeName();
-
-        if (nonQualifiedTypeName.indexOf('.') != -1) {
-            throw new IllegalArgumentException(
-                    "Please do not use type names that contains '.' (dots)");
-        }
+        final String []typeNameParts = featureType.getTypeName().split("\\.");
+        final String unqualifiedTypeName = typeNameParts[typeNameParts.length - 1];
 
         // Create a new SeTable/SeLayer with the specified attributes....
         ArcSDEPooledConnection connection = null;
@@ -391,11 +382,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
             // create a table with provided username
             String qualifiedName = null;
 
-            if (nonQualifiedTypeName.indexOf('.') == -1) {
+            if (unqualifiedTypeName.indexOf('.') == -1) {
                 qualifiedName = connection.getUser() + "." + featureType.getTypeName();
                 LOGGER.finer("new full qualified type name: " + qualifiedName);
             } else {
-                qualifiedName = nonQualifiedTypeName;
+                qualifiedName = unqualifiedTypeName;
                 LOGGER.finer("full qualified type name provided by user: " + qualifiedName);
             }
 
@@ -408,11 +399,11 @@ public class ArcSDEDataStore extends AbstractDataStore {
             table = createSeTable(connection, qualifiedName, HACK_COL_NAME, configKeyword);
             tableCreated = true;
 
-            List atts = Arrays.asList(featureType.getAttributes());
+            final List<AttributeDescriptor> atts = featureType.getAttributes();
             AttributeDescriptor currAtt;
 
-            for (Iterator it = atts.iterator(); it.hasNext();) {
-                currAtt = (AttributeDescriptor) it.next();
+            for (Iterator<AttributeDescriptor> it = atts.iterator(); it.hasNext();) {
+                currAtt = it.next();
 
                 if (currAtt instanceof GeometryDescriptor) {
                     GeometryDescriptor geometryAtt = (GeometryDescriptor) currAtt;
@@ -667,18 +658,22 @@ public class ArcSDEDataStore extends AbstractDataStore {
             };
         } catch (SchemaException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new DataSourceException("Types do not match: " + ex.getMessage(), ex);
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception t) {
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
-            throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
-        }finally{
             if (sdeQuery != null) {
                 sdeQuery.close();
             }
+            throw new DataSourceException("Types do not match: " + ex.getMessage(), ex);
+        } catch (IOException e) {
+            if (sdeQuery != null) {
+                sdeQuery.close();
+            }
+            throw e;
+        } catch (Exception t) {
+            LOGGER.log(Level.SEVERE, t.getMessage(), t);
+            if (sdeQuery != null) {
+                sdeQuery.close();
+            }
+            throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
         }
-
         return reader;
     }
 
