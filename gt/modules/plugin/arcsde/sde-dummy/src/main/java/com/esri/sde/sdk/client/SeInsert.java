@@ -7,7 +7,7 @@ public class SeInsert {
 	public void intoTable(String s, String[] t) {}
 	public void setWriteMode(boolean b) {}
 	public SeRow getRowToSet() { return null; }
-	public void execute() {}
+	public void execute() throws SeException{}
 	public void close()throws SeException {}
 
 }
