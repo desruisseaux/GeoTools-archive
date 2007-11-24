@@ -35,8 +35,11 @@ public class IntersectsImpl extends GeometryFilterImpl implements Intersects {
 	}
 	
 	public boolean evaluate(Object feature) {
-		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature))
+		if (feature instanceof SimpleFeature && !validate((SimpleFeature)feature)){
+		    // we could not obtain a geometry for both left and right hand sides
+		    // so default to false
 			return false;
+		}
 		
 		Geometry left = getLeftGeometry(feature);
 		Geometry right = getRightGeometry(feature);

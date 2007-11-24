@@ -154,8 +154,9 @@ public class TransactionStateDiff implements State {
      * Called by commit() to apply one set of diff
      * 
      * <p>
-     * diff will be modified as the differneces are applied, If the opperations
-     * is successful diff will be empty at the end of this process.
+     * The provided <code> will be modified as the differences are applied,
+     * If the operations are all successful diff will be empty at
+     * the end of this process.
      * </p>
      * 
      * <p>
@@ -166,6 +167,7 @@ public class TransactionStateDiff implements State {
      * <li>
      * fid|null: represents a fid being removed
      * </li>
+     * 
      * <li>
      * fid|feature: where fid exists, represents feature modification
      * </li>
@@ -346,11 +348,20 @@ public class TransactionStateDiff implements State {
                         break;
                     }
                 }
+                public String toString() {
+                    return "<DiffFeatureWriter>("+reader.toString()+")";
+                }
             };
     }
-    
+    /**
+     * A NullObject used to represent the absence of a SimpleFeature.
+     * <p>
+     * This class is used by TransactionStateDiff as a placeholder
+     * to represent features that have been removed. The concept
+     * is generally useful and may wish to be taken out as a separate
+     * class (used for example to represent deleted rows in a shapefile).
+     */
     public static final SimpleFeature NULL=new SimpleFeature( ){
-
         public Object getAttribute(String path) {
             return null;
         }
@@ -475,8 +486,15 @@ public class TransactionStateDiff implements State {
 
         public void setValue(Object newValue) {
         }
-
-		
+        public String toString() {
+            return "<NullFeature>";
+        }
+        public int hashCode() {
+            return 0;
+        }
+		public boolean equals( Object arg0 ) {
+		    return arg0 == this;
+		}
     };
 
 

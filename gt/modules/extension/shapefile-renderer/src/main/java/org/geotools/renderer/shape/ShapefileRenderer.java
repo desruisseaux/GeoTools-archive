@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -382,7 +383,7 @@ public class ShapefileRenderer implements GTRenderer {
         if (state == null) {
             return Collections.EMPTY_SET;
         }
-
+        // set of fids that has been modified (ie updated or deleted)
         Set fids = new HashSet();
         Map modified = null;
         Map added = null;
@@ -404,23 +405,26 @@ public class ShapefileRenderer implements GTRenderer {
             for( Iterator modifiedIter = modified.keySet().iterator(), 
             		addedIter=added.values().iterator(); 
             	modifiedIter.hasNext() || addedIter.hasNext(); ) {
-                if (renderingStopRequested) {
-                    break;
-                }
-
-                boolean doElse = true;
-                if( modifiedIter.hasNext() ){
-                	String fid=(String)modifiedIter.next();
-                	feature = (SimpleFeature) modified.get(fid);
-                    fids.add(fid);
-                }else{
-                    feature = (SimpleFeature) addedIter.next();
-                }
-                
-                if (!query.getFilter().evaluate(feature))
-                    continue;
-
-                if (feature != TransactionStateDiff.NULL) {
+                try {
+                    if (renderingStopRequested) {
+                        break;
+                    }
+                    boolean doElse = true;
+                    if( modifiedIter.hasNext() ){
+                    	String fid= (String) modifiedIter.next();
+                    	feature = (SimpleFeature) modified.get(fid);
+                        fids.add(fid);
+                    } else {
+                        feature = (SimpleFeature) addedIter.next();
+                    }
+                    if( feature == TransactionStateDiff.NULL){
+                        continue; // skip this feature as it is removed
+                    }
+                    if (!query.getFilter().evaluate(feature)){
+                        // currently this is failing for TransactionStateDiff.NULL
+                        continue; 
+                    }
+    
                     // applicable rules
                     for( Iterator it = ruleList.iterator(); it.hasNext(); ) {
                         Rule r = (Rule) it.next();
@@ -492,9 +496,11 @@ public class ShapefileRenderer implements GTRenderer {
                         LOGGER.finer("feature rendered event ...");
                     }
                 }
+                catch (RuntimeException e) {
+                    fireErrorEvent(e);
+                }
             }
         }
-
         return fids;
     }
 
@@ -553,23 +559,33 @@ public class ShapefileRenderer implements GTRenderer {
 
                     boolean doElse = true;
 
-                    
-
-                    String nextFid = fidReader.next();
-                    if( nextFid == null){
-                        LOGGER.finer("Skipping invalid FID; Please regenerate your index.");
-                        continue;
+                    String nextFid = null;
+                    if( fidReader.hasNext() ){
+                        try {
+                            nextFid = fidReader.next();
+                        }
+                        catch( NoSuchElementException invalidIndex){
+                            fireErrorEvent(new IllegalStateException("Skipping invalid FID; Please regenerate your index.", invalidIndex));
+                            // TODO: mark index as needing regeneration
+                        }
                     }
-                    LOGGER.finer("trying to read geometry ...");
-                    
-                    if (modifiedFIDs.contains(nextFid)) {
+                    else {
+                        fireErrorEvent(new IllegalStateException("Skipping invalid FID; shape and index are out of sync please regenerate index."));
+                        // TODO: mark index as needing regeneration
+                    }
+                    LOGGER.finer("trying to read geometry ...");                    
+                    if (nextFid == null || modifiedFIDs.contains(nextFid)) {
+                        // this one is modified we will get it when we processTransaction
                         shpreader.next();
-                        if( dbfreader != null && !dbfreader.IsRandomAccessEnabled() )
+                        if( dbfreader != null && !dbfreader.IsRandomAccessEnabled() ){
                             dbfreader.skip();
+                        }
                         continue;
                     }
-                    if( dbfreader != null && dbfreader.IsRandomAccessEnabled() )
+                    
+                    if( dbfreader != null && dbfreader.IsRandomAccessEnabled() ){
                         dbfreader.goTo(shpreader.getRecordNumber());
+                    }
                     ShapefileReader.Record record = shpreader.next();
 
                     Object geom = record.shape();

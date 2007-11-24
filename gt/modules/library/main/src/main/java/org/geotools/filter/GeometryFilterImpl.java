@@ -205,19 +205,21 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     }
     
     /**
-     * Subclass convenience method for validating the internals of the 
+     * Subclass convenience method to make sure we have
+     * geometry instances on both the left and right hand sides.
+     * <p>
+     * @return true iff we can perform a geometry operation
      */
-    protected boolean validate(SimpleFeature feature) {
-    	
+    protected boolean validate(SimpleFeature feature) {    	
     	// Checks for error condition
         Geometry right = getRightGeometry(feature);
         Geometry left = getLeftGeometry(feature);
 
-       // default behaviour: if the geometry that is to be filtered is not
-        // there we default to not returning anything
-        if(left == null)
+        if(left == null || right == null ){
+            // default behaviour: if the geometry that is to be filtered is not
+            // there we default to not returning anything
             return false;
-        
+        }        
         return true;
     }
     

@@ -42,7 +42,8 @@ public class DirectPropertyAccessorFactory implements PropertyAccessorFactory {
                     return property.getName().getLocalPart().equals( xpath );
                 }
                 else {
-                    // a property with no name? Is this the default geometry?
+                    // A property with no name? this is probably a place holder
+                    // or Null Object (such as TransactionStateDiff.NULL).
                     return false;
                 }
             }
