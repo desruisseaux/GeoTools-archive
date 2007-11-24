@@ -130,7 +130,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @param store
 	 *            DOCUMENT ME!
 	 * @param state
-	 *            DOCUMENT ME!
+	 *            transaction state or <code>null</code> if in auto commit mode.
 	 * @param layer
 	 *            DOCUMENT ME!
 	 */
@@ -150,9 +150,15 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 */
 	public SimpleFeatureType getFeatureType() {
 		try {
-			return ArcSDEAdapter.fetchSchema(
-					this.dataStore.getConnectionPool(), this.layer
-							.getQualifiedName(), this.dataStore.getNamespace());
+		    SimpleFeatureType schema;
+		    if(transactionState != null){
+	            final ArcSDEPooledConnection connection;
+		        connection = transactionState.getConnection();
+		        schema = dataStore.getSchema(layer.getQualifiedName(), connection);
+		    }else{
+		        schema = dataStore.getSchema(layer.getQualifiedName());
+		    }
+		    return schema;
 		} catch (SeException e) {
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
 			throw new RuntimeException(e.getMessage());

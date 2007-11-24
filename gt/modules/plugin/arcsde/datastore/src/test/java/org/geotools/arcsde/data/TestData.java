@@ -94,15 +94,6 @@ public class TestData {
      */
     private Properties conProps = null;
 
-    /** the name of the table holding the point test features */
-    private String point_table;
-
-    /** the name of the table holding the linestring test features */
-    private String line_table;
-
-    /** the name of the table holding the polygon test features */
-    private String polygon_table;
-
     /**
      * the name of a table that can be manipulated without risk of loosing
      * important data
@@ -146,23 +137,8 @@ public class TestData {
         this.conProps.load(in);
         in.close();
 
-        this.point_table = this.conProps.getProperty("point_table");
-        this.line_table = this.conProps.getProperty("line_table");
-        this.polygon_table = this.conProps.getProperty("polygon_table");
         this.temp_table = this.conProps.getProperty("temp_table");
         this.configKeyword = this.conProps.getProperty("configKeyword");
-
-        if (this.point_table == null) {
-            throw new IllegalArgumentException("point_table not defined in " + propsFile);
-        }
-
-        if (this.line_table == null) {
-            throw new IllegalArgumentException("line_table not defined in " + propsFile);
-        }
-
-        if (this.polygon_table == null) {
-            throw new IllegalArgumentException("polygon_table not defined in " + propsFile);
-        }
 
         if (this.temp_table == null) {
             throw new IllegalArgumentException("temp_table not defined in " + propsFile);
@@ -230,24 +206,6 @@ public class TestData {
         return this.conProps;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return Returns the line_table.
-     */
-    public String getLine_table() {
-        return this.line_table;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return Returns the point_table.
-     */
-    public String getPoint_table() {
-        return this.point_table;
-    }
-
     public String getTemp_table() throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
         SeConnection conn = getConnectionPool().getConnection();
@@ -270,15 +228,6 @@ public class TestData {
 
     public String getConfigKeyword() {
         return this.configKeyword;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @return Returns the polygon_table.
-     */
-    public String getPolygon_table() {
-        return this.polygon_table;
     }
 
     /**

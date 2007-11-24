@@ -217,7 +217,6 @@
                 correctly working right now!
               -->
               <includes>
-                <include>**/ArcSDETestSuite.java</include>
                 <include>**/*Test.java</include>
               </includes>
               <excludes>

@@ -15,10 +15,12 @@ import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -26,6 +28,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.text.cql2.CQL;
 import org.opengis.feature.simple.SimpleFeature;
@@ -609,6 +612,60 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 		assertEquals(features.size() + initialCount, fcount);
 	}
 
+	/**
+	 * Ensure modified features for a given FeatureStore are returned
+	 * by subsequent queries even if the transaction has not beeb commited.
+	 * @throws Exception 
+	 */
+	public void testTransactionStateDiff() throws Exception{
+	    testData.insertTestData();
+	    
+	    final DataStore ds = testData.getDataStore();
+	    final String typeName = testData.getTemp_table();
+        final FeatureStore transFs = (FeatureStore) ds.getFeatureSource(typeName);
+        final SimpleFeatureType schema = transFs.getSchema();
+        
+	    Transaction transaction = new DefaultTransaction("test_handle");
+	    transFs.setTransaction(transaction);
+	    
+	    //create a feature to add
+	    SimpleFeatureBuilder builder = new SimpleFeatureBuilder(schema);
+	    builder.set("INT32_COL", Integer.valueOf(1000));
+	    builder.set("STRING_COL", "inside transaction");
+	    SimpleFeature feature = builder.buildFeature(null);
+	    
+	    //add the feature
+	    transFs.addFeatures(DataUtilities.collection(feature));
+	    
+	    //now confirm for that transaction the feature is fetched, and outside it it's not.
+	    Filter filterNewFeature = CQL.toFilter("INT32_COL = 1000");
+	    FeatureCollection features = transFs.getFeatures(filterNewFeature);
+	    int size = features.size();
+        assertEquals(1, size);
+	    
+	    //ok transaction respected, assert the feature does not exist outside it
+	    DefaultQuery query = new DefaultQuery(typeName, filterNewFeature);
+        FeatureReader reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        assertFalse(reader.hasNext());
+        reader.close();
+        
+        //ok, but what if we ask for a feature reader with the same transaction
+        reader = ds.getFeatureReader(query, transaction);
+        assertTrue(reader.hasNext());
+        reader.next();
+        assertFalse(reader.hasNext());
+        reader.close();
+        
+        //now commit, and Transaction.AUTO_COMMIT should carry it over
+        transaction.commit();
+
+        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        assertTrue(reader.hasNext());
+        reader.close();
+        
+	}
+	
+	
 	/**
 	 * DOCUMENT ME!
 	 * 

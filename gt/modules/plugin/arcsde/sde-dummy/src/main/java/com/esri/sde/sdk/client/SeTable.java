@@ -16,5 +16,6 @@ public class SeTable {
 		public static /* GEOT-947 final*/ int SE_COUNT_STATS = 0;
 		public int getCount() { return 0; }
 	}
+    public int getPermissions() throws SeException{return 0;}
 	
 }

@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.geotools.data.DataSourceException;
 
@@ -229,13 +228,17 @@ public class ArcSDEConnectionPool {
         }
 
         try {
-            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-            String caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
-            System.err.println("Looking connection for " + caller);
+//            if(LOGGER.isLoggable(Level.FINER)){
+//                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//                String caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+//                System.err.println("Looking connection for " + caller);
+//            }
             
             ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
             
-            System.err.println("Returning connection " + ret);
+            if(LOGGER.isLoggable(Level.FINER)){
+                LOGGER.finer("Returning connection " + ret);
+            }
 
             return ret;
         } catch (NoSuchElementException e) {
@@ -401,14 +404,15 @@ public class ArcSDEConnectionPool {
      * 
      * @throws DataSourceException
      */
-    public List /* <String> */getAvailableLayerNames() throws DataSourceException {
+    @SuppressWarnings("unchecked")
+    public List<String> getAvailableLayerNames() throws DataSourceException {
         ArcSDEPooledConnection conn = null;
 
-        List layerNames = new LinkedList();
+        List<String> layerNames = new LinkedList<String>();
         try {
             conn = getConnection();
-            for (Iterator it = conn.getLayers().iterator(); it.hasNext();) {
-                layerNames.add(((SeLayer) it.next()).getQualifiedName());
+            for (Iterator<SeLayer> it = conn.getLayers().iterator(); it.hasNext();) {
+                layerNames.add(it.next().getQualifiedName());
             }
         } catch (SeException ex) {
             throw new DataSourceException("Error querying the layers list"

@@ -91,7 +91,9 @@ public class ArcSDEPooledConnection extends SeConnection {
 	    }
 	    
         try {
-            System.err.println("Close: returning connection " + toString() + " to pool");
+            if(LOGGER.isLoggable(Level.FINER)){
+                LOGGER.finer("Close: returning connection " + toString() + " to pool");
+            }
             this.pool.returnObject(this);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

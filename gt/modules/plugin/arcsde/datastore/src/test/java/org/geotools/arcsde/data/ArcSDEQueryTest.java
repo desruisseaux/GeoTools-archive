@@ -21,12 +21,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
+import org.geotools.arcsde.ArcSDEDataStoreFactory;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
@@ -37,7 +45,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
- * DOCUMENT ME!
+ * Test suite for the {@link ArcSDEQuery} query wrapper
  *
  * @author Gabriel Roldan
  * @source $URL$
@@ -45,7 +53,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ArcSDEQueryTest extends TestCase {
 
-    private TestData testData;
+    private static TestData testData;
 
     /**
      * do not access it directly, use {@link #getQueryAll()}
@@ -78,6 +86,46 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     /**
+     * Builds a test suite for all this class' tests with per suite
+     * initialization directed to {@link #oneTimeSetUp()} and per suite clean up
+     * directed to {@link #oneTimeTearDown()}
+     * 
+     * @return
+     */
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
+        suite.addTestSuite(ArcSDEQueryTest.class);
+
+        TestSetup wrapper = new TestSetup(suite) {
+            protected void setUp() throws Exception {
+                oneTimeSetUp();
+            }
+
+            protected void tearDown() {
+                oneTimeTearDown();
+            }
+        };
+        return wrapper;
+    }
+
+    private static void oneTimeSetUp() throws Exception {
+        testData = new TestData();
+        testData.setUp();
+        if (ArcSDEDataStoreFactory.getSdeClientVersion() == ArcSDEDataStoreFactory.JSDE_VERSION_DUMMY) {
+            throw new RuntimeException("Don't run the test-suite with the dummy jar.  "
+                    + "Make sure the real ArcSDE jars are on your classpath.");
+        }
+        final boolean insertTestData = true;
+        testData.createTempTable(insertTestData);
+    }
+
+    private static void oneTimeTearDown() {
+        boolean cleanTestTable = false;
+        boolean cleanPool = true;
+        testData.tearDown(cleanTestTable, cleanPool);
+    }
+    
+    /**
      * loads {@code test-data/testparams.properties} into a Properties object, wich is
      * used to obtain test tables names and is used as parameter to find the DataStore
      *
@@ -85,21 +133,40 @@ public class ArcSDEQueryTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        this.testData = new TestData();
-        this.testData.setUp();
+        if(testData == null){
+            oneTimeSetUp();
+        }
         dstore = testData.getDataStore();
-        typeName = testData.getLine_table();
+        typeName = testData.getTemp_table();
         this.ftype = dstore.getSchema(typeName);
         
         //grab some fids
-        FeatureReader reader = dstore.getFeatureReader(typeName);
+        FeatureSource source = dstore.getFeatureSource(typeName);
+        FeatureCollection features = source.getFeatures();
+        FeatureIterator iterator = features.features();
         List fids = new ArrayList();
         for(int i = 0; i < FILTERING_COUNT; i++){
-        	fids.add(ff.featureId(reader.next().getID()));
+        	fids.add(ff.featureId(iterator.next().getID()));
         }
-        reader.close();
+        iterator.close();
         Id filter = ff.id(new HashSet(fids));
         filteringQuery = new DefaultQuery(typeName, filter);
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        try{
+            this.queryAll.close();
+        }catch(Exception e){
+            //no-op
+        }
+        try{
+            this.queryFiltered.close();
+        }catch(Exception e){
+            //no-op
+        }
+        this.queryAll = null;
+        this.queryFiltered = null;
     }
 
     private ArcSDEQuery getQueryAll() throws IOException{
@@ -110,29 +177,6 @@ public class ArcSDEQueryTest extends TestCase {
     private ArcSDEQuery getQueryFiltered() throws IOException{
         this.queryFiltered = ArcSDEQuery.createQuery(dstore, filteringQuery);
         return this.queryFiltered;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @throws Exception DOCUMENT ME!
-     */
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        try{
-        	this.queryAll.close();
-        }catch(Exception e){
-        	//no-op
-        }
-        try{
-        	this.queryFiltered.close();
-        }catch(Exception e){
-        	//no-op
-        }
-        this.queryAll = null;
-        this.queryFiltered = null;
-        testData.tearDown(true, true);
-        testData = null;
     }
 
     /**
@@ -184,15 +228,17 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testCalculateResultCount() throws Exception{
-    	FeatureReader reader = dstore.getFeatureReader(typeName);
-    	int readed = 0;
+    	FeatureCollection features = dstore.getFeatureSource(typeName).getFeatures();
+    	FeatureIterator reader = features.features();
+    	int read = 0;
     	while(reader.hasNext()){
     		reader.next();
-    		readed++;
+    		read++;
     	}
+    	reader.close();
     	
     	int calculated = getQueryAll().calculateResultCount();
-    	assertEquals(readed, calculated);
+    	assertEquals(read, calculated);
     	
     	calculated = getQueryFiltered().calculateResultCount();
     	assertEquals(FILTERING_COUNT, calculated);
@@ -202,28 +248,40 @@ public class ArcSDEQueryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testCalculateQueryExtent()throws Exception {
-    	FeatureReader reader = dstore.getFeatureReader(typeName);
+    	FeatureCollection features = dstore.getFeatureSource(typeName).getFeatures();
+    	FeatureIterator reader = features.features();
     	ReferencedEnvelope real = new ReferencedEnvelope();
     	while(reader.hasNext()){
     		real.include(reader.next().getBounds());
     	}
     	
-    	Envelope e = getQueryAll().calculateQueryExtent();
-    	assertNotNull(e);
-    	assertEquals(real, e);
+    	//TODO: make calculateQueryExtent to return ReferencedEnvelope
+    	Envelope actual = getQueryAll().calculateQueryExtent();
+    	Envelope expected = new Envelope(real);
+    	
+    	assertNotNull(actual);
+    	assertEquals(expected, actual);
     	
     	reader.close();
     
-    	reader = dstore.getFeatureReader(typeName, filteringQuery);
+    	FeatureReader featureReader = dstore.getFeatureReader(filteringQuery, Transaction.AUTO_COMMIT);
     	real = new ReferencedEnvelope();
-    	while(reader.hasNext()){
-    		real.include(reader.next().getBounds());
+    	while(featureReader.hasNext()){
+    		real.include(featureReader.next().getBounds());
     	}
     	
-    	e = getQueryFiltered().calculateQueryExtent();
-    	assertNotNull(e);
-    	assertEquals(real, e);
-    	reader.close();
+    	actual = getQueryFiltered().calculateQueryExtent();
+    	assertNotNull(actual);
+    	expected = new Envelope(real);	
+    	assertEquals(expected, actual);
+    	featureReader.close();
     }
 
+    private void assertEquals(Envelope e1, Envelope e2){
+        final double tolerance = 1.0E-9;
+        assertEquals(e1.getMinX(), e2.getMinX(), tolerance);
+        assertEquals(e1.getMinY(), e2.getMinY(), tolerance);
+        assertEquals(e1.getMaxX(), e2.getMaxX(), tolerance);
+        assertEquals(e1.getMaxY(), e2.getMaxY(), tolerance);
+    }
 }
