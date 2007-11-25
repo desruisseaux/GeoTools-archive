@@ -16,8 +16,6 @@
  */
 package org.geotools.arcsde.pool;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
