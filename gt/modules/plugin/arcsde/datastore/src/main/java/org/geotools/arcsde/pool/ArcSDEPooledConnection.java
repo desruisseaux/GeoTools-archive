@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.pool.ObjectPool;
-import org.geotools.data.Transaction;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -36,7 +35,7 @@ import com.esri.sde.sdk.client.SeException;
  */
 public class ArcSDEPooledConnection extends SeConnection {
 
-	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEPooledConnection.class.getPackage().getName());
+	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.pool");
 	
 	private ObjectPool pool;
 	

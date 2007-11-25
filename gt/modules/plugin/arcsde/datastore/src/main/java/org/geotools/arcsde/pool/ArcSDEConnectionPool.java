@@ -78,7 +78,7 @@ import com.esri.sde.sdk.client.SeTable;
  */
 public class ArcSDEConnectionPool {
     /** package's logger */
-    protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEConnectionPool.class.getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.pool");
 
     /** DOCUMENT ME! */
     protected static final Level INFO_LOG_LEVEL = Level.WARNING;

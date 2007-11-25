@@ -29,6 +29,11 @@ import java.io.IOException;
  */
 public class UnavailableArcSDEConnectionException extends IOException {
 	/**
+     * serial version id
+     */
+    private static final long serialVersionUID = -7964603239735118491L;
+
+    /**
 	 * Creates a new UnavailableArcSDEConnectionException object.
 	 * 
 	 * @param usedConnections
