@@ -151,7 +151,11 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      * empty constructor
      */
     public ArcSDEDataStoreFactory() {
-        // does nothing
+        if (!isAvailable()) {
+            LOGGER.warning("The ESRI ArcSDE Java API seems to not be on your classpath. Please"
+                    + " verify that all needed jars are. ArcSDE data stores"
+                    + " will not be available.");
+        }
     }
     
     /**
@@ -317,11 +321,6 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
             LOGGER.finer(SeConnection.class.getName() + " is in place.");
             LOGGER.finer(PeCoordinateSystem.class.getName() + " is in place.");
         } catch (Throwable t) {
-            LOGGER.log(
-                    Level.WARNING,
-                    "ArcSDE Java API seems to not be on your classpath. Please"
-                    + " verify that all needed jars are. ArcSDE data stores" +
-                    " will not be available.", t);
             return false;
         }
         
