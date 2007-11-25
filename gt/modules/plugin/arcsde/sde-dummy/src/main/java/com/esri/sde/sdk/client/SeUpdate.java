@@ -9,4 +9,8 @@ public class SeUpdate {
 	public SeRow getRowToSet() { return null; }
 	public void execute() {}
 	public void close() {}
+
+    public SeRow singleRow(SeObjectId seObjectId, String typeName, String[] rowColumnNames) throws SeException{
+        return null;
+    }
 }

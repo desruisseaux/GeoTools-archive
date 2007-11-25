@@ -2,7 +2,7 @@ package com.esri.sde.sdk.client;
 
 public class SeColumnDefinition {
 	
-	public SeColumnDefinition(String s,int i,int j,int k, boolean b) {}
+    public SeColumnDefinition(String s,int i,int j,int k, boolean b) {}
 	
 	public static /* GEOT-947 final*/ int TYPE_SMALLINT = 0;
 	public static /* GEOT-947 final*/ int TYPE_INTEGER = 1;
@@ -20,6 +20,9 @@ public class SeColumnDefinition {
 	public static /* GEOT-947 final*/ int TYPE_RASTER = 13;
 	public static /* GEOT-947 final*/ int TYPE_NSTRING = 14;
 	public static /* GEOT-947 final*/ int TYPE_UUID = 15;
+    public static int TYPE_CLOB = 1;
+    public static int TYPE_NCLOB = 1;
+
 	
 	
 	public String getName() { return null; }

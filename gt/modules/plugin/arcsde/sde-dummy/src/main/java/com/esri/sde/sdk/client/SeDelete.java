@@ -6,4 +6,6 @@ public class SeDelete {
 	
 	public void byId(String s, SeObjectId d) {}
 
+    public void close() throws SeException{}
+
 }
