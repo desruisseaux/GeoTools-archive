@@ -44,6 +44,7 @@ import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.LockingManager;
@@ -59,6 +60,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
@@ -106,10 +108,14 @@ public class ArcSDEDataStore implements DataStore {
      */
     private Map<String, FeatureType> viewSchemasCache = new HashMap<String, FeatureType>();
 
+    /**
+     * Per inprocess view typeName SQL query definitions
+     */
     private Map<String, PlainSelect> viewSelectStatements = new HashMap<String, PlainSelect>();
 
     /**
-     * In process view definitions
+     * In process view definitions in ArcSDE Java API terms created from their
+     * SQL definitions
      */
     private Map<String, SeQueryInfo> viewQueryInfos = new HashMap<String, SeQueryInfo>();
 
@@ -121,15 +127,37 @@ public class ArcSDEDataStore implements DataStore {
      */
     private String namespace;
 
+    /**
+     * Creates a new ArcSDE DataStore working over the given connection pool
+     * 
+     * @param connPool
+     *            pool of {@link ArcSDEPooledConnection} this datastore works
+     *            upon.
+     */
     public ArcSDEDataStore(final ArcSDEConnectionPool connPool) {
-        this(connPool, "http://www.geotools.org");
+        this(connPool, null);
     }
 
+    /**
+     * Creates a new ArcSDE DataStore working over the given connection pool
+     * 
+     * @param connPool
+     *            pool of {@link ArcSDEPooledConnection} this datastore works
+     *            upon.
+     * @param namespaceUri
+     *            namespace URI for the {@link SimpleFeatureType}s,
+     *            {@link AttributeType}s, and {@link AttributeDescriptor}s
+     *            created by this datastore. May be <code>null</code>.
+     */
     public ArcSDEDataStore(final ArcSDEConnectionPool connPool, final String namespaceUri) {
         this.connectionPool = connPool;
         this.namespace = namespaceUri;
     }
 
+    /**
+     * @see DataStore#createSchema(SimpleFeatureType)
+     * @see #createSchema(SimpleFeatureType, Map)
+     */
     public void createSchema(final SimpleFeatureType featureType) throws IOException {
         createSchema(featureType, null);
     }
@@ -196,10 +224,16 @@ public class ArcSDEDataStore implements DataStore {
         return layerNames.toArray(new String[layerNames.size()]);
     }
 
+    /**
+     * TODO: implement dispose()!
+     */
     public void dispose() {
         LOGGER.info("dispose not yet implemented for ArcSDE, don't forget to do that!");
     }
 
+    /**
+     * @see DataStore#getFeatureReader(Query, Transaction)
+     */
     public FeatureReader getFeatureReader(final Query query, final Transaction transaction)
             throws IOException {
         Filter filter = query.getFilter();
@@ -208,64 +242,69 @@ public class ArcSDEDataStore implements DataStore {
 
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.INCLUDE?");
+                    + "did you mean Filter.INCLUDE?");
         }
-        if( typeName == null ){
-            throw new NullPointerException(
-                "getFeatureReader requires typeName: "
-                + "use getTypeNames() for a list of available types");
+        if (typeName == null) {
+            throw new NullPointerException("getFeatureReader requires typeName: "
+                    + "use getTypeNames() for a list of available types");
         }
         if (transaction == null) {
-            throw new NullPointerException(
-                "getFeatureReader requires Transaction: "
-                + "did you mean to use Transaction.AUTO_COMMIT?");
+            throw new NullPointerException("getFeatureReader requires Transaction: "
+                    + "did you mean to use Transaction.AUTO_COMMIT?");
         }
-        SimpleFeatureType featureType = getSchema( query.getTypeName() );
+        SimpleFeatureType featureType = getSchema(query.getTypeName());
 
-        if( propertyNames != null || query.getCoordinateSystem()!=null ){
+        if (propertyNames != null || query.getCoordinateSystem() != null) {
             try {
-                featureType = DataUtilities.createSubType( featureType, propertyNames, query.getCoordinateSystem() );
+                featureType = DataUtilities.createSubType(featureType, propertyNames, query
+                        .getCoordinateSystem());
             } catch (SchemaException e) {
-                LOGGER.log( Level.FINEST, e.getMessage(), e);
-                throw new DataSourceException( "Could not create Feature Type for query", e );
+                LOGGER.log(Level.FINEST, e.getMessage(), e);
+                throw new DataSourceException("Could not create Feature Type for query", e);
 
             }
         }
-        if ( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )) {
+        if (filter == Filter.EXCLUDE || filter.equals(Filter.EXCLUDE)) {
             return new EmptyFeatureReader(featureType);
         }
-        //GR: allow subclases to implement as much filtering as they can,
-        //by returning just it's unsupperted filter
+        // GR: allow subclases to implement as much filtering as they can,
+        // by returning just it's unsupperted filter
         filter = getUnsupportedFilter(typeName, filter);
-        if(filter == null){
-            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
+        if (filter == null) {
+            throw new NullPointerException(
+                    "getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
         }
 
-        // There are cases where the readers have to lock.  Take shapefile for example.  Getting a Reader causes
-        // the file to be locked.  However on a commit TransactionStateDiff locks before a writer is obtained.  In order to 
-        // prevent deadlocks either the diff has to obtained first or the reader has to be obtained first.
-        // Because shapefile writes to a buffer first the actual write lock is not flipped until the transaction has most of the work
-        // done.  As a result I suggest getting the diff first then getting the reader.
+        // There are cases where the readers have to lock. Take shapefile for
+        // example. Getting a Reader causes
+        // the file to be locked. However on a commit TransactionStateDiff locks
+        // before a writer is obtained. In order to
+        // prevent deadlocks either the diff has to obtained first or the reader
+        // has to be obtained first.
+        // Because shapefile writes to a buffer first the actual write lock is
+        // not flipped until the transaction has most of the work
+        // done. As a result I suggest getting the diff first then getting the
+        // reader.
         // JE
-//        Diff diff=null;
-//        if (transaction != Transaction.AUTO_COMMIT) {
-//            TransactionStateDiff state = state(transaction);
-//            if( state != null ){
-//                diff = state.diff(typeName);
-//            }
-//        }
-        
+        // Diff diff=null;
+        // if (transaction != Transaction.AUTO_COMMIT) {
+        // TransactionStateDiff state = state(transaction);
+        // if( state != null ){
+        // diff = state.diff(typeName);
+        // }
+        // }
+
         // This calls our subclass "simple" implementation
         // All other functionality will be built as a reader around
         // this class
         //
         FeatureReader reader = getFeatureReader(typeName, query);
 
-//        if( diff!=null ){
-//            reader = new DiffFeatureReader(reader, diff, query.getFilter());
-//        }
+        // if( diff!=null ){
+        // reader = new DiffFeatureReader(reader, diff, query.getFilter());
+        // }
 
-        if (!filter.equals( Filter.INCLUDE ) ) {
+        if (!filter.equals(Filter.INCLUDE)) {
             reader = new FilteringFeatureReader(reader, filter);
         }
 
@@ -275,12 +314,12 @@ public class ArcSDEDataStore implements DataStore {
         }
 
         if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
-                reader = new MaxFeatureReader(reader, query.getMaxFeatures());
+            reader = new MaxFeatureReader(reader, query.getMaxFeatures());
         }
 
         return reader;
     }
-    
+
     /**
      * GR: this method is called from inside getFeatureReader(Query ,Transaction )
      * to allow subclasses return an optimized FeatureReader which supports the
@@ -301,10 +340,9 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @throws IOException
      *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
      */
-    protected FeatureReader getFeatureReader(String typeName, Query query) throws IOException {
+    private FeatureReader getFeatureReader(final String typeName, final Query query)
+            throws IOException {
         ArcSDEQuery sdeQuery = null;
         FeatureReader reader = null;
 
@@ -322,7 +360,8 @@ public class ArcSDEDataStore implements DataStore {
                     ArcSDEAttributeReader sdeAtts = (ArcSDEAttributeReader) atts;
                     Object[] currAtts = sdeAtts.readAll();
                     System.arraycopy(currAtts, 0, this.attributes, 0, currAtts.length);
-                    return SimpleFeatureBuilder.build(resultingSchema, this.attributes, sdeAtts.readFID());
+                    return SimpleFeatureBuilder.build(resultingSchema, this.attributes, sdeAtts
+                            .readFID());
                 }
             };
         } catch (SchemaException ex) {
@@ -346,6 +385,11 @@ public class ArcSDEDataStore implements DataStore {
         return reader;
     }
 
+    /**
+     * @see DataStore#getFeatureSource(String)
+     * @return {@link FeatureSource} or {@link FeatureStore} depending on if the
+     *         user has write permissions over <code>typeName</code>
+     */
     public FeatureSource getFeatureSource(final String typeName) throws IOException {
         FeatureSource fsource;
         final SimpleFeatureType featureType = getSchema(typeName);
@@ -359,72 +403,45 @@ public class ArcSDEDataStore implements DataStore {
         return fsource;
     }
 
+    /**
+     * @see DataStore#getFeatureWriter(String, Transaction)
+     */
     public FeatureWriter getFeatureWriter(final String typeName, final Transaction transaction)
             throws IOException {
         return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
 
+    /**
+     * @see DataStore#getFeatureWriter(String, Filter, Transaction)
+     */
     public FeatureWriter getFeatureWriter(final String typeName, final Filter filter,
             final Transaction transaction) throws IOException {
-        SimpleFeatureType featureType = getSchema(typeName);
-        List<AttributeDescriptor> attributes = featureType.getAttributes();
-        String[] names = new String[attributes.size()];
-
-        // Extract the attribute names for the query, we want them all...
-        for (int i = 0; i < names.length; i++) {
-            names[i] = attributes.get(i).getLocalName();
+        if (!canWrite(typeName)) {
+            throw new DataSourceException("No write permissions over " + typeName);
         }
+        final SimpleFeatureType featureType = getSchema(typeName);
+        final DefaultQuery query = new DefaultQuery(typeName, filter);
+        final FeatureReader reader = getFeatureReader(query, transaction);
 
-        DefaultQuery query = new DefaultQuery(typeName, filter, 100, names, "handle");
-        ArrayList list = new ArrayList();
+        FeatureWriter writer;
 
-        // We really don't need any transaction handling here, just keep it
-        // simple as
-        // we are going to exhaust this feature reader immediately. Really, this
-        // could
-        // consume a great deal of memory based on the query.
-        // PENDING Jake Fear: Optimize this operation, exhausting the reader in
-        // this
-        // case could be a cause of real trouble later on. I need to think
-        // through
-        // the consequences of all of this. Really the feature writer should
-        // delegate to a FeatureReader for the features that are queried. That
-        // way
-        // we can stream all of these goodies instead of having big fat
-        // chunks...
-        //
-        // All that said, this works until I get everything else completed....
-        FeatureReader featureReader = getFeatureReader(query, Transaction.AUTO_COMMIT);
-
-        while (featureReader.hasNext()) {
-            try {
-                list.add(featureReader.next());
-            } catch (Exception ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-                break;
-            }
+        if (Transaction.AUTO_COMMIT == transaction) {
+            writer = new AutoCommitFeatureWriter(featureType, reader, connectionPool);
+        } else {
+            writer = new TransactionFeatureWriter(featureType, reader, connectionPool, transaction);
         }
-        featureReader.close();
-
-        ArcTransactionState state = getArcTransactionState(transaction);
-
-        ArcSDEPooledConnection connection = connectionPool.getConnection();
-        SeLayer layer;
-        FIDReader fidStrategy;
-        try {
-            layer = connectionPool.getSdeLayer(connection, typeName);
-            fidStrategy = FIDReader.getFidReader(connection, layer);
-        } finally {
-            connection.close();
-        }
-
-        FeatureWriter writer = new ArcSDEFeatureWriter(this, fidStrategy, state, layer, list);
-
         return writer;
     }
 
+    /**
+     * @see DataStore#getFeatureWriterAppend(String, Transaction)
+     */
     public FeatureWriter getFeatureWriterAppend(final String typeName, final Transaction transaction)
             throws IOException {
+        if (true) {
+            return getFeatureWriter(typeName, Filter.EXCLUDE, transaction);
+        }
+
         final ArcTransactionState state = getArcTransactionState(transaction);
 
         SeLayer layer;
@@ -457,10 +474,19 @@ public class ArcSDEDataStore implements DataStore {
         return null;
     }
 
+    /**
+     * @see DataStore#getView(Query)
+     */
     public FeatureSource getView(final Query query) throws IOException, SchemaException {
         return new DefaultView(this.getFeatureSource(query.getTypeName()), query);
     }
 
+    /**
+     * This operation is not supported at this version of the GeoTools ArcSDE
+     * plugin.
+     * 
+     * @see DataStore#updateSchema(String, SimpleFeatureType)
+     */
     public void updateSchema(final String typeName, final SimpleFeatureType featureType)
             throws IOException {
         throw new UnsupportedOperationException("Schema modification not supported");
@@ -469,14 +495,12 @@ public class ArcSDEDataStore implements DataStore {
     // ////// NON API Methods /////////
 
     /**
-     * GR: if a subclass supports filtering, it should override this method to
-     * return the unsupported part of the passed filter, so a
+     * Returns the unsupported part of the passed filter, so a
      * FilteringFeatureReader will be constructed upon it. Otherwise it will
      * just return the same filter.
      * 
      * <p>
-     * If the complete filter is supported, the subclass must return
-     * <code>Filter.INCLUDE</code>
+     * If the complete filter is supported, returns <code>Filter.INCLUDE</code>
      * </p>
      * 
      * @param typeName
@@ -504,14 +528,15 @@ public class ArcSDEDataStore implements DataStore {
                 layer = connectionPool.getSdeLayer(typeName);
                 qInfo = null;
             }
-            
+
             ArcSDEPooledConnection conn = null;
             FIDReader fidReader;
             try {
                 conn = connectionPool.getConnection();
                 fidReader = FIDReader.getFidReader(conn, layer);
             } finally {
-                if (conn != null) conn.close();
+                if (conn != null)
+                    conn.close();
             }
 
             SimpleFeatureType schema = getSchema(typeName);
@@ -589,7 +614,7 @@ public class ArcSDEDataStore implements DataStore {
 
                 if (state == null) {
                     // start a transaction
-                    state = new ArcTransactionState(this);
+                    state = new ArcTransactionState(connectionPool);
                     transaction.putState(connectionPool, state);
                 }
             }
@@ -792,7 +817,7 @@ public class ArcSDEDataStore implements DataStore {
 
         return count;
     }
-    
+
     /**
      * Computes the bounds of the features for the specified feature type that
      * satisfy the query provided that there is a fast way to get that result.
@@ -803,7 +828,8 @@ public class ArcSDEDataStore implements DataStore {
      * to be real bound of the features
      * </p>
      * 
-     * @param query non null query and query.getTypeName()
+     * @param query
+     *            non null query and query.getTypeName()
      * 
      * @return the bounds, or null if too expensive
      * 
@@ -830,9 +856,10 @@ public class ArcSDEDataStore implements DataStore {
             if (ev != null)
                 LOGGER.fine("ArcSDE optimized getBounds call returned: " + ev);
             else
-                LOGGER.fine("ArcSDE couldn't process all filters in this query, so optimized getBounds() returns null.");
+                LOGGER
+                        .fine("ArcSDE couldn't process all filters in this query, so optimized getBounds() returns null.");
         }
 
-        return ReferencedEnvelope.reference( ev );
+        return ReferencedEnvelope.reference(ev);
     }
 }

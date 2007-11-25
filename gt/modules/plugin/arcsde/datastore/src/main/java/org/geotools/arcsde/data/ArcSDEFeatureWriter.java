@@ -57,6 +57,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Jake Fear, jfear@polexis.com
  * @source $URL$
  * @version
+ * @deprecated to be removed in favor of {@link AutoCommitFeatureWriter} and {@link TransactionFeatureWriter}
  */
 class ArcSDEFeatureWriter implements FeatureWriter {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ArcSDEFeatureWriter.class.getPackage().getName());

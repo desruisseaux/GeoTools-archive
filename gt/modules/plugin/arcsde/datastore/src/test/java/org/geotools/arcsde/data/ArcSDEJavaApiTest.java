@@ -35,11 +35,13 @@ import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeDelete;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeFilter;
 import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeObjectId;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRow;
@@ -829,6 +831,37 @@ public class ArcSDEJavaApiTest extends TestCase {
         }
     } // End method createBaseTable
 
+    public void testDeleteById() throws DataSourceException, UnavailableArcSDEConnectionException,
+            SeException {
+     
+        final String typeName = testData.getTemp_table();
+        final SeQuery query = new SeQuery(conn, new String[] {"ROW_ID", "INT32_COL" }, new SeSqlConstruct(
+                typeName));
+        query.prepareQuery();
+        query.execute();
+        
+        final int rowId;
+        try{
+            SeRow row = query.fetch();
+            rowId = row.getInteger(0).intValue();
+        }finally{
+            query.close();
+        }
+        
+        SeDelete delete = new SeDelete(conn);
+        delete.byId(typeName, new SeObjectId(rowId));
+        
+        final String whereClause = "ROW_ID=" + rowId;
+        final SeSqlConstruct sqlConstruct = new SeSqlConstruct(typeName, whereClause);
+        final SeQuery deletedQuery = new SeQuery(conn, new String[]{"ROW_ID"}, sqlConstruct);
+        
+        deletedQuery.prepareQuery();
+        deletedQuery.execute();
+        
+        SeRow row = deletedQuery.fetch();
+        assertNull(whereClause + " should have returned no records as it was deleted", row);
+    }
+
     /**
      * Does a query over a non autocommit transaction return the added/modified
      * features and hides the deleted ones?
@@ -843,7 +876,7 @@ public class ArcSDEJavaApiTest extends TestCase {
         final SeLayer tempLayer = testData.getTempLayer();
 
         testData.truncateTempTable();
-        
+
         {
             final ArcSDEConnectionPool pool = testData.getConnectionPool();
             transConn = pool.getConnection();
@@ -851,9 +884,9 @@ public class ArcSDEJavaApiTest extends TestCase {
             transConn.startTransaction();
         }
 
-        //flag to rollback or not at finally{}
+        // flag to rollback or not at finally{}
         boolean commited = false;
-        
+
         try {
             SeInsert insert = new SeInsert(transConn);
             final String[] columns = { "INT32_COL", "STRING_COL" };
@@ -876,15 +909,15 @@ public class ArcSDEJavaApiTest extends TestCase {
             transQuery.prepareQuery();
             transQuery.execute();
             SeRow transRow = transQuery.fetch();
-            //querying over a transaction in progress does NOT give diff
+            // querying over a transaction in progress does NOT give diff
             assertNull(transRow);
-            //assertEquals(Integer.valueOf(50), transRow.getInteger(0));
+            // assertEquals(Integer.valueOf(50), transRow.getInteger(0));
             transQuery.close();
 
             // commit transaction
             transConn.commitTransaction();
             commited = true;
-            
+
             SeQuery query = new SeQuery(this.conn, columns, sqlConstruct);
             query.prepareQuery();
             query.execute();
@@ -893,11 +926,11 @@ public class ArcSDEJavaApiTest extends TestCase {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(!commited){
+            if (!commited) {
                 transConn.rollbackTransaction();
             }
             transConn.close();
-            //conn.close(); closed at tearDown
+            // conn.close(); closed at tearDown
         }
     }
 }

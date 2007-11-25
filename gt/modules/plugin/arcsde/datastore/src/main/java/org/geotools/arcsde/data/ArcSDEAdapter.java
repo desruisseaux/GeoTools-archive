@@ -95,6 +95,9 @@ public class ArcSDEAdapter {
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_DATE), Date.class);
         // @TODO: not at all, only for capable open table with GeoServer
         sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_BLOB), byte[].class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_CLOB), String.class);
+        sde2JavaTypes.put(Integer.valueOf(SeColumnDefinition.TYPE_NCLOB), String.class);
+
         // @TODO sde2JavaTypes.put(new Integer(SeColumnDefinition.TYPE_CLOB),
         // String.class);
         // @Tested for view
@@ -121,11 +124,11 @@ public class ArcSDEAdapter {
         java2SDETypes.put(Short.class, new SdeTypeDef(SeColumnDefinition.TYPE_SMALLINT, 4, 0));
         java2SDETypes.put(Integer.class, new SdeTypeDef(SeColumnDefinition.TYPE_INTEGER, 10, 0));
         java2SDETypes.put(Float.class, new SdeTypeDef(SeColumnDefinition.TYPE_FLOAT, 5, 2));
-        java2SDETypes.put(Double.class, new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 15, 4));
+        java2SDETypes.put(Double.class, new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 25, 4));
         java2SDETypes.put(Date.class, new SdeTypeDef(SeColumnDefinition.TYPE_DATE, 1, 0));
         java2SDETypes.put(Long.class, new SdeTypeDef(SeColumnDefinition.TYPE_INTEGER, 10, 0));
         java2SDETypes.put(byte[].class, new SdeTypeDef(SeColumnDefinition.TYPE_BLOB, 1, 0));
-        java2SDETypes.put(Number.class, new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 15, 4));
+        java2SDETypes.put(Number.class, new SdeTypeDef(SeColumnDefinition.TYPE_DOUBLE, 25, 4));
     }
 
     /**
@@ -378,15 +381,7 @@ public class ArcSDEAdapter {
             } else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {
                 throw new DataSourceException("Raster columns are not supported yet");
             } else {
-                Object obj = sde2JavaTypes.get(sdeType);
-                if (obj == null) {
-                    // interesting question: Do we throw an exception here, or
-                    // do we allow un-handle-able columns
-                    // to just 'disappear' when serving those tables?
-                    throw new DataSourceException("Unsupported column type (" + sdeType.intValue()
-                            + ") for " + attName);
-                }
-                typeClass = (Class) obj;
+                typeClass = getJavaBinding(sdeType);
                 // @TODO: add restrictions once the Restrictions utility methods
                 // are implemented
                 // Set restrictions = Restrictions.createLength(name, typeClass,
@@ -407,6 +402,49 @@ public class ArcSDEAdapter {
         }
 
         return attDescriptors;
+    }
+
+    /**
+     * Returns the Java class binding for a given SDE column type.
+     * <p>
+     * Mappings are:
+     * <ul>
+     * <li>{@link SeColumnDefinition#TYPE_BLOB}: byte[].class
+     * <li>{@link SeColumnDefinition#TYPE_CLOB}: {@link String}.class
+     * <li>{@link SeColumnDefinition#TYPE_DATE}: {@link Date}.class
+     * <li>{@link SeColumnDefinition#TYPE_FLOAT32}: {@link Float}.class
+     * <li>{@link SeColumnDefinition#TYPE_FLOAT64}: {@link Double}.class
+     * <li>{@link SeColumnDefinition#TYPE_INT16}: {@link Short}.class
+     * <li>{@link SeColumnDefinition#TYPE_INT32}: {@link Integer}.class
+     * <li>{@link SeColumnDefinition#TYPE_INT64}: {@link Long}.class
+     * <li>{@link SeColumnDefinition#TYPE_NCLOB}: {@link String}.class
+     * <li>{@link SeColumnDefinition#TYPE_NSTRING}: {@link String}.class
+     * <li>{@link SeColumnDefinition#TYPE_UUID}: {@link String}.class
+     * </ul>
+     * </p>
+     * <p>
+     * Currently <b>there're not</b> defined bindings for:
+     * <ul>
+     * <li>{@link SeColumnDefinition#TYPE_XML}
+     * <li>{@link SeColumnDefinition#TYPE_RASTER}
+     * </ul>
+     * </p>
+     * <p>
+     * To obtain the JTS Geometry class binding for an sde column of type
+     * {@link SeColumnDefinition#TYPE_SHAPE} use
+     * {@link #getGeometryTypeFromLayerMask(int)}.
+     * </p>
+     * 
+     * @param sdeType
+     * @return
+     */
+    public static Class getJavaBinding(final Integer sdeType) {
+        Class javaClass = (Class) sde2JavaTypes.get(sdeType);
+        if (javaClass == null) {
+            throw new NoSuchElementException("No java class binding for SeColumn type "
+                    + sdeType.intValue());
+        }
+        return javaClass;
     }
 
     private static SimpleFeatureType createSchema(String typeName, String namespace, List properties) {
@@ -652,7 +690,25 @@ public class ArcSDEAdapter {
                     "Only FeatureIds are supported when encoding id filters to SDE.  Not "
                             + id.getClass());
 
-        String fid = ((FeatureId) id).getID();
+        final String fid = ((FeatureId) id).getID();
+        return getNumericFid(fid);
+    }
+
+    /**
+     * Returns the numeric identifier of a FeatureId, given by the full
+     * qualified name of the featureclass prepended to the ArcSDE feature id.
+     * ej: SDE.SDE.SOME_LAYER.1
+     * 
+     * @param id
+     *            a geotools FeatureID
+     * 
+     * @return an ArcSDE feature ID
+     * 
+     * @throws IllegalArgumentException
+     *             If the given string is not properly formatted
+     *             [anystring].[long value]
+     */
+    public static long getNumericFid(String fid) throws IllegalArgumentException {
         int dotIndex = fid.lastIndexOf('.');
         try {
             return Long.decode(fid.substring(++dotIndex)).longValue();

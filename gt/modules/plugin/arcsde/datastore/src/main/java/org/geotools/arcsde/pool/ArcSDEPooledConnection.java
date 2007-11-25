@@ -72,6 +72,10 @@ public class ArcSDEPooledConnection extends SeConnection {
 	    transactionInProgress = false;
 	}
 	
+	public boolean isTransactionActive(){
+	    return transactionInProgress;
+	}
+	
 	public void rollbackTransaction() throws SeException{
 	    super.rollbackTransaction();
 	    transactionInProgress = false;
