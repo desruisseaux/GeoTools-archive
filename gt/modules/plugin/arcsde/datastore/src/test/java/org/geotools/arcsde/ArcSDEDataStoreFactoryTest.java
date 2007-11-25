@@ -28,6 +28,7 @@ import org.geotools.arcsde.data.InProcessViewSupportTestData;
 import org.geotools.arcsde.data.TestData;
 import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -109,9 +110,12 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
     public void testLookUp() throws IOException {
         DataStore dataStore;
 
-        dataStore = DataStoreFinder.getDataStore(nonWorkingParams);
-        assertNull(dataStore);
-
+        try {
+            dataStore = DataStoreFinder.getDataStore(nonWorkingParams);
+            fail("should have failed with non working parameters");
+        } catch (DataSourceException e) {
+            assertTrue(true);
+        }
         dataStore = DataStoreFinder.getDataStore(workingParams);
         assertNotNull(dataStore);
         assertTrue(dataStore instanceof ArcSDEDataStore);
