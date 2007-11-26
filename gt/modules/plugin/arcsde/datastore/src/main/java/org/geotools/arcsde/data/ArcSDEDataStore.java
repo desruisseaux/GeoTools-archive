@@ -64,19 +64,9 @@ import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeTable;
 
 /**
- * Implements a DataStore to work upon an ArcSDE spatial database gateway.
- * String[] getTypeNames() FeatureType getSchema(String typeName) FeatureReader
- * getFeatureReader( typeName ) FeatureWriter getFeatureWriter( typeName )
- * Filter getUnsupportedFilter(String typeName, Filter filter) FeatureReader
- * getFeatureReader(String typeName, Query query)
+ * DataStore implementation to work upon an ArcSDE spatial database gateway.
  * 
- * <p>
- * All remaining functionality is implemented against these methods, including
- * Transaction and Locking Support. These implementations will not be optimal
- * but they will work.
- * </p>
- * 
- * @author Gabriel Roldan, The Open Planning Project
+ * @author Gabriel Roldan (TOPP)
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSDEDataStore.java $
  * @version $Id$
