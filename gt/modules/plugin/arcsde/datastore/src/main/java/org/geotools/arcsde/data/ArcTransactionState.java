@@ -42,17 +42,10 @@ class ArcTransactionState implements Transaction.State {
             .getLogger(ArcTransactionState.class.getPackage().getName());
 
     /**
-     * Connection lazily grabbed from the pool, and held until commit() or
-     * rollback() is called.
+     * Transactional connection this state works upon, held until commit(),
+     * rollback() or close() is called.
      */
     private ArcSDEPooledConnection connection;
-
-    /**
-     * Connection pool this state grabs connections from to be held during a
-     * transaction lifetime. A value of <code>null</code> indicates close()
-     * has been called and thus any other usage attempt shall fail.
-     */
-    private ArcSDEConnectionPool pool;
 
     /**
      * Creates a new ArcTransactionState object.
@@ -62,8 +55,8 @@ class ArcTransactionState implements Transaction.State {
      *            there's a transaction open (signaled by any use of
      *            {@link #getConnection()}
      */
-    public ArcTransactionState(ArcSDEConnectionPool pool) {
-        this.pool = pool;
+    private ArcTransactionState(ArcSDEPooledConnection connection) {
+        this.connection = connection;
     }
 
     /**
@@ -83,11 +76,15 @@ class ArcTransactionState implements Transaction.State {
         try {
             connection.commitTransaction();
         } catch (SeException se) {
+            try {
+                connection.rollbackTransaction();
+            } catch (SeException e) {
+                LOGGER.log(Level.WARNING, se.getMessage(), se);
+            }
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new IOException(se.getMessage());
-        } finally {
-            connection.close();
-            connection = null;
+        }finally{
+            close();
         }
     }
 
@@ -101,9 +98,8 @@ class ArcTransactionState implements Transaction.State {
         } catch (SeException se) {
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new IOException(se.getMessage());
-        } finally {
-            connection.close();
-            connection = null;
+        }finally{
+            close();
         }
     }
 
@@ -127,13 +123,6 @@ class ArcTransactionState implements Transaction.State {
             // this is a call to free resources (ugly, but that's what the API
             // says)
             close();
-        } else {
-            try {
-                getConnection();
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, e.getMessage(), e);
-                throw new RuntimeException(e.getMessage());
-            }
         }
     }
 
@@ -145,7 +134,7 @@ class ArcTransactionState implements Transaction.State {
      *             if the transaction state has been closed.
      */
     private void failIfClosed() throws IllegalStateException {
-        if (pool == null) {
+        if (connection == null) {
             throw new IllegalStateException("This transaction state has already been closed");
         }
     }
@@ -156,7 +145,6 @@ class ArcTransactionState implements Transaction.State {
      */
     private void close() {
         // can't even try to use this state in any way from now on
-        pool = null;
         if (connection != null) {
             // may throw ISE if transaction is still in progress
             try {
@@ -180,11 +168,6 @@ class ArcTransactionState implements Transaction.State {
     /**
      * Used only within the package to provide access to a single connection on
      * which this transaction is being conducted.
-     * <p>
-     * The very call to this method signals a transaction is in progress, and
-     * thus if a connection has not been yet grabbed from the pool, one it taken
-     * and a transaction is open on the connection.
-     * </p>
      * 
      * @return connection
      * @throws UnavailableArcSDEConnectionException
@@ -194,19 +177,6 @@ class ArcTransactionState implements Transaction.State {
     ArcSDEPooledConnection getConnection() throws DataSourceException,
             UnavailableArcSDEConnectionException {
         failIfClosed();
-        if (connection == null) {
-            connection = pool.getConnection();
-            try {
-                // tells ArcSDE to never to auto commit
-                connection.setTransactionAutoCommit(0);
-                // and start a transaction. Remember no connection can be
-                // returned
-                // to the pool if it has a transaction in progress
-                connection.startTransaction();
-            } catch (SeException e) {
-                throw new DataSourceException("Cannot initiate transaction on " + connection);
-            }
-        }
         return connection;
     }
 
@@ -223,7 +193,7 @@ class ArcTransactionState implements Transaction.State {
      *         <code>connectionPool</code> as key.
      */
     public static ArcTransactionState getState(final Transaction transaction,
-            final ArcSDEConnectionPool connectionPool) {
+            final ArcSDEConnectionPool connectionPool) throws IOException {
         ArcTransactionState state;
 
         synchronized (ArcTransactionState.class) {
@@ -231,7 +201,24 @@ class ArcTransactionState implements Transaction.State {
 
             if (state == null) {
                 // start a transaction
-                state = new ArcTransactionState(connectionPool);
+                final ArcSDEPooledConnection connection = connectionPool.getConnection();
+                try {
+                    // do not auto commit
+                    connection.setTransactionAutoCommit(0);
+                    // and start a transaction
+                    connection.startTransaction();
+                } catch (SeException e) {
+                    try {
+                        connection.rollbackTransaction();
+                    } catch (SeException ignorableException) {
+                        // bah, we're already failing
+                    }
+                    connection.close();
+                    throw new DataSourceException("Exception initiating transaction on "
+                            + connection, e);
+                }
+
+                state = new ArcTransactionState(connection);
                 transaction.putState(connectionPool, state);
             }
         }

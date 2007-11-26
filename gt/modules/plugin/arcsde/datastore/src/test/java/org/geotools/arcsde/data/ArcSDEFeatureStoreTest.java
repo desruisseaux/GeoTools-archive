@@ -333,7 +333,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final Filter filter = CQL.toFilter("INT32_COL = 3");
 
         FeatureWriter writer = ds.getFeatureWriter(typeName, filter, Transaction.AUTO_COMMIT);
-        
+
         try {
             assertTrue(writer.hasNext());
             SimpleFeature feature = writer.next();
@@ -380,10 +380,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         final DataStore ds = testData.getDataStore();
 
-        final Transaction transaction = new DefaultTransaction();
-        final FeatureWriter writer = ds.getFeatureWriter(typeName, transaction);
         final SimpleFeatureType ftype = testFeatures.getSchema();
         final FeatureIterator iterator = testFeatures.features();
+
+        final Transaction transaction = new DefaultTransaction();
+        final FeatureWriter writer = ds.getFeatureWriter(typeName, transaction);
 
         try {
             while (iterator.hasNext()) {
@@ -410,12 +411,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             transaction.commit();
         } catch (Exception e) {
-            try {
-                transaction.close();
-            } catch (IOException closeEx) {
-                closeEx.printStackTrace();
-            }
+            transaction.rollback();
             throw e;
+        } finally {
+            transaction.close();
         }
 
         try {
@@ -427,7 +426,6 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             assertFalse(reader.hasNext());
         } finally {
             reader.close();
-            transaction.close();
         }
     }
 
@@ -738,12 +736,22 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         reader.close();
 
         // now commit, and Transaction.AUTO_COMMIT should carry it over
-        transaction.commit();
+        try {
+            transaction.commit();
+        } catch (IOException e) {
+            transaction.rollback();
+        } finally {
+            transaction.close();
+        }
 
         reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
         assertTrue(reader.hasNext());
         reader.close();
 
+    }
+
+    public void testSetFeatures() {
+        throw new UnsupportedOperationException("implement");
     }
 
     /**

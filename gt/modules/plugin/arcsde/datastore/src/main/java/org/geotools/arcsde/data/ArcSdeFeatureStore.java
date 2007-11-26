@@ -8,9 +8,12 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -43,6 +46,21 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
         }
         super.transaction = transaction;
+    }
+
+    /**
+     * Overrides {@link ArcSdeFeatureSource#getFeatures(Query)} to return a
+     * transaction aware collection.
+     * 
+     * @see ArcSDEDataStore#getFeatureReader(Query, Transaction)
+     */
+    @Override
+    public FeatureCollection getFeatures(Query query) throws IOException {
+        final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
+        final Transaction transaction = getTransaction();
+        final FeatureReader featureReader = ds.getFeatureReader(query, transaction);
+        final FeatureCollection collection = DataUtilities.collection(featureReader);
+        return collection;
     }
 
     /**
@@ -132,7 +150,6 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     public void setFeatures(final FeatureReader reader) throws IOException {
         final String typeName = featureType.getTypeName();
         final ArcSDEPooledConnection connection = getConnection();
-        final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
         final boolean transactionInProgress = transactionInProgress();
         try {
             // truncate using this connection to apply or not depending on
@@ -175,7 +192,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         return Transaction.AUTO_COMMIT != getTransaction();
     }
 
-    private ArcSDEPooledConnection getConnection() throws DataSourceException,
+    private ArcSDEPooledConnection getConnection() throws IOException,
             UnavailableArcSDEConnectionException {
         final Transaction transaction = getTransaction();
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();

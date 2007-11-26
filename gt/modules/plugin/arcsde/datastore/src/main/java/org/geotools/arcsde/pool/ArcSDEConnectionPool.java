@@ -219,17 +219,17 @@ public class ArcSDEConnectionPool {
 
         try {
             String caller = null;
-            if(LOGGER.isLoggable(Level.FINER)){
-                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
-                System.err.print("-> " + caller);
-            }
+//            if(LOGGER.isLoggable(Level.FINER)){
+//                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+//                System.err.print("-> " + caller);
+//            }
             
             ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
             
             if(LOGGER.isLoggable(Level.FINER)){
-                System.err.println(" got " + ret);
-                //LOGGER.finer(ret + " out of connection pool");
+                //System.err.println(" got " + ret);
+                LOGGER.finer(ret + " out of connection pool");
             }
 
             return ret;
