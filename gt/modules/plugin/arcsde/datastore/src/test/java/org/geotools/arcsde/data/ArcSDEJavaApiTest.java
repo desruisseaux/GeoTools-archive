@@ -881,6 +881,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             final ArcSDEConnectionPool pool = testData.getConnectionPool();
             transConn = pool.getConnection();
             // start a transaction on transConn
+            transConn.setTransactionAutoCommit(0);
             transConn.startTransaction();
         }
 
@@ -898,6 +899,8 @@ public class ArcSDEJavaApiTest extends TestCase {
             row.setString(1, "inside transaction");
 
             insert.execute();
+            //IMPORTANT to call close for the diff to take effect
+            insert.close();
 
             final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);
             // the query over the transaction connection
@@ -909,8 +912,8 @@ public class ArcSDEJavaApiTest extends TestCase {
             transQuery.prepareQuery();
             transQuery.execute();
             SeRow transRow = transQuery.fetch();
-            // querying over a transaction in progress does NOT give diff
-            assertNull(transRow);
+            // querying over a transaction in progress does give diff
+            assertNotNull(transRow);
             // assertEquals(Integer.valueOf(50), transRow.getInteger(0));
             transQuery.close();
 
