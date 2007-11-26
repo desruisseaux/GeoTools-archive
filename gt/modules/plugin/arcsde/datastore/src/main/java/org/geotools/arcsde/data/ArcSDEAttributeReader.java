@@ -92,18 +92,34 @@ class ArcSDEAttributeReader implements AttributeReader {
     private ArcSDEPooledConnection connection;
 
     /**
+     * Flag indicating whether to close or not the connection.
+     * <p>
+     * If <code>true</code> the connection is automatically closed when the
+     * reader is exhausted or then {@link #close()} is called. Otherwise it is
+     * untouched. Rationale being an {@link ArcSDEFeatureReader} using this
+     * attribute reader may be acting as the streamed content for a
+     * FeatureWriter and sharing the connection, so closing the connection
+     * becomes the responsibility of the feature writer, or it might be returned
+     * to the pool while the writer is still using it.
+     * </p>
+     */
+    private boolean handleConnectionClosing;
+
+    /**
      * The query that defines this readers interaction with an ArcSDE instance.
      * 
      * @param query
      * @param connection
+     * @param handleConnectionClosing
+     *            whether to close or not the connection when done.
      * 
      * @throws IOException
-     *             DOCUMENT ME!
      */
-    public ArcSDEAttributeReader(ArcSDEQuery query, ArcSDEPooledConnection connection)
-            throws IOException {
+    public ArcSDEAttributeReader(final ArcSDEQuery query, final ArcSDEPooledConnection connection,
+            final boolean handleConnectionClosing) throws IOException {
         this.query = query;
         this.connection = connection;
+        this.handleConnectionClosing = handleConnectionClosing;
         this.fidReader = query.getFidReader();
         this.schema = query.getSchema();
 
@@ -142,8 +158,10 @@ class ArcSDEAttributeReader implements AttributeReader {
     public void close() throws IOException {
         if (query != null) {
             this.query.close();
-            if (!connection.isTransactionActive()) {
-                connection.close();
+            if (handleConnectionClosing) {
+                if (!connection.isTransactionActive()) {
+                    connection.close();
+                }
             }
             query = null;
             connection = null;

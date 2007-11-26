@@ -51,7 +51,6 @@ import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.SchemaException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -60,11 +59,9 @@ import org.opengis.filter.Filter;
 
 import com.esri.sde.sdk.client.SeDefs;
 import com.esri.sde.sdk.client.SeException;
-import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeTable;
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Implements a DataStore to work upon an ArcSDE spatial database gateway.
@@ -257,7 +254,10 @@ public class ArcSDEDataStore implements DataStore {
             }
         }
 
-        FeatureReader reader = getFeatureReader(query, connection);
+        // indicates the feature reader should close the connection when done
+        // if it's not inside a transaction.
+        final boolean handleConnection = true;
+        FeatureReader reader = getFeatureReader(query, connection, handleConnection);
         return reader;
     }
 
@@ -271,12 +271,18 @@ public class ArcSDEDataStore implements DataStore {
      * </p>
      * 
      * @param query
+     *            the Query containing the request criteria
      * @param connection
+     *            the connection to use to retrieve content
+     * @param readerClosesConnection
+     *            flag indicating whether the reader should auto-close the
+     *            connection when exhausted or when close() is called.
      * @return
      * @throws IOException
      */
     private FeatureReader getFeatureReader(final Query query,
-            final ArcSDEPooledConnection connection) throws IOException {
+            final ArcSDEPooledConnection connection, final boolean readerClosesConnection)
+            throws IOException {
         final String typeName = query.getTypeName();
         final String propertyNames[] = query.getPropertyNames();
 
@@ -311,7 +317,8 @@ public class ArcSDEDataStore implements DataStore {
 
         sdeQuery.execute();
 
-        final ArcSDEAttributeReader attReader = new ArcSDEAttributeReader(sdeQuery, connection);
+        final ArcSDEAttributeReader attReader = new ArcSDEAttributeReader(sdeQuery, connection,
+                readerClosesConnection);
         FeatureReader reader;
         try {
             reader = new ArcSDEFeatureReader(attReader);
@@ -395,8 +402,11 @@ public class ArcSDEDataStore implements DataStore {
 
             // get a reader over the requested content. It'll be used to stream
             // out the writer's features and will share a connection and
-            // transaction.
-            final FeatureReader reader = getFeatureReader(query, connection);
+            // transaction. handleConnection in false means the reader shall not
+            // try to close the connection, the writer will take care of it if
+            // need be.
+            final boolean handleConnection = false;
+            final FeatureReader reader = getFeatureReader(query, connection, handleConnection);
 
             FeatureWriter writer;
 
@@ -748,87 +758,5 @@ public class ArcSDEDataStore implements DataStore {
         } else if (construct != null) {
             errors.add(construct);
         }
-    }
-
-    /**
-     * Gets the number of the features that would be returned by this query for
-     * the specified feature type.
-     * 
-     * <p>
-     * If getBounds(Query) returns <code>-1</code> due to expense consider
-     * using <code>getFeatures(Query).getCount()</code> as a an alternative.
-     * </p>
-     * 
-     * @param query
-     *            Contains the Filter and MaxFeatures to find the bounds for.
-     * 
-     * @return The number of Features provided by the Query or <code>-1</code>
-     *         if count is too expensive to calculate or any errors or occur.
-     * 
-     * @throws IOException
-     *             if there are errors getting the count TODO: refactor out of
-     *             ArcSDEDataStore and make it respect a transaction in progress
-     */
-    int getCount(Query query) throws IOException {
-        LOGGER.fine("getCount");
-
-        int count = ArcSDEQuery.calculateResultCount(this, query);
-        LOGGER.fine("count: " + count);
-
-        return count;
-    }
-
-    /**
-     * Computes the bounds of the features for the specified feature type that
-     * satisfy the query provided that there is a fast way to get that result.
-     * 
-     * <p>
-     * Will return null if there is not fast way to compute the bounds. Since
-     * it's based on some kind of header/cached information, it's not guaranteed
-     * to be real bound of the features
-     * </p>
-     * 
-     * @param query
-     *            non null query and query.getTypeName()
-     * 
-     * @return the bounds, or null if too expensive
-     * 
-     * @throws IOException
-     *             TODO: refactor out of ArcSDEDataStore and make it respecting
-     *             transaction state if there's a transaction in progress
-     */
-    ReferencedEnvelope getBounds(Query query) throws IOException {
-        LOGGER.fine("getBounds");
-
-        Envelope ev;
-        final String typeName = query.getTypeName();
-        final ArcSDEPooledConnection connection = connectionPool.getConnection();
-        try {
-            if (query.getFilter().equals(Filter.INCLUDE)) {
-                LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
-                // we're really asking for a bounds of the WHOLE layer,
-                // let's just ask SDE metadata for that, rather than doing an
-                // expensive query
-                SeLayer thisLayer = connection.getLayer(typeName);
-                SeExtent extent = thisLayer.getExtent();
-                ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
-                        .getMaxY());
-            } else {
-                SimpleFeatureType schema = getSchema(typeName, connection);
-                ev = ArcSDEQuery.calculateQueryExtent(connection, schema, query);
-            }
-        } finally {
-            connection.close();
-        }
-
-        if (LOGGER.isLoggable(Level.FINE)) {
-            if (ev != null)
-                LOGGER.fine("ArcSDE optimized getBounds call returned: " + ev);
-            else
-                LOGGER
-                        .fine("ArcSDE couldn't process all filters in this query, so optimized getBounds() returns null.");
-        }
-
-        return ReferencedEnvelope.reference(ev);
     }
 }

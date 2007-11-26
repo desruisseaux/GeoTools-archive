@@ -3,7 +3,11 @@ package org.geotools.arcsde.data;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
@@ -13,10 +17,18 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 
+import com.esri.sde.sdk.client.SeExtent;
+import com.esri.sde.sdk.client.SeLayer;
+import com.vividsolutions.jts.geom.Envelope;
+
 public class ArcSdeFeatureSource implements FeatureSource {
+
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
     protected SimpleFeatureType featureType;
     protected ArcSDEDataStore dataStore;
@@ -27,28 +39,105 @@ public class ArcSdeFeatureSource implements FeatureSource {
         this.dataStore = dataStore;
     }
 
-    public void addFeatureListener(FeatureListener listener) {
+    /**
+     * @see FeatureSource#addFeatureListener(FeatureListener)
+     */
+    public final void addFeatureListener(final FeatureListener listener) {
         dataStore.listenerManager.addFeatureListener(this, listener);
     }
 
-    public void removeFeatureListener(FeatureListener listener) {
+    /**
+     * @see FeatureSource#removeFeatureListener(FeatureListener)
+     */
+    public final void removeFeatureListener(final FeatureListener listener) {
         dataStore.listenerManager.removeFeatureListener(this, listener);
     }
 
-    public ReferencedEnvelope getBounds() throws IOException {
-        final String typeName = featureType.getName().getLocalPart();
-        final DefaultQuery query = new DefaultQuery(typeName);
-        return dataStore.getBounds(query);
+    /**
+     * @see FeatureSource#getBounds()
+     */
+    public final ReferencedEnvelope getBounds() throws IOException {
+        return getBounds(Query.ALL);
     }
 
-    public ReferencedEnvelope getBounds(Query query) throws IOException {
-        Query namedQuery = namedQuery(query);
-        return dataStore.getBounds(namedQuery);
+    /**
+     * @see FeatureSource#getBounds(Query)
+     */
+    public final ReferencedEnvelope getBounds(final Query query) throws IOException {
+        Envelope ev;
+        {
+            Query namedQuery = namedQuery(query);
+
+            final String typeName = query.getTypeName();
+            final ArcSDEPooledConnection connection = getConnection();
+            try {
+                if (query.getFilter().equals(Filter.INCLUDE)) {
+                    LOGGER.finer("getting bounds of entire layer.  Using optimized SDE call.");
+                    // we're really asking for a bounds of the WHOLE layer,
+                    // let's just ask SDE metadata for that, rather than doing
+                    // an
+                    // expensive query
+                    SeLayer thisLayer = connection.getLayer(typeName);
+                    SeExtent extent = thisLayer.getExtent();
+                    ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
+                            .getMaxY());
+                } else {
+                    ev = ArcSDEQuery.calculateQueryExtent(connection, featureType, namedQuery);
+                }
+            } finally {
+                if (!connection.isTransactionActive()) {
+                    connection.close();
+                }
+            }
+        }
+        if (LOGGER.isLoggable(Level.FINE)) {
+            if (ev != null) {
+                LOGGER.finer("ArcSDE optimized getBounds call returned: " + ev);
+            } else {
+                LOGGER.finer("ArcSDE couldn't process all filters in this query, "
+                        + "so optimized getBounds() returns null.");
+            }
+        }
+
+        final ReferencedEnvelope envelope;
+        final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
+        if (defaultGeometry == null) {
+            envelope = ReferencedEnvelope.reference(ev);
+        } else {
+            envelope = new ReferencedEnvelope(ev, defaultGeometry.getCRS());
+        }
+        return envelope;
     }
 
-    public int getCount(final Query query) throws IOException {
-        Query namedQuery = namedQuery(query);
-        return dataStore.getCount(namedQuery);
+    /**
+     * @see FeatureSource#getCount(Query)
+     */
+    public final int getCount(final Query query) throws IOException {
+        final Query namedQuery = namedQuery(query);
+        final ArcSDEPooledConnection connection = getConnection();
+        final int count;
+        try {
+            count = ArcSDEQuery.calculateResultCount(connection, featureType, namedQuery);
+        } finally {
+            if (!connection.isTransactionActive()) {
+                connection.close();
+            }
+        }
+        return count;
+    }
+
+    /**
+     * convenient way to get a connection for {@link #getBounds()} and
+     * {@link #getCount(Query)}. {@link TransactionFeatureWriter} overrides to
+     * get the connection from the transaction instead of the pool.
+     * 
+     * @return
+     * @throws IOException
+     */
+    protected ArcSDEPooledConnection getConnection() throws IOException {
+        final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
+        final ArcSDEPooledConnection connection = connectionPool.getConnection();
+        return connection;
     }
 
     private Query namedQuery(final Query query) {
@@ -63,29 +152,48 @@ public class ArcSdeFeatureSource implements FeatureSource {
         return namedQuery;
     }
 
-    public DataStore getDataStore() {
+    /**
+     * @see FeatureSource#getDataStore()
+     */
+    public final DataStore getDataStore() {
         return dataStore;
     }
 
-    public FeatureCollection getFeatures(Query query) throws IOException {
+    /**
+     * @see FeatureSource#getFeatures(Query)
+     */
+    public FeatureCollection getFeatures(final Query query) throws IOException {
         FeatureCollection collection = new DefaultFeatureResults(this, query);
         return collection;
     }
 
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    /**
+     * @see FeatureSource#getFeatures(Filter)
+     */
+    public final FeatureCollection getFeatures(final Filter filter) throws IOException {
         DefaultQuery query = new DefaultQuery(featureType.getTypeName(), filter);
         return getFeatures(query);
     }
 
-    public FeatureCollection getFeatures() throws IOException {
+    /**
+     * @see FeatureSource#getFeatures()
+     */
+    public final FeatureCollection getFeatures() throws IOException {
         return getFeatures(Filter.INCLUDE);
     }
 
-    public SimpleFeatureType getSchema() {
+    /**
+     * @see FeatureSource#getSchema();
+     */
+    public final SimpleFeatureType getSchema() {
         return featureType;
     }
 
-    public Set getSupportedHints() {
+    /**
+     * @return empty set
+     * @see FeatureSource#getSupportedHints()
+     */
+    public final Set getSupportedHints() {
         return Collections.EMPTY_SET;
     }
 

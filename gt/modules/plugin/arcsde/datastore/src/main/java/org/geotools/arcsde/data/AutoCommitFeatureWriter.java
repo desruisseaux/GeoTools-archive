@@ -12,9 +12,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
@@ -201,7 +199,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
                 try {
                     connection.rollbackTransaction();
                 } catch (SeException e1) {
-                    LOGGER.log(Level.SEVERE, "Unrecoverable error rolling back delete transaction",
+                    getLogger().log(Level.SEVERE, "Unrecoverable error rolling back delete transaction",
                             e);
                 }
             }
@@ -211,7 +209,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
                 try {
                     seDelete.close();
                 } catch (SeException e) {
-                    LOGGER.log(Level.SEVERE, "Unrecoverable error rolling back delete transaction",
+                    getLogger().log(Level.SEVERE, "Unrecoverable error rolling back delete transaction",
                             e);
                 }
             }
@@ -230,10 +228,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
                 updateRow(feature, getLayer(), connection);
             }
         } catch (SeException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
-            if (LOGGER.isLoggable(Level.FINE)) {
-                e.printStackTrace();
-            }
+            getLogger().log(Level.WARNING, e.getMessage(), e);
             throw new DataSourceException(e.getMessage(), e);
         }
     }
@@ -397,7 +392,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
                 } catch (Exception e) {
                     String msg = e instanceof SeException ? ((SeException) e).getSeError()
                             .getErrDesc() : e.getMessage();
-                    LOGGER.log(Level.WARNING, msg, e);
+                            getLogger().log(Level.WARNING, msg, e);
                     throw new DataSourceException(msg, e);
                 }
             } else {
@@ -508,4 +503,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
         return connection;
     }
 
+    protected Logger getLogger(){
+        return LOGGER;
+    }
 }

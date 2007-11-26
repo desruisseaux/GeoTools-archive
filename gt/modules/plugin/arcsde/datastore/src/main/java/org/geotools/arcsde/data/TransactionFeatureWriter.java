@@ -2,14 +2,14 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.Transaction;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -24,6 +24,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 class TransactionFeatureWriter extends AutoCommitFeatureWriter {
 
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
     private ArcTransactionState state;
 
     /**
@@ -67,9 +68,15 @@ class TransactionFeatureWriter extends AutoCommitFeatureWriter {
      */
     @Override
     public void close() throws IOException {
+        // we're inside a transaction, so we don't
+        // close the connection. Neither filteredContent should do.
         if (filteredContent != null) {
             filteredContent.close();
             filteredContent = null;
         }
+    }
+
+    protected Logger getLogger() {
+        return LOGGER;
     }
 }

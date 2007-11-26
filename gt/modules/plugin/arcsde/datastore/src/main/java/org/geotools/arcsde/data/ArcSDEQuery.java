@@ -510,27 +510,19 @@ class ArcSDEQuery {
 
     /**
      * Convenient method to just calculate the result count of a given query.
-     * 
-     * @param ds
-     * @param query
-     * 
-     * 
-     * @throws IOException
      */
-    public static int calculateResultCount(ArcSDEDataStore ds, Query query) throws IOException {
-        ArcSDEPooledConnection connection = ds.getConnectionPool().getConnection();
-        SimpleFeatureType schema = ds.getSchema(query.getTypeName(), connection);
+    public static int calculateResultCount(final ArcSDEPooledConnection connection,
+            final SimpleFeatureType featureType, final Query query) throws IOException {
         ArcSDEQuery countQuery = null;
 
         int count;
         try {
-            countQuery = createQuery(connection, schema, query);
+            countQuery = createQuery(connection, featureType, query);
             count = countQuery.calculateResultCount();
         } finally {
             if (countQuery != null) {
                 countQuery.close();
             }
-            connection.close();
         }
         return count;
     }

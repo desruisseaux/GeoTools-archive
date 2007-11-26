@@ -3,13 +3,14 @@ package org.geotools.arcsde.data;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -17,6 +18,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -27,7 +29,10 @@ import com.esri.sde.sdk.client.SeTable;
 
 public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureStore {
 
-    public ArcSdeFeatureStore(SimpleFeatureType featureType, ArcSDEDataStore arcSDEDataStore) {
+    private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
+
+    public ArcSdeFeatureStore(final SimpleFeatureType featureType,
+            final ArcSDEDataStore arcSDEDataStore) {
         super(featureType, arcSDEDataStore);
     }
 
@@ -39,12 +44,31 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     }
 
     /**
+     * Sets this FeatureStore transaction.
+     * <p>
+     * If transaction is not auto commit, initiates an
+     * {@link ArcTransactionState} with the dataStore's connection pool as key.
+     * </p>
+     * 
      * @see FeatureStore#setTransaction(Transaction)
      */
     public void setTransaction(final Transaction transaction) {
         if (transaction == null) {
             throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
+        } else if (super.transaction != Transaction.AUTO_COMMIT) {
+            throw new IllegalStateException("Transactio already set");
         }
+
+        final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
+        try {
+            // set the transaction state so it grabs a connection and starts a
+            // transaction on it
+            ArcTransactionState state = ArcTransactionState.getState(transaction, connectionPool);
+            LOGGER.finer("ArcSDE transaction initialized: " + state);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
+        }
+
         super.transaction = transaction;
     }
 
@@ -148,15 +172,27 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * @see FeatureStore#setFeatures(FeatureReader)
      */
     public void setFeatures(final FeatureReader reader) throws IOException {
+        final SimpleFeatureType readerType = reader.getFeatureType();
+        if (!this.featureType.equals(readerType)) {
+            throw new IllegalArgumentException("Type mismatch: " + readerType);
+        }
+
         final String typeName = featureType.getTypeName();
         final ArcSDEPooledConnection connection = getConnection();
-        final boolean transactionInProgress = transactionInProgress();
         try {
             // truncate using this connection to apply or not depending on
             // whether a transaction is in progress
             truncate(typeName, connection);
+            final FeatureWriter writer = dataStore.getFeatureWriterAppend(typeName, transaction);
+            while (reader.hasNext()) {
+                SimpleFeature feature = reader.next();
+                SimpleFeature newFeature = writer.next();
+                newFeature.setAttributes(feature.getAttributes());
+                writer.write();
+            }
+            writer.close();
         } finally {
-            if (!transactionInProgress) {
+            if (!connection.isTransactionActive()) {
                 connection.close();
             }
         }
@@ -174,14 +210,26 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * @throws DataSourceException
      */
     private void truncate(final String typeName, final ArcSDEPooledConnection connection)
-            throws DataSourceException {
-        try {
-            // whether this takes effect immediatelly or not depends
-            // on the connection being in autocommit mode or not
-            final SeTable table = new SeTable(connection, typeName);
-            table.truncate();
-        } catch (SeException e) {
-            throw new DataSourceException("Cannot truncate table " + featureType, e);
+            throws IOException {
+        final boolean transactionInProgress = connection.isTransactionActive();
+        final SeTable table = connection.getTable(typeName);
+        if (transactionInProgress) {
+            // need to do actual deletes, as SeTable.truncate does not respects
+            // transactions and would delete all content
+            LOGGER.fine("deleting all table records for " + typeName);
+            final FeatureWriter writer = dataStore.getFeatureWriter(typeName, transaction);
+            while (writer.hasNext()) {
+                writer.next();
+                writer.remove();
+            }
+        } else {
+            // we're in auto commit mode, lets truncate the table the fast way
+            try {
+                LOGGER.fine("truncating table " + typeName);
+                table.truncate();
+            } catch (SeException e) {
+                throw new DataSourceException("Cannot truncate table " + featureType, e);
+            }
         }
     }
 
@@ -192,7 +240,14 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         return Transaction.AUTO_COMMIT != getTransaction();
     }
 
-    private ArcSDEPooledConnection getConnection() throws IOException,
+    /**
+     * If current transaction is not auto commit, grabs the connection from the
+     * {@link ArcTransactionState#getConnection() transaction state} using the
+     * datastore's connection pool as key. Otherwise asks the pool for a new
+     * connection.
+     */
+    @Override
+    protected ArcSDEPooledConnection getConnection() throws IOException,
             UnavailableArcSDEConnectionException {
         final Transaction transaction = getTransaction();
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
@@ -201,7 +256,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             connection = connectionPool.getConnection();
         } else {
             final ArcTransactionState state;
-            state = ArcTransactionState.getState(transaction, connectionPool);
+            state = (ArcTransactionState) transaction.getState(connectionPool);
             connection = state.getConnection();
         }
         return connection;

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import junit.extensions.TestSetup;
+import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -28,6 +29,7 @@ import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -291,76 +293,18 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         testData.deleteTable(typeName);
     }
 
-    public void testInsertGeometry() throws Exception {
+    public void testInsertAutoCommit() throws Exception {
+        // the table populated here is test friendly since it can hold
+        // any kind of geometries.
+        testData.truncateTempTable();
+
         testInsertAutoCommit(Geometry.class);
-    }
-
-    public void testInsertPoint() throws Exception {
         testInsertAutoCommit(Point.class);
-    }
-
-    public void testInsertMultiPoint() throws Exception {
         testInsertAutoCommit(MultiPoint.class);
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @throws Exception
-     *             DOCUMENT ME!
-     */
-    public void testInsertLineString() throws Exception {
         testInsertAutoCommit(LineString.class);
-    }
-
-    public void testInsertMultiLineString() throws Exception {
         testInsertAutoCommit(MultiLineString.class);
-    }
-
-    public void testInsertPolygon() throws Exception {
         testInsertAutoCommit(Polygon.class);
-    }
-
-    public void testInsertMultiPolygon() throws Exception {
         testInsertAutoCommit(MultiPolygon.class);
-    }
-
-    public void testUpdateAutoCommit() throws Exception {
-        testData.insertTestData();
-
-        final String typeName = testData.getTemp_table();
-        final DataStore ds = testData.getDataStore();
-        final Filter filter = CQL.toFilter("INT32_COL = 3");
-
-        FeatureWriter writer = ds.getFeatureWriter(typeName, filter, Transaction.AUTO_COMMIT);
-
-        try {
-            assertTrue(writer.hasNext());
-            SimpleFeature feature = writer.next();
-            feature.setAttribute("INT32_COL", Integer.valueOf(-1000));
-            writer.write();
-            assertFalse(writer.hasNext());
-        } finally {
-            writer.close();
-        }
-
-        DefaultQuery query = new DefaultQuery(typeName, filter);
-        FeatureReader reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        try {
-            assertFalse(reader.hasNext());
-        } finally {
-            reader.close();
-        }
-
-        query = new DefaultQuery(typeName, CQL.toFilter("INT32_COL = -1000"));
-        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        try {
-            assertTrue(reader.hasNext());
-            reader.next();
-            assertFalse(reader.hasNext());
-        } finally {
-            reader.close();
-        }
     }
 
     /**
@@ -428,6 +372,43 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             reader.close();
         }
     }
+    public void testUpdateAutoCommit() throws Exception {
+        testData.insertTestData();
+
+        final String typeName = testData.getTemp_table();
+        final DataStore ds = testData.getDataStore();
+        final Filter filter = CQL.toFilter("INT32_COL = 3");
+
+        FeatureWriter writer = ds.getFeatureWriter(typeName, filter, Transaction.AUTO_COMMIT);
+
+        try {
+            assertTrue(writer.hasNext());
+            SimpleFeature feature = writer.next();
+            feature.setAttribute("INT32_COL", Integer.valueOf(-1000));
+            writer.write();
+            assertFalse(writer.hasNext());
+        } finally {
+            writer.close();
+        }
+
+        DefaultQuery query = new DefaultQuery(typeName, filter);
+        FeatureReader reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        try {
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+        }
+
+        query = new DefaultQuery(typeName, CQL.toFilter("INT32_COL = -1000"));
+        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
+        try {
+            assertTrue(reader.hasNext());
+            reader.next();
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+        }
+    }
 
     /**
      * Tests the writing of features with autocommit transaction.
@@ -441,12 +422,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      *             DOCUMENT ME!
      */
     private void testInsertAutoCommit(Class<? extends Geometry> geometryClass) throws Exception {
-        // the table populated here is test friendly since it can hold
-        // any kind of geometries.
-        testData.truncateTempTable();
-
         final String typeName = testData.getTemp_table();
-        final FeatureCollection testFeatures = testData.createTestFeatures(geometryClass, 5);
+        final int insertCount = 5;
+        final FeatureCollection testFeatures = testData.createTestFeatures(geometryClass,
+                insertCount);
 
         final DataStore ds = testData.getDataStore();
         final FeatureSource fsource = ds.getFeatureSource(typeName);
@@ -750,8 +729,60 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
     }
 
-    public void testSetFeatures() {
-        throw new UnsupportedOperationException("implement");
+    public void testSetFeaturesAutoCommit() throws Exception {
+        testData.insertTestData();
+        final FeatureCollection featuresToSet = testData.createTestFeatures(Point.class, 5);
+        final DataStore ds = testData.getDataStore();
+        final String typeName = testData.getTemp_table();
+
+        final FeatureStore store = (FeatureStore) ds.getFeatureSource(typeName);
+
+        final int initialCount = store.getCount(Query.ALL);
+        assertTrue(initialCount > 0);
+        assertTrue(initialCount != 5);
+
+        store.setFeatures(DataUtilities.reader(featuresToSet));
+
+        final int newCount = store.getCount(Query.ALL);
+        assertEquals(5, newCount);
+    }
+
+    public void testSetFeaturesTransaction() throws Exception {
+        testData.insertTestData();
+        final FeatureCollection featuresToSet = testData.createTestFeatures(Point.class, 5);
+        final DataStore ds = testData.getDataStore();
+        final String typeName = testData.getTemp_table();
+
+        final Transaction transaction = new DefaultTransaction("testSetFeaturesTransaction handle");
+        final FeatureStore store = (FeatureStore) ds.getFeatureSource(typeName);
+        store.setTransaction(transaction);
+
+        final int initialCount = store.getCount(Query.ALL);
+        assertTrue(initialCount > 0);
+        assertTrue(initialCount != 5);
+
+        try {
+            store.setFeatures(DataUtilities.reader(featuresToSet));
+            final int countInsideTransaction = store.getCount(Query.ALL);
+            assertEquals(5, countInsideTransaction);
+            
+            final FeatureSource sourceNoTransaction = ds.getFeatureSource(typeName);
+            int countNoTransaction = sourceNoTransaction.getCount(Query.ALL);
+            assertEquals(initialCount, countNoTransaction);
+            
+            //now commit
+            transaction.commit();
+            countNoTransaction = sourceNoTransaction.getCount(Query.ALL);
+            assertEquals(5, countNoTransaction);
+        }catch(Exception e){
+            transaction.rollback();
+            throw e;
+        }catch(AssertionFailedError e){
+            transaction.rollback();
+            throw e;
+        } finally {
+            transaction.close();
+        }
     }
 
     /**
