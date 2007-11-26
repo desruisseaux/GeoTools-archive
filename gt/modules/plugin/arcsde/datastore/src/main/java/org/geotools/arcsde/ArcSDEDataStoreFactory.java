@@ -120,7 +120,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                 //SeDBTune only exists in 9.2
                 Class.forName("com.esri.sde.sdk.client.SeDBTune");
                 JSDE_CLIENT_VERSION = JSDE_VERSION_92;
-                LOGGER.info("Using ArcSDE API version 9.2 (or higher)");
+                LOGGER.fine("Using ArcSDE API version 9.2 (or higher)");
             } catch (Throwable t2) {
                 //we're using 9.1 or 9.0.
                 try {
@@ -128,10 +128,10 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                     if (projcss.length == 16380) {
                         //perhaps I am the hack-master.
                         JSDE_CLIENT_VERSION = JSDE_VERSION_91;
-                        LOGGER.info("Using ArcSDE API version 9.1");
+                        LOGGER.fine("Using ArcSDE API version 9.1");
                     } else {
                         JSDE_CLIENT_VERSION = JSDE_VERSION_90;
-                        LOGGER.info("Using ArcSDE API version 9.0 (or an earlier 8.x version)");
+                        LOGGER.fine("Using ArcSDE API version 9.0 (or an earlier 8.x version)");
                     }
                 } catch (Throwable crap) {
                     //not sure what happened here...  This next line is
