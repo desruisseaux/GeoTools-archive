@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,7 @@
  */
 package org.geotools.metadata.iso.extent;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicExtent;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -75,7 +72,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
      *
      * @return {@code true} for inclusion, or {@code false} for exclusion.
-     */    
+     */
     public Boolean getInclusion() {
         return inclusion;
     }

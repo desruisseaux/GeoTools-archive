@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,11 @@
  */
 package org.geotools.metadata.iso.distribution;
 
-// J2SE direct dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.metadata.distribution.Format;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -51,19 +46,19 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
     /**
      * Provides a description of the format of the data to be distributed.
      */
-    private Collection distributionFormats;
+    private Collection<Format> distributionFormats;
 
     /**
      * Provides information about the distributor.
      */
-    private Collection distributors;
+    private Collection<Distributor> distributors;
 
     /**
      * Provides information about technical means and media by which a resource is obtained
      * from the distributor.
      */
-    private Collection transferOptions;
-    
+    private Collection<DigitalTransferOptions> transferOptions;
+
     /**
      * Constructs an initially empty distribution.
      */
@@ -82,28 +77,28 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
     /**
      * Provides a description of the format of the data to be distributed.
      */
-    public synchronized Collection getDistributionFormats() {
+    public synchronized Collection<Format> getDistributionFormats() {
         return distributionFormats = nonNullCollection(distributionFormats, Format.class);
     }
 
     /**
      * Set a description of the format of the data to be distributed.
      */
-    public synchronized void setDistributionFormats(final Collection newValues) {
+    public synchronized void setDistributionFormats(final Collection<? extends Format> newValues) {
         distributionFormats = copyCollection(newValues, distributionFormats, Format.class);
     }
 
     /**
      * Provides information about the distributor.
      */
-    public synchronized Collection getDistributors() {
+    public synchronized Collection<Distributor> getDistributors() {
         return distributors = nonNullCollection(distributors, Distributor.class);
     }
 
     /**
      * Set information about the distributor.
      */
-    public synchronized void setDistributors(final Collection newValues) {
+    public synchronized void setDistributors(final Collection<? extends Distributor> newValues) {
         distributors = copyCollection(newValues, distributors, Distributor.class);
     }
 
@@ -111,7 +106,7 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
      * Provides information about technical means and media by which a resource is obtained
      * from the distributor.
      */
-    public synchronized Collection getTransferOptions() {
+    public synchronized Collection<DigitalTransferOptions> getTransferOptions() {
         return transferOptions = nonNullCollection(transferOptions, DigitalTransferOptions.class);
     }
 
@@ -119,7 +114,9 @@ public class DistributionImpl extends MetadataEntity implements Distribution {
      * Set information about technical means and media by which a resource is obtained
      * from the distributor.
      */
-    public synchronized void setTransferOptions(final Collection newValues) {
+    public synchronized void setTransferOptions(
+            final Collection<? extends DigitalTransferOptions> newValues)
+    {
         transferOptions = copyCollection(newValues, transferOptions, DigitalTransferOptions.class);
     }
 }

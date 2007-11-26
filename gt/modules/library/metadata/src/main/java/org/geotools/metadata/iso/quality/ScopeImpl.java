@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,12 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// OpenGIS dependencies
 import java.util.Collection;
 
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.Scope;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.maintenance.ScopeDescription;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -46,7 +43,7 @@ public class ScopeImpl extends MetadataEntity implements Scope {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -8021256328527422972L;
-    
+
     /**
      * Hierarchical level of the data specified by the scope.
      */
@@ -61,7 +58,7 @@ public class ScopeImpl extends MetadataEntity implements Scope {
     /**
      * Detailed description about the level of the data specified by the scope.
      */
-    private Collection/*<ScopeDescription>*/ levelDescription;
+    private Collection<ScopeDescription> levelDescription;
 
     /**
      * Constructs an initially empty scope.
@@ -90,7 +87,7 @@ public class ScopeImpl extends MetadataEntity implements Scope {
      */
     public ScopeCode getLevel() {
         return level;
-    } 
+    }
 
     /**
      * Set the hierarchical level of the data specified by the scope.
@@ -107,7 +104,7 @@ public class ScopeImpl extends MetadataEntity implements Scope {
      *
      * @since 2.4
      */
-    public synchronized Collection getLevelDescription() {
+    public synchronized Collection<ScopeDescription> getLevelDescription() {
         return levelDescription = nonNullCollection(levelDescription, ScopeDescription.class);
     }
 
@@ -116,9 +113,11 @@ public class ScopeImpl extends MetadataEntity implements Scope {
      *
      * @since 2.4
      */
-    public synchronized void setLevelDescription(final Collection newValues) {
+    public synchronized void setLevelDescription(
+            final Collection<? extends ScopeDescription> newValues)
+    {
         levelDescription = copyCollection(newValues, levelDescription, ScopeDescription.class);
-    }        
+    }
 
     /**
      * Information about the spatial, vertical and temporal extent of the data specified by the

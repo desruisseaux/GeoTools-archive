@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.metadata.iso.constraint;
 
-// OpenGIS direct dependencies
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.SecurityConstraints;
 import org.opengis.util.InternationalString;
@@ -40,7 +39,7 @@ public class SecurityConstraintsImpl extends ConstraintsImpl implements Security
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6412833018607679734L;;
-    
+
     /**
      * Name of the handling restrictions on the resource.
      */
@@ -83,14 +82,14 @@ public class SecurityConstraintsImpl extends ConstraintsImpl implements Security
     public SecurityConstraintsImpl(final Classification classification) {
         setClassification(classification);
     }
-    
+
     /**
      * Returns the name of the handling restrictions on the resource.
      */
     public Classification getClassification() {
         return classification;
     }
-    
+
     /**
      * Set the name of the handling restrictions on the resource.
      */

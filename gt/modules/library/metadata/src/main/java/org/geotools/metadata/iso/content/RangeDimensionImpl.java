@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,12 +19,9 @@
  */
 package org.geotools.metadata.iso.content;
 
-// OpenGIS dependencies
 import org.opengis.metadata.content.RangeDimension;
 import org.opengis.util.InternationalString;
 import org.opengis.util.MemberName;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -93,7 +90,7 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
     public InternationalString getDescriptor() {
         return descriptor;
     }
-    
+
     /**
      * Set the description of the range of a cell measurement value.
      */

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.ConformanceResult;
 import org.opengis.util.InternationalString;
@@ -42,7 +41,7 @@ public class ConformanceResultImpl extends ResultImpl implements ConformanceResu
      * Serial number for compatibility with different versions.
      */
     private static final long serialVersionUID = 6429932577869033286L;
-    
+
     /**
      * Citation of product specification or user requirement against which data is being evaluated.
      */
@@ -57,7 +56,7 @@ public class ConformanceResultImpl extends ResultImpl implements ConformanceResu
      * Indication of the conformance result.
      */
     private boolean pass;
-    
+
     /**
      * Constructs an initially empty conformance result.
      */

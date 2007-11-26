@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,8 @@
  */
 package org.geotools.metadata.iso.identification;
 
-// OpenGIS dependencies
 import org.opengis.metadata.identification.RepresentativeFraction;
 import org.opengis.metadata.identification.Resolution;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -110,7 +107,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      */
     public Double getDistance() {
         return distance;
-    }    
+    }
 
     /**
      * Set the ground sample distance.

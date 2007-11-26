@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,13 +19,10 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// OpenGIS direct dependencies
 import org.opengis.metadata.quality.Result;
 import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.util.SimpleInternationalString;
 

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,11 @@
  */
 package org.geotools.metadata.iso.distribution;
 
-// J2SE direct dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Medium;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -63,13 +58,13 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Information about online sources from which the resource can be obtained.
      */
-    private Collection onLines;
+    private Collection<OnLineResource> onLines;
 
     /**
      * Information about offline media on which the resource can be obtained.
      */
     private Medium offLines;
-    
+
     /**
      * Constructs an initially empty digital transfer options.
      */
@@ -121,14 +116,14 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Returns information about online sources from which the resource can be obtained.
      */
-    public synchronized Collection getOnLines() {
+    public synchronized Collection<OnLineResource> getOnLines() {
         return onLines = nonNullCollection(onLines, OnLineResource.class);
     }
 
     /**
      * Set information about online sources from which the resource can be obtained.
      */
-    public synchronized void setOnLines(final Collection newValues) {
+    public synchronized void setOnLines(final Collection<? extends OnLineResource> newValues) {
         onLines = copyCollection(newValues, onLines, OnLineResource.class);
     }
 
@@ -138,7 +133,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     public Medium getOffLine() {
         return offLines;
     }
-    
+
     /**
      * Set information about offline media on which the resource can be obtained.
      */

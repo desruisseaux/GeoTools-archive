@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,12 @@
  */
 package org.geotools.metadata.iso.maintenance;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Collections;
-
-// OpenGIS dependencies
 import org.opengis.metadata.maintenance.ScopeDescription;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
 
 
 /**
@@ -45,6 +42,26 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5671299759930976286L;
+
+    /**
+     * The attributes to which the information applies.
+     */
+    private Set<AttributeType> attributes;
+
+    /**
+     * The features to which the information applies.
+     */
+    private Set<FeatureType> features;
+
+    /**
+     * The feature instances to which the information applies.
+     */
+    private Set<FeatureType> featureInstances;
+
+    /**
+     * The attribute instances to which the information applies.
+     */
+    private Set<AttributeType> attributeInstances;
 
     /**
      * Dataset to which the information applies.
@@ -74,40 +91,68 @@ public class ScopeDescriptionImpl extends MetadataEntity implements ScopeDescrip
 
     /**
      * Returns the attributes to which the information applies.
-     *
-     * @todo Not yet implemented.
      */
-    public Set getAttributes() {
-        return Collections.EMPTY_SET;
+    public Set<AttributeType> getAttributes() {
+        return attributes = nonNullSet(attributes, AttributeType.class);
+    }
+
+    /**
+     * Set the attributes to which the information applies.
+     *
+     * @since 2.5
+     */
+    public synchronized void setAttributes(final Set<? extends AttributeType> newValues) {
+        attributes = (Set<AttributeType>) copyCollection(newValues, attributes, AttributeType.class);
     }
 
     /**
      * Returns the features to which the information applies.
-     *
-     * @todo Not yet implemented.
      */
-    public Set getFeatures() {
-        return Collections.EMPTY_SET;
+    public Set<FeatureType> getFeatures() {
+        return features = nonNullSet(features, FeatureType.class);
+    }
+
+    /**
+     * Set the features to which the information applies.
+     *
+     * @since 2.5
+     */
+    public synchronized void setFeatures(final Set<? extends FeatureType> newValues) {
+        features = (Set<FeatureType>) copyCollection(newValues, features, FeatureType.class);
     }
 
     /**
      * Returns the feature instances to which the information applies.
-     *
-     * @todo Not yet implemented.
      */
-    public Set getFeatureInstances() {
-        return Collections.EMPTY_SET;
+    public Set<FeatureType> getFeatureInstances() {
+        return featureInstances = nonNullSet(featureInstances, FeatureType.class);
+    }
+
+    /**
+     * Set the feature instances to which the information applies.
+     *
+     * @since 2.5
+     */
+    public synchronized void setFeatureInstances(final Set<? extends FeatureType> newValues) {
+        featureInstances = (Set<FeatureType>) copyCollection(newValues, featureInstances, FeatureType.class);
     }
 
     /**
      * Returns the attribute instances to which the information applies.
      *
      * @since 2.4
-     *
-     * @todo Not yet implemented.
      */
-    public Set getAttributeInstances() {
-        return Collections.EMPTY_SET;
+    public Set<AttributeType> getAttributeInstances() {
+        return attributeInstances = nonNullSet(attributeInstances, AttributeType.class);
+    }
+
+    /**
+     * Set the attribute instances to which the information applies.
+     *
+     * @since 2.5
+     */
+    public synchronized void setAttributeInstances(final Set<? extends AttributeType> newValues) {
+        attributeInstances = (Set<AttributeType>) copyCollection(newValues, attributeInstances, AttributeType.class);
     }
 
     /**

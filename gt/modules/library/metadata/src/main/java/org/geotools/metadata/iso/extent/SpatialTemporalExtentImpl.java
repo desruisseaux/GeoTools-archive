@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,8 @@
  */
 package org.geotools.metadata.iso.extent;
 
-// J2SE direct dependencies
 import java.util.Collection;
 import java.util.Date;
-
-// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.SpatialTemporalExtent;
 
@@ -50,8 +47,8 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
      * The spatial extent component of composite
      * spatial and temporal extent.
      */
-    private Collection spatialExtent;
-    
+    private Collection<GeographicExtent> spatialExtent;
+
     /**
      * Constructs an initially empty spatial-temporal extent.
      */
@@ -70,21 +67,20 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
     /**
      * Creates a spatial-temporal extent initialized to the specified values.
      */
-    public SpatialTemporalExtentImpl(final Date       startTime,
-                                     final Date       endTime,
-                                     final Collection spatialExtent)
+    public SpatialTemporalExtentImpl(final Date startTime, final Date endTime,
+                                     final Collection<? extends GeographicExtent> spatialExtent)
     {
         super(startTime, endTime);
         setSpatialExtent(spatialExtent);
     }
-    
+
     /**
      * Returns the spatial extent component of composite
      * spatial and temporal extent.
      *
      * @return The list of geographic extents (never {@code null}).
      */
-    public synchronized Collection getSpatialExtent() {
+    public synchronized Collection<GeographicExtent> getSpatialExtent() {
         return spatialExtent = nonNullCollection(spatialExtent, GeographicExtent.class);
     }
 
@@ -92,7 +88,9 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
      * Set the spatial extent component of composite
      * spatial and temporal extent.
      */
-    public synchronized void setSpatialExtent(final Collection newValues) {
+    public synchronized void setSpatialExtent(
+            final Collection<? extends GeographicExtent> newValues)
+    {
         spatialExtent = copyCollection(newValues, spatialExtent, GeographicExtent.class);
     }
 }

@@ -44,6 +44,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
+import org.opengis.util.Record;
 
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -363,23 +364,22 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * never-ending recursive calls.
      */
     private static double getAccuracy0(final CoordinateOperation operation) {
-        final Collection accuracies = operation.getPositionalAccuracy();
-        for (final Iterator it=accuracies.iterator(); it.hasNext();) {
-            final Collection results = ((PositionalAccuracy) it.next()).getResults();
-            for (final Iterator it2 = results.iterator(); it2.hasNext();) {
-                final Result accuracy = (Result) it2.next();
-                if (accuracy instanceof QuantitativeResult) {
-                    final QuantitativeResult quantity = (QuantitativeResult) accuracy;
-                    final Collection r = quantity.getValues();
-                    if (r != null) {
+        final Collection<PositionalAccuracy> accuracies = operation.getPositionalAccuracy();
+        if (accuracies != null) for (final PositionalAccuracy accuracy : accuracies) {
+            if (accuracy != null) for (final Result result : accuracy.getResults()) {
+                if (result instanceof QuantitativeResult) {
+                    final QuantitativeResult quantity = (QuantitativeResult) result;
+                    final Collection<? extends Record> records = quantity.getValues();
+                    if (records != null) {
                         final Unit unit = quantity.getValueUnit();
                         if (unit!=null && SI.METER.isCompatible(unit)) {
-                            for (final Iterator i=r.iterator();i.hasNext();) {
-                                final Number d = (Number) i.next();
-                                if (d != null) {
-                                    double value = d.doubleValue();
-                                    value = unit.getConverterTo(SI.METER).convert(value);
-                                    return value;
+                            for (final Record record : records) {
+                                for (final Object value : record.getAttributes().values()) {
+                                    if (value instanceof Number) {
+                                        double v = ((Number) value).doubleValue();
+                                        v = unit.getConverterTo(SI.METER).convert(v);
+                                        return v;
+                                    }
                                 }
                             }
                         }

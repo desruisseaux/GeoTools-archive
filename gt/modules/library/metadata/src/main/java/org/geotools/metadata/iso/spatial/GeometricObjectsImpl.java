@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,8 @@
  */
 package org.geotools.metadata.iso.spatial;
 
-// OpenGIS dependencies
 import org.opengis.metadata.spatial.GeometricObjects;
 import org.opengis.metadata.spatial.GeometricObjectType;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -74,14 +71,14 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
     public GeometricObjectsImpl(final GeometricObjectType geometricObjectType) {
         setGeometricObjectType(geometricObjectType);
     }
-    
+
     /**
      * Total number of the point or vector object type occurring in the dataset.
      */
     public GeometricObjectType getGeometricObjectType() {
         return geometricObjectType;
     }
-    
+
     /**
      * Set the total number of the point or vector object type occurring in the dataset.
      */
@@ -96,7 +93,7 @@ public class GeometricObjectsImpl extends MetadataEntity implements GeometricObj
     public Integer getGeometricObjectCount() {
         return geometricObjectCount;
     }
-    
+
     /**
      * Set the total number of the point or vector object type occurring in the dataset.
      */

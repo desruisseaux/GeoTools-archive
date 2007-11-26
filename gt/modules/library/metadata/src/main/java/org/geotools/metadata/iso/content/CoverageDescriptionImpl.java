@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,26 +19,16 @@
  */
 package org.geotools.metadata.iso.content;
 
-// J2SE dependencies
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
-// OpenGIS dependencies
 import org.opengis.metadata.content.CoverageContentType;
 import org.opengis.metadata.content.CoverageDescription;
 import org.opengis.metadata.content.RangeDimension;
-import org.opengis.util.MemberName;
-import org.opengis.util.Record;
-import org.opengis.util.RecordSchema;
 import org.opengis.util.RecordType;
-import org.opengis.util.TypeName;
 
 
 /**
  * Information about the content of a grid data cell.
- * 
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -64,7 +54,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
     /**
      * Information on the dimensions of the cell measurement value.
      */
-    private Collection dimensions;
+    private Collection<RangeDimension> dimensions;
 
     /**
      * Constructs an empty coverage description.
@@ -113,7 +103,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
 
     /**
      * Returns the information on the dimensions of the cell measurement value.
-     * 
+     *
      * @deprecated use {@link #getDimensions}
      */
     public RangeDimension getDimension() {
@@ -123,7 +113,7 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
 
     /**
      * Set the information on the dimensions of the cell measurement value.
-     * 
+     *
      * @deprecated use {@link #setDimensions}
      */
     public synchronized void setDimension(final RangeDimension newValue) {
@@ -132,19 +122,19 @@ public class CoverageDescriptionImpl extends ContentInformationImpl implements C
 
     /**
      * Returns the information on the dimensions of the cell measurement value.
-     * 
+     *
      * @since 2.4
      */
-    public synchronized Collection getDimensions() {
+    public synchronized Collection<RangeDimension> getDimensions() {
         return dimensions = nonNullCollection(dimensions, RangeDimension.class);
     }
 
     /**
      * Set the information on the dimensions of the cell measurement value.
-     * 
+     *
      * since 2.4
      */
-    public synchronized void setDimensions(final Collection newValues) {
+    public synchronized void setDimensions(final Collection<? extends RangeDimension> newValues) {
         dimensions = copyCollection(newValues, dimensions, RangeDimension.class);
     }
 }

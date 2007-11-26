@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,9 +17,8 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.metadata.iso.quality; 
+package org.geotools.metadata.iso.quality;
 
-// OpenGIS dependencies
 import org.opengis.metadata.quality.LogicalConsistency;
 
 
@@ -39,7 +38,7 @@ public class LogicalConsistencyImpl extends ElementImpl implements LogicalConsis
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -2470752876057569947L;
-    
+
     /**
      * Constructs an initially empty logical consistency.
      */

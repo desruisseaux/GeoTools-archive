@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,11 @@
  */
 package org.geotools.metadata.iso.identification;
 
-// J2SE direct dependencies
 import java.util.Collection;
 import java.util.Date;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.identification.Usage;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -70,8 +65,8 @@ public class UsageImpl extends MetadataEntity implements Usage {
      * Identification of and means of communicating with person(s) and organization(s)
      * using the resource(s).
      */
-    private Collection userContactInfo;
-    
+    private Collection<ResponsibleParty> userContactInfo;
+
     /**
      * Constructs an initially empty usage.
      */
@@ -91,12 +86,12 @@ public class UsageImpl extends MetadataEntity implements Usage {
      * Creates an usage initialized to the specified values.
      */
     public UsageImpl(final InternationalString specificUsage,
-                     final Collection          userContactInfo)
+                     final Collection<ResponsibleParty> userContactInfo)
     {
         setUserContactInfo(userContactInfo);
         setSpecificUsage  (specificUsage  );
     }
-    
+
     /**
      * Brief description of the resource and/or resource series usage.
      */
@@ -148,15 +143,17 @@ public class UsageImpl extends MetadataEntity implements Usage {
      * Identification of and means of communicating with person(s) and organization(s)
      * using the resource(s).
      */
-    public synchronized Collection getUserContactInfo() {
+    public synchronized Collection<ResponsibleParty> getUserContactInfo() {
         return userContactInfo = nonNullCollection(userContactInfo, ResponsibleParty.class);
     }
-    
+
     /**
      * Set identification of and means of communicating with person(s) and organization(s)
      * using the resource(s).
      */
-    public synchronized void setUserContactInfo(final Collection newValues) {
+    public synchronized void setUserContactInfo(
+            final Collection<? extends ResponsibleParty> newValues)
+    {
         userContactInfo = copyCollection(newValues, userContactInfo, ResponsibleParty.class);
-    }    
+    }
 }

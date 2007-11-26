@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -18,10 +18,7 @@
  */
 package org.geotools.metadata.iso.identification;
 
-// OpenGIS dependencies
 import org.opengis.metadata.identification.RepresentativeFraction;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -29,7 +26,7 @@ import org.geotools.resources.i18n.Errors;
 /**
  * A scale where {@linkplain #getDenominator denominator} = {@code 1 / scale}.
  * This implementation is set up as a {@linkplain Number number} - because it is.
- * 
+ *
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
@@ -126,6 +123,7 @@ public class RepresentativeFractionImpl extends Number implements Representative
     /**
      * Compares this object with the specified value for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         /*
          * Note: 'equals(Object)' and 'hashCode()' implementations are defined in the interface,
@@ -144,6 +142,7 @@ public class RepresentativeFractionImpl extends Number implements Representative
     /**
      * Returns a hash value for this representative fraction.
      */
+    @Override
     public int hashCode() {
         return (int) denominator;
     }

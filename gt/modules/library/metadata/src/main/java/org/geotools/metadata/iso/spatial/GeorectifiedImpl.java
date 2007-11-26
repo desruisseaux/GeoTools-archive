@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,14 @@
  */
 package org.geotools.metadata.iso.spatial;
 
-// J2SE direct dependencies
 import java.util.Collection;
 import java.util.List;
-
-// OpenGIS dependencies
 import org.opengis.metadata.spatial.CellGeometry;
+import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.Georectified;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.util.CheckedArrayList;
 
 
@@ -71,7 +67,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * diagonals in the grid spatial dimensions. There are four corner points in a
      * georectified grid; at least two corner points along one diagonal are required.
      */
-    private List cornerPoints;
+    private List<Point> cornerPoints;
 
     /**
      * Earth location in the coordinate system defined by the Spatial Reference System
@@ -93,7 +89,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Information about which grid dimensions are the spatial dimensions.
      */
-    private Collection transformationDimensionMapping;
+    private Collection<InternationalString> transformationDimensionMapping;
 
     /**
      * Constructs an initially empty georectified object.
@@ -113,12 +109,12 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Creates a georectified object initialized to the specified values.
      */
-    public GeorectifiedImpl(final int              numberOfDimensions,
-                            final List             axisDimensionsProperties,
-                            final CellGeometry     cellGeometry,
-                            final boolean          transformationParameterAvailable,
-                            final boolean          checkPointAvailable,
-                            final List             cornerPoints,
+    public GeorectifiedImpl(final int numberOfDimensions,
+                            final List<? extends Dimension> axisDimensionsProperties,
+                            final CellGeometry cellGeometry,
+                            final boolean transformationParameterAvailable,
+                            final boolean checkPointAvailable,
+                            final List<? extends Point> cornerPoints,
                             final PixelOrientation pointInPixel)
     {
         super(numberOfDimensions,
@@ -170,17 +166,17 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
      * diagonals in the grid spatial dimensions. There are four corner points in a
      * georectified grid; at least two corner points along one diagonal are required.
      */
-    public synchronized List getCornerPoints() {
+    public synchronized List<Point> getCornerPoints() {
         return cornerPoints = nonNullList(cornerPoints, Point.class);
     }
 
     /**
      * Set the corner points.
      */
-    public synchronized void setCornerPoints(final List newValues) {
+    public synchronized void setCornerPoints(final List<? extends Point> newValues) {
         checkWritePermission();
         if (cornerPoints == null) {
-            cornerPoints = new CheckedArrayList(Point.class);
+            cornerPoints = new CheckedArrayList<Point>(Point.class);
         } else {
             cornerPoints.clear();
         }
@@ -237,7 +233,7 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Information about which grid dimensions are the spatial dimensions.
      */
-    public synchronized Collection getTransformationDimensionMapping() {
+    public synchronized Collection<InternationalString> getTransformationDimensionMapping() {
         return transformationDimensionMapping = nonNullCollection(transformationDimensionMapping,
                                                                   InternationalString.class);
     }
@@ -245,7 +241,9 @@ public class GeorectifiedImpl extends GridSpatialRepresentationImpl implements G
     /**
      * Set information about which grid dimensions are the spatial dimensions.
      */
-    public synchronized void setTransformationDimensionMapping(final Collection newValues) {
+    public synchronized void setTransformationDimensionMapping(
+            final Collection<? extends InternationalString> newValues)
+    {
         transformationDimensionMapping = copyCollection(newValues, transformationDimensionMapping,
                                                         InternationalString.class);
     }

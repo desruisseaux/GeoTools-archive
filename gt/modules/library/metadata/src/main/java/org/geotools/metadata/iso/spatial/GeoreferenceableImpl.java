@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,13 +19,11 @@
  */
 package org.geotools.metadata.iso.spatial;
 
-// J2SE direct dependencies
 import java.util.List;
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.spatial.CellGeometry;
+import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.Georeferenceable;
 import org.opengis.util.InternationalString;
 import org.opengis.util.Record;
@@ -72,7 +70,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     /**
      * Reference providing description of the parameters.
      */
-    private Collection parameterCitation;
+    private Collection<Citation> parameterCitation;
 
     /**
      * Constructs an initially empty georeferenceable.
@@ -92,12 +90,12 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     /**
      * Creates a georeferencable initialized to the given parameters.
      */
-    public GeoreferenceableImpl(final int          numberOfDimensions,
-                                final List         axisDimensionsProperties,
+    public GeoreferenceableImpl(final int numberOfDimensions,
+                                final List<? extends Dimension> axisDimensionsProperties,
                                 final CellGeometry cellGeometry,
-                                final boolean      transformationParameterAvailable,
-                                final boolean      controlPointAvailable, 
-                                final boolean      orientationParameterAvailable)
+                                final boolean transformationParameterAvailable,
+                                final boolean controlPointAvailable,
+                                final boolean orientationParameterAvailable)
     {
         super(numberOfDimensions, axisDimensionsProperties, cellGeometry, transformationParameterAvailable);
         setControlPointAvailable        (controlPointAvailable        );
@@ -118,7 +116,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
        checkWritePermission();
        controlPointAvailable = newValue;
     }
-    
+
     /**
      * Indication of whether or not orientation parameters are available.
      */
@@ -151,7 +149,7 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
 
     /**
      * Terms which support grid data georeferencing.
-     * 
+     *
      * @deprecated please use {@link #getGeoreferencedParameters}.
      */
     public Object getParameters() {
@@ -165,11 +163,11 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
      */
     public Record getGeoreferencedParameters() {
         return georeferencedParameters;
-    }            
+    }
 
     /**
      * Set terms which support grid data georeferencing.
-     * 
+     *
      * @deprecated please use {@link #setGeoreferencedParameters}.
      */
     public void setParameters(final Object newValue) {
@@ -189,14 +187,14 @@ public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implemen
     /**
      * Reference providing description of the parameters.
      */
-    public synchronized Collection getParameterCitation() {
+    public synchronized Collection<Citation> getParameterCitation() {
         return parameterCitation = nonNullCollection(parameterCitation, Citation.class);
     }
 
     /**
      * Set reference providing description of the parameters.
      */
-    public synchronized void setParameterCitation(final Collection newValues) {
+    public synchronized void setParameterCitation(final Collection<? extends Citation> newValues) {
         parameterCitation = copyCollection(newValues, parameterCitation, Citation.class);
     }
 }

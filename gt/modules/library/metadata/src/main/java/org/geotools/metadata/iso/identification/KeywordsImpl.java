@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,11 @@
  */
 package org.geotools.metadata.iso.identification;
 
-// J2SE direct dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -51,7 +46,7 @@ public class KeywordsImpl extends MetadataEntity implements Keywords {
     /**
      * Commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject.
      */
-    private Collection keywords;
+    private Collection<InternationalString> keywords;
 
     /**
      * Subject matter used to group similar keywords.
@@ -81,22 +76,22 @@ public class KeywordsImpl extends MetadataEntity implements Keywords {
 
     /**
      * Creates keywords initialized to the given list.
-     */    
-    public KeywordsImpl(final Collection keywords) {
+     */
+    public KeywordsImpl(final Collection<? extends InternationalString> keywords) {
         setKeywords(keywords);
     }
 
     /**
      * Commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject.
      */
-    public synchronized Collection getKeywords() {
+    public synchronized Collection<InternationalString> getKeywords() {
         return keywords = nonNullCollection(keywords, InternationalString.class);
     }
 
     /**
      * Set commonly used word(s) or formalised word(s) or phrase(s) used to describe the subject.
      */
-    public synchronized void setKeywords(final Collection newValues) {
+    public synchronized void setKeywords(final Collection<? extends InternationalString> newValues) {
         keywords = copyCollection(newValues, keywords, InternationalString.class);
     }
 
@@ -121,7 +116,7 @@ public class KeywordsImpl extends MetadataEntity implements Keywords {
     public Citation getThesaurusName() {
         return thesaurusName;
     }
-    
+
     /**
      * Set the name of the formally registered thesaurus or a similar authoritative source
      * of keywords.

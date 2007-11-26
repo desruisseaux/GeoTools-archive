@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,8 +19,8 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// OpenGIS dependencies
 import org.opengis.metadata.quality.Completeness;
+
 
 /**
  * Presence and absence of features, their attributes and their relationships.
@@ -37,7 +37,7 @@ public class CompletenessImpl extends ElementImpl implements Completeness {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7893993264874215741L;
-    
+
     /**
      * Constructs an initially empty completeness.
      */

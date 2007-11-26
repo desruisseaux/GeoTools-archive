@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,7 @@
  */
 package org.geotools.metadata.iso.extent;
 
-// J2Se dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.geometry.Geometry;
 
@@ -48,7 +45,7 @@ public class BoundingPolygonImpl extends GeographicExtentImpl implements Boundin
     /**
      * The sets of points defining the bounding polygon.
      */
-    private Collection/*<Geometry>*/ polygons;
+    private Collection<Geometry> polygons;
 
     /**
      * Constructs an initially empty bounding polygon.
@@ -68,21 +65,21 @@ public class BoundingPolygonImpl extends GeographicExtentImpl implements Boundin
     /**
      * Creates a bounding polygon initialized to the specified value.
      */
-    public BoundingPolygonImpl(final Collection/*<Geometry>*/ polygons) {
+    public BoundingPolygonImpl(final Collection<Geometry> polygons) {
         setPolygons(polygons);
     }
 
     /**
      * Returns the sets of points defining the bounding polygon.
      */
-    public synchronized Collection/*<Geometry>*/ getPolygons() {
+    public synchronized Collection<Geometry> getPolygons() {
         return polygons = nonNullCollection(polygons, Geometry.class);
     }
 
     /**
      * Set the sets of points defining the bounding polygon.
      */
-    public synchronized void setPolygons(final Collection/*<Geometry>*/ newValues) {
+    public synchronized void setPolygons(final Collection<? extends Geometry> newValues) {
         polygons = copyCollection(newValues, polygons, Geometry.class);
     }
 }

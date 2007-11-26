@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// OpenGIS direct dependencies
 import org.opengis.metadata.quality.Result;
 import org.opengis.metadata.quality.AbsoluteExternalPositionalAccuracy;
 
@@ -41,12 +40,12 @@ public class AbsoluteExternalPositionalAccuracyImpl extends PositionalAccuracyIm
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 4116627805950579738L;
-    
+
     /**
      * Constructs an initially empty absolute external positional accuracy.
      */
     public AbsoluteExternalPositionalAccuracyImpl() {
-    }    
+    }
 
     /**
      * Creates an positional accuracy initialized to the given result.

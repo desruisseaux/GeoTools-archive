@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,11 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// J2SE direct dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.lineage.Lineage;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.quality.Scope;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -46,7 +41,7 @@ public class DataQualityImpl extends MetadataEntity implements DataQuality {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 7964896551368382214L;
-    
+
     /**
      * The specific data to which the data quality information applies.
      */
@@ -65,7 +60,7 @@ public class DataQualityImpl extends MetadataEntity implements DataQuality {
      * {@linkplain org.opengis.metadata.maintenance.ScopeCode#DATASET dataset}.
      */
     private Lineage lineage;
-    
+
     /**
      * Constructs an initially empty data quality.
      */
@@ -87,7 +82,7 @@ public class DataQualityImpl extends MetadataEntity implements DataQuality {
     public DataQualityImpl(Scope scope) {
         setScope(scope);
     }
-    
+
     /**
      * The specific data to which the data quality information applies.
      */

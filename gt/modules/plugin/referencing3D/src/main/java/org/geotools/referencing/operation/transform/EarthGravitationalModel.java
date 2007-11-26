@@ -18,7 +18,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
@@ -38,7 +36,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.DefaultParameterDescriptor;
@@ -356,6 +353,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
@@ -363,6 +361,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
     /**
      * Returns the parameters for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         return new ParameterGroup(getParameterDescriptors(),
                new ParameterValue[] {
@@ -408,7 +407,8 @@ public final class EarthGravitationalModel extends VerticalTransform {
         /**
          * Returns the operation type for this transform.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<? extends Transformation> getOperationType() {
             return Transformation.class;
         }
 
@@ -420,7 +420,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
          * @throws ParameterNotFoundException if a required parameter was not found.
          * @throws FactoryException if this method failed to load the coefficient file.
          */
-        protected MathTransform createMathTransform(final ParameterValueGroup values) 
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException, FactoryException
         {
             int nmax = intValue(ORDER, values);

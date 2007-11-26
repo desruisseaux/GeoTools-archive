@@ -15,7 +15,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -67,6 +66,7 @@ public abstract class VerticalTransform extends AbstractMathTransform {
     /**
      * Transforms a list of coordinate point ordinal values.
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
             throws TransformException
@@ -81,8 +81,8 @@ public abstract class VerticalTransform extends AbstractMathTransform {
         }
         while (--numPts >= 0) {
             final float x,y,z;
-            dstPts[dstOff + 0] = (float)  (x = srcPts[srcOff + 0]);
-            dstPts[dstOff + 1] = (float)  (y = srcPts[srcOff + 1]);
+            dstPts[dstOff + 0] =          (x = srcPts[srcOff + 0]);
+            dstPts[dstOff + 1] =          (y = srcPts[srcOff + 1]);
             dstPts[dstOff + 2] = (float) ((z = srcPts[srcOff + 2]) + heightOffset(x,y,z));
             srcOff += step;
             dstOff += step;

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,14 +19,9 @@
  */
 package org.geotools.metadata.iso.identification;
 
-// J2SE direct dependencies
 import java.net.URI;
-
-// OpenGIS dependencies
 import org.opengis.metadata.identification.BrowseGraphic;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -88,7 +83,7 @@ public class BrowseGraphicImpl extends MetadataEntity implements BrowseGraphic {
     public BrowseGraphicImpl(final URI fileName) {
         setFileName(fileName);
     }
-    
+
     /**
      * Name of the file that contains a graphic that provides an illustration of the dataset.
      */

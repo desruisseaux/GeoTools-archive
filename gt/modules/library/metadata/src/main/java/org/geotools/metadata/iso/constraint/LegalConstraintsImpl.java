@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,7 @@
  */
 package org.geotools.metadata.iso.constraint;
 
-// J2SE direct dependencies
 import java.util.Collection;
-import java.util.Collections;
-
-// OpenGIS dependencies
 import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.constraint.LegalConstraints;
 import org.opengis.util.InternationalString;
@@ -49,13 +45,13 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    private Collection accessConstraints;
+    private Collection<Restriction> accessConstraints;
 
     /**
      * Constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    private Collection useConstraints;
+    private Collection<Restriction> useConstraints;
 
     /**
      * Other restrictions and legal prerequisites for accessing and using the resource.
@@ -63,7 +59,7 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    private Collection/*<InternationalString>*/ otherConstraints;
+    private Collection<InternationalString> otherConstraints;
 
     /**
      * Constructs an initially empty constraints.
@@ -84,7 +80,7 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Returns the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    public synchronized Collection getAccessConstraints() {
+    public synchronized Collection<Restriction> getAccessConstraints() {
         return accessConstraints = nonNullCollection(accessConstraints, Restriction.class);
     }
 
@@ -92,7 +88,9 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Set the access constraints applied to assure the protection of privacy or intellectual property,
      * and any special restrictions or limitations on obtaining the resource.
      */
-    public synchronized void setAccessConstraints(final Collection newValues) {
+    public synchronized void setAccessConstraints(
+            final Collection<? extends Restriction> newValues)
+    {
         accessConstraints = copyCollection(newValues, accessConstraints, Restriction.class);
     }
 
@@ -100,7 +98,7 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Returns the constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    public synchronized Collection getUseConstraints() {
+    public synchronized Collection<Restriction> getUseConstraints() {
         return useConstraints = nonNullCollection(useConstraints, Restriction.class);
     }
 
@@ -108,7 +106,9 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * Set the constraints applied to assure the protection of privacy or intellectual property, and any
      * special restrictions or limitations or warnings on using the resource.
      */
-    public synchronized void setUseConstraints(final Collection newValues) {
+    public synchronized void setUseConstraints(
+            final Collection<? extends Restriction> newValues)
+    {
         useConstraints = copyCollection(newValues, useConstraints, Restriction.class);
     }
 
@@ -118,14 +118,16 @@ public class LegalConstraintsImpl extends ConstraintsImpl implements LegalConstr
      * access constraints} or {@linkplain #getUseConstraints use constraints} declares
      * {@linkplain Restriction#OTHER_RESTRICTIONS other restrictions}.
      */
-    public synchronized Collection getOtherConstraints() {
+    public synchronized Collection<InternationalString> getOtherConstraints() {
         return otherConstraints = nonNullCollection(otherConstraints, InternationalString.class);
     }
 
     /**
      * Set the other restrictions and legal prerequisites for accessing and using the resource.
      */
-    public synchronized void setOtherConstraints(final Collection/*<InternationalString>*/ newValues) {
+    public synchronized void setOtherConstraints(
+            final Collection<? extends InternationalString> newValues)
+    {
         otherConstraints = copyCollection(newValues, otherConstraints, InternationalString.class);
-    }   
+    }
 }

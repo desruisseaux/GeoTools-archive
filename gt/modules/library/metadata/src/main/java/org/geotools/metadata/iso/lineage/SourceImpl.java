@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,7 @@
  */
 package org.geotools.metadata.iso.lineage;
 
-// J2SE direct dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.identification.RepresentativeFraction;
@@ -30,8 +27,6 @@ import org.opengis.metadata.lineage.Source;
 import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.metadata.iso.identification.RepresentativeFractionImpl;
 
@@ -75,12 +70,12 @@ public class SourceImpl extends MetadataEntity implements Source {
     /**
      * Information about the spatial, vertical and temporal extent of the source data.
      */
-    private Collection sourceExtents;
+    private Collection<Extent> sourceExtents;
 
     /**
      * Information about an event in the creation process for the source data.
      */
-    private Collection sourceSteps;
+    private Collection<ProcessStep> sourceSteps;
 
     /**
      * Creates an initially empty source.
@@ -179,28 +174,28 @@ public class SourceImpl extends MetadataEntity implements Source {
      * Returns tiInformation about the spatial, vertical and temporal extent
      * of the source data.
      */
-    public synchronized Collection getSourceExtents()  {
+    public synchronized Collection<Extent> getSourceExtents()  {
         return sourceExtents = nonNullCollection(sourceExtents, Extent.class);
     }
 
     /**
      * Information about the spatial, vertical and temporal extent of the source data.
      */
-    public synchronized void setSourceExtents(final Collection newValues) {
+    public synchronized void setSourceExtents(final Collection<? extends Extent> newValues) {
         sourceExtents = copyCollection(newValues, sourceExtents, Extent.class);
     }
 
     /**
      * Returns information about an event in the creation process for the source data.
      */
-    public synchronized Collection getSourceSteps() {
+    public synchronized Collection<ProcessStep> getSourceSteps() {
         return sourceSteps = nonNullCollection(sourceSteps, ProcessStep.class);
     }
 
     /**
      * Set information about an event in the creation process for the source data.
      */
-    public synchronized void setSourceSteps(final Collection newValues) {
+    public synchronized void setSourceSteps(final Collection<? extends ProcessStep> newValues) {
         sourceSteps = copyCollection(newValues, sourceSteps, ProcessStep.class);
     }
 }

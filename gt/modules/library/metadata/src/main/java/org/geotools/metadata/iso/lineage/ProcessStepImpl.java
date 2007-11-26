@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,14 @@
  */
 package org.geotools.metadata.iso.lineage;
 
-// J2SE direct dependencies
 import java.util.Collection;
 import java.util.Date;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.lineage.Source;
 import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -48,7 +45,7 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 4629429337326490722L;
-    
+
     /**
      * Description of the event, including related parameters or tolerances.
      */
@@ -70,12 +67,12 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
-    private Collection processors;
+    private Collection<ResponsibleParty> processors;
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    private Collection sources;
+    private Collection<Source> sources;
 
     /**
      * Creates an initially empty process step.
@@ -98,14 +95,14 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
     public ProcessStepImpl(final InternationalString description) {
         setDescription(description);
     }
-    
+
      /**
      * Returns the description of the event, including related parameters or tolerances.
      */
     public InternationalString getDescription() {
         return description;
     }
-    
+
     /**
      * Set the description of the event, including related parameters or tolerances.
      */
@@ -150,7 +147,7 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Returns the identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
-    public synchronized Collection getProcessors() {
+    public synchronized Collection<ResponsibleParty> getProcessors() {
         return processors = nonNullCollection(processors, ResponsibleParty.class);
     }
 
@@ -158,7 +155,7 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Identification of, and means of communication with, person(s) and
      * organization(s) associated with the process step.
      */
-    public synchronized void setProcessors(final Collection newValues) {
+    public synchronized void setProcessors(final Collection<? extends ResponsibleParty> newValues) {
         processors = copyCollection(newValues, processors, ResponsibleParty.class);
     }
 
@@ -166,14 +163,14 @@ public class ProcessStepImpl extends MetadataEntity implements ProcessStep {
      * Returns the information about the source data used in creating the data specified
      * by the scope.
      */
-    public synchronized Collection getSources() {
+    public synchronized Collection<Source> getSources() {
         return sources = nonNullCollection(sources, Source.class);
     }
 
     /**
      * Information about the source data used in creating the data specified by the scope.
      */
-    public synchronized void setSources(final Collection newValues) {
+    public synchronized void setSources(final Collection<? extends Source> newValues) {
         sources = copyCollection(newValues, sources, Source.class);
     }
 }

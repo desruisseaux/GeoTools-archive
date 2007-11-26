@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,15 @@
  */
 package org.geotools.metadata.iso.identification;
 
-// J2SE direct dependencies
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
 import java.nio.charset.Charset;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.extent.GeographicDescription;
 import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.Resolution;
 import org.opengis.metadata.identification.TopicCategory;
@@ -56,28 +54,28 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Method used to spatially represent geographic information.
      */
-    private Collection spatialRepresentationTypes;
+    private Collection<SpatialRepresentationType> spatialRepresentationTypes;
 
     /**
      * Factor which provides a general understanding of the density of spatial data
      * in the dataset.
      */
-    private Collection spatialResolutions;
+    private Collection<Resolution> spatialResolutions;
 
     /**
      * Language(s) used within the dataset.
      */
-    private Collection language;
+    private Collection<Locale> language;
 
     /**
      * Full name of the character coding standard used for the dataset.
      */
-    private Collection/*<CharacterSet>*/ characterSets;
+    private Collection<CharacterSet> characterSets;
 
     /**
      * Main theme(s) of the datset.
      */
-    private Collection topicCategories;
+    private Collection<TopicCategory> topicCategories;
 
     /**
      * Minimum bounding rectangle within which data is available.
@@ -86,7 +84,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated not in ISO 19115:2003
      */
-    private Collection geographicBox;
+    private Collection<GeographicBoundingBox> geographicBox;
 
     /**
      * Description of the geographic area within which data is available.
@@ -95,7 +93,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated not in ISO 19115:2003
      */
-    private Collection geographicDescription;
+    private Collection<GeographicDescription> geographicDescription;
 
     /**
      * Description of the dataset in the producers processing environment, including items
@@ -107,7 +105,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Additional extent information including the bounding polygon, vertical, and temporal
      * extent of the dataset.
      */
-    private Collection extent;
+    private Collection<Extent> extent;
 
     /**
      * Any other descriptive information about the dataset.
@@ -132,20 +130,20 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Creates a data identification initialized to the specified values.
      */
-    public DataIdentificationImpl(final Citation citation, 
-                                  final InternationalString abstracts, 
-                                  final Collection language, 
-                                  final Collection topicCategories)
+    public DataIdentificationImpl(final Citation citation,
+                                  final InternationalString abstracts,
+                                  final Collection<? extends Locale> language,
+                                  final Collection<? extends TopicCategory> topicCategories)
     {
         super(citation, abstracts);
         setLanguage       (language       );
         setTopicCategories(topicCategories);
     }
-    
+
     /**
      * Method used to spatially represent geographic information.
      */
-    public synchronized Collection getSpatialRepresentationTypes() {
+    public synchronized Collection<SpatialRepresentationType> getSpatialRepresentationTypes() {
         return spatialRepresentationTypes = nonNullCollection(spatialRepresentationTypes,
                                                               SpatialRepresentationType.class);
     }
@@ -153,7 +151,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Set the method used to spatially represent geographic information.
      */
-    public synchronized void setSpatialRepresentationTypes(final Collection newValues) {
+    public synchronized void setSpatialRepresentationTypes(
+            final Collection<? extends SpatialRepresentationType> newValues)
+    {
         spatialRepresentationTypes = copyCollection(newValues, spatialRepresentationTypes,
                                                     SpatialRepresentationType.class);
     }
@@ -162,7 +162,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Factor which provides a general understanding of the density of spatial data
      * in the dataset.
      */
-    public synchronized Collection getSpatialResolutions() {
+    public synchronized Collection<Resolution> getSpatialResolutions() {
         return spatialResolutions = nonNullCollection(spatialResolutions, Resolution.class);
     }
 
@@ -170,21 +170,23 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Set the factor which provides a general understanding of the density of spatial data
      * in the dataset.
      */
-    public synchronized void setSpatialResolutions(final Collection newValues)  {
+    public synchronized void setSpatialResolutions(
+            final Collection<? extends Resolution> newValues)
+    {
         spatialResolutions = copyCollection(newValues, spatialResolutions, Resolution.class);
     }
 
     /**
      * Language(s) used within the dataset.
      */
-    public synchronized Collection getLanguage() {
+    public synchronized Collection<Locale> getLanguage() {
         return language = nonNullCollection(language, Locale.class);
     }
 
     /**
      * Set the language(s) used within the dataset.
      */
-    public synchronized void setLanguage(final Collection newValues)  {
+    public synchronized void setLanguage(final Collection<? extends Locale> newValues)  {
         language = copyCollection(newValues, language, Locale.class);
     }
 
@@ -194,14 +196,14 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * @deprecated Use {@link #getCharacterSets} instead.
      */
     public Charset getCharacterSet() {
-        final Collection characterSet = getCharacterSets();
-        return characterSet.isEmpty() ? null : ((CharacterSet) characterSet.iterator().next()).toCharset();
+        final Collection<CharacterSet> characterSet = getCharacterSets();
+        return characterSet.isEmpty() ? null : characterSet.iterator().next().toCharset();
     }
 
     /**
      * Full name of the character coding standard used for the dataset.
      */
-    public synchronized Collection getCharacterSets() {
+    public synchronized Collection<CharacterSet> getCharacterSets() {
         return characterSets = nonNullCollection(characterSets, CharacterSet.class);
     }
 
@@ -217,24 +219,26 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     /**
      * Set the full name of the character coding standard used for the dataset.
      */
-    public synchronized void setCharacterSets(final Collection/*<CharacterSet>*/ newValues) {
+    public synchronized void setCharacterSets(final Collection<? extends CharacterSet> newValues) {
         characterSets = copyCollection(newValues, characterSets, CharacterSet.class);
     }
-    
+
     /**
      * Main theme(s) of the datset.
      */
-    public synchronized Collection getTopicCategories()  {
+    public synchronized Collection<TopicCategory> getTopicCategories()  {
         return topicCategories = nonNullCollection(topicCategories, TopicCategory.class);
     }
 
     /**
      * Set the main theme(s) of the datset.
      */
-    public synchronized void setTopicCategories(final Collection newValues)  {
+    public synchronized void setTopicCategories(
+            final Collection<? extends TopicCategory> newValues)
+    {
         topicCategories = copyCollection(newValues, topicCategories, TopicCategory.class);
     }
-    
+
     /**
      * Minimum bounding rectangle within which data is available.
      * Only one of {@code getGeographicBox()} and {@link #getGeographicDescription()}
@@ -242,7 +246,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated not in ISO 19115:2003
      */
-    public synchronized Collection getGeographicBox() {
+    public synchronized Collection<GeographicBoundingBox> getGeographicBox() {
         return geographicBox = nonNullCollection(geographicBox, GeographicBoundingBox.class);
     }
 
@@ -251,7 +255,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated not in ISO 19115:2003
      */
-    public synchronized void setGeographicBox(final Collection newValues)  {
+    public synchronized void setGeographicBox(
+            final Collection<? extends GeographicBoundingBox> newValues)
+    {
         geographicBox = copyCollection(newValues, geographicBox, GeographicBoundingBox.class);
     }
 
@@ -262,9 +268,9 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated not in ISO 19115:2003
      */
-    public synchronized Collection getGeographicDescription() {
+    public synchronized Collection<GeographicDescription> getGeographicDescription() {
         return geographicDescription = nonNullCollection(geographicDescription,
-                                                         InternationalString.class);
+                                                         GeographicDescription.class);
     }
 
     /**
@@ -272,9 +278,11 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      *
      * @deprecated not in ISO 19115:2003
      */
-    public synchronized void setGeographicDescription(final Collection newValues)  {
+    public synchronized void setGeographicDescription(
+            final Collection<? extends GeographicDescription> newValues)
+    {
         geographicDescription = copyCollection(newValues, geographicDescription,
-                                               InternationalString.class);
+                                               GeographicDescription.class);
     }
 
     /**
@@ -297,14 +305,14 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
      * Additional extent information including the bounding polygon, vertical, and temporal
      * extent of the dataset.
      */
-    public synchronized Collection getExtent() {
+    public synchronized Collection<Extent> getExtent() {
         return extent = nonNullCollection(extent, Extent.class);
     }
 
     /**
      * Set additional extent information.
      */
-    public synchronized void setExtent(final Collection newValues)  {
+    public synchronized void setExtent(final Collection<? extends Extent> newValues) {
         extent = copyCollection(newValues, extent, Extent.class);
     }
 

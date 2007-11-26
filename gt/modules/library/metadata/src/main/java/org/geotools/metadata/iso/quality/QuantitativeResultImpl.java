@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,14 @@
  */
 package org.geotools.metadata.iso.quality;
 
-// J2SE dependencies and extension
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.quality.QuantitativeResult;
 import org.opengis.util.InternationalString;
+import org.opengis.util.Record;
 import org.opengis.util.RecordType;
-
-// Geotools dependencies
 import org.geotools.util.CheckedArrayList;
 
 
@@ -49,11 +45,11 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      * Serial number for compatibility with different versions.
      */
     private static final long serialVersionUID = 1230713599561236060L;
-    
+
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
-     */    
-    private Collection/*<Double>*/ values;
+     */
+    private Collection<Record> values;
 
     /**
      * Value type for reporting a data quality result, or {@code null} if none.
@@ -91,16 +87,16 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     public QuantitativeResultImpl(final double[] values) {
         setValues(values);
     }
-    
+
     /**
      * Quantitative value or values, content determined by the evaluation procedure used.
      */
-    public synchronized Collection getValues() {
+    public synchronized Collection<Record> getValues() {
         if (values == null) {
             if (isModifiable()) {
-                values = new CheckedArrayList(Double.class);
+                values = new CheckedArrayList<Record>(Record.class);
             } else {
-                values = Collections.EMPTY_LIST;
+                values = Collections.emptyList();
             }
         }
         return values;
@@ -114,10 +110,51 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
         if (newValues == null) {
             values = null;
         } else {
-            values = new CheckedArrayList(Double.class, newValues.length);
+            values = new CheckedArrayList<Record>(Record.class, newValues.length);
             for (int i=0; i<newValues.length; i++) {
-                values.add(Double.valueOf(newValues[i]));
+                values.add(new SimpleRecord(newValues[i]));
             }
+        }
+    }
+
+    /**
+     * Temporary record implementation will we wait for a real one.
+     *
+     * @deprecated To be replaced by a better implementation as soon as we can.
+     */
+    private static final class SimpleRecord implements Record, java.io.Serializable {
+        private final java.util.Map<org.opengis.util.MemberName, Object> map;
+
+        public SimpleRecord(final double value) {
+            map = java.util.Collections.singletonMap((org.opengis.util.MemberName) null, (Object) value);
+        }
+        public RecordType getRecordType() {
+            throw new UnsupportedOperationException();
+        }
+
+        public java.util.Map<org.opengis.util.MemberName, Object> getAttributes() {
+            return map;
+        }
+
+        public Object locate(org.opengis.util.MemberName name) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void set(org.opengis.util.MemberName name, Object value) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            if (other instanceof SimpleRecord) {
+                return map.equals(((SimpleRecord) other).map);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return map.hashCode();
         }
     }
 
@@ -126,10 +163,10 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
      *
      * @since 2.4
      */
-    public synchronized void setValues(final Collection/*<Double>*/ newValues) {
-        values = copyCollection(newValues, values, Double.class);
+    public synchronized void setValues(final Collection<Record> newValues) {
+        values = copyCollection(newValues, values, Record.class);
     }
-    
+
     /**
      * Value type for reporting a data quality result, or {@code null} if none.
      */
@@ -144,7 +181,7 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
         checkWritePermission();
         valueType = newValue;
     }
-    
+
     /**
      * Value unit for reporting a data quality result, or {@code null} if none.
      */
@@ -173,5 +210,5 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     public synchronized void setErrorStatistic(final InternationalString newValue) {
         checkWritePermission();
         errorStatistic = newValue;
-    } 
+    }
 }

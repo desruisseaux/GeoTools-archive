@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,19 +19,16 @@
  */
 package org.geotools.metadata.iso.extent;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -185,7 +182,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         setSouthBoundLatitude(southBoundLatitude);
         setNorthBoundLatitude(northBoundLatitude);
     }
-    
+
     /**
      * Returns the western-most coordinate of the limit of the
      * dataset extent. The value is expressed in longitude in
@@ -196,7 +193,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     public double getWestBoundLongitude() {
         return westBoundLongitude;
     }
-    
+
     /**
      * Set the western-most coordinate of the limit of the
      * dataset extent. The value is expressed in longitude in
@@ -313,6 +310,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     /**
      * Compares this geographic bounding box with the specified object for equality.
      */
+    @Override
     public synchronized boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -338,6 +336,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      *
      * @todo Consider relying on the default implementation, since it cache the hash code.
      */
+    @Override
     public synchronized int hashCode() {
         if (!getClass().equals(GeographicBoundingBoxImpl.class)) {
             return super.hashCode();
@@ -362,6 +361,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     /**
      * Returns a string representation of this extent using a default angle pattern.
      */
+    @Override
     public String toString() {
         return toString(this, "DD°MM'SS.s\"", null);
     }
@@ -396,15 +396,12 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Returns a helper method which depends on the referencing module. We use reflection
      * since we can't have a direct dependency to this module.
      */
-    private static Method getMethod(final String name, final Class[] arguments) {
+    private static Method getMethod(final String name, final Class<?>[] arguments) {
         try {
             return Class.forName("org.geotools.resources.BoundingBoxes").getMethod(name, arguments);
         } catch (ClassNotFoundException exception) {
-            // Simplify when we will be allowed to compile for J2SE 1.5.
-            UnsupportedOperationException e = new UnsupportedOperationException(Errors.format(
-                    ErrorKeys.MISSING_MODULE_$1, "referencing"));
-            e.initCause(exception);
-            throw e;
+            throw new UnsupportedOperationException(Errors.format(
+                    ErrorKeys.MISSING_MODULE_$1, "referencing"), exception);
         } catch (NoSuchMethodException exception) {
             // Should never happen if we didn't broke our BoundingBoxes helper class.
             throw new AssertionError(exception);

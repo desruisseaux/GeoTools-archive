@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,7 @@
  */
 package org.geotools.metadata.iso.spatial;
 
-// J2SE direct dependencies
-import java.util.Collections;
 import java.util.List;
-
-// OpenGIS dependencies
 import org.opengis.metadata.spatial.Dimension;
 import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.GridSpatialRepresentation;
@@ -55,7 +51,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
     /**
      * Information about spatial-temporal axis properties.
      */
-    private List axisDimensionsProperties;
+    private List<Dimension> axisDimensionsProperties;
 
     /**
      * Identification of grid data as point or cell.
@@ -89,7 +85,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
      * match exactly the types expected by getters and setters.
      */
     public GridSpatialRepresentationImpl(final int numberOfDimensions,
-                                         final List axisDimensionsProperties,
+                                         final List<? extends Dimension> axisDimensionsProperties,
                                          final CellGeometry cellGeometry,
                                          final boolean transformationParameterAvailable)
     {
@@ -117,16 +113,16 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
     /**
      * Information about spatial-temporal axis properties.
      */
-    public synchronized List getAxisDimensionsProperties() {
+    public synchronized List<Dimension> getAxisDimensionsProperties() {
         return axisDimensionsProperties = nonNullList(axisDimensionsProperties, Dimension.class);
     }
 
     /**
      * Set information about spatial-temporal axis properties.
      */
-    public synchronized void setAxisDimensionsProperties(final List newValues) {
+    public synchronized void setAxisDimensionsProperties(final List<? extends Dimension> newValues) {
         checkWritePermission();
-        axisDimensionsProperties = (List)
+        axisDimensionsProperties = (List<Dimension>)
                 copyCollection(newValues, axisDimensionsProperties, Dimension.class);
     }
 
@@ -134,7 +130,7 @@ public class GridSpatialRepresentationImpl extends SpatialRepresentationImpl
      * Identification of grid data as point or cell.
      */
     public CellGeometry getCellGeometry() {
-        return cellGeometry;        
+        return cellGeometry;
     }
 
     /**

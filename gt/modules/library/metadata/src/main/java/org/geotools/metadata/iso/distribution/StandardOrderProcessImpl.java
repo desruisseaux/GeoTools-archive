@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -18,15 +18,10 @@
  *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.metadata.iso.distribution;
- 
-// J2SE direct dependencies and extensions
-import java.util.Date;
 
-// OpenGIS dependencies
+import java.util.Date;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.distribution.StandardOrderProcess;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -46,7 +41,7 @@ public class StandardOrderProcessImpl extends MetadataEntity implements Standard
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -6503378937452728631L;
-    
+
     /**
      * Fees and terms for retrieving the resource.
      * Include monetary units (as specified in ISO 4217).

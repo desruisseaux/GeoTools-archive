@@ -22,15 +22,10 @@
  */
 package org.geotools.metadata.iso.constraint;
 
-// J2SE direct dependencies
 import java.util.Collection;
-import java.util.Iterator;
 
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.constraint.Constraints;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -49,12 +44,12 @@ public class ConstraintsImpl extends MetadataEntity implements Constraints {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 7197823876215294777L;
-    
+
     /**
      * Limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    private Collection useLimitation;
+    private Collection<InternationalString> useLimitation;
 
     /**
      * Constructs an initially empty constraints.
@@ -75,7 +70,7 @@ public class ConstraintsImpl extends MetadataEntity implements Constraints {
      * Returns the limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    public synchronized Collection getUseLimitation() {
+    public synchronized Collection<InternationalString> getUseLimitation() {
         return useLimitation = nonNullCollection(useLimitation, InternationalString.class);
     }
 
@@ -83,7 +78,9 @@ public class ConstraintsImpl extends MetadataEntity implements Constraints {
      * Set the limitation affecting the fitness for use of the resource. Example, "not to be used for
      * navigation".
      */
-    public synchronized void setUseLimitation(final Collection newValues) {
+    public synchronized void setUseLimitation(
+            final Collection<? extends InternationalString> newValues)
+    {
         useLimitation = copyCollection(newValues, useLimitation, InternationalString.class);
     }
 }

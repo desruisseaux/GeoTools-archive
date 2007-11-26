@@ -26,7 +26,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>gt2-coverageio</artifactId>
   <packaging>jar</packaging>
-  <name>Base classes for coverage I/O</name>
+  <name>Coverage I/O base classes</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/coverageio/</url>
 
   <scm>

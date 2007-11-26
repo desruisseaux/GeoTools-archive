@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,12 @@
  */
 package org.geotools.metadata.iso.distribution;
 
-// J2SE direct dependencies and extensions
 import java.util.Collection;
 import javax.units.Unit;
-
-// OpenGIS dependencies
 import org.opengis.metadata.distribution.Medium;
 import org.opengis.metadata.distribution.MediumFormat;
 import org.opengis.metadata.distribution.MediumName;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -48,7 +43,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -2838122926367921673L;
-    
+
     /**
      * Name of the medium on which the resource can be received.
      */
@@ -59,7 +54,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
      * Returns {@code null} if unknown.
      * If non-null, then the number should be greater than zero.
      */
-    private Collection densities;
+    private Collection<Double> densities;
 
     /**
      * Units of measure for the recording density.
@@ -75,13 +70,13 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Methods used to write to the medium.
      */
-    private Collection/*<MediumFormat>*/ mediumFormats;
+    private Collection<MediumFormat> mediumFormats;
 
     /**
      * Description of other limitations or requirements for using the medium.
      */
     private InternationalString mediumNote;
-    
+
     /**
      * Constructs an initially empty medium.
      */
@@ -147,14 +142,14 @@ public class MediumImpl extends MetadataEntity implements Medium {
     /**
      * Returns the method used to write to the medium.
      */
-    public synchronized Collection/*<MediumFormat>*/ getMediumFormats() {
+    public synchronized Collection<MediumFormat> getMediumFormats() {
         return mediumFormats = nonNullCollection(mediumFormats, MediumFormat.class);
     }
 
     /**
      * Set the method used to write to the medium.
      */
-    public synchronized void setMediumFormats(final Collection/*<MediumFormat>*/ newValues) {
+    public synchronized void setMediumFormats(final Collection<? extends MediumFormat> newValues) {
         mediumFormats = copyCollection(newValues, mediumFormats, MediumFormat.class);
     }
 
@@ -164,7 +159,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
     public InternationalString getMediumNote() {
         return mediumNote;
     }
-    
+
     /**
      * Set a description of other limitations or requirements for using the medium.
      */
@@ -172,20 +167,20 @@ public class MediumImpl extends MetadataEntity implements Medium {
         checkWritePermission();
         mediumNote = newValue;
     }
-    
+
     /**
      * Returns the density at which the data is recorded.
      * The numbers should be greater than zero.
      */
-    public synchronized Collection getDensities() {
-        return densities = nonNullCollection(densities, Number.class);
+    public synchronized Collection<Double> getDensities() {
+        return densities = nonNullCollection(densities, Double.class);
     }
 
     /**
      * Set density at which the data is recorded.
      * The numbers should be greater than zero.
      */
-    public synchronized void setDensities(final Collection newValues) {
-        densities = copyCollection(newValues, densities, Number.class);
+    public synchronized void setDensities(final Collection<? extends Double> newValues) {
+        densities = copyCollection(newValues, densities, Double.class);
     }
 }

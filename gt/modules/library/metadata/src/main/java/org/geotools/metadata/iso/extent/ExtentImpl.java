@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,11 +19,7 @@
  */
 package org.geotools.metadata.iso.extent;
 
-// J2SE dependencies
-import java.util.Iterator;
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicExtent;
@@ -31,8 +27,6 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.TemporalExtent;
 import org.opengis.metadata.extent.VerticalExtent;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -79,17 +73,17 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Provides geographic component of the extent of the referring object
      */
-    private Collection/*<GeographicExtent>*/ geographicElements;
+    private Collection<GeographicExtent> geographicElements;
 
     /**
      * Provides temporal component of the extent of the referring object
      */
-    private Collection/*<TemporalExtent>*/ temporalElements;
+    private Collection<TemporalExtent> temporalElements;
 
     /**
      * Provides vertical component of the extent of the referring object
      */
-    private Collection/*<VerticalExtent>*/ verticalElements;
+    private Collection<VerticalExtent> verticalElements;
 
     /**
      * Constructs an initially empty extent.
@@ -124,42 +118,48 @@ public class ExtentImpl extends MetadataEntity implements Extent {
     /**
      * Provides geographic component of the extent of the referring object
      */
-    public synchronized Collection/*<GeographicExtent>*/ getGeographicElements() {
+    public synchronized Collection<GeographicExtent> getGeographicElements() {
         return geographicElements = nonNullCollection(geographicElements, GeographicExtent.class);
     }
 
     /**
      * Set geographic component of the extent of the referring object
      */
-    public synchronized void setGeographicElements(final Collection/*<GeographicExtent>*/ newValues) {
+    public synchronized void setGeographicElements(
+            final Collection<? extends GeographicExtent> newValues)
+    {
         geographicElements = copyCollection(newValues, geographicElements, GeographicExtent.class);
     }
 
     /**
      * Provides temporal component of the extent of the referring object
      */
-    public synchronized Collection/*<TemporalExtent>*/ getTemporalElements() {
+    public synchronized Collection<TemporalExtent> getTemporalElements() {
         return temporalElements = nonNullCollection(temporalElements, TemporalExtent.class);
     }
 
     /**
      * Set temporal component of the extent of the referring object
      */
-    public synchronized void setTemporalElements(final Collection/*<TemporalExtent>*/ newValues) {
+    public synchronized void setTemporalElements(
+            final Collection<? extends TemporalExtent> newValues)
+    {
         temporalElements = copyCollection(newValues, temporalElements, TemporalExtent.class);
     }
 
     /**
      * Provides vertical component of the extent of the referring object
      */
-    public synchronized Collection/*<VerticalExtent>*/ getVerticalElements() {
+    public synchronized Collection<VerticalExtent> getVerticalElements() {
         return verticalElements = nonNullCollection(verticalElements, VerticalExtent.class);
     }
 
     /**
      * Set vertical component of the extent of the referring object
      */
-    public synchronized void setVerticalElements(final Collection/*<VerticalExtent>*/ newValues) {
+    public synchronized void setVerticalElements(
+            final Collection<? extends VerticalExtent> newValues)
+    {
         verticalElements = copyCollection(newValues, verticalElements, VerticalExtent.class);
     }
 
@@ -174,8 +174,7 @@ public class ExtentImpl extends MetadataEntity implements Extent {
         GeographicBoundingBox candidate = null;
         if (extent != null) {
             GeographicBoundingBoxImpl modifiable = null;
-            for (final Iterator it=extent.getGeographicElements().iterator(); it.hasNext();) {
-                final GeographicExtent element = (GeographicExtent) it.next();
+            for (final GeographicExtent element : extent.getGeographicElements()) {
                 final GeographicBoundingBox bounds;
                 if (element instanceof GeographicBoundingBox) {
                     bounds = (GeographicBoundingBox) element;

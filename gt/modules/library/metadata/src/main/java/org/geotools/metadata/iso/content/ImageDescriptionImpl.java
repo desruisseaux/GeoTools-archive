@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.metadata.iso.content;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.content.ImageDescription;
 import org.opengis.metadata.content.ImagingCondition;
@@ -40,70 +39,70 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -6168624828802439062L;
-    
+
     /**
      * Illumination elevation measured in degrees clockwise from the target plane at
      * intersection of the optical line of sight with the Earths surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     private Double illuminationElevationAngle;
-    
+
     /**
      * Illumination azimuth measured in degrees clockwise from true north at the time the
      * image is taken. For images from a scanning device, refer to the centre pixel of the image.
      */
     private Double illuminationAzimuthAngle;
-    
+
     /**
      * Conditions affected the image.
      */
     private ImagingCondition imagingCondition;
-    
+
     /**
      * Specifies the image quality.
      */
     private Identifier imageQualityCode;
-    
+
     /**
      * Area of the dataset obscured by clouds, expressed as a percentage of the spatial extent.
      */
     private Double cloudCoverPercentage;
-    
+
     /**
      * Image distributors code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     private Identifier processingLevelCode;
-    
+
     /**
      * Count of the number the number of lossy compression cycles performed on the image.
      * {@code null} if the information is not provided.
      */
     private Integer compressionGenerationQuantity;
-    
+
     /**
      * Indication of whether or not triangulation has been performed upon the image.
      * {@code null} if the information is not provided.
      */
     private Boolean triangulationIndicator;
-    
+
     /**
      * Indication of whether or not the radiometric calibration information for generating the
      * radiometrically calibrated standard data product is available.
      */
     private Boolean radiometricCalibrationDataAvailable;
-    
+
     /**
      * Indication of whether or not constants are available which allow for camera calibration
      * corrections.
      */
     private Boolean cameraCalibrationInformationAvailable;
-    
+
     /**
      * Indication of whether or not Calibration Reseau information is available.
      */
     private Boolean filmDistortionInformationAvailable;
-    
+
     /**
      * Indication of whether or not lens aberration correction information is available.
      */

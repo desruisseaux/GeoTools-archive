@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,12 @@
  */
 package org.geotools.metadata.iso.distribution;
 
-// J2SE direct dependencies
 import java.util.Collection;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distributor;
 import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.distribution.StandardOrderProcess;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -58,18 +53,18 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
      * Provides information about how the resource may be obtained, and related
      * instructions and fee information.
      */
-    private Collection distributionOrderProcesses;
+    private Collection<StandardOrderProcess> distributionOrderProcesses;
 
     /**
      * Provides information about the format used by the distributor.
      */
-    private Collection distributorFormats;
+    private Collection<Format> distributorFormats;
 
     /**
      * Provides information about the technical means and media used by the distributor.
      */
-    private Collection distributorTransferOptions;
-    
+    private Collection<DigitalTransferOptions> distributorTransferOptions;
+
     /**
      * Constructs an initially empty distributor.
      */
@@ -111,7 +106,7 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
      * Provides information about how the resource may be obtained, and related
      * instructions and fee information.
      */
-    public synchronized Collection getDistributionOrderProcesses() {
+    public synchronized Collection<StandardOrderProcess> getDistributionOrderProcesses() {
         return distributionOrderProcesses = nonNullCollection(distributionOrderProcesses,
                                                               StandardOrderProcess.class);
     }
@@ -120,7 +115,9 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
      * Set information about how the resource may be obtained, and related
      * instructions and fee information.
      */
-    public synchronized void setDistributionOrderProcesses(final Collection newValues) {
+    public synchronized void setDistributionOrderProcesses(
+            final Collection<? extends StandardOrderProcess> newValues)
+    {
         distributionOrderProcesses = copyCollection(newValues, distributionOrderProcesses,
                                                     StandardOrderProcess.class);
     }
@@ -128,29 +125,31 @@ public class DistributorImpl extends MetadataEntity implements Distributor {
     /**
      * Provides information about the format used by the distributor.
      */
-    public synchronized Collection getDistributorFormats() {
+    public synchronized Collection<Format> getDistributorFormats() {
         return distributorFormats = nonNullCollection(distributorFormats, Format.class);
     }
 
     /**
      * Set information about the format used by the distributor.
      */
-    public synchronized void setDistributorFormats(final Collection newValues) {
+    public synchronized void setDistributorFormats(final Collection<? extends Format> newValues) {
         distributorFormats = copyCollection(newValues, distributorFormats, Format.class);
     }
 
     /**
      * Provides information about the technical means and media used by the distributor.
      */
-    public synchronized Collection getDistributorTransferOptions() {
+    public synchronized Collection<DigitalTransferOptions> getDistributorTransferOptions() {
         return distributorTransferOptions = nonNullCollection(distributorTransferOptions,
                                                               DigitalTransferOptions.class);
     }
-    
+
     /**
      * Provides information about the technical means and media used by the distributor.
      */
-    public synchronized void setDistributorTransferOptions(final Collection newValues) {
+    public synchronized void setDistributorTransferOptions(
+            final Collection<? extends DigitalTransferOptions> newValues)
+    {
         distributorTransferOptions = copyCollection(newValues, distributorTransferOptions,
                                                     DigitalTransferOptions.class);
     }

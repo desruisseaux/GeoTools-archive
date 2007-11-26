@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,16 +16,14 @@
  *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
- */ 
+ */
 package org.geotools.metadata.iso.quality;
 
-// J2SE direct dependencies
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.Element;
@@ -33,7 +31,6 @@ import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.metadata.quality.Result;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -54,11 +51,11 @@ public class ElementImpl extends MetadataEntity implements Element {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -3542504624077298894L;
-    
+
     /**
      * Name of the test applied to the data.
      */
-    private Collection namesOfMeasure;
+    private Collection<InternationalString> namesOfMeasure;
 
     /**
      * Code identifying a registered standard procedure, or {@code null} if none.
@@ -97,7 +94,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      * come of evaluating the obtained value (or set of values) against a specified
      * acceptable conformance quality level.
      */
-    private Collection/*<Result>*/ results;
+    private Collection<Result> results;
 
     /**
      * Constructs an initially empty element.
@@ -120,18 +117,20 @@ public class ElementImpl extends MetadataEntity implements Element {
     public ElementImpl(final Result result) {
         setResults(Collections.singleton(result));
     }
-    
+
     /**
      * Returns the name of the test applied to the data.
      */
-    public synchronized Collection getNamesOfMeasure() {
+    public synchronized Collection<InternationalString> getNamesOfMeasure() {
         return namesOfMeasure = nonNullCollection(namesOfMeasure, InternationalString.class);
     }
 
     /**
      * Set the name of the test applied to the data.
      */
-    public synchronized void setNamesOfMeasure(final Collection newValues) {
+    public synchronized void setNamesOfMeasure(
+            final Collection<? extends InternationalString> newValues)
+    {
         namesOfMeasure = copyCollection(newValues, namesOfMeasure, InternationalString.class);
     }
 
@@ -235,9 +234,9 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @since 2.4
      */
-    public synchronized Collection/*<Date>*/ getDates() {
+    public synchronized Collection<Date> getDates() {
         if (date1 == Long.MIN_VALUE) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         if (date2 == Long.MIN_VALUE) {
             return Collections.singleton(new Date(date1));
@@ -253,6 +252,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @deprecated Use {@link #setDates(Collection)} instead.
      */
+    @SuppressWarnings("fallthrough")
     public synchronized void setDate(final Date[] newValue) {
         checkWritePermission();
         date1 = date2 = Long.MIN_VALUE;
@@ -273,8 +273,8 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @since 2.4
      */
-    public void setDates(final Collection/*<Date>*/ newValues) {
-        setDate((Date[]) newValues.toArray(new Date[newValues.size()]));
+    public void setDates(final Collection<Date> newValues) {
+        setDate(newValues.toArray(new Date[newValues.size()]));
     }
 
     /**
@@ -307,7 +307,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @since 2.4
      */
-    public synchronized Collection getResults() {
+    public synchronized Collection<Result> getResults() {
         return results = nonNullCollection(results, Result.class);
     }
 
@@ -318,7 +318,7 @@ public class ElementImpl extends MetadataEntity implements Element {
      *
      * @since 2.4
      */
-    public synchronized void setResults(final Collection/*<Result>*/ newValues) {
+    public synchronized void setResults(final Collection<? extends Result> newValues) {
         results = copyCollection(newValues, results, Result.class);
     }
 }

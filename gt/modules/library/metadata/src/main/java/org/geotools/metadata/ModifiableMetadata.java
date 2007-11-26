@@ -309,7 +309,7 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
     /**
      * Copies the content of one collection ({@code source}) into an other ({@code target}).
      * If the target collection is {@code null}, or if its type ({@link List} vs {@link Set})
-     * doesn't matches the type of the source collection, a new target collection is expected.
+     * doesn't matches the type of the source collection, a new target collection is created.
      * <p>
      * A call to {@link #checkWritePermission} is implicit before the copy is performed.
      *
@@ -368,6 +368,28 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
     protected final <E> Collection<E> nonNullCollection(final Collection<E> c,
                                                         final Class<E> elementType)
     {
+        assert Thread.holdsLock(this);
+        if (c != null) {
+            return c;
+        }
+        if (isModifiable()) {
+            return new CheckedHashSet<E>(elementType);
+        }
+        return Collections.emptySet();
+    }
+
+    /**
+     * Returns the specified set, or a new one if {@code c} is null.
+     * This is a convenience method for implementation of {@code getFoo()}
+     * methods.
+     *
+     * @param  c The set to checks.
+     * @param  elementType The element type (used only if {@code c} is null).
+     * @return {@code c}, or a new set if {@code c} is null.
+     *
+     * @since 2.5
+     */
+    protected final <E> Set<E> nonNullSet(final Set<E> c, final Class<E> elementType) {
         assert Thread.holdsLock(this);
         if (c != null) {
             return c;

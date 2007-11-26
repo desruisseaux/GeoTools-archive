@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,12 +19,10 @@
  */
 package org.geotools.metadata.iso.maintenance;
 
-// J2SE direct dependencies
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
@@ -32,8 +30,6 @@ import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.maintenance.ScopeDescription;
 import org.opengis.temporal.PeriodDuration;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -74,23 +70,23 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
     /**
      * Scope of data to which maintenance is applied.
      */
-    private Collection/*<ScopeCode>*/ updateScopes;
+    private Collection<ScopeCode> updateScopes;
 
     /**
      * Additional information about the range or extent of the resource.
      */
-    private Collection/*<ScopeDescription>*/ updateScopeDescriptions;
+    private Collection<ScopeDescription> updateScopeDescriptions;
 
     /**
      * Information regarding specific requirements for maintaining the resource.
      */
-    private Collection/*<InternationalString>*/ maintenanceNotes;
+    private Collection<InternationalString> maintenanceNotes;
 
     /**
      * Identification of, and means of communicating with,
      * person(s) and organization(s) with responsibility for maintaining the metadata
      */
-    private Collection/*<ResponsibleParty>*/ contacts;
+    private Collection<ResponsibleParty> contacts;
 
     /**
      * Creates a an initially empty maintenance information.
@@ -187,7 +183,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized Collection getUpdateScopes() {
+    public synchronized Collection<ScopeCode> getUpdateScopes() {
         return updateScopes = nonNullCollection(updateScopes, ScopeCode.class);
     }
 
@@ -196,7 +192,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized void setUpdateScopes(final Collection newValues) {
+    public synchronized void setUpdateScopes(final Collection<? extends ScopeCode> newValues) {
         updateScopes = copyCollection(newValues, updateScopes, ScopeCode.class);
     }
 
@@ -206,9 +202,8 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      * @deprecated Replaced by {@link #getUpdateScopeDescriptions}.
      */
     public ScopeDescription getUpdateScopeDescription() {
-        final Collection updateScopeDescriptions = getUpdateScopeDescriptions();
-        return updateScopeDescriptions.isEmpty() ? null :
-            (ScopeDescription) updateScopeDescriptions.iterator().next();
+        final Collection<ScopeDescription> updateScopeDescriptions = getUpdateScopeDescriptions();
+        return updateScopeDescriptions.isEmpty() ? null : updateScopeDescriptions.iterator().next();
     }
 
     /**
@@ -225,7 +220,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized Collection getUpdateScopeDescriptions() {
+    public synchronized Collection<ScopeDescription> getUpdateScopeDescriptions() {
         return updateScopeDescriptions = nonNullCollection(updateScopeDescriptions, ScopeDescription.class);
     }
 
@@ -234,7 +229,9 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized void setUpdateScopeDescriptions(final Collection newValues) {
+    public synchronized void setUpdateScopeDescriptions(
+            final Collection<? extends ScopeDescription> newValues)
+    {
         updateScopeDescriptions = copyCollection(newValues, updateScopeDescriptions, ScopeDescription.class);
     }
 
@@ -244,9 +241,8 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      * @deprecated Replaced by {@link #getMaintenanceNotes}.
      */
     public InternationalString getMaintenanceNote() {
-        final Collection maintenanceNotes = getMaintenanceNotes();
-        return maintenanceNotes.isEmpty() ? null :
-            (InternationalString) maintenanceNotes.iterator().next();
+        final Collection<InternationalString> maintenanceNotes = getMaintenanceNotes();
+        return maintenanceNotes.isEmpty() ? null : maintenanceNotes.iterator().next();
     }
 
     /**
@@ -263,7 +259,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized Collection getMaintenanceNotes() {
+    public synchronized Collection<InternationalString> getMaintenanceNotes() {
         return maintenanceNotes = nonNullCollection(maintenanceNotes, InternationalString.class);
     }
 
@@ -272,7 +268,9 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized void setMaintenanceNotes(final Collection newValues) {
+    public synchronized void setMaintenanceNotes(
+            final Collection<? extends InternationalString> newValues)
+    {
         maintenanceNotes = copyCollection(newValues, maintenanceNotes, InternationalString.class);
     }
 
@@ -282,7 +280,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized Collection getContacts() {
+    public synchronized Collection<ResponsibleParty> getContacts() {
         return contacts = nonNullCollection(contacts, ResponsibleParty.class);
     }
 
@@ -292,7 +290,7 @@ public class MaintenanceInformationImpl extends MetadataEntity implements Mainte
      *
      * @since 2.4
      */
-    public synchronized void setContacts(final Collection newValues) {
+    public synchronized void setContacts(final Collection<? extends ResponsibleParty> newValues) {
         contacts = copyCollection(newValues, contacts, ResponsibleParty.class);
     }
 }
