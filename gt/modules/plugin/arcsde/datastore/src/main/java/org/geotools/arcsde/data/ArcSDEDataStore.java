@@ -246,19 +246,45 @@ public class ArcSDEDataStore implements DataStore {
         assert query.getFilter() != null;
         assert transaction != null;
 
-        Filter filter = query.getFilter();
-        String typeName = query.getTypeName();
-        String propertyNames[] = query.getPropertyNames();
-
         ArcSDEPooledConnection connection;
-        if (Transaction.AUTO_COMMIT == transaction) {
-            connection = connectionPool.getConnection();
-        } else {
-            ArcTransactionState state = (ArcTransactionState) transaction.getState(connectionPool);
-            connection = state.getConnection();
+        {
+            if (Transaction.AUTO_COMMIT == transaction) {
+                connection = connectionPool.getConnection();
+            } else {
+                ArcTransactionState state = ArcTransactionState.getState(transaction,
+                        connectionPool);
+                connection = state.getConnection();
+            }
         }
 
-        SimpleFeatureType featureType = getSchema(typeName, connection);
+        FeatureReader reader = getFeatureReader(query, connection);
+        return reader;
+    }
+
+    /**
+     * Returns an {@link ArcSDEFeatureReader} for the given query that works
+     * against the given connection.
+     * <p>
+     * Explicitly stating the connection to use allows for the feature reader to
+     * fetch the differencies (additions/modifications/deletions) made while a
+     * transaction is in progress.
+     * </p>
+     * 
+     * @param query
+     * @param connection
+     * @return
+     * @throws IOException
+     */
+    private FeatureReader getFeatureReader(final Query query,
+            final ArcSDEPooledConnection connection) throws IOException {
+        final String typeName = query.getTypeName();
+        final String propertyNames[] = query.getPropertyNames();
+
+        final SimpleFeatureType completeSchema = getSchema(typeName, connection);
+        final ArcSDEQuery sdeQuery;
+
+        Filter filter = query.getFilter();
+        SimpleFeatureType featureType = completeSchema;
 
         if (propertyNames != null || query.getCoordinateSystem() != null) {
             try {
@@ -274,7 +300,25 @@ public class ArcSDEDataStore implements DataStore {
             return new EmptyFeatureReader(featureType);
         }
 
-        FeatureReader reader = getFeatureReader(query, connection);
+        if (isView(typeName)) {
+            SeQueryInfo definitionQuery = getViewQueryInfo(typeName);
+            PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, definitionQuery,
+                    viewSelectStatement);
+        } else {
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query);
+        }
+
+        sdeQuery.execute();
+
+        final ArcSDEAttributeReader attReader = new ArcSDEAttributeReader(sdeQuery, connection);
+        FeatureReader reader;
+        try {
+            reader = new ArcSDEFeatureReader(attReader);
+        } catch (SchemaException e) {
+            throw new RuntimeException("Schema missmatch, should never happen!: " + e.getMessage(),
+                    e);
+        }
 
         filter = getUnsupportedFilter(typeName, filter, connection);
         if (!filter.equals(Filter.INCLUDE)) {
@@ -290,33 +334,6 @@ public class ArcSDEDataStore implements DataStore {
             reader = new MaxFeatureReader(reader, query.getMaxFeatures());
         }
 
-        return reader;
-    }
-
-    private FeatureReader getFeatureReader(final Query query,
-            final ArcSDEPooledConnection connection) throws IOException {
-        final String typeName = query.getTypeName();
-        final SimpleFeatureType completeSchema = getSchema(typeName, connection);
-        final ArcSDEQuery sdeQuery;
-        if (isView(typeName)) {
-            SeQueryInfo definitionQuery = getViewQueryInfo(typeName);
-            PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, definitionQuery,
-                    viewSelectStatement);
-        } else {
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query);
-        }
-
-        sdeQuery.execute();
-
-        final ArcSDEAttributeReader attReader = new ArcSDEAttributeReader(sdeQuery);
-        ArcSDEFeatureReader reader;
-        try {
-            reader = new ArcSDEFeatureReader(attReader);
-        } catch (SchemaException e) {
-            throw new RuntimeException("Schema missmatch, should never happen!: " + e.getMessage(),
-                    e);
-        }
         return reader;
     }
 
@@ -358,18 +375,58 @@ public class ArcSDEDataStore implements DataStore {
         if (!canWrite(typeName)) {
             throw new DataSourceException("No write permissions over " + typeName);
         }
-        final SimpleFeatureType featureType = getSchema(typeName);
-        final DefaultQuery query = new DefaultQuery(typeName, filter);
-        final FeatureReader reader = getFeatureReader(query, transaction);
-
-        FeatureWriter writer;
-
-        if (Transaction.AUTO_COMMIT == transaction) {
-            writer = new AutoCommitFeatureWriter(featureType, reader, connectionPool);
-        } else {
-            writer = new TransactionFeatureWriter(featureType, reader, connectionPool, transaction);
+        // get the connection the streamed writer content has to work over
+        // so the reader and writer share it
+        final ArcSDEPooledConnection connection;
+        final ArcTransactionState state;
+        {
+            if (Transaction.AUTO_COMMIT == transaction) {
+                connection = connectionPool.getConnection();
+                state = null;
+            } else {
+                state = ArcTransactionState.getState(transaction, connectionPool);
+                connection = state.getConnection();
+            }
         }
-        return writer;
+
+        try {
+            final SimpleFeatureType featureType = getSchema(typeName, connection);
+            final DefaultQuery query = new DefaultQuery(typeName, filter);
+
+            // get a reader over the requested content. It'll be used to stream
+            // out the writer's features and will share a connection and
+            // transaction.
+            final FeatureReader reader = getFeatureReader(query, connection);
+
+            FeatureWriter writer;
+
+            if (Transaction.AUTO_COMMIT == transaction) {
+                writer = new AutoCommitFeatureWriter(featureType, reader, connection);
+            } else {
+                // if there's a transaction, the reader and the writer will
+                // share
+                // the connection
+                // held in the transaction state
+                writer = new TransactionFeatureWriter(featureType, reader, state);
+            }
+            return writer;
+        } catch (IOException e) {
+            try {
+                connection.rollbackTransaction();
+            } catch (SeException e1) {
+                LOGGER.log(Level.SEVERE, "Error rolling back transaction on " + connection, e);
+            }
+            connection.close();
+            throw e;
+        } catch (RuntimeException e) {
+            try {
+                connection.rollbackTransaction();
+            } catch (SeException e1) {
+                LOGGER.log(Level.SEVERE, "Error rolling back transaction on " + connection, e);
+            }
+            connection.close();
+            throw e;
+        }
     }
 
     /**
@@ -518,32 +575,6 @@ public class ArcSDEDataStore implements DataStore {
             canWrite = true;
         }
         return canWrite;
-    }
-
-    /**
-     * Grab the ArcTransactionState (when not using AUTO_COMMIT).
-     * <p>
-     * As of GeoTools 2.5 we store the TransactionState using the connection
-     * pool as a key.
-     * 
-     * @param transaction
-     * @return
-     */
-    public ArcTransactionState getArcTransactionState(Transaction transaction) {
-        ArcTransactionState state = null;
-
-        if (Transaction.AUTO_COMMIT != transaction) {
-            synchronized (this) {
-                state = (ArcTransactionState) transaction.getState(connectionPool);
-
-                if (state == null) {
-                    // start a transaction
-                    state = new ArcTransactionState(connectionPool);
-                    transaction.putState(connectionPool, state);
-                }
-            }
-        }
-        return state;
     }
 
     /**

@@ -171,12 +171,17 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         ArcSDEConnectionPool connectionPool = testData.getConnectionPool();
         ArcSDEPooledConnection connection = connectionPool.getConnection();
-        int objectId = (int) ArcSDEAdapter.getNumericFid(fid);
-        String whereClause = "ROW_ID=" + objectId;
-        SeQuery seQuery = new SeQuery(connection, new String[] { "ROW_ID", "INT32_COL",
-                "STRING_COL" }, new SeSqlConstruct(typeName, whereClause));
-        seQuery.prepareQuery();
-        seQuery.execute();
+        SeQuery seQuery;
+        try {
+            int objectId = (int) ArcSDEAdapter.getNumericFid(fid);
+            String whereClause = "ROW_ID=" + objectId;
+            seQuery = new SeQuery(connection, new String[] { "ROW_ID", "INT32_COL", "STRING_COL" },
+                    new SeSqlConstruct(typeName, whereClause));
+            seQuery.prepareQuery();
+            seQuery.execute();
+        } finally {
+            connection.close();
+        }
         SeRow row = seQuery.fetch();
         assertNull(row);
 
@@ -328,9 +333,9 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final Filter filter = CQL.toFilter("INT32_COL = 3");
 
         FeatureWriter writer = ds.getFeatureWriter(typeName, filter, Transaction.AUTO_COMMIT);
-
-        assertTrue(writer.hasNext());
+        
         try {
+            assertTrue(writer.hasNext());
             SimpleFeature feature = writer.next();
             feature.setAttribute("INT32_COL", Integer.valueOf(-1000));
             writer.write();
@@ -442,11 +447,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         // any kind of geometries.
         testData.truncateTempTable();
 
-        String typeName = testData.getTemp_table();
-        FeatureCollection features = testData.createTestFeatures(geometryClass, 5);
+        final String typeName = testData.getTemp_table();
+        final FeatureCollection testFeatures = testData.createTestFeatures(geometryClass, 5);
 
-        DataStore ds = testData.getDataStore();
-        FeatureSource fsource = ds.getFeatureSource(typeName);
+        final DataStore ds = testData.getDataStore();
+        final FeatureSource fsource = ds.getFeatureSource(typeName);
 
         // incremented on each feature added event to
         // ensure events are being raised as expected
@@ -472,7 +477,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         SimpleFeature dest;
 
         try {
-            for (FeatureIterator fi = features.features(); fi.hasNext();) {
+            for (FeatureIterator fi = testFeatures.features(); fi.hasNext();) {
                 source = fi.next();
                 dest = writer.next();
                 dest.setAttributes(source.getAttributes());
@@ -484,7 +489,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         // was the features really inserted?
         int fcount = fsource.getCount(Query.ALL);
-        assertEquals(features.size() + initialCount, fcount);
+        assertEquals(testFeatures.size() + initialCount, fcount);
 
         /*
          * String msg = "a FEATURES_ADDED event should have been called " +

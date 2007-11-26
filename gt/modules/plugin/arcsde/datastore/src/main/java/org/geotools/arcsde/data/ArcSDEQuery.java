@@ -126,16 +126,16 @@ class ArcSDEQuery {
      * 
      * @see prepareQuery
      */
-    private ArcSDEQuery(ArcSDEPooledConnection connection, SimpleFeatureType schema,
-            FilterSet filterSet, FIDReader fidReader) throws DataSourceException {
+    private ArcSDEQuery(final ArcSDEPooledConnection connection, final SimpleFeatureType schema,
+            final FilterSet filterSet, final FIDReader fidReader) throws DataSourceException {
         this.connection = connection;
         this.schema = schema;
         this.filters = filterSet;
         this.fidReader = fidReader;
     }
 
-    public static ArcSDEQuery createQuery(ArcSDEPooledConnection connection,
-            SimpleFeatureType schema, Query query) throws IOException {
+    public static ArcSDEQuery createQuery(final ArcSDEPooledConnection connection,
+            final SimpleFeatureType schema, final Query query) throws IOException {
         return createQuery(connection, schema, query, null, null);
     }
 
@@ -698,17 +698,16 @@ class ArcSDEQuery {
     // //////////////////////////////////////////////////////////////////////
 
     /**
-     * Closes the query and releases the holded connection back to the
-     * connection pool. If reset is TRUE, the query status is set to INACTIVE;
-     * also releases the SeConnection back to the SeConnectionPool
+     * Closes the query.
+     * <p>
+     * The {@link ArcSDEPooledConnection connection} used by the query is not
+     * closed by this operation as it was provided by the calling code and thus
+     * it is its responsibility to handle the connection life cycle.
+     * </p>
      */
     public void close() {
         close(this.query);
         this.query = null;
-        if (connection != null) {
-            connection.close();
-            connection = null;
-        }
     }
 
     /**

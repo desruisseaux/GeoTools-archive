@@ -209,4 +209,32 @@ class ArcTransactionState implements Transaction.State {
         }
         return connection;
     }
+
+    /**
+     * Grab the ArcTransactionState (when not using AUTO_COMMIT).
+     * <p>
+     * As of GeoTools 2.5 we store the TransactionState using the connection
+     * pool as a key.
+     * </p>
+     * 
+     * @param transaction
+     *            non autocommit transaction
+     * @return the ArcTransactionState stored in the transaction with
+     *         <code>connectionPool</code> as key.
+     */
+    public static ArcTransactionState getState(final Transaction transaction,
+            final ArcSDEConnectionPool connectionPool) {
+        ArcTransactionState state;
+
+        synchronized (ArcTransactionState.class) {
+            state = (ArcTransactionState) transaction.getState(connectionPool);
+
+            if (state == null) {
+                // start a transaction
+                state = new ArcTransactionState(connectionPool);
+                transaction.putState(connectionPool, state);
+            }
+        }
+        return state;
+    }
 }

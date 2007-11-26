@@ -180,12 +180,12 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         final Transaction transaction = getTransaction();
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
         ArcSDEPooledConnection connection;
-        if (Transaction.AUTO_COMMIT != transaction) {
-            final ArcTransactionState state = (ArcTransactionState) transaction
-                    .getState(connectionPool);
-            connection = state.getConnection();
-        } else {
+        if (Transaction.AUTO_COMMIT == transaction) {
             connection = connectionPool.getConnection();
+        } else {
+            final ArcTransactionState state;
+            state = ArcTransactionState.getState(transaction, connectionPool);
+            connection = state.getConnection();
         }
         return connection;
     }

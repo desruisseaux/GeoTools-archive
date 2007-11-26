@@ -68,14 +68,9 @@ class AutoCommitFeatureWriter implements FeatureWriter {
     private ArcSDEPooledConnection connection;
 
     /**
-     * Where to get a connection from.
-     */
-    private ArcSDEConnectionPool pool;
-
-    /**
      * Reader for streamed access to filtered content this writer acts upon.
      */
-    private FeatureReader filteredContent;
+    protected FeatureReader filteredContent;
 
     /**
      * Builder for new Features this writer creates when next() is called and
@@ -91,35 +86,32 @@ class AutoCommitFeatureWriter implements FeatureWriter {
     private Map<String, Integer> mutableColumnNames;
 
     /**
+     * Not to be accessed directly, but through {@link #getLayer()}
+     */
+    private SeLayer cachedLayer;
+
+    /**
+     * Not to be accessed directly, but through {@link #getTable()}
+     */
+    private SeTable cachedTable;
+
+    /**
      * The feature at the current index. No need to maintain any sort of
      * collection of features as this writer works a feature at a time.
      */
     private SimpleFeature feature;
 
-    private SeLayer layer;
-
-    private SeTable table;
-
     public AutoCommitFeatureWriter(final SimpleFeatureType featureType,
-            final FeatureReader filteredContent, final ArcSDEConnectionPool pool)
+            final FeatureReader filteredContent, final ArcSDEPooledConnection connection)
             throws NoSuchElementException, IOException {
         assert featureType != null;
         assert filteredContent != null;
-        assert pool != null;
+        assert connection != null;
 
         this.featureType = featureType;
         this.filteredContent = filteredContent;
-        this.pool = pool;
+        this.connection = connection;
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
-        final String typeName = featureType.getTypeName();
-
-        ArcSDEPooledConnection conn = pool.getConnection();
-        try {
-            this.layer = conn.getLayer(typeName);
-            this.table = conn.getTable(typeName);
-        } finally {
-            conn.close();
-        }
     }
 
     /**
@@ -233,9 +225,9 @@ class AutoCommitFeatureWriter implements FeatureWriter {
         try {
             final ArcSDEPooledConnection connection = getConnection();
             if (isNewlyCreated(feature)) {
-                insertSeRow(feature, layer, connection);
+                insertSeRow(feature, getLayer(), connection);
             } else {
-                updateRow(feature, layer, connection);
+                updateRow(feature, getLayer(), connection);
             }
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
@@ -427,9 +419,9 @@ class AutoCommitFeatureWriter implements FeatureWriter {
         if (mutableColumnNames == null) {
             // We are going to inspect the column defintions in order to
             // determine which attributes are actually mutable...
-            final SeColumnDefinition[] columnDefinitions = table.describe();
+            final SeColumnDefinition[] columnDefinitions = getTable().describe();
             final String shapeAttributeName;
-            shapeAttributeName = layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
+            shapeAttributeName = getLayer().getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
 
             // use LinkedHashMap to respect column order
             Map<String, Integer> columnList = new LinkedHashMap<String, Integer>();
@@ -464,6 +456,26 @@ class AutoCommitFeatureWriter implements FeatureWriter {
         return this.mutableColumnNames;
     }
 
+    private SeTable getTable() throws DataSourceException {
+        if (this.cachedTable == null) {
+            final ArcSDEPooledConnection connection = getConnection();
+            final String typeName = this.featureType.getTypeName();
+            final SeTable table = connection.getTable(typeName);
+            this.cachedTable = table;
+        }
+        return this.cachedTable;
+    }
+
+    private SeLayer getLayer() throws DataSourceException {
+        if (this.cachedLayer == null) {
+            final ArcSDEPooledConnection connection = getConnection();
+            final String typeName = this.featureType.getTypeName();
+            final SeLayer layer = connection.getLayer(typeName);
+            this.cachedLayer = layer;
+        }
+        return this.cachedLayer;
+    }
+
     /**
      * Creates a feature id for a new feature; the feature id is compound of the
      * {@value #NEW_FID_PREFIX} plus a UUID.
@@ -486,25 +498,14 @@ class AutoCommitFeatureWriter implements FeatureWriter {
     }
 
     /**
-     * Return connection in use. Get a new one from the pool if needed.
-     * Subclasses may override to get the connection from a transaction, for
-     * example.
+     * Return connection in use. Subclasses may override to get the connection
+     * from a transaction, for example.
      * 
      * @return
      * @throws DataSourceException
      */
     protected ArcSDEPooledConnection getConnection() throws DataSourceException {
-        if (connection == null) {
-            try {
-                connection = pool.getConnection();
-            } catch (UnavailableArcSDEConnectionException e) {
-                throw new DataSourceException(e);
-            }
-        }
         return connection;
     }
 
-    public ArcSDEConnectionPool getPool() {
-        return pool;
-    }
 }
