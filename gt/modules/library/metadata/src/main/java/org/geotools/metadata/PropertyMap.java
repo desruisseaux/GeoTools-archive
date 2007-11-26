@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.metadata;
 
-// J2SE dependencies
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -38,7 +36,7 @@ import org.geotools.resources.Utilities;
  *
  * @see MetadataStandard#asMap
  */
-final class PropertyMap extends AbstractMap/*<String,Object>*/ {
+final class PropertyMap extends AbstractMap<String,Object> {
     /**
      * The metadata object to wrap.
      */
@@ -52,7 +50,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
     /**
      * A view of the mappings contained in this map.
      */
-    private final Set/*<Map.Entry<String,Object>>*/ entrySet;
+    private final Set<Map.Entry<String,Object>> entrySet;
 
     /**
      * Creates a property map for the specified metadata and accessor.
@@ -66,13 +64,15 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
     /**
      * Returns {@code true} if this map contains no key-value mappings.
      */
+    @Override
     public boolean isEmpty() {
         return entrySet().isEmpty();
     }
 
     /**
-     * Returns {@code true} if this map contains a mapping for the specified key. 
+     * Returns {@code true} if this map contains a mapping for the specified key.
      */
+    @Override
     public boolean containsKey(final Object key) {
         return get(key) != null;
     }
@@ -81,9 +81,15 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
      * Returns the value to which the specified key is mapped, or {@code null}
      * if this map contains no mapping for the key.
      */
+    @Override
     public Object get(final Object key) {
-        final Object value = accessor.get(accessor.indexOf((String) key), metadata);
-        return PropertyAccessor.isEmpty(value) ? null : value;
+        if (key instanceof String) {
+            final Object value = accessor.get(accessor.indexOf((String) key), metadata);
+            if (!PropertyAccessor.isEmpty(value)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     /**
@@ -91,23 +97,30 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
      *
      * @throws IllegalArgumentException if the specified property can't be set.
      */
-    public Object put(final Object key, final Object value)
+    @Override
+    public Object put(final String key, final Object value)
             throws IllegalArgumentException
     {
-        return accessor.set(accessor.indexOf((String) key), metadata, value);
+        return accessor.set(accessor.indexOf(key), metadata, value);
     }
 
     /**
      * Removes the mapping for a key from this map if it is present.
      */
+    @Override
     public Object remove(final Object key) {
-        return put(key, null);
+        if (key instanceof String) {
+            return put((String) key, null);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Returns a view of the mappings contained in this map. 
+     * Returns a view of the mappings contained in this map.
      */
-    public Set/*<Map.Entry<String,Object>>*/ entrySet() {
+    @Override
+    public Set<Map.Entry<String,Object>> entrySet() {
         return entrySet;
     }
 
@@ -119,7 +132,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
      *
      * @author Martin Desruisseaux
      */
-    private final class Property/*<String,Object>*/ implements Map.Entry {
+    private final class Property implements Map.Entry<String,Object> {
         /**
          * The property index.
          */
@@ -142,7 +155,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
         /**
          * Returns the key corresponding to this entry.
          */
-        public Object getKey() {
+        public String getKey() {
             return accessor.name(index);
         }
 
@@ -164,7 +177,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
         /**
          * Compares the specified entry with this one for equality.
          */
-        public boolean equals(final Map.Entry entry) {
+        public boolean equals(final Map.Entry<?,?> entry) {
             return Utilities.equals(getKey(),   entry.getKey()) &&
                    Utilities.equals(getValue(), entry.getValue());
         }
@@ -173,6 +186,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
          * Compares the specified object with this entry for equality.
          * Criterions are specified by the {@link Map.Entry} contract.
          */
+        @Override
         public boolean equals(final Object object) {
             return (object instanceof Map.Entry) && equals((Map.Entry) object);
         }
@@ -181,6 +195,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
          * Returns the hash code value for this map entry. The
          * formula is specified by the {@link Map.Entry} contract.
          */
+        @Override
         public int hashCode() {
             Object x = getKey();
             int code = (x != null) ? x.hashCode() : 0;
@@ -200,7 +215,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
      *
      * @author Martin Desruisseaux
      */
-    private final class Iter implements Iterator {
+    private final class Iter implements Iterator<Map.Entry<String,Object>> {
         /**
          * The current and the next property, or {@code null} if the iteration is over.
          */
@@ -239,7 +254,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
         /**
          * Returns the next element in the iteration.
          */
-        public Object next() {
+        public Map.Entry<String,Object> next() {
             if (next != null) {
                 current = next;
                 move(next.index + 1);
@@ -270,7 +285,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
      *
      * @author Martin Desruisseaux
      */
-    private final class Entries extends AbstractSet/*<Map.Entry<String,Object>>*/ {
+    private final class Entries extends AbstractSet<Map.Entry<String,Object>> {
         /**
          * Creates an entry set.
          */
@@ -280,12 +295,13 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
         /**
          * Returns an iterator over the elements contained in this collection.
          */
-        public Iterator iterator() {
+        @Override
+        public Iterator<Map.Entry<String,Object>> iterator() {
             return new Iter();
         }
 
         /**
-         * Returns the number of elements in this collection. 
+         * Returns the number of elements in this collection.
          */
         public int size() {
             return accessor.count(metadata, Integer.MAX_VALUE);
@@ -294,6 +310,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
         /**
          * Returns true if this collection contains no elements.
          */
+        @Override
         public boolean isEmpty() {
             return accessor.count(metadata, 1) == 0;
         }
@@ -301,6 +318,7 @@ final class PropertyMap extends AbstractMap/*<String,Object>*/ {
         /**
          * Returns {@code true} if this collection contains the specified element.
          */
+        @Override
         public boolean contains(final Object object) {
             if (object instanceof Map.Entry) {
                 final Map.Entry entry = (Map.Entry) object;

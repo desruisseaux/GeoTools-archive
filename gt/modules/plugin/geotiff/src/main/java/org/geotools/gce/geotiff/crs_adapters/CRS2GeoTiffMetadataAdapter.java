@@ -33,6 +33,7 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffCoordinat
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffGCSCodes;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffPCSCodes;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes.GeoTiffUoMCodes;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -167,15 +168,15 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 */
 	private static int getEPSGCode(final IdentifiedObject obj) {
 		// looking for an EPSG code
-		final Set identifiers = obj.getIdentifiers();
-		final Iterator it = identifiers.iterator();
+		final Set<? extends Identifier> identifiers = obj.getIdentifiers();
+		final Iterator<? extends Identifier> it = identifiers.iterator();
 		String code = "";
 		Citation cite;
 		Identifier identifier;
 		while (it.hasNext()) {
-			identifier = ((Identifier) it.next());
-			cite = (Citation) identifier.getAuthority();
-			if (cite.getIdentifiers().contains("EPSG")) {
+			identifier = it.next();
+			cite = identifier.getAuthority();
+			if (Citations.identifierMatches(cite, "EPSG")) {
 
 				code = identifier.getCode();
 				break;

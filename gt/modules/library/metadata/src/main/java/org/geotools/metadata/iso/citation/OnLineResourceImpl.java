@@ -19,16 +19,11 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// J2SE direct dependencies
 import java.net.URI;
 import java.net.URISyntaxException;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 

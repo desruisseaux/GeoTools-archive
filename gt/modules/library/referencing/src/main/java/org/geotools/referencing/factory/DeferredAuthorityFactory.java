@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,21 +19,13 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.factory.Factory;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -122,6 +114,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * Returns {@code true} if this factory is available. The default implementation returns
      * {@code false} if {@link #createBackingStore} throws an exception.
      */
+    @Override
     public boolean isAvailable() {
         return super.isAvailable();
     }
@@ -132,6 +125,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * @return The backing store to uses in {@code createXXX(...)} methods.
      * @throws FactoryException if the creation of backing store failed.
      */
+    @Override
     final AbstractAuthorityFactory getBackingStore() throws FactoryException {
         assert Thread.holdsLock(this);
         if (backingStore == null) {
@@ -200,6 +194,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
      * Releases resources immediately instead of waiting for the garbage collector. This
      * method disposes the backing store regardeless of {@link #canDisposeBackingStore} value.
      */
+    @Override
     public synchronized void dispose() throws FactoryException {
         if (disposer != null) {
             disposer.cancel();

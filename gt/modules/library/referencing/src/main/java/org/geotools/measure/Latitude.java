@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
  *    (C) 1999, Fisheries and Oceans Canada
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -35,17 +35,17 @@ public final class Latitude extends Angle {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -4496748683919618976L;
-    
+
     /**
      * Minimum legal value for latitude (-90°).
      */
     public static final double MIN_VALUE = -90;
-    
+
     /**
      * Maximum legal value for latitude (+90°).
      */
     public static final double MAX_VALUE = +90;
-    
+
     /**
      * Contruct a new latitude with the specified value.
      *
@@ -54,7 +54,7 @@ public final class Latitude extends Angle {
     public Latitude(final double theta) {
         super(theta);
     }
-    
+
     /**
      * Constructs a newly allocated {@code Latitude} object that
      * represents the latitude value represented by the string.   The

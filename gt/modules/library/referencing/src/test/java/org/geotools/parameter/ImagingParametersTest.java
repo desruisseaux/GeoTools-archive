@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -19,7 +19,6 @@ package org.geotools.parameter;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterList;
 import javax.media.jai.OperationDescriptor;
@@ -35,8 +34,6 @@ import org.opengis.util.GenericName;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.GeneralParameterDescriptor;
 
 import org.geotools.TestData;
 import org.geotools.metadata.iso.citation.Citations;
@@ -55,7 +52,6 @@ public final class ImagingParametersTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -84,7 +80,7 @@ public final class ImagingParametersTest extends TestCase {
         final ImagingParameterDescriptors parameters;
         descriptor = JAI.getDefaultInstance().getOperationRegistry().getDescriptor(mode, "AddConst");
         parameters = new ImagingParameterDescriptors(descriptor);
-        final GenericName alias = (GenericName) parameters.getAlias().iterator().next();
+        final GenericName alias = parameters.getAlias().iterator().next();
         /*
          * Tests the operation-wide properties.
          */
@@ -171,7 +167,7 @@ public final class ImagingParametersTest extends TestCase {
                         .getDescriptor(RenderedRegistryMode.MODE_NAME, "Extrema");
 
         // Gets the ImagingParameterDescriptors to replace xPeriod
-        final List replacingDescriptors = new ArrayList(1);
+        final List<ParameterDescriptor> replacingDescriptors = new ArrayList<ParameterDescriptor>(1);
         replacingDescriptors.add(SPATIAL_SUBSAMPLING_X);
         final ImagingParameterDescriptors ripd =
                 new ImagingParameterDescriptors(operation, replacingDescriptors);
@@ -182,7 +178,7 @@ public final class ImagingParametersTest extends TestCase {
         final ParameterValue p = rip.parameter("xPeriod");
         assertSame(SPATIAL_SUBSAMPLING_X, p.getDescriptor());
 
-        // Note that we are supposed to use spatial coordinates for this value we are seeting here. 
+        // Note that we are supposed to use spatial coordinates for this value we are seeting here.
         p.setValue(new Double(2.3));
         assertTrue(p.toString().startsWith("xPeriod = 2.3"));
 

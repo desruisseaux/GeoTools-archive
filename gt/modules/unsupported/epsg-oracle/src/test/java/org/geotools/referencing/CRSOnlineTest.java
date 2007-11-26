@@ -32,6 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.GeoTools;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 import org.geotools.referencing.factory.epsg.oracle.OracleOnlineTestCase;
 
@@ -165,13 +166,13 @@ public class CRSOnlineTest extends OracleOnlineTestCase {
         authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString(Locale.US));
-        assertTrue(authority.getIdentifiers().contains("EPSG"));
+        assertTrue(Citations.identifierMatches(authority, "EPSG"));
 
         // Tests the modified factory.
         factory   = new OrderedAxisAuthorityFactory("EPSG", null, null);
         authority = factory.getAuthority();
         assertNotNull(authority);
-        assertTrue(authority.getIdentifiers().contains("EPSG"));
+        assertTrue(Citations.identifierMatches(authority, "EPSG"));
     }
 
     /**
@@ -185,7 +186,7 @@ public class CRSOnlineTest extends OracleOnlineTestCase {
         vendor  = factory.getVendor();
         assertNotNull(vendor);
         assertEquals("Geotools", vendor.getTitle().toString(Locale.US));
-        assertFalse(vendor.getIdentifiers().contains("EPSG"));
+        assertFalse(Citations.identifierMatches(vendor, "EPSG"));
     }
 
     /**

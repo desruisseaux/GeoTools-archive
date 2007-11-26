@@ -19,7 +19,6 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,14 +26,11 @@ import java.util.Map;
 import java.util.Set;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.util.CodeList;
-import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.ClassChanger;
@@ -217,7 +213,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * 
      * @param name         The parameter name.
      * @param remarks      An optional description as a {@link String} or an
-     *                     {@link InternationalString}, or {@code null} if none.
+     *                     {@link org.opengis.util.InternationalString}, or {@code null} if none.
      * @param defaultValue The default value.
      * @param required     {@code true} if this parameter is required, {@code false} otherwise.
      */

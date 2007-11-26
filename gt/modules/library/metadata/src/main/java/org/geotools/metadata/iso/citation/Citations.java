@@ -19,21 +19,16 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// J2SE direct dependencies
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
-
-// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.PresentationForm;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.util.InternationalString;
-import org.opengis.referencing.crs.CRSAuthorityFactory;       // For javadoc
-import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
-
-// Geotools dependencies
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -107,7 +102,7 @@ public final class Citations {
     public static final Citation OPEN_GIS;
     static {
         final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.OPEN_GIS);
-        final Collection alt = c.getAlternateTitles();
+        final Collection<InternationalString> alt = c.getAlternateTitles();
         alt.add(new SimpleInternationalString("OpenGIS"));
         alt.addAll(OGC.getAlternateTitles());
         c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
@@ -190,13 +185,13 @@ public final class Citations {
     public static final Citation WMS;
     static {
         final CitationImpl c = new CitationImpl("Web Map Service");
-        final Collection titles = c.getAlternateTitles();
+        final Collection<InternationalString> titles = c.getAlternateTitles();
         titles.add(new SimpleInternationalString("WMS"));
         titles.add(new SimpleInternationalString("WMS 1.3.0"));
         titles.add(new SimpleInternationalString("OGC 04-024"));
         titles.add(new SimpleInternationalString("ISO 19128"));
 
-        final Collection parties = c.getCitedResponsibleParties();
+        final Collection<ResponsibleParty> parties = c.getCitedResponsibleParties();
         parties.add(ResponsiblePartyImpl.OGC);
         parties.add(ResponsiblePartyImpl.OGC(Role.PUBLISHER, OnLineResourceImpl.WMS));
         /*
@@ -255,8 +250,9 @@ public final class Citations {
      * addition, this citation contains the "EPSG" {@linkplain Citation#getIdentifiers identifier}
      * for the "Authority name" {@linkplain Citation#getIdentifierTypes identifier type}.
      * <p>
-     * This citation is used as an authority for {@linkplain CoordinateReferenceSystem coordinate
-     * reference system} identifiers. When searching an {@linkplain CRSAuthorityFactory CRS
+     * This citation is used as an authority for
+     * {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference system}
+     * identifiers. When searching an {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS
      * authority factory} on EPSG data, Geotools compares the {@code "EPSG"} string against the
      * {@linkplain Citation#getIdentifiers identifiers} (or against the {@linkplain Citation#getTitle
      * title} and {@linkplain Citation#getAlternateTitles alternate titles} if there is no identifier)
@@ -285,8 +281,9 @@ public final class Citations {
      * <p>
      * <strong>Warning:</strong> {@code AUTO} is different from {@link #AUTO2} used for WMS 1.3.0.
      * <p>
-     * This citation is used as an authority for {@linkplain CoordinateReferenceSystem coordinate
-     * reference system} identifiers. When searching an {@linkplain CRSAuthorityFactory CRS
+     * This citation is used as an authority for
+     * {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference system}
+     * identifiers. When searching an {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS
      * authority factory} on AUTO data, Geotools compares the {@code "AUTO"} string against the
      * {@linkplain Citation#getIdentifiers identifiers} (or against the {@linkplain Citation#getTitle
      * title} and {@linkplain Citation#getAlternateTitles alternate titles} if there is no identifier)
@@ -308,7 +305,7 @@ public final class Citations {
          * titles for the WMS specification (see the WMS constant in this class), not for the
          * AUTO authority name.
          */
-        final Collection parties = c.getCitedResponsibleParties();
+        final Collection<ResponsibleParty> parties = c.getCitedResponsibleParties();
         parties.add(ResponsiblePartyImpl.OGC);
         parties.add(ResponsiblePartyImpl.OGC(Role.PUBLISHER, OnLineFunction.DOWNLOAD,
                                              "http://www.opengis.org/docs/01-068r3.pdf"));
@@ -328,8 +325,9 @@ public final class Citations {
      * <strong>Warning:</strong> {@code AUTO2} is different from {@link #AUTO} used for WMS 1.1.1
      * and earlier.
      * <p>
-     * This citation is used as an authority for {@linkplain CoordinateReferenceSystem coordinate
-     * reference system} identifiers. When searching an {@linkplain CRSAuthorityFactory CRS
+     * This citation is used as an authority for
+     * {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference system}
+     * identifiers. When searching an {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS
      * authority factory} on AUTO2 data, Geotools compares the {@code "AUTO2"} string against the
      * {@linkplain Citation#getIdentifiers identifiers} (or against the {@linkplain Citation#getTitle
      * title} and {@linkplain Citation#getAlternateTitles alternate titles} if there is no identifier)
@@ -351,7 +349,7 @@ public final class Citations {
          * titles for the WMS specification (see the WMS constant in this class), not for the
          * AUTO2 authority name.
          */
-        final Collection parties = c.getCitedResponsibleParties();
+        final Collection<ResponsibleParty> parties = c.getCitedResponsibleParties();
         parties.add(ResponsiblePartyImpl.OGC);
         parties.add(ResponsiblePartyImpl.OGC(Role.PUBLISHER, OnLineResourceImpl.WMS));
         c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL); // See comment in WMS.
@@ -462,7 +460,7 @@ public final class Citations {
      */
     public static boolean titleMatches(final Citation c1, final Citation c2) {
         InternationalString candidate = c2.getTitle();
-        Iterator iterator = null;
+        Iterator<? extends InternationalString> iterator = null;
         do {
             final String asString = candidate.toString(Locale.US);
             if (titleMatches(c1, asString)) {
@@ -473,7 +471,7 @@ public final class Citations {
                 return true;
             }
             if (iterator == null) {
-                final Collection titles = c2.getAlternateTitles();
+                final Collection<? extends InternationalString> titles = c2.getAlternateTitles();
                 if (titles == null) {
                     break;
                 }
@@ -482,7 +480,7 @@ public final class Citations {
             if (!iterator.hasNext()) {
                 break;
             }
-            candidate = (InternationalString) iterator.next();
+            candidate = iterator.next();
         } while (true);
         return false;
     }
@@ -500,7 +498,7 @@ public final class Citations {
     public static boolean titleMatches(final Citation citation, String title) {
         title = title.trim();
         InternationalString candidate = citation.getTitle();
-        Iterator iterator = null;
+        Iterator<? extends InternationalString> iterator = null;
         do {
             final String asString = candidate.toString(Locale.US);
             if (asString.trim().equalsIgnoreCase(title)) {
@@ -511,7 +509,7 @@ public final class Citations {
                 return true;
             }
             if (iterator == null) {
-                final Collection titles = citation.getAlternateTitles();
+                final Collection<? extends InternationalString> titles = citation.getAlternateTitles();
                 if (titles == null) {
                     break;
                 }
@@ -520,7 +518,7 @@ public final class Citations {
             if (!iterator.hasNext()) {
                 break;
             }
-            candidate = (InternationalString) iterator.next();
+            candidate = iterator.next();
         } while (true);
         return false;
     }
@@ -545,7 +543,7 @@ public final class Citations {
          * identifiers in only one citation, make sure that this citation is the second one (c2) in
          * order to allow at least one call to 'identifierMatches(c1, String)'.
          */
-        Iterator iterator = c2.getIdentifiers().iterator();
+        Iterator<? extends Identifier> iterator = c2.getIdentifiers().iterator();
         if (!iterator.hasNext()) {
             iterator = c1.getIdentifiers().iterator();
             if (!iterator.hasNext()) {
@@ -555,7 +553,7 @@ public final class Citations {
             c2 = null; // Just for make sure that we don't use it by accident.
         }
         do {
-            final String id = ((String) iterator.next()).trim();
+            final String id = iterator.next().getCode().trim();
             if (identifierMatches(c1, id)) {
                 return true;
             }
@@ -577,10 +575,10 @@ public final class Citations {
      */
     public static boolean identifierMatches(final Citation citation, String identifier) {
         identifier = identifier.trim();
-        final Collection identifiers = citation.getIdentifiers();
-        for (final Iterator it=identifiers.iterator(); it.hasNext();) {
-            final String id = ((String) it.next()).trim();
-            if (identifier.equalsIgnoreCase(id)) {
+        final Collection<? extends Identifier> identifiers = citation.getIdentifiers();
+        for (final Identifier id : identifiers) {
+            final String code = id.getCode().trim();
+            if (identifier.equalsIgnoreCase(code)) {
                 return true;
             }
         }
@@ -600,8 +598,8 @@ public final class Citations {
      */
     public static String getIdentifier(final Citation citation) {
         String identifier = null;
-        for (final Iterator it=citation.getIdentifiers().iterator(); it.hasNext();) {
-            final String candidate = ((String) it.next()).trim();
+        for (final Identifier id : citation.getIdentifiers()) {
+            final String candidate = id.getCode().trim();
             final int length = candidate.length();
             if (length != 0) {
                 if (identifier == null || length < identifier.length()) {

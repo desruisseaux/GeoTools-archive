@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,8 @@
  */
 package org.geotools.metadata.iso;
 
-// J2SE direct dependencies
 import java.util.Collection;
 
-// OpenGIS dependencies
 import org.opengis.metadata.FeatureTypeList;
 import org.opengis.metadata.SpatialAttributeSupplement;
 
@@ -48,9 +46,9 @@ public class SpatialAttributeSupplementImpl extends MetadataEntity
     /**
      * Provides information about the list of feature types with the same spatial representation.
      */
-    private Collection featureTypeList;
+    private Collection<FeatureTypeList> featureTypeList;
 
-    /** 
+    /**
      * Construct an initially empty spatial attribute supplement.
      */
     public SpatialAttributeSupplementImpl() {
@@ -65,7 +63,7 @@ public class SpatialAttributeSupplementImpl extends MetadataEntity
         super(source);
     }
 
-    /** 
+    /**
      * Creates a spatial attribute supplement initialized to the given values.
      */
     public SpatialAttributeSupplementImpl(final Collection featureTypeList) {
@@ -75,14 +73,16 @@ public class SpatialAttributeSupplementImpl extends MetadataEntity
     /**
      * Provides information about the list of feature types with the same spatial representation.
      */
-    public synchronized Collection getFeatureTypeList() {
+    public synchronized Collection<FeatureTypeList> getFeatureTypeList() {
         return featureTypeList = nonNullCollection(featureTypeList, FeatureTypeList.class);
     }
 
     /**
      * Set information about the list of feature types with the same spatial representation.
      */
-    public synchronized void setFeatureTypeList(final Collection newValues) {
+    public synchronized void setFeatureTypeList(
+            final Collection<? extends FeatureTypeList> newValues)
+    {
         featureTypeList = copyCollection(newValues, featureTypeList, FeatureTypeList.class);
     }
 }

@@ -38,6 +38,7 @@ import com.sun.star.uno.AnyConverter;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
@@ -56,7 +57,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.Identifier;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -412,9 +412,9 @@ public final class Referencing extends Formulas implements XReferencing {
      * Returns the identifier for the specified object. Used for logging.
      */
     private static String getIdentifier(final IdentifiedObject object) {
-        final Collection identifiers = object.getIdentifiers();
+        final Collection<ReferenceIdentifier> identifiers = object.getIdentifiers();
         if (identifiers!=null && !identifiers.isEmpty()) {
-            return ((Identifier) identifiers.iterator().next()).getCode();
+            return identifiers.iterator().next().getCode();
         }
         return object.getName().getCode();
     }

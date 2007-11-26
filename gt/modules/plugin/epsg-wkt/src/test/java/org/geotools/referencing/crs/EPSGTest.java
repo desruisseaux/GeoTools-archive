@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 
 /**
  * These EPSG support.
- * 
+ *
  * @author Jody Garnett
  * @since 2.1.M3
  * @source $URL$
@@ -49,36 +49,36 @@ public class EPSGTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         factory = new EPSGCRSAuthorityFactory();
-    }    
+    }
     public void testAuthority(){
         Citation authority = factory.getAuthority();
-        
+
         assertNotNull( authority );
         assertEquals( "European Petroleum Survey Group", authority.getTitle().toString() );
-        assertTrue( authority.getIdentifiers().contains( "EPSG" ) );
+        assertTrue( Citations.identifierMatches(authority, "EPSG" ) );
     }
-    
+
     public void testVendor(){
-        Citation vendor = factory.getVendor();        
+        Citation vendor = factory.getVendor();
         assertNotNull( vendor );
         assertEquals( "Geotools", vendor.getTitle().toString() );
     }
-    
+
     public void testCodes() throws Exception {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
-        
+
         assertNotNull( codes );
-        assertEquals( 2798, codes.size() );                               
+        assertEquals( 2798, codes.size() );
     }
-    
+
     /**
      * A random CRS for fun.
      */
     public void test26910() throws Exception {
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:26910");
-        assertNotNull( crs );                
+        assertNotNull( crs );
     }
-    
+
     /** UDIG requires this to work */
     public void test4326() throws Exception {
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:4326");
@@ -102,38 +102,38 @@ public class EPSGTest extends TestCase {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
         int total = codes.size();
         int count = 0;
-        
-        for( Iterator i=codes.iterator(); i.hasNext(); ){           
+
+        for( Iterator i=codes.iterator(); i.hasNext(); ){
             CoordinateReferenceSystem crs;
             String code = (String) i.next();
             try {
                 crs = (CoordinateReferenceSystem) factory.createObject( code );
-                if( crs != null ) count ++;                
+                if( crs != null ) count ++;
             } catch (Throwable e) {
                 System.err.println("WARNING (CRS: "+code+" ):"+e );
-            }            
+            }
         }
-        System.out.println( "success:" + count + "/" + total );                
+        System.out.println( "success:" + count + "/" + total );
     }
-    
 
-    
+
+
     /**
      * A random CRS for fun.
      */
     public void test26910Lower() throws Exception {
         CoordinateReferenceSystem crs = CRS.decode("epsg:26910");
-        assertNotNull( crs );                
+        assertNotNull( crs );
     }
-    
+
     /**
      * A random CRS for fun.
      */
     public void test26986Lower() throws Exception {
         CoordinateReferenceSystem crs = CRS.decode("epsg:26986");
-        assertNotNull( crs );                
+        assertNotNull( crs );
     }
-    
+
     /** wfs requires this to work */
     public void test4326Lower() throws Exception {
         CoordinateReferenceSystem crs = CRS.decode("epsg:4326");

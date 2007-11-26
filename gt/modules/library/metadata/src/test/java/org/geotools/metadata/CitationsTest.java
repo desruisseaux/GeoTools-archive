@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, Geotools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -65,7 +65,7 @@ public class CitationsTest extends TestCase {
          *           (?m) enable the multi-lines mode for ^ and $.
          *           ^ and $ match the begining and end of a line respectively.
          */
-        assertTrue(text.matches("(?s)(?m).*^\\s+Identifiers:\\s+EPSG$.*"));
+        assertTrue(text.matches("(?s)(?m).*^\\s+Identifiers:\\s+Code:\\s+EPSG$.*"));
         assertTrue(text.matches("(?s)(?m).*^\\s+Linkage:\\s+http://www.epsg.org$.*"));
     }
 

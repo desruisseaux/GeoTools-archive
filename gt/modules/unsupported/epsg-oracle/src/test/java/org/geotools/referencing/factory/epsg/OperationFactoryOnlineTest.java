@@ -55,7 +55,7 @@ public class OperationFactoryOnlineTest extends OracleOnlineTestCase {
      * Returns the first identifier for the specified object.
      */
     private static String getIdentifier(final IdentifiedObject object) {
-        return ((Identifier) object.getIdentifiers().iterator().next()).getCode();
+        return object.getIdentifiers().iterator().next().getCode();
     }
 
     /**

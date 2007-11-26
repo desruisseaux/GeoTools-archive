@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -42,12 +42,12 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      * Telephone numbers by which individuals can speak to the responsible organization or
      * individual.
      */
-    private Collection voices;
+    private Collection<String> voices;
 
     /**
      * Telephone numbers of a facsimile machine for the responsible organization or individual.
      */
-    private Collection facsimiles;
+    private Collection<String> facsimiles;
 
     /**
      * Constructs a default telephone.
@@ -80,7 +80,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      *
      * @since 2.4
      */
-    public synchronized Collection getVoices() {
+    public synchronized Collection<String> getVoices() {
         return voices = nonNullCollection(voices, String.class);
     }
 
@@ -100,7 +100,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      *
      * @since 2.4
      */
-    public synchronized void setVoices(final Collection newValues) {
+    public synchronized void setVoices(final Collection<? extends String> newValues) {
         voices = copyCollection(newValues, voices, String.class);
     }
 
@@ -121,7 +121,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      *
      * @since 2.4
      */
-    public synchronized Collection getFacsimiles() {
+    public synchronized Collection<String> getFacsimiles() {
         return facsimiles = nonNullCollection(facsimiles, String.class);
     }
 
@@ -141,7 +141,7 @@ public class TelephoneImpl extends MetadataEntity implements Telephone {
      *
      * @since 2.4
      */
-    public synchronized void setFacsimiles(final Collection newValues) {
+    public synchronized void setFacsimiles(final Collection<? extends String> newValues) {
         facsimiles = copyCollection(newValues, facsimiles, String.class);
     }
 }

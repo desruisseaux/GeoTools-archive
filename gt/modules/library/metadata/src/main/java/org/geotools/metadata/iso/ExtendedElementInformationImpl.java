@@ -19,10 +19,8 @@
  */
 package org.geotools.metadata.iso;
 
-// J2SE direct dependencies
 import java.util.Collection;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.Obligation;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -109,7 +107,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
      * Name of the metadata entity(s) under which this extended metadata element may appear.
      * The name(s) may be standard metadata element(s) or other extended metadata element(s).
      */
-    private Collection parentEntity;
+    private Collection<String> parentEntity;
 
     /**
      * Specifies how the extended element relates to other existing elements and entities.
@@ -119,12 +117,12 @@ public class ExtendedElementInformationImpl extends MetadataEntity
     /**
      * Reason for creating the extended element.
      */
-    private Collection rationales;
+    private Collection<InternationalString> rationales;
 
     /**
      * Name of the person or organization creating the extended element.
      */
-    private Collection sources;
+    private Collection<ResponsibleParty> sources;
     
     /**
      * Construct an initially empty extended element information.
@@ -148,9 +146,9 @@ public class ExtendedElementInformationImpl extends MetadataEntity
                                           final InternationalString definition, 
                                           final InternationalString condition, 
                                           final Datatype            datatype, 
-                                          final Collection          parentEntity, 
+                                          final Collection<String>  parentEntity, 
                                           final InternationalString rule,
-                                          final Collection          sources)
+                                          final Collection<? extends ResponsibleParty> sources)
     {
         setName        (name);
         setDefinition  (definition);
@@ -315,14 +313,16 @@ public class ExtendedElementInformationImpl extends MetadataEntity
      * Name of the metadata entity(s) under which this extended metadata element may appear.
      * The name(s) may be standard metadata element(s) or other extended metadata element(s).
      */
-    public synchronized Collection getParentEntity() {
+    public synchronized Collection<String> getParentEntity() {
         return parentEntity = nonNullCollection(parentEntity, String.class);
     }
 
     /**
      * Set the name of the metadata entity(s) under which this extended metadata element may appear.
      */
-    public synchronized void setParentEntity(final Collection newValues) {
+    public synchronized void setParentEntity(
+            final Collection<? extends String> newValues)
+    {
         parentEntity = copyCollection(newValues, parentEntity, String.class);
     }
 
@@ -344,28 +344,32 @@ public class ExtendedElementInformationImpl extends MetadataEntity
     /**
      * Reason for creating the extended element.
      */
-    public synchronized Collection getRationales() {
+    public synchronized Collection<InternationalString> getRationales() {
         return rationales = nonNullCollection(rationales, InternationalString.class);
     }
 
     /**
      * Set the reason for creating the extended element.
      */
-    public synchronized void setRationales(final Collection newValues) {
+    public synchronized void setRationales(
+            final Collection<? extends InternationalString> newValues)
+    {
         rationales = copyCollection(newValues, rationales, InternationalString.class);
     }
 
     /**
      * Name of the person or organization creating the extended element.
      */
-    public synchronized Collection getSources() {
+    public synchronized Collection<ResponsibleParty> getSources() {
         return sources = nonNullCollection(sources, ResponsibleParty.class);
     }
         
     /**
      * Set the name of the person or organization creating the extended element.
      */
-    public synchronized void setSources(final Collection newValues) {
+    public synchronized void setSources(
+            final Collection<? extends ResponsibleParty> newValues)
+    {
         sources = copyCollection(newValues, sources, ResponsibleParty.class);
     }
 }

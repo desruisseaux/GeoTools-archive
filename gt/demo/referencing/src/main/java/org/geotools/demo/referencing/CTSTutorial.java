@@ -597,12 +597,12 @@ public class CTSTutorial {
         
         System.out.println("  getIdentifiers():");
         //Identifier[]
-        Iterator idents = identObj.getIdentifiers().iterator();
+        Iterator<? extends Identifier> idents = identObj.getIdentifiers().iterator();
         if (! idents.hasNext()) {
             System.out.println("    no extra identifiers");
         } else {
             for (int i=0; idents.hasNext(); i++) {
-                Identifier ident = (Identifier)idents.next();
+                Identifier ident = idents.next();
                 System.out.println("    identifier(" + i + ").getCode() - " + ident.getCode());
                 System.out.println("    identifier(" + i + ").getAuthority() - " + ident.getAuthority());
             }

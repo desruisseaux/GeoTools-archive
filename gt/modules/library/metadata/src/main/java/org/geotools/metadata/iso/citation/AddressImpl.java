@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,9 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// J2SE direct dependencies
 import java.util.Collection;
-import java.util.Iterator;
-
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Address;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -46,17 +40,17 @@ public class AddressImpl extends MetadataEntity implements Address {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 2278687294173262546L;
-    
+
     /**
      * State, province of the location.
      */
     private InternationalString administrativeArea;
-    
+
     /**
      * The city of the location
      */
     private InternationalString city;
-    
+
    /**
      * Country of the physical address.
      */
@@ -64,18 +58,18 @@ public class AddressImpl extends MetadataEntity implements Address {
 
     /**
      * ZIP or other postal code.
-     */    
+     */
     private String postalCode;
 
     /**
      * Address line for the location (as described in ISO 11180, Annex A).
      */
-    private Collection deliveryPoints;
-    
+    private Collection<String> deliveryPoints;
+
     /**
      * Address of the electronic mailbox of the responsible organization or individual.
      */
-    private Collection electronicMailAddresses;
+    private Collection<String> electronicMailAddresses;
 
     /**
      * Constructs an initially empty address.
@@ -99,7 +93,7 @@ public class AddressImpl extends MetadataEntity implements Address {
     public InternationalString getAdministrativeArea() {
         return administrativeArea;
     }
-    
+
     /**
      * Set the state, province of the location.
      */
@@ -139,34 +133,38 @@ public class AddressImpl extends MetadataEntity implements Address {
         checkWritePermission();
         country = newValue;
     }
-    
+
     /**
      * Returns the address line for the location (as described in ISO 11180, Annex A).
      */
-    public synchronized Collection getDeliveryPoints() {
+    public synchronized Collection<String> getDeliveryPoints() {
         return deliveryPoints = nonNullCollection(deliveryPoints, String.class);
     }
-    
+
     /**
      * Set the address line for the location (as described in ISO 11180, Annex A).
      */
-    public synchronized void setDeliveryPoints(final Collection newValues) {
+    public synchronized void setDeliveryPoints(
+            final Collection<? extends String> newValues)
+    {
         deliveryPoints = copyCollection(newValues, deliveryPoints, String.class);
     }
     /**
      * Returns the address of the electronic mailbox of the responsible organization or individual.
      */
-    public synchronized Collection getElectronicMailAddresses() {
+    public synchronized Collection<String> getElectronicMailAddresses() {
         return electronicMailAddresses = nonNullCollection(electronicMailAddresses, String.class);
     }
 
     /**
      * Set the address of the electronic mailbox of the responsible organization or individual.
      */
-    public synchronized void setElectronicMailAddresses(final Collection newValues) {
+    public synchronized void setElectronicMailAddresses(
+            final Collection<? extends String> newValues)
+    {
         electronicMailAddresses = copyCollection(newValues, electronicMailAddresses, String.class);
     }
-    
+
     /**
      * Returns ZIP or other postal code.
      * Returns {@code null} if unspecified.
@@ -174,7 +172,7 @@ public class AddressImpl extends MetadataEntity implements Address {
     public String getPostalCode() {
         return postalCode;
     }
-    
+
     /**
      * Set ZIP or other postal code.
      */

@@ -22,11 +22,13 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 import org.geotools.resources.Arguments;
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
 
@@ -72,6 +74,7 @@ public final class AUTOTest extends TestCase {
     /**
      * Initializes the factory to test.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         factory = new AutoCRSFactory();
@@ -81,7 +84,7 @@ public final class AUTOTest extends TestCase {
      * Tests the registration in {@link ReferencingFactoryFinder}.
      */
     public void testFactoryFinder() {
-        final Collection authorities = ReferencingFactoryFinder.getAuthorityNames();
+        final Collection<String> authorities = ReferencingFactoryFinder.getAuthorityNames();
         assertTrue(authorities.contains("AUTO"));
         assertTrue(authorities.contains("AUTO2"));
         factory = ReferencingFactoryFinder.getCRSAuthorityFactory("AUTO", null);
@@ -93,11 +96,11 @@ public final class AUTOTest extends TestCase {
      * Checks the authority names.
      */
     public void testAuthority() {
-        final Collection identifiers = factory.getAuthority().getIdentifiers();
-        assertTrue (identifiers.contains("AUTO"));
-        assertTrue (identifiers.contains("AUTO2"));
-        assertFalse(identifiers.contains("EPSG"));
-        assertFalse(identifiers.contains("CRS"));
+        final Citation authority = factory.getAuthority();
+        assertTrue (Citations.identifierMatches(authority, "AUTO"));
+        assertTrue (Citations.identifierMatches(authority, "AUTO2"));
+        assertFalse(Citations.identifierMatches(authority, "EPSG"));
+        assertFalse(Citations.identifierMatches(authority, "CRS"));
     }
 
     /**

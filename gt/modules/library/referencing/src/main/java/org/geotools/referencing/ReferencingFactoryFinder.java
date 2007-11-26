@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import javax.imageio.spi.ServiceRegistry;
 
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
@@ -172,13 +173,8 @@ loop:       for (int i=0; ; i++) {
                     final Citation authority = factory.getAuthority();
                     if (authority != null) {
                         authorityNames.add(Citations.getIdentifier(authority));
-                    }
-                    // Temporary workaround for a GeoTools bug (wrong type in the collection).
-                    if (authority instanceof org.geotools.metadata.iso.citation.CitationImpl) {
-                        final org.geotools.metadata.iso.citation.CitationImpl impl =
-                                (org.geotools.metadata.iso.citation.CitationImpl) authority;
-                        for (final Object code : impl.getIdentifiers()) {
-                            authorityNames.add(code.toString());
+                        for (final Identifier id : authority.getIdentifiers()) {
+                            authorityNames.add(id.getCode());
                         }
                     }
                 }

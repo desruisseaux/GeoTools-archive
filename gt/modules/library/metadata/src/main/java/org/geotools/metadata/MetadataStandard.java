@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,13 +15,11 @@
  */
 package org.geotools.metadata;
 
-// J2SE dependencies
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -67,15 +65,15 @@ public final class MetadataStandard {
     /**
      * Accessors for the specified implementations.
      */
-    private final Map/*<Class,PropertyAccessor>*/ accessors = new HashMap();
+    private final Map<Class<?>,PropertyAccessor> accessors = new HashMap<Class<?>,PropertyAccessor>();
 
     /**
      * Shared pool of {@link PropertyTree} instances, once for each thread
      * (in order to avoid the need for thread synchronization).
      */
-    private final ThreadLocal treeBuilders = new ThreadLocal() {
+    private final ThreadLocal<PropertyTree> treeBuilders = new ThreadLocal<PropertyTree>() {
         @Override
-        protected Object initialValue() {
+        protected PropertyTree initialValue() {
             return new PropertyTree(MetadataStandard.this);
         }
     };
@@ -100,11 +98,13 @@ public final class MetadataStandard {
      * @throws ClassCastException if the specified implementation class do
      *         not implements a metadata interface of the expected package.
      */
-    private PropertyAccessor getAccessor(final Class implementation) throws ClassCastException {
+    private PropertyAccessor getAccessor(final Class<?> implementation)
+            throws ClassCastException
+    {
         final PropertyAccessor accessor = getAccessorOptional(implementation);
         if (accessor == null) {
             throw new ClassCastException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
-                                         implementation.getName()));        
+                                         implementation.getName()));
         }
         return accessor;
     }
@@ -112,9 +112,9 @@ public final class MetadataStandard {
     /**
      * Returns the accessor for the specified implementation, or {@code null} if none.
      */
-    final PropertyAccessor getAccessorOptional(final Class implementation) {
+    final PropertyAccessor getAccessorOptional(final Class<?> implementation) {
         synchronized (accessors) {
-            PropertyAccessor accessor = (PropertyAccessor) accessors.get(implementation);
+            PropertyAccessor accessor = accessors.get(implementation);
             if (accessor == null) {
                 Class type = getType(implementation);
                 if (type != null) {
@@ -131,10 +131,9 @@ public final class MetadataStandard {
      * Only one metadata interface can be implemented.
      *
      * @param  metadata The metadata implementation to wraps.
-     * @param  interfacePackage The root package for metadata interfaces.
      * @return The single interface, or {@code null} if none where found.
      */
-    private Class getType(final Class implementation) {
+    private Class<?> getType(final Class<?> implementation) {
         return PropertyAccessor.getType(implementation, interfacePackage);
     }
 
@@ -146,7 +145,7 @@ public final class MetadataStandard {
      *
      * @see AbstractMap#getInterface
      */
-    public Class getInterface(final Class implementation) throws ClassCastException {
+    public Class<?> getInterface(final Class<?> implementation) throws ClassCastException {
         return getAccessor(implementation).type;
     }
 
@@ -167,7 +166,7 @@ public final class MetadataStandard {
      *
      * @see AbstractMap#asMap
      */
-    public Map asMap(final Object metadata) throws ClassCastException {
+    public Map<String,Object> asMap(final Object metadata) throws ClassCastException {
         return new PropertyMap(metadata, getAccessor(metadata.getClass()));
     }
 
@@ -187,7 +186,7 @@ public final class MetadataStandard {
      * @see AbstractMap#asTree
      */
     public TreeModel asTree(final Object metadata) throws ClassCastException {
-        final PropertyTree builder = (PropertyTree) treeBuilders.get();
+        final PropertyTree builder = treeBuilders.get();
         return new DefaultTreeModel(builder.asTree(metadata), true);
     }
 
@@ -311,7 +310,7 @@ public final class MetadataStandard {
      * @see AbstractMap#toString
      */
     public String toString(final Object metadata) throws ClassCastException {
-        final PropertyTree builder = (PropertyTree) treeBuilders.get();
+        final PropertyTree builder = treeBuilders.get();
         return PropertyTree.toString(builder.asTree(metadata));
     }
 

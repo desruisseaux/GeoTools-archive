@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,21 +16,16 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.util.SimpleInternationalString;
 
@@ -47,7 +42,6 @@ public final class IdentifiedObjectTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -71,7 +65,7 @@ public final class IdentifiedObjectTest extends TestCase {
      * the correct value.
      */
     public void testIdentifier() {
-        final Map properties = new HashMap();
+        final Map<String,Object> properties = new HashMap<String,Object>();
         assertNull(properties.put("code",          "This is a code"));
         assertNull(properties.put("authority",     "This is an authority"));
         assertNull(properties.put("version",       "This is a version"));
@@ -115,7 +109,7 @@ public final class IdentifiedObjectTest extends TestCase {
      * Test {@link IdentifiedObject}.
      */
     public void testIdentifiedObject() {
-        final Map properties = new HashMap();
+        final Map<String,Object> properties = new HashMap<String,Object>();
         assertNull(properties.put("name",             "This is a name"));
         assertNull(properties.put("remarks",          "There is remarks"));
         assertNull(properties.put("remarks_fr",       "Voici des remarques"));
@@ -127,7 +121,7 @@ public final class IdentifiedObjectTest extends TestCase {
         assertNull(properties.put("realizationEpoch", "Realization epoch"));
         assertNull(properties.put("validArea",        "Valid area"));
 
-        final Map remaining = new HashMap();
+        final Map<String,Object> remaining = new HashMap<String,Object>();
         final AbstractIdentifiedObject reference = new AbstractIdentifiedObject(
                 properties, remaining, new String[] {"local"});
         assertEquals("name",       "This is a name",         reference.getName().getCode());
@@ -152,7 +146,7 @@ public final class IdentifiedObjectTest extends TestCase {
      * Test {@link AbstractReferenceSystem}.
      */
     public void testReferenceSystem() {
-        final Map properties = new HashMap();
+        final Map<String,Object> properties = new HashMap<String,Object>();
         assertNull(properties.put("name",       "This is a name"));
         assertNull(properties.put("scope",      "This is a scope"));
         assertNull(properties.put("scope_fr",   "Valide dans ce domaine"));

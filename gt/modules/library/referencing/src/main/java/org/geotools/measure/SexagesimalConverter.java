@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2000, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.measure;
 
-// J2SE dependencies and extensions
 import javax.units.Converter;
 import javax.units.ConversionException;
 
@@ -57,7 +56,7 @@ class SexagesimalConverter extends Converter {
      * The inverse of this converter.
      */
     private final Converter inverse;
-    
+
     /**
      * Constructs a converter for sexagesimal units.
      *
@@ -69,7 +68,7 @@ class SexagesimalConverter extends Converter {
         this.divider = divider;
         this.inverse = new Inverse(this);
     }
-    
+
     /**
      * Constructs a converter for sexagesimal units.
      * This constructor is for {@link Inverse} usage only.
@@ -85,7 +84,7 @@ class SexagesimalConverter extends Converter {
     public final Converter inverse() {
         return inverse;
     }
-    
+
     /**
      * Performs a conversion from fractional degrees to sexagesimal degrees.
      */
@@ -114,16 +113,18 @@ class SexagesimalConverter extends Converter {
     /**
      * Compares this converter with the specified object.
      */
+    @Override
     public final boolean equals(final Object object) {
-        return object!=null && object.getClass().equals(getClass()) &&
+        return object != null && object.getClass().equals(getClass()) &&
                 ((SexagesimalConverter) object).divider == divider;
     }
 
     /**
      * Returns a hash value for this converter.
      */
+    @Override
     public int hashCode() {
-        return (int)serialVersionUID + divider;
+        return (int) serialVersionUID + divider;
     }
 
     /**
@@ -145,6 +146,7 @@ class SexagesimalConverter extends Converter {
         /**
          * Performs a conversion from sexagesimal degrees to fractional degrees.
          */
+        @Override
         public double convert(double value) throws ConversionException {
             value *= this.divider;
             int deg,min;
@@ -173,8 +175,9 @@ class SexagesimalConverter extends Converter {
         /**
          * Returns a hash value for this converter.
          */
+        @Override
         public int hashCode() {
-            return (int)serialVersionUID + divider;
+            return (int) serialVersionUID + divider;
         }
     }
 }

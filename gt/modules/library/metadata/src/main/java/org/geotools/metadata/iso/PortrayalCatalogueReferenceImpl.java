@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,8 @@
  */
 package org.geotools.metadata.iso;
 
-// J2SE direct dependencies
 import java.util.Collection;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.PortrayalCatalogueReference;
 
@@ -48,7 +46,7 @@ public class PortrayalCatalogueReferenceImpl extends MetadataEntity
     /**
      * Bibliographic reference to the portrayal catalogue cited.
      */
-    private Collection portrayalCatalogueCitations;
+    private Collection<Citation> portrayalCatalogueCitations;
 
     /**
      * Construct an initially empty portrayal catalogue reference.
@@ -68,21 +66,23 @@ public class PortrayalCatalogueReferenceImpl extends MetadataEntity
     /**
      * Creates a portrayal catalogue reference initialized to the given values.
      */
-    public PortrayalCatalogueReferenceImpl(final Collection portrayalCatalogueCitations) {
+    public PortrayalCatalogueReferenceImpl(final Collection<Citation> portrayalCatalogueCitations) {
         setPortrayalCatalogueCitations(portrayalCatalogueCitations);
     }
-    
+
     /**
      * Bibliographic reference to the portrayal catalogue cited.
      */
-    public synchronized Collection getPortrayalCatalogueCitations() {
+    public synchronized Collection<Citation> getPortrayalCatalogueCitations() {
         return portrayalCatalogueCitations = nonNullCollection(portrayalCatalogueCitations, Citation.class);
     }
 
     /**
      * Set bibliographic reference to the portrayal catalogue cited.
      */
-    public synchronized void setPortrayalCatalogueCitations(Collection newValues) {
+    public synchronized void setPortrayalCatalogueCitations(
+            Collection<? extends Citation> newValues)
+    {
         portrayalCatalogueCitations = copyCollection(newValues, portrayalCatalogueCitations, Citation.class);
     }
 }

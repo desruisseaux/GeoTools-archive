@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -18,11 +18,8 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.util.SimpleInternationalString;
 

@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.ReferenceIdentifier;
@@ -509,10 +510,10 @@ public class NamedIdentifier implements ReferenceIdentifier, GenericName,
      * through the identifier, then through the titles if no suitable identifier were found.
      */
     private static String getCodeSpace(final Citation authority) {
-        final Collection identifiers = authority.getIdentifiers();
+        final Collection<? extends Identifier> identifiers = authority.getIdentifiers();
         if (identifiers != null) {
-            for (final Iterator it=identifiers.iterator(); it.hasNext();) {
-                final String identifier = (String) it.next();
+            for (final Identifier id : identifiers) {
+                final String identifier = id.getCode();
                 if (isValidCodeSpace(identifier)) {
                     return identifier;
                 }

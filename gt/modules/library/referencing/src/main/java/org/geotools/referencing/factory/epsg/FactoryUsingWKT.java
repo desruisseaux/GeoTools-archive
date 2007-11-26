@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2005-2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,15 +29,13 @@ import java.util.logging.Level;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -71,7 +68,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * <p>
  * This factory can also be used to provide custom extensions or overrides to a main EPSG factory.
  * In order to provide a custom extension file, override the {@link #getDefinitionsURL()} method.
- * In order to make the factory be an override, change the default priority by using the 
+ * In order to make the factory be an override, change the default priority by using the
  * two arguments constructor (this factory defaults to {@link ThreadedEpsgFactory#PRIORITY} - 10,
  * so it's used as an extension).
  *
@@ -85,15 +82,6 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuthorityFactory {
     /**
-     * The {@linkplain System#getProperty(String) system property} key for setting the directory
-     * where to search for the {@value #FILENAME} file.
-     *
-     * @since 2.4
-     * @deprecated Moved to {@link GeoTools#CRS_AUTHORITY_EXTRA_DIRECTORY}.
-     */
-    public static final String CRS_DIRECTORY_KEY = GeoTools.CRS_AUTHORITY_EXTRA_DIRECTORY;
-
-    /**
      * The authority. Will be created only when first needed.
      *
      * @see #getAuthority
@@ -105,8 +93,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * search for the first occurence of this file in the following places:
      * <p>
      * <ul>
-     *   <li>In the directory specified by the {@value GeoTools#CRS_DIRECTORY_KEY} system
-     *       property.</li>
+     *   <li>In the directory specified by the
+     *       {@value org.geotools.factory.GeoTools#CRS_DIRECTORY_KEY} system property.</li>
      *   <li>In every {@code org/geotools/referencing/factory/espg} directories found on the
      *       classpath.</li>
      * </ul>
@@ -186,7 +174,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      *
      * @see #getAuthorities
      */
-    //@Override
+    @Override
     public Citation getAuthority() {
         // No need to synchronize; this is not a big deal if we create this object twice.
         if (authority == null) {
@@ -196,11 +184,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
                 case 1: authority = authorities[0]; break;
                 default: {
                     final CitationImpl c = new CitationImpl(authorities[0]);
-                    final Collection types = c.getIdentifierTypes();
-                    final Collection identifiers = c.getIdentifiers();
+                    final Collection<String> types = c.getIdentifierTypes();
+                    final Collection<Identifier> identifiers = c.getIdentifiers();
                     for (int i=1; i<authorities.length; i++) {
                         types.add("Authority name");
-                        identifiers.add(Citations.getIdentifier(authorities[i]));
+                        identifiers.addAll(authorities[i].getIdentifiers());
                     }
                     c.freeze();
                     authority = c;
@@ -276,8 +264,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
                 throw new FactoryNotFoundException(Errors.format(
                         ErrorKeys.FILE_DOES_NOT_EXIST_$1, FILENAME));
             }
-            final Iterator ids = getAuthority().getIdentifiers().iterator();
-            final String authority = ids.hasNext() ? (String) ids.next() : "EPSG";
+            final Iterator<? extends Identifier> ids = getAuthority().getIdentifiers().iterator();
+            final String authority = ids.hasNext() ? ids.next().getCode() : "EPSG";
             LOGGER.log(Logging.format(Level.CONFIG, LoggingKeys.USING_FILE_AS_FACTORY_$2,
                                       url.getPath(), authority));
             return new PropertyAuthorityFactory(factories, getAuthorities(), url);
@@ -289,12 +277,9 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     /**
      * Returns a factory of the given type.
      */
-    private static final AbstractAuthorityFactory /*T*/ getFactory(
-            final Class/*<T extends AbstractAuthorityFactory>*/ type)
-    {
-        // TODO: use type.cast(...) when we will be allowed to compile for J2SE 1.5.
-        return (AbstractAuthorityFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
-                new Hints(Hints.CRS_AUTHORITY_FACTORY, type));
+    private static final <T extends AbstractAuthorityFactory> T getFactory(final Class<T> type) {
+        return type.cast(ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
+                new Hints(Hints.CRS_AUTHORITY_FACTORY, type)));
     }
 
     /**
@@ -323,11 +308,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
             throw new AssertionError(e);
         }
         out.println();
-        final Set wktCodes   = this.      getAuthorityCodes(IdentifiedObject.class);
-        final Set sqlCodes   = sqlFactory.getAuthorityCodes(IdentifiedObject.class);
-        final Set duplicated = new TreeSet();
-        for (final Iterator it=wktCodes.iterator(); it.hasNext();) {
-            final String code = ((String) it.next()).trim();
+        final Set<String> wktCodes   = this.      getAuthorityCodes(IdentifiedObject.class);
+        final Set<String> sqlCodes   = sqlFactory.getAuthorityCodes(IdentifiedObject.class);
+        final Set<String> duplicated = new TreeSet<String>();
+        for (String code : wktCodes) {
+            code = code.trim();
             if (sqlCodes.contains(code)) {
                 duplicated.add(code);
                 /*
@@ -342,8 +327,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
         if (duplicated.isEmpty()) {
             out.println(resources.getString(VocabularyKeys.NO_DUPLICATION_FOUND));
         } else {
-            for (final Iterator it=duplicated.iterator(); it.hasNext();) {
-                final String code = (String) it.next();
+            for (final String code : duplicated) {
                 out.print(resources.getLabel(VocabularyKeys.DUPLICATED_VALUE));
                 out.println(code);
             }
@@ -365,10 +349,9 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * @since 2.4
      */
     protected Set reportInstantiationFailures(final PrintWriter out) throws FactoryException {
-        final Set codes = getAuthorityCodes(CoordinateReferenceSystem.class);
-        final Map failures = new TreeMap();
-        for (final Iterator it=codes.iterator(); it.hasNext();) {
-            final String code = (String) it.next();
+        final Set<String> codes = getAuthorityCodes(CoordinateReferenceSystem.class);
+        final Map<String,String> failures = new TreeMap<String,String>();
+        for (final String code : codes) {
             try {
                 createCoordinateReferenceSystem(code);
             } catch (FactoryException exception) {
@@ -377,12 +360,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
         }
         if (!failures.isEmpty()) {
             final TableWriter writer = new TableWriter(out, " ");
-            for (final Iterator it=failures.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
-                writer.write((String) entry.getKey());
+            for (final Map.Entry<String,String> entry : failures.entrySet()) {
+                writer.write(entry.getKey());
                 writer.write(':');
                 writer.nextColumn();
-                writer.write((String) entry.getValue());
+                writer.write(entry.getValue());
                 writer.nextLine();
             }
             try {
@@ -421,7 +403,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     /**
      * Implementation of the {@link #main} method, shared by subclasses.
      */
-    static void main(String[] args, final Class/*<? extends FactoryUsingWKT>*/ type)
+    static void main(String[] args, final Class<? extends FactoryUsingWKT> type)
             throws FactoryException
     {
         final Arguments arguments = new Arguments(args);
@@ -429,8 +411,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
         final boolean duplicated  = arguments.getFlag("-duplicated");
         final boolean instantiate = arguments.getFlag("-test");
         args = arguments.getRemainingArguments(0);
-        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        final FactoryUsingWKT factory = (FactoryUsingWKT) getFactory(type);
+        final FactoryUsingWKT factory = getFactory(type);
         if (duplicated) {
             factory.reportDuplicatedCodes(arguments.out);
         }

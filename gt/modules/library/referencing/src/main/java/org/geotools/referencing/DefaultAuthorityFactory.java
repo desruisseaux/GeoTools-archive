@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,19 +15,13 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
-import java.util.Collection;
 import java.util.Set;
-import java.util.Iterator;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
-// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
-import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.factory.ManyAuthoritiesFactory;
@@ -42,7 +36,7 @@ import org.geotools.referencing.factory.ThreadedAuthorityFactory;
  *   <li>Uses {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} to swap ordinate order if needed.</li>
  *   <li>Uses {@link ManyAuthoritiesFactory} to access CRSAuthorities in the environment.</li>
  * </ul>
- * 
+ *
  * @since 2.3
  * @source $URL$
  * @version $Id$
@@ -61,13 +55,12 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
      * Implementation of {@link CRS#getSupportedCodes}. Provided here in order to reduce the
      * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
      */
-    static Set/*<String>*/ getSupportedCodes(final String authority) {
-        Set result = Collections.EMPTY_SET;
+    static Set<String> getSupportedCodes(final String authority) {
+        Set<String> result = Collections.emptySet();
         boolean isSetCopied = false;
-        for (final Iterator i=ReferencingFactoryFinder.getCRSAuthorityFactories(null).iterator(); i.hasNext();) {
-            final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
+        for (final CRSAuthorityFactory factory : ReferencingFactoryFinder.getCRSAuthorityFactories(null)) {
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
-                final Set codes;
+                final Set<String> codes;
                 try {
                     codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
                 } catch (Exception exception) {
@@ -85,7 +78,7 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
                         result = codes;
                     } else {
                         if (!isSetCopied) {
-                            result = new LinkedHashSet(result);
+                            result = new LinkedHashSet<String>(result);
                             isSetCopied = true;
                         }
                         result.addAll(codes);
@@ -100,14 +93,11 @@ final class DefaultAuthorityFactory extends ThreadedAuthorityFactory implements 
      * Implementation of {@link CRS#getSupportedAuthorities}. Provided here in order to reduce the
      * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
      */
-    static Set/*<String>*/ getSupportedAuthorities(final boolean returnAliases) {
-        final Set authorityFactories = ReferencingFactoryFinder.getCRSAuthorityFactories(null);
-        final Set result = new LinkedHashSet();
-        for (final Iterator i = authorityFactories.iterator(); i.hasNext();) {
-            final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
-            final Collection identifiers = factory.getAuthority().getIdentifiers();
-            for (final Iterator j = identifiers.iterator(); j.hasNext();) {
-                result.add(j.next());
+    static Set<String> getSupportedAuthorities(final boolean returnAliases) {
+        final Set<String> result = new LinkedHashSet<String>();
+        for (final CRSAuthorityFactory factory : ReferencingFactoryFinder.getCRSAuthorityFactories(null)) {
+            for (final Identifier id : factory.getAuthority().getIdentifiers()) {
+                result.add(id.getCode());
                 if (!returnAliases) {
                     break;
                 }

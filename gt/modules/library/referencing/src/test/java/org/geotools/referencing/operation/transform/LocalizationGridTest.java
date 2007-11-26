@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -46,17 +46,17 @@ public final class LocalizationGridTest extends TestCase {
      * The grid of localization to test.
      */
     private LocalizationGrid grid;
-    
+
     /**
      * The "real world" coordinates of the image.
      */
-    private static final double[][] GRID_DATA =  
+    private static final double[][] GRID_DATA =
         {{74.273440,   -37.882812,    /* First line. */
           72.695310,   -38.375000,
           71.382810,   -38.765625,
           70.250000,   -39.085938,
           69.257810,   -39.359375,
-          68.375000,   -39.585938}, 
+          68.375000,   -39.585938},
          {74.273440,   -37.875000,    /* Second line. */
           72.695310,   -38.367188,
           71.375000,   -38.757812,
@@ -87,13 +87,13 @@ public final class LocalizationGridTest extends TestCase {
           70.226560,   -39.039062,
           69.234375,   -39.312500,
           68.351560,   -39.539062}};
-       
+
     /**
      * Maximal error between expected "real world" and computed "real world"
      * coordinates when direct transformation is used.
      */
     private static final double EPS = 1E-9;
-    
+
     /**
      * Maximal error between expected "real world" and computed "real world"
      * coordinates when the fitted affine transformation is used.
@@ -104,7 +104,6 @@ public final class LocalizationGridTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -114,7 +113,7 @@ public final class LocalizationGridTest extends TestCase {
     public static Test suite() {
         return new TestSuite(LocalizationGridTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -126,6 +125,7 @@ public final class LocalizationGridTest extends TestCase {
      * Set up common objects used for all tests.
      * This implementation construct a default localization grid.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         final int width  = GRID_DATA[0].length/2;
@@ -188,16 +188,16 @@ public final class LocalizationGridTest extends TestCase {
         for (int j=0; j<height; j++) {
             final double[] line = GRID_DATA[j];
             assertEquals("Grid is not square", width*2, line.length);
-            for (int i=0; i<width; i++) {                
+            for (int i=0; i<width; i++) {
                 assertEquals(real ? line[i*2+0] : i, array[offset++], eps);
                 assertEquals(real ? line[i*2+1] : j, array[offset++], eps);
             }
         }
         assertEquals("Grid is not square", width*height*2, offset);
     }
-    
+
     /**
-     * Test direct transformation from grid coordinates to "real world" 
+     * Test direct transformation from grid coordinates to "real world"
      * coordinates using the localization grid.
      */
     public void testDirectTransform() throws TransformException {
@@ -205,8 +205,8 @@ public final class LocalizationGridTest extends TestCase {
         grid.getMathTransform().transform(array, 0, array, 0, array.length/2);
         compare(array, true, EPS);
     }
-    
-    
+
+
     /**
      * Test affine tranformation for the whole grid by comparing the
      * expected "real world" to the approximated coordinates. Since
@@ -218,7 +218,7 @@ public final class LocalizationGridTest extends TestCase {
         grid.getAffineTransform().transform(array, 0, array, 0, array.length/2);
         compare(array, true, FIT_TOLERANCE);
     }
-    
+
     /**
      * Test inverse transformation from "real world" coordinates
      * to grid coordinates coordinate using the localization grid.

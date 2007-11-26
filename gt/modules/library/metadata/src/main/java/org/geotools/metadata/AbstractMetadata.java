@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -48,7 +48,7 @@ public abstract class AbstractMetadata {
     /**
      * A view of this metadata as a map. Will be created only when first needed.
      */
-    private transient Map asMap;
+    private transient Map<String,Object> asMap;
 
     /**
      * Creates an initially empty metadata.
@@ -126,7 +126,7 @@ public abstract class AbstractMetadata {
      * The map supports the {@link Map#put put} operations if the underlying
      * metadata object contains {@link #set*(...)} methods.
      */
-    public synchronized Map asMap() {
+    public synchronized Map<String,Object> asMap() {
         if (asMap == null) {
             asMap = getStandard().asMap(this);
         }
@@ -155,6 +155,7 @@ public abstract class AbstractMetadata {
      * providing that every childs implement the {@link Object#equals} method as well. This
      * is the case by default if every childs are subclasses of {@code AbstractMetadata}.
      */
+    @Override
     public synchronized boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             return getStandard().shallowEquals(this, object, false);
@@ -168,6 +169,7 @@ public abstract class AbstractMetadata {
      * same contract than {@link java.util.Set#hashCode} and ensure that the hash code
      * value is insensitive to the ordering of properties.
      */
+    @Override
     public synchronized int hashCode() {
         int code = hashCode;
         if (code == 0) {
@@ -185,6 +187,7 @@ public abstract class AbstractMetadata {
     /**
      * Returns a string representation of this metadata.
      */
+    @Override
     public synchronized String toString() {
         return getStandard().toString(this);
     }

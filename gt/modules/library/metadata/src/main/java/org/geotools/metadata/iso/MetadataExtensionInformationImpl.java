@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,8 @@
  */
 package org.geotools.metadata.iso;
 
-// J2SE direct dependencies
 import java.util.Collection;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.MetadataExtensionInformation;
@@ -56,7 +54,7 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
      * Provides information about a new metadata element, not found in ISO 19115, which is
      * required to describe geographic data.
      */
-    private Collection extendedElementInformation;
+    private Collection<ExtendedElementInformation> extendedElementInformation;
 
     /**
      * Construct an initially empty metadata extension information.
@@ -86,22 +84,23 @@ public class MetadataExtensionInformationImpl extends MetadataEntity
      */
     public synchronized void setExtensionOnLineResource(final OnLineResource newValue) {
         checkWritePermission();
-        this.extensionOnLineResource = newValue; 
+        this.extensionOnLineResource = newValue;
     }
 
     /**
      * Provides information about a new metadata element, not found in ISO 19115, which is
      * required to describe geographic data.
      */
-    public synchronized Collection getExtendedElementInformation() {
+    public synchronized Collection<ExtendedElementInformation> getExtendedElementInformation() {
         return extendedElementInformation = nonNullCollection(extendedElementInformation,
                                                               ExtendedElementInformation.class);
     }
-    
+
     /**
      * Set information about a new metadata element.
      */
-    public synchronized void setExtendedElementInformation(final Collection newValues) {
+    public synchronized void setExtendedElementInformation(
+            final Collection<? extends ExtendedElementInformation> newValues) {
         extendedElementInformation = copyCollection(newValues, extendedElementInformation,
                                                     ExtendedElementInformation.class);
     }

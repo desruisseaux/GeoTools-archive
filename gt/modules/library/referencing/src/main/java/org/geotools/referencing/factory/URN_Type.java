@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory;
 
-// OpenGIS dependencies
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.cs.AxisDirection;
@@ -75,12 +74,12 @@ final class URN_Type {
      * The factory for this type, either as a {@link AuthorityFactory} subinterface
      * or a {@link CodeList}.
      */
-    public final Class type;
+    public final Class<?> type;
 
     /**
      * Creates a new instance of {@code URN_Type}.
      */
-    private URN_Type(final String name, final Class type) {
+    private URN_Type(final String name, final Class<?> type) {
         this.name = name;
         this.type = type;
     }
@@ -108,6 +107,7 @@ final class URN_Type {
     /**
      * Returns the type name, for formatting and debugging purpose.
      */
+    @Override
     public String toString() {
         return name;
     }

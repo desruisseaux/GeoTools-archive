@@ -27,7 +27,6 @@ import org.opengis.metadata.content.ImagingCondition;
 
 import org.opengis.util.CodeList;
 import org.opengis.metadata.MetaData;
-import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.extent.VerticalExtent;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.maintenance.ScopeDescription;
@@ -75,7 +74,7 @@ public class ISOTest extends TestCase {
      * will automatically scans for dependencies even if an interface do not appears in this
      * list. This list should not contains any {@link CodeList}.
      */
-    private static final Class[] TEST = new Class[] {
+    private static final Class<?>[] TEST = new Class[] {
         org.opengis.metadata.ApplicationSchemaInformation.class,
         org.opengis.metadata.ExtendedElementInformation.class,
         org.opengis.metadata.FeatureTypeList.class,
@@ -168,7 +167,7 @@ public class ISOTest extends TestCase {
     /**
      * GeoAPI interfaces that are know to be unimplemented at this stage.
      */
-    private static final Class[] UNIMPLEMENTED = new Class[] {
+    private static final Class<?>[] UNIMPLEMENTED = new Class[] {
         AggregateInformation.class,
         CoverageContentType.class,
         ImagingCondition.class,
@@ -216,10 +215,10 @@ public class ISOTest extends TestCase {
     public void testDependencies() {
         assertNull(getImplementation(Number.class));
         assertSame(MetaDataImpl.class, getImplementation(MetaData.class));
-        final Set done = new HashSet();
+        final Set<Class<?>> done = new HashSet<Class<?>>();
         for (int i=0; i<TEST.length; i++) {
-            final Class type = TEST[i];
-            final Class impl = getImplementation(type);
+            final Class<?> type = TEST[i];
+            final Class<?> impl = getImplementation(type);
             if (impl == null) {
                 if (isImplemented(type)) {
                     fail(type.getName() + " is not implemented.");
@@ -237,7 +236,7 @@ public class ISOTest extends TestCase {
      * Recursively ensures that the specified metadata implementation has
      * setters for every methods.
      */
-    private static void assertSetters(final PropertyAccessor accessor, final Set/*<Class>*/ done) {
+    private static void assertSetters(final PropertyAccessor accessor, final Set<Class<?>> done) {
         if (done.add(accessor.type)) {
             /*
              * Tries to instantiate the implementation. Every implementation should have a

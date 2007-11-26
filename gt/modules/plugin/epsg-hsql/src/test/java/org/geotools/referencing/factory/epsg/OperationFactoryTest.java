@@ -16,16 +16,13 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.util.Iterator;
 import java.util.logging.Level;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -37,7 +34,6 @@ import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.ConcatenatedOperation;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.AuthorityBackedFactory;
@@ -89,7 +85,7 @@ public class OperationFactoryTest extends TestCase {
      * Returns the first identifier for the specified object.
      */
     private static String getIdentifier(final IdentifiedObject object) {
-        return ((Identifier) object.getIdentifiers().iterator().next()).getCode();
+        return object.getIdentifiers().iterator().next().getCode();
     }
 
     /**
@@ -137,7 +133,7 @@ public class OperationFactoryTest extends TestCase {
             if (op instanceof Transformation) {
                 count++;
             } else {
-                assertTrue("Expected Conversion but got " + 
+                assertTrue("Expected Conversion but got " +
                            Utilities.getShortName(AbstractCoordinateOperation.getType(op)) + ". ",
                            (op instanceof Conversion));
             }

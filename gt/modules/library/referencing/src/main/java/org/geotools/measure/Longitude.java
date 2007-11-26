@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
  *    (C) 1999, Fisheries and Oceans Canada
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -34,17 +34,17 @@ public final class Longitude extends Angle {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -8614900608052762636L;
-    
+
     /**
      * Minimum legal value for longitude (-180°).
      */
     public static final double MIN_VALUE = -180;
-    
+
     /**
      * Maximum legal value for longitude (+180°).
      */
     public static final double MAX_VALUE = +180;
-    
+
     /**
      * Contruct a new longitude with the specified value.
      *
@@ -53,7 +53,7 @@ public final class Longitude extends Angle {
     public Longitude(final double theta) {
         super(theta);
     }
-    
+
     /**
      * Constructs a newly allocated {@code Longitude} object that
      * represents the longitude value represented by the string.   The

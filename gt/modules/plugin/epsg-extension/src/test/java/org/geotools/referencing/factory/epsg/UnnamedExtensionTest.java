@@ -15,20 +15,18 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// Java dependencies
 import java.util.Set;
 import java.util.Collection;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.NamedIdentifier;
@@ -36,7 +34,6 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactory;
 import org.geotools.metadata.iso.citation.Citations;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -44,7 +41,7 @@ import junit.framework.TestSuite;
 
 /**
  * Tests {@link UnnamedExtension}.
- * 
+ *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -70,7 +67,6 @@ public class UnnamedExtensionTest extends TestCase {
      * @param args the command line arguments.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -84,6 +80,7 @@ public class UnnamedExtensionTest extends TestCase {
     /**
      * Gets the authority factory for ESRI.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         factory = (UnnamedExtension) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
@@ -97,8 +94,8 @@ public class UnnamedExtensionTest extends TestCase {
         final Citation authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString());
-        assertTrue (authority.getIdentifiers().contains("EPSG"));
-        assertFalse(authority.getIdentifiers().contains("ESRI"));
+        assertTrue (Citations.identifierMatches(authority, "EPSG"));
+        assertFalse(Citations.identifierMatches(authority, "ESRI"));
         assertTrue(factory instanceof UnnamedExtension);
     }
 
@@ -106,7 +103,7 @@ public class UnnamedExtensionTest extends TestCase {
      * Tests the vendor.
      */
     public void testVendor(){
-        final Citation vendor = factory.getVendor();        
+        final Citation vendor = factory.getVendor();
         assertNotNull(vendor);
         assertEquals("Geotools", vendor.getTitle().toString());
     }
@@ -140,7 +137,7 @@ public class UnnamedExtensionTest extends TestCase {
         actual   = CRS.decode("EPSG:41001");
         assertSame(expected, actual);
         assertTrue(actual instanceof ProjectedCRS);
-        Collection ids = actual.getIdentifiers();
+        Collection<ReferenceIdentifier> ids = actual.getIdentifiers();
         assertTrue (ids.contains(new NamedIdentifier(Citations.EPSG, "41001")));
         assertFalse(ids.contains(new NamedIdentifier(Citations.ESRI, "41001")));
     }
@@ -181,7 +178,7 @@ public class UnnamedExtensionTest extends TestCase {
 
     /**
      * Tests the extensions through a URI.
-     * 
+     *
      * @see http://jira.codehaus.org/browse/GEOT-1563
      */
     public void testURI() throws FactoryException {

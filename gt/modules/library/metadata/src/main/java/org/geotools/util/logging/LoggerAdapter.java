@@ -399,8 +399,9 @@ public abstract class LoggerAdapter extends Logger {
      */
     @Override
     public void log(final Level level, final String message, final Object param) {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             log(level, message, asArray(param));
+        }
     }
 
     /**
@@ -410,8 +411,9 @@ public abstract class LoggerAdapter extends Logger {
      */
     @Override
     public void log(final Level level, final String message, final Object[] params) {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             log(level, format(message, params));
+        }
     }
 
     /**
@@ -451,8 +453,9 @@ public abstract class LoggerAdapter extends Logger {
     public void logp(final Level level, final String sourceClass, final String sourceMethod,
                      final String message, final Object param)
     {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             logp(level, sourceClass, sourceMethod, message, asArray(param));
+        }
     }
 
     /**
@@ -467,8 +470,9 @@ public abstract class LoggerAdapter extends Logger {
     public void logp(final Level level, final String sourceClass, final String sourceMethod,
                      final String message, final Object[] params)
     {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             logp(level, sourceClass, sourceMethod, format(message, params));
+        }
     }
 
     /**
@@ -480,8 +484,9 @@ public abstract class LoggerAdapter extends Logger {
     public void logrb(final Level level, final String sourceClass, final String sourceMethod,
                       final String bundleName, final String message)
     {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             logp(level, sourceClass, sourceMethod, localize(bundleName, message));
+        }
     }
 
     /**
@@ -493,8 +498,9 @@ public abstract class LoggerAdapter extends Logger {
     public void logrb(final Level level, final String sourceClass, final String sourceMethod,
                       final String bundleName, final String message, final Throwable thrown)
     {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             logp(level, sourceClass, sourceMethod, localize(bundleName, message), thrown);
+        }
     }
 
     /**
@@ -506,8 +512,9 @@ public abstract class LoggerAdapter extends Logger {
     public void logrb(final Level level, final String sourceClass, final String sourceMethod,
                       final String bundleName, final String message, final Object param)
     {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             logp(level, sourceClass, sourceMethod, localize(bundleName, message), param);
+        }
     }
 
     /**
@@ -519,8 +526,9 @@ public abstract class LoggerAdapter extends Logger {
     public void logrb(final Level level, final String sourceClass, final String sourceMethod,
                       final String bundleName, String message, final Object[] params)
     {
-        if(isLoggable(level))
+        if (isLoggable(level)) {
             logp(level, sourceClass, sourceMethod, localize(bundleName, message), params);
+        }
     }
 
     /**

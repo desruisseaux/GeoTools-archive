@@ -16,30 +16,18 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
-import java.util.Iterator;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.cs.CSAuthorityFactory;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.datum.DatumAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.util.Version;
-import org.geotools.factory.Hints;
-import org.geotools.factory.Factory;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.metadata.iso.citation.CitationImpl;
 
 
 /**
@@ -148,7 +136,7 @@ final class URN_Parser {
      * the class to work in a predicable way. It is just an indication for the user that his URN
      * may be wrong.
      */
-    final void logWarningIfTypeMismatch(final Class/*<? extends AuthorityFactory>*/ expected) {
+    final void logWarningIfTypeMismatch(final Class<? extends AuthorityFactory> expected) {
         if (!expected.isAssignableFrom(type.type)) {
             // Build a simplified URN, omitting "urn:ogc:def" and version number.
             final String urn = "..." + SEPARATOR + type + SEPARATOR + authority + SEPARATOR + code;
@@ -164,6 +152,7 @@ final class URN_Parser {
     /**
      * Returns the URN.
      */
+    @Override
     public String toString() {
         return urn;
     }

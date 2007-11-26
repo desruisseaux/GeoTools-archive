@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,23 +16,18 @@
  */
 package org.geotools.measure;
 
-// J2SE dependencies
 import java.text.Format;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-// OpenGIS dependencies
 import org.opengis.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.AbstractCRS;
@@ -56,7 +51,6 @@ public final class FormatTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         final Arguments arguments = new Arguments(args);
         args = arguments.getRemainingArguments(0);
         Locale.setDefault(arguments.locale);

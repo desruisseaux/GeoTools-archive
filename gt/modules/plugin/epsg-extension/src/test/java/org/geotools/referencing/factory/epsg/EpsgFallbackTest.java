@@ -15,23 +15,19 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies
 import java.util.Collection;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.citation.Citations;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -40,7 +36,7 @@ import junit.framework.TestSuite;
 /**
  * Tests {@link FactoryUsingWKT} as a fallback after {@link DefaultFactory}.
  * This method performs the tests through the {@link CRS#decode} method.
- * 
+ *
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
@@ -119,7 +115,7 @@ public class EpsgFallbackTest extends TestCase {
         assertSame(crs, CRS.decode(code, true));
 
         // Checks identifier
-        final Collection identifiers = crs.getIdentifiers();
+        final Collection<ReferenceIdentifier> identifiers = crs.getIdentifiers();
         assertNotNull(identifiers);
         assertFalse(identifiers.isEmpty());
         NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");
@@ -208,7 +204,7 @@ public class EpsgFallbackTest extends TestCase {
         assertSame(crs, CRS.decode(code, true));
 
         // Checks identifier
-        final Collection identifiers = crs.getIdentifiers();
+        final Collection<ReferenceIdentifier> identifiers = crs.getIdentifiers();
         assertNotNull(identifiers);
         assertFalse(identifiers.isEmpty());
         NamedIdentifier expected = new NamedIdentifier(Citations.EPSG, "42102");

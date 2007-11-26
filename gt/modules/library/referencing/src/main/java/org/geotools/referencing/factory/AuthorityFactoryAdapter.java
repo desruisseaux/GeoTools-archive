@@ -994,8 +994,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
             f = getCoordinateOperationAuthorityFactory(code);
         } else {
-            throw new IllegalArgumentException(
-                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type",
+                    Utilities.getShortClassName(type)));
         }
         return type.cast(f);
     }

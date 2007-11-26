@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,29 +19,17 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// J2SE direct dependencies
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-
-// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
-import org.opengis.referencing.crs.CRSAuthorityFactory;       // For javadoc
-import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.metadata.iso.IdentifierImpl;
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -69,12 +57,12 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Short name or other language name by which the cited information is known.
      * Example: "DCW" as an alternative title for "Digital Chart of the World.
      */
-    private Collection alternateTitles;
+    private Collection<InternationalString> alternateTitles;
 
     /**
      * Reference date for the cited resource.
      */
-    private Collection dates;
+    private Collection<CitationDate> dates;
 
     /**
      * Version of the cited resource.
@@ -91,26 +79,26 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    private Collection identifiers;
+    private Collection<Identifier> identifiers;
 
     /**
      * Reference form of the unique identifier (ID). Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
-     * 
+     *
      * @deprecated
      */
-    private Collection identifierTypes;
+    private Collection<String> identifierTypes;
 
     /**
      * Name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    private Collection citedResponsibleParties;
+    private Collection<ResponsibleParty> citedResponsibleParties;
 
     /**
      * Mode in which the resource is represented, or an empty string if none.
      */
-    private Collection presentationForm;
+    private Collection<PresentationForm> presentationForm;
 
     /**
      * Information about the series, or aggregate dataset, of which the dataset is a part.
@@ -205,7 +193,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
             getAlternateTitles().add(new SimpleInternationalString(identifier));
         }
         getIdentifierTypes().add("Authority name");
-        getIdentifiers().add(identifier);
+        getIdentifiers().add(new IdentifierImpl(identifier));
     }
 
     /**
@@ -227,28 +215,30 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Returns the short name or other language name by which the cited information is known.
      * Example: "DCW" as an alternative title for "Digital Chart of the World".
      */
-    public synchronized Collection getAlternateTitles() {
+    public synchronized Collection<InternationalString> getAlternateTitles() {
         return alternateTitles = nonNullCollection(alternateTitles, InternationalString.class);
     }
 
     /**
      * Set the short name or other language name by which the cited information is known.
      */
-    public synchronized void setAlternateTitles(final Collection newValues) {
+    public synchronized void setAlternateTitles(
+            final Collection<? extends InternationalString> newValues)
+    {
         alternateTitles = copyCollection(newValues, alternateTitles, InternationalString.class);
     }
 
     /**
      * Returns the reference date for the cited resource.
      */
-    public synchronized Collection getDates() {
+    public synchronized Collection<CitationDate> getDates() {
         return dates = nonNullCollection(dates, CitationDate.class);
     }
 
     /**
      * Set the reference date for the cited resource.
      */
-    public synchronized void setDates(final Collection newValues) {
+    public synchronized void setDates(final Collection<? extends CitationDate> newValues) {
         dates = copyCollection(newValues, dates, CitationDate.class);
     }
 
@@ -288,35 +278,35 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Returns the unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public synchronized Collection getIdentifiers() {
-        return identifiers = nonNullCollection(identifiers, String.class);
+    public synchronized Collection<Identifier> getIdentifiers() {
+        return identifiers = nonNullCollection(identifiers, Identifier.class);
     }
 
     /**
      * Set the unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public synchronized void setIdentifiers(final Collection newValues) {
-        identifiers = copyCollection(newValues, identifiers, String.class);
+    public synchronized void setIdentifiers(final Collection<? extends Identifier> newValues) {
+        identifiers = copyCollection(newValues, identifiers, Identifier.class);
     }
 
     /**
      * Returns the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
-     * 
+     *
      * @deprecated IdentifierType removed from ISO 19115
      */
-    public synchronized Collection getIdentifierTypes() {
+    public synchronized Collection<String> getIdentifierTypes() {
         return identifierTypes = nonNullCollection(identifierTypes, String.class);
     }
 
     /**
      * Set the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
-     * 
+     *
      * @deprecated IdentifierType removed from ISO 19115
      */
-    public synchronized void setIdentifierTypes(final Collection newValues) {
+    public synchronized void setIdentifierTypes(final Collection<? extends String> newValues) {
         identifierTypes = copyCollection(newValues, identifierTypes, String.class);
     }
 
@@ -324,7 +314,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Returns the name and position information for an individual or organization that is
      * responsible for the resource. Returns an empty string if there is none.
      */
-    public synchronized Collection getCitedResponsibleParties() {
+    public synchronized Collection<ResponsibleParty> getCitedResponsibleParties() {
         return citedResponsibleParties = nonNullCollection(citedResponsibleParties,
                                                            ResponsibleParty.class);
     }
@@ -333,7 +323,9 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * Set the name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    public synchronized void setCitedResponsibleParties(final Collection newValues) {
+    public synchronized void setCitedResponsibleParties(
+            final Collection<? extends ResponsibleParty> newValues)
+    {
         citedResponsibleParties = copyCollection(newValues, citedResponsibleParties,
                                                  ResponsibleParty.class);
     }
@@ -341,14 +333,16 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * Returns the mode in which the resource is represented, or an empty string if none.
      */
-    public synchronized Collection getPresentationForm() {
+    public synchronized Collection<PresentationForm> getPresentationForm() {
         return presentationForm = nonNullCollection(presentationForm, PresentationForm.class);
     }
 
     /**
      * Set the mode in which the resource is represented, or an empty string if none.
      */
-    public synchronized void setPresentationForm(final Collection newValues) {
+    public synchronized void setPresentationForm(
+            final Collection<? extends PresentationForm> newValues)
+    {
         presentationForm = copyCollection(newValues, presentationForm, PresentationForm.class);
     }
 

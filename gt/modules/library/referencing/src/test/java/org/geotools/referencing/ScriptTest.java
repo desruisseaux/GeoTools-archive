@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,23 +16,10 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.net.URL;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.test.TestData;
 
 
@@ -55,7 +42,6 @@ public final class ScriptTest extends TestCase {
      * Run all tests from the command line.
      */
     public static void main(final String[] args) throws Exception {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -65,7 +51,7 @@ public final class ScriptTest extends TestCase {
     public static Test suite() {
         return new TestSuite(ScriptTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -84,7 +70,7 @@ public final class ScriptTest extends TestCase {
         test.executeAll();
         in.close();
     }
-    
+
     /**
      * Run "AbridgedMolodensky.txt".
      *
@@ -93,7 +79,7 @@ public final class ScriptTest extends TestCase {
     public void testAbridgedMolodesky() throws Exception {
         runScript("scripts/AbridgedMolodensky.txt");
     }
-    
+
     /**
      * Run "Molodensky.txt".
      *
@@ -104,7 +90,7 @@ public final class ScriptTest extends TestCase {
     public void testMolodesky() throws Exception {
         runScript("scripts/Molodensky.txt");
     }
-    
+
     /**
      * Run "Simple.txt".
      *
@@ -113,7 +99,7 @@ public final class ScriptTest extends TestCase {
     public void testSimple() throws Exception {
         runScript("scripts/Simple.txt");
     }
-    
+
     /**
      * Run "Projections.txt".
      *
@@ -122,7 +108,7 @@ public final class ScriptTest extends TestCase {
     public void testProjections() throws Exception {
         runScript("scripts/Projections.txt");
     }
-    
+
     /**
      * Run "Mercator.txt".
      *
@@ -131,7 +117,7 @@ public final class ScriptTest extends TestCase {
     public void testMercator() throws Exception {
         runScript("scripts/Mercator.txt");
     }
-    
+
     /**
      * Run the "ObliqueMercator.txt".
      *
@@ -140,7 +126,7 @@ public final class ScriptTest extends TestCase {
     public void testObliqueMercator() throws Exception {
         runScript("scripts/ObliqueMercator.txt");
     }
-    
+
     /**
      * Run "TransverseMercator.txt".
      *
@@ -148,8 +134,8 @@ public final class ScriptTest extends TestCase {
      */
     public void testTransverseMercator() throws Exception {
         runScript("scripts/TransverseMercator.txt");
-    }   
-    
+    }
+
     /**
      * Run "AlbersEqualArea.txt"
      *
@@ -158,7 +144,7 @@ public final class ScriptTest extends TestCase {
     public void testAlbersEqualArea() throws Exception {
         runScript("scripts/AlbersEqualArea.txt");
     }
-    
+
     /**
      * Run "LambertAzimuthalEqualArea.txt".
      *
@@ -167,7 +153,7 @@ public final class ScriptTest extends TestCase {
     public void testLambertAzimuthalEqualArea() throws Exception {
         runScript("scripts/LambertAzimuthalEqualArea.txt");
     }
-    
+
     /**
      * Run "LambertConic.txt".
      *
@@ -176,7 +162,7 @@ public final class ScriptTest extends TestCase {
     public void testLambertConic() throws Exception {
         runScript("scripts/LambertConic.txt");
     }
-    
+
     /**
      * Run "Stereographic.txt".
      *
@@ -185,7 +171,7 @@ public final class ScriptTest extends TestCase {
     public void testStereographic() throws Exception {
         runScript("scripts/Stereographic.txt");
     }
-    
+
     /**
      * Run "Orthographic.txt".
      *
@@ -194,25 +180,25 @@ public final class ScriptTest extends TestCase {
     public void testOrthographic() throws Exception {
         runScript("scripts/Orthographic.txt");
     }
-    
+
     /**
      * Run "NZMG.txt"
-     * 
+     *
      * @throws Exception If a test failed.
      */
     public void testNZMG() throws Exception {
     	runScript("scripts/NZMG.txt");
     }
-    
+
     /**
      * Run "Krovak.txt"
-     * 
+     *
      * @throws Exception If a test failed.
      */
     public void testKrovak() throws Exception {
     	runScript("scripts/Krovak.txt");
     }
-    
+
     /**
      * Run "OpenGIS.txt".
      *
@@ -221,7 +207,7 @@ public final class ScriptTest extends TestCase {
 //    public void testOpenGIS() throws Exception {
 //        runScript("scripts/OpenGIS.txt");
 //    }
-    
+
     /**
      * Run "NADCON.txt"
      *

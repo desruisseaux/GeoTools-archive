@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.metadata.iso;
 
-// OpenGIS dependencies
 import org.opengis.metadata.FeatureTypeList;
 
 
@@ -38,7 +37,7 @@ public class FeatureTypeListImpl extends MetadataEntity implements FeatureTypeLi
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5417914796207743856L;
-    
+
     /**
      * Instance of a type defined in the spatial schema.
      */
@@ -73,7 +72,7 @@ public class FeatureTypeListImpl extends MetadataEntity implements FeatureTypeLi
         setSpatialObject    (spatialObject    );
         setSpatialSchemaName(spatialSchemaName);
     }
-    
+
     /**
      * Instance of a type defined in the spatial schema.
      */

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.Set;
 import java.util.Arrays;
@@ -26,8 +25,8 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
 
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.AuthorityFactory;
@@ -40,7 +39,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.wkt.Parser;
@@ -50,10 +48,9 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryDependencies;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+
 
 /**
  * Implementation of the {@link CRS#main} method. Exists as a separated class in order
@@ -143,15 +140,14 @@ final class Command {
      * Lists all authority codes.
      */
     private void codes(final PrintWriter out) throws FactoryException {
-        final Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        final Set<String> codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         final TableWriter table = new TableWriter(out);
         table.writeHorizontalSeparator();
         table.write(Vocabulary.format(VocabularyKeys.CODE));
         table.nextColumn();
         table.write(Vocabulary.format(VocabularyKeys.DESCRIPTION));
         table.writeHorizontalSeparator();
-        for (final Iterator it=codes.iterator(); it.hasNext();) {
-            final String code = (String) it.next();
+        for (final String code : codes) {
             table.write(code);
             table.nextColumn();
             try {
@@ -177,7 +173,7 @@ final class Command {
      * Lists all CRS authority factories.
      */
     private static void factories(final PrintWriter out) {
-        final Set/*<Citation>*/ done = new HashSet();
+        final Set<Citation> done  = new HashSet<Citation>();
         final TableWriter   table = new TableWriter(out, " \u2502 ");
         final TableWriter   notes = new TableWriter(out, " ");
         int noteCount = 0;
@@ -190,10 +186,9 @@ final class Command {
         table.nextColumn();
         table.write(Vocabulary.format(VocabularyKeys.NOTE));
         table.writeHorizontalSeparator();
-        for (final Iterator it=ReferencingFactoryFinder.getCRSAuthorityFactories(HINTS).iterator(); it.hasNext();) {
-            AuthorityFactory factory = (AuthorityFactory) it.next();
+        for (AuthorityFactory factory : ReferencingFactoryFinder.getCRSAuthorityFactories(HINTS)) {
             final Citation authority = factory.getAuthority();
-            final Iterator identifiers = authority.getIdentifiers().iterator();
+            final Iterator<? extends Identifier> identifiers = authority.getIdentifiers().iterator();
             if (!identifiers.hasNext()) {
                 // No identifier. Scan next authorities.
                 continue;
@@ -202,7 +197,7 @@ final class Command {
                 // Already done. Scans next authorities.
                 continue;
             }
-            table.write((String) identifiers.next());
+            table.write(identifiers.next().getCode());
             table.nextColumn();
             table.write(authority.getTitle().toString().trim());
             if (factory instanceof AbstractAuthorityFactory) {
@@ -307,10 +302,9 @@ final class Command {
         char[] separator = null;
         for (int i=0; i<args.length; i++) {
             for (int j=i+1; j<args.length; j++) {
-                final Set/*<CoordinateOperation>*/ op;
+                final Set<CoordinateOperation> op;
                 op = factory.createFromCoordinateReferenceSystemCodes(args[i], args[j]);
-                for (final Iterator it=op.iterator(); it.hasNext();) {
-                    final CoordinateOperation operation = (CoordinateOperation) it.next();
+                for (final CoordinateOperation operation : op) {
                     if (separator == null) {
                         separator = getSeparator();
                     } else {

@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.metadata;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -26,7 +25,6 @@ import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
 
-// Geotools dependencies
 import org.geotools.util.CheckedArrayList;
 import org.geotools.util.CheckedHashSet;
 import org.geotools.util.logging.Logging;
@@ -151,7 +149,7 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
                  * Need a SHALLOW copy of this metadata, because some attributes
                  * may already be unmodifiable and we don't want to clone them.
                  */
-                candidate = (ModifiableMetadata) clone();
+                candidate = clone();
             } catch (CloneNotSupportedException exception) {
                 /*
                  * The metadata is not cloneable for some reason left to the user
@@ -188,6 +186,7 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * @param  object The object to convert in an immutable one.
      * @return A presumed immutable view of the specified object.
      */
+    @SuppressWarnings("unchecked") // We really don't know the collection types.
     static Object unmodifiable(final Object object) {
         /*
          * CASE 1 - The object is an implementation of ModifiableMetadata. It may have
@@ -233,8 +232,8 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
                 return Collections.EMPTY_MAP;
             }
             map = new LinkedHashMap(map);
-            for (final Iterator it=map.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
+            for (final Iterator<Map.Entry> it=map.entrySet().iterator(); it.hasNext();) {
+                final Map.Entry entry = it.next();
                 entry.setValue(unmodifiable(entry.getValue()));
             }
             return Collections.unmodifiableMap(map);
@@ -314,14 +313,14 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * <p>
      * A call to {@link #checkWritePermission} is implicit before the copy is performed.
      *
-     * @param  source      The source collection. {@code null} is synonymous to empty. 
+     * @param  source      The source collection. {@code null} is synonymous to empty.
      * @param  target      The target collection, or {@code null} if not yet created.
      * @param  elementType The base type of elements to put in the collection.
      * @return {@code target}, or a newly created collection.
      * @throws UnmodifiableMetadataException if this metadata is unmodifiable.
      */
-    protected final Collection copyCollection(final Collection source, Collection target,
-                                              final Class elementType)
+    protected final <E> Collection<E> copyCollection(final Collection<? extends E> source,
+            Collection<E> target, final Class<E> elementType)
             throws UnmodifiableMetadataException
     {
         if (unmodifiable == FREEZING) {
@@ -330,7 +329,9 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
              * an unmodifiable instance created by unmodifiable(Object).
              */
             assert !isModifiable(source);
-            return source;
+            @SuppressWarnings("unchecked")
+            final Collection<E> unmodifiable = (Collection<E>) source;
+            return unmodifiable;
         }
         checkWritePermission();
         if (source == null) {
@@ -344,10 +345,10 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
             } else {
                 int capacity = source.size();
                 if (isList) {
-                    target = new CheckedArrayList(elementType, capacity);
+                    target = new CheckedArrayList<E>(elementType, capacity);
                 } else {
                     capacity = Math.round(capacity / 0.75f) + 1;
-                    target = new CheckedHashSet(elementType, capacity);
+                    target = new CheckedHashSet<E>(elementType, capacity);
                 }
             }
             target.addAll(source);
@@ -364,15 +365,17 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * @param  elementType The element type (used only if {@code c} is null).
      * @return {@code c}, or a new collection if {@code c} is null.
      */
-    protected final Collection nonNullCollection(final Collection c, final Class elementType) {
+    protected final <E> Collection<E> nonNullCollection(final Collection<E> c,
+                                                        final Class<E> elementType)
+    {
         assert Thread.holdsLock(this);
         if (c != null) {
             return c;
         }
         if (isModifiable()) {
-            return new CheckedHashSet(elementType);
+            return new CheckedHashSet<E>(elementType);
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
@@ -384,15 +387,15 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * @param  elementType The element type (used only if {@code c} is null).
      * @return {@code c}, or a new list if {@code c} is null.
      */
-    protected final List nonNullList(final List c, final Class elementType) {
+    protected final <E> List<E> nonNullList(final List<E> c, final Class<E> elementType) {
         assert Thread.holdsLock(this);
         if (c != null) {
             return c;
         }
         if (isModifiable()) {
-            return new CheckedArrayList(elementType);
+            return new CheckedArrayList<E>(elementType);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -407,7 +410,8 @@ public abstract class ModifiableMetadata extends AbstractMetadata implements Clo
      * @return A <strong>shallow</strong> copy of this metadata.
      * @throws CloneNotSupportedException if the clone is not supported.
      */
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    @Override
+    protected ModifiableMetadata clone() throws CloneNotSupportedException {
+        return (ModifiableMetadata) super.clone();
     }
 }

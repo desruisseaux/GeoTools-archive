@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
  *    (C) 1999, Fisheries and Oceans Canada
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,9 +17,7 @@
  */
 package org.geotools.measure;
 
-// Miscellaneous
 import javax.units.Unit;
-
 import org.geotools.resources.Utilities;
 
 
@@ -72,6 +70,7 @@ public final class Measure extends Number {
     /**
      * Returns a hash code value for this measure.
      */
+    @Override
     public int hashCode() {
         long code = Double.doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32) ^ unit.hashCode();
@@ -80,6 +79,7 @@ public final class Measure extends Number {
     /**
      * Compares this measure with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof Measure) {
             final Measure that = (Measure) object;
@@ -92,6 +92,7 @@ public final class Measure extends Number {
     /**
      * Returns a string representation of this measure.
      */
+    @Override
     public String toString() {
         final StringBuffer buffer = new StringBuffer();
         buffer.append(value);

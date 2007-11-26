@@ -15,13 +15,11 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
@@ -31,7 +29,6 @@ import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.util.Version;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
@@ -72,7 +69,8 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * The authority factories by versions. Factories will be created by
      * {@link #createVersionedFactory} when first needed.
      */
-    private final SortedMap/*<Version,AbstractAuthorityFactory>*/ byVersions = new TreeMap();
+    private final SortedMap<Version, AuthorityFactory> byVersions =
+            new TreeMap<Version, AuthorityFactory>();
 
     /**
      * The last code processed, or {@code null} if none.
@@ -112,6 +110,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * Returns the authority, which contains {@code "urn:ogc:def"} and {@code "urn:x-ogc:def"}
      * identifiers.
      */
+    @Override
     public Citation getAuthority() {
         return Citations.URN_OGC;
     }
@@ -145,9 +144,10 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @return A factory for the specified authority code (never {@code null}).
      * @throws FactoryException if no suitable factory were found.
      */
+    @Override
     protected AuthorityFactory getAuthorityFactory(final String code) throws FactoryException {
         if (code != null) {
-            return getAuthorityFactory(getParser(code).type.type, code);
+            return getAuthorityFactory(getParser(code).type.type.asSubclass(AuthorityFactory.class), code);
         } else {
             return super.getAuthorityFactory(code);
         }
@@ -164,6 +164,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @return A factory for the specified URN (never {@code null}).
      * @throws FactoryException if no datum factory is available.
      */
+    @Override
     protected DatumAuthorityFactory getDatumAuthorityFactory(final String code)
             throws FactoryException
     {
@@ -189,6 +190,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @return A factory for the specified URN (never {@code null}).
      * @throws FactoryException if no coordinate system factory is available.
      */
+    @Override
     protected CSAuthorityFactory getCSAuthorityFactory(final String code)
             throws FactoryException
     {
@@ -214,6 +216,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @return A factory for the specified URN (never {@code null}).
      * @throws FactoryException if no coordinate reference system factory is available.
      */
+    @Override
     protected CRSAuthorityFactory getCRSAuthorityFactory(final String code)
             throws FactoryException
     {
@@ -240,6 +243,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @return A factory for the specified URN (never {@code null}).
      * @throws FactoryException if no coordinate operation factory is available.
      */
+    @Override
     protected CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
             throws FactoryException
     {
@@ -270,7 +274,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
         }
         AuthorityFactory factory;
         synchronized (byVersions) {
-            factory = (AuthorityFactory) byVersions.get(version);
+            factory = byVersions.get(version);
             if (factory == null) {
                 factory = createVersionedFactory(version);
                 if (factory != null) {
@@ -297,7 +301,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
     {
         final Hints hints = new Hints(factory.getImplementationHints());
         hints.put(Hints.VERSION, version);
-        final List factories = Arrays.asList(new AuthorityFactory[] {
+        final List<AuthorityFactory> factories = Arrays.asList(new AuthorityFactory[] {
             new AllAuthoritiesFactory(hints),
             factory
         });
@@ -312,6 +316,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      * @return The code to give to the underlying factories.
      * @throws FactoryException if the code can't be converted.
      */
+    @Override
     protected String toBackingFactoryCode(final String code) throws FactoryException {
         return getParser(code).getAuthorityCode();
     }

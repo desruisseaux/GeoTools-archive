@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies and extensions
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,25 +26,18 @@ import java.util.Locale;
 import java.util.Map;
 import javax.units.SI;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.GenericName;
-
-// Geotools dependencies
-import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.cs.DefaultVerticalCS;
-import org.geotools.referencing.datum.AbstractDatum;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
@@ -64,7 +56,6 @@ public final class PredefinedObjectsTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -101,8 +92,8 @@ public final class PredefinedObjectsTest extends TestCase {
         assertEquals("Latitude",  "AXIS[\"Spherical latitude\", NORTH]", DefaultCoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
 
         // Test localization
-        assertEquals("English", "Time",  ((GenericName) DefaultCoordinateSystemAxis.TIME.getAlias().iterator().next()).toInternationalString().toString(Locale.ENGLISH));
-        assertEquals("French",  "Temps", ((GenericName) DefaultCoordinateSystemAxis.TIME.getAlias().iterator().next()).toInternationalString().toString(Locale.FRENCH ));
+        assertEquals("English", "Time",  DefaultCoordinateSystemAxis.TIME.getAlias().iterator().next().toInternationalString().toString(Locale.ENGLISH));
+        assertEquals("French",  "Temps", DefaultCoordinateSystemAxis.TIME.getAlias().iterator().next().toInternationalString().toString(Locale.FRENCH ));
         // TODO: remove cast and use static import once we are allowed to compile for J2SE 1.5.
         //       It will make the line much shorter!!
 
@@ -111,7 +102,7 @@ public final class PredefinedObjectsTest extends TestCase {
         assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,  true ));
         assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE, true ));
         assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE, false));
- 
+
         // Test aliases in the special "longitude" and "latitude" cases.
         assertTrue ("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,  false));
         assertTrue ("Latitude",  DefaultCoordinateSystemAxis.LATITUDE .equals(DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,   false));
@@ -151,7 +142,7 @@ public final class PredefinedObjectsTest extends TestCase {
                                       "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]]", DefaultGeodeticDatum.WGS84      .toWKT(0));
 
         // Test properties
-        final Map properties = new HashMap();
+        final Map<String,Object> properties = new HashMap<String,Object>();
         properties.put("name",          "This is a name");
         properties.put("scope",         "This is a scope");
         properties.put("scope_fr",      "Valide dans ce domaine");

@@ -15,7 +15,6 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// J2SE dependencies and extensions
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -23,12 +22,10 @@ import java.sql.SQLException;
 import java.awt.geom.AffineTransform;
 import javax.units.Unit;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.*;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
@@ -39,7 +36,6 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
@@ -52,7 +48,6 @@ import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.Arguments;
 
@@ -107,7 +102,7 @@ public class DefaultFactoryTest extends TestCase {
         extensive = true;
         arguments.getRemainingArguments(0);
         org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
-        junit.textui.TestRunner.run(suite());        
+        junit.textui.TestRunner.run(suite());
     }
 
     /**
@@ -127,6 +122,7 @@ public class DefaultFactoryTest extends TestCase {
     /**
      * Sets up the authority factory.
      */
+    @Override
     protected void setUp() throws SQLException {
         if (factory == null) {
             factory = (ThreadedEpsgFactory) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
@@ -155,7 +151,7 @@ public class DefaultFactoryTest extends TestCase {
      * Returns the first identifier for the specified object.
      */
     private static String getIdentifier(final IdentifiedObject object) {
-        return ((Identifier) object.getIdentifiers().iterator().next()).getCode();
+        return object.getIdentifiers().iterator().next().getCode();
     }
 
     /**
@@ -166,17 +162,17 @@ public class DefaultFactoryTest extends TestCase {
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation operation;
         ParameterValueGroup parameters;
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("4274");
         assertEquals("4274", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeographicCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4140");
         assertEquals("4140", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeographicCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("2027");
         assertEquals("2027", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof ProjectedCRS);
@@ -187,7 +183,7 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals(0.9996, parameters.parameter("scale_factor"      ).doubleValue(), EPS);
         assertEquals(500000, parameters.parameter("false_easting"     ).doubleValue(), EPS);
         assertEquals(     0, parameters.parameter("false_northing"    ).doubleValue(), EPS);
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem(" EPSG : 2442 ");
         assertEquals("2442", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof ProjectedCRS);
@@ -198,27 +194,27 @@ public class DefaultFactoryTest extends TestCase {
         assertEquals(     1, parameters.parameter("scale_factor"      ).doubleValue(), EPS);
         assertEquals(500000, parameters.parameter("false_easting"     ).doubleValue(), EPS);
         assertEquals(     0, parameters.parameter("false_northing"    ).doubleValue(), EPS);
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4915");
         assertEquals("4915", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeocentricCRS);
         assertEquals(3, sourceCRS.getCoordinateSystem().getDimension());
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4993");
         assertEquals("4993", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeographicCRS);
         assertEquals(3, sourceCRS.getCoordinateSystem().getDimension());
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:5735");
         assertEquals("5735", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof VerticalCRS);
         assertEquals(1, sourceCRS.getCoordinateSystem().getDimension());
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:5801");
         assertEquals("5801", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof EngineeringCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
-        
+
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:7400");
         assertEquals("7400", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof CompoundCRS);
@@ -825,15 +821,15 @@ public class DefaultFactoryTest extends TestCase {
               "   AXIS[\"Northing\", NORTH],\n"                            +
               "   AXIS[\"Easting\", EAST]]";
         crs = CRS.parseWKT(wkt);
-        
+
         finder.setFullScanAllowed(false);
         IdentifiedObject found = finder.find(crs);
         assertTrue("Should not find the CRS without a full scan.", found == null || found != null );
-        
+
         finder.setFullScanAllowed(true);
         find = finder.find(crs);
         assertNotNull("With full scan allowed, the CRS should be found.", find);
-        
+
         assertTrue("Should found an object equals (ignoring metadata) to the requested one.",
                    CRS.equalsIgnoreMetadata(crs, find));
         assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
@@ -841,9 +837,9 @@ public class DefaultFactoryTest extends TestCase {
         finder.setFullScanAllowed(false);
         assertEquals("The CRS should still in the cache.",
                      "EPSG:2442", finder.findIdentifier(crs));
-        
+
     }
-    
+
     /**
      * We are supposed to be able to get back identical CoordinateReferenceSystem
      * objects when we create using the same definition.
@@ -857,14 +853,14 @@ public class DefaultFactoryTest extends TestCase {
     public void testIntern() throws Exception {
         AbstractCRS epsgCrs = (AbstractCRS) CRS.decode("EPSG:4326");
         String wkt = epsgCrs.toWKT();
-        
+
         AbstractCRS wktCrs = (AbstractCRS) CRS.parseWKT(wkt);
-        
+
         assertTrue( "equals ignore metadata", epsgCrs.equals( wktCrs, false ));
-        assertFalse( "equals comapre metadata", epsgCrs.equals( wktCrs, true ));        
+        assertFalse( "equals comapre metadata", epsgCrs.equals( wktCrs, true ));
         //assertEquals( "equals", epsgCrs, wktCrs );
         //assertSame( "idenitity", epsgCrs, wktCrs );
-        
+
         // parsing the same thing twice?
         AbstractCRS wktCrs2 = (AbstractCRS) CRS.parseWKT(wkt);
         assertEquals( "equals", wktCrs, wktCrs2);

@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
  *    (C) 1999, Fisheries and Oceans Canada
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,15 +17,11 @@
  */
 package org.geotools.measure;
 
-// J2SE dependencies
 import java.io.Serializable;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.text.Format;
 import java.text.ParseException;
 import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.resources.ClassChanger;
 
 
@@ -42,46 +38,46 @@ import org.geotools.resources.ClassChanger;
  * @see Longitude
  * @see AngleFormat
  */
-public class Angle implements Comparable, Serializable {
+public class Angle implements Comparable<Angle>, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 1158747349433104534L;
-    
+
     /**
      * A shared instance of {@link AngleFormat}.
      */
-    private static Reference format;
-    
+    private static Format format;
+
     /**
      * Define how angle can be converted to {@link Number} objects.
      */
     static {
-        ClassChanger.register(new ClassChanger(Angle.class, Double.class) {
-            protected Number convert(final Comparable o) {
-                return new Double(((Angle) o).theta);
+        ClassChanger.register(new ClassChanger<Angle,Double>(Angle.class, Double.class) {
+            protected Double convert(final Angle o) {
+                return o.theta;
             }
-            
-            protected Comparable inverseConvert(final Number value) {
-                return new Angle(value.doubleValue());
+
+            protected Angle inverseConvert(final Double value) {
+                return new Angle(value);
             }
         });
     }
-    
+
     /**
      * Angle value in degres.
      */
     private final double theta;
-    
+
     /**
-     * Contruct a new angle with the specified value.
+     * Contructs a new angle with the specified value.
      *
      * @param theta Angle in degrees.
      */
     public Angle(final double theta) {
         this.theta = theta;
     }
-    
+
     /**
      * Constructs a newly allocated {@code Angle} object that represents the angle value
      * represented by the string. The string should represents an angle in either fractional
@@ -91,46 +87,51 @@ public class Angle implements Comparable, Serializable {
      * @throws NumberFormatException if the string does not contain a parsable angle.
      */
     public Angle(final String string) throws NumberFormatException {
+        final Format format = getAngleFormat();
+        final Angle theta;
         try {
-            final Angle theta = (Angle) getAngleFormat().parseObject(string);
-            if (getClass().isAssignableFrom(theta.getClass())) {
-                this.theta = theta.theta;
-            } else {
-                throw new NumberFormatException();
+            synchronized (Angle.class) {
+                theta = (Angle) format.parseObject(string);
             }
-        }
-        catch (ParseException exception) {
-            NumberFormatException e=new NumberFormatException(exception.getLocalizedMessage());
+        } catch (ParseException exception) {
+            NumberFormatException e = new NumberFormatException(exception.getLocalizedMessage());
             e.initCause(exception);
             throw e;
         }
+        if (getClass().isAssignableFrom(theta.getClass())) {
+            this.theta = theta.theta;
+        } else {
+            throw new NumberFormatException(string);
+        }
     }
-    
+
     /**
      * Returns the angle value in degrees.
      */
     public double degrees() {
         return theta;
     }
-    
+
     /**
      * Returns the angle value in radians.
      */
     public double radians() {
         return Math.toRadians(theta);
     }
-    
+
     /**
      * Returns a hash code for this {@code Angle} object.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(theta);
         return (int) code ^ (int) (code >>> 32);
     }
-    
+
     /**
      * Compares the specified object with this angle for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -143,35 +144,37 @@ public class Angle implements Comparable, Serializable {
             return false;
         }
     }
-    
+
     /**
      * Compares two {@code Angle} objects numerically. The comparaison
      * is done as if by the {@link Double#compare(double,double)} method.
      */
-    public int compareTo(final Object that) {
-        return Double.compare(this.theta, ((Angle)that).theta);
+    public int compareTo(final Angle that) {
+        return Double.compare(this.theta, that.theta);
     }
-    
+
     /**
      * Returns a string representation of this {@code Angle} object.
      */
+    @Override
     public String toString() {
-        return getAngleFormat().format(this, new StringBuffer(), null).toString();
+        StringBuffer buffer = new StringBuffer();
+        synchronized (Angle.class) {
+            final Format format = getAngleFormat();
+            buffer = format.format(this, buffer, null);
+        }
+        return buffer.toString();
     }
-    
+
     /**
      * Returns a shared instance of {@link AngleFormat}. The return type is
      * {@link Format} in order to avoid class loading before necessary.
      */
-    private static synchronized Format getAngleFormat() {
-        if (format!=null) {
-            final Format angleFormat = (Format) format.get();
-            if (angleFormat!=null) {
-                return angleFormat;
-            }
+    private static Format getAngleFormat() {
+        assert Thread.holdsLock(Angle.class);
+        if (format == null) {
+            format = new AngleFormat("D°MM.m'", Locale.US);
         }
-        final Format newFormat = new AngleFormat("D°MM.m'", Locale.US);
-        format = new SoftReference(newFormat);
-        return newFormat;
+        return format;
     }
 }

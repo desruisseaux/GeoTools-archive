@@ -15,25 +15,25 @@
  */
 package org.geotools.referencing.factory.wms;
 
-// J2SE dependencies
 import java.util.Collection;
-import java.util.logging.Level;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+
+import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.CachedCRSAuthorityDecorator;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
-import org.geotools.resources.Arguments;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.GeographicCRS;
+
 
 /**
  * Tests {@link WebCRSFactory}.
@@ -52,10 +52,6 @@ public final class CRSTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final boolean log = arguments.getFlag("-log");
-        arguments.getRemainingArguments(0);
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 
@@ -76,6 +72,7 @@ public final class CRSTest extends TestCase {
     /**
      * Initializes the factory to test.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         factory = new WebCRSFactory();
@@ -95,11 +92,11 @@ public final class CRSTest extends TestCase {
      * Checks the authority names.
      */
     public void testAuthority() {
-        final Collection identifiers = factory.getAuthority().getIdentifiers();
-        assertTrue (identifiers.contains("CRS"));
-        assertFalse(identifiers.contains("EPSG"));
-        assertFalse(identifiers.contains("AUTO"));
-        assertFalse(identifiers.contains("AUTO2"));
+        final Citation authority = factory.getAuthority();
+        assertTrue (Citations.identifierMatches(authority, "CRS"));
+        assertFalse(Citations.identifierMatches(authority, "EPSG"));
+        assertFalse(Citations.identifierMatches(authority, "AUTO"));
+        assertFalse(Citations.identifierMatches(authority, "AUTO2"));
     }
 
     /**

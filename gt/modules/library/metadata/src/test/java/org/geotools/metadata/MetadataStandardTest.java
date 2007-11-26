@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, Geotools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -86,11 +86,11 @@ public class MetadataStandardTest extends TestCase {
      */
     public void testMap() {
         final Citation citation = new CitationImpl(Citations.EPSG);
-        final Map map = MetadataStandard.ISO_19115.asMap(citation);
+        final Map<String,Object> map = MetadataStandard.ISO_19115.asMap(citation);
         assertFalse(map.isEmpty());
         assertTrue (map.size() > 1);
 
-        final Set keys = map.keySet();
+        final Set<String> keys = map.keySet();
         assertTrue ("Property exists and should be defined.",            keys.contains("title"));
         assertFalse("Property exists but undefined for Citations.EPSG.", keys.contains("ISBN"));
         assertFalse("Property do not exists.",                           keys.contains("dummy"));
@@ -102,20 +102,20 @@ public class MetadataStandardTest extends TestCase {
 
         final Object identifiers = map.get("identifiers");
         assertTrue(identifiers instanceof Collection);
-        assertTrue(((Collection) identifiers).contains("EPSG"));
+        assertTrue(PropertyAccessorTest.containsEPSG(identifiers));
 
-        final Map copy = new HashMap(map);
+        final Map<String,Object> copy = new HashMap<String,Object>(map);
         assertEquals(map, copy);
 
         // Note: AbstractCollection do not defines hashCode(); we have to wraps in a HashSet.
         final int hashCode = citation.hashCode();
-        assertEquals("hashCode() should be as in a Set.", hashCode, new HashSet(map .values()).hashCode());
-        assertEquals("hashCode() should be as in a Set.", hashCode, new HashSet(copy.values()).hashCode());
+        assertEquals("hashCode() should be as in a Set.", hashCode, new HashSet<Object>(map .values()).hashCode());
+        assertEquals("hashCode() should be as in a Set.", hashCode, new HashSet<Object>(copy.values()).hashCode());
 
         map.remove("identifiers");
         final int newHashCode = citation.hashCode();
         assertFalse(map.equals(copy));
         assertFalse(hashCode == newHashCode);
-        assertEquals(newHashCode, new HashSet(map.values()).hashCode());
+        assertEquals(newHashCode, new HashSet<Object>(map.values()).hashCode());
     }
 }

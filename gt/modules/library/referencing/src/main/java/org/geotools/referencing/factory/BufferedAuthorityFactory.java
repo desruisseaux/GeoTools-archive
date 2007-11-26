@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies and extensions
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Level;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
@@ -46,7 +44,6 @@ import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.BufferedFactory;
 import org.geotools.resources.Utilities;
@@ -95,7 +92,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * The pool of cached objects.
      */
-    private final LinkedHashMap pool = new LinkedHashMap(32, 0.75f, true);
+    private final LinkedHashMap<Object,Object> pool =
+            new LinkedHashMap<Object,Object>(32, 0.75f, true);
 
     /**
      * The maximum number of objects to keep by strong reference. If a greater amount of
@@ -107,7 +105,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * The pool of objects identified by {@link #find}.
      */
-    private final Map/*<IdentifiedObject,IdentifiedObject>*/ findPool = new WeakHashMap();
+    private final Map<IdentifiedObject,IdentifiedObject> findPool =
+            new WeakHashMap<IdentifiedObject,IdentifiedObject>();
 
     /**
      * Constructs an instance wrapping the specified factory with a default number
@@ -227,6 +226,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      * {@code false} if no backing store were setup and
      * {@link DeferredAuthorityFactory#createBackingStore} throws an exception.
      */
+    @Override
     synchronized boolean isAvailable() {
         try {
             return getBackingStore().isAvailable();
@@ -243,17 +243,16 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
              * The factory creation failed for an other reason, which may be more
              * serious. Now it is time to log a warning with a stack trace.
              */
-            final Citation   citation = getAuthority();
-            final Collection   titles = citation.getAlternateTitles();
+            final Citation citation = getAuthority();
+            final Collection<? extends InternationalString> titles = citation.getAlternateTitles();
             InternationalString title = citation.getTitle();
             if (titles != null) {
-                for (final Iterator it=titles.iterator(); it.hasNext();) {
+                for (final InternationalString candidate : titles) {
                     /*
                      * Uses the longuest title instead of the main one. In Geotools
                      * implementation, the alternate title may contains usefull informations
                      * like the EPSG database version number and the database engine.
                      */
-                    final InternationalString candidate = (InternationalString) it.next();
                     if (candidate.length() > title.length()) {
                         title  = candidate;
                     }
@@ -275,7 +274,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      * for {@link FallbackAuthorityFactory} internal use only and should not be public. A
      * cheap test without {@link #getBackingStore} invocation is suffisient for our needs.
      */
-    //@Override
+    @Override
     boolean sameAuthorityCodes(final AuthorityFactory factory) {
         final AbstractAuthorityFactory backingStore = this.backingStore; // Protect from changes.
         if (backingStore != null && backingStore.sameAuthorityCodes(factory)) {
@@ -287,6 +286,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns the vendor responsible for creating the underlying factory implementation.
      */
+    @Override
     public synchronized Citation getVendor() {
         return (backingStore!=null) ? backingStore.getVendor() : super.getVendor();
     }
@@ -305,6 +305,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @throws FactoryException if a failure occured while fetching the engine description.
      */
+    @Override
     public synchronized String getBackingStoreDescription() throws FactoryException {
         return getBackingStore().getBackingStoreDescription();
     }
@@ -319,7 +320,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
      */
-    public synchronized Set getAuthorityCodes(final Class type)
+    public synchronized Set<String> getAuthorityCodes(final Class type)
             throws FactoryException
     {
         return getBackingStore().getAuthorityCodes(type);
@@ -343,6 +344,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an arbitrary object from a code.
      */
+    @Override
     public synchronized IdentifiedObject createObject(final String code)
             throws FactoryException
     {
@@ -361,6 +363,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an arbitrary datum from a code.
      */
+    @Override
     public synchronized Datum createDatum(final String code)
             throws FactoryException
     {
@@ -379,6 +382,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an engineering datum from a code.
      */
+    @Override
     public synchronized EngineeringDatum createEngineeringDatum(final String code)
             throws FactoryException
     {
@@ -397,6 +401,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an image datum from a code.
      */
+    @Override
     public synchronized ImageDatum createImageDatum(final String code)
             throws FactoryException
     {
@@ -415,6 +420,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a vertical datum from a code.
      */
+    @Override
     public synchronized VerticalDatum createVerticalDatum(final String code)
             throws FactoryException
     {
@@ -433,6 +439,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a temporal datum from a code.
      */
+    @Override
     public synchronized TemporalDatum createTemporalDatum(final String code)
             throws FactoryException
     {
@@ -451,6 +458,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a geodetic datum from a code.
      */
+    @Override
     public synchronized GeodeticDatum createGeodeticDatum(final String code)
             throws FactoryException
     {
@@ -469,6 +477,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an ellipsoid from a code.
      */
+    @Override
     public synchronized Ellipsoid createEllipsoid(final String code)
             throws FactoryException
     {
@@ -487,6 +496,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a prime meridian from a code.
      */
+    @Override
     public synchronized PrimeMeridian createPrimeMeridian(final String code)
             throws FactoryException
     {
@@ -505,6 +515,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an extent (usually an area of validity) from a code.
      */
+    @Override
     public synchronized Extent createExtent(final String code)
             throws FactoryException
     {
@@ -523,6 +534,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an arbitrary coordinate system from a code.
      */
+    @Override
     public synchronized CoordinateSystem createCoordinateSystem(final String code)
             throws FactoryException
     {
@@ -541,6 +553,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a cartesian coordinate system from a code.
      */
+    @Override
     public synchronized CartesianCS createCartesianCS(final String code)
             throws FactoryException
     {
@@ -559,6 +572,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a polar coordinate system from a code.
      */
+    @Override
     public synchronized PolarCS createPolarCS(final String code)
             throws FactoryException
     {
@@ -577,6 +591,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a cylindrical coordinate system from a code.
      */
+    @Override
     public synchronized CylindricalCS createCylindricalCS(final String code)
             throws FactoryException
     {
@@ -595,6 +610,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a spherical coordinate system from a code.
      */
+    @Override
     public synchronized SphericalCS createSphericalCS(final String code)
             throws FactoryException
     {
@@ -613,6 +629,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an ellipsoidal coordinate system from a code.
      */
+    @Override
     public synchronized EllipsoidalCS createEllipsoidalCS(final String code)
             throws FactoryException
     {
@@ -631,6 +648,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a vertical coordinate system from a code.
      */
+    @Override
     public synchronized VerticalCS createVerticalCS(final String code)
             throws FactoryException
     {
@@ -649,6 +667,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a temporal coordinate system from a code.
      */
+    @Override
     public synchronized TimeCS createTimeCS(final String code)
             throws FactoryException
     {
@@ -667,6 +686,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a coordinate system axis from a code.
      */
+    @Override
     public synchronized CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
@@ -685,6 +705,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an unit from a code.
      */
+    @Override
     public synchronized Unit createUnit(final String code)
             throws FactoryException
     {
@@ -703,6 +724,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an arbitrary coordinate reference system from a code.
      */
+    @Override
     public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
@@ -721,6 +743,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a 3D coordinate reference system from a code.
      */
+    @Override
     public synchronized CompoundCRS createCompoundCRS(final String code)
             throws FactoryException
     {
@@ -739,6 +762,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a derived coordinate reference system from a code.
      */
+    @Override
     public synchronized DerivedCRS createDerivedCRS(final String code)
             throws FactoryException
     {
@@ -757,6 +781,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an engineering coordinate reference system from a code.
      */
+    @Override
     public synchronized EngineeringCRS createEngineeringCRS(final String code)
             throws FactoryException
     {
@@ -775,6 +800,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a geographic coordinate reference system from a code.
      */
+    @Override
     public synchronized GeographicCRS createGeographicCRS(final String code)
             throws FactoryException
     {
@@ -793,6 +819,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a geocentric coordinate reference system from a code.
      */
+    @Override
     public synchronized GeocentricCRS createGeocentricCRS(final String code)
             throws FactoryException
     {
@@ -811,6 +838,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns an image coordinate reference system from a code.
      */
+    @Override
     public synchronized ImageCRS createImageCRS(final String code)
             throws FactoryException
     {
@@ -829,6 +857,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a projected coordinate reference system from a code.
      */
+    @Override
     public synchronized ProjectedCRS createProjectedCRS(final String code)
             throws FactoryException
     {
@@ -847,6 +876,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a temporal coordinate reference system from a code.
      */
+    @Override
     public synchronized TemporalCRS createTemporalCRS(final String code)
             throws FactoryException
     {
@@ -865,6 +895,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Returns a vertical coordinate reference system from a code.
      */
+    @Override
     public synchronized VerticalCRS createVerticalCRS(final String code)
             throws FactoryException
     {
@@ -885,6 +916,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @since 2.2
      */
+    @Override
     public synchronized ParameterDescriptor createParameterDescriptor(final String code)
             throws FactoryException
     {
@@ -905,6 +937,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @since 2.2
      */
+    @Override
     public synchronized OperationMethod createOperationMethod(final String code)
             throws FactoryException
     {
@@ -925,6 +958,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @since 2.2
      */
+    @Override
     public synchronized CoordinateOperation createCoordinateOperation(final String code)
             throws FactoryException
     {
@@ -945,15 +979,16 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @since 2.2
      */
-    public synchronized Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
+    @Override
+    public synchronized Set<CoordinateOperation> createFromCoordinateReferenceSystemCodes(
                         final String sourceCode, final String targetCode)
             throws FactoryException
     {
-        final Set/*<CoordinateOperation>*/ operations;
+        final Set<CoordinateOperation> operations;
         final CodePair key = new CodePair(trimAuthority(sourceCode), trimAuthority(targetCode));
         final Object cached = get(key);
-        if (cached instanceof Set/*<CoordinateOperation>*/) {
-            operations = (Set/*<CoordinateOperation>*/) cached;
+        if (cached instanceof Set) {
+            operations = (Set<CoordinateOperation>) cached;
         } else {
             operations = Collections.unmodifiableSet(getBackingStore()
                          .createFromCoordinateReferenceSystemCodes(sourceCode, targetCode));
@@ -974,6 +1009,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
             this.target = target;
         }
 
+        @Override
         public int hashCode() {
             int code = 0;
             if (source!=null) code  = source.hashCode();
@@ -981,6 +1017,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
             return code;
         }
 
+        @Override
         public boolean equals(final Object other) {
             if (other instanceof CodePair) {
                 final CodePair that = (CodePair) other;
@@ -990,6 +1027,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
             return false;
         }
 
+        @Override
         public String toString() {
             return source + " \u21E8 " + target;
         }
@@ -1002,9 +1040,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
      *
      * @since 2.4
      */
-    //@Override
+    @Override
     public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
-            final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
+            final Class<? extends IdentifiedObject> type) throws FactoryException
     {
         return new Finder(getBackingStore().getIdentifiedObjectFinder(type));
     }
@@ -1031,7 +1069,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
          * to the specified object. The default implementation performs the same lookup than
          * the backing store and caches the result.
          */
-        //@Override
+        @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             /*
              * Do not synchronize on 'BufferedAuthorityFactory.this'. This method may take a
@@ -1044,7 +1082,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
              */
             IdentifiedObject candidate;
             synchronized (findPool) {
-                candidate = (IdentifiedObject) findPool.get(object);
+                candidate = findPool.get(object);
             }
             if (candidate == null) {
                 // Must delegates to 'finder' (not to 'super') in order to take
@@ -1062,11 +1100,11 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
         /**
          * Returns the identifier for the specified object.
          */
-        //@Override
+        @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
             synchronized (findPool) {
-                candidate = (IdentifiedObject) findPool.get(object);
+                candidate = findPool.get(object);
             }
             if (candidate != null) {
                 return getIdentifier(candidate);
@@ -1080,6 +1118,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
     /**
      * Releases resources immediately instead of waiting for the garbage collector.
      */
+    @Override
     public synchronized void dispose() throws FactoryException {
         if (backingStore != null) {
             backingStore.dispose();
@@ -1099,7 +1138,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
         assert Thread.holdsLock(this);
         Object object = pool.get(key);
         if (object instanceof Reference) {
-            object = ((Reference) object).get();
+            object = ((Reference<?>) object).get();
         }
         return object;
     }
@@ -1116,8 +1155,8 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
         pool.put(key, object);
         int toReplace = pool.size() - maxStrongReferences;
         if (toReplace > 0) {
-            for (final Iterator it=pool.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
+            for (final Iterator<Map.Entry<Object,Object>> it=pool.entrySet().iterator(); it.hasNext();) {
+                final Map.Entry<Object,Object> entry = it.next();
                 final Object value = entry.getValue();
                 if (value instanceof Reference) {
                     if (((Reference) value).get() == null) {
@@ -1125,7 +1164,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory implement
                     }
                     continue;
                 }
-                entry.setValue(new WeakReference(value));
+                entry.setValue(new WeakReference<Object>(value));
                 if (--toReplace == 0) {
                     break;
                 }

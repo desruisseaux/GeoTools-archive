@@ -56,7 +56,6 @@ public final class Transform3DTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -77,7 +76,7 @@ public final class Transform3DTest extends TestCase {
     /**
      * Convenience method returning a set of properties for a CRS with the specified name.
      */
-    private static Map name(final String name) {
+    private static Map<String,String> name(final String name) {
         return Collections.singletonMap(IdentifiedObject.NAME_KEY, name);
     }
 

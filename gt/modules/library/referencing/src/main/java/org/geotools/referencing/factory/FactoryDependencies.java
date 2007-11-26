@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.factory;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -30,7 +29,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
@@ -43,7 +42,6 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 
-// Geotools dependencies
 import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -183,8 +181,7 @@ public class FactoryDependencies {
         if (factory instanceof ReferencingFactory) {
             final Collection<?> dep = ((ReferencingFactory) factory).dependencies();
             if (dep != null) {
-                for (final Iterator it=dep.iterator(); it.hasNext();) {
-                    final Object element = it.next();
+                for (final Object element : dep) {
                     final MutableTreeNode child;
                     if (element instanceof Factory) {
                         final Factory candidate = (Factory) element;
@@ -214,14 +211,14 @@ public class FactoryDependencies {
         if (factory instanceof AuthorityFactory) {
             final Citation authority = ((AuthorityFactory) factory).getAuthority();
             if (authority != null) {
-                final Collection identifiers = authority.getIdentifiers();
+                final Collection<? extends Identifier> identifiers = authority.getIdentifiers();
                 if (identifiers != null && !identifiers.isEmpty()) {
                     boolean next = false;
-                    for (final Iterator it=identifiers.iterator(); it.hasNext();) {
+                    for (final Identifier id : identifiers) {
                         if (next) {
                             buffer.append(", ");
                         }
-                        appendIdentifier(buffer, (String) it.next());
+                        appendIdentifier(buffer, id.getCode());
                         next = true;
                     }
                 } else {

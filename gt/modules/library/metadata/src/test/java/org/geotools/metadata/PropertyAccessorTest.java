@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, Geotools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -22,6 +22,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.geotools.util.SimpleInternationalString;
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.citation.Citations;
@@ -102,8 +103,22 @@ public class PropertyAccessorTest extends TestCase {
         assertTrue(String.valueOf(index), index >= 0);
         final Object identifiers = accessor.get(index, citation);
         assertNotNull(identifiers);
+        assertTrue(containsEPSG(identifiers));
+    }
+
+    /**
+     * Returns {@code true} if the specified identifiers contains the {@code "EPSG"} code.
+     */
+    static boolean containsEPSG(final Object identifiers) {
         assertTrue(identifiers instanceof Collection);
-        assertTrue(((Collection) identifiers).contains("EPSG"));
+        @SuppressWarnings("unchecked")
+        final Collection<Identifier> collection = (Collection) identifiers;
+        for (final Identifier id : collection) {
+            if (id.getCode().equals("EPSG")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -129,7 +144,7 @@ public class PropertyAccessorTest extends TestCase {
         assertNotNull(target);
         assertNotSame(source, target);
         assertEquals (source, target);
-        assertTrue(((Collection) target).contains("EPSG"));
+        assertTrue(containsEPSG(target));
 
         assertSame(target, accessor.set(index, citation, null));
         final Object value = accessor.get(index, citation);
@@ -158,7 +173,7 @@ public class PropertyAccessorTest extends TestCase {
         hashCode = accessor.hashCode(citation);
         assertEquals("Metadata with a single String value.", ISBN.hashCode(), hashCode);
 
-        final Set set = new HashSet();
+        final Set<Object> set = new HashSet<Object>();
         assertEquals("By Set.hashCode() contract.", 0, set.hashCode());
         assertTrue(set.add(ISBN));
         assertEquals("Expected Metadata.hashCode() == Set.hashCode().", set.hashCode(), hashCode);
@@ -171,8 +186,8 @@ public class PropertyAccessorTest extends TestCase {
         assertEquals("Expected Metadata.hashCode() == Set.hashCode().", set.hashCode(), hashCode);
         assertEquals("CitationsImpl.hashCode() should delegate.", hashCode, citation.hashCode());
 
-        final Collection values = citation.asMap().values();
-        assertEquals(hashCode, new HashSet(values).hashCode());
+        final Collection<Object> values = citation.asMap().values();
+        assertEquals(hashCode, new HashSet<Object>(values).hashCode());
         assertTrue(values.containsAll(set));
         assertTrue(set.containsAll(values));
     }

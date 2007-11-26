@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.metadata;
 
-// J2SE dependencies
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,7 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-// Geotools implementation
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -70,12 +68,12 @@ final class PropertyAccessor {
      * Getters shared between many instances of this class. Two different implementations
      * may share the same getters but different setters.
      */
-    private static final Map/*<Class, Method[]>*/ SHARED_GETTERS = new HashMap();
+    private static final Map<Class, Method[]> SHARED_GETTERS = new HashMap<Class, Method[]>();
 
     /**
      * The implemented metadata interface.
      */
-    final Class type;
+    final Class<?> type;
 
     /**
      * The implementation class. The following condition must hold:
@@ -84,7 +82,7 @@ final class PropertyAccessor {
      * type.{@linkplain Class#isAssignableFrom isAssignableFrom}(implementation);
      * </pre></blockquote>
      */
-    final Class implementation;
+    final Class<?> implementation;
 
     /**
      * The getter methods. This array should not contain any null element.
@@ -105,13 +103,13 @@ final class PropertyAccessor {
      * @param  type The interface implemented by the metadata.
      *         Should be the value returned by {@link #getType}.
      */
-    PropertyAccessor(final Class implementation, final Class type) {
+    PropertyAccessor(final Class<?> implementation, final Class<?> type) {
         this.implementation = implementation;
         this.type           = type;
         assert type.isAssignableFrom(implementation) : implementation;
         getters = getGetters(type);
         Method[] setters = null;
-        final Class[] arguments = new Class[1];
+        final Class<?>[] arguments = new Class[1];
         for (int i=0; i<getters.length; i++) {
             final Method getter = getters[i];
             final Method setter; // To be determined later
@@ -148,12 +146,12 @@ final class PropertyAccessor {
      * @param  interfacePackage The root package for metadata interfaces.
      * @return The single interface, or {@code null} if none where found.
      */
-    static Class getType(final Class implementation, final String interfacePackage) {
+    static Class<?> getType(final Class<?> implementation, final String interfacePackage) {
         if (!implementation.isInterface()) {
-            final Class[] interfaces = implementation.getInterfaces();
+            final Class<?>[] interfaces = implementation.getInterfaces();
             int count = 0;
             for (int i=0; i<interfaces.length; i++) {
-                final Class candidate = interfaces[i];
+                final Class<?> candidate = interfaces[i];
                 if (candidate.getName().startsWith(interfacePackage)) {
                     interfaces[count++] = candidate;
                 }
@@ -168,17 +166,19 @@ final class PropertyAccessor {
     /**
      * Returns the getters. The returned array should never be modified,
      * since it may be shared among many instances of {@code PropertyAccessor}.
-     *
-     * @todo Ignore deprecated methods when we will be allowed to compile for J2SE 1.5.
      */
-    private static Method[] getGetters(final Class type) {
+    private static Method[] getGetters(final Class<?> type) {
         synchronized (SHARED_GETTERS) {
-            Method[] getters = (Method[]) SHARED_GETTERS.get(type);
+            Method[] getters = SHARED_GETTERS.get(type);
             if (getters == null) {
                 getters = type.getMethods();
                 int count = 0;
                 for (int i=0; i<getters.length; i++) {
                     final Method candidate = getters[i];
+                    if (candidate.getAnnotation(Deprecated.class) != null) {
+                        // Ignores deprecated methods.
+                        continue;
+                    }
                     if (!candidate.getReturnType().equals(Void.TYPE) &&
                          candidate.getParameterTypes().length == 0)
                     {
@@ -195,7 +195,7 @@ final class PropertyAccessor {
                         }
                     }
                 }
-                getters = (Method[]) XArray.resize(getters, count);
+                getters = XArray.resize(getters, count);
                 SHARED_GETTERS.put(type, getters);
             }
             return getters;
@@ -412,8 +412,8 @@ final class PropertyAccessor {
      * @param skipNulls If {@code true}, only non-null values will be compared.
      */
     public boolean shallowEquals(final Object metadata1, final Object metadata2, final boolean skipNulls) {
-        assert type.isInstance(metadata1);
-        assert type.isInstance(metadata2);
+        assert type.isInstance(metadata1) : metadata1;
+        assert type.isInstance(metadata2) : metadata2;
         for (int i=0; i<getters.length; i++) {
             final Method  method = getters[i];
             final Object  value1 = get(method, metadata1);
@@ -448,8 +448,8 @@ final class PropertyAccessor {
             throws UnmodifiableMetadataException
     {
         boolean success = true;
-        assert type          .isInstance(source);
-        assert implementation.isInstance(target);
+        assert type          .isInstance(source) : source;
+        assert implementation.isInstance(target) : target;
         final Object[] arguments = new Object[1];
         for (int i=0; i<getters.length; i++) {
             arguments[0] = get(getters[i], source);
@@ -473,7 +473,7 @@ final class PropertyAccessor {
      * {@linkplain ModifiableMetadata#unmodifiable unmodifiable variant.
      */
     final void freeze(final Object metadata) {
-        assert implementation.isInstance(metadata);
+        assert implementation.isInstance(metadata) : metadata;
         if (setters != null) {
             final Object[] arguments = new Object[1];
             for (int i=0; i<getters.length; i++) {
@@ -515,7 +515,7 @@ final class PropertyAccessor {
      * to the ordering of properties.
      */
     public int hashCode(final Object metadata) {
-        assert type.isInstance(metadata);
+        assert type.isInstance(metadata) : metadata;
         int code = 0;
         for (int i=0; i<getters.length; i++) {
             final Object value = get(getters[i], metadata);
@@ -530,7 +530,7 @@ final class PropertyAccessor {
      * Counts the number of non-null properties.
      */
     public int count(final Object metadata, final int max) {
-        assert type.isInstance(metadata);
+        assert type.isInstance(metadata) : metadata;
         int count = 0;
         for (int i=0; i<getters.length; i++) {
             if (!isEmpty(get(getters[i], metadata))) {

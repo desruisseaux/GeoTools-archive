@@ -16,7 +16,6 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,12 +34,10 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
@@ -52,7 +49,6 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
@@ -70,7 +66,6 @@ public final class ParametersTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -184,7 +179,7 @@ public final class ParametersTest extends TestCase {
         Parameter param = new Parameter("Test", AxisDirection.DISPLAY_UP);
         ParameterDescriptor op = (ParameterDescriptor) param.getDescriptor();
         assertEquals("Set<AxisDirection>",
-                     new HashSet(Arrays.asList(AxisDirection.values())),
+                     new HashSet<AxisDirection>(Arrays.asList(AxisDirection.values())),
                      op.getValidValues());
         assertNull("defaultValue", op.getDefaultValue());
         param.setValue(AxisDirection.DOWN);
@@ -334,7 +329,7 @@ public final class ParametersTest extends TestCase {
         assertTrue  ("validValues", validValues.contains(AxisDirection.SOUTH));
         assertTrue  ("validValues", validValues.contains(AxisDirection.DISPLAY_LEFT));
         assertTrue  ("validValues", validValues.contains(AxisDirection.PAST));
-        assertEquals("validValues", new HashSet(Arrays.asList(AxisDirection.values())), validValues);
+        assertEquals("validValues", new HashSet<AxisDirection>(Arrays.asList(AxisDirection.values())), validValues);
         try {
             parameter.doubleValue();
             fail("doubleValue should not be allowed on AxisDirection");
@@ -361,6 +356,7 @@ public final class ParametersTest extends TestCase {
              * <code>ParameterValue</code>. However, the Geotools implementation should
              * be robust enough to accept other values. We will test that.
              */
+            @Override
             public int getMaximumOccurs() {
                 return 2;
             }

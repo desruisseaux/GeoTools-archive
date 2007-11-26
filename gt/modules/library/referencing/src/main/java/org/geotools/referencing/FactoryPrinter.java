@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE direct dependencies
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -26,12 +25,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
 
-// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.AuthorityFactory;
 
-// Geotools dependencies
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
@@ -47,7 +45,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Desruisseaux
  */
-final class FactoryPrinter implements Comparator {
+final class FactoryPrinter implements Comparator<Class<?>> {
     /**
      * Constructs a default instance of this printer.
      */
@@ -58,9 +56,7 @@ final class FactoryPrinter implements Comparator {
      * Compares two factories for order. This is used for sorting out the factories
      * before to display them.
      */
-    public int compare(final Object object1, final Object object2) {
-        final Class/*<Factory>*/ factory1 = (Class) object1;
-        final Class/*<Factory>*/ factory2 = (Class) object2;
+    public int compare(final Class<?> factory1, final Class<?> factory2) {
         if (false) {
             // Sort authority factory last
             final boolean isAuthority1 = AuthorityFactory.class.isAssignableFrom(factory1);
@@ -76,7 +72,7 @@ final class FactoryPrinter implements Comparator {
     }
 
     /**
-     * List all available factory implementations in a tabular format. For each factory interface,
+     * Lists all available factory implementations in a tabular format. For each factory interface,
      * the first implementation listed is the default one. This method provides a way to check the
      * state of a system, usually for debugging purpose.
      *
@@ -91,8 +87,8 @@ final class FactoryPrinter implements Comparator {
         /*
          * Gets the categories in some sorted order.
          */
-        final List categories = new ArrayList();
-        for (final Iterator it=registry.getCategories(); it.hasNext();) {
+        final List<Class<?>> categories = new ArrayList<Class<?>>();
+        for (final Iterator<Class<?>> it=registry.getCategories(); it.hasNext();) {
             categories.add(it.next());
         }
         Collections.sort(categories, this);
@@ -114,17 +110,17 @@ final class FactoryPrinter implements Comparator {
         table.nextLine('\u2550');
         final StringBuffer vendors         = new StringBuffer();
         final StringBuffer implementations = new StringBuffer();
-        for (final Iterator it=categories.iterator(); it.hasNext();) {
+        for (final Iterator<Class<?>> it=categories.iterator(); it.hasNext();) {
             /*
              * Writes the category name (CRSFactory, DatumFactory, etc.)
              */
-            final Class category = (Class) it.next();
+            final Class<?> category = it.next();
             table.write(Utilities.getShortName(category));
             table.nextColumn();
             /*
-             * Write the authorities in a single cell. Same for vendors and implementations.
+             * Writes the authorities in a single cell. Same for vendors and implementations.
              */
-            final Iterator providers=registry.getServiceProviders(category, null, null);
+            final Iterator<?> providers = registry.getServiceProviders(category, null, null);
             while (providers.hasNext()) {
                 if (implementations.length() != 0) {
                     table          .write ('\n');
@@ -136,10 +132,12 @@ final class FactoryPrinter implements Comparator {
                 vendors.append(vendor.getTitle().toString(locale));
                 implementations.append(Utilities.getShortClassName(provider));
                 if (provider instanceof AuthorityFactory) {
-                    final Citation authority   = ((AuthorityFactory) provider).getAuthority();
-                    final Iterator identifiers = authority.getIdentifiers().iterator();
-                    final String   identifier  = identifiers.hasNext() ? identifiers.next().toString()
-                                               : authority.getTitle().toString(locale);
+                    final Citation authority = ((AuthorityFactory) provider).getAuthority();
+                    final Iterator<? extends Identifier> identifiers =
+                            authority.getIdentifiers().iterator();
+                    final String identifier = identifiers.hasNext()
+                            ? identifiers.next().getCode().toString()
+                            : authority.getTitle().toString(locale);
                     table.write(identifier);
                 }
             }

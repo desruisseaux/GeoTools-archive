@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.metadata.iso;
 
-// OpenGIS direct dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 
@@ -39,7 +38,7 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 7459062382170865919L;
-    
+
     /**
      * Alphanumeric value identifying an instance in the namespace.
      */
@@ -58,8 +57,8 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
      * Organization or party responsible for definition and maintenance of the
      * {@linkplain #getCode code}.
      */
-    private Citation authority;    
-    
+    private Citation authority;
+
     /**
      * Construct an initially empty identifier.
      */
@@ -121,7 +120,7 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
     public String getVersion() {
         return version;
     }
-    
+
     /**
      * Set an identifier of the version of the associated code.
      */
@@ -137,7 +136,7 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
      * @return The authority, or {@code null} if not available.
      */
     public Citation getAuthority() {
-        return authority;        
+        return authority;
     }
 
     /**

@@ -68,7 +68,6 @@ public class FallbackAuthorityFactoryTest extends TestCase {
      * @param args the command line arguments.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -82,6 +81,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
     /**
      * Adds the extra factory to the set of authority factories.
      */
+    @Override
     public void setUp() {
         assertNull(extra);
         extra = new FactoryEPSGExtra();
@@ -92,6 +92,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
     /**
      * Removes the extra factory from the set of authority factories.
      */
+    @Override
     public void tearDown() {
         if (org.geotools.test.TestData.isBaseJavaPlatform()) {
             // Disabled in J2SE 1.4 build because of a bug.
@@ -178,6 +179,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
         /**
          * Returns the URL to the test file that contains a broken CRS for code EPSG:1.
          */
+        @Override
         protected URL getDefinitionsURL() {
             return FactoryUsingWKT.class.getResource("epsg2.properties");
         }

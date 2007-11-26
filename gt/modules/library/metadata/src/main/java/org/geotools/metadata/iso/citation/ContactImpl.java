@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,14 +19,11 @@
  */
 package org.geotools.metadata.iso.citation;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Address;
 import org.opengis.metadata.citation.Contact;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.Telephone;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 
 
@@ -44,7 +41,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 3283637180253117382L;
-    
+
     /**
      * Contact informations for the <A HREF="http://www.opengeospatial.org">Open Geospatial consortium</A>.
      * "Open Geospatial consortium" is the new name for "OpenGIS consortium".
@@ -56,7 +53,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
         final ContactImpl c = new ContactImpl(OnLineResourceImpl.OGC);
         c.freeze();
         OGC = c;
-    }    
+    }
     /**
      * Contact informations for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
      * "OpenGIS consortium" is the old name for "Open Geospatial consortium".
@@ -69,7 +66,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
         c.freeze();
         OPEN_GIS = c;
     }
-    
+
     /**
      * Contact informations for the
      * <A HREF="http://www.epsg.org">European Petroleum Survey Group</A>.
@@ -159,28 +156,28 @@ public class ContactImpl extends MetadataEntity implements Contact {
         c.freeze();
         GEOTOOLS = c;
     }
-    
+
     /**
      * Supplemental instructions on how or when to contact the individual or organization.
      */
     private InternationalString contactInstructions;
-    
+
     /**
      * Time period (including time zone) when individuals can contact the organization or
-     * individual. 
+     * individual.
      */
     private InternationalString hoursOfService;
-    
+
     /**
      * On-line information that can be used to contact the individual or organization.
      */
     private OnLineResource onLineResource;
-    
+
     /**
      * Physical and email address at which the organization or individual may be contacted.
      */
     private Address address;
-    
+
     /**
      * Telephone numbers at which the organization or individual may be contacted.
      */
@@ -225,7 +222,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
         checkWritePermission();
         address = newValue;
     }
-    
+
     /**
      * Returns supplemental instructions on how or when to contact the individual or organization.
      * Returns {@code null} if none.
@@ -272,11 +269,11 @@ public class ContactImpl extends MetadataEntity implements Contact {
     public synchronized void setPhone(final Telephone newValue) {
         checkWritePermission();
         phone = newValue;
-    }    
+    }
 
     /**
      * Returns time period (including time zone) when individuals can contact the organization or
-     * individual. 
+     * individual.
      * Returns {@code null} if none.
      */
     public InternationalString getHoursOfService() {
@@ -285,7 +282,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
 
     /**
      * Set time period (including time zone) when individuals can contact the organization or
-     * individual. 
+     * individual.
      */
     public synchronized void setHoursOfService(final InternationalString newValue) {
         checkWritePermission();

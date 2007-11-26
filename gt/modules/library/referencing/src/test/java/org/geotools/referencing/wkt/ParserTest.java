@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,20 +23,13 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
 import org.geotools.referencing.crs.DefaultProjectedCRS;
-import org.geotools.referencing.wkt.AbstractParser;
-import org.geotools.referencing.wkt.MathTransformParser;
-import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.TestScript;
 import org.geotools.test.TestData;
 
@@ -56,7 +48,6 @@ public final class ParserTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -66,7 +57,7 @@ public final class ParserTest extends TestCase {
     public static Test suite() {
         return new TestSuite(ParserTest.class);
     }
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -292,7 +283,7 @@ public final class ParserTest extends TestCase {
         if (reader == null) {
             throw new FileNotFoundException(filename);
         }
-        final Collection pool = new HashSet();
+        final Collection<Object> pool = new HashSet<Object>();
         String line;
         while ((line=reader.readLine()) != null) {
             line = line.trim();

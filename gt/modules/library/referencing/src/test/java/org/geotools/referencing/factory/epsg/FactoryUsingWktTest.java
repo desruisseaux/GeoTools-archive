@@ -15,22 +15,18 @@
  */
 package org.geotools.referencing.factory.epsg;
 
-// Java dependencies
 import java.io.File;
 import java.util.Collection;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ProjectedCRS;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
@@ -40,7 +36,7 @@ import org.geotools.referencing.NamedIdentifier;
 
 /**
  * Tests {@link FactoryUsingWKT}.
- * 
+ *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -65,7 +61,6 @@ public class FactoryUsingWktTest extends TestCase {
      * @param args the command line arguments.
      */
     public static void main(final String[] args) {
-        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -79,6 +74,7 @@ public class FactoryUsingWktTest extends TestCase {
     /**
      * Gets the authority factory for ESRI.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         factory = (FactoryUsingWKT) ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
@@ -110,8 +106,8 @@ public class FactoryUsingWktTest extends TestCase {
         final Citation authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString());
-        assertTrue (authority.getIdentifiers().contains("EPSG"));
-        assertFalse(authority.getIdentifiers().contains("ESRI"));
+        assertTrue (Citations.identifierMatches(authority, "EPSG"));
+        assertFalse(Citations.identifierMatches(authority, "ESRI"));
         assertTrue(factory instanceof FactoryUsingWKT);
     }
 
@@ -119,7 +115,7 @@ public class FactoryUsingWktTest extends TestCase {
      * Tests the vendor.
      */
     public void testVendor(){
-        final Citation vendor = factory.getVendor();        
+        final Citation vendor = factory.getVendor();
         assertNotNull(vendor);
         assertEquals("Geotools", vendor.getTitle().toString());
     }
@@ -136,5 +132,5 @@ public class FactoryUsingWktTest extends TestCase {
         Collection ids = actual.getIdentifiers();
         assertTrue (ids.contains(new NamedIdentifier(Citations.EPSG, "42101")));
         assertFalse(ids.contains(new NamedIdentifier(Citations.ESRI, "42101")));
-    }    
+    }
 }

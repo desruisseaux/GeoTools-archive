@@ -4,7 +4,7 @@
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
  *    (C) 1998, Pêches et Océans Canada
- *  
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,7 +17,6 @@
  */
 package org.geotools.measure;
 
-// J2SE dependencies
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -29,14 +28,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-// Units dependencies
 import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -46,7 +43,6 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -399,7 +395,7 @@ public class CoordinateFormat extends Format {
     public String format(final DirectPosition point) {
         return format(point, new StringBuffer(), null).toString();
     }
-    
+
     /**
      * Formats a direct position and appends the resulting text to a given string buffer.
      * The position's dimension must matches the {@linkplain #getCoordinateReferenceSystem
@@ -499,11 +495,11 @@ public class CoordinateFormat extends Format {
             throw new IllegalArgumentException(String.valueOf(object));
         }
     }
-    
+
     /**
      * Not yet implemented.
      */
-    public Object parseObject(final String source, final ParsePosition position) {
+    public DirectPosition parseObject(final String source, final ParsePosition position) {
         throw new UnsupportedOperationException("DirectPosition parsing not yet implemented.");
     }
 }
