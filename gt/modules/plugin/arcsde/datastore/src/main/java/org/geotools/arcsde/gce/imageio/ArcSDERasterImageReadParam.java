@@ -22,13 +22,10 @@ import java.util.HashMap;
 
 import javax.imageio.ImageReadParam;
 
-import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 
 import com.esri.sde.sdk.client.SeConnection;
-import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRasterBand;
-import com.esri.sde.sdk.client.SeRow;
 
 /**
  * This class represents the parameters passed to an ArcSDERasterReader each

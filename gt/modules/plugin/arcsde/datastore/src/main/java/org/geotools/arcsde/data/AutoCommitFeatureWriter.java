@@ -44,7 +44,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/AutoCommitFeatureWriter.java $
  */
 class AutoCommitFeatureWriter implements FeatureWriter {
 
@@ -111,8 +112,14 @@ class AutoCommitFeatureWriter implements FeatureWriter {
         this.pool = pool;
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
         final String typeName = featureType.getTypeName();
-        this.layer = pool.getSdeLayer(typeName);
-        this.table = pool.getSdeTable(typeName);
+
+        ArcSDEPooledConnection conn = pool.getConnection();
+        try {
+            this.layer = conn.getLayer(typeName);
+            this.table = conn.getTable(typeName);
+        } finally {
+            conn.close();
+        }
     }
 
     /**

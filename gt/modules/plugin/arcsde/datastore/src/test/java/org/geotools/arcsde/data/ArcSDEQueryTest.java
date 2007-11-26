@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.arcsde.ArcSDEDataStoreFactory;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -170,12 +171,14 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     private ArcSDEQuery getQueryAll() throws IOException{
-        this.queryAll = ArcSDEQuery.createQuery(dstore, ftype, Query.ALL);
+        ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
+        this.queryAll = ArcSDEQuery.createQuery(connection, ftype, Query.ALL);
         return this.queryAll;
     }
     
     private ArcSDEQuery getQueryFiltered() throws IOException{
-        this.queryFiltered = ArcSDEQuery.createQuery(dstore, filteringQuery);
+        ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
+        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery);
         return this.queryFiltered;
     }
 

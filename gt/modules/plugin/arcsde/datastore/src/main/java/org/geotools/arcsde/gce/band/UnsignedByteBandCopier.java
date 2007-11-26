@@ -17,14 +17,12 @@
 package org.geotools.arcsde.gce.band;
 
 import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 
-import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeRasterTile;
 
 public class UnsignedByteBandCopier extends ArcSDERasterBandCopier {

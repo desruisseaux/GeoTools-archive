@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,25 +52,21 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
-import org.omg.CORBA._PolicyStub;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.BoundingBox;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeException;
@@ -625,7 +620,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         try {
             ArcSDEPooledConnection scon = connectionPool.getConnection();
 
-            SeTable sTable = connectionPool.getSdeTable(scon, rasterTable);
+            SeTable sTable = scon.getTable(rasterTable);
             SeQuery q = null;
             try {
                 SeColumnDefinition[] cols = sTable.describe();

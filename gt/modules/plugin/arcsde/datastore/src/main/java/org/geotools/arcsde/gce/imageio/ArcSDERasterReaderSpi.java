@@ -16,20 +16,14 @@
  */
 package org.geotools.arcsde.gce.imageio;
 
-import java.awt.Dimension;
-import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.arcsde.gce.ArcSDEPyramid;
-import org.geotools.arcsde.gce.ArcSDEPyramidLevel;
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.data.jdbc.ConnectionPool;
 
 /**
  * An ImageIO Service Provider Interface for creating ArcSDERasterReaders.

@@ -238,4 +238,8 @@ class ArcSDEAttributeReader implements AttributeReader {
 
         return this.fidPrefix.toString();
 	}
+
+    SimpleFeatureType getFeatureType() {
+        return schema;
+    }
 }

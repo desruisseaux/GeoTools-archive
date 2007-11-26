@@ -26,11 +26,6 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
-import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
-import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 
 

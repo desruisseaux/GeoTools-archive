@@ -18,8 +18,6 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
@@ -167,7 +165,7 @@ public abstract class FIDReader {
             }
             return fidReader;
         } catch (SeException e) {
-            throw new DataSourceException("Obtaining FID strategy for " + layer, e);
+            throw new DataSourceException("Obtaining FID strategy for " + layer + ": " + e.getMessage(), e);
         }
     }
 

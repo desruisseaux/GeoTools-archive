@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
@@ -32,7 +31,6 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * An implementation of the ArcSDE Raster Format.  Based on the ArcGrid module.

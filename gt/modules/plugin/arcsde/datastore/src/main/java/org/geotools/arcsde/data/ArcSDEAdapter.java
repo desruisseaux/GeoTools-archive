@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeTypeBuilder;
@@ -268,12 +267,10 @@ public class ArcSDEAdapter {
     /**
      * Fetchs the schema for the "SQL SELECT" like view definition
      */
-    public static SimpleFeatureType fetchSchema(ArcSDEConnectionPool connPool, String typeName,
-            String namespace, SeQueryInfo queryInfo) throws IOException {
+    public static SimpleFeatureType fetchSchema(final ArcSDEPooledConnection conn, final String typeName,
+            final String namespace, final SeQueryInfo queryInfo) throws IOException {
 
         List<AttributeDescriptor> attributeDescriptors;
-
-        ArcSDEPooledConnection conn = connPool.getConnection();
 
         SeQuery testQuery = null;
         try {
@@ -282,7 +279,7 @@ public class ArcSDEAdapter {
             String mainTable = queryInfo.getConstruct().getTables()[0];
             SeLayer layer = null;
             try {
-                layer = connPool.getSdeLayer(conn, mainTable);
+                layer = conn.getLayer(mainTable);
             } catch (NoSuchElementException e) {
                 LOGGER.info(mainTable + " is not an SeLayer, so no CRS info will be parsed");
             }
@@ -308,7 +305,6 @@ public class ArcSDEAdapter {
                 } catch (SeException e) {
                 }
             }
-            conn.close();
         }
         SimpleFeatureType type = createSchema(typeName, namespace, attributeDescriptors);
         return type;
@@ -859,8 +855,12 @@ public class ArcSDEAdapter {
      * 
      * @param hints
      *            A map containing extra ArcSDE-specific hints about how to
-     *            create the underlying ArcSDE SeLayer and SeTable objects from
+     *            create the underlying ArcS DE SeLayer and SeTable objects from
      *            this FeatureType.
+     * @param connection
+     *            connection to use in order to create the layer and table on
+     *            the server. The connection shall be managed by this method
+     *            caller.
      * 
      * @throws IOException
      *             see <code>throws DataSourceException</code> bellow
@@ -877,8 +877,8 @@ public class ArcSDEAdapter {
      *             type at the ArcSDE instance (e.g. a table with that name
      *             already exists).
      */
-    public static void createSchema(SimpleFeatureType featureType, Map hints,
-            ArcSDEConnectionPool connectionPool) throws IOException, IllegalArgumentException {
+    public static void createSchema(final SimpleFeatureType featureType, final Map hints,
+            final ArcSDEPooledConnection connection) throws IOException, IllegalArgumentException {
         if (featureType == null) {
             throw new NullPointerException("You have to provide a FeatureType instance");
         }
@@ -892,7 +892,6 @@ public class ArcSDEAdapter {
         final String unqualifiedTypeName = typeNameParts[typeNameParts.length - 1];
 
         // Create a new SeTable/SeLayer with the specified attributes....
-        ArcSDEPooledConnection connection = null;
         SeTable table = null;
         SeLayer layer = null;
 
@@ -931,8 +930,6 @@ public class ArcSDEAdapter {
         Exception error = null;
 
         try {
-            connection = connectionPool.getConnection();
-
             // create a table with provided username
             String qualifiedName = null;
 
@@ -1006,14 +1003,10 @@ public class ArcSDEAdapter {
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getSeError().getErrDesc(), e);
             throw new DataSourceException(e.getMessage(), e);
-        } catch (DataSourceException dse) {
-            LOGGER.log(Level.WARNING, dse.getMessage(), dse);
-            throw dse;
         } finally {
             if ((error != null) && tableCreated) {
                 // TODO: remove table if created and then failed
             }
-            connection.close();
         }
     }
 

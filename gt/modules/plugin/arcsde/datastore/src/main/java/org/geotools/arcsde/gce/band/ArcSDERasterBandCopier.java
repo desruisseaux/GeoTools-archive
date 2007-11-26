@@ -22,7 +22,6 @@ import java.awt.image.WritableRaster;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeRaster;
-import com.esri.sde.sdk.client.SeRasterBand;
 import com.esri.sde.sdk.client.SeRasterTile;
 
 public abstract class ArcSDERasterBandCopier {

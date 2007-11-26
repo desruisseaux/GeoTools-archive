@@ -39,17 +39,11 @@ import javax.imageio.metadata.IIOMetadata;
 import org.geotools.arcsde.gce.ArcSDEPyramid;
 import org.geotools.arcsde.gce.ArcSDEPyramidLevel;
 import org.geotools.arcsde.gce.band.ArcSDERasterBandCopier;
-import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
-import com.esri.sde.sdk.client.SeRaster;
-import com.esri.sde.sdk.client.SeRasterAttr;
-import com.esri.sde.sdk.client.SeRasterBand;
 import com.esri.sde.sdk.client.SeRasterConstraint;
 import com.esri.sde.sdk.client.SeRasterTile;
 import com.esri.sde.sdk.client.SeRow;

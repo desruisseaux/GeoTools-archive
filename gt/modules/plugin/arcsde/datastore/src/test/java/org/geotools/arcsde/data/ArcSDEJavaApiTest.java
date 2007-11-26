@@ -33,7 +33,6 @@ import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SDEPoint;
 import com.esri.sde.sdk.client.SeColumnDefinition;
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeDelete;
 import com.esri.sde.sdk.client.SeException;
@@ -208,7 +207,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             // constraints affects the COUNT statistics
             SeExtent extent = new SeExtent(-180, -90, -170, -80);
 
-            SeLayer layer = pool.getSdeLayer(typeName);
+            SeLayer layer = conn.getLayer(typeName);
             SeShape filterShape = new SeShape(layer.getCoordRef());
             filterShape.generateRectangle(extent);
 
@@ -283,7 +282,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             // constraints affects the COUNT statistics
             SeExtent extent = new SeExtent(-180, -90, -170, -80);
 
-            SeLayer layer = pool.getSdeLayer(typeName);
+            SeLayer layer = conn.getLayer(typeName);
             SeShape filterShape = new SeShape(layer.getCoordRef());
             filterShape.generateRectangle(extent);
 

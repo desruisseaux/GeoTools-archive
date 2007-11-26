@@ -32,14 +32,11 @@ import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.data.AttributeReader;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultFeatureReader;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.Diff;
-import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
@@ -52,19 +49,14 @@ import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
-import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.view.DefaultView;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
-
-import sun.nio.cs.ext.ISCII91;
 
 import com.esri.sde.sdk.client.SeDefs;
 import com.esri.sde.sdk.client.SeException;
@@ -189,6 +181,7 @@ public class ArcSDEDataStore implements DataStore {
      *             DOCUMENT ME!
      * @throws DataSourceException
      *             DOCUMENT ME!
+     * @see DataStore#getSchema(String)
      */
     public synchronized SimpleFeatureType getSchema(final String typeName)
             throws java.io.IOException {
@@ -232,27 +225,40 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
+     * Returns an {@link ArcSDEFeatureReader}
+     * <p>
+     * Preconditions:
+     * <ul>
+     * <li><code>query != null</code>
+     * <li><code>query.getTypeName() != null</code>
+     * <li><code>query.getFilter != null</code>
+     * <li><code>transaction != null</code>
+     * </ul>
+     * </p>
+     * 
      * @see DataStore#getFeatureReader(Query, Transaction)
+     * @return {@link ArcSDEFeatureReader} aware of the transaction state
      */
     public FeatureReader getFeatureReader(final Query query, final Transaction transaction)
             throws IOException {
+        assert query != null;
+        assert query.getTypeName() != null;
+        assert query.getFilter() != null;
+        assert transaction != null;
+
         Filter filter = query.getFilter();
         String typeName = query.getTypeName();
         String propertyNames[] = query.getPropertyNames();
 
-        if (filter == null) {
-            throw new NullPointerException("getFeatureReader requires Filter: "
-                    + "did you mean Filter.INCLUDE?");
+        ArcSDEPooledConnection connection;
+        if (Transaction.AUTO_COMMIT == transaction) {
+            connection = connectionPool.getConnection();
+        } else {
+            ArcTransactionState state = (ArcTransactionState) transaction.getState(connectionPool);
+            connection = state.getConnection();
         }
-        if (typeName == null) {
-            throw new NullPointerException("getFeatureReader requires typeName: "
-                    + "use getTypeNames() for a list of available types");
-        }
-        if (transaction == null) {
-            throw new NullPointerException("getFeatureReader requires Transaction: "
-                    + "did you mean to use Transaction.AUTO_COMMIT?");
-        }
-        SimpleFeatureType featureType = getSchema(query.getTypeName());
+
+        SimpleFeatureType featureType = getSchema(typeName, connection);
 
         if (propertyNames != null || query.getCoordinateSystem() != null) {
             try {
@@ -267,43 +273,10 @@ public class ArcSDEDataStore implements DataStore {
         if (filter == Filter.EXCLUDE || filter.equals(Filter.EXCLUDE)) {
             return new EmptyFeatureReader(featureType);
         }
-        // GR: allow subclases to implement as much filtering as they can,
-        // by returning just it's unsupperted filter
-        filter = getUnsupportedFilter(typeName, filter);
-        if (filter == null) {
-            throw new NullPointerException(
-                    "getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
-        }
 
-        // There are cases where the readers have to lock. Take shapefile for
-        // example. Getting a Reader causes
-        // the file to be locked. However on a commit TransactionStateDiff locks
-        // before a writer is obtained. In order to
-        // prevent deadlocks either the diff has to obtained first or the reader
-        // has to be obtained first.
-        // Because shapefile writes to a buffer first the actual write lock is
-        // not flipped until the transaction has most of the work
-        // done. As a result I suggest getting the diff first then getting the
-        // reader.
-        // JE
-        // Diff diff=null;
-        // if (transaction != Transaction.AUTO_COMMIT) {
-        // TransactionStateDiff state = state(transaction);
-        // if( state != null ){
-        // diff = state.diff(typeName);
-        // }
-        // }
+        FeatureReader reader = getFeatureReader(query, connection);
 
-        // This calls our subclass "simple" implementation
-        // All other functionality will be built as a reader around
-        // this class
-        //
-        FeatureReader reader = getFeatureReader(typeName, query);
-
-        // if( diff!=null ){
-        // reader = new DiffFeatureReader(reader, diff, query.getFilter());
-        // }
-
+        filter = getUnsupportedFilter(typeName, filter, connection);
         if (!filter.equals(Filter.INCLUDE)) {
             reader = new FilteringFeatureReader(reader, filter);
         }
@@ -320,67 +293,29 @@ public class ArcSDEDataStore implements DataStore {
         return reader;
     }
 
-    /**
-     * GR: this method is called from inside getFeatureReader(Query ,Transaction )
-     * to allow subclasses return an optimized FeatureReader which supports the
-     * filter and attributes truncation specified in <code>query</code>
-     * 
-     * <p>
-     * A subclass that supports the creation of such an optimized FeatureReader
-     * should override this method. Otherwise, it just returns
-     * <code>getFeatureReader(typeName)</code>
-     * </p>
-     * 
-     * @param typeName
-     *            DOCUMENT ME!
-     * @param query
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     * 
-     * @throws IOException
-     *             DOCUMENT ME!
-     */
-    private FeatureReader getFeatureReader(final String typeName, final Query query)
-            throws IOException {
-        ArcSDEQuery sdeQuery = null;
-        FeatureReader reader = null;
+    private FeatureReader getFeatureReader(final Query query,
+            final ArcSDEPooledConnection connection) throws IOException {
+        final String typeName = query.getTypeName();
+        final SimpleFeatureType completeSchema = getSchema(typeName, connection);
+        final ArcSDEQuery sdeQuery;
+        if (isView(typeName)) {
+            SeQueryInfo definitionQuery = getViewQueryInfo(typeName);
+            PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, definitionQuery,
+                    viewSelectStatement);
+        } else {
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query);
+        }
 
+        sdeQuery.execute();
+
+        final ArcSDEAttributeReader attReader = new ArcSDEAttributeReader(sdeQuery);
+        ArcSDEFeatureReader reader;
         try {
-            SimpleFeatureType schema = getSchema(typeName);
-            sdeQuery = ArcSDEQuery.createQuery(this, schema, query);
-
-            sdeQuery.execute();
-
-            AttributeReader attReader = new ArcSDEAttributeReader(sdeQuery);
-            final SimpleFeatureType resultingSchema = sdeQuery.getSchema();
-            reader = new DefaultFeatureReader(attReader, resultingSchema) {
-                protected org.opengis.feature.simple.SimpleFeature readFeature(AttributeReader atts)
-                        throws IllegalAttributeException, IOException {
-                    ArcSDEAttributeReader sdeAtts = (ArcSDEAttributeReader) atts;
-                    Object[] currAtts = sdeAtts.readAll();
-                    System.arraycopy(currAtts, 0, this.attributes, 0, currAtts.length);
-                    return SimpleFeatureBuilder.build(resultingSchema, this.attributes, sdeAtts
-                            .readFID());
-                }
-            };
-        } catch (SchemaException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
-            throw new DataSourceException("Types do not match: " + ex.getMessage(), ex);
-        } catch (IOException e) {
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
-            throw e;
-        } catch (Exception t) {
-            LOGGER.log(Level.SEVERE, t.getMessage(), t);
-            if (sdeQuery != null) {
-                sdeQuery.close();
-            }
-            throw new DataSourceException("Problem with feature reader: " + t.getMessage(), t);
+            reader = new ArcSDEFeatureReader(attReader);
+        } catch (SchemaException e) {
+            throw new RuntimeException("Schema missmatch, should never happen!: " + e.getMessage(),
+                    e);
         }
         return reader;
     }
@@ -404,6 +339,9 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
+     * Delegates to
+     * {@link #getFeatureWriter(String, Filter, Transaction) getFeatureWriter(typeName, Filter.INCLUDE, transaction)}
+     * 
      * @see DataStore#getFeatureWriter(String, Transaction)
      */
     public FeatureWriter getFeatureWriter(final String typeName, final Transaction transaction)
@@ -412,6 +350,7 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
+     * 
      * @see DataStore#getFeatureWriter(String, Filter, Transaction)
      */
     public FeatureWriter getFeatureWriter(final String typeName, final Filter filter,
@@ -434,36 +373,14 @@ public class ArcSDEDataStore implements DataStore {
     }
 
     /**
+     * Delegates to
+     * {@link #getFeatureWriter(String, Filter, Transaction) getFeatureWriter(typeName, Filter.EXCLUDE, transaction)}
+     * 
      * @see DataStore#getFeatureWriterAppend(String, Transaction)
      */
     public FeatureWriter getFeatureWriterAppend(final String typeName, final Transaction transaction)
             throws IOException {
-        if (true) {
-            return getFeatureWriter(typeName, Filter.EXCLUDE, transaction);
-        }
-
-        final ArcTransactionState state = getArcTransactionState(transaction);
-
-        SeLayer layer;
-        FIDReader fidStrategy;
-        // use the same connection than for the transaction to
-        // retrieve the fid strategy, don't close it as its in
-        // the ArcTransactionState domain to do that
-        ArcSDEPooledConnection conn;
-        if (state == null) {
-            conn = getConnectionPool().getConnection();
-        } else {
-            conn = state.getConnection();
-        }
-        layer = connectionPool.getSdeLayer(conn, typeName);
-        fidStrategy = FIDReader.getFidReader(conn, layer);
-        if (state == null) {
-            conn.close();
-        }
-
-        FeatureWriter writer = new ArcSDEFeatureWriter(this, fidStrategy, state, layer);
-
-        return writer;
+        return getFeatureWriter(typeName, Filter.EXCLUDE, transaction);
     }
 
     /**
@@ -510,7 +427,8 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @return DOCUMENT ME!
      */
-    private org.opengis.filter.Filter getUnsupportedFilter(String typeName, Filter filter) {
+    private org.opengis.filter.Filter getUnsupportedFilter(final String typeName,
+            final Filter filter, final ArcSDEPooledConnection conn) {
         try {
             SeLayer layer;
             SeQueryInfo qInfo;
@@ -523,25 +441,18 @@ public class ArcSDEDataStore implements DataStore {
                 } catch (SeException e) {
                     throw new RuntimeException(e.getMessage());
                 }
-                layer = connectionPool.getSdeLayer(mainLayerName);
+                layer = conn.getLayer(mainLayerName);
             } else {
-                layer = connectionPool.getSdeLayer(typeName);
+                layer = conn.getLayer(typeName);
                 qInfo = null;
             }
 
-            ArcSDEPooledConnection conn = null;
-            FIDReader fidReader;
-            try {
-                conn = connectionPool.getConnection();
-                fidReader = FIDReader.getFidReader(conn, layer);
-            } finally {
-                if (conn != null)
-                    conn.close();
-            }
+            FIDReader fidReader = FIDReader.getFidReader(conn, layer);
 
-            SimpleFeatureType schema = getSchema(typeName);
+            SimpleFeatureType schema = getSchema(typeName, conn);
+            PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
             ArcSDEQuery.FilterSet filters = ArcSDEQuery.createFilters(layer, schema, filter, qInfo,
-                    getViewSelectStatement(typeName), fidReader);
+                    viewSelectStatement, fidReader);
 
             Filter result = filters.getUnsupportedFilter();
 
@@ -552,7 +463,7 @@ public class ArcSDEDataStore implements DataStore {
             }
 
             return result;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
 
@@ -579,7 +490,20 @@ public class ArcSDEDataStore implements DataStore {
      * @throws DataSourceException
      */
     private boolean canWrite(final String typeName) throws DataSourceException {
-        final SeTable sdeTable = connectionPool.getSdeTable(typeName);
+        final SeTable sdeTable;
+        {
+            ArcSDEPooledConnection conn = null;
+            try {
+                conn = connectionPool.getConnection();
+                sdeTable = conn.getTable(typeName);
+            } catch (UnavailableArcSDEConnectionException e) {
+                throw new DataSourceException(e);
+            } finally {
+                if (conn != null) {
+                    conn.close();
+                }
+            }
+        }
         final int permissions;
         try {
             permissions = sdeTable.getPermissions();
@@ -675,9 +599,8 @@ public class ArcSDEDataStore implements DataStore {
             schema = (SimpleFeatureType) schemasCache.get(typeName);
 
             if (schema == null) {
-                ArcSDEConnectionPool connectionPool = getConnectionPool();
-                SeLayer layer = connectionPool.getSdeLayer(conn, typeName);
-                SeTable table = connectionPool.getSdeTable(conn, typeName);
+                SeLayer layer = conn.getLayer(typeName);
+                SeTable table = conn.getTable(typeName);
                 schema = ArcSDEAdapter.fetchSchema(layer, table, this.namespace);
                 schemasCache.put(typeName, schema);
             }
@@ -688,7 +611,12 @@ public class ArcSDEDataStore implements DataStore {
 
     public void createSchema(SimpleFeatureType featureType, Map hints) throws IOException,
             IllegalArgumentException {
-        ArcSDEAdapter.createSchema(featureType, hints, connectionPool);
+        final ArcSDEPooledConnection connection = connectionPool.getConnection();
+        try {
+            ArcSDEAdapter.createSchema(featureType, hints, connection);
+        } finally {
+            connection.close();
+        }
     }
 
     /**
@@ -705,7 +633,6 @@ public class ArcSDEDataStore implements DataStore {
      * @throws IOException
      */
     public void registerView(final String typeName, final PlainSelect select) throws IOException {
-
         if (typeName == null)
             throw new NullPointerException("typeName");
         if (select == null)
@@ -716,28 +643,29 @@ public class ArcSDEDataStore implements DataStore {
 
         verifyQueryIsSupported(select);
 
-        ArcSDEPooledConnection conn = connectionPool.getConnection();
+        final ArcSDEPooledConnection conn = connectionPool.getConnection();
 
-        PlainSelect qualifiedSelect = SelectQualifier.qualify(conn, select);
-        // System.out.println(qualifiedSelect);
-
-        SeQueryInfo queryInfo;
-        LOGGER.fine("creating definition query info");
         try {
-            queryInfo = QueryInfoParser.parse(conn, qualifiedSelect);
-        } catch (SeException e) {
-            throw new DataSourceException("Parsing select: " + e.getMessage(), e);
+            final PlainSelect qualifiedSelect = SelectQualifier.qualify(conn, select);
+            // System.out.println(qualifiedSelect);
+
+            final SeQueryInfo queryInfo;
+            try {
+                LOGGER.fine("creating definition query info");
+                queryInfo = QueryInfoParser.parse(conn, qualifiedSelect);
+            } catch (SeException e) {
+                throw new DataSourceException("Parsing select: " + e.getMessage(), e);
+            }
+            SimpleFeatureType viewSchema = ArcSDEAdapter.fetchSchema(conn, typeName, namespace,
+                    queryInfo);
+            LOGGER.fine("view schema: " + viewSchema);
+
+            this.viewQueryInfos.put(typeName, queryInfo);
+            this.viewSchemasCache.put(typeName, viewSchema);
+            this.viewSelectStatements.put(typeName, qualifiedSelect);
         } finally {
             conn.close();
         }
-
-        SimpleFeatureType viewSchema = ArcSDEAdapter.fetchSchema(connectionPool, typeName,
-                namespace, queryInfo);
-        LOGGER.fine("view schema: " + viewSchema);
-
-        this.viewQueryInfos.put(typeName, queryInfo);
-        this.viewSchemasCache.put(typeName, viewSchema);
-        this.viewSelectStatements.put(typeName, qualifiedSelect);
     }
 
     /**
@@ -807,7 +735,8 @@ public class ArcSDEDataStore implements DataStore {
      *         if count is too expensive to calculate or any errors or occur.
      * 
      * @throws IOException
-     *             if there are errors getting the count
+     *             if there are errors getting the count TODO: refactor out of
+     *             ArcSDEDataStore and make it respect a transaction in progress
      */
     int getCount(Query query) throws IOException {
         LOGGER.fine("getCount");
@@ -834,22 +763,31 @@ public class ArcSDEDataStore implements DataStore {
      * @return the bounds, or null if too expensive
      * 
      * @throws IOException
+     *             TODO: refactor out of ArcSDEDataStore and make it respecting
+     *             transaction state if there's a transaction in progress
      */
     ReferencedEnvelope getBounds(Query query) throws IOException {
         LOGGER.fine("getBounds");
 
         Envelope ev;
-        if (query.getFilter().equals(Filter.INCLUDE)) {
-            LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
-            // we're really asking for a bounds of the WHOLE layer,
-            // let's just ask SDE metadata for that, rather than doing an
-            // expensive query
-            SeLayer thisLayer = this.connectionPool.getSdeLayer(query.getTypeName());
-            SeExtent extent = thisLayer.getExtent();
-            ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
-                    .getMaxY());
-        } else {
-            ev = ArcSDEQuery.calculateQueryExtent(this, query);
+        final String typeName = query.getTypeName();
+        final ArcSDEPooledConnection connection = connectionPool.getConnection();
+        try {
+            if (query.getFilter().equals(Filter.INCLUDE)) {
+                LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
+                // we're really asking for a bounds of the WHOLE layer,
+                // let's just ask SDE metadata for that, rather than doing an
+                // expensive query
+                SeLayer thisLayer = connection.getLayer(typeName);
+                SeExtent extent = thisLayer.getExtent();
+                ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
+                        .getMaxY());
+            } else {
+                SimpleFeatureType schema = getSchema(typeName, connection);
+                ev = ArcSDEQuery.calculateQueryExtent(connection, schema, query);
+            }
+        } finally {
+            connection.close();
         }
 
         if (LOGGER.isLoggable(Level.FINE)) {
