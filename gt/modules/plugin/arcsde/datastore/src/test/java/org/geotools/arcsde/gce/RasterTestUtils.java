@@ -1,6 +1,5 @@
 package org.geotools.arcsde.gce;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;

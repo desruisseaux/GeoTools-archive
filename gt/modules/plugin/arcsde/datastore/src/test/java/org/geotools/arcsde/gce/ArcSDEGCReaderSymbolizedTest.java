@@ -18,14 +18,9 @@ package org.geotools.arcsde.gce;
 
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-
-import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
@@ -44,7 +39,6 @@ import org.geotools.renderer.lite.gridcoverage2d.RasterSymbolizerSupport;
 import org.geotools.styling.NamedLayer;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.SLDParser;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyledLayerDescriptor;
 import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
