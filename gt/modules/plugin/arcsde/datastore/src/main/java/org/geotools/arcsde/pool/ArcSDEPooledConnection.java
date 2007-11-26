@@ -131,7 +131,7 @@ public class ArcSDEPooledConnection extends SeConnection {
 
         try {
             if (LOGGER.isLoggable(Level.FINER)) {
-                System.err.println("<- returning " + toString() + " to pool");
+                LOGGER.finer("<- returning " + toString() + " to pool");
             }
             this.pool.returnObject(this);
         } catch (Exception e) {

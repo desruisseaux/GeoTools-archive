@@ -94,7 +94,7 @@ public class ArcSDEConnectionPool {
     /** this connection pool connection's parameters */
     private ArcSDEConnectionConfig config;
 
-    /** DOCUMENT ME! */
+    /** Apache commons-pool used to pool arcsde connections*/
     private ObjectPool pool;
 
     /**
@@ -218,32 +218,30 @@ public class ArcSDEConnectionPool {
         }
 
         try {
-            String caller = null;
-            if(LOGGER.isLoggable(Level.FINER)){
-                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
-                System.err.print("-> " + caller);
-            }
+//            String caller = null;
+//            if(LOGGER.isLoggable(Level.FINER)){
+//                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+//                System.err.print("-> " + caller);
+//            }
             
             ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
             
             if(LOGGER.isLoggable(Level.FINER)){
-                System.err.println(" got " + ret);
+                //System.err.println(" got " + ret);
+                LOGGER.finer(ret + " out of connection pool");
             }
 
             return ret;
         } catch (NoSuchElementException e) {
-            System.err.println(" UnavailableArcSDEConnectionException");
             LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
             throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(), this.config);
         } catch (SeException se) {
-            System.err.println(" SeException");
             LOGGER.log(Level.WARNING, "ArcSDE error getting connection: "
                     + se.getSeError().getErrDesc(), se);
             throw new DataSourceException("ArcSDE Error Message: " + se.getSeError().getErrDesc(),
                     se);
         } catch (Exception e) {
-            System.err.println(" Exception(" + e.getMessage() + ")");
             LOGGER.log(Level.WARNING, "Unknown problem getting connection: " + e.getMessage(), e);
             throw new DataSourceException(
                     "Unknown problem fetching connection from connection pool", e);
