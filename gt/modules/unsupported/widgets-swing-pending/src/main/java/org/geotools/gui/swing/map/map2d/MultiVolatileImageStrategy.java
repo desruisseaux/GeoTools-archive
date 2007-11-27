@@ -32,7 +32,7 @@ import org.geotools.map.event.MapLayerListEvent;
  * 
  * @author Johann Sorel
  */
-class VolatileMultiBufferPane extends MapBufferPane {
+class MultiVolatileImageStrategy extends RenderingStrategy {
 
     private final JLayeredPane pane = new JLayeredPane();
     private final MapContext buffercontext = new OneLayerContext();
@@ -44,7 +44,7 @@ class VolatileMultiBufferPane extends MapBufferPane {
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    VolatileMultiBufferPane(DefaultMap2D map) {
+    MultiVolatileImageStrategy(DefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
         pane.add(component, new Integer(0));

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002-2007, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,18 +14,17 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.listener;
+package org.geotools.gui.swing.map.map2d;
 
-import java.util.EventListener;
+import org.geotools.map.MapLayer;
 
 /**
  *
  * @author Johann Sorel
  */
-public interface Map2DActionStateListener extends EventListener{
+public interface EditableMap2D extends SelectableMap2D{
 
-    public void mapActionStateChanged(Map2DMapAreaEvent event);
+    public void setEditedMapLayer(MapLayer layer);
     
-    public void mapContextChanged(Map2DContextEvent event);
-    
+    public MapLayer getEditedMapLayer();
 }

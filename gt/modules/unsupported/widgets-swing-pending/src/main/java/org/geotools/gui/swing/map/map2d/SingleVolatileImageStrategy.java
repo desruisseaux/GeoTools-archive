@@ -26,17 +26,18 @@ import javax.swing.RepaintManager;
 import org.geotools.map.MapContext;
 import org.geotools.map.event.MapLayerListEvent;
 
+
 /**
  *
  * @author Johann Sorel
  */
-class VolatileBufferPane extends MapBufferPane {
+class SingleVolatileImageStrategy extends RenderingStrategy {
 
     private BufferComponent comp = new BufferComponent(this);
     private DefaultMap2D map;
 
     //optimize with hardware doublebuffer, also called backbuffer
-    VolatileBufferPane(DefaultMap2D map) {
+    SingleVolatileImageStrategy(DefaultMap2D map) {
         this.map = map;
 
     }
@@ -116,18 +117,17 @@ class VolatileBufferPane extends MapBufferPane {
 
     //------------------------PRIVATES CLASSES----------------------------------
 }
-
 class BufferComponent extends JComponent {
 
     public Boolean ACTIF = false;
     private GraphicsConfiguration GC;
-    private VolatileBufferPane pane;
+    private SingleVolatileImageStrategy pane;
     private VolatileImage buffer;
     private RepaintingThread repainter;
     private RerenderingThread rerenderer;
     private boolean update = true;
 
-    BufferComponent(VolatileBufferPane bufpane) {
+    BufferComponent(SingleVolatileImageStrategy bufpane) {
         this.pane = bufpane;
         RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
         setDoubleBuffered(true);
@@ -246,7 +246,7 @@ class BufferComponent extends JComponent {
                 try {
                     sleep(300);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(VolatileBufferPane.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SingleVolatileImageStrategy.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 comp.repaint();
             }

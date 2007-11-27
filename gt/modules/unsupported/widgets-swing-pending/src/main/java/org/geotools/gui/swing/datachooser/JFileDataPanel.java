@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.datachooser;
 
 import java.awt.Component;
@@ -31,6 +30,7 @@ import javax.swing.event.EventListenerList;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -59,16 +59,16 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     /** Creates new form DefaultShapeTypeChooser */
     public JFileDataPanel() {
         initComponents();
-              
+
         gui_choose.addChoosableFileFilter(new FiltreWorldImage());
         gui_choose.addChoosableFileFilter(new FiltreTIF());
         gui_choose.addChoosableFileFilter(new FiltreShape());
         gui_choose.setMultiSelectionEnabled(true);
-        
-        if(LASTPATH != null){
+
+        if (LASTPATH != null) {
             gui_choose.setCurrentDirectory(LASTPATH);
-            }
-        
+        }
+
     }
 
     /** This method is called from within the constructor to
@@ -119,57 +119,56 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-
     private void actionNouveau(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionNouveau
         ArrayList<MapLayer> layers = new ArrayList<MapLayer>();
         RandomStyleFactory rsf = new RandomStyleFactory();
-        
+
         File[] files = gui_choose.getSelectedFiles();
-            for (File f : files) {
-                LASTPATH = f;
-                Object source = getDataStore(f);
+        for (File f : files) {
+            LASTPATH = f;
+            Object source = getDataStore(f);
+            if (source != null) {
+                try {
+                    FeatureSource fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
+                    Style style = rsf.createRandomVectorStyle(fs);
+                    MapLayer layer = new DefaultMapLayer(fs, style);
+                    layer.setTitle(f.getName());
+                    layers.add(layer);
+                } catch (IOException ex) {
+                    jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                }
+            } else {
+
+                source = getGridCoverage(f);
                 if (source != null) {
                     try {
-                        FeatureSource fs = ((DataStore) source).getFeatureSource(((DataStore) source).getTypeNames()[0]);
-                        Style style = rsf.createRandomVectorStyle(fs);
-                        MapLayer layer = new DefaultMapLayer(fs, style);
+                        Style style = rsf.createRasterStyle();
+                        MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
                         layer.setTitle(f.getName());
                         layers.add(layer);
-                    } catch (IOException ex) {
+                    } catch (TransformException ex) {
+                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                    } catch (FactoryRegistryException ex) {
+                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                    } catch (SchemaException ex) {
+                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                    } catch (IllegalAttributeException ex) {
                         jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
                     }
                 } else {
+                    jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
+                }
+            }
+            LASTPATH = f;
+        }
 
-                    source = getGridCoverage(f);
-                    if (source != null) {
-                        try {
-                            Style style = rsf.createRasterStyle();
-                            MapLayer layer = new DefaultMapLayer((GridCoverage) source, style);
-                            layer.setTitle(f.getName());
-                            layers.add(layer);
-                        } catch (TransformException ex) {
-                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
-                        } catch (FactoryRegistryException ex) {
-                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
-                        } catch (SchemaException ex) {
-                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
-                        } catch (IllegalAttributeException ex) {
-                            jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
-                        }
-                    } else {
-                        jtf_error.setText(TextBundle.getResource().getString("DefaultFileTypeChooser_error"));
-                    }
-                }
-                LASTPATH = f;
+        if (layers.size() > 0) {
+            MapLayer[] lys = new MapLayer[layers.size()];
+            for (int i = 0; i < layers.size(); i++) {
+                lys[i] = layers.get(i);
             }
-            
-            if(layers.size()>0){
-                MapLayer[] lys = new MapLayer[layers.size()];
-                for(int i=0;i<layers.size();i++){
-                    lys[i] =  layers.get(i);
-                }
-                fireEvent( lys );
-            }
+            fireEvent(lys);
+        }
         
     }//GEN-LAST:event_actionNouveau
 
@@ -190,17 +189,35 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
     }
 
     private DataStore getDataStore(File f) {
-        Map<String, Object> map = new HashMap<String, Object>();
+
         DataStore dataStore = null;
+
+        //try using a simple shapefileDatastore, wich as no edition problems
         try {
-            map.put("url", f.toURI().toURL());
-            dataStore = DataStoreFinder.getDataStore(map);
+            dataStore = new ShapefileDataStore(f.toURI().toURL());
         } catch (MalformedURLException ex) {
+            dataStore = null;
             ex.printStackTrace();
             return null;
         } catch (IOException ex) {
+            dataStore = null;
             ex.printStackTrace();
             return null;
+        }
+
+        //
+        if (dataStore == null) {
+            try {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("url", f.toURI().toURL());
+                dataStore = DataStoreFinder.getDataStore(map);
+            } catch (MalformedURLException ex) {
+                ex.printStackTrace();
+                return null;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return null;
+            }
         }
 
         return dataStore;
@@ -222,20 +239,17 @@ public class JFileDataPanel extends javax.swing.JPanel implements DataPanel {
         return cover;
     }
 
-    private void fireEvent(MapLayer[] layers){
-        for( DataListener lst : listeners.getListeners(DataListener.class)){
+    private void fireEvent(MapLayer[] layers) {
+        for (DataListener lst : listeners.getListeners(DataListener.class)) {
             lst.addLayers(layers);
         }
-        
+
     }
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton but_nouveau;
     private javax.swing.JFileChooser gui_choose;
     private javax.swing.JTextField jtf_error;
     // End of variables declaration//GEN-END:variables
-
     public void addListener(DataListener listener) {
         listeners.add(DataListener.class, listener);
     }

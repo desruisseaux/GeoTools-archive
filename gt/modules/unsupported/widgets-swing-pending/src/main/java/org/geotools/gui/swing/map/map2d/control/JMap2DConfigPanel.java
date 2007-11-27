@@ -23,12 +23,12 @@ import org.geotools.renderer.GTRenderer;
  *
  * @author  johann Sorel
  */
-public class JOptimizeMap2DPanel extends javax.swing.JPanel {
+public class JMap2DConfigPanel extends javax.swing.JPanel {
 
     private DefaultMap2D map = null;
 
     /** Creates new form JOptimizeMap2DPanel */
-    public JOptimizeMap2DPanel() {
+    public JMap2DConfigPanel() {
         initComponents();
     }
 

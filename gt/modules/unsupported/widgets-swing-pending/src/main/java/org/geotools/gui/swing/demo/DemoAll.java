@@ -56,6 +56,7 @@ import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.JServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.map.map2d.DefaultEditableMap2D;
 import org.geotools.gui.swing.map.map2d.DefaultSelectableMap2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
@@ -75,7 +76,7 @@ import org.geotools.styling.Style;
 public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final DefaultSelectableMap2D map;
+    private final DefaultEditableMap2D map;
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
@@ -89,22 +90,22 @@ public class DemoAll extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
 
-        map = new DefaultSelectableMap2D(new ShapefileRenderer());
+        map = new DefaultEditableMap2D(new ShapefileRenderer());
         map.getComponent().setOpaque(false);
         
         final MapContext context = buildContext();
         initTree(tree,map);
-        
-                
+                        
         pan_mappane.setLayout(new GridLayout(1, 1));
         pan_mappane.add(map);
-
         
         
         tree.addContext(context);
 
-        lightcontrol.setMap(map);
-        infopanel.setMap(map);
+        gui_map2dcontrol.setMap(map);
+        gui_map2dinfo.setMap(map);
+        gui_map2dedit.setMap(map);
+        
         
         tree.addTreeContextListener(new TreeContextListener() {
 
@@ -231,8 +232,9 @@ public class DemoAll extends javax.swing.JFrame {
         jSplitPane1 = new javax.swing.JSplitPane();
         jpanel8 = new javax.swing.JPanel();
         pan_mappane = new javax.swing.JPanel();
-        lightcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
-        infopanel = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
+        gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        gui_map2dinfo = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
+        gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
         jPanel4 = new javax.swing.JPanel();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -318,27 +320,30 @@ public class DemoAll extends javax.swing.JFrame {
         );
         pan_mappaneLayout.setVerticalGroup(
             pan_mappaneLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 413, Short.MAX_VALUE)
+            .add(0, 409, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout jpanel8Layout = new org.jdesktop.layout.GroupLayout(jpanel8);
         jpanel8.setLayout(jpanel8Layout);
         jpanel8Layout.setHorizontalGroup(
             jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(infopanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
+            .add(gui_map2dinfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
             .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jpanel8Layout.createSequentialGroup()
-                .add(lightcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(297, Short.MAX_VALUE))
+                .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 132, Short.MAX_VALUE)
+                .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 175, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         jpanel8Layout.setVerticalGroup(
             jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jpanel8Layout.createSequentialGroup()
-                .add(lightcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jpanel8Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(pan_mappane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(infopanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(gui_map2dinfo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         jSplitPane1.setRightComponent(jpanel8);
@@ -568,7 +573,9 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem guiChkOpacity;
     private javax.swing.JCheckBoxMenuItem guiChkStyle;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
-    private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar infopanel;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DControlBar gui_map2dcontrol;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DEditBar gui_map2dedit;
+    private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar gui_map2dinfo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
@@ -587,7 +594,6 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSplitPane jSplitPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
-    private org.geotools.gui.swing.map.map2d.control.JMap2DControlBar lightcontrol;
     private javax.swing.JPanel pan_mappane;
     private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables

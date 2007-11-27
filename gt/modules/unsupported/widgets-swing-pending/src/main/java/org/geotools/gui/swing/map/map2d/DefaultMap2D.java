@@ -33,9 +33,9 @@ import java.util.Observer;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
-import org.geotools.gui.swing.map.map2d.listener.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
-import org.geotools.gui.swing.map.map2d.listener.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.overLayer.WaitingOverLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -68,7 +68,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     protected MapContext context;
     protected Envelope mapArea;
     protected JLayeredPane layerPane = new JLayeredPane();
-    protected MapBufferPane bufferPane = new MultiBufferPane(this);
+    protected RenderingStrategy bufferPane = new MultiBufferedImageStrategy(this);
     protected WaitingOverLayer waitingPane = new WaitingOverLayer();
     private final MapLayerListListener mapLayerListlistener;
     private final MapContext buffercontext = new OneLayerContext();
@@ -254,16 +254,16 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
             switch (type) {
                 case SINGLE_BUFFER:
-                    bufferPane = new SingleBufferPane(this);
+                    bufferPane = new SingleBufferedImageStrategy(this);
                     break;
                 case MULTI_BUFFER:
-                    bufferPane = new MultiBufferPane(this);
+                    bufferPane = new MultiBufferedImageStrategy(this);
                     break;
                 case MERGE_BUFFER:
-                    bufferPane = new MultiMergeBufferPane(this);
+                    bufferPane = new MergeBufferedImageStrategy(this);
                     break;
                 case SINGLE_VOLATILE:
-                    bufferPane = new VolatileBufferPane(this);
+                    bufferPane = new SingleVolatileImageStrategy(this);
                     break;
             }
 

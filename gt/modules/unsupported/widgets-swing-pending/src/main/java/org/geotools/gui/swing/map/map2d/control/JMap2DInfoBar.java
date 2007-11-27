@@ -82,7 +82,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
     private void gui_configActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_configActionPerformed
         if (map != null && map instanceof DefaultMap2D) {
             
-            JOptimizeMap2DPanel opt = new JOptimizeMap2DPanel();
+            JMap2DConfigPanel opt = new JMap2DConfigPanel();
             opt.setMap((DefaultMap2D)map);
                         
             JDialog dia = new JDialog();

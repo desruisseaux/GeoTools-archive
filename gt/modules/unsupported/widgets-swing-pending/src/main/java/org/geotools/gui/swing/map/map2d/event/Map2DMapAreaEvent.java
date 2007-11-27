@@ -14,20 +14,33 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.listener;
+package org.geotools.gui.swing.map.map2d.event;
 
-import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
-import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
-import java.util.EventListener;
+import com.vividsolutions.jts.geom.Envelope;
+import java.util.EventObject;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
  * @author Johann Sorel
  */
-public interface Map2DListener extends EventListener{
+public class Map2DMapAreaEvent extends EventObject{
 
-    public void mapAreaChanged(Map2DMapAreaEvent event);
+    private Envelope oldEnvelope = null;
+    private Envelope newEnvelope = null;
     
-    public void mapContextChanged(Map2DContextEvent event);
     
+    public Map2DMapAreaEvent(Map2D map, Envelope oldone, Envelope newone){
+        super(map);
+        oldEnvelope = oldone;
+        newEnvelope = newone;
+    }
+
+    public Envelope getPreviousMapArea() {
+        return oldEnvelope;
+    }
+
+    public Envelope getNewMapArea() {
+        return newEnvelope;
+    }
 }

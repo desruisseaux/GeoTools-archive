@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d;
 
 import org.geotools.gui.swing.map.MapConstants;
+import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 
 /**
  *
@@ -30,4 +31,8 @@ public interface NavigableMap2D extends Map2D{
     public void setZoomFactor(double zoomFactor);
     public double getZoomFactor();
       
+    public void addNavigableMap2DListener(NavigableMap2DListener listener);
+    public void removeNavigableMap2DListener(NavigableMap2DListener listener);
+    public NavigableMap2DListener[] getNavigableMap2DListeners();
+    
 }

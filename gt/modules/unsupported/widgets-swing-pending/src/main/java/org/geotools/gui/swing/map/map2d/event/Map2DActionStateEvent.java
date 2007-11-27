@@ -14,33 +14,37 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map.map2d.listener;
+package org.geotools.gui.swing.map.map2d.event;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.EventObject;
+import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
  * @author Johann Sorel
  */
-public class Map2DMapAreaEvent extends EventObject{
+public class Map2DActionStateEvent extends EventObject{
 
-    private Envelope oldEnvelope = null;
-    private Envelope newEnvelope = null;
+    private MapConstants.ACTION_STATE oldstate = null;
+    private MapConstants.ACTION_STATE newstate = null;
     
     
-    public Map2DMapAreaEvent(Map2D map, Envelope oldone, Envelope newone){
+    public Map2DActionStateEvent(Map2D map, MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone){
         super(map);
-        oldEnvelope = oldone;
-        newEnvelope = newone;
+        oldstate = oldone;
+        newstate = newone;
     }
 
-    public Envelope getPreviousMapArea() {
-        return oldEnvelope;
+    public MapConstants.ACTION_STATE getPreviousState() {
+        return oldstate;
     }
 
-    public Envelope getNewMapArea() {
-        return newEnvelope;
+    public MapConstants.ACTION_STATE getNewState() {
+        return newstate;
     }
+    
+    
+    
+    
 }

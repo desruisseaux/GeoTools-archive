@@ -20,9 +20,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.Date;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
+import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
+import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanOverLayer;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
@@ -50,9 +53,26 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         NEXT_OVER_LAYER_INDEX++;
     }
 
+    private void fireActionStateChanged(MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone) {
+        Map2DActionStateEvent mce = new Map2DActionStateEvent(this, oldone, newone);
+
+        NavigableMap2DListener[] lst = getNavigableMap2DListeners();
+
+        for (NavigableMap2DListener l : lst) {
+            l.mapActionStateChanged(mce);
+        }
+
+    }
+
+    
     //-----------------------NAVIGABLEMAP2D-------------------------------------
     public void setActionState(ACTION_STATE state) {
-        actionState = state;
+        
+        if(actionState != state){
+            fireActionStateChanged(actionState, state);
+            actionState = state;
+        }
+        
     }
 
     public ACTION_STATE getActionState() {
@@ -66,6 +86,19 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
     public double getZoomFactor() {
         return zoomFactor;
     }
+    
+    public void addNavigableMap2DListener(NavigableMap2DListener listener) {
+        MAP2DLISTENERS.add(NavigableMap2DListener.class, listener);
+    }
+
+    public void removeNavigableMap2DListener(NavigableMap2DListener listener) {
+        MAP2DLISTENERS.remove(NavigableMap2DListener.class, listener);
+    }
+
+    public NavigableMap2DListener[] getNavigableMap2DListeners() {
+        return MAP2DLISTENERS.getListeners(NavigableMap2DListener.class);
+    }
+    
 
     //---------------------PRIVATE CLASSES--------------------------------------
     private class MouseListen implements MouseInputListener {
@@ -299,6 +332,8 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
         public void mouseMoved(MouseEvent e) {
         }
     }
+
+    
 }
 
 

@@ -26,7 +26,7 @@ import org.geotools.map.event.MapLayerListEvent;
  *
  * @author Johann Sorel
  */
-class SingleBufferPane extends MapBufferPane {
+class SingleBufferedImageStrategy extends RenderingStrategy {
 
     private Thread thread = null;
     private BufferComponent comp = new BufferComponent();
@@ -34,7 +34,7 @@ class SingleBufferPane extends MapBufferPane {
     private boolean mustupdate = false;
 
     //optimize with hardware doublebuffer, also called backbuffer
-    SingleBufferPane(DefaultMap2D map) {
+    SingleBufferedImageStrategy(DefaultMap2D map) {
         this.map = map;
 
     }

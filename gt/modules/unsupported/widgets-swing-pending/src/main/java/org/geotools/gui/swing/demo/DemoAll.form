@@ -259,22 +259,26 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="infopanel" alignment="0" pref="507" max="32767" attributes="0"/>
+                  <Component id="gui_map2dinfo" alignment="0" pref="507" max="32767" attributes="0"/>
                   <Component id="pan_mappane" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lightcontrol" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="307" max="32767" attributes="0"/>
+                      <Component id="gui_map2dcontrol" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="132" max="32767" attributes="0"/>
+                      <Component id="gui_map2dedit" min="-2" pref="175" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lightcontrol" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="gui_map2dedit" max="32767" attributes="1"/>
+                          <Component id="gui_map2dcontrol" alignment="0" max="32767" attributes="1"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="pan_mappane" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="infopanel" min="-2" pref="24" max="-2" attributes="0"/>
+                      <Component id="gui_map2dinfo" min="-2" pref="24" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -300,9 +304,11 @@
                 </DimensionLayout>
               </Layout>
             </Container>
-            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DControlBar" name="lightcontrol">
+            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DControlBar" name="gui_map2dcontrol">
             </Component>
-            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar" name="infopanel">
+            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar" name="gui_map2dinfo">
+            </Component>
+            <Component class="org.geotools.gui.swing.map.map2d.control.JMap2DEditBar" name="gui_map2dedit">
             </Component>
           </SubComponents>
         </Container>

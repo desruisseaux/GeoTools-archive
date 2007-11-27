@@ -38,14 +38,16 @@ import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
-import org.geotools.gui.swing.map.map2d.listener.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
-import org.geotools.gui.swing.map.map2d.listener.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 
 /**
  * @author johann sorel
  */
-public class JMap2DControlBar extends JPanel implements Map2DListener {
+public class JMap2DControlBar extends JPanel implements Map2DListener, NavigableMap2DListener {
 
     private final List<Envelope> mapAreas = new ArrayList<Envelope>();
     private Envelope lastMapArea = null;
@@ -57,6 +59,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
     private final JToggleButton gui_zoomOut = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_out"));
     private final JToggleButton gui_zoomPan = buildToggleButton(IconBundle.getResource().getIcon("16_zoom_pan"));
     private final JToggleButton gui_select = buildToggleButton(IconBundle.getResource().getIcon("16_select"));
+    private final JToggleButton gui_other = new JToggleButton();
     private final JButton gui_refresh = buildButton(IconBundle.getResource().getIcon("16_data_reload"));
 
     /**
@@ -67,9 +70,9 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
     }
 
     public JMap2DControlBar(Map pane) {
-        super(new FlowLayout(FlowLayout.LEFT,0,0));
+        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         //super( new GridLayout(1,8));
-        getInsets().set(0, 0,0,0);
+        getInsets().set(0, 0, 0, 0);
         setMap(pane);
         init();
     }
@@ -81,6 +84,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
         bg.add(gui_zoomOut);
         bg.add(gui_zoomPan);
         bg.add(gui_select);
+        bg.add(gui_other);
 
         gui_zoomAll.addActionListener(new ActionListener() {
 
@@ -101,41 +105,41 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
         gui_nextArea.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if(lastMapArea != null){
+                if (lastMapArea != null) {
                     int index = mapAreas.indexOf(lastMapArea);
-                    
+
                     index++;
-                    if(index<mapAreas.size()){
+                    if (index < mapAreas.size()) {
                         map.setMapArea(mapAreas.get(index));
                         map.refresh();
                     }
-                    if(index == mapAreas.size()-1){
+                    if (index == mapAreas.size() - 1) {
                         gui_nextArea.setEnabled(false);
-                    }                    
+                    }
                 }
             }
         });
-        
+
         gui_previousArea.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                
-                if(lastMapArea != null){
+
+                if (lastMapArea != null) {
                     int index = mapAreas.indexOf(lastMapArea);
-                    
+
                     index--;
-                    if(index>=0){
+                    if (index >= 0) {
                         map.setMapArea(mapAreas.get(index));
                         map.refresh();
                     }
-                    if(index == 0){
+                    if (index == 0) {
                         gui_previousArea.setEnabled(false);
-                    }                    
+                    }
                 }
             }
         });
-        
-        
+
+
         gui_zoomIn.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -176,7 +180,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
 
             public void actionPerformed(ActionEvent e) {
                 if (map != null) {
-                     map.refresh();
+                    map.refresh();
                 }
             }
         });
@@ -192,23 +196,22 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
         add(gui_select);
 
     }
+    private final int largeur = 2;
 
-    private final int largeur =  2;
-    
     private JButton buildButton(ImageIcon img) {
         JButton but = new JButton(img);
-        but.setBorder(new EmptyBorder(largeur,largeur,largeur,largeur));
+        but.setBorder(new EmptyBorder(largeur, largeur, largeur, largeur));
         but.setBorderPainted(false);
         but.setContentAreaFilled(false);
-        but.setPreferredSize(new Dimension(25,25));
+        but.setPreferredSize(new Dimension(25, 25));
         but.setOpaque(false);
         return but;
     }
 
     private JToggleButton buildToggleButton(ImageIcon img) {
         JToggleButton but = new JToggleButton(img);
-        but.setBorder(new EmptyBorder(largeur,largeur,largeur,largeur));
-        but.setPreferredSize(new Dimension(25,25));
+        but.setBorder(new EmptyBorder(largeur, largeur, largeur, largeur));
+        but.setPreferredSize(new Dimension(25, 25));
         but.setBorderPainted(true);
         //but.setContentAreaFilled(false);
         //but.setOpaque(false);
@@ -219,6 +222,10 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
 
         if (map != null) {
             map.removeMap2DListener(this);
+
+            if (map instanceof NavigableMap2D) {
+                ((NavigableMap2D) map).removeNavigableMap2DListener(this);
+            }
             lastMapArea = map.getMapArea();
         }
 
@@ -229,6 +236,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
 
             if (pane instanceof NavigableMap2D) {
                 NavigableMap2D navigationMap = (NavigableMap2D) pane;
+                navigationMap.addNavigableMap2DListener(this);
                 gui_zoomAll.setEnabled(true);
                 gui_zoomIn.setEnabled(true);
                 gui_zoomOut.setEnabled(true);
@@ -247,7 +255,11 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
                     case SELECT:
                         gui_select.setSelected(true);
                         break;
-                    case EDIT:
+                    default:
+                        gui_zoomIn.setSelected(false);
+                        gui_zoomAll.setSelected(false);
+                        gui_zoomPan.setSelected(false);
+                        gui_select.setSelected(false);
                         break;
                 }
 
@@ -274,44 +286,44 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
 
     //-----------------------Map2DListener--------------------------------------
     public void mapAreaChanged(Map2DMapAreaEvent event) {
-        
+
         while (mapAreas.size() > 10) {
             mapAreas.remove(0);
         }
-        
+
         Envelope newMapArea = event.getNewMapArea();
         lastMapArea = newMapArea;
 
         if (mapAreas.contains(newMapArea)) {
 
             if (mapAreas.size() > 1) {
-                
+
                 int position = mapAreas.indexOf(newMapArea);
-                
-                if(position == 0){
+
+                if (position == 0) {
                     gui_previousArea.setEnabled(false);
                     gui_nextArea.setEnabled(true);
-                }else if(position == mapAreas.size()-1){                    
+                } else if (position == mapAreas.size() - 1) {
                     gui_previousArea.setEnabled(true);
                     gui_nextArea.setEnabled(false);
-                }else{
+                } else {
                     gui_previousArea.setEnabled(true);
                     gui_nextArea.setEnabled(true);
                 }
-                                
+
             } else {
                 gui_previousArea.setEnabled(false);
                 gui_nextArea.setEnabled(false);
             }
 
-            
+
         } else {
             mapAreas.add(newMapArea);
-            
+
             if (mapAreas.size() > 1) {
                 gui_previousArea.setEnabled(true);
                 gui_nextArea.setEnabled(false);
-            }else{
+            } else {
                 gui_previousArea.setEnabled(false);
                 gui_nextArea.setEnabled(false);
             }
@@ -326,5 +338,25 @@ public class JMap2DControlBar extends JPanel implements Map2DListener {
         mapAreas.clear();
         gui_nextArea.setEnabled(false);
         gui_previousArea.setEnabled(false);
+    }
+
+    public void mapActionStateChanged(Map2DActionStateEvent event) {
+        switch (event.getNewState()) {
+            case ZOOM_IN:
+                gui_zoomIn.setSelected(true);
+                break;
+            case ZOOM_OUT:
+                gui_zoomAll.setSelected(true);
+                break;
+            case PAN:
+                gui_zoomPan.setSelected(true);
+                break;
+            case SELECT:
+                gui_select.setSelected(true);
+                break;
+            default:
+                gui_other.setSelected(true);
+                break;
+        }
     }
 }

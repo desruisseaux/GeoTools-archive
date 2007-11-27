@@ -34,7 +34,7 @@ import org.geotools.referencing.operation.matrix.AffineTransform2D;
  * 
  * @author Johann Sorel
  */
-class MultiMergeBufferPane extends MapBufferPane {
+class MergeBufferedImageStrategy extends RenderingStrategy {
 
     private final JLayeredPane pane = new JLayeredPane();
     private Map<MapLayer, BufferedImage> stock = new HashMap<MapLayer, BufferedImage>();
@@ -45,7 +45,7 @@ class MultiMergeBufferPane extends MapBufferPane {
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    MultiMergeBufferPane(DefaultMap2D map) {
+    MergeBufferedImageStrategy(DefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
         pane.add(component,new Integer(0));

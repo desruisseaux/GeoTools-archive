@@ -30,7 +30,7 @@ import org.geotools.map.event.MapLayerListEvent;
  * 
  * @author Johann Sorel
  */
-class MultiBufferPane extends MapBufferPane {
+class MultiBufferedImageStrategy extends RenderingStrategy {
 
     private final JLayeredPane pane = new JLayeredPane();
     private Map<MapLayer, BufferComponent> stock = new HashMap<MapLayer, BufferComponent>();
@@ -40,7 +40,7 @@ class MultiBufferPane extends MapBufferPane {
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    MultiBufferPane(DefaultMap2D map) {
+    MultiBufferedImageStrategy(DefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
     }

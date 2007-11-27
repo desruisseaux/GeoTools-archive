@@ -13,37 +13,30 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+package org.geotools.gui.swing.map.map2d;
 
-package org.geotools.gui.swing.map.map2d.listener;
-
-import java.util.EventObject;
-import org.geotools.gui.swing.map.map2d.Map2D;
-import org.geotools.map.MapContext;
+import java.util.Observable;
+import javax.swing.JComponent;
+import org.geotools.map.event.MapLayerListEvent;
 
 /**
  *
  * @author Johann Sorel
  */
-public class Map2DContextEvent extends EventObject{
+public abstract class RenderingStrategy extends Observable{
 
-    private MapContext oldContext = null;
-    private MapContext newContext = null;
-    
-    
-    public Map2DContextEvent(Map2D map, MapContext oldone, MapContext newone){
-        super(map);
-        oldContext = oldone;
-        newContext = newone;
-    }
+        
+    public abstract void redraw(boolean complete);
 
-    public MapContext getPreviousContext() {
-        return oldContext;
-    }
+    public abstract void layerChanged(MapLayerListEvent event);
 
-    public MapContext getNewContext() {
-        return newContext;
-    }
-    
+    public abstract void layerDeleted(MapLayerListEvent event);
+
+    public abstract void layerAdded(MapLayerListEvent event);
+
+    public abstract void layerMoved(MapLayerListEvent event);
+        
+    public abstract JComponent getComponent();
     
     
     
