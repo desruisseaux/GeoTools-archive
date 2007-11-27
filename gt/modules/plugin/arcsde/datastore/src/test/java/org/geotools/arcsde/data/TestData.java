@@ -111,7 +111,7 @@ public class TestData {
      * @throws IOException
      *             DOCUMENT ME!
      */
-    public TestData() throws IOException {
+    public TestData() {
         // intentionally blank
     }
 
@@ -158,20 +158,20 @@ public class TestData {
         }
     }
 
-    public SeTable getTempTable(){
-        if(tempTable == null){
+    public SeTable getTempTable() {
+        if (tempTable == null) {
             throw new IllegalStateException("createTempTable() not called first");
         }
         return tempTable;
     }
-    
-    public SeLayer getTempLayer(){
-        if(tempTableLayer == null){
+
+    public SeLayer getTempLayer() {
+        if (tempTableLayer == null) {
             throw new IllegalStateException("createTempTable() not called first");
         }
         return tempTableLayer;
     }
-    
+
     /**
      * creates an ArcSDEDataStore using {@code test-data/testparams.properties}
      * as holder of datastore parameters
@@ -339,9 +339,9 @@ public class TestData {
             conn.close();
         }
     }
-    
+
     public void truncateTempTable() {
-        if(tempTable != null){
+        if (tempTable != null) {
             try {
                 tempTable.truncate();
             } catch (SeException e) {
@@ -349,7 +349,6 @@ public class TestData {
             }
         }
     }
-    
 
     /**
      * 
@@ -807,4 +806,145 @@ public class TestData {
         return seCRS;
     }
 
+    /**
+     * Creates some simple test layers on the sde instance
+     * 
+     * @param argv
+     */
+    public static void main(String[] argv) {
+        TestData testData = new TestData();
+        try {
+            testData.setUp();
+            testData.createSimpleTestTables();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSimpleTestTables() throws IOException, SeException {
+        final ArcSDEConnectionPool connectionPool = getConnectionPool();
+        final ArcSDEPooledConnection conn = connectionPool.getConnection();
+
+        String tableName;
+        String rowIdColName;
+        int rowIdColumnType;
+        int shapeTypeMask;
+        try {
+            rowIdColName = "ROW_ID";
+            shapeTypeMask = SeLayer.SE_POINT_TYPE_MASK;
+
+            tableName = "GT_TEST_POINT_ROWID_USER";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            tableName = "GT_TEST_POINT_ROWID_SDE";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            tableName = "GT_TEST_POINT_ROWID_NONE";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+
+            shapeTypeMask = SeLayer.SE_LINE_TYPE_MASK;
+
+            tableName = "GT_TEST_LINE_ROWID_USER";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            tableName = "GT_TEST_LINE_ROWID_SDE";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            tableName = "GT_TEST_LINE_ROWID_NONE";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            shapeTypeMask = SeLayer.SE_AREA_TYPE_MASK;
+
+            tableName = "GT_TEST_POLYGON_ROWID_USER";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            tableName = "GT_TEST_POLYGON_ROWID_SDE";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+
+            tableName = "GT_TEST_POLYGON_ROWID_NONE";
+            rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
+            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+        } finally {
+            conn.close();
+        }
+    }
+
+    private void createSimpleTestTable(final ArcSDEPooledConnection conn, final String tableName,
+            final String rowIdColName, final int rowIdColumnType, final int shapeTypeMask) throws SeException {
+        System.out.println("Creating layer " + tableName);
+
+        final SeLayer layer = new SeLayer(conn);
+        final SeTable table = new SeTable(conn, tableName);
+        layer.setTableName(tableName);
+
+        final String configKeyword = "DEFAULTS";
+        
+        final boolean isNullable = true;
+
+        //ROW_ID, INT_COL, DATE_COL, STRING_COL
+        final int numCols = 4;
+        final SeColumnDefinition[] colDefs = new SeColumnDefinition[numCols];
+
+        // first column to be SDE managed feature id
+        colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
+        colDefs[1] = new SeColumnDefinition("INT_COL", SeColumnDefinition.TYPE_INT32, 10, 0, isNullable);
+        colDefs[2] = new SeColumnDefinition("DATE_COL", SeColumnDefinition.TYPE_DATE, 1, 0, isNullable);
+        colDefs[3] = new SeColumnDefinition("STRING_COL", SeColumnDefinition.TYPE_STRING, 25, 0, isNullable);
+
+        /*
+         * Create the table using the DBMS default configuration keyword. Valid
+         * keywords are defined in the dbtune table.
+         */
+        table.create(colDefs, configKeyword);
+
+        /*
+         * Register the column to be used as feature id and managed by sde
+         */
+        if(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType){
+            SeRegistration reg = new SeRegistration(conn, table.getName());
+            LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
+            reg.setRowIdColumnName("ROW_ID");
+            reg.setRowIdColumnType(rowIdColumnType);
+            reg.alter();
+        }
+
+        /*
+         * Define the attributes of the spatial column
+         */
+        layer.setSpatialColumnName("GEOM");
+
+        /*
+         * Set the type of shapes that can be inserted into the layer. 
+         */
+        layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | shapeTypeMask);
+        layer.setGridSizes(1100.0, 0.0, 0.0);
+        layer.setDescription("GeoTools test table");
+
+        /*
+         * Define the layer's Coordinate Reference
+         */
+        SeCoordinateReference coordref = getGenericCoordRef();
+
+        // SeExtent ext = new SeExtent(-1000000.0, -1000000.0, 1000000.0,
+        // 1000000.0);
+        SeExtent ext = coordref.getXYEnvelope();
+        layer.setExtent(ext);
+        layer.setCoordRef(coordref);
+
+        layer.setCreationKeyword(configKeyword);
+
+        /*
+         * Spatially enable the new table...
+         */
+        layer.create(3, 4);
+    }
 }
