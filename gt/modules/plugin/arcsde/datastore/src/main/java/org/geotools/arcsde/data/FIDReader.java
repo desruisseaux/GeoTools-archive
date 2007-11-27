@@ -20,15 +20,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 
+import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeShape;
+import com.esri.sde.sdk.client.SeTable;
 
 /**
  * Strategy object used to manage the different ways an ArcSDE server handles
@@ -137,7 +140,7 @@ public abstract class FIDReader {
         try {
             tableName = layer.getQualifiedName();
         } catch (SeException e) {
-            throw new DataSourceException("asking qualified name of " + layer.getName(), e);
+            throw new ArcSdeException("asking qualified name of " + layer.getName(), e);
         }
         try {
             SeRegistration reg = new SeRegistration(conn, tableName);
@@ -145,7 +148,15 @@ public abstract class FIDReader {
             // final int rowIdAllocationType = reg.getRowIdAllocation();
             final int rowIdColumnType = reg.getRowIdColumnType();
             final String rowIdColumnName = reg.getRowIdColumnName();
-
+            int rowIdColumnIndex = -1;
+            SeTable table = conn.getTable(tableName);
+            SeColumnDefinition[] schema = table.describe();
+            for(int index = 0; index < schema.length; index++){
+                if(schema[index].getName().equals(rowIdColumnName)){
+                    rowIdColumnIndex = index;
+                    break;
+                }
+            }
             if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE){
                 // use column name, value maintained by sde
                 fidReader = new SdeManagedFidReader(tableName, rowIdColumnName);
@@ -163,6 +174,7 @@ public abstract class FIDReader {
                 throw new IllegalStateException("Unkown ArcSDE row ID registration type: "
                         + rowIdColumnType + " for layer " + tableName);
             }
+            fidReader.setColumnIndex(rowIdColumnIndex);
             return fidReader;
         } catch (SeException e) {
             throw new DataSourceException("Obtaining FID strategy for " + layer + ": " + e.getMessage(), e);
@@ -199,7 +211,7 @@ public abstract class FIDReader {
                     }
                     return shape.getFeatureId().longValue();
                 } catch (SeException e) {
-                    throw new DataSourceException("Getting fid from shape", e);
+                    throw new ArcSdeException("Getting fid from shape", e);
                 }
             } else {
                 int shapeIdIndex = getColumnIndex();
