@@ -47,6 +47,8 @@ class ArcTransactionState implements Transaction.State {
      */
     private ArcSDEPooledConnection connection;
 
+    private Transaction transaction;
+
     /**
      * Creates a new ArcTransactionState object.
      * 
@@ -75,16 +77,19 @@ class ArcTransactionState implements Transaction.State {
         failIfClosed();
         try {
             connection.commitTransaction();
+            // and keep editing
+            connection.setTransactionAutoCommit(0);
+            connection.startTransaction();
         } catch (SeException se) {
             try {
                 connection.rollbackTransaction();
             } catch (SeException e) {
                 LOGGER.log(Level.WARNING, se.getMessage(), se);
             }
+            // release resources
+            close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new IOException(se.getMessage());
-        }finally{
-            close();
         }
     }
 
@@ -95,11 +100,14 @@ class ArcTransactionState implements Transaction.State {
         failIfClosed();
         try {
             connection.rollbackTransaction();
+            // and keep editing
+            connection.setTransactionAutoCommit(0);
+            connection.startTransaction();
         } catch (SeException se) {
+            // release resources
+            close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new IOException(se.getMessage());
-        }finally{
-            close();
         }
     }
 
@@ -119,11 +127,22 @@ class ArcTransactionState implements Transaction.State {
      *             if close() is called while a transaction is in progress
      */
     public void setTransaction(final Transaction transaction) {
+        if (Transaction.AUTO_COMMIT.equals(transaction)) {
+            throw new IllegalArgumentException("Cannot use Transaction.AUTO_COMMIT here");
+        }
         if (transaction == null) {
             // this is a call to free resources (ugly, but that's what the API
             // says)
             close();
+        } else if (this.transaction != null) {
+            // assert this assumption
+            throw new IllegalStateException(
+                    "Once a transaction is set, it is "
+                            + "illegal to call Transaction.State.setTransaction with anything other than null: "
+                            + transaction);
         }
+
+        this.transaction = transaction;
     }
 
     /**
@@ -148,6 +167,17 @@ class ArcTransactionState implements Transaction.State {
         if (connection != null) {
             // may throw ISE if transaction is still in progress
             try {
+                // release current transaction before returning the
+                // connection to the pool
+                try {
+                    connection.rollbackTransaction();
+                } catch (SeException e) {
+                    // TODO: this shouldn't happen, but if it does
+                    // we should somehow invalidate the connection?
+                    LOGGER.log(Level.SEVERE, "Unexpected exception at close(): "
+                            + e.getSeError().getSdeErrMsg(), e);
+                }
+                // now its safe to return it to the pool
                 connection.close();
             } catch (IllegalStateException workflowError) {
                 // fail fast but put the connection in a healthy state first

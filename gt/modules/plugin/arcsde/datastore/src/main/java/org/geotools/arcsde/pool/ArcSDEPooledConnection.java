@@ -18,6 +18,7 @@ package org.geotools.arcsde.pool;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,7 +78,11 @@ public class ArcSDEPooledConnection extends SeConnection {
                 throw new DataSourceException("Can't obtain layer " + layerName, e);
             }
         }
-        return cachedLayers.get(layerName);
+        SeLayer seLayer = cachedLayers.get(layerName);
+        if(seLayer == null){
+            throw new NoSuchElementException("Layer '" + layerName + "' not found");
+        }
+        return seLayer;
     }
 
     public synchronized SeTable getTable(final String tableName) throws DataSourceException {
@@ -131,8 +136,11 @@ public class ArcSDEPooledConnection extends SeConnection {
 
         try {
             if (LOGGER.isLoggable(Level.FINER)) {
+                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+                String caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+                System.err.println("<- " + caller + " returning " + toString() + " to pool");
+
                 LOGGER.finer("<- returning " + toString() + " to pool");
-                //System.err.println("<- returning " + toString() + " to pool");
             }
             this.pool.returnObject(this);
         } catch (Exception e) {

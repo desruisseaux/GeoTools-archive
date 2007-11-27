@@ -55,7 +55,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     public void setTransaction(final Transaction transaction) {
         if (transaction == null) {
             throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
-        } else if (super.transaction != Transaction.AUTO_COMMIT) {
+        } else if (!Transaction.AUTO_COMMIT.equals(super.transaction)) {
             throw new IllegalStateException("Transactio already set");
         }
 
@@ -245,7 +245,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         final Transaction transaction = getTransaction();
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
         ArcSDEPooledConnection connection;
-        if (Transaction.AUTO_COMMIT == transaction) {
+        if (Transaction.AUTO_COMMIT.equals(transaction)) {
             connection = connectionPool.getConnection();
         } else {
             final ArcTransactionState state;

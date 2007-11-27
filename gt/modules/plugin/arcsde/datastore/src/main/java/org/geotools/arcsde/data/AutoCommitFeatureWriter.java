@@ -315,6 +315,8 @@ class AutoCommitFeatureWriter implements FeatureWriter {
 
         // Now "commit" the changes.
         insert.execute();
+        
+        //testing what happens with udig, may need to uncomment
         insert.close();
     }
 

@@ -84,9 +84,9 @@ public class ArcSDEConnectionPool {
     public static final int DEFAULT_CONNECTIONS = 2;
 
     /** default number of maximun allowable connections a pool can hold */
-    public static final int DEFAULT_MAX_CONNECTIONS = 2;
+    public static final int DEFAULT_MAX_CONNECTIONS = 6;
 
-    public static final int DEFAULT_MAX_WAIT_TIME = 1000;
+    public static final int DEFAULT_MAX_WAIT_TIME = 500;
 
     /** DOCUMENT ME! */
     private SeConnectionFactory seConnectionFactory;
@@ -219,16 +219,16 @@ public class ArcSDEConnectionPool {
 
         try {
             String caller = null;
-//            if(LOGGER.isLoggable(Level.FINER)){
-//                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-//                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
-//                System.err.print("-> " + caller);
-//            }
+            if(LOGGER.isLoggable(Level.FINER)){
+                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+                System.err.print("-> " + caller);
+            }
             
             ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
             
             if(LOGGER.isLoggable(Level.FINER)){
-                //System.err.println(" got " + ret);
+                System.err.println(" got " + ret);
                 LOGGER.finer(ret + " out of connection pool");
             }
 

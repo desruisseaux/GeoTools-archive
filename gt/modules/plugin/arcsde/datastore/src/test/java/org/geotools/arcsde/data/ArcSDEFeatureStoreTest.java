@@ -1,6 +1,7 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -53,6 +54,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * Unit tests for transaction support
@@ -372,6 +374,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             reader.close();
         }
     }
+
     public void testUpdateAutoCommit() throws Exception {
         testData.insertTestData();
 
@@ -681,6 +684,12 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final FeatureStore transFs = (FeatureStore) ds.getFeatureSource(typeName);
         final SimpleFeatureType schema = transFs.getSchema();
 
+        // once the transaction is set to the FeatureStore, it lasts until
+        // another transaction
+        // is set. Calling transaction.close() closes Transaction.State
+        // held on it, allowing State objects to release resources. After
+        // close() the transaction
+        // is no longer valid.
         Transaction transaction = new DefaultTransaction("test_handle");
         transFs.setTransaction(transaction);
 
@@ -695,37 +704,73 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         // now confirm for that transaction the feature is fetched, and outside
         // it it's not.
-        Filter filterNewFeature = CQL.toFilter("INT32_COL = 1000");
+        final Filter filterNewFeature = CQL.toFilter("INT32_COL = 1000");
+        final DefaultQuery newFeatureQuery = new DefaultQuery(typeName, filterNewFeature);
+
         FeatureCollection features = transFs.getFeatures(filterNewFeature);
         int size = features.size();
         assertEquals(1, size);
 
         // ok transaction respected, assert the feature does not exist outside
         // it
-        DefaultQuery query = new DefaultQuery(typeName, filterNewFeature);
-        FeatureReader reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        assertFalse(reader.hasNext());
-        reader.close();
+        FeatureReader reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+        try {
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+        }
 
         // ok, but what if we ask for a feature reader with the same transaction
-        reader = ds.getFeatureReader(query, transaction);
-        assertTrue(reader.hasNext());
-        reader.next();
-        assertFalse(reader.hasNext());
-        reader.close();
+        reader = ds.getFeatureReader(newFeatureQuery, transaction);
+        try {
+            assertTrue(reader.hasNext());
+            reader.next();
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+        }
 
         // now commit, and Transaction.AUTO_COMMIT should carry it over
         try {
             transaction.commit();
         } catch (IOException e) {
             transaction.rollback();
+            throw e;
+        }
+
+        try {
+            reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+            assertTrue(reader.hasNext());
+        } finally {
+            reader.close();
+        }
+
+        // now keep using the transaction, it should still work
+        transFs.removeFeatures(filterNewFeature);
+
+        // no change yet outside the transaction
+        try {
+            reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+            assertTrue(reader.hasNext());
+        } finally {
+            reader.close();
+        }
+
+        // but yes inside it
+        try {
+            reader = ds.getFeatureReader(newFeatureQuery, transaction);
+            assertFalse(reader.hasNext());
+        } finally {
+            reader.close();
+        }
+
+        try {
+            transaction.commit();
+            reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+            assertFalse(reader.hasNext());
         } finally {
             transaction.close();
         }
-
-        reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
-        assertTrue(reader.hasNext());
-        reader.close();
 
     }
 
@@ -765,24 +810,39 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             store.setFeatures(DataUtilities.reader(featuresToSet));
             final int countInsideTransaction = store.getCount(Query.ALL);
             assertEquals(5, countInsideTransaction);
-            
+
             final FeatureSource sourceNoTransaction = ds.getFeatureSource(typeName);
             int countNoTransaction = sourceNoTransaction.getCount(Query.ALL);
             assertEquals(initialCount, countNoTransaction);
-            
-            //now commit
+
+            // now commit
             transaction.commit();
             countNoTransaction = sourceNoTransaction.getCount(Query.ALL);
             assertEquals(5, countNoTransaction);
-        }catch(Exception e){
+        } catch (Exception e) {
             transaction.rollback();
             throw e;
-        }catch(AssertionFailedError e){
+        } catch (AssertionFailedError e) {
             transaction.rollback();
             throw e;
         } finally {
             transaction.close();
         }
+    }
+
+    public void testSdeEditTableAutoCommit() throws Exception {
+        final ArcSDEDataStore dataStore = testData.getDataStore();
+        final FeatureStore store = (FeatureStore) dataStore.getFeatureSource("SDE.EDIT");
+        final SimpleFeatureType schema = store.getSchema();
+
+        SimpleFeature feature = SimpleFeatureBuilder.build(schema, (Object[]) null, (String) null);
+        String wellKnownText = "MULTIPOLYGON(((0 0, 0 10, 10 10, 10 0, 0 0)))";
+        Geometry polygon = new WKTReader().read(wellKnownText);
+        feature.setAttribute("SHAPE", polygon);
+        FeatureCollection collection = DataUtilities.collection(feature);
+
+        store.addFeatures(collection);
+
     }
 
     /**
