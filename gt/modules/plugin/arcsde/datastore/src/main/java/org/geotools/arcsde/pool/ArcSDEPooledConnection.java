@@ -136,9 +136,9 @@ public class ArcSDEPooledConnection extends SeConnection {
 
         try {
             if (LOGGER.isLoggable(Level.FINER)) {
-                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-                String caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
-                System.err.println("<- " + caller + " returning " + toString() + " to pool");
+//                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+//                String caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
+//                System.err.println("<- " + caller + " returning " + toString() + " to pool");
 
                 LOGGER.finer("<- returning " + toString() + " to pool");
             }
