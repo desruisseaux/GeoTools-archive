@@ -601,7 +601,7 @@ public abstract class MathTransformBuilder {
         final int necessaryNumber = getMinimumPointCount();
         if (points.length < necessaryNumber) {
             throw new MismatchedSizeException(Errors.format(ErrorKeys.INSUFFICIENT_POINTS_$2,
-                        new Integer(points.length), new Integer(necessaryNumber)));
+                        points.length, necessaryNumber));
         }
         CoordinateReferenceSystem crs = null;
         final int dimension = getDimension();
@@ -610,8 +610,7 @@ public abstract class MathTransformBuilder {
             final int pointDim = point.getDimension();
             if (pointDim != dimension) {
                 throw new MismatchedDimensionException(Errors.format(
-                        ErrorKeys.MISMATCHED_DIMENSION_$3, label + '[' + i + ']',
-                        new Integer(pointDim), new Integer(dimension)));
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, label + '[' + i + ']', pointDim, dimension));
             }
             crs = getCoordinateReferenceSystem(point, crs);
         }

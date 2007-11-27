@@ -251,7 +251,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      *
      * @see #getAxisName
      */
-    private final Map/*<String,AxisName>*/ axisNames = new HashMap();
+    private final Map<String,AxisName> axisNames = new HashMap<String,AxisName>();
     
     /**
      * Cache for axis numbers. This service is not provided by {@link BufferedAuthorityFactory}
@@ -259,7 +259,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      *
      * @see #getDimensionForCRS
      */
-    private final Map/*<String,Short>*/ axisCounts = new HashMap();
+    private final Map<String,Short> axisCounts = new HashMap<String,Short>();
     
     /**
      * Cache for projection checks. This service is not provided by {@link BufferedAuthorityFactory}
@@ -267,7 +267,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      *
      * @see #isProjection
      */
-    private final Map/*<String,Boolean>*/ codeProjection = new HashMap();
+    private final Map<String,Boolean> codeProjection = new HashMap<String,Boolean>();
     
     /**
      * Pool of naming systems, used for caching.
@@ -803,7 +803,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         ensureNonNull("code", code);
         final String       KEY = "IdentifiedObject";
         PreparedStatement stmt = (PreparedStatement) statements.get(KEY); // Null allowed.
-        StringBuffer     query = null; // Will be created only if the last statement doesn't suit.
+        StringBuilder    query = null; // Will be created only if the last statement doesn't suit.
         /*
          * Iterates through all tables listed in TABLES_INFO, starting with the table used during
          * the last call to 'createObject(code)'.  This approach assumes that two consecutive calls
@@ -831,7 +831,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                         continue;
                     }
                     if (query == null) {
-                        query = new StringBuffer("SELECT ");
+                        query = new StringBuilder("SELECT ");
                     }
                     query.setLength(7); // 7 is the length of "SELECT " in the line above.
                     query.append(table.codeColumn);
@@ -1523,8 +1523,8 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         }
         result.close();
         if (i != axis.length) {
-            throw new FactoryException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                       new Integer(axis.length), new Integer(i)));
+            throw new FactoryException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, axis.length, i));
         }
         return axis;
     }
@@ -2121,7 +2121,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
      */
     private short getDimensionForCRS(final String code) throws SQLException {
         final PreparedStatement stmt;
-        final Short cached = (Short) axisCounts.get(code);
+        final Short cached = axisCounts.get(code);
         final short dimension;
         if (cached == null) {
         	stmt = prepareStatement("Dimension", 
@@ -2133,7 +2133,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
 	        stmt.setString(1, code);
 	        final ResultSet result = stmt.executeQuery();
 	        dimension = result.next() ? result.getShort(1) : 2;
-	        axisCounts.put(code, new Short(dimension));
+	        axisCounts.put(code, dimension);
 	        result.close();
         } else {
         	dimension = cached.shortValue();
@@ -2884,8 +2884,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
             case 8609: parameters.ey  = value; break;
             case 8610: parameters.ez  = value; break;
             case 8611: parameters.ppm = value; break;
-            default:   throw new FactoryException(Errors.format(ErrorKeys.UNEXPECTED_PARAMETER_$1,
-                                                  new Integer(code)));
+            default:   throw new FactoryException(Errors.format(ErrorKeys.UNEXPECTED_PARAMETER_$1, code));
         }
     }
 
@@ -3055,7 +3054,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
          * @param  factory    The factory originator.
          */
         public AuthorityCodeSet(final TableInfo table,final Class type){
-            final StringBuffer buffer = new StringBuffer("SELECT ");
+            final StringBuilder buffer = new StringBuilder("SELECT ");
             buffer.append(table.codeColumn);
             if (table.nameColumn != null) {
                 buffer.append(", ").append(table.nameColumn);

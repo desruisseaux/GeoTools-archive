@@ -607,7 +607,7 @@ public class Console extends AbstractConsole {
         final int targetDim =    targetPosition.getDimension();
         if (sourceDim != targetDim) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                        new Integer(sourceDim), new Integer(targetDim)));
+                        sourceDim, targetDim));
         }
         for (int i=0; i<sourceDim; i++) {
             // Use '!' for catching NaN.

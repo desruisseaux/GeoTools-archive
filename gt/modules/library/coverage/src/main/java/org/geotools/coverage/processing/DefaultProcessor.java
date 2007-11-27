@@ -92,8 +92,8 @@ public class DefaultProcessor extends AbstractProcessor {
          * for serious trouble.
          */
         if (cache.getMemoryCapacity() + (4*1024*1024) >= maxMemory) {
-            LOGGER.log(Logging.format(Level.SEVERE, LoggingKeys.EXCESSIVE_TILE_CACHE_$1,
-                                      new Double(maxMemory/(1024*1024.0))));
+            LOGGER.log(Logging.format(Level.SEVERE,
+                    LoggingKeys.EXCESSIVE_TILE_CACHE_$1, maxMemory / (1024 * 1024.0)));
         }
     }
 

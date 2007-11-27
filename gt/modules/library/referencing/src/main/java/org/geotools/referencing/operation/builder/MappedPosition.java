@@ -209,7 +209,7 @@ public class MappedPosition implements Serializable {
         final int dimension = target.getDimension();
         if (otherDim != dimension) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                        new Integer(otherDim), new Integer(dimension)));
+                        otherDim, dimension));
         }
         double sum = 0;
         for (int i=0; i<dimension; i++) {

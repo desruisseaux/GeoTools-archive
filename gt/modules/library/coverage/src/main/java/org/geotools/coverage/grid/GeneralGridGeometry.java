@@ -470,8 +470,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      */
     public boolean isDefined(final int bitmask) throws IllegalArgumentException {
         if ((bitmask & ~(CRS | ENVELOPE | GRID_RANGE | GRID_TO_CRS)) != 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                             "bitmask", new Integer(bitmask)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "bitmask", bitmask));
         }
         return ((bitmask & CRS)         == 0 || (envelope  != null && envelope.getCoordinateReferenceSystem()!=null))
             && ((bitmask & ENVELOPE)    == 0 || (envelope  != null && !envelope.isNull()))
@@ -514,7 +514,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * is implementation dependent. It is usually provided for debugging purposes.
      */
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         buffer.append(gridRange);
         buffer.append(", ");

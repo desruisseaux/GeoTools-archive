@@ -161,8 +161,8 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
         final CoordinateSystem cs = crs.getCoordinateSystem();
         final int dimension = cs.getDimension();
         if (dimension != 3) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                                   new Integer(3), new Integer(dimension)));
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, 3, dimension));
         }
         if (coverage instanceof SpatioTemporalCoverage3D) {
             final SpatioTemporalCoverage3D source = (SpatioTemporalCoverage3D) coverage;

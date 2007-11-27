@@ -195,8 +195,8 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         // getting parameters for the FilteredSubsample operation
         final ParameterValueGroup param = processor.getOperation("FilteredSubsample").getParameters();
         param.parameter("Source").setValue(coverage);
-        param.parameter("scaleX").setValue(new Integer(2));
-        param.parameter("scaleY").setValue(new Integer(2));
+        param.parameter("scaleX").setValue(Integer.valueOf(2));
+        param.parameter("scaleY").setValue(Integer.valueOf(2));
         param.parameter("qsFilterArray").setValue(filter);
         param.parameter("Interpolation").setValue(interp);
         param.parameter("BorderExtender").setValue(

@@ -192,10 +192,10 @@ public class ScaleTest extends GridCoverageTest {
         // getting parameters for doing a scale
         final ParameterValueGroup param = processor.getOperation("Scale").getParameters();
         param.parameter("Source").setValue(coverage);
-        param.parameter("xScale").setValue(new Float(0.5));
-        param.parameter("yScale").setValue(new Float(0.5));
-        param.parameter("xTrans").setValue(new Float(0));
-        param.parameter("yTrans").setValue(new Float(0));
+        param.parameter("xScale").setValue(Float.valueOf(0.5f));
+        param.parameter("yScale").setValue(Float.valueOf(0.5f));
+        param.parameter("xTrans").setValue(Float.valueOf(0.0f));
+        param.parameter("yTrans").setValue(Float.valueOf(0.0f));
         param.parameter("Interpolation").setValue(interp);
         param.parameter("BorderExtender").setValue(
                 BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));

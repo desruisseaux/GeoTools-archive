@@ -39,7 +39,7 @@ public class NodataFilterDescriptor extends OperationDescriptorImpl {
     /**
      * The range of valid parameter values.
      */
-    private static final Range ARGUMENT_RANGE = new Range(Integer.class, new Integer(0), null);
+    private static final Range ARGUMENT_RANGE = new Range(Integer.class, Integer.valueOf(0), null);
 
     /**
      * Constructs the descriptor.
@@ -56,10 +56,10 @@ public class NodataFilterDescriptor extends OperationDescriptorImpl {
                              {"arg1Desc",    "The minimal number of valid neighbors required " +
                                              "in order to consider the average as valid."}},
               new String[]   {RenderedRegistryMode.MODE_NAME}, 1,
-              new String[]   {"padding", "validityThreshold"},   // Argument names
-              new Class []   {Integer.class, Integer.class},     // Argument classes
-              new Object[]   {new Integer(1), new Integer(4)},   // Default values for parameters
-              new Range[]    {ARGUMENT_RANGE, ARGUMENT_RANGE}    // Valid range for parameters
+              new String[]   {"padding", "validityThreshold"},         // Argument names
+              new Class []   {Integer.class,      Integer.class},      // Argument classes
+              new Object[]   {Integer.valueOf(1), Integer.valueOf(4)}, // Default values for parameters
+              new Range[]    {ARGUMENT_RANGE, ARGUMENT_RANGE}          // Valid range for parameters
         );
     }
 }

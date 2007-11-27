@@ -151,7 +151,7 @@ public final class Registry {
                                           allowed ? javaFactory : nativeFactory);
                 final LogRecord record = Logging.format(Level.CONFIG,
                                                  LoggingKeys.NATIVE_ACCELERATION_STATE_$2,
-                                                 operation, new Integer(allowed ? 1 : 0));
+                                                 operation, Integer.valueOf(allowed ? 1 : 0));
                 log("setNativeAccelerationAllowed", record);
             }
         }

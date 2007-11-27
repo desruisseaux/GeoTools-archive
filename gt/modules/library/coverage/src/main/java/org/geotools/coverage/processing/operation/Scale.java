@@ -63,7 +63,7 @@ public class Scale extends Operation2D {
 			Citations.GEOTOOLS, "xScale", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Float(1), // Default value
+			1f,   // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
@@ -76,7 +76,7 @@ public class Scale extends Operation2D {
 			Citations.GEOTOOLS, "yScale", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Float(1), // Default value
+			1f,   // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
@@ -89,7 +89,7 @@ public class Scale extends Operation2D {
 			Citations.GEOTOOLS, "xTrans", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Float(0), // Default value
+			0f,   // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
@@ -102,7 +102,7 @@ public class Scale extends Operation2D {
 			Citations.GEOTOOLS, "yTrans", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Float(0), // Default value
+			0f,   // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure

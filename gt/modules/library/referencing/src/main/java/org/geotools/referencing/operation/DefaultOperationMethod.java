@@ -235,7 +235,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     {
         if (value < 0) {
             throw new IllegalArgumentException(Errors.format(
-                      ErrorKeys.ILLEGAL_ARGUMENT_$2, name, new Integer(value)));
+                      ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value));
         }
     }
 
@@ -411,8 +411,8 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
                     return;
                 }
             }
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                                               name, new Integer(actual), new Integer(expected)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$3, name, actual, expected));
         }
     }
 }

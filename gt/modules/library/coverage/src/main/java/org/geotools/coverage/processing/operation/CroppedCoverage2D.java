@@ -347,10 +347,10 @@ final class CroppedCoverage2D extends GridCoverage2D {
 				//
 				// /////////////////////////////////////////////////////////////////////
 				// executing the crop
-				pbj.add(new Float(minX));
-				pbj.add(new Float(minY));
-				pbj.add(new Float(width));
-				pbj.add(new Float(height));
+				pbj.add(Float.valueOf((float) minX));
+				pbj.add(Float.valueOf((float) minY));
+				pbj.add(Float.valueOf((float) width));
+				pbj.add(Float.valueOf((float) height));
 				if (!useProvidedProcessor)
 					croppedImage = JAI.create("Crop", pbj, targetHints);
 				else
@@ -423,10 +423,10 @@ final class CroppedCoverage2D extends GridCoverage2D {
 					operatioName = "Mosaic";
 				} else {
 					// executing the crop
-					pbj.add(new Float(minX));
-					pbj.add(new Float(minY));
-					pbj.add(new Float(width));
-					pbj.add(new Float(height));
+					pbj.add(Float.valueOf((float) minX));
+					pbj.add(Float.valueOf((float) minY));
+					pbj.add(Float.valueOf((float) width));
+					pbj.add(Float.valueOf((float) height));
 					operatioName = "Crop";
 				}
 

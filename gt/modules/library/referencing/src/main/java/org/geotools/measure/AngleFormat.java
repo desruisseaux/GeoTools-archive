@@ -516,8 +516,7 @@ public class AngleFormat extends Format {
             degrees = tmp;
             if (minutes<0 || minutes>60) {
                 // Erreur d'arrondissement (parce que l'angle est trop élevé)
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1,
-                                                   new Double(angle)));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1, angle));
             }
             if (width2 != 0) {
                 tmp      = (int) minutes; // Arrondie vers 0 même si négatif.
@@ -525,8 +524,7 @@ public class AngleFormat extends Format {
                 minutes  = tmp;
                 if (secondes<0 || secondes>60) {
                     // Erreur d'arrondissement (parce que l'angle est trop élevé)
-                    throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1,
-                                                       new Double(angle)));
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.ANGLE_OVERFLOW_$1, angle));
                 }
                 /*
                  * On applique maintenant une correction qui tiendra

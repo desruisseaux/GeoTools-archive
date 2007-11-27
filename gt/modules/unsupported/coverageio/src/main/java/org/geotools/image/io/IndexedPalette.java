@@ -114,7 +114,7 @@ final class IndexedPalette extends Palette {
         ensureInsideBounds(size,  upper,      MAX_UNSIGNED + 1);
         if (lower >= upper) {
             throw new IllegalArgumentException(factory.getErrorResources().getString(
-                    ErrorKeys.BAD_RANGE_$2, new Integer(lower), new Integer(upper)));
+                    ErrorKeys.BAD_RANGE_$2, lower, upper));
         }
         this.lower = lower;
         this.upper = upper;

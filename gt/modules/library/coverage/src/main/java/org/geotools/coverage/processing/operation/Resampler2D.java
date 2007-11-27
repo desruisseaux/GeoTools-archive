@@ -538,16 +538,16 @@ final class Resampler2D extends GridCoverage2D {
                 LoggingKeys.APPLIED_RESAMPLE_$11, new Object[] {
                 /*  {0} */ sourceCoverage.getName().toString(locale),
                 /*  {1} */ sourceCoverage.getCoordinateReferenceSystem().getName().getCode(),
-                /*  {2} */ new Integer(sourceImage.getWidth()),
-                /*  {3} */ new Integer(sourceImage.getHeight()),
+                /*  {2} */ sourceImage.getWidth(),
+                /*  {3} */ sourceImage.getHeight(),
                 /*  {4} */ targetCoverage.getCoordinateReferenceSystem().getName().getCode(),
-                /*  {5} */ new Integer(targetImage.getWidth()),
-                /*  {6} */ new Integer(targetImage.getHeight()),
+                /*  {5} */ targetImage.getWidth(),
+                /*  {6} */ targetImage.getHeight(),
                 /*  {7} */ targetImage.getOperationName(),
-                /*  {8} */ new Integer(sourceCoverage == sourceCoverage.geophysics(true) ? 1 : 0),
+                /*  {8} */ Integer.valueOf(sourceCoverage == sourceCoverage.geophysics(true) ? 1 : 0),
                 /*  {9} */ ImageUtilities.getInterpolationName(interpolation),
                 /* {10} */ (background != null) ? background.length == 1 ? (Double.isNaN(background[0]) ? (Object) "NaN"
-                                 : (Object) new Double(background[0]))
+                                 : (Object) Double.valueOf(background[0]))
                                  : (Object) XArray.toString(background, locale)
                                  : "No background used" }));
         }

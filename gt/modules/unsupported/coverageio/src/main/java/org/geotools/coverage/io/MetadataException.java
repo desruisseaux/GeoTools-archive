@@ -138,13 +138,14 @@ public class MetadataException extends IIOException {
      * Aucune valeur n'est définie pour la propriété "ULY".
      * </pre></blockquote>
      */
+    @Override
     public String toString() {
         final MetadataBuilder.Key key = getMetadataKey();
         final String alias = getMetadataAlias();
         if (key == null && alias == null) {
             return super.toString();
         }
-        final StringBuffer buffer = new StringBuffer(getClass().getName());
+        final StringBuilder buffer = new StringBuilder(getClass().getName());
         buffer.append('[');
         if (key != null) {
             buffer.append("key=\"").append(key).append('"');

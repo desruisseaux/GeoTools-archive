@@ -366,6 +366,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
          * Concatenates the supplied transform with an "ellipsoid to geocentric" or a
          * "geocentric to ellipsod" step, if needed.
          */
+        @SuppressWarnings("fallthrough")
         private static MathTransform concatenate(final MathTransform    transform,
                                                  final ParameterValueGroup values,
                                                  final ParameterDescriptor major,
@@ -380,8 +381,7 @@ public class GeocentricTranslation extends ProjectiveTransform {
                 case 2:        // Fall through for 0 and 2 cases.
                 case 3: break; // The dimension is a valid value.
                 default: throw new IllegalArgumentException(Errors.format(
-                               ErrorKeys.ILLEGAL_ARGUMENT_$2, dim.getName().getCode(),
-                               new Integer(dimension)));
+                               ErrorKeys.ILLEGAL_ARGUMENT_$2, dim.getName().getCode(), dimension));
             }
             ensureValid(major, semiMajor);
             ensureValid(minor, semiMinor);

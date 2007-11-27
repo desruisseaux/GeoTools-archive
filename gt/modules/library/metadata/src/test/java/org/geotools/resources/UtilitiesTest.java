@@ -77,9 +77,9 @@ public final class UtilitiesTest extends TestCase {
      */
     @SuppressWarnings("unchecked") // We break consistency on purpose for one test.
     public void testSameInterfaces() {
-        assertTrue (Utilities.sameInterfaces(StringBuffer.class, String.class, CharSequence.class));
-        assertTrue (Utilities.sameInterfaces(StringBuffer.class, String.class, Serializable.class));
-        assertFalse(Utilities.sameInterfaces((Class) File.class, String.class, CharSequence.class));
-        assertTrue (Utilities.sameInterfaces(        File.class, String.class, Serializable.class));
+        assertTrue (Utilities.sameInterfaces(StringBuilder.class, String.class, CharSequence.class));
+        assertTrue (Utilities.sameInterfaces(StringBuilder.class, String.class, Serializable.class));
+        assertFalse(Utilities.sameInterfaces((Class)  File.class, String.class, CharSequence.class));
+        assertTrue (Utilities.sameInterfaces(         File.class, String.class, Serializable.class));
     }
 }

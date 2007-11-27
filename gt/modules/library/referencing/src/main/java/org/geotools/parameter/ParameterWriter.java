@@ -391,11 +391,11 @@ public class ParameterWriter extends FilterWriter {
          *   titles    -  The column number for each column title.
          *   names     -  The names (including alias) for each line.
          */
-        final Map      titles = new LinkedHashMap/*<Object,Integer>*/();
-        final List      names = new ArrayList/*<String[]>*/();
-        final Locale   locale = this.locale; // Protect from changes.
+        final Map<Object,Integer> titles = new LinkedHashMap<Object,Integer>();
+        final List<String[]>      names  = new ArrayList<String[]>();
+        final Locale              locale = this.locale; // Protect from changes.
         String[] descriptions = null;
-        titles.put(null, new Integer(0)); // Special value for the identifier column.
+        titles.put(null, 0); // Special value for the identifier column.
         for (final Iterator it=parameters.iterator(); it.hasNext();) {
             final IdentifiedObject element = (IdentifiedObject) it.next();
             final Collection/*<GenericName>*/ aliases = element.getAlias();
@@ -424,7 +424,7 @@ public class ParameterWriter extends FilterWriter {
                         }
                         title = scope.toInternationalString().toString(locale);
                     } else {
-                        title = new Integer(count++);
+                        title = count++;
                     }
                     /*
                      * The alias scope is used as the column's title. If the alias has no scope,
@@ -432,9 +432,9 @@ public class ParameterWriter extends FilterWriter {
                      * exists. If it exists, fetch its position. If it doesn't exist, inserts the
                      * new column at the end of existing columns.
                      */
-                    Integer position = (Integer) titles.get(title);
+                    Integer position = titles.get(title);
                     if (position == null) {
-                        position = new Integer(titles.size());
+                        position = titles.size();
                         titles.put(title, position);
                     }
                     /*

@@ -98,7 +98,7 @@ public class HsqlEpsgDatabase {
          * File.toURI() because HSQL doesn't seem to expect an encoded URL (e.g.
          * "%20" instead of spaces).
          */
-        final StringBuffer url = new StringBuffer("jdbc:hsqldb:file:");
+        final StringBuilder url = new StringBuilder("jdbc:hsqldb:file:");
         final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
         if (path.length()==0 || path.charAt(0)!='/') {
             url.append('/');
@@ -143,7 +143,7 @@ public class HsqlEpsgDatabase {
             final BufferedReader in = new BufferedReader(new InputStreamReader(
                             HsqlEpsgDatabase.class.getResourceAsStream("EPSG.sql"),
                             "ISO-8859-1"));
-            StringBuffer insertStatement = null;
+            StringBuilder insertStatement = null;
             String line;
             while ((line = in.readLine()) != null) {
                 line = line.trim();
@@ -155,7 +155,7 @@ public class HsqlEpsgDatabase {
                          * The row values appear in next lines; the current line
                          * should stop right after the VALUES keyword.
                          */
-                        insertStatement = new StringBuffer(line);
+                        insertStatement = new StringBuilder(line);
                         continue;
                     }
                     if (insertStatement != null) {

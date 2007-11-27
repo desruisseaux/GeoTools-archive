@@ -101,7 +101,7 @@ public class Category implements Serializable {
      */
     private static final NumberRange BYTE_0;
     static {
-        final Byte index = new Byte((byte) 0);
+        final Byte index = 0;
         BYTE_0 = new NumberRange(Byte.class, index, index);
     }
 
@@ -110,7 +110,7 @@ public class Category implements Serializable {
      */
     private static final NumberRange BYTE_1;
     static {
-        final Byte index = new Byte((byte) 1);
+        final Byte index = 1;
         BYTE_1 = new NumberRange(Byte.class, index, index);
     }
 
@@ -236,7 +236,7 @@ public class Category implements Serializable {
                     final Color        color,
                     final int          sample)
     {
-        this(name, toARGB(color, sample), new Integer(sample));
+        this(name, toARGB(color, sample), Integer.valueOf(sample));
         assert minimum == sample : minimum;
         assert maximum == sample : maximum;
     }
@@ -252,7 +252,7 @@ public class Category implements Serializable {
                     final Color        color,
                     final double       sample)
     {
-        this(name, toARGB(color, (int)sample), new Double(sample));
+        this(name, toARGB(color, (int) sample), Double.valueOf(sample));
         assert Double.doubleToRawLongBits(minimum) == Double.doubleToRawLongBits(sample) : minimum;
         assert Double.doubleToRawLongBits(maximum) == Double.doubleToRawLongBits(sample) : maximum;
     }
@@ -318,8 +318,8 @@ public class Category implements Serializable {
                     final double       offset) throws IllegalArgumentException
     {
         this(name, colors,
-             new NumberRange(Integer.class, new Integer(lower), true,
-                                            new Integer(upper), false), scale, offset);
+             new NumberRange(Integer.class, Integer.valueOf(lower), true,
+                    Integer.valueOf(upper), false), scale, offset);
     }
 
     /**
@@ -362,12 +362,10 @@ public class Category implements Serializable {
             throw new AssertionError(exception);
         }
         if (Double.isNaN(scale) || Double.isInfinite(scale)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_COEFFICIENT_$2,
-                                               "scale", new Double(scale)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_COEFFICIENT_$2, "scale", scale));
         }
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_COEFFICIENT_$2,
-                                               "offset", new Double(offset)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_COEFFICIENT_$2, "offset", offset));
         }
     }
 
@@ -864,8 +862,9 @@ public class Category implements Serializable {
      * The returned string is implementation dependent.
      * It is usually provided for debugging purposes.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append("(\"");
         buffer.append(name);
         buffer.append("\":[");

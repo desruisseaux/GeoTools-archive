@@ -110,8 +110,8 @@ final class ColorModelFactory {
         this.numBands    = numBands;
         this.type        = type;
         if (visibleBand<0 || visibleBand>=numBands) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
-                                               new Integer(visibleBand)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_BAND_NUMBER_$1, visibleBand));
         }
     }
 

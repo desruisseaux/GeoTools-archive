@@ -516,8 +516,8 @@ public class ColorMap implements Serializable {
                     outOfBounds = true;
                 }
                 if (outOfBounds) {
-                    AbstractProcessor.LOGGER.warning(Errors.format(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
-                            category, new Integer(0), new Integer(ARGB.length - 1)));
+                    AbstractProcessor.LOGGER.warning(Errors.format(
+                            ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, category, 0, ARGB.length - 1));
                 }
                 if (upper <= lower) {
                     continue;
@@ -653,8 +653,7 @@ public class ColorMap implements Serializable {
                 if (colors.length == 1) {
                     message = Integer.toHexString(colors[0].getRGB()).toUpperCase();
                 } else {
-                    message = Vocabulary.format(VocabularyKeys.COLOR_COUNT_$1,
-                                new Integer(((Color[]) colors).length));
+                    message = Vocabulary.format(VocabularyKeys.COLOR_COUNT_$1, colors.length);
                 }
                 writer.write(message);
             }

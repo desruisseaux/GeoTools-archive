@@ -142,7 +142,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     {
         this.factory    = factory;
         this.connection = connection;
-        final StringBuffer buffer = new StringBuffer("SELECT ");
+        final StringBuilder buffer = new StringBuilder("SELECT ");
         buffer.append(table.codeColumn);
         if (table.nameColumn != null) {
             buffer.append(", ").append(table.nameColumn);

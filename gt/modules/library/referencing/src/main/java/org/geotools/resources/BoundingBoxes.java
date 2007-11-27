@@ -121,16 +121,13 @@ public final class BoundingBoxes {
     public static String toString(final GeographicBoundingBox box,
                                   final String pattern, final Locale locale)
     {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         final AngleFormat  format;
         format = (locale!=null) ? new AngleFormat(pattern, locale) : new AngleFormat(pattern);
-        buffer.append(format.format(new  Latitude(box.getNorthBoundLatitude())));
-        buffer.append(", ");
-        buffer.append(format.format(new Longitude(box.getWestBoundLongitude())));
-        buffer.append(" - ");
-        buffer.append(format.format(new  Latitude(box.getSouthBoundLatitude())));
-        buffer.append(", ");
-        buffer.append(format.format(new Longitude(box.getEastBoundLongitude())));
-        return buffer.toString();
+        return buffer
+                .append(format.format(new  Latitude(box.getNorthBoundLatitude()))).append(", ")
+                .append(format.format(new Longitude(box.getWestBoundLongitude()))).append(" - ")
+                .append(format.format(new  Latitude(box.getSouthBoundLatitude()))).append(", ")
+                .append(format.format(new Longitude(box.getEastBoundLongitude()))).toString();
     }    
 }

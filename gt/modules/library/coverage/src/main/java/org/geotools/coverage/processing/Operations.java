@@ -262,8 +262,8 @@ public class Operations {
             throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("NodataFilter",      source,
-                                          "padding",           new Integer(padding),
-                                          "validityThreshold", new Integer(validityThreshold));
+                                          "padding",           Integer.valueOf(padding),
+                                          "validityThreshold", Integer.valueOf(validityThreshold));
     }
 
     /**
@@ -513,10 +513,10 @@ public class Operations {
             throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("Scale", source,
-                                          "xScale", new Float(xScale),
-                                          "yScale", new Float(yScale),
-                                          "xTrans", new Float(xTrans),
-                                          "yTrans", new Float(yTrans),
+                                          "xScale", Float.valueOf((float) xScale),
+                                          "yScale", Float.valueOf((float) yScale),
+                                          "xTrans", Float.valueOf((float) xTrans),
+                                          "yTrans", Float.valueOf((float) yTrans),
                                           "Interpolation", interpolation,
                                           "BorderExtender", extender);
     }
@@ -569,8 +569,8 @@ public class Operations {
             throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("SubsampleAverage", source,
-                                          "scaleX",           new Double(scaleX),
-                                          "scaleY",           new Double(scaleY),
+                                          "scaleX",           Double.valueOf(scaleX),
+                                          "scaleY",           Double.valueOf(scaleY),
                                           "Interpolation",    interpolation,
                                           "BorderExtender",   be);
     }
@@ -670,8 +670,8 @@ public class Operations {
             throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("FilteredSubsample", source,
-                                          "scaleX",            new Integer(scaleX),
-                                          "scaleY",            new Integer(scaleY),
+                                          "scaleX",            Integer.valueOf(scaleX),
+                                          "scaleY",            Integer.valueOf(scaleY),
                                           "qsFilterArray",     qsFilter,
                                           "Interpolation",     interpolation,
                                           "BorderExtender",    be);

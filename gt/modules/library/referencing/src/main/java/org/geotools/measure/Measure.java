@@ -94,7 +94,7 @@ public final class Measure extends Number {
      */
     @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(value);
         buffer.append(' ');
         buffer.append(unit);

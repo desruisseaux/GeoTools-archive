@@ -100,6 +100,7 @@ public abstract class AbstractEnvelope implements Envelope {
      * of envelopes to format, users will get more control by using their own instance of
      * {@link org.geotools.measure.CoordinateFormat}.
      */
+    @Override
     public String toString() {
         return toString(this);
     }
@@ -108,7 +109,7 @@ public abstract class AbstractEnvelope implements Envelope {
      * Formats the specified envelope.
      */
     static String toString(final Envelope envelope) {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(envelope)).append('[');
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(envelope)).append('[');
         final int dimension = envelope.getDimension();
         for (int i=0; i<dimension; i++) {
             if (i != 0) {
@@ -122,6 +123,7 @@ public abstract class AbstractEnvelope implements Envelope {
     /**
      * Returns a hash value for this envelope.
      */
+    @Override
     public int hashCode() {
         final int dimension = getDimension();
         int code = 1;
@@ -147,6 +149,7 @@ public abstract class AbstractEnvelope implements Envelope {
      *       We can not relax this rule before we ensure that every implementations in
      *       the Geotools code base follow the same contract.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final Envelope that = (Envelope) object;

@@ -697,8 +697,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                     break;
                 }
                 default: {
-                    throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                       "dim", new Integer(dim)));
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$2, "dim", dim));
                 }
             }
             final double  a = doubleValue(SRC_SEMI_MAJOR, values);

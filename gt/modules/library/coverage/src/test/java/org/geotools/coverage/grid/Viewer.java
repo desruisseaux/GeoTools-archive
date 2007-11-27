@@ -138,7 +138,7 @@ public class Viewer extends JPanel {
      * @return The viewer, for information.
      */
     public static Viewer show(final GridCoverage2D coverage, final String title) {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         if (title != null) {
             buffer.append(title);
             buffer.append(" - ");

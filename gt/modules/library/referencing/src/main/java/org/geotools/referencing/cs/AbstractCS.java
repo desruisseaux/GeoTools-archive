@@ -464,8 +464,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     {
         if (coordinates.length != axis.length) {
             throw new MismatchedDimensionException(Errors.format(
-                        ErrorKeys.MISMATCHED_DIMENSION_$3, name,
-                        new Integer(coordinates.length), new Integer(axis.length)));
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, name, coordinates.length, axis.length));
         }
     }
 

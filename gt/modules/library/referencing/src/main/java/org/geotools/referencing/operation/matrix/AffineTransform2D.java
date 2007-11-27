@@ -153,12 +153,12 @@ public class AffineTransform2D extends AffineTransform implements Matrix {
                 break;
             }
             default: {
-                throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                    "column", new Integer(column)));
+                throw new IndexOutOfBoundsException(
+                        Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "column", column));
             }
         }
-        throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                            "row", new Integer(row)));
+        throw new IndexOutOfBoundsException(Errors.format(
+                ErrorKeys.ILLEGAL_ARGUMENT_$2, "row", row));
     }
 
     /**
@@ -170,12 +170,12 @@ public class AffineTransform2D extends AffineTransform implements Matrix {
      */
     public void setElement(final int row, final int column, final double value) {
         if (row<0 || row>=SIZE) {
-            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                "row", new Integer(row)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "row", row));
         }
         if (column<0 || column>=SIZE) {
-            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                "column", new Integer(column)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "column", column));
         }
         if (row == SIZE-1) {
             checkLastRow(column, value);
@@ -198,7 +198,7 @@ public class AffineTransform2D extends AffineTransform implements Matrix {
     {
         if (value != (column == SIZE-1 ? 1 : 0)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                      "matrix[" + (SIZE-1) + ',' + column + ']', new Double(value)));
+                      "matrix[" + (SIZE-1) + ',' + column + ']', value));
         }
     }
 

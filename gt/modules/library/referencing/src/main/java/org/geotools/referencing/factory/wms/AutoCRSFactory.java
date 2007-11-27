@@ -75,7 +75,7 @@ public class AutoCRSFactory extends DirectAuthorityFactory implements CRSAuthori
      *
      * @todo Replace this with full FactorySPI system.
      */
-    private final Map factlets = new TreeMap();
+    private final Map<Integer,Factlet> factlets = new TreeMap<Integer,Factlet>();
 
     /**
      * Constructs a default factory for the {@code AUTO} authority.
@@ -101,7 +101,7 @@ public class AutoCRSFactory extends DirectAuthorityFactory implements CRSAuthori
      */
     private void add(final Factlet f) {
         final int code = f.code();
-        if (factlets.put(new Integer(code), f) != null) {
+        if (factlets.put(code, f) != null) {
             throw new IllegalArgumentException(String.valueOf(code));
         }
     }
@@ -117,8 +117,8 @@ public class AutoCRSFactory extends DirectAuthorityFactory implements CRSAuthori
         if (code.authority.equalsIgnoreCase("AUTO") ||
             code.authority.equalsIgnoreCase("AUTO2"))
         {
-            final Integer key = new Integer(code.code);
-            final Factlet fac = (Factlet) factlets.get(key);
+            final Integer key = code.code;
+            final Factlet fac = factlets.get(key);
             if (fac != null) {
                 return fac;
             }

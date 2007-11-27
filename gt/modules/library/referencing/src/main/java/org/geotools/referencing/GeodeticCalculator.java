@@ -429,8 +429,7 @@ public class GeodeticCalculator {
     {
         if (!(distance>=0.0 && distance<=maxOrthodromicDistance)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.DISTANCE_OUT_OF_RANGE_$4,
-                    new Double(distance), new Double(0), new Double(maxOrthodromicDistance),
-                    ellipsoid.getAxisUnit()));
+                    distance, 0.0, maxOrthodromicDistance, ellipsoid.getAxisUnit()));
         }
     }
 
@@ -446,7 +445,7 @@ public class GeodeticCalculator {
     {
         if (numberOfPoints < 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                        "numberOfPoints", new Integer(numberOfPoints)));
+                        "numberOfPoints", numberOfPoints));
         }
     }
 
@@ -1322,7 +1321,7 @@ public class GeodeticCalculator {
         if (directionValid) {
             buffer.write(resources.getLabel(VocabularyKeys.ORTHODROMIC_DISTANCE));
             buffer.nextColumn();
-            buffer.write(nf.format(new Double(distance)));
+            buffer.write(nf.format(distance));
             if (ellipsoid != null) {
                 buffer.write(' ');
                 buffer.write(ellipsoid.getAxisUnit().toString());

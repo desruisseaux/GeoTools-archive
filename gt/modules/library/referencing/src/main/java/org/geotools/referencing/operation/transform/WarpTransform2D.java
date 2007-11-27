@@ -368,14 +368,14 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
             final WarpPolynomial poly = (WarpPolynomial) warp;
             final ParameterValue[] p = new ParameterValue[7];
             int c = 0;
-            p[c++] = new Parameter(Provider.DEGREE,   new Integer(poly.getDegree()));
+            p[c++] = new Parameter(Provider.DEGREE,   Integer.valueOf(poly.getDegree()));
             p[c++] = new Parameter(Provider.X_COEFFS, poly.getXCoeffs());
             p[c++] = new Parameter(Provider.Y_COEFFS, poly.getYCoeffs());
             float s;
-            if ((s=poly.getPreScaleX ()) != 1) p[c++] = new Parameter(Provider. PRE_SCALE_X, new Float(s));
-            if ((s=poly.getPreScaleY ()) != 1) p[c++] = new Parameter(Provider. PRE_SCALE_Y, new Float(s));
-            if ((s=poly.getPostScaleX()) != 1) p[c++] = new Parameter(Provider.POST_SCALE_X, new Float(s));
-            if ((s=poly.getPostScaleY()) != 1) p[c++] = new Parameter(Provider.POST_SCALE_Y, new Float(s));
+            if ((s=poly.getPreScaleX ()) != 1) p[c++] = new Parameter(Provider. PRE_SCALE_X, s);
+            if ((s=poly.getPreScaleY ()) != 1) p[c++] = new Parameter(Provider. PRE_SCALE_Y, s);
+            if ((s=poly.getPostScaleX()) != 1) p[c++] = new Parameter(Provider.POST_SCALE_X, s);
+            if ((s=poly.getPostScaleY()) != 1) p[c++] = new Parameter(Provider.POST_SCALE_Y, s);
             return new ParameterGroup(getParameterDescriptors(), (ParameterValue[]) XArray.resize(p, c));
         } else {
             return super.getParameterValues();
@@ -590,7 +590,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         /** Descriptor for the "{@link WarpPolynomial#getPostScaleY postScaleY}" parameter value. */
         public static final ParameterDescriptor POST_SCALE_Y;
         static {
-            final Float ONE = new Float(1);
+            final Float ONE = 1f;
              PRE_SCALE_X = new DefaultParameterDescriptor( "preScaleX", null, ONE, false);
              PRE_SCALE_Y = new DefaultParameterDescriptor( "preScaleY", null, ONE, false);
             POST_SCALE_X = new DefaultParameterDescriptor("postScaleX", null, ONE, false);

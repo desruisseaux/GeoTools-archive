@@ -269,17 +269,14 @@ public abstract class TestTransform extends TestCase {
         final int stop = Math.min(expected.length, actual.length)/dimension * dimension;
         assertEquals("Array length for expected points", stop, expected.length);
         assertEquals("Array length for actual points",   stop,   actual.length);
-        final StringBuffer buffer = new StringBuffer(name);
+        final StringBuilder buffer = new StringBuilder(name);
         buffer.append(": point[");
         final int start = buffer.length();
         for (int i=0; i<stop; i++) {
             buffer.setLength(start);
-            buffer.append(i/dimension);
-            buffer.append(", dimension ");
-            buffer.append(i % dimension);
-            buffer.append(" of ");
-            buffer.append(dimension);
-            buffer.append(']');
+            buffer.append(i / dimension).append(", dimension ")
+                  .append(i % dimension).append(" of ")
+                  .append(    dimension).append(']');
             if (isReal(expected[i])) {
                 // The "two steps" method in ConcatenatedTransformTest sometime produces
                 // random NaN numbers. This "two steps" is used only for comparaison purpose;

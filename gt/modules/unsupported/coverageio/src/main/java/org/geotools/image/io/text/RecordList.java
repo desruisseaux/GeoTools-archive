@@ -329,8 +329,7 @@ final class RecordList {
         } catch (IIOException exception) {
             // Ignore.
         }
-        return Vocabulary.format(VocabularyKeys.POINT_COUNT_IN_GRID_$3,
-                new Integer(upper), new Float(xCount), new Float(yCount));
+        return Vocabulary.format(VocabularyKeys.POINT_COUNT_IN_GRID_$3, upper, xCount, yCount);
     }
 
     /**

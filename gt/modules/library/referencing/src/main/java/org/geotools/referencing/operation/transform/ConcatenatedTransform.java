@@ -155,8 +155,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
             throw new IllegalArgumentException(
                       Errors.format(ErrorKeys.CANT_CONCATENATE_TRANSFORMS_$2,
                                     getName(tr1), getName(tr2)) + ' ' +
-                      Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                    new Integer(dim1), new Integer(dim2)));
+                      Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2, dim1, dim2));
         }
         if (tr1.isIdentity()) return tr2;
         if (tr2.isIdentity()) return tr1;

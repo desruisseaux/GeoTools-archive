@@ -184,6 +184,7 @@ final class SampleTranscoder extends PointOpImage {
          * @param param The parameter block for the operation to performs.
          * @param message A buffer for formatting an error message if any.
          */
+        @Override
         protected boolean validateParameters(final String      modeName,
                                              final ParameterBlock param,
                                              final StringBuffer message)
@@ -196,7 +197,7 @@ final class SampleTranscoder extends PointOpImage {
             final int numBands = source.getSampleModel().getNumBands();
             if (numBands != bands.length) {
                 message.append(Errors.format(ErrorKeys.NUMBER_OF_BANDS_MISMATCH_$3,
-                         new Integer(numBands), new Integer(bands.length), "SampleDimension"));
+                         numBands, bands.length, "SampleDimension"));
                 return false;
             }
             for (int i=0; i<numBands; i++) {

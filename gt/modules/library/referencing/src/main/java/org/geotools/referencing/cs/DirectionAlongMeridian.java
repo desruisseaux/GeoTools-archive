@@ -277,6 +277,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
      * Tests this object for equality with the specified one.
      * This method is used mostly for assertions.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof DirectionAlongMeridian) {
             final DirectionAlongMeridian that = (DirectionAlongMeridian) object;
@@ -289,6 +290,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
     /**
      * Returns a hash code value, for consistency with {@link #equals}.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(meridian);
         return (int)serialVersionUID ^ (int)code ^ (int)(code >> 32) + 37*baseDirection.hashCode();
@@ -302,8 +304,9 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
      * {@link AxisDirection} for a given direction; we avoid potential differences like lower
      * versus upper cases, amount of white space, <cite>etc</cite>.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(baseDirection.name());
+        final StringBuilder buffer = new StringBuilder(baseDirection.name());
         toLowerCase(buffer, 0);
         buffer.append(" along ");
         final double md = Math.abs(meridian);
@@ -330,7 +333,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
      * Changes the buffer content to lower case from {@code base+1} to
      * the end of the buffer. For {@link #toString} internal use only.
      */
-    private static void toLowerCase(final StringBuffer buffer, final int base) {
+    private static void toLowerCase(final StringBuilder buffer, final int base) {
         for (int i=buffer.length(); --i>base;) {
             buffer.setCharAt(i, Character.toLowerCase(buffer.charAt(i)));
         }

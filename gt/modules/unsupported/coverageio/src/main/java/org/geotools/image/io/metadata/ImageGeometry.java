@@ -78,8 +78,7 @@ public class ImageGeometry extends MetadataAccessor {
         final int dim1 = gridRange.childCount();
         final int dim2  = envelope .childCount();
         if (dim1 != dim2) {
-            warning("getDimension", ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer[] {
-                    new Integer(dim1), new Integer(dim2)});
+            warning("getDimension", ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer[] {dim1, dim2});
         }
         return Math.min(dim1, dim2);
     }

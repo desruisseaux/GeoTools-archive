@@ -70,7 +70,7 @@ final class ModifiedParameterDescriptor extends DefaultParameterDescriptor {
     {
         super(original);
         this.original     = original;
-        this.defaultValue = new Double(defaultValue);
+        this.defaultValue = Double.valueOf(defaultValue);
     }
 
     /**

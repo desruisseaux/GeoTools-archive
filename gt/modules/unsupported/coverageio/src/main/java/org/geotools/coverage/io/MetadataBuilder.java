@@ -766,9 +766,9 @@ public class MetadataBuilder {
      */
     protected void load(final BufferedReader in) throws IOException {
         assert Thread.holdsLock(this);
-        final Set  previousComments = new HashSet();
-        final StringBuffer comments = new StringBuffer();
-        final String  lineSeparator = System.getProperty("line.separator", "\n");
+        final Set   previousComments = new HashSet();
+        final StringBuilder comments = new StringBuilder();
+        final String   lineSeparator = System.getProperty("line.separator", "\n");
         String line; while ((line=in.readLine())!=null) {
             if (line.trim().length()!=0) {
                 if (!parseLine(line)) {
@@ -1288,7 +1288,7 @@ public class MetadataBuilder {
         final int  integer = (int) value;
         if (value != integer) {
             throw new MetadataException(Errors.getResources(userLocale).getString(
-                      ErrorKeys.BAD_PARAMETER_$2, lastAlias, new Double(value)), key, lastAlias);
+                      ErrorKeys.BAD_PARAMETER_$2, lastAlias, value), key, lastAlias);
         }
         return integer;
     }
@@ -2096,14 +2096,14 @@ public class MetadataBuilder {
     static String trim(String str, final String separator) {
         if (str != null) {
             str = str.trim();
-            StringBuffer buffer = null;
+            StringBuilder buffer = null;
     loop:       for (int i=str.length(); --i>=0;) {
                 if (Character.isSpaceChar(str.charAt(i))) {
                     final int upper = i;
                     do if (--i < 0) break loop;
                     while (Character.isSpaceChar(str.charAt(i)));
                     if (buffer == null) {
-                        buffer = new StringBuffer(str);
+                        buffer = new StringBuilder(str);
                     }
                     buffer.replace(i+1, upper+1, separator);
                 }
@@ -2263,14 +2263,14 @@ public class MetadataBuilder {
             }
             switch (method) {
                 default     : throw new AssertionError(method);
-                case LENGTH : return new Double(        envelope.getLength (dimension));
+                case LENGTH : return Double.valueOf(    envelope.getLength (dimension));
                 case MINIMUM: return getValue(coverage, envelope.getMinimum(dimension));
                 case MAXIMUM: return getValue(coverage, envelope.getMaximum(dimension));
-                case SIZE   : return new Integer(          range.getLength (dimension));
-                case LOWER  : return new Integer(          range.getLower  (dimension));
-                case UPPER  : return new Integer(          range.getUpper  (dimension));
+                case SIZE   : return Integer.valueOf(      range.getLength (dimension));
+                case LOWER  : return Integer.valueOf(      range.getLower  (dimension));
+                case UPPER  : return Integer.valueOf(      range.getUpper  (dimension));
                 case RESOLUTION: {
-                    return new Double(envelope.getLength(dimension)/range.getLength(dimension));
+                    return Double.valueOf(envelope.getLength(dimension) / range.getLength(dimension));
                 }
             }
         }
@@ -2287,7 +2287,7 @@ public class MetadataBuilder {
                     return DefaultTemporalCRS.wrap((TemporalCRS) crs).toDate(value);
                 }
             }
-            return new Double(value);
+            return Double.valueOf(value);
         }
 
         /**

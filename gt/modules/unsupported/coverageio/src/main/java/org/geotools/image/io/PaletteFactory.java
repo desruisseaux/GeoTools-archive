@@ -629,7 +629,7 @@ public class PaletteFactory {
             return value;
         }
         throw new ParseException(getErrorResources().getString(
-                ErrorKeys.RGB_OUT_OF_RANGE_$1, new Integer(value)), 0);
+                ErrorKeys.RGB_OUT_OF_RANGE_$1, value), 0);
     }
 
     /**

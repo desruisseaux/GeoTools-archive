@@ -206,8 +206,8 @@ public class FactoryDependencies {
      * Creates a single node for the specified factory.
      */
     private DefaultMutableTreeNode createNode(final Factory factory) {
-        final StringBuffer buffer =
-                new StringBuffer(Utilities.getShortClassName(factory)).append('[');
+        final StringBuilder buffer =
+                new StringBuilder(Utilities.getShortClassName(factory)).append('[');
         if (factory instanceof AuthorityFactory) {
             final Citation authority = ((AuthorityFactory) factory).getAuthority();
             if (authority != null) {
@@ -263,7 +263,7 @@ public class FactoryDependencies {
     /**
      * Appends an identifier to the specified buffer.
      */
-    private void appendIdentifier(final StringBuffer buffer, final CharSequence identifier) {
+    private void appendIdentifier(final StringBuilder buffer, final CharSequence identifier) {
         if (colorEnabled) buffer.append(X364.MAGENTA);
         buffer.append('"').append(identifier).append('"');
         if (colorEnabled) buffer.append(X364.DEFAULT);

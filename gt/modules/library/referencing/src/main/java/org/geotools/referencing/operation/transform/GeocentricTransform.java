@@ -184,8 +184,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     {
         if (!(value>=0 && value<=max)) {
             // Use '!' in order to trap NaN
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               name, new Double(value)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value));
         }
     }
 

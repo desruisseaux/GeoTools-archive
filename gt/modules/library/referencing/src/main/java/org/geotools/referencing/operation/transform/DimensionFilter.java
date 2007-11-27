@@ -320,8 +320,8 @@ public class DimensionFilter {
         final int upper     = sourceDimensions[dimInput-1] + 1;
         assert XArray.isStrictlySorted(sourceDimensions);
         if (upper > dimSource) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "sourceDimensions", new Integer(upper-1)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "sourceDimensions", upper-1));
         }
         /*
          * Check for easiest cases: same transform, identity transform or concatenated transforms.
@@ -485,8 +485,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
         final int upper     = targetDimensions[dimOutput-1];
         assert XArray.isStrictlySorted(targetDimensions);
         if (upper > dimTarget) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "targetDimensions", new Integer(upper)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "targetDimensions", upper));
         }
         if (dimOutput == dimTarget) {
             assert lower==0 && upper==dimTarget;
@@ -594,8 +594,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
      */
     private static int[] add(int[] sequence, int dimension) throws IllegalArgumentException {
         if (dimension < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "dimension", new Integer(dimension)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "dimension", dimension));
         }
         if (sequence == null) {
             return new int[] {dimension};
@@ -646,8 +646,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
             throws IllegalArgumentException
     {
         if (lower<0 || lower>=upper) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "lower", new Integer(lower)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", lower));
         }
         if (sequence == null) {
             sequence = series(lower, upper);
@@ -684,8 +684,8 @@ reduce:     for (int j=0; j<rows.length; j++) {
         for (int i=0; i<dimensions.length; i++) {
             final int value = dimensions[i];
             if (value <= last) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                   "dimensions["+i+']', new Integer(value)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_ARGUMENT_$2, "dimensions[" + i + ']', value));
             }
             last = value;
         }

@@ -300,7 +300,7 @@ public final class Element {
      */
     private ParseException missingCharacter(final char c, final int position) {
         return trim("missingCharacter", new ParseException(complete(
-                    Errors.format(ErrorKeys.MISSING_CHARACTER_$1, new Character(c))), position));
+                    Errors.format(ErrorKeys.MISSING_CHARACTER_$1, Character.valueOf(c))), position));
     }
 
     /**

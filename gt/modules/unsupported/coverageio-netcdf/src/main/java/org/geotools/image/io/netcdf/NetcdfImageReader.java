@@ -602,8 +602,7 @@ scan:       while (it.hasNext()) {
             final Variable candidate = findVariable(name);
             final int rank = candidate.getRank();
             if (rank < Math.max(X_DIMENSION, Y_DIMENSION)) {
-                throw new IIOException(Errors.format(
-                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(rank)));
+                throw new IIOException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1, rank));
             }
             variable      = candidate;
             variableIndex = imageIndex;
@@ -695,7 +694,7 @@ scan:       while (it.hasNext()) {
                 final int relative = rank - bandDimension;
                 if (relative < 0 || relative == X_DIMENSION || relative == Y_DIMENSION) {
                     throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
-                            "bandDimension", new Integer(bandDimension)));
+                            "bandDimension", bandDimension));
                 }
             }
         }

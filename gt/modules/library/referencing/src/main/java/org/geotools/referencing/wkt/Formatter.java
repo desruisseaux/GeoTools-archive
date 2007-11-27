@@ -223,8 +223,8 @@ public class Formatter {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, "symbols"));
         }
         if (indentation < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                               "indentation", new Integer(indentation)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "indentation", indentation));
         }
         numberFormat = (NumberFormat) symbols.numberFormat.clone();
         buffer = new StringBuffer();

@@ -213,19 +213,19 @@ public final class ParametersTest extends TestCase {
 
         descriptor = new DefaultParameterDescriptor("Test", 12, 4, 20, SI.METER);
         parameter  = (ParameterValue) descriptor.createValue();
-        assertEquals("name",         "Test",          descriptor.getName().getCode());
-        assertEquals("unit",         SI.METER,        descriptor.getUnit());
-        assertEquals("class",        Double.class,    descriptor.getValueClass());
-        assertEquals("defaultValue", new Double(12),  descriptor.getDefaultValue());
-        assertEquals("minimum",      new Double( 4),  descriptor.getMinimumValue());
-        assertEquals("maximum",      new Double(20),  descriptor.getMaximumValue());
-        assertEquals("value",        12,               parameter.intValue());
-        assertEquals("unit",         SI.METER,         parameter.getUnit());
+        assertEquals("name",         "Test",       descriptor.getName().getCode());
+        assertEquals("unit",         SI.METER,     descriptor.getUnit());
+        assertEquals("class",        Double.class, descriptor.getValueClass());
+        assertEquals("defaultValue", 12.0,         descriptor.getDefaultValue());
+        assertEquals("minimum",       4.0,         descriptor.getMinimumValue());
+        assertEquals("maximum",      20.0,         descriptor.getMaximumValue());
+        assertEquals("value",        12,           parameter.intValue());
+        assertEquals("unit",         SI.METER,     parameter.getUnit());
         for (int i=4; i<=20; i++) {
             parameter.setValue(i);
-            assertEquals("value", new Double(i), parameter.getValue());
-            assertEquals("unit",  SI.METER,      parameter.getUnit());
-            assertEquals("value", i,             parameter.doubleValue(SI.METER), 0);
+            assertEquals("value", Double.valueOf(i), parameter.getValue());
+            assertEquals("unit",  SI.METER,          parameter.getUnit());
+            assertEquals("value", i,                 parameter.doubleValue(SI.METER), 0);
         }
         try {
             parameter.setValue(3.0);
@@ -271,17 +271,17 @@ public final class ParametersTest extends TestCase {
         Set                 validValues;
 
         parameter  = new Parameter("Test", 14);
-        descriptor = (ParameterDescriptor)            parameter.getDescriptor();
-        assertNull  ("unit",                          parameter.getUnit());
-        assertEquals("intValue",     14,              parameter.intValue());
-        assertEquals("doubleValue",  14,              parameter.doubleValue(), 0);
-        assertEquals("type",         Integer.class,  descriptor.getValueClass());
-        assertEquals("name",         "Test",         descriptor.getName().getCode());
-        assertEquals("defaultValue", new Integer(0), descriptor.getDefaultValue());
-        assertNull  ("minimum",                      descriptor.getMinimumValue());
-        assertNull  ("maximum",                      descriptor.getMaximumValue());
-        assertNull  ("unit",                         descriptor.getUnit());
-        assertNull  ("validValues",                  descriptor.getValidValues());
+        descriptor = (ParameterDescriptor)           parameter.getDescriptor();
+        assertNull  ("unit",                         parameter.getUnit());
+        assertEquals("intValue",     14,             parameter.intValue());
+        assertEquals("doubleValue",  14,             parameter.doubleValue(), 0);
+        assertEquals("type",         Integer.class, descriptor.getValueClass());
+        assertEquals("name",         "Test",        descriptor.getName().getCode());
+        assertEquals("defaultValue", 0,             descriptor.getDefaultValue());
+        assertNull  ("minimum",                     descriptor.getMinimumValue());
+        assertNull  ("maximum",                     descriptor.getMaximumValue());
+        assertNull  ("unit",                        descriptor.getUnit());
+        assertNull  ("validValues",                 descriptor.getValidValues());
         try {
             parameter.doubleValue(SI.METER);
             fail("doubleValue(METER)");
@@ -346,7 +346,7 @@ public final class ParametersTest extends TestCase {
      */
     public void testGroup() throws IOException {
         final ParameterWriter writer = new ParameterWriter(new StringWriter());
-        final Integer ONE = new Integer(1);
+        final Integer ONE = 1;
         final ParameterDescriptor p1, p2, p3, p4;
         p1 = new DefaultParameterDescriptor(Collections.singletonMap("name", "1"), Integer.class, null, ONE, null, null, null, true);
         p2 = new DefaultParameterDescriptor(Collections.singletonMap("name", "2"), Integer.class, null, ONE, null, null, null, true);

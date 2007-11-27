@@ -101,7 +101,7 @@ final class BandSelector2D extends GridCoverage2D {
         GridCoverage2D source = (GridCoverage2D) parameters.parameter("Source").getValue();
         int[] bandIndices = parameters.parameter("SampleDimensions").intValueList();
         if (bandIndices != null) {
-            bandIndices = (int[]) bandIndices.clone();
+            bandIndices = bandIndices.clone();
         }
         Integer visibleBand = (Integer) parameters.parameter("VisibleSampleDimension").getValue();
         /*
@@ -205,7 +205,7 @@ final class BandSelector2D extends GridCoverage2D {
             }
         }
         if (visibleBand == null) {
-            visibleBand = new Integer(visibleTargetBand);
+            visibleBand = visibleTargetBand;
         }
         ParameterBlock params = new ParameterBlock().addSource(sourceImage);
         if (targetBands != sourceBands) {

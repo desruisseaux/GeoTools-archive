@@ -198,7 +198,7 @@ public class NetcdfReadParam extends GeographicImageReadParam {
             if (sliceIndices == null) {
                 sliceIndices = new HashMap<AxisType,Integer>();
             }
-            sliceIndices.put(dimension, new Integer(indice));
+            sliceIndices.put(dimension, indice);
         } else if (sliceIndices != null) {
             sliceIndices.remove(dimension);
             if (sliceIndices.isEmpty()) {

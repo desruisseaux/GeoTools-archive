@@ -67,10 +67,10 @@ public final class TypeMap {
     private static final TypeMap[] MAP = new TypeMap[SampleDimensionType.values().length];
     static {
         final Map  pool = new HashMap(32);
-        final Float  M1 = new Float (-Float  .MAX_VALUE);
-        final Float  P1 = new Float ( Float  .MAX_VALUE);
-        final Double M2 = new Double(-Double .MAX_VALUE);
-        final Double P2 = new Double( Double .MAX_VALUE);
+        final Float  M1 = -Float .MAX_VALUE;
+        final Float  P1 =  Float .MAX_VALUE;
+        final Double M2 = -Double.MAX_VALUE;
+        final Double P2 =  Double.MAX_VALUE;
         // The constructor will register automatically those objects in the above array.
         new TypeMap(SampleDimensionType. UNSIGNED_1BIT,  DataBuffer.TYPE_BYTE,   (byte) 1, false, false,        pool);
         new TypeMap(SampleDimensionType. UNSIGNED_2BITS, DataBuffer.TYPE_BYTE,   (byte) 2, false, false,        pool);
@@ -132,7 +132,7 @@ public final class TypeMap {
     private final InternationalString name = new AbstractInternationalString() {
         public String toString(final Locale locale) {
             return Vocabulary.getResources(locale).getString(VocabularyKeys.DATA_TYPE_$2,
-                    new Integer(real ? 2 : signed ? 1 : 0), new Integer(size));
+                    Integer.valueOf(real ? 2 : signed ? 1 : 0), size);
         }
     };
 
@@ -160,21 +160,21 @@ public final class TypeMap {
             final long max = (1L << (signed ? size-1 : size)) - 1;
             final long min = signed ? ~max : 0; // Tild (~), not minus sign (-).
             if (max <= Byte.MAX_VALUE) {
-                lower = new Byte((byte) min);
-                upper = new Byte((byte) max);
-                one   = new Byte((byte) 1);
+                lower = Byte.valueOf((byte) min);
+                upper = Byte.valueOf((byte) max);
+                one   = Byte.valueOf((byte) 1);
             } else if (max <= Short.MAX_VALUE) {
-                lower = new Short((short) min);
-                upper = new Short((short) max);
-                one   = new Short((short) 1);
+                lower = Short.valueOf((short) min);
+                upper = Short.valueOf((short) max);
+                one   = Short.valueOf((short) 1);
             } else if (max <= Integer.MAX_VALUE) {
-                lower = new Integer((int) min);
-                upper = new Integer((int) max);
-                one   = new Integer((int) 1);
+                lower = Integer.valueOf((int) min);
+                upper = Integer.valueOf((int) max);
+                one   = Integer.valueOf(1);
             } else {
-                lower = new Long(min);
-                upper = new Long(max);
-                one   = new Long(1L);
+                lower = Long.valueOf(min);
+                upper = Long.valueOf(max);
+                one   = Long.valueOf(1L);
             }
             lower = unique(pool, lower);
             upper = unique(pool, upper);
@@ -290,8 +290,7 @@ public final class TypeMap {
             throws IllegalArgumentException
     {
         if (band<0 || band>=model.getNumBands()) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
-                                               new Integer(band)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, band));
         }
         boolean signed = true;
         switch (model.getDataType()) {
@@ -429,6 +428,7 @@ public final class TypeMap {
      * @throws IllegalArgumentException if {@code allowWidening} is {@code false}
      *         and the specified {@code value} can't fit in the specified sample type.
      */
+    @SuppressWarnings("fallthrough")
     public static Number wrapSample(final double             value,
                                     final SampleDimensionType type,
                                     final boolean    allowWidening)
@@ -464,7 +464,7 @@ public final class TypeMap {
             case -16: {
                 final short candidate = (short) value;
                 if (candidate == value) {
-                    return new Short(candidate);
+                    return Short.valueOf(candidate);
                 }
                 if (!allowWidening) break;
                 // Fall through
@@ -473,7 +473,7 @@ public final class TypeMap {
             case -32: {
                 final int candidate = (int) value;
                 if (candidate == value) {
-                    return new Integer(candidate);
+                    return Integer.valueOf(candidate);
                 }
                 if (!allowWidening) break;
                 // Fall through
@@ -481,27 +481,25 @@ public final class TypeMap {
             case 32: {
                 final long candidate = (long) value;
                 if (candidate == value) {
-                    return new Long(candidate);
+                    return Long.valueOf(candidate);
                 }
                 if (!allowWidening) break;
                 // Fall through
             }
             case (32 << 16): {
                 if (!allowWidening || Math.abs(value) <= Float.MAX_VALUE) {
-                    return new Float((float) value);
+                    return Float.valueOf((float) value);
                 }
                 // Fall through
             }
             case (64 << 16): {
-                return new Double(value);
+                return Double.valueOf(value);
             }
             default: {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                   "type", type));
+                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
             }
         }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                           "value", new Double(value)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "value", value));
     }
 
     /**
@@ -516,8 +514,7 @@ public final class TypeMap {
             throws IllegalArgumentException
     {
         if (band<0 || band>=ColorUtilities.getNumBands(model)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1,
-                                               new Integer(band)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_BAND_NUMBER_$1, band));
         }
         if (model instanceof IndexColorModel) {
             return ColorInterpretation.PALETTE_INDEX;

@@ -333,8 +333,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         final int dim = envelope.getDimension();
         if (dimension != dim) {
             throw new MismatchedDimensionException(Errors.format(
-                        ErrorKeys.MISMATCHED_DIMENSION_$3, name,
-                        new Integer(dim), new Integer(dimension)));
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, name, dim, dimension));
         }
     }
     
@@ -473,7 +472,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         int check;
         if ((check=getNumRow())!=3 || (check=getNumCol())!=3) {
             throw new IllegalStateException(Errors.format(
-                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(check-1)));
+                        ErrorKeys.NOT_TWO_DIMENSIONAL_$1, check-1));
         }
         if (isAffine()) {
             return new AffineTransform(getElement(0,0), getElement(1,0),

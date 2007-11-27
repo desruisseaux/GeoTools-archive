@@ -108,8 +108,8 @@ final class FactoryPrinter implements Comparator<Class<?>> {
         table.write(resources.getString(VocabularyKeys.IMPLEMENTATIONS));
         table.nextLine();
         table.nextLine('\u2550');
-        final StringBuffer vendors         = new StringBuffer();
-        final StringBuffer implementations = new StringBuffer();
+        final StringBuilder vendors         = new StringBuilder();
+        final StringBuilder implementations = new StringBuilder();
         for (final Iterator<Class<?>> it=categories.iterator(); it.hasNext();) {
             /*
              * Writes the category name (CRSFactory, DatumFactory, etc.)

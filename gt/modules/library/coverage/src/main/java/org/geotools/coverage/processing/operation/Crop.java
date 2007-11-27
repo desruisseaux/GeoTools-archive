@@ -132,9 +132,9 @@ public class Crop extends Operation2D {
 	public static final ParameterDescriptor ROI_OPTIMISATION_TOLERANCE = new DefaultParameterDescriptor(
 			Citations.GEOTOOLS, "ROITolerance", Double.class, // Value class
 			null, // Array of valid values
-			new Double(0.6), // Default value
-			new Double(0), // Minimal value
-			new Double(1.0), // Maximal value
+			0.6,  // Default value
+			0.0,  // Minimal value
+			1.0,  // Maximal value
 			null, // Unit of measure
 			true); // Parameter is optional
 

@@ -242,9 +242,9 @@ public abstract class AbstractStatisticsOperationJAI extends
 					worldToGridTransform, shrinkedEnvelope).toRectangle2D();
 
 			// block settings
-			block.setParameter("xPeriod", new Integer((int) transformedEnv
+			block.setParameter("xPeriod", Integer.valueOf((int) transformedEnv
 					.getWidth()));
-			block.setParameter("yPeriod", new Integer((int) transformedEnv
+			block.setParameter("yPeriod", Integer.valueOf((int) transformedEnv
 					.getHeight()));
 
 			// /////////////////////////////////////////////////////////////////////

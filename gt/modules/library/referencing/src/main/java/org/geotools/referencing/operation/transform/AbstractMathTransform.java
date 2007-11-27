@@ -144,8 +144,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                                            final int   dimension,
                                            final int    expected)
     {
-        return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                             argument, new Integer(dimension), new Integer(expected));
+        return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3, argument, dimension, expected);
     }
     
     /**

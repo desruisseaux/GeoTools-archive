@@ -432,16 +432,13 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             description = Vocabulary.formatInternational(VocabularyKeys.UNTITLED);
         }
         if (Double.isInfinite(minimum) || Double.isInfinite(maximum) || !(minimum < maximum)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                    new Double(minimum), new Double(maximum)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, minimum, maximum));
         }
         if (Double.isNaN(scale) || Double.isInfinite(scale) || scale == 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
-                    "scale", new Double(scale)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2, "scale", scale));
         }
         if (Double.isNaN(offset) || Double.isInfinite(offset)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2,
-                    "offset", new Double(offset)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_PARAMETER_$2, "offset", offset));
         }
         if (type == null) {
             type = TypeMap.getSampleDimensionType(minimum, maximum);

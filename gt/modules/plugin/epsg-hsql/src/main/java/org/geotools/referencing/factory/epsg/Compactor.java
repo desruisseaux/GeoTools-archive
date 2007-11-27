@@ -112,7 +112,7 @@ final class Compactor {
      * Removes the useless "E0" exponents after floating point numbers.
      */
     private static String removeUselessExponents(String line) {
-        StringBuffer  cleaned = null;
+        StringBuilder cleaned = null;
         final Matcher matcher = uselessExponentPattern.matcher(line);
         while (true) {
             int lastIndex = 0;
@@ -127,7 +127,7 @@ final class Compactor {
                 if (!quoted) {
                     // Found a number outside quotes. Replace.
                     if (cleaned == null) {
-                        cleaned = new StringBuffer();
+                        cleaned = new StringBuilder();
                     }
                     cleaned.append(line.substring(lastIndex, matcher.end(1)));
                     lastIndex = matcher.end();
@@ -153,7 +153,7 @@ final class Compactor {
         if (line.charAt(index) != '\'') {
             return line;
         }
-        final StringBuffer cleaned = new StringBuffer(line.substring(0, index));
+        final StringBuilder cleaned = new StringBuilder(line.substring(0, index));
         if (line.charAt(++index) == '\'') {
             cleaned.append("NULL");
         } else do {

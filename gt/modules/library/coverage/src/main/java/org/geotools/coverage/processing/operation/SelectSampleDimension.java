@@ -122,7 +122,7 @@ public class SelectSampleDimension extends Operation2D {
                 Integer.class,                      // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
-                new Integer(0),                     // Minimal value
+                0,                                  // Minimal value
                 null,                               // Maximal value
                 null,                               // Unit of measure
                 false);                             // Parameter is optional

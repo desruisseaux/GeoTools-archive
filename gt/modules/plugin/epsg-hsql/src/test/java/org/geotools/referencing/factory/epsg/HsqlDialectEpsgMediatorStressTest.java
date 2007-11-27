@@ -48,10 +48,11 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
     static String[] codes;
     Hints hints;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         hints = new Hints(Hints.CACHE_POLICY, "none");
-        hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
+        hints.put(Hints.AUTHORITY_MAX_ACTIVE, Integer.valueOf(MAX_WORKERS));
         datasource = HsqlEpsgDatabase.createDataSource();
         mediator = new HsqlDialectEpsgMediator(80, hints, datasource);
         codes = getCodes();
@@ -92,34 +93,24 @@ public class HsqlDialectEpsgMediatorStressTest extends TestCase {
             System.out.println("Cumulative Time: " + totalTime + " ms");
             System.out.println("Cumulative Iterations: " + totalRuns);
             System.out.println("Overall Time: " + timeElapsed);
-            System.out.println("Throughput: " + (1000 * totalRuns / new Long(totalTime).doubleValue()) + " Hz");
+            System.out.println("Throughput: " + (1000 * totalRuns / (double) totalTime) + " Hz");
             System.out.println("Min: " + minTime);
             System.out.println("Max: " + maxTime);
             System.out.println("BUFFER_POLICY: " + hints.get(Hints.CACHE_POLICY).toString());
             System.out.println("# CRS codes: " + codes.length);
             //append results to file
-            StringBuffer sb = new StringBuffer();
-            sb.append(RUNNER_COUNT);
-            sb.append(", ");
-            sb.append(MAX_WORKERS);
-            sb.append(", ");
-            sb.append(ITERATIONS);
-            sb.append(", ");
-            sb.append(hints.get(Hints.CACHE_POLICY).toString());
-            sb.append(", ");
-            sb.append(totalTime / totalRuns);
-            sb.append(", ");
-            sb.append(totalTime);
-            sb.append(", ");
-            sb.append(totalRuns);
-            sb.append(", ");
-            sb.append((1000 * totalRuns / new Long(totalTime).doubleValue()));
-            sb.append(", ");
-            sb.append(minTime);
-            sb.append(", ");
-            sb.append(maxTime);
-            sb.append(", ");
-            sb.append(exceptions);
+            StringBuilder sb = new StringBuilder();
+            sb.append(RUNNER_COUNT).append(", ")
+              .append(MAX_WORKERS) .append(", ")
+              .append(ITERATIONS)  .append(", ")
+              .append(hints.get(Hints.CACHE_POLICY)).append(", ")
+              .append(totalTime / totalRuns).append(", ")
+              .append(totalTime).append(", ")
+              .append(totalRuns).append(", ")
+              .append((1000 * totalRuns / (double) totalTime)).append(", ")
+              .append(minTime).append(", ")
+              .append(maxTime).append(", ")
+              .append(exceptions);
             File file = new File("mediator-stress.csv");
             String header = null;
             String content = sb.toString();

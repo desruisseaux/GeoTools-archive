@@ -765,7 +765,7 @@ public class CoverageStack extends AbstractCoverage {
         double z = point.getOrdinate(zDimension);
         int index;
         try {
-            index = Arrays.binarySearch(elements, new Double(z), COMPARATOR);
+            index = Arrays.binarySearch(elements, Double.valueOf(z), COMPARATOR);
         } catch (UndeclaredThrowableException exception) {
             throw rethrow(exception);
         }
@@ -927,7 +927,7 @@ public class CoverageStack extends AbstractCoverage {
          * Currently loaded coverages are not valid for the requested z value.
          * Search for the coverage to use as upper bounds ({@link #upper}).
          */
-        final Number Z = new Double(z);
+        final Number Z = Double.valueOf(z);
         int index;
         try {
             index = Arrays.binarySearch(elements, Z, COMPARATOR);

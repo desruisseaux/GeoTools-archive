@@ -30,10 +30,11 @@ public class HsqlDialectEpsgMediatorConnectionLeakTest extends TestCase {
     String[] codes;
     Hints hints;
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         hints = new Hints(Hints.CACHE_POLICY, "none");
-        hints.put(Hints.AUTHORITY_MAX_ACTIVE, new Integer(MAX_WORKERS));
+        hints.put(Hints.AUTHORITY_MAX_ACTIVE, Integer.valueOf(MAX_WORKERS));
 
         final DataSource database = HsqlEpsgDatabase.createDataSource();
         datasource = new BasicDataSource(){

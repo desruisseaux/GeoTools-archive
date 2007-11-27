@@ -193,8 +193,8 @@ public final class CRSUtilities {
     {
         int dimension = crs.getCoordinateSystem().getDimension();
         if (lower<0 || lower>upper || upper>dimension) {
-            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.INDEX_OUT_OF_BOUNDS_$1,
-                                                new Integer(lower<0 ? lower : upper)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.INDEX_OUT_OF_BOUNDS_$1, lower<0 ? lower : upper));
         }
         while (lower!=0 || upper!=dimension) {
             final List<CoordinateReferenceSystem> c = getComponents(crs);

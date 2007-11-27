@@ -83,8 +83,7 @@ public class GeneralGridRange implements GridRange, Serializable {
             final int upper = index[dimension+i];
             if (!(lower <= upper)) {
                 throw new IllegalArgumentException(Errors.format(
-                        ErrorKeys.BAD_GRID_RANGE_$3, new Integer(i),
-                        new Integer(lower), new Integer(upper)));
+                        ErrorKeys.BAD_GRID_RANGE_$3, i, lower, upper));
             }
         }
     }
@@ -124,7 +123,7 @@ public class GeneralGridRange implements GridRange, Serializable {
     public GeneralGridRange(final int[] lower, final int[] upper) {
         if (lower.length != upper.length) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                        new Integer(lower.length), new Integer(upper.length)));
+                        lower.length, upper.length));
         }
         index = new int[lower.length + upper.length];
         System.arraycopy(lower, 0, index, 0,            lower.length);
@@ -316,12 +315,12 @@ public class GeneralGridRange implements GridRange, Serializable {
         final int curDim = index.length/2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
-            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                "lower", new Integer(lower)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", lower));
         }
         if (newDim<0 || upper>curDim) {
-            throw new IndexOutOfBoundsException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                "upper", new Integer(upper)));
+            throw new IndexOutOfBoundsException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", upper));
         }
         final GeneralGridRange gridRange = new GeneralGridRange(newDim);
         System.arraycopy(index, lower,        gridRange.index, 0,      newDim);
@@ -339,8 +338,8 @@ public class GeneralGridRange implements GridRange, Serializable {
         if (index.length == 4) {
             return new Rectangle(index[0], index[1], index[2]-index[0], index[3]-index[1]);
         } else {
-            throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
-                                            new Integer(getDimension())));
+            throw new IllegalStateException(Errors.format(
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, getDimension()));
         }
     }
 
@@ -348,6 +347,7 @@ public class GeneralGridRange implements GridRange, Serializable {
      * Returns a hash value for this grid range. This value need not remain
      * consistent between different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         if (index != null) {
@@ -361,6 +361,7 @@ public class GeneralGridRange implements GridRange, Serializable {
     /**
      * Compares the specified object with this grid range for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof GeneralGridRange) {
             final GeneralGridRange that = (GeneralGridRange) object;
@@ -373,9 +374,10 @@ public class GeneralGridRange implements GridRange, Serializable {
      * Returns a string représentation of this grid range. The returned string is
      * implementation dependent. It is usually provided for debugging purposes.
      */
+    @Override
     public String toString() {
         final int dimension = index.length/2;
-        final StringBuffer buffer=new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer=new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         for (int i=0; i<dimension; i++) {
             if (i!=0) {

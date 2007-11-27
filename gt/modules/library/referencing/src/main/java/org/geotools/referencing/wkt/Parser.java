@@ -699,7 +699,7 @@ public class Parser extends MathTransformParser {
         element.close();
         final VerticalDatumType type = DefaultVerticalDatum.getVerticalDatumTypeFromLegacyCode(datum);
         if (type == null) {
-            throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, new Integer(datum)));
+            throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, datum));
         }
         try {
             return datumFactory.createVerticalDatum(properties, type);
@@ -985,7 +985,7 @@ public class Parser extends MathTransformParser {
          * order to avoid providing wrong informations.
          */
         final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[toBase.getSourceDimensions()];
-        final StringBuffer buffer = new StringBuffer(name);
+        final StringBuilder buffer = new StringBuilder(name);
         buffer.append(" axis ");
         final int start = buffer.length();
         try {

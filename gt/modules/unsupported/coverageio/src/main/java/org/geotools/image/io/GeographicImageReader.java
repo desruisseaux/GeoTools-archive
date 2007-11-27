@@ -184,8 +184,7 @@ public abstract class GeographicImageReader extends ImageReader {
      * @param upper The upper legal value, exclusive.
      */
     private String indexOutOfBounds(final int index, final int lower, final int upper) {
-        return getErrorResources().getString(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
-                new Integer(index), new Integer(lower), new Integer(upper-1));
+        return getErrorResources().getString(ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, index, lower, upper-1);
     }
 
     /**

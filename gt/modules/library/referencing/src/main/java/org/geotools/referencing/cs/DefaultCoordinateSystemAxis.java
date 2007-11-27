@@ -691,8 +691,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
         ensureNonNull("unit",         unit);
         ensureNonNull("rangeMeaning", rangeMeaning);
         if (!(minimum < maximum)) { // Use '!' for catching NaN
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                        new Double(minimum), new Double(maximum)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2, minimum, maximum));
         }
     }
 

@@ -936,7 +936,7 @@ public class OperationJAI extends Operation2D {
 
         /** Returns a string localized in the given locale. */
         public String toString(final Locale locale) {
-            final StringBuffer buffer = new StringBuffer(operation);
+            final StringBuilder buffer = new StringBuilder(operation);
             buffer.append('(');
             for (int i=0; i<sources.length; i++) {
                 if (i != 0) {
@@ -944,8 +944,7 @@ public class OperationJAI extends Operation2D {
                 }
                 buffer.append(sources[i].toString(locale));
             }
-            buffer.append(')');
-            return buffer.toString();
+            return buffer.append(')').toString();
         }
     }
 

@@ -555,7 +555,7 @@ public abstract class MapProjection extends AbstractMathTransform
                  * them handle the exception the way they are used to.
                  */
                 throw new ProjectionException(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$4,
-                          new Double   (distance),
+                          distance,
                           new Longitude(longitude - Math.toDegrees(centralMeridian )),
                           new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin)),
                           getParameterDescriptors().getName().getCode()));
@@ -636,8 +636,7 @@ public abstract class MapProjection extends AbstractMathTransform
                 actual   = Math.toDegrees(actual);
                 expected = Math.toDegrees(expected);
             }
-            throw new AssertionError(Errors.format(ErrorKeys.TEST_FAILURE_$3, variable,
-                      new Double(expected), new Double(actual)));
+            throw new AssertionError(Errors.format(ErrorKeys.TEST_FAILURE_$3, variable, expected, actual));
         }
     }
 

@@ -156,7 +156,7 @@ public final class ImagingParametersTest extends TestCase {
                     Double.class,    // Value class (mandatory)
                     null,            // Array of valid values
                     null,            // Default value
-                    new Double(0),   // Minimal value
+                    0.0,             // Minimal value
                     null,            // Maximal value
                     null,            // Unit of measure
                     false);          // Parameter is optional
@@ -179,7 +179,7 @@ public final class ImagingParametersTest extends TestCase {
         assertSame(SPATIAL_SUBSAMPLING_X, p.getDescriptor());
 
         // Note that we are supposed to use spatial coordinates for this value we are seeting here.
-        p.setValue(new Double(2.3));
+        p.setValue(Double.valueOf(2.3));
         assertTrue(p.toString().startsWith("xPeriod = 2.3"));
 
         // Tests direct access to the parameter list.

@@ -166,8 +166,9 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      * @param  statement The statement in MS-Access syntax.
      * @return The SQL statement in ANSI syntax.
      */
+    @Override
     protected String adaptSQL(final String statement) {
-        final StringBuffer modified = new StringBuffer(statement);
+        final StringBuilder modified = new StringBuilder(statement);
         for (final Iterator it=map.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             final String  oldName = (String) entry.getKey();

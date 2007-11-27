@@ -202,7 +202,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * Returns a log record for the specified exception.
      */
     public static LogRecord getLogRecord(final Throwable error) {
-        final StringBuffer buffer = new StringBuffer(getShortClassName(error));
+        final StringBuilder buffer = new StringBuilder(getShortClassName(error));
         final String message = error.getLocalizedMessage();
         if (message != null) {
             buffer.append(": ");

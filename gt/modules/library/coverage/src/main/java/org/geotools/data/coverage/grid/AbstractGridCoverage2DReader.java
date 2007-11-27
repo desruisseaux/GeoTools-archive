@@ -200,7 +200,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// Default image index 0
 		//
 		// //
-		Integer imageChoice = new Integer(0);
+		Integer imageChoice = 0;
 
 		// we are able to handle overviews properly only if the transformation is
         // an affine transform with pure scale and translation, no rotational components
@@ -288,11 +288,11 @@ public abstract class AbstractGridCoverage2DReader implements
 			// checking that we did not exceeded the maximum number of pages.
 			if (i == numOverviews) {
 				// int subsamplingFactor=
-				imageChoice = new Integer(numOverviews);
+				imageChoice = numOverviews;
 			} else
 				// keeping the first image at highest resolution into account in
 				// order to get the overview wit
-				imageChoice = new Integer(i + 1);
+				imageChoice = i + 1;
 		}
 		// /////////////////////////////////////////////////////////////////////
 		// DECIMATION ON READING

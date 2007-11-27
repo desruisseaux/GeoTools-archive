@@ -50,7 +50,7 @@ public class SubsampleAverage extends Operation2D {
 			Citations.OGC, "scaleX", Double.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Double(0.5), // Default value
+			0.5,  // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
@@ -63,7 +63,7 @@ public class SubsampleAverage extends Operation2D {
 			Citations.OGC, "scaleY", Double.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Double(0.5), // Default value
+			0.5,  // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure

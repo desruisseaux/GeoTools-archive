@@ -170,7 +170,7 @@ public class MetadataAccessor {
             switch (count) {
                 default: {
                     warning("<init>", ErrorKeys.TOO_MANY_OCCURENCES_$2,
-                            new Object[] {parentPath, new Integer(count)});
+                            new Object[] {parentPath, count});
                     // Fall through for picking the first node.
                 }
                 case 1: {
@@ -694,7 +694,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     private static String formatSequence(final Object values) {
         String text = null;
         if (values != null) {
-            final StringBuffer buffer = new StringBuffer();
+            final StringBuilder buffer = new StringBuilder();
             final int length = Array.getLength(values);
             for (int i=0; i<length; i++) {
                 if (i != 0) {

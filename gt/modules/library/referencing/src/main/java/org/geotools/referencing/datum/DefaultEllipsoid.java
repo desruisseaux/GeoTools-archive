@@ -297,8 +297,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
         if (value > 0) {
             return value;
         }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                           name, new Double(value)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value));
     }
 
     /**

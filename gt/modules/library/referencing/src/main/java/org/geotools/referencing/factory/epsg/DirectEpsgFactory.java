@@ -195,8 +195,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
             case 8609: parameters.ey  = value; break;
             case 8610: parameters.ez  = value; break;
             case 8611: parameters.ppm = value; break;
-            default:   throw new FactoryException(Errors.format(ErrorKeys.UNEXPECTED_PARAMETER_$1,
-                                                  new Integer(code)));
+            default:   throw new FactoryException(Errors.format(
+                    ErrorKeys.UNEXPECTED_PARAMETER_$1, code));
         }
     }
     /// Datum shift operation methods
@@ -345,7 +345,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * because the keys will always be the exact same object, namely the hard-coded argument given
      * to calls to {@link #prepareStatement} in this class.
      */
-    private final Map/*<String,PreparedStatement>*/ statements = new IdentityHashMap();
+    private final Map<String,PreparedStatement> statements =
+            new IdentityHashMap<String,PreparedStatement>();
 
     /**
      * The set of authority codes for different types. This map is used by the
@@ -363,7 +364,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * in this map, and returns {@code false} if some are found (thus blocking the call to
      * {@link #dispose} by the {@link ThreadedEpsgFactory} timer).
      */
-    private final Map/*<Class,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
+    private final Map<Class,Reference<AuthorityCodes>> authorityCodes =
+            new HashMap<Class,Reference<AuthorityCodes>>();
 
     /**
      * Cache for axis names. This service is not provided by {@link BufferedAuthorityFactory}
@@ -371,7 +373,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @see #getAxisName
      */
-    private final Map/*<String,AxisName>*/ axisNames = new HashMap();
+    private final Map<String,AxisName> axisNames = new HashMap<String,AxisName>();
     
     /**
      * Cache for axis numbers. This service is not provided by {@link BufferedAuthorityFactory}
@@ -379,7 +381,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @see #getDimensionForCRS
      */
-    private final Map/*<String,Short>*/ axisCounts = new HashMap();
+    private final Map<String,Short> axisCounts = new HashMap<String,Short>();
     
     /**
      * Cache for projection checks. This service is not provided by {@link BufferedAuthorityFactory}
@@ -387,7 +389,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      *
      * @see #isProjection
      */
-    private final Map/*<String,Boolean>*/ codeProjection = new HashMap();
+    private final Map<String,Boolean> codeProjection = new HashMap<String,Boolean>();
     
 
     /**
@@ -982,7 +984,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         ensureNonNull("code", code);
         final String       KEY = "IdentifiedObject";
         PreparedStatement stmt = (PreparedStatement) statements.get(KEY); // Null allowed.
-        StringBuffer     query = null; // Will be created only if the last statement doesn't suit.
+        StringBuilder    query = null; // Will be created only if the last statement doesn't suit.
         /*
          * Iterates through all tables listed in TABLES_INFO, starting with the table used during
          * the last call to 'createObject(code)'.  This approach assumes that two consecutive calls
@@ -1010,7 +1012,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                         continue;
                     }
                     if (query == null) {
-                        query = new StringBuffer("SELECT ");
+                        query = new StringBuilder("SELECT ");
                     }
                     query.setLength(7); // 7 is the length of "SELECT " in the line above.
                     query.append(table.codeColumn);
@@ -1701,8 +1703,8 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
         }
         result.close();
         if (i != axis.length) {
-            throw new FactoryException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                       new Integer(axis.length), new Integer(i)));
+            throw new FactoryException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, axis.length, i));
         }
         return axis;
     }
@@ -2298,7 +2300,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      */
     private short getDimensionForCRS(final String code) throws SQLException {
         final PreparedStatement stmt;
-        final Short cached = (Short) axisCounts.get(code);
+        final Short cached = axisCounts.get(code);
         final short dimension;
         if (cached == null) {
         	stmt = prepareStatement("Dimension", 
@@ -2310,7 +2312,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
 	        stmt.setString(1, code);
 	        final ResultSet result = stmt.executeQuery();
 	        dimension = result.next() ? result.getShort(1) : 2;
-	        axisCounts.put(code, new Short(dimension));
+	        axisCounts.put(code, dimension);
 	        result.close();
         } else {
         	dimension = cached.shortValue();

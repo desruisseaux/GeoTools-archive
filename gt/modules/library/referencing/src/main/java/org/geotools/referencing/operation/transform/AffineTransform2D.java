@@ -116,8 +116,7 @@ final class AffineTransform2D extends XAffineTransform
             final int dimension = ptDst.getDimension();
             if (dimension != 2) {
                 throw new MismatchedDimensionException(Errors.format(
-                          ErrorKeys.MISMATCHED_DIMENSION_$3,
-                          "ptDst", new Integer(dimension), new Integer(2)));
+                          ErrorKeys.MISMATCHED_DIMENSION_$3, "ptDst", dimension, 2));
             }
         }
         final double[] array = ptSrc.getCoordinates();

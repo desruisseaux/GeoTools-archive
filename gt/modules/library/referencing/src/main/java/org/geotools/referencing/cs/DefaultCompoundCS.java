@@ -114,7 +114,7 @@ public class DefaultCompoundCS extends AbstractCS {
      * @param locale The locale for the name.
      */
     private static String getName(final CoordinateSystem[] cs) {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         for (int i=0; i<cs.length; i++) {
             if (buffer.length() != 0) {
                 buffer.append(" / ");

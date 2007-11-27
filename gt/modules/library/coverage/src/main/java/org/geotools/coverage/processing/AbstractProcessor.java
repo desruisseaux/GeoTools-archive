@@ -172,7 +172,7 @@ public abstract class AbstractProcessor {
             final LogRecord record = Logging.getResources(locale).getLogRecord(
                                      OPERATION, LoggingKeys.APPLIED_OPERATION_$4,
                                      getName((source!=null) ? source : result, locale),
-                                     operationName, interp, new Integer(fromCache ? 1:0));
+                                     operationName, interp, Integer.valueOf(fromCache ? 1 : 0));
             // Note: DefaultProcessor is the class that will use this method.
             record.setSourceClassName("org.geotools.coverage.processing.DefaultProcessor");
             record.setSourceMethodName("doOperation");

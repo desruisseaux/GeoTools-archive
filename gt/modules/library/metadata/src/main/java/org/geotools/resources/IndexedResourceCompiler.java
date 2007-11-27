@@ -282,7 +282,7 @@ public final class IndexedResourceCompiler implements Comparator<Object> {
     private static String toMessageFormatString(final String text) {
         int level =  0;
         int last  = -1;
-        final StringBuffer buffer = new StringBuffer(text);
+        final StringBuilder buffer = new StringBuilder(text);
 search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
             switch (buffer.charAt(i)) {
                 /*

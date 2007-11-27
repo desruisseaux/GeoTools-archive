@@ -405,7 +405,7 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
         final int numImages = getNumImages(false);
         if (imageIndex<reader.getMinIndex() || (imageIndex>=numImages && numImages>=0)) {
             throw new IndexOutOfBoundsException(Errors.getResources(locale).getString(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "imageIndex", new Integer(imageIndex)));
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "imageIndex", imageIndex));
         }
         return numImages;
     }

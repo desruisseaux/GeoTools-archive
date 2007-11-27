@@ -127,7 +127,7 @@ public final class InternationalStringTest extends TestCase {
         assertEquals("Equals:", toTest, toTest);
         if (toTest instanceof CharSequence) {
             assertEquals("CharSequence:", toTest.toString(),
-                    new StringBuffer((CharSequence) toTest).toString());
+                    new StringBuilder((CharSequence) toTest).toString());
         }
         /*
          * Tests serialization

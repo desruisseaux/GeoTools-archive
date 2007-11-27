@@ -73,7 +73,8 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
     /**
      * The map of pre-defined CRS.
      */
-    private final Map/*<Integer,CoordinateReferenceSystem>*/ crsMap = new TreeMap();
+    private final Map<Integer,CoordinateReferenceSystem> crsMap =
+            new TreeMap<Integer,CoordinateReferenceSystem>();
 
     /**
      * Constructs a default factory for the {@code CRS} authority.
@@ -133,7 +134,7 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
         });
         final CoordinateReferenceSystem crs = factories.getCRSFactory().createGeographicCRS(
                                     properties, datum, DefaultEllipsoidalCS.GEODETIC_2D);
-        if (crsMap.put(new Integer(code), crs) != null) {
+        if (crsMap.put(code, crs) != null) {
             throw new IllegalArgumentException(text);
         }
     }
@@ -205,7 +206,7 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
             throw e;
         }
         ensureInitialized();
-        final CoordinateReferenceSystem crs = (CoordinateReferenceSystem) crsMap.get(new Integer(i));
+        final CoordinateReferenceSystem crs = crsMap.get(i);
         if (crs != null) {
             return crs;
         }

@@ -263,8 +263,8 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
         if ((dim1=dimSource) != (dim2=base.getCoordinateSystem().getDimension()) ||
             (dim1=dimTarget) != (dim2=derivedCS.getDimension()))
         {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                                   new Integer(dim1), new Integer(dim2)));
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, dim1, dim2));
         }
     }
 

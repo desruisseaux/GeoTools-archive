@@ -56,7 +56,7 @@ public class FilteredSubsample extends Operation2D {
 			Citations.GEOTOOLS, "scaleX", Integer.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Integer(2), // Default value
+			2,    // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
@@ -69,7 +69,7 @@ public class FilteredSubsample extends Operation2D {
 			Citations.GEOTOOLS, "scaleY", Integer.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			new Integer(2), // Default value
+			2,    // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure

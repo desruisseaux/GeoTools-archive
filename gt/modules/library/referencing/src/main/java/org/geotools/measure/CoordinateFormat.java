@@ -431,10 +431,10 @@ public class CoordinateFormat extends Format {
             final Object object;
             final byte type = types[fi];
             switch (type) {
-                default:        object=new Double   (value); break;
-                case LONGITUDE: object=new Longitude(value); break;
-                case LATITUDE:  object=new Latitude (value); break;
-                case ANGLE:     object=new Angle    (value); break;
+                default:        object=Double.valueOf(value); break;
+                case LONGITUDE: object=new Longitude (value); break;
+                case LATITUDE:  object=new Latitude  (value); break;
+                case ANGLE:     object=new Angle     (value); break;
                 case DATE: {
                     final CoordinateSystemAxis axis = cs.getAxis(i);
                     long offset = Math.round(toMillis[fi].convert(value));

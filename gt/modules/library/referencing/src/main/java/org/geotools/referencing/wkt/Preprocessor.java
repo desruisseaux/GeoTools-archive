@@ -267,7 +267,7 @@ public class Preprocessor extends Format {
     private String substitute(final String text) {
         Replacement last;
         replacements = last = new Replacement(0, 0, offset);
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         for (final Iterator it=definitions.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry)  it.next();
             final String     name = (String)     entry.getKey();
@@ -305,7 +305,7 @@ public class Preprocessor extends Format {
                          * chained list of 'Replacement' objects.
                          */
                         if (buffer == null) {
-                            buffer = new StringBuffer(text);
+                            buffer = new StringBuilder(text);
                             assert buffer.indexOf(name, index) == index;
                         }
                         final String value = def.asString;
@@ -474,8 +474,9 @@ public class Preprocessor extends Format {
         /**
          * Returns a string representation for debugging purpose.
          */
+        @Override
         public String toString() {
-            final StringBuffer buffer = new StringBuffer();
+            final StringBuilder buffer = new StringBuilder();
             for (Replacement r=this; r!=null; r=r.next) {
                 if (r != this) {
                     buffer.append(", ");

@@ -174,7 +174,7 @@ public class GridToEnvelopeMapper {
         final int userDim = userRange.getDimension();
         if (userDim != gridDim) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                        new Integer(gridDim), new Integer(userDim)));
+                        gridDim, userDim));
         }
         this.gridRange = gridRange;
         this.envelope  = userRange;
@@ -212,7 +212,7 @@ public class GridToEnvelopeMapper {
             }
             if (dim1 != dim2) {
                 throw new MismatchedDimensionException(Errors.format(
-                        ErrorKeys.MISMATCHED_DIMENSION_$3, label, new Integer(dim1), new Integer(dim2)));
+                        ErrorKeys.MISMATCHED_DIMENSION_$3, label, dim1, dim2));
             }
         }
     }

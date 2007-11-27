@@ -51,7 +51,7 @@ public class HysteresisDescriptor extends OperationDescriptorImpl {
               new String[]   {RenderedRegistryMode.MODE_NAME}, 1,
               new String[]   {"low", "high", "padValue"}, // Argument names
               new Class []   {Double.class, Double.class, Double.class},    // Argument classes
-              new Object[]   {NO_PARAMETER_DEFAULT, NO_PARAMETER_DEFAULT, new Double(0)},
+              new Object[]   {NO_PARAMETER_DEFAULT, NO_PARAMETER_DEFAULT, 0.0},
               null // No restriction on valid parameter values.
        );
     }

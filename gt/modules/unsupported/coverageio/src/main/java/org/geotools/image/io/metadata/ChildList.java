@@ -61,7 +61,7 @@ abstract class ChildList<T extends MetadataAccessor> extends MetadataAccessor {
      */
     public T getChild(final int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= childCount()) {
-            throw new IndexOutOfBoundsException(Errors.format(outOfBounds(), new Integer(index)));
+            throw new IndexOutOfBoundsException(Errors.format(outOfBounds(), index));
         }
         while (childs.size() <= index) {
             childs.add(null);

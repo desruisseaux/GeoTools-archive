@@ -157,8 +157,8 @@ public class GridCoverageFactory extends AbstractFactory {
         switch (dimension) {
             case  2: return DefaultGeographicCRS.WGS84;
             case  3: return DefaultGeographicCRS.WGS84_3D;
-            default: throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                                                        "dimension", new Integer(dimension)));
+            default: throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "dimension", dimension));
         }
     }
 

@@ -192,7 +192,7 @@ public abstract class AbstractParser extends Format {
             if (number != null) {
                 int i = position.getIndex();
                 if (i<text.length() && text.charAt(i)=='e') {
-                    final StringBuffer buffer = new StringBuffer(text);
+                    final StringBuilder buffer = new StringBuilder(text);
                     buffer.setCharAt(i, 'E');
                     text = buffer.toString();
                     position.setIndex(base);

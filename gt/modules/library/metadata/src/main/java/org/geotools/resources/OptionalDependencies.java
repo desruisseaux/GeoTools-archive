@@ -139,7 +139,7 @@ public final class OptionalDependencies {
      * @return       Le tableau {@code last}, qui peut éventuellement avoir été agrandit.
      */
     private static boolean[] toString(final TreeModel model, final Object node,
-                                      final StringBuffer buffer, final int level, boolean[] last,
+                                      final StringBuilder buffer, final int level, boolean[] last,
                                       final String lineSeparator)
     {
         for (int i=0; i<level; i++) {
@@ -176,7 +176,7 @@ public final class OptionalDependencies {
         if (root == null) {
             return null;
         }
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         toString(tree, root, buffer, 0, new boolean[64],
                  System.getProperty("line.separator", "\n"));
         return buffer.toString();

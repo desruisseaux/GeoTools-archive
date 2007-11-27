@@ -81,7 +81,7 @@ public class GeographicImageReadParam extends ImageReadParam {
     private void ensureValidBand(final int band) throws IllegalArgumentException {
         if (band < 0) {
             throw new IllegalArgumentException(getErrorResources().getString(
-                    ErrorKeys.BAD_BAND_NUMBER_$1, new Integer(band)));
+                    ErrorKeys.BAD_BAND_NUMBER_$1, band));
         }
     }
 

@@ -450,9 +450,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
             longBuffer.position(longBuffer.position() + SEPARATOR_BYTES);
 
             for (j = 0; j < nc; j++) {
-                gridShift.setLocalizationPoint(j, i,
-                    (new Float(longBuffer.getFloat())).doubleValue(),
-                    (new Float(latBuffer.getFloat())).doubleValue());
+                gridShift.setLocalizationPoint(j, i, longBuffer.getFloat(), latBuffer.getFloat());
             }
         }
 

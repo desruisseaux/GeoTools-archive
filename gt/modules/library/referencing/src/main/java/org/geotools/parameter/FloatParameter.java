@@ -218,7 +218,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @return The parameter value as an object.
      */
     public Object getValue() {
-        return new Double(value);
+        return Double.valueOf(value);
     }
 
     /**
@@ -240,7 +240,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
             throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         value = unit.getConverterTo(thisUnit).convert(value);
-        Parameter.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
+        Parameter.ensureValidValue((ParameterDescriptor) descriptor, Double.valueOf(value));
         this.value = value;
     }
 
@@ -252,7 +252,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *         (for example a value out of range).
      */
     public void setValue(final double value) throws InvalidParameterValueException {
-        Parameter.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
+        Parameter.ensureValidValue((ParameterDescriptor) descriptor, Double.valueOf(value));
         this.value = value;
     }
 

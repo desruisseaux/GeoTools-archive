@@ -453,19 +453,17 @@ public final class MathTransformTest extends TestCase {
             /*
              * Compare all target points.
              */
-            final StringBuffer buffer = new StringBuffer(name);
+            final StringBuilder buffer = new StringBuilder(name);
             buffer.append(": Compare transform[");
             final int lengthJ = buffer.length();
             for (int j=0; j<targets.length; j++) {
                 buffer.setLength(lengthJ);
-                buffer.append(j);
-                buffer.append("] with [");
+                buffer.append(j).append("] with [");
                 final int lengthI = buffer.length();
                 final GeneralDirectPosition targetJ = targets[j];
                 for (int i=j+1; i<targets.length; i++) {
                     buffer.setLength(lengthI);
-                    buffer.append(i);
-                    buffer.append(']');
+                    buffer.append(i).append(']');
                     final String label = buffer.toString();
                     final GeneralDirectPosition targetI = targets[i];
                     assertTrue(targetJ.ordinates != targetI.ordinates);

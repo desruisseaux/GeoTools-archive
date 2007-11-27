@@ -260,8 +260,8 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     {
         final int actual = crs.getCoordinateSystem().getDimension();
         if (actual != expected) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                      name, new Integer(actual), new Integer(expected)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$3, name, actual, expected));
         }
     }
 

@@ -103,6 +103,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
      * @param param The parameter block for the operation to performs.
      * @param message A buffer for formatting an error message if any.
      */
+    @Override
     protected boolean validateParameters(final String      modeName,
                                          final ParameterBlock param,
                                          final StringBuffer message)
@@ -118,7 +119,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
         for (int i=0; i<matrix.length; i++) {
             if (matrix[i].length != numSamples) {
                 message.append(Errors.format(ErrorKeys.UNEXPECTED_ROW_LENGTH_$3,
-                        new Integer(i), new Integer(matrix[i].length), new Integer(numSamples)));
+                        i, matrix[i].length, numSamples));
                 return false;
             }
         }

@@ -165,7 +165,7 @@ public class TextRecordImageReader extends TextImageReader {
         final int xColumn = getColumnX(imageIndex);
         if (xColumn < 0) {
             throw new IllegalStateException(Errors.format(
-                    ErrorKeys.NEGATIVE_COLUMN_$2, "x", new Integer(xColumn)));
+                    ErrorKeys.NEGATIVE_COLUMN_$2, "x", xColumn));
         }
         return xColumn;
     }
@@ -189,7 +189,7 @@ public class TextRecordImageReader extends TextImageReader {
         final int yColumn = getColumnY(imageIndex);
         if (yColumn < 0) {
             throw new IllegalStateException(Errors.format(
-                    ErrorKeys.NEGATIVE_COLUMN_$2, "y", new Integer(yColumn)));
+                    ErrorKeys.NEGATIVE_COLUMN_$2, "y", yColumn));
         }
         return yColumn;
     }
@@ -589,8 +589,7 @@ public class TextRecordImageReader extends TextImageReader {
      * correspond pas à des coordonnées pixels entières.
      */
     private void fireBadCoordinate(final float coordinate) {
-        processWarningOccurred(getPositionString(Errors.format(
-                ErrorKeys.BAD_COORDINATE_$1, new Float(coordinate))));
+        processWarningOccurred(getPositionString(Errors.format(ErrorKeys.BAD_COORDINATE_$1, coordinate)));
     }
 
     /**

@@ -208,7 +208,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
              * File.toURI() because HSQL doesn't seem to expect an encoded URL
              * (e.g. "%20" instead of spaces).
              */
-            final StringBuffer url = new StringBuffer(PREFIX);
+            final StringBuilder url = new StringBuilder(PREFIX);
             final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
             if (path.length()==0 || path.charAt(0)!='/') {
                 url.append('/');
@@ -323,7 +323,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
             try {
                 final BufferedReader in = new BufferedReader(new InputStreamReader(
                         ThreadedHsqlEpsgFactory.class.getResourceAsStream(SQL_FILE), "ISO-8859-1"));
-                StringBuffer insertStatement = null;
+                StringBuilder insertStatement = null;
                 String line;
                 while ((line=in.readLine()) != null) {
                     line = line.trim();
@@ -335,7 +335,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
                              * The row values appear in next lines; the current line
                              * should stop right after the VALUES keyword.
                              */
-                            insertStatement = new StringBuffer(line);
+                            insertStatement = new StringBuilder(line);
                             continue;
                         }
                         if (insertStatement != null) {

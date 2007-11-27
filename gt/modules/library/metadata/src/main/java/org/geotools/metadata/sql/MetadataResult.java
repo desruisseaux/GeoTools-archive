@@ -80,7 +80,7 @@ final class MetadataResult {
             // TODO: localize
             throw new SQLException("Invalid query");
         }
-        final StringBuffer buffer = new StringBuffer(query);
+        final StringBuilder buffer = new StringBuilder(query);
         buffer.replace(index, index+1, tableName);
         statement = connection.prepareStatement(buffer.toString());
     }

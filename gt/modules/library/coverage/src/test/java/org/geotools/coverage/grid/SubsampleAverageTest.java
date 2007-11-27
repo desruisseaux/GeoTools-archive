@@ -148,8 +148,8 @@ public class SubsampleAverageTest extends GridCoverageTest {
         final DefaultProcessor processor = new DefaultProcessor(hints);
         final ParameterValueGroup param = processor.getOperation("SubsampleAverage").getParameters();
         param.parameter("Source").setValue(coverage);
-        param.parameter("scaleX").setValue(new Double(0.5));
-        param.parameter("scaleY").setValue(new Double(0.5));
+        param.parameter("scaleX").setValue(Double.valueOf(0.5));
+        param.parameter("scaleY").setValue(Double.valueOf(0.5));
         param.parameter("Interpolation").setValue(
                 Interpolation.getInstance(Interpolation.INTERP_NEAREST));
         param.parameter("BorderExtender").setValue(

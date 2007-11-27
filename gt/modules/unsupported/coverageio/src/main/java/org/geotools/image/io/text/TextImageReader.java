@@ -265,7 +265,7 @@ public abstract class TextImageReader extends StreamImageReader {
             file = null;
         }
         final Integer line = (reader instanceof LineNumberReader) ?
-                new Integer(((LineNumberReader) reader).getLineNumber()) : null;
+                ((LineNumberReader) reader).getLineNumber() : null;
 
         final Vocabulary resources = Vocabulary.getResources(null);
         final String position;

@@ -132,8 +132,7 @@ public abstract class Palette {
     {
         if (value < min || value > max) {
             throw new IllegalArgumentException(factory.getErrorResources().getString(
-                    ErrorKeys.VALUE_OUT_OF_BOUNDS_$3,
-                    new Integer(value), new Integer(min), new Integer(max)));
+                    ErrorKeys.VALUE_OUT_OF_BOUNDS_$3, value, min, max));
         }
     }
 

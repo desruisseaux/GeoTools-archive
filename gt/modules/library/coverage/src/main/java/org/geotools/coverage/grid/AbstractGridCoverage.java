@@ -373,7 +373,7 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      */
     private String indexOutOfBounds(final int index) {
         return Errors.getResources(getLocale()).
-                getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "index", new Integer(index));
+                getString(ErrorKeys.ILLEGAL_ARGUMENT_$2, "index", index);
     }
 
     /**

@@ -211,8 +211,8 @@ public class ImageWorker {
 		// /////////////////////////////////////////////////////////////////////
 		final ParameterBlockJAI pbj = new ParameterBlockJAI("ImageRead");
 		pbj.setParameter("Input", source);
-		pbj.setParameter("ImageChoice", new Integer(imageChoice));
-		pbj.setParameter("ReadMetadata", new Boolean(readMetadata));
+		pbj.setParameter("ImageChoice", Integer.valueOf(imageChoice));
+		pbj.setParameter("ReadMetadata", Boolean.valueOf(readMetadata));
 		pbj.setParameter("VerifyInput", Boolean.TRUE);
 
 		// /////////////////////////////////////////////////////////////////////
@@ -556,7 +556,7 @@ public class ImageWorker {
     private double[][] getExtremas() {
         Object extrema = getComputedProperty(EXTREMA);
         if (!(extrema instanceof double[][])) {
-            final Integer ONE = new Integer(1);
+            final Integer ONE = 1;
             image = ExtremaDescriptor.create(
                     image,  // The source image.
                     roi,    // The region of the image to scan. Default to all.
@@ -775,8 +775,7 @@ public class ImageWorker {
 		if (error) {
 			// color quantization
 			// final RenderedOp temp = ColorQuantizerDescriptor.create(image,
-			// ColorQuantizerDescriptor.MEDIANCUT, new Integer(254),
-			// new Integer(200), null, new Integer(1), new Integer(1),
+			// ColorQuantizerDescriptor.MEDIANCUT, 254, 200, null, 1, 1,
 			// getRenderingHints());
 			// final ImageLayout layout= new ImageLayout();
 			// layout.setColorModel(temp.getColorModel());
@@ -1084,7 +1083,7 @@ public class ImageWorker {
 			// 'getRenderingHints(int)'.
 			final RenderingHints hints = getRenderingHints((cm instanceof DirectColorModel) ? DataBuffer.TYPE_BYTE
 					: type);
-			image = FormatDescriptor.create(image, new Integer(
+			image = FormatDescriptor.create(image, Integer.valueOf(
 					(cm instanceof DirectColorModel) ? DataBuffer.TYPE_BYTE
 							: type), hints);
 		}
@@ -1326,7 +1325,7 @@ public class ImageWorker {
 	 */
 	public final ImageWorker format(final int dataType) {
 
-		image = FormatDescriptor.create(image, new Integer(dataType),
+		image = FormatDescriptor.create(image, Integer.valueOf(dataType),
 				getRenderingHints());
 
 		// All post conditions for this method contract.
@@ -1400,8 +1399,7 @@ public class ImageWorker {
 				threshold = 0.5 * (extremas[0][0] + extremas[1][0]);
 			}
 			final RenderingHints hints = getRenderingHints();
-			image = BinarizeDescriptor.create(image, new Double(threshold),
-					hints);
+			image = BinarizeDescriptor.create(image, threshold, hints);
 			invalidateStatistics();
 		}
 
@@ -1493,13 +1491,13 @@ public class ImageWorker {
 		// final ArrayList uniqueColorsList = new ArrayList(10);
 		Integer color;
 		// reset transparency index
-		ArrayList transparentPixelsIndexes = new ArrayList(10);
+		ArrayList<Integer> transparentPixelsIndexes = new ArrayList<Integer>(10);
 		for (; i < mapSize; i++) {
 			// get the color for this pixel removing the alpha information.
-			color = new Integer(ColorUtilities.getIntFromColor(cm.getRed(i), cm
+			color = Integer.valueOf(ColorUtilities.getIntFromColor(cm.getRed(i), cm
 					.getGreen(i), cm.getBlue(i), 255));
 			if (tempTransparentColor == color.intValue()) {
-				transparentPixelsIndexes.add(new Integer(i));
+				transparentPixelsIndexes.add(i);
 				if (Transparency.BITMASK == transparency)
 					break;
 
@@ -1556,8 +1554,7 @@ public class ImageWorker {
 		hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
 		hints.add(new RenderingHints(JAI.KEY_REPLACE_INDEX_COLOR_MODEL,
 				Boolean.FALSE));
-		image = FormatDescriptor.create(image, new Integer(image
-				.getSampleModel().getDataType()), hints);
+		image = FormatDescriptor.create(image, image.getSampleModel().getDataType(), hints);
 
 		invalidateStatistics();
 		return this;
@@ -2144,7 +2141,7 @@ public class ImageWorker {
 		if (layout.isValid(ImageLayout.TILE_WIDTH_MASK)
 				|| layout.isValid(ImageLayout.TILE_HEIGHT_MASK)) {
 			final int type = image.getSampleModel().getDataType();
-			image = FormatDescriptor.create(image, new Integer(type), hints);
+			image = FormatDescriptor.create(image, type, hints);
 		}
 
 		return this;
@@ -2528,8 +2525,8 @@ public class ImageWorker {
 				worker.setRenderingHint(JAI.KEY_TILE_CACHE, JAI
 						.getDefaultInstance().getTileCache());
 				if (operation != null) {
-					worker.getClass().getMethod(operation, null).invoke(worker,
-							null);
+					worker.getClass().getMethod(operation, (Class[]) null).invoke(worker,
+							(Object[]) null);
 				}
 				/*
 				 * TIP: Tests operations here (before the call to 'show()'), if

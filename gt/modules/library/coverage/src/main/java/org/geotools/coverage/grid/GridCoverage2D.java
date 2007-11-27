@@ -324,11 +324,10 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             } else {
                 min    = range.getLower(i);
                 length = Math.min(Math.max(range.getUpper(i), 0), 1);
-                label  = new Integer(i);
+                label  = Integer.valueOf(i);
             }
             if (range.getLower(i)!=min || range.getLength(i)!=length) {
-                return Errors.format(ErrorKeys.BAD_GRID_RANGE_$3, label,
-                                     new Integer(min), new Integer(min+length));
+                return Errors.format(ErrorKeys.BAD_GRID_RANGE_$3, label, min, min + length);
             }
         }
         return null;
@@ -519,8 +518,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         final int actual   = point.getDimension();
         final int expected = crs.getCoordinateSystem().getDimension();
         if (actual != expected) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                                   new Integer(actual), new Integer(expected)));
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, actual, expected));
         }
         if (point instanceof Point2D) {
             return (Point2D) point;
@@ -627,21 +626,17 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             final int  numBands = image.getNumBands();
             final Raster raster = image.getTile(image.XToTileX(x), image.YToTileY(y));
             final int  datatype = image.getSampleModel().getDataType();
-            final StringBuffer  buffer = new StringBuffer();
-            buffer.append('(');
-            buffer.append(x);
-            buffer.append(',');
-            buffer.append(y);
-            buffer.append(")=[");
+            final StringBuilder  buffer = new StringBuilder();
+            buffer.append('(').append(x).append(',').append(y).append(")=[");
             for (int band=0; band<numBands; band++) {
-                if (band!=0) {
+                if (band != 0) {
                     buffer.append(";\u00A0");
                 }
                 final double sample = raster.getSampleDouble(x, y, band);
                 switch (datatype) {
-                    case DataBuffer.TYPE_DOUBLE: buffer.append((double)sample); break;
-                    case DataBuffer.TYPE_FLOAT : buffer.append( (float)sample); break;
-                    default                    : buffer.append(   (int)sample); break;
+                    case DataBuffer.TYPE_DOUBLE: buffer.append(        sample); break;
+                    case DataBuffer.TYPE_FLOAT : buffer.append((float) sample); break;
+                    default                    : buffer.append(  (int) sample); break;
                 }
                 final String formatted = sampleDimensions[band].getLabel(sample, null);
                 if (formatted != null) {
@@ -705,7 +700,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             return;
         }
         if (title == null || (title = title.trim()).length() == 0) {
-            final StringBuffer buffer  = new StringBuffer(String.valueOf(getName()));
+            final StringBuilder buffer = new StringBuilder(String.valueOf(getName()));
             final int visibleBandIndex = CoverageUtilities.getVisibleBand(this);
             final SampleDimension visibleBand = getSampleDimension(visibleBandIndex);
             final Unit unit = visibleBand.getUnits();
@@ -1088,7 +1083,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                                      AbstractProcessor.OPERATION,
                                      LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
-                                     new Integer(geo ? 1 : 0), shortName});
+                                     Integer.valueOf(geo ? 1 : 0), shortName});
             record.setSourceClassName(GridCoverage2D.class.getName());
             record.setSourceMethodName("geophysics");
             LOGGER.log(record);

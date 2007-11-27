@@ -200,7 +200,7 @@ public class AnsiDialectEpsgFactory extends AbstractEpsgFactory {
      * @return The SQL statement in ANSI syntax.
      */
     protected String adaptSQL(final String statement) {
-        final StringBuffer modified = new StringBuffer(statement);
+        final StringBuilder modified = new StringBuilder(statement);
         for (final Iterator it=map.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             final String  oldName = (String) entry.getKey();

@@ -96,9 +96,10 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
      *       constract, which should uses Well Known Text (WKT) format as much
      *       as possible.
      */
+    @Override
     public String toString() {
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
 
         for (final Iterator i = trianglesToKeysMap.keySet().iterator(); i.hasNext();) {
             TINTriangle trian = (TINTriangle) i.next();

@@ -240,7 +240,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
                  *   - IndexOutOfBoundsException   if 'n' or 'm' values are illegal.
                  */
                 final IOException exception = new IOException(Errors.format(
-                        ErrorKeys.BAD_LINE_IN_FILE_$2, filename, new Integer(in.getLineNumber())));
+                        ErrorKeys.BAD_LINE_IN_FILE_$2, filename, in.getLineNumber()));
                 exception.initCause(cause);
                 throw exception;
             }
@@ -364,9 +364,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
     @Override
     public ParameterValueGroup getParameterValues() {
         return new ParameterGroup(getParameterDescriptors(),
-               new ParameterValue[] {
-                   new Parameter(Provider.ORDER, new Integer(nmax))
-               });
+               new ParameterValue[] {new Parameter(Provider.ORDER, nmax)});
     }
 
     /**

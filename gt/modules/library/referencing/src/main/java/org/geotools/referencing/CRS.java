@@ -949,7 +949,7 @@ public final class CRS {
         final int sourceDim = transform.getSourceDimensions();
         if (envelope.getDimension() != sourceDim) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                      new Integer(sourceDim), new Integer(envelope.getDimension())));
+                      sourceDim, envelope.getDimension()));
         }
         int coordinateNumber = 0;
         GeneralEnvelope transformed = null;

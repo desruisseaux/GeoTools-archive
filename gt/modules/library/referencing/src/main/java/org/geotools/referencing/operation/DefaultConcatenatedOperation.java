@@ -222,8 +222,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
                     final int dim2 =     next.getCoordinateSystem().getDimension();
                     if (dim1 != dim2) {
                         throw new IllegalArgumentException(Errors.format(
-                                  ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                  new Integer(dim1), new Integer(dim2)));
+                                  ErrorKeys.MISMATCHED_DIMENSION_$2, dim1, dim2));
                     }
                 }
             }

@@ -849,8 +849,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     private static void checkDimension(final DirectPosition point) {
         final int dim = point.getDimension();
         if (dim != 1) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                                   new Integer(1), new Integer(dim)));
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, 1, dim));
         }
     }
     
@@ -892,8 +892,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         {
             category = getCategory(value);
             if (category == null) {
-                throw new TransformException(Errors.format(ErrorKeys.NO_CATEGORY_FOR_VALUE_$1,
-                                             new Double(value)));
+                throw new TransformException(Errors.format(ErrorKeys.NO_CATEGORY_FOR_VALUE_$1, value));
             }
             last = category;
         }
@@ -914,8 +913,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         {
             category = getCategory(value);
             if (category == null) {
-                throw new TransformException(Errors.format(ErrorKeys.NO_CATEGORY_FOR_VALUE_$1,
-                                             new Double(value)));
+                throw new TransformException(Errors.format(ErrorKeys.NO_CATEGORY_FOR_VALUE_$1, value));
             }
             last = category;
         }
@@ -1056,8 +1054,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
             }
             category = getCategory(value);
             if (category == null) {
-                throw new TransformException(Errors.format(ErrorKeys.NO_CATEGORY_FOR_VALUE_$1,
-                                             new Double(value)));
+                throw new TransformException(Errors.format(ErrorKeys.NO_CATEGORY_FOR_VALUE_$1, value));
             }
             maximum = category.maximum;
             minimum = category.minimum;

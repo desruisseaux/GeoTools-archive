@@ -713,7 +713,7 @@ public class IndexedResourceBundle extends ResourceBundle {
      */
     @Override
     public synchronized String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         if (values != null) {
             int count = 0;
