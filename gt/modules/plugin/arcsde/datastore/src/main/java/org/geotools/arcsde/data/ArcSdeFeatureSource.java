@@ -66,9 +66,8 @@ public class ArcSdeFeatureSource implements FeatureSource {
     public final ReferencedEnvelope getBounds(final Query query) throws IOException {
         Envelope ev;
         {
-            Query namedQuery = namedQuery(query);
-
-            final String typeName = query.getTypeName();
+            final Query namedQuery = namedQuery(query);
+            final String typeName = namedQuery.getTypeName();
             final ArcSDEPooledConnection connection = getConnection();
             try {
                 if (query.getFilter().equals(Filter.INCLUDE)) {

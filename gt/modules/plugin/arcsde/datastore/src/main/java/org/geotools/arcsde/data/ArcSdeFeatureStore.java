@@ -234,13 +234,6 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     }
 
     /**
-     * Whether the feature store has a non auto commit transaction set
-     */
-    private boolean transactionInProgress() {
-        return Transaction.AUTO_COMMIT != getTransaction();
-    }
-
-    /**
      * If current transaction is not auto commit, grabs the connection from the
      * {@link ArcTransactionState#getConnection() transaction state} using the
      * datastore's connection pool as key. Otherwise asks the pool for a new
