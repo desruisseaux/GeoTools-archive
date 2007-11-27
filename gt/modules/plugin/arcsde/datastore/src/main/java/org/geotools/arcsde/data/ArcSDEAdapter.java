@@ -267,8 +267,9 @@ public class ArcSDEAdapter {
     /**
      * Fetchs the schema for the "SQL SELECT" like view definition
      */
-    public static SimpleFeatureType fetchSchema(final ArcSDEPooledConnection conn, final String typeName,
-            final String namespace, final SeQueryInfo queryInfo) throws IOException {
+    public static SimpleFeatureType fetchSchema(final ArcSDEPooledConnection conn,
+            final String typeName, final String namespace, final SeQueryInfo queryInfo)
+            throws IOException {
 
         List<AttributeDescriptor> attributeDescriptors;
 
@@ -392,9 +393,15 @@ public class ArcSDEAdapter {
             if (fieldLen > 0) {
                 b.setLength(fieldLen);
             }
-            b.setCRS(metadata);
+            // only set CRS if its a geometry type, otherwise
+            // AttributeTypeBuilder
+            // creates a GeometryAttributeType disregarding the class binding
+            if (Geometry.class.isAssignableFrom(typeClass)) {
+                b.setCRS(metadata);
+            }
 
-            attDescriptors.add(b.buildDescriptor(attName));
+            AttributeDescriptor buildDescriptor = b.buildDescriptor(attName);
+            attDescriptors.add(buildDescriptor);
         }
 
         return attDescriptors;
