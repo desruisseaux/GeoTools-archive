@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -243,7 +244,7 @@ public class ArcSDEDataStore implements DataStore {
 
         ArcSDEPooledConnection connection;
         {
-            if (Transaction.AUTO_COMMIT == transaction) {
+            if (Transaction.AUTO_COMMIT.equals(transaction)) {
                 connection = connectionPool.getConnection();
             } else {
                 ArcTransactionState state = ArcTransactionState.getState(transaction,
@@ -385,7 +386,7 @@ public class ArcSDEDataStore implements DataStore {
         final ArcSDEPooledConnection connection;
         final ArcTransactionState state;
         {
-            if (Transaction.AUTO_COMMIT == transaction) {
+            if (Transaction.AUTO_COMMIT.equals(transaction)) {
                 connection = connectionPool.getConnection();
                 state = null;
             } else {
@@ -655,7 +656,12 @@ public class ArcSDEDataStore implements DataStore {
             schema = (SimpleFeatureType) schemasCache.get(typeName);
 
             if (schema == null) {
-                SeLayer layer = conn.getLayer(typeName);
+                SeLayer layer;
+                try {
+                    layer = conn.getLayer(typeName);
+                } catch (NoSuchElementException e) {
+                    throw new DataSourceException("FeatureType does not exist: " + typeName, e);
+                }
                 SeTable table = conn.getTable(typeName);
                 schema = ArcSDEAdapter.fetchSchema(layer, table, this.namespace);
                 schemasCache.put(typeName, schema);
