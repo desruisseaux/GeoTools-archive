@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,30 +78,36 @@ public class ArcSDEDataStore implements DataStore {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.arcsde.data");
 
     /** Manages listener lists for FeatureSource implementation */
-    FeatureListenerManager listenerManager = new FeatureListenerManager();
+    final FeatureListenerManager listenerManager = new FeatureListenerManager();
 
-    private ArcSDEConnectionPool connectionPool;
+    private final ArcSDEConnectionPool connectionPool;
 
     /**
      * <code>Map&lt;typeName/FeatureType&gt;</code> of inprocess views feature
      * type schemas registered through
      * {@link #registerView(String, PlainSelect)}
      */
-    private Map<String, FeatureType> viewSchemasCache = new HashMap<String, FeatureType>();
+    private final Map<String, FeatureType> viewSchemasCache = new HashMap<String, FeatureType>();
 
     /**
      * Per inprocess view typeName SQL query definitions
      */
-    private Map<String, PlainSelect> viewSelectStatements = new HashMap<String, PlainSelect>();
+    private final Map<String, PlainSelect> viewSelectStatements = new HashMap<String, PlainSelect>();
 
     /**
      * In process view definitions in ArcSDE Java API terms created from their
      * SQL definitions
      */
-    private Map<String, SeQueryInfo> viewQueryInfos = new HashMap<String, SeQueryInfo>();
+    private final Map<String, SeQueryInfo> viewQueryInfos = new HashMap<String, SeQueryInfo>();
 
     /** Cached feature types */
-    private Map<String, FeatureType> schemasCache = new HashMap<String, FeatureType>();
+    private final Map<String, FeatureType> schemasCache = new HashMap<String, FeatureType>();
+
+    /**
+     * Cached set of type names with write permissions to alleviate the task of
+     * {@link #canWrite(String)}
+     */
+    private final Set<String> writableTypeNames = new HashSet<String>();
 
     /**
      * Namespace URI to construct FeatureTypes and AttributeTypes with
@@ -547,34 +555,51 @@ public class ArcSDEDataStore implements DataStore {
      * @throws DataSourceException
      */
     private boolean canWrite(final String typeName) throws DataSourceException {
-        final SeTable sdeTable;
-        {
-            ArcSDEPooledConnection conn = null;
+        if (writableTypeNames.isEmpty()) {
+            populateWritableTypeNamesCache();
+        }
+        final boolean writable = writableTypeNames.contains(typeName);
+        return writable;
+    }
+
+    private void populateWritableTypeNamesCache() throws DataSourceException {
+        synchronized (writableTypeNames) {
+            if (!writableTypeNames.isEmpty()) {
+                return;
+            }
+            final List<String> allLayerNames = connectionPool.getAvailableLayerNames();
+            final ArcSDEPooledConnection conn;
             try {
                 conn = connectionPool.getConnection();
-                sdeTable = conn.getTable(typeName);
             } catch (UnavailableArcSDEConnectionException e) {
                 throw new DataSourceException(e);
-            } finally {
-                if (conn != null) {
-                    conn.close();
+            }
+            try {
+                SeTable sdeTable;
+                int permissions;
+                int insertMask;
+                int updateMask;
+                boolean canWrite;
+                for (String typeName : allLayerNames) {
+                    sdeTable = conn.getTable(typeName);
+                    permissions = sdeTable.getPermissions();
+                    insertMask = SeDefs.SE_INSERT_PRIVILEGE;
+                    updateMask = SeDefs.SE_UPDATE_PRIVILEGE;
+                    canWrite = false;
+                    if (((insertMask & permissions) == insertMask)
+                            && ((updateMask & permissions) == updateMask)) {
+                        canWrite = true;
+                    }
+                    if (canWrite) {
+                        writableTypeNames.add(typeName);
+                    }
                 }
+            } catch (SeException e) {
+                throw new DataSourceException(e);
+            } finally {
+                conn.close();
             }
         }
-        final int permissions;
-        try {
-            permissions = sdeTable.getPermissions();
-        } catch (SeException e) {
-            throw new DataSourceException(e);
-        }
-        final int insertMask = SeDefs.SE_INSERT_PRIVILEGE;
-        final int updateMask = SeDefs.SE_UPDATE_PRIVILEGE;
-        boolean canWrite = false;
-        if (((insertMask & permissions) == insertMask)
-                && ((updateMask & permissions) == updateMask)) {
-            canWrite = true;
-        }
-        return canWrite;
     }
 
     /**
@@ -640,8 +665,36 @@ public class ArcSDEDataStore implements DataStore {
         return schema;
     }
 
-    public void createSchema(SimpleFeatureType featureType, Map hints) throws IOException,
-            IllegalArgumentException {
+    /**
+     * Creates a given FeatureType on the ArcSDE instance this DataStore is
+     * running over.
+     * <p>
+     * This deviation from the {@link DataStore#createSchema(SimpleFeatureType)}
+     * API is to allow the specification of ArcSDE specific hints for the
+     * "Feature Class" to create:
+     * <ul>
+     * At this time the following hints may be passed:
+     * <li><b>configuration.keywords</b>: database configuration keyword to
+     * use for the newly create feature type. In not present,
+     * <code>"DEFAULTS"</code> will be used.</li>
+     * <li><b>rowid.column.name</b>: indicates the name of the table column to
+     * set up as the unique identifier, and thus to be used as feature id.</li>
+     * <li><b>rowid.column.type</b>: The row id column type. Must be one of
+     * the following allowed values: <code>"NONE"</code>, <code>"USER"</code>,
+     * <code>"SDE"</code> in order to set up the row id column name to not be
+     * managed at all, to be user managed or to be managed by ArcSDE,
+     * respectively. Refer to the ArcSDE documentation for an explanation of the
+     * meanings of those terms.</li>
+     * </ul>
+     * </p>
+     * 
+     * @param featureType
+     * @param hints
+     * @throws IOException
+     * @throws IllegalArgumentException
+     */
+    public void createSchema(final SimpleFeatureType featureType, final Map<String, String> hints)
+            throws IOException, IllegalArgumentException {
         final ArcSDEPooledConnection connection = connectionPool.getConnection();
         try {
             ArcSDEAdapter.createSchema(featureType, hints, connection);
