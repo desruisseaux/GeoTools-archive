@@ -267,12 +267,10 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 			pair = pairs[0].split(",");
 			Double.parseDouble(pair[0]);
 			Double.parseDouble(pair[1]);
-			properties.getProperty("Name");
+			if( !properties.containsKey("Name")) return false;
 			try {
-				properties.getProperty("ExpandToRGB").equalsIgnoreCase(
-						"true");
+			    if( !properties.containsKey("ExpandToRGB")) return false;
 			} catch (Exception e) {
-
 			}
 			return true;
 		} catch (IOException e) {
