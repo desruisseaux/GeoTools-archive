@@ -20,7 +20,6 @@ package org.geotools.image.io;
 import java.io.*; // Many imports, including some for javadoc only.
 import java.net.URL;
 import java.net.URLConnection;
-import javax.imageio.ImageWriter;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
@@ -49,18 +48,15 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
      * created by {@link #getOutputStream} or similar methods in subclasses.
      * <p>
      * This field is never equals to the user-specified {@linkplain #output output}, since the
-     * usual {@link ImageWriter} contract is to <strong>not</strong> close the user-provided
-     * stream. It is set to a non-null value only if a stream has been created from an other
-     * user object like {@link File} or {@link URL}.
+     * usual {@link javax.imageio.ImageWriter} contract is to <strong>not</strong> close the
+     * user-provided stream. It is set to a non-null value only if a stream has been created
+     * from an other user object like {@link File} or {@link URL}.
      *
      * @see #getOutputStream
      * @see org.geotools.image.io.text.TextImageWriter#getWriter
      * @see #close
-     *
-     * @todo The field type will be changed to {@link Closeable} when we will be allowed
-     *       to compile for J2SE 1.5.
      */
-    protected Object closeOnReset;
+    protected Closeable closeOnReset;
 
     /**
      * {@link #output} as an output stream, or {@code null} if none.
@@ -90,7 +86,7 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
      * @see #getOutput
      * @see #getOutputStream
      */
-    //@Override
+    @Override
     public void setOutput(final Object output) {
         closeSilently();
         super.setOutput(output);
@@ -163,18 +159,10 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
      *
      * @see #closeOnReset
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         if (closeOnReset != null) {
-            // TODO: replace the remaining of this block by the following line
-            //       when we will be allowed to compile for J2SE 1.5.
-            //closeOnReset.close();
-            if (closeOnReset instanceof OutputStream) {
-                ((OutputStream) closeOnReset).close();
-            }
-            if (closeOnReset instanceof Writer) {
-                ((Writer) closeOnReset).close();
-            }
+            closeOnReset.close();
         }
         closeOnReset = null;
         stream       = null;
@@ -199,7 +187,7 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
      * created by a previous call to {@link #getOutputStream}, it will be {@linkplain #close
      * closed} before to reset this writer.
      */
-    //@Override
+    @Override
     public void reset() {
         closeSilently();
         super.reset();
@@ -210,7 +198,7 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
      * by a previous call to {@link #getOutputStream}, it will be {@linkplain #close closed}
      * before to dispose this writer.
      */
-    //@Override
+    @Override
     public void dispose() {
         closeSilently();
         super.dispose();
@@ -219,7 +207,7 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
     /**
      * Closes the streams. This method is automatically invoked by the garbage collector.
      */
-    //@Override
+    @Override
     protected void finalize() throws Throwable {
         close();
         super.finalize();

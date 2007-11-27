@@ -42,7 +42,7 @@ public class FeatureCatalogueDescriptionImpl extends ContentInformationImpl
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -2566307080447896276L;
+    private static final long serialVersionUID = 1984922846251567908L;
 
     /**
      * Indication of whether or not the cited feature catalogue complies with ISO 19110.

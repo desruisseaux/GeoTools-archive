@@ -4,7 +4,7 @@
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -84,7 +84,7 @@ public abstract class Palette {
      * over {@link java.lang.ref.SoftReference}. The purpose of this weak reference is to
      * share existing instances, not to cache it since it is cheap to rebuild.
      */
-    private transient Reference/*<ColorModel>*/ colors;
+    private transient Reference<ColorModel> colors;
 
     /**
      * A weak reference to the image specifier to be returned by {@link #getImageTypeSpecifier}.
@@ -92,7 +92,7 @@ public abstract class Palette {
      * and we don't want to prevent it to be garbage collected. See {@link #colors} for an
      * explanation about why we use weak instead of soft references.
      */
-    private transient Reference/*<ImageTypeSpecifier>*/ specifier;
+    private transient Reference<ImageTypeSpecifier> specifier;
 
     /**
      * Creates a palette with the specified name.
@@ -164,7 +164,7 @@ public abstract class Palette {
      */
     public synchronized ColorModel getColorModel() throws IOException {
         if (colors != null) {
-            final ColorModel candidate = (ColorModel) colors.get();
+            final ColorModel candidate = colors.get();
             if (candidate != null) {
                 return candidate;
             }
@@ -187,16 +187,16 @@ public abstract class Palette {
      */
     final ImageTypeSpecifier queryCache() {
         if (specifier != null) {
-            final ImageTypeSpecifier candidate = (ImageTypeSpecifier) specifier.get();
+            final ImageTypeSpecifier candidate = specifier.get();
             if (candidate != null) {
                 return candidate;
             }
         }
         if (samples!=null && colors!=null) {
-            final ColorModel candidate = (ColorModel) colors.get();
+            final ColorModel candidate = colors.get();
             if (candidate != null) {
                 final ImageTypeSpecifier its = new ImageTypeSpecifier(candidate, samples);
-                specifier = new WeakReference(its);
+                specifier = new WeakReference<ImageTypeSpecifier>(its);
                 return its;
             }
         }
@@ -209,7 +209,7 @@ public abstract class Palette {
     final void cache(final ImageTypeSpecifier its) {
         samples   = its.getSampleModel();
         colors    = new PaletteDisposer.Reference(this, its.getColorModel());
-        specifier = new WeakReference/*<ImageTypeSpecifier>*/(its);
+        specifier = new WeakReference<ImageTypeSpecifier>(its);
     }
 
     /**
@@ -263,6 +263,7 @@ public abstract class Palette {
      *
      * @throws IOException if the color values can't be read.
      */
+    @SuppressWarnings("deprecation")
     public void show() throws IOException {
         final JFrame frame = new JFrame(toString());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -274,7 +275,7 @@ public abstract class Palette {
     /**
      * Returns a hash value for this palette.
      */
-    //@Override
+    @Override
     public int hashCode() {
         return name.hashCode() + 37*numBands + 17*visibleBand;
     }
@@ -282,7 +283,7 @@ public abstract class Palette {
     /**
      * Compares this palette with the specified object for equality.
      */
-    //@Override
+    @Override
     public boolean equals(final Object object) {
         if (object != null && getClass().equals(object.getClass())) {
             final Palette that = (Palette) object;

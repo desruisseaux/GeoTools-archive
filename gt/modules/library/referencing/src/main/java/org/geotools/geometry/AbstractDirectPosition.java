@@ -16,12 +16,10 @@
  */
 package org.geotools.geometry;
 
-// OpenGIS dependencies
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -84,7 +82,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
             final int dimension = crs.getCoordinateSystem().getDimension();
             if (dimension != expected) {
                 throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                          crs.getName().getCode(), new Integer(dimension), new Integer(expected)));
+                          crs.getName().getCode(), dimension, expected));
             }
         }
     }
@@ -105,7 +103,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
     {
         if (dimension != expectedDimension) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
-                        name, new Integer(dimension), new Integer(expectedDimension)));
+                        name, dimension, expectedDimension));
         }
     }
 
@@ -115,6 +113,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
      * of positions to format, users will get more control by using their own instance of
      * {@link org.geotools.measure.CoordinateFormat}.
      */
+    @Override
     public String toString() {
         return toString(this);
     }
@@ -123,7 +122,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
      * Formats the specified position.
      */
     static String toString(final DirectPosition position) {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(position)).append('[');
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(position)).append('[');
         final int dimension = position.getDimension();
         for (int i=0; i<dimension; i++) {
             if (i != 0) {
@@ -137,6 +136,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
     /**
      * Returns a hash value for this coordinate.
      */
+    @Override
     public int hashCode() {
         final int dimension = getDimension();
         int code = 1;
@@ -156,6 +156,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
      * direct position} with equals {@linkplain #getCoordinates coordinates} and
      * {@linkplain #getCoordinateReferenceSystem CRS}.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof DirectPosition) {
             final DirectPosition that = (DirectPosition) object;
@@ -183,10 +184,12 @@ public abstract class AbstractDirectPosition implements DirectPosition {
      * Returns a deep copy of this position.
      *
      * @deprecated Will be removed after GeoAPI update.
+     *             Uncommented the methods in subclasses.
      */
-    public Object clone() {
+    @Override
+    public AbstractDirectPosition clone() {
         try {
-            return super.clone();
+            return (AbstractDirectPosition) super.clone();
         } catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.
             throw new AssertionError(exception);

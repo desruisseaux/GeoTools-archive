@@ -122,14 +122,13 @@ public class GeneralGridCoordinates implements GridCoordinates, Serializable {
     /**
      * Returns a string representation of this grid coordinates.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer("GridCoordinates");
+        final StringBuilder buffer = new StringBuilder("GridCoordinates");
         for (int i=0; i<coordinates.length; i++) {
-            buffer.append(i==0 ? '[' : ',');
-            buffer.append(coordinates[i]);
+            buffer.append(i==0 ? '[' : ',').append(coordinates[i]);
         }
-        buffer.append(']');
-        return buffer.toString();
+        return buffer.append(']').toString();
     }
 
     /**
@@ -137,6 +136,7 @@ public class GeneralGridCoordinates implements GridCoordinates, Serializable {
      *
      * @todo Use {@link Arrays#hashCode(int[])} when we will be allowed to compile for J2SE 1.5.
      */
+    @Override
     public int hashCode() {
         int code = (int) serialVersionUID;
         for (int i=0; i<coordinates.length; i++) {
@@ -148,6 +148,7 @@ public class GeneralGridCoordinates implements GridCoordinates, Serializable {
     /**
      * Compares this grid coordinates with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization.
@@ -163,7 +164,8 @@ public class GeneralGridCoordinates implements GridCoordinates, Serializable {
     /**
      * Returns a clone of this coordinates.
      */
-    public Object clone() {
+    @Override
+    public GeneralGridCoordinates clone() {
         return new GeneralGridCoordinates(coordinates);
     }
 

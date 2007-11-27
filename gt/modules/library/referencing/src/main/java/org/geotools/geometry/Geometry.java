@@ -138,7 +138,8 @@ public abstract class Geometry implements org.opengis.geometry.Geometry, Seriali
      * @throws CloneNotSupportedException if this object do not support clone. This exception is
      *         never throws if this object implements {@link Cloneable}.
      */
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    @Override
+    public Geometry clone() throws CloneNotSupportedException {
+        return (Geometry) super.clone();
     }
 }

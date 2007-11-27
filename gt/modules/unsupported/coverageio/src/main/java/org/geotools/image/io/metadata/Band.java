@@ -50,7 +50,7 @@ public class Band extends MetadataAccessor {
      * @param parent    The set of all bands.
      * @param bandIndex The band index for this instance.
      */
-    Band(final ChildList parent, final int bandIndex) {
+    Band(final ChildList<Band> parent, final int bandIndex) {
         super(parent);
         selectChild(bandIndex);
     }

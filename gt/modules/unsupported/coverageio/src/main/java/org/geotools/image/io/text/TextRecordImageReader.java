@@ -18,21 +18,15 @@ package org.geotools.image.io.text;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
-import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
@@ -76,9 +70,7 @@ import org.geotools.image.io.metadata.GeographicMetadata;
  * columns are three image's bands. The whole file contains only one image (unless
  * {@link #getNumImages} has been overridden). All (<var>x</var>,<var>y</var>)
  * coordinates belong to pixel's center. This decoder will automatically translate
- * (<var>x</var>,<var>y</var>) coordinates from logical space to pixel space. The
- * {@link #getTransform} method provides a convenient {@link AffineTransform} for
- * performing coordinate transformations between pixel and logical spaces.
+ * (<var>x</var>,<var>y</var>) coordinates from logical space to pixel space.
  * <p>
  * By default, {@code TextRecordImageReader} assumes that <var>x</var> and
  * <var>y</var> coordinates appear in column #0 and 1 respectively. It also assumes
@@ -230,7 +222,7 @@ public class TextRecordImageReader extends TextImageReader {
      * {@link java.io.Reader}, {@link java.io.InputStream} or
      * {@link javax.imageio.stream.ImageInputStream}.
      */
-    //@Override
+    @Override
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
                          final boolean ignoreMetadata)
@@ -245,7 +237,7 @@ public class TextRecordImageReader extends TextImageReader {
      * @param  imageIndex  The image index.
      * @throws IOException if an error occurs reading the information from the input source.
      */
-    //@Override
+    @Override
     public int getNumBands(final int imageIndex) throws IOException {
         return getRecords(imageIndex).getColumnCount() -
                 (getCheckedColumnX(imageIndex) == getCheckedColumnY(imageIndex) ? 1 : 2);
@@ -281,7 +273,7 @@ public class TextRecordImageReader extends TextImageReader {
      * @return The metadata, or {@code null} if none.
      * @throws IOException If an error occurs reading the data information from the input source.
      */
-    //@Override
+    @Override
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
         if (ignoreMetadata) {
@@ -438,7 +430,7 @@ public class TextRecordImageReader extends TextImageReader {
                     if (data == null) {
                         data = new RecordList[imageIndex+1];
                     } else if (data.length <= imageIndex) {
-                        data = (RecordList[]) XArray.resize(data, imageIndex+1);
+                        data = XArray.resize(data, imageIndex+1);
                     }
                     data[nextImageIndex] = records;
                     final float meanDatumLength = (getStreamPosition(reader)-origine) / (float)records.getDataCount();
@@ -614,7 +606,7 @@ public class TextRecordImageReader extends TextImageReader {
     /**
      * Restores the {@code TextRecordImageReader} to its initial state.
      */
-    //@Override
+    @Override
     public void reset() {
         clear();
         super.reset();
@@ -752,7 +744,7 @@ public class TextRecordImageReader extends TextImageReader {
          * columns. This is an arbitrary choice, which is why this method is not public. It may
          * be changed in any future Geotools version.
          */
-        //@Override
+        @Override
         boolean isValidColumnCount(final int count) {
             return count >= (xColumn == yColumn ? 2 : 3) && count <= 10;
         }

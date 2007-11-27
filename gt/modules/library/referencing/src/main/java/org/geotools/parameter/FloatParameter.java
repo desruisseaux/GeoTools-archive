@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,14 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies and extensions
 import java.net.URI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -44,7 +41,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  * When those conditions are meet, {@code ParameterRealValue} is slightly more efficient
  * than {@code ParameterValue} since it avoid the creation of {@link Double} objects.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -300,7 +297,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         throw new InvalidParameterTypeException(getClassTypeError(),
                   Parameter.getName(descriptor));
     }
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      *
@@ -315,7 +312,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter.
      *

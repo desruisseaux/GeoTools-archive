@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,15 +16,13 @@
  */
 package org.geotools.image.io;
 
-// J2SE dependencies
-import java.awt.image.Raster;  // For javadoc
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 
 
 /**
  * Converts samples from the values stored in the image file to the values stored in the
- * {@linkplain Raster raster}. Some typical conversions are:
+ * {@linkplain java.awt.image.Raster raster}. Some typical conversions are:
  * <p>
  * <ul>
  *   <li>Replace "<cite>nodata</cite>" values (typically a fixed value like 9999 or
@@ -45,7 +43,7 @@ import org.geotools.resources.Utilities;
  * {@linkplain java.awt.image.ColorModel color model}, e.g. for working around negative numbers.
  *
  * Sample converters work on {@code int}, {@code float} or {@code double} primitive types,
- * which match the primitive types expected by the {@link Raster} API.
+ * which match the primitive types expected by the {@link java.awt.image.Raster} API.
  *
  * @since 2.4
  * @source $URL$
@@ -134,7 +132,7 @@ public abstract class SampleConverter {
      * be converted into {@link Double#NaN} value.
      *
      * @param value The value read from the image file.
-     * @return The value to store in the {@linkplain Raster raster}.
+     * @return The value to store in the {@linkplain java.awt.image.Raster raster}.
      */
     public abstract double convert(double value);
 
@@ -144,7 +142,7 @@ public abstract class SampleConverter {
      * be converted into {@link Float#NaN} value.
      *
      * @param value The value read from the image file.
-     * @return The value to store in the {@linkplain Raster raster}.
+     * @return The value to store in the {@linkplain java.awt.image.Raster raster}.
      */
     public abstract float convert(float value);
 
@@ -152,7 +150,7 @@ public abstract class SampleConverter {
      * Converts a float-precision value before to store it in the raster.
      *
      * @param value The value read from the image file.
-     * @return The value to store in the {@linkplain Raster raster}.
+     * @return The value to store in the {@linkplain java.awt.image.Raster raster}.
      */
     public abstract int convert(int value);
 
@@ -167,6 +165,7 @@ public abstract class SampleConverter {
      * Returns a string representation of this sample converter.
      * This is mostly for debugging purpose and may change in any future version.
      */
+    @Override
     public String toString() {
         return Utilities.getShortClassName(this) + "[offset=" + getOffset() + ']';
     }
@@ -198,9 +197,9 @@ public abstract class SampleConverter {
         final int    integerValue;
 
         PadValueMask(final double padValue) {
-            doubleValue  = (double) padValue;
-            floatValue   = (float)  padValue;
-            final int p  = (int)    padValue;
+            doubleValue  =         padValue;
+            floatValue   = (float) padValue;
+            final int p  = (int)   padValue;
             integerValue = (p == padValue) ? p : 0;
         }
 
@@ -233,19 +232,22 @@ public abstract class SampleConverter {
             integerOffset = (int) Math.round(offset);
         }
 
-        //@Override (apply everywhere...)
+        @Override
         public double convert(final double value) {
             return (value == doubleValue) ? Double.NaN : value + doubleOffset;
         }
 
+        @Override
         public float convert(final float value) {
             return (value == floatValue) ? Float.NaN : value + floatOffset;
         }
 
+        @Override
         public int convert(final int value) {
             return (value == integerValue) ? 0 : value + integerOffset;
         }
 
+        @Override
         public double getOffset() {
             return doubleOffset;
         }
@@ -304,18 +306,21 @@ public abstract class SampleConverter {
 
         MaskAndOffset(final double offset, final double[] padValues) {
             super(padValues);
-            doubleOffset = (double) offset;
-            floatOffset  = (float)  offset;
+            doubleOffset =         offset;
+            floatOffset  = (float) offset;
         }
 
+        @Override
         public double convert(final double value) {
             return super.convert(value) + doubleOffset;
         }
 
+        @Override
         public float convert(final float value) {
             return super.convert(value) + floatOffset;
         }
 
+        @Override
         public double getOffset() {
             return doubleOffset;
         }

@@ -55,11 +55,8 @@ public abstract class StreamImageReader extends GeographicImageReader {
      * @see #getInputStream
      * @see org.geotools.image.io.text.TextImageReader#getReader
      * @see #close
-     *
-     * @todo The field type will be changed to {@link Closeable} when we will be allowed
-     *       to compile for J2SE 1.5.
      */
-    protected Object closeOnReset;
+    protected Closeable closeOnReset;
 
     /**
      * {@link #input} as an input stream, or {@code null} if none.
@@ -219,15 +216,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
     @Override
     protected void close() throws IOException {
         if (closeOnReset != null) {
-            // TODO: replace the remaining of this block by the following line
-            //       when we will be allowed to compile for J2SE 1.5.
-            //closeOnReset.close();
-            if (closeOnReset instanceof InputStream) {
-                ((InputStream) closeOnReset).close();
-            }
-            if (closeOnReset instanceof Reader) {
-                ((Reader) closeOnReset).close();
-            }
+            closeOnReset.close();
         }
         closeOnReset = null;
         stream       = null;

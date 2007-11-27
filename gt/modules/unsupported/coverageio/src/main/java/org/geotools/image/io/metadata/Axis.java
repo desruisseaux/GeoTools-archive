@@ -51,7 +51,7 @@ public class Axis extends MetadataAccessor {
      * @param parent The set of all axis.
      * @param index  The axis index for this instance.
      */
-    Axis(final ChildList parent, final int index) {
+    Axis(final ChildList<Axis> parent, final int index) {
         super(parent);
         selectChild(index);
     }

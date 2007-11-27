@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io;
 
-// Input/output
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.stream.ImageInputStream;
@@ -56,6 +55,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public int read(final byte[] b) throws IOException {
         return input.read(b);
     }
@@ -65,6 +65,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public int read(final byte[] b, final int off, final int len) throws IOException {
         return input.read(b, off, len);
     }
@@ -74,6 +75,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public long skip(final long n) throws IOException {
         return input.skipBytes(n);
     }
@@ -83,6 +85,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public boolean markSupported() {
         return true;
     }
@@ -92,6 +95,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void mark(final int readlimit) {
         input.mark();
     }
@@ -102,6 +106,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void reset() throws IOException {
         input.reset();
     }
@@ -111,6 +116,7 @@ final class InputStreamAdapter extends InputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {
         input.close();
     }

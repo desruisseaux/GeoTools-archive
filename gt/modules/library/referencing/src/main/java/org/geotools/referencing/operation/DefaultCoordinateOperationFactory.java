@@ -1380,9 +1380,7 @@ search: for (int j=0; j<targets.length; j++) {
          * for any target coordinates.
          */
         assert count == targets.length : count;
-        while (count!=0 && steps[--count].getMathTransform().isIdentity()) {
-            // Intentionnaly empty.
-        }
+        while (count!=0 && steps[--count].getMathTransform().isIdentity());
         final ReferencingFactoryContainer factories = getFactoryContainer();
         CoordinateOperation operation = null;
         CoordinateReferenceSystem sourceStepCRS = sourceCRS;

@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.netcdf;
 
-// J2SE dependencies
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.NumberFormat;
@@ -31,10 +30,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 
-// NetCDF dependencies
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
 import ucar.nc2.dataset.AxisType;
@@ -44,7 +41,6 @@ import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.VariableDS;
 
-// Geotools dependencies
 import org.geotools.image.io.metadata.Axis;
 import org.geotools.image.io.metadata.ImageGeometry;
 import org.geotools.image.io.metadata.ImageReferencing;
@@ -81,7 +77,7 @@ public class NetcdfMetadata extends GeographicMetadata {
     /**
      * The mapping between UCAR axis type and ISO axis directions.
      */
-    private static final Map/*<AxisType,AxisDirection>*/ DIRECTIONS = new HashMap(16);
+    private static final Map<AxisType,AxisDirection> DIRECTIONS = new HashMap<AxisType,AxisDirection>(16);
     static {
         add(AxisType.Time,     AxisDirection.FUTURE);
         add(AxisType.GeoX,     AxisDirection.EAST);
@@ -110,9 +106,9 @@ public class NetcdfMetadata extends GeographicMetadata {
      */
     public NetcdfMetadata(final ImageReader reader, final NetcdfDataset file) {
         super(reader);
-        final List/*<CoordinateSystem>*/ systems = file.getCoordinateSystems();
+        final List<CoordinateSystem> systems = file.getCoordinateSystems();
         if (!systems.isEmpty()) {
-            addCoordinateSystem((CoordinateSystem) systems.get(0));
+            addCoordinateSystem(systems.get(0));
         }
     }
 
@@ -124,9 +120,9 @@ public class NetcdfMetadata extends GeographicMetadata {
      */
     public NetcdfMetadata(final ImageReader reader, final VariableDS variable) {
         super(reader);
-        final List/*<CoordinateSystem>*/ systems = variable.getCoordinateSystems();
+        final List<CoordinateSystem> systems = variable.getCoordinateSystems();
         if (!systems.isEmpty()) {
-            addCoordinateSystem((CoordinateSystem) systems.get(0));
+            addCoordinateSystem(systems.get(0));
         }
         setSampleType(GeographicMetadataFormat.PACKED);
         addSampleDimension(variable);
@@ -163,9 +159,9 @@ public class NetcdfMetadata extends GeographicMetadata {
          * the (time, depth, latitude, longitude) order, which typically maps to
          * (longitude, latitude, depth, time) order in Geotools referencing framework.
          */
-        final List/*<CoordinateAxis>*/ axis = cs.getCoordinateAxes();
+        final List<CoordinateAxis> axis = cs.getCoordinateAxes();
         for (int i=axis.size(); --i>=0;) {
-            addCoordinateAxis((CoordinateAxis) axis.get(i));
+            addCoordinateAxis(axis.get(i));
         }
     }
 
@@ -198,7 +194,7 @@ public class NetcdfMetadata extends GeographicMetadata {
          * ("ellipsoidal" or "cartesian") or the units ("degrees" or "m").
          */
         String direction = null;
-        AxisDirection directionCode = (AxisDirection) DIRECTIONS.get(type);
+        AxisDirection directionCode = DIRECTIONS.get(type);
         if (directionCode != null) {
             if (CoordinateAxis.POSITIVE_DOWN.equalsIgnoreCase(axis.getPositive())) {
                 directionCode = directionCode.opposite();
@@ -239,7 +235,7 @@ public class NetcdfMetadata extends GeographicMetadata {
             Date epoch = null;
             if (origin != null) {
                 origin = MetadataAccessor.trimFractionalPart(origin);
-                epoch = (Date) parse(type, origin, Date.class, "addCoordinateAxis");
+                epoch = parse(type, origin, Date.class, "addCoordinateAxis");
             }
             axisNode.setTimeOrigin(epoch);
             axisNode.setUnits(units);
@@ -291,10 +287,8 @@ public class NetcdfMetadata extends GeographicMetadata {
      * @param  expected The expected type.
      * @return The value after parsing.
      */
-    private Object /*<T>*/ parse(final AxisType type, String value,
-                                 final Class/*<T>*/ expected, final String caller)
-    {
-        final LoggedFormat format = createLoggedFormat(getAxisFormat(type, value), expected);
+    private <T> T parse(final AxisType type, String value, final Class<T> expected, final String caller) {
+        final LoggedFormat<T> format = createLoggedFormat(getAxisFormat(type, value), expected);
         format.setLogger("org.geotools.image.io.netcdf");
         format.setCaller(NetcdfMetadata.class, caller);
         return format.parse(value);

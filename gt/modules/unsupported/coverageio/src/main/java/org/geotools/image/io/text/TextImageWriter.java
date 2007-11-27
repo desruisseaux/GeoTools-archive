@@ -30,8 +30,6 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.iterator.RectIter;
-
-import org.geotools.resources.XMath;
 import org.geotools.image.io.StreamImageWriter;
 
 
@@ -103,7 +101,7 @@ public abstract class TextImageWriter extends StreamImageWriter {
      * @see Spi#locale
      */
     protected Locale getDataLocale(final ImageWriteParam parameters) {
-        return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).locale : null;        
+        return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).locale : null;
     }
 
     /**
@@ -270,7 +268,7 @@ public abstract class TextImageWriter extends StreamImageWriter {
      *       {@link DecimalFormat}...
      */
     protected FieldPosition getExpectedFractionPosition(final NumberFormat format) {
-        int width  = Math.max((int) Math.floor(XMath.log10(maximum)) + 1,
+        int width  = Math.max((int) Math.floor(Math.log10(maximum)) + 1,
                               format.getMinimumIntegerDigits());
         int digits = Math.min(format.getMaximumFractionDigits(), MAXIMUM_DIGITS);
         if (format instanceof DecimalFormat) {
@@ -298,7 +296,7 @@ public abstract class TextImageWriter extends StreamImageWriter {
      *
      * @see #closeOnReset
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         writer = null;
         super.close();

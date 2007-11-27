@@ -30,6 +30,11 @@ import org.geotools.resources.Utilities;
  */
 final class ScaledColorSpace extends ColorSpace {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 438226855772441165L;
+
+    /**
      * Minimal normalized RGB value.
      */
     private static final float MIN_VALUE = 0f;
@@ -119,7 +124,7 @@ final class ScaledColorSpace extends ColorSpace {
     /**
      * Returns the minimum value for the specified RGB component.
      */
-    //@Override
+    @Override
     public float getMinValue(final int component) {
         return MIN_VALUE * scale + offset;
     }
@@ -127,7 +132,7 @@ final class ScaledColorSpace extends ColorSpace {
     /**
      * Returns the maximum value for the specified RGB component.
      */
-    //@Override
+    @Override
     public float getMaxValue(final int component) {
         return MAX_VALUE * scale + offset;
     }
@@ -135,9 +140,9 @@ final class ScaledColorSpace extends ColorSpace {
     /**
      * Returns a string representation of this color model.
      */
-    //@Override
+    @Override
     public String toString() {
-        return Utilities.getShortClassName(this) + 
+        return Utilities.getShortClassName(this) +
                 '[' + getMinValue(visibleBand) + ", " + getMaxValue(visibleBand) + ']';
     }
 }

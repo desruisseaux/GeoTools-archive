@@ -17,14 +17,12 @@ package org.geotools.image.io.netcdf;
 
 import java.awt.image.DataBuffer;
 
-// NetCDF dependencies
 import ucar.ma2.DataType;
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
 import ucar.nc2.VariableIF;
 import ucar.nc2.dataset.VariableEnhanced;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
 import org.geotools.image.io.metadata.Band;
 

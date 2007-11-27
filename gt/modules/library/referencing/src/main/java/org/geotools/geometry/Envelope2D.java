@@ -16,10 +16,8 @@
  */
 package org.geotools.geometry;
 
-// J2SE dependencies
 import java.awt.geom.Rectangle2D;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -28,7 +26,6 @@ import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;  // For javadoc
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -76,8 +73,8 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         // TODO: check below should be first, if only Sun could fix RFE #4093999.
         final int dimension = envelope.getDimension();
         if (dimension != 2) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
-                                                   new Integer(dimension)));
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, dimension));
         }
         setCoordinateReferenceSystem(envelope.getCoordinateReferenceSystem());
     }
@@ -154,7 +151,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         AbstractDirectPosition.checkCoordinateReferenceSystemDimension(crs, getDimension());
         this.crs = crs;
     }
-    
+
     /**
      * Returns the number of dimensions.
      */
@@ -238,6 +235,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      * Returns a hash value for this envelope. This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         int code = super.hashCode() ^ (int)serialVersionUID;
         if (crs != null) {
@@ -249,6 +247,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
     /**
      * Compares the specified object with this envelope for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final CoordinateReferenceSystem otherCRS =
@@ -303,6 +302,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      *
      * @since 2.4
      */
+    @Override
     public String toString() {
         return AbstractEnvelope.toString(this);
     }

@@ -16,14 +16,12 @@
  */
 package org.geotools.geometry;
 
-// J2SE dependencies
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Arrays;
 import javax.units.Unit;
 import javax.units.ConversionException;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -36,7 +34,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -169,7 +166,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         ensureNonNull("envelope", envelope);
         if (envelope instanceof GeneralEnvelope) {
             final GeneralEnvelope e = (GeneralEnvelope) envelope;
-            ordinates = (double[]) e.ordinates.clone();
+            ordinates = e.ordinates.clone();
             crs = e.crs;
         } else {
             crs = envelope.getCoordinateReferenceSystem();
@@ -263,8 +260,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
             transformed = CRS.transform(gridToCRS, this);
         } catch (TransformException exception) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
-                                    Utilities.getShortClassName(gridToCRS))/*, exception*/);
-            // TODO: uncomment the exception cause when we will be allowed to target J2SE 1.5.
+                        Utilities.getShortClassName(gridToCRS)), exception);
         }
         assert transformed.ordinates.length == this.ordinates.length;
         System.arraycopy(transformed.ordinates, 0, this.ordinates, 0, ordinates.length);
@@ -294,7 +290,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     {
         if (dim1 != dim2) {
             throw new MismatchedDimensionException(Errors.format(
-                    ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer(dim1), new Integer(dim2)));
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, dim1, dim2));
         }
     }
 
@@ -311,39 +307,9 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         for (int i=0; i<dimension; i++) {
             if (!(ordinates[i] <= ordinates[dimension+i])) { // Use '!' in order to catch 'NaN'.
                 throw new IllegalArgumentException(Errors.format(
-                        ErrorKeys.ILLEGAL_ENVELOPE_ORDINATE_$1, new Integer(i)));
+                        ErrorKeys.ILLEGAL_ENVELOPE_ORDINATE_$1, i));
             }
         }
-    }
-
-    /**
-     * Returns the coordinate reference system from an arbitrary envelope, or {@code null}
-     * if unknown. This method performs some sanity checking for ensuring that the envelope
-     * CRS is consistent.
-     *
-     * @deprecated Use {@link Envelope#getCoordinateReferenceSystem()} instead.
-     *
-     * @since 2.3
-     */
-    public static CoordinateReferenceSystem getCoordinateReferenceSystem(final Envelope envelope) {
-        if (envelope == null) {
-            return null;
-        }
-        if (envelope instanceof GeneralEnvelope) {
-            return ((GeneralEnvelope) envelope).getCoordinateReferenceSystem();
-        }
-        if (envelope instanceof Envelope2D) {
-            return ((Envelope2D) envelope).getCoordinateReferenceSystem();
-        }
-        final DirectPosition lower = envelope.getLowerCorner();
-        final DirectPosition upper = envelope.getUpperCorner();
-        if (lower.getDimension() == upper.getDimension()) {
-            final CoordinateReferenceSystem crs = lower.getCoordinateReferenceSystem();
-            if (Utilities.equals(crs, upper.getCoordinateReferenceSystem())) {
-                return crs;
-            }
-        }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.MALFORMED_ENVELOPE));
     }
 
     /**
@@ -384,7 +350,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *
      * @return The lower corner.
      */
-    //@Override
+    @Override
     public DirectPosition getLowerCorner() {
         final int dim = ordinates.length/2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
@@ -399,7 +365,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *
      * @return The upper corner.
      */
-    //@Override
+    @Override
     public DirectPosition getUpperCorner() {
         final int dim = ordinates.length/2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
@@ -830,11 +796,11 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
             throw new IndexOutOfBoundsException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", lower));
         }
         if (newDim<0 || upper>curDim) {
             throw new IndexOutOfBoundsException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", upper));
         }
         final GeneralEnvelope envelope = new GeneralEnvelope(newDim);
         System.arraycopy(ordinates, lower,        envelope.ordinates, 0,      newDim);
@@ -858,11 +824,11 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
         final int rmvDim = upper-lower;
         if (lower<0 || lower>curDim) {
             throw new IndexOutOfBoundsException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", lower));
         }
         if (rmvDim<0 || upper>curDim) {
             throw new IndexOutOfBoundsException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", new Integer(upper)));
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "upper", upper));
         }
         final GeneralEnvelope envelope = new GeneralEnvelope(curDim - rmvDim);
         System.arraycopy(ordinates, 0,     envelope.ordinates, 0,            lower);
@@ -882,15 +848,16 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
                                                     ordinates[2], ordinates[3]);
         } else {
             throw new IllegalStateException(Errors.format(
-                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, new Integer(getDimension())));
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, getDimension()));
         }
     }
 
     /**
      * Returns a hash value for this envelope.
      */
+    @Override
     public int hashCode() {
-        int code = GeneralDirectPosition.hashCode(ordinates);
+        int code = Arrays.hashCode(ordinates);
         if (crs != null) {
             code += crs.hashCode();
         }
@@ -901,6 +868,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     /**
      * Compares the specified object with this envelope for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final GeneralEnvelope that = (GeneralEnvelope) object;
@@ -911,35 +879,8 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     }
 
     /**
-     * Compares to the specified envelope for equality up to the specified relative tolerance value.
-     * The tolerance value {@code eps} is relative to the {@linkplain #getLength envelope length}
-     * along each dimension. More specifically, the actual tolerance value for a given dimension
-     * <var>i</var> is {@code eps}&times;{@code length} where {@code length} is the maximum of
-     * {@linkplain #getLength this envelope length} and the specified envelope length along
-     * dimension <var>i</var>.
-     * <p>
-     * Relative tolerance value (as opposed to absolute tolerance value) help to workaround the
-     * fact that tolerance value are CRS dependent. For example the tolerance value need to be
-     * smaller for geographic CRS than for UTM projections, because the former typically has a
-     * range of -180 to 180° while the later can have a range of thousands of meters.
-     * <p>
-     * This method assumes that the specified envelope uses the same CRS than this envelope.
-     * For performance reason, it will no be verified unless J2SE assertions are enabled.
-     *
-     * @see #contains(Envelope, boolean)
-     * @see #intersects(Envelope, boolean)
-     *
-     * @since 2.3
-     *
-     * @deprecated Use {@link #equals(Envelope, double, boolean)} instead.
-     */
-    public boolean equals(final Envelope envelope, final double eps) {
-    	return equals(envelope, eps, true);
-    }
-
-    /**
      * Compares to the specified envelope for equality up to the specified tolerance value.
-     * The tolerance value {@code eps} can be either relative to the {@linkplain #getLength 
+     * The tolerance value {@code eps} can be either relative to the {@linkplain #getLength
      * envelope length} along each dimension or can be an absolute value (as for example some
      * ground resolution of a {@linkplain org.opengis.coverage.grid.GridCoverage grid coverage}).
      * <p>
@@ -999,10 +940,11 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
     /**
      * Returns a deep copy of this envelope.
      */
-    public Object clone() {
+    @Override
+    public GeneralEnvelope clone() {
         try {
             GeneralEnvelope e = (GeneralEnvelope) super.clone();
-            e.ordinates = (double[]) e.ordinates.clone();
+            e.ordinates = e.ordinates.clone();
             return e;
         } catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.

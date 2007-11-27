@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -244,6 +244,7 @@ public class Matrix2 implements XMatrix, Serializable {
      * Returns {@code true} if the specified object is of type {@code Matrix2} and
      * all of the data members are equal to the corresponding data members in this matrix.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final Matrix2 that = (Matrix2) object;
@@ -258,6 +259,7 @@ public class Matrix2 implements XMatrix, Serializable {
     /**
      * Returns a hash code value based on the data values in this object.
      */
+    @Override
     public int hashCode() {
         return (int)((((Double.doubleToLongBits(m00)  +
                      37*Double.doubleToLongBits(m01)) +
@@ -265,11 +267,12 @@ public class Matrix2 implements XMatrix, Serializable {
                      37*Double.doubleToLongBits(m11)) ^
                         serialVersionUID);
     }
-    
+
     /**
      * Returns a string representation of this matrix. The returned string is implementation
      * dependent. It is usually provided for debugging purposes only.
      */
+    @Override
     public String toString() {
         return GeneralMatrix.toString(this);
     }
@@ -277,9 +280,10 @@ public class Matrix2 implements XMatrix, Serializable {
     /**
      * Returns a clone of this matrix.
      */
-    public Object clone() {
+    @Override
+    public Matrix2 clone() {
         try {
-            return super.clone();
+            return (Matrix2) super.clone();
         } catch (CloneNotSupportedException e) {
             // Should not happen, since we are cloneable.
             throw new AssertionError(e);

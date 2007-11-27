@@ -271,9 +271,7 @@ public final class XMath {
             upper = asText.length();
             power = 0;
         }
-        while ((asText.charAt(--upper)) == '0') {
-            // Intentionnaly blank.
-        }
+        while ((asText.charAt(--upper)) == '0');
         return Math.max(upper - asText.indexOf('.') - power, 0);
     }
 
@@ -461,7 +459,7 @@ public final class XMath {
      * @param  type The type to test (may be {@code null}).
      * @return {@code true} if {@code type} is the class {@link Float} or {@link Double}.
      */
-    public static boolean isReal(final Class type) {
+    public static boolean isReal(final Class<?> type) {
         return type != null &&
                Double.class.equals(type) ||
                 Float.class.equals(type);
@@ -475,7 +473,7 @@ public final class XMath {
      * @return {@code true} if {@code type} is the class {@link Long}, {@link Integer},
      *         {@link Short} or {@link Byte}.
      */
-    public static boolean isInteger(final Class type) {
+    public static boolean isInteger(final Class<?> type) {
         return type != null &&
                Long.class.equals(type) ||
             Integer.class.equals(type) ||
@@ -489,7 +487,7 @@ public final class XMath {
      * @param  type The type (may be {@code null}).
      * @return The number of bits, or 0 if unknow.
      */
-    public static int getBitCount(final Class type) {
+    public static int getBitCount(final Class<?> type) {
         if (Double   .class.equals(type)) return Double   .SIZE;
         if (Float    .class.equals(type)) return Float    .SIZE;
         if (Long     .class.equals(type)) return Long     .SIZE;
@@ -508,7 +506,7 @@ public final class XMath {
      * @param  type The primitive type (may be {@code null}).
      * @return The type as a wrapper.
      */
-    public static Class primitiveToWrapper(final Class type) {
+    public static Class<?> primitiveToWrapper(final Class<?> type) {
         if (Character.TYPE.equals(type)) return Character.class;
         if (Boolean  .TYPE.equals(type)) return Boolean  .class;
         if (Byte     .TYPE.equals(type)) return Byte     .class;

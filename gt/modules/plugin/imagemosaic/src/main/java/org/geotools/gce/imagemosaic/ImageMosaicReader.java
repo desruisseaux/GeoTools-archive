@@ -79,6 +79,7 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
@@ -423,14 +424,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				.getDefaultValue();
 		double inputImageThreshold = ((Double) ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
 				.getDefaultValue()).doubleValue();
-		Parameter param = null;
+		ParameterValue param = null;
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
 		boolean blend = false;
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				param = (Parameter) params[i];
+				param = (ParameterValue) params[i];
 
 				if (param.getDescriptor().getName().getCode().equals(
 						ImageMosaicFormat.READ_GRIDGEOMETRY2D.getName()

@@ -290,7 +290,7 @@ public abstract class GeographicImageReader extends ImageReader {
             metadata = new GeographicMetadata[Math.max(imageIndex+1, 4)];
         }
         if (imageIndex >= metadata.length) {
-            metadata = (GeographicMetadata[]) XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
+            metadata = XArray.resize(metadata, Math.max(imageIndex+1, metadata.length*2));
         }
         metadata[imageIndex] = parser;
         return parser;

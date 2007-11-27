@@ -16,11 +16,7 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
 import java.io.Serializable;
-import org.w3c.dom.Node;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -93,6 +89,7 @@ public class Identification implements CharSequence, Serializable {
     /**
      * Returns the {@linkplain #name}.
      */
+    @Override
     public String toString() {
         return name;
     }
@@ -100,6 +97,7 @@ public class Identification implements CharSequence, Serializable {
     /**
      * Returns a hash value for this identification.
      */
+    @Override
     public int hashCode() {
         int code = (int) serialVersionUID;
         if (name != null) code ^= name.hashCode();
@@ -110,6 +108,7 @@ public class Identification implements CharSequence, Serializable {
     /**
      * Compares the specified object with this identification for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final Identification that = (Identification) object;

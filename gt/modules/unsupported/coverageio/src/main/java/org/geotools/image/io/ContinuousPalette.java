@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2007, GeoTools Project Managment Committee (PMC)
  *    (C) 2007, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -20,7 +20,6 @@ import java.awt.Transparency;
 import java.awt.image.DataBuffer;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
-import java.awt.image.ComponentSampleModel;
 import javax.media.jai.ComponentSampleModelJAI;
 import javax.imageio.ImageTypeSpecifier;
 import java.io.IOException;
@@ -40,7 +39,8 @@ import org.geotools.resources.image.ComponentColorModelJAI;
 final class ContinuousPalette extends Palette {
     /**
      * Tells if we should use {@link ComponentSampleModelJAI} instead of the more standard
-     * {@link ComponentSampleModel}. There is two problems with models provided with J2SE 1.4:
+     * {@link java.awt.image.ComponentSampleModel}. There is two problems with models provided
+     * with J2SE 1.4:
      * <p>
      * <ul>
      *   <li>As of J2SE 1.4.0, {@link ImageTypeSpecifier#createBanded} doesn't accept
@@ -95,7 +95,7 @@ final class ContinuousPalette extends Palette {
      * Returns the scale from <cite>normalized values</cite> (values in the range [0..1])
      * to values in the range of this palette.
      */
-    //@Override
+    @Override
     double getScale() {
         return maximum - minimum;
     }
@@ -104,7 +104,7 @@ final class ContinuousPalette extends Palette {
      * Returns the offset from <cite>normalized values</cite> (values in the range [0..1])
      * to values in the range of this palette.
      */
-    //@Override
+    @Override
     double getOffset() {
         return minimum;
     }
@@ -148,7 +148,7 @@ final class ContinuousPalette extends Palette {
     /**
      * Returns a hash value for this palette.
      */
-    //@Override
+    @Override
     public int hashCode() {
         return 37 * (37 * (37 * super.hashCode() + Float.floatToIntBits(minimum)) +
                 Float.floatToIntBits(maximum)) + dataType;
@@ -157,7 +157,7 @@ final class ContinuousPalette extends Palette {
     /**
      * Compares this palette with the specified object for equality.
      */
-    //@Override
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -174,7 +174,7 @@ final class ContinuousPalette extends Palette {
     /**
      * Returns a string representation of this palette. Used for debugging purpose only.
      */
-    //@Override
+    @Override
     public String toString() {
         return name + " [" + minimum + " ... " + maximum + ']';
     }

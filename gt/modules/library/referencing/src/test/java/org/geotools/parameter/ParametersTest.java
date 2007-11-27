@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -45,6 +45,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
@@ -208,10 +209,10 @@ public final class ParametersTest extends TestCase {
      */
     public void testParameterDescriptor() {
         ParameterDescriptor descriptor;
-        Parameter           parameter;
+        ParameterValue      parameter;
 
         descriptor = new DefaultParameterDescriptor("Test", 12, 4, 20, SI.METER);
-        parameter  = (Parameter) descriptor.createValue();
+        parameter  = (ParameterValue) descriptor.createValue();
         assertEquals("name",         "Test",          descriptor.getName().getCode());
         assertEquals("unit",         SI.METER,        descriptor.getUnit());
         assertEquals("class",        Double.class,    descriptor.getValueClass());
@@ -242,7 +243,7 @@ public final class ParametersTest extends TestCase {
         }
         for (int i=400; i<=2000; i+=100) {
             parameter.setValue(i, SI.CENTI(SI.METER));
-            assertEquals("value", new Double(i),      parameter.getValue());
+            assertEquals("value", Double.valueOf(i),  parameter.getValue());
             assertEquals("unit",  SI.CENTI(SI.METER), parameter.getUnit());
             assertEquals("value", i/100,              parameter.doubleValue(SI.METER), 0);
         }
@@ -724,7 +725,7 @@ public final class ParametersTest extends TestCase {
                 assertEquals("width",  width,  ((Parameter) parameters.parameter("num_col")).intValue());
                 assertEquals("equals", copy,   parameters.getMatrix());
                 assertEquals("equals", parameters, parameters.clone());
-            }        
+            }
         }
     }
 

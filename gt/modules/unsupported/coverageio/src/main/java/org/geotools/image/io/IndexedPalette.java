@@ -4,7 +4,7 @@
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -125,7 +125,7 @@ final class IndexedPalette extends Palette {
      * Returns the scale from <cite>normalized values</cite> (values in the range [0..1])
      * to values in the range of this palette.
      */
-    //@Override
+    @Override
     double getScale() {
         return upper - lower;
     }
@@ -134,7 +134,7 @@ final class IndexedPalette extends Palette {
      * Returns the offset from <cite>normalized values</cite> (values in the range [0..1])
      * to values in the range of this palette.
      */
-    //@Override
+    @Override
     double getOffset() {
         return lower;
     }
@@ -232,7 +232,7 @@ final class IndexedPalette extends Palette {
     /**
      * Returns a hash value for this palette.
      */
-    //@Override
+    @Override
     public int hashCode() {
         return super.hashCode() + 37*(lower + 37*(upper + 37*size));
     }
@@ -240,7 +240,7 @@ final class IndexedPalette extends Palette {
     /**
      * Compares this palette with the specified object for equality.
      */
-    //@Override
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -257,7 +257,7 @@ final class IndexedPalette extends Palette {
     /**
      * Returns a string representation of this palette. Used for debugging purpose only.
      */
-    //@Override
+    @Override
     public String toString() {
         return name + " [" + lower + "..." + (upper-1) + "] size=" + size;
     }

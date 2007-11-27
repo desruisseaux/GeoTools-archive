@@ -206,7 +206,7 @@ public class TextMatrixImageReader extends TextImageReader {
      * @return The metadata, or {@code null} if none.
      * @throws IOException If an error occurs reading the data information from the input source.
      */
-    //@Override
+    @Override
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
         if (!ignoreMetadata) {
@@ -334,7 +334,7 @@ public class TextMatrixImageReader extends TextImageReader {
     /**
      * Closes the input stream and disposes the resources that was specific to that stream.
      */
-    //@Override
+    @Override
     public void close() throws IOException {
         completed      = false;
         data           = null;

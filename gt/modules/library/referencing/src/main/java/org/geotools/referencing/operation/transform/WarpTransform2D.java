@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
@@ -348,7 +348,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     public Warp getWarp() {
         return warp;
     }
-    
+
     /**
      * Returns the parameter descriptors for this math transform.
      */
@@ -528,7 +528,8 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * when transforming an array of points using {@link Warp#mapDestPoint}.
      */
     private static final class PointFloat extends Point2D.Float {
-        public Object clone() {
+        @Override
+        public PointFloat clone() {
             return this;
         }
     }
@@ -542,10 +543,13 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         public PointDouble() {
             super();
         }
+
         public PointDouble(double x, double y) {
             super(x,y);
         }
-        public Object clone() {
+
+        @Override
+        public PointDouble clone() {
             return this;
         }
     }

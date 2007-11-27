@@ -298,7 +298,7 @@ public abstract class TextImageReader extends StreamImageReader {
      *
      * @see #closeOnReset
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         reader = null;
         super.close();

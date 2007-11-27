@@ -15,7 +15,6 @@
  */
 package org.geotools.data;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import org.geotools.parameter.Parameter;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.FloatParameter;
-import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
 
@@ -182,7 +181,7 @@ class ParamDescriptor extends DefaultParameterDescriptor {
         super( param.key, param.description, param.sample, param.required );
         this.param = param;
     }
-    public GeneralParameterValue createValue() {
+    public ParameterValue createValue() {
         if (Double.TYPE.equals( getValueClass())) {
             return new FloatParameter(this){
                 protected Object valueOf(String text) throws IOException {

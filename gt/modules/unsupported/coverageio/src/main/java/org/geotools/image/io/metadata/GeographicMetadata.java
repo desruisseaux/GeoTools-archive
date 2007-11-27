@@ -83,12 +83,12 @@ public class GeographicMetadata extends IIOMetadata {
      * The list of {@linkplain Band bands}.
      * Will be created only when first needed.
      */
-    private ChildList/*<Bands>*/ bands;
+    private ChildList<Band> bands;
 
     /**
      * The standard date format. Will be created only when first needed.
      */
-    private transient LoggedFormat/*<Date>*/ dateFormat;
+    private transient LoggedFormat<Date> dateFormat;
 
     /**
      * Creates a default metadata instance. This constructor defines no standard or native format.
@@ -203,7 +203,7 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * Returns the list of all {@linkplain Band bands}.
      */
-    final ChildList/*<Bands>*/ getBands() {
+    final ChildList<Band> getBands() {
         if (bands == null) {
             bands = new ChildList.Bands(this);
         }
@@ -243,7 +243,7 @@ public class GeographicMetadata extends IIOMetadata {
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
     public Band getBand(final int bandIndex) throws IndexOutOfBoundsException {
-        return (Band) getBands().getChild(bandIndex);
+        return getBands().getChild(bandIndex);
     }
 
     /**
@@ -252,7 +252,7 @@ public class GeographicMetadata extends IIOMetadata {
      * @param name The name for the new band.
      */
     public Band addBand(final String name) {
-        final Band band = (Band) getBands().addChild();
+        final Band band = getBands().addChild();
         band.setName(name);
         return band;
     }
@@ -353,29 +353,41 @@ public class GeographicMetadata extends IIOMetadata {
     }
 
     /**
+     * A {@link LoggedFormat} which use the {@link GeographicMetadata#getLocale reader locale}
+     * for warnings.
+     */
+    private final class FormatAdapter<T> extends LoggedFormat<T> {
+        private static final long serialVersionUID = -1108933164506428318L;
+
+        FormatAdapter(final Format format, final Class<T> type) {
+            super(format, type);
+        }
+
+        @Override
+        protected Locale getWarningLocale() {
+            return getLocale();
+        }
+
+        @Override
+        protected void logWarning(final LogRecord warning) {
+            warningOccurred(warning);
+        }
+    }
+
+    /**
      * Wraps the specified format in order to either parse fully a string, or log a warning.
      *
      * @param format The format to use for parsing and formatting.
      * @param type   The expected type of parsed values.
      */
-    protected /*<T>*/ LoggedFormat createLoggedFormat(final Format format, final Class/*<T>*/ type) {
-        return new LoggedFormat/*<T>*/(format, type) {
-            //@Override
-            protected Locale getWarningLocale() {
-                return getLocale();
-            }
-
-            //@Override
-            protected void logWarning(final LogRecord warning) {
-                warningOccurred(warning);
-            }
-        };
+    protected <T> LoggedFormat<T> createLoggedFormat(final Format format, final Class<T> type) {
+        return new FormatAdapter<T>(format, type);
     }
 
     /**
      * Returns a standard date format to be shared by {@link MetadataAccessor}.
      */
-    final LoggedFormat/*<Date>*/ dateFormat() {
+    final LoggedFormat<Date> dateFormat() {
         if (dateFormat == null) {
             final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -389,6 +401,7 @@ public class GeographicMetadata extends IIOMetadata {
     /**
      * Returns a string representation of this metadata, mostly for debugging purpose.
      */
+    @Override
     public String toString() {
         return OptionalDependencies.toString(
                 OptionalDependencies.xmlToSwing(getAsTree(GeographicMetadataFormat.FORMAT_NAME)));

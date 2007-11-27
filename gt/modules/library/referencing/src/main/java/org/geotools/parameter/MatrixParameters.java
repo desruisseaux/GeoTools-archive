@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -60,7 +60,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7747712999115044943L;
-    
+
     /**
      * The parameter values. Will be constructed only when first requested.
      */
@@ -93,6 +93,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * since the description depends on <code>"num_row"</code> and <code>"num_col"</code>
      * parameter values.
      */
+    @Override
     public GeneralParameterDescriptor getDescriptor() {
         return this;
     }
@@ -176,6 +177,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * @return The parameter value for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
+    @Override
     public ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
@@ -245,14 +247,14 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
             matrixValues = new ParameterValue[numRow][];
         }
         if (row >= matrixValues.length) {
-            matrixValues = (ParameterValue[][]) XArray.resize(matrixValues, numRow);
+            matrixValues = XArray.resize(matrixValues, numRow);
         }
         ParameterValue[] rowValues = matrixValues[row];
         if (rowValues == null) {
             matrixValues[row] = rowValues = new ParameterValue[numCol];
         }
         if (column >= rowValues.length) {
-            matrixValues[row] = rowValues = (ParameterValue[]) XArray.resize(rowValues, numCol);
+            matrixValues[row] = rowValues = XArray.resize(rowValues, numCol);
         }
         ParameterValue param = rowValues[column];
         if (param == null) {
@@ -300,9 +302,9 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
                 }
             }
         }
-        return new UnmodifiableArrayList((ParameterValue[]) XArray.resize(parameters, k));
+        return UnmodifiableArrayList.wrap((ParameterValue[]) XArray.resize(parameters, k));
     }
-    
+
     /**
      * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
@@ -329,7 +331,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
                         if (element != null) {
                             matrix.setElement(j, i, element.doubleValue());
                         }
-                    }                
+                    }
                 }
             }
         }
@@ -349,7 +351,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();
         this.numRow.setValue(numRow);
-        this.numCol.setValue(numCol);        
+        this.numCol.setValue(numCol);
         for (int row=0; row<numRow; row++) {
             for (int col=0; col<numCol; col++) {
                 final double element = matrix.getElement(row,col);
@@ -357,7 +359,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
                 final Object defaultValue = descriptor.getDefaultValue();
                 if (defaultValue instanceof Number) {
                     double value = ((Number) defaultValue).doubleValue();
-                    if (Double.doubleToLongBits(element) == 
+                    if (Double.doubleToLongBits(element) ==
                         Double.doubleToLongBits(value))
                     {
                         /*
@@ -369,12 +371,12 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
                         }
                         continue;
                     }
-                }               
+                }
                 if (matrixValues == null) {
                     matrixValues = new ParameterValue[numRow][];
                 }
                 if (matrixValues[row] == null ){
-                    matrixValues[row] = new ParameterValue[numCol]; 
+                    matrixValues[row] = new ParameterValue[numCol];
                 }
                 matrixValues[row][col] = new FloatParameter(descriptor, element);
             }
@@ -384,6 +386,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     /**
      * Compare this object with the specified one for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true; // Slight optimization.
@@ -409,16 +412,17 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     /**
      * Returns a clone of this parameter group.
      */
-    public Object clone() {
+    @Override
+    public MatrixParameters clone() {
         final MatrixParameters copy = (MatrixParameters) super.clone();
         if (copy.matrixValues != null) {
-            copy.numRow       = (ParameterValue)     copy.parameter(0);
-            copy.numCol       = (ParameterValue)     copy.parameter(1);
-            copy.matrixValues = (ParameterValue[][]) copy.matrixValues.clone();
+            copy.numRow       = (ParameterValue) copy.parameter(0);
+            copy.numCol       = (ParameterValue) copy.parameter(1);
+            copy.matrixValues =                  copy.matrixValues.clone();
             for (int j=0; j<copy.matrixValues.length; j++) {
                 ParameterValue[] array = copy.matrixValues[j];
                 if (array != null) {
-                    copy.matrixValues[j] = array = (ParameterValue[]) array.clone();
+                    copy.matrixValues[j] = array = array.clone();
                     for (int i=0; i<array.length; i++) {
                         if (array[i] != null) {
                             array[i] = (ParameterValue) array[i].clone();
@@ -431,11 +435,12 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     }
 
     /**
-     * Write the content of this parameter to the specified table.
+     * Writes the content of this parameter to the specified table.
      *
      * @param  table The table where to format the parameter value.
      * @throws IOException if an error occurs during output operation.
      */
+    @Override
     protected void write(final TableWriter table) throws IOException {
         table.write(getName(descriptor));
         table.nextColumn();

@@ -54,6 +54,7 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -363,14 +364,14 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 
-		Parameter param = null;
+		ParameterValue param = null;
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
 
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				param = (Parameter) params[i];
+				param = (ParameterValue) params[i];
 
 				if (param.getDescriptor().getName().getCode().equals(
 						ImagePyramidFormat.READ_GRIDGEOMETRY2D.getName()

@@ -16,30 +16,27 @@
  */
 package org.geotools.coverage.processing;
 
-// J2SE dependencies and extensions
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Arrays;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.referencing.operation.MathTransform1D;
 
-// Geotools dependencies
 import org.geotools.util.NumberRange;
-import org.geotools.coverage.Category;
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.resources.Utilities;
 
 
 /**
  * Argument type for {@link DefaultProcessor} operations for specifying the range,
  * colors and units of a computation result. {@code RangeSpecifier} are used for tuning the
- * {@link Category} object to be constructed. For example the {@code "GradientMagnitude"}
- * operation will produces new {@link GridCoverage2D} with sample values ranging from 0 to some
- * maximal value which may be very different from the source {@link GridCoverage2D} range. By
- * default, most {@linkplain OperationJAI operations} try to guess a raisonable range for output
+ * {@link org.geotools.coverage.Category} object to be constructed. For example the
+ * {@code "GradientMagnitude"} operation will produces new
+ * {@link org.geotools.coverage.grid.GridCoverage2D} with sample values
+ * ranging from 0 to some maximal value which may be very different from the source
+ * {@link org.geotools.coverage.grid.GridCoverage2D} range. By default, most
+ * {@linkplain OperationJAI operations} try to guess a raisonable range for output
  * values. This default behavior can be overridden with an explicit {@code RangeSpecifier}
  * argument.
  * <p>
@@ -156,22 +153,23 @@ public class RangeSpecifier implements Serializable, Cloneable {
      * Returns the target colors, or {@code null} if none.
      */
     public Color[] getColors() {
-        return (colors!=null) ? (Color[])colors.clone() : null;
+        return (colors != null) ? colors.clone() : null;
     }
 
     /**
      * Set the target colors to the specified value.
      */
     public void setColors(final Color[] colors) {
-        this.colors = (colors!=null) ? (Color[])colors.clone() : null;
+        this.colors = (colors != null) ? colors.clone() : null;
     }
 
     /**
      * Returns a clone of this object.
      */
-    public Object clone() {
+    @Override
+    public RangeSpecifier clone() {
         try {
-             return super.clone();
+             return (RangeSpecifier) super.clone();
         } catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.
             throw new AssertionError(exception);
@@ -181,6 +179,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     /**
      * Returns a hash code value for this range specifier.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         if (range != null) {
@@ -195,6 +194,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     /**
      * Compares this range specifier with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final RangeSpecifier that = (RangeSpecifier) object;
@@ -209,15 +209,15 @@ public class RangeSpecifier implements Serializable, Cloneable {
     /**
      * Returns a string representation of this range specifier.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         if (range != null) {
             buffer.append(range);
         } else if (transform != null) {
             buffer.append(transform);
         }
-        buffer.append(']');
-        return buffer.toString();
+        return buffer.append(']').toString();
     }
 }

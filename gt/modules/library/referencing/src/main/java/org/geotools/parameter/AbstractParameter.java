@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -73,14 +73,14 @@ public abstract class AbstractParameter extends Formattable
         this.descriptor = descriptor;
         ensureNonNull("descriptor", descriptor);
     }
-    
+
     /**
      * Returns the abstract definition of this parameter or group of parameters.
      */
     public GeneralParameterDescriptor getDescriptor() {
         return descriptor;
     }
-    
+
     /**
      * Makes sure that an argument is non-null. This method was already defined in
      * {@link org.geotools.referencing.AbstractIdentifiedObject}, but is defined here again
@@ -98,7 +98,7 @@ public abstract class AbstractParameter extends Formattable
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
         }
     }
-    
+
     /**
      * Makes sure an array element is non-null. This is
      * a convenience method for subclass constructors.
@@ -125,7 +125,7 @@ public abstract class AbstractParameter extends Formattable
      * @throws IllegalArgumentException if {@code value} is non-null and has a non-assignable
      *         class.
      */
-    static void ensureValidClass(final Class valueClass, final Object value)
+    static <T> void ensureValidClass(final Class<?> valueClass, final Object value)
             throws IllegalArgumentException
     {
         if (value != null) {
@@ -157,21 +157,23 @@ public abstract class AbstractParameter extends Formattable
     /**
      * Returns a copy of this parameter value or group.
      */
-    public Object clone() {
+    @Override
+    public AbstractParameter clone() {
         try {
-            return super.clone();
+            return (AbstractParameter) super.clone();
         } catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable
             throw new AssertionError(exception);
         }
     }
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      *
      * @param  object The object to compare to {@code this}.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final AbstractParameter that = (AbstractParameter) object;
@@ -179,11 +181,12 @@ public abstract class AbstractParameter extends Formattable
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter. This value doesn't need
      * to be the same in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return descriptor.hashCode() ^ (int)serialVersionUID;
     }
@@ -192,6 +195,7 @@ public abstract class AbstractParameter extends Formattable
      * Returns a string representation of this parameter. The default implementation
      * delegates the work to {@link #write}, which should be overridden by subclasses.
      */
+    @Override
     public final String toString() {
         final TableWriter table = new TableWriter(null, 1);
         table.setMultiLinesCells(true);
@@ -318,6 +322,7 @@ public abstract class AbstractParameter extends Formattable
      * Known Text</cite> (WKT)</A>. This method doesn't need to be overridden, since the formatter
      * already know how to {@linkplain Formatter#append(GeneralParameterValue) format parameters}.
      */
+    @Override
     protected final String formatWKT(final Formatter formatter) {
         return "PARAMETER";
     }

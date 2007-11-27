@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,28 +19,23 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
 import java.io.File;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Set;
 
-// Units dependencies
 import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.util.CodeList;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
@@ -71,32 +66,6 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     private static final long serialVersionUID = -5837826787089486776L;
 
     /**
-     * Frequently used values. <strong>Must</strong> be in increasing order.
-     *
-     * @todo To be removed when we will be allowed to compile for J2SE 1.5.
-     */
-    private static final int[] CACHED_VALUES = {
-        -360, -180, -90, -45, -30, -4, -3, -2, -1, 0, +1, +2, +3, +4, +30, +45, +90, +180, +360
-    };
-
-    /** Frequently used values as integers. */ private static final Integer[] CACHED_INTEGERS;
-    /** Frequently used values as doubles.  */ private static final Double [] CACHED_DOUBLES;
-    static {
-        CACHED_INTEGERS = new Integer[CACHED_VALUES.length];
-        CACHED_DOUBLES  = new Double [CACHED_VALUES.length];
-        for (int i=0; i<CACHED_VALUES.length; i++) {
-            CACHED_INTEGERS[i] = new Integer(CACHED_VALUES[i]);
-            CACHED_DOUBLES [i] = new Double (CACHED_VALUES[i]);
-        }
-    }
-
-    /**
-     * An array with a single {@link String} class.
-     * Used for {@link #parse} default implementation.
-     */
-    private static final Class[] STRING_ARGUMENT = new Class[] {String.class};
-
-    /**
      * The value.
      */
     private Object value;
@@ -117,7 +86,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     public Parameter(final String name, final int value) {
         this(new DefaultParameterDescriptor(name, 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
-        this.value = wrap(value);
+        this.value = value;
     }
 
     /**
@@ -133,7 +102,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     public Parameter(final String name, final double value, final Unit unit) {
         this(new DefaultParameterDescriptor(name, Double.NaN, Double.NEGATIVE_INFINITY,
                                             Double.POSITIVE_INFINITY, normalize(unit)));
-        this.value = wrap(value);
+        this.value = value;
         this.unit  = unit;
     }
 
@@ -178,49 +147,6 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         super(descriptor);
         unit = descriptor.getUnit();
         setValue(value);
-    }
-
-    /**
-     * Wraps the specified value in an {@link Integer} object.
-     * This method try to avoid object creation if the value
-     * is one of {@link #CACHED_VALUES frequently used values}.
-     */
-    static Integer wrap(final int value) {
-        final int i = Arrays.binarySearch(CACHED_VALUES, value);
-        return (i>=0) ? CACHED_INTEGERS[i] : new Integer(value);
-    }
-
-    /**
-     * Wraps the specified value in an {@link Double} object.
-     * This method try to avoid object creation if the value
-     * is one of {@link #CACHED_VALUES frequently used values}.
-     */
-    static Double wrap(final double value) {
-        final int integer = (int)value;
-        if (integer == value) {
-            final int i = Arrays.binarySearch(CACHED_VALUES, integer);
-            if (i >= 0) {
-                return CACHED_DOUBLES[i];
-            }
-        }
-        return new Double(value);
-    }
-
-    /**
-     * Replace the specified value by the cached value, if it exists.
-     * This is used for reducing memory usage for frequently used values.
-     */
-    static Comparable replace(final Comparable value) {
-        final Comparable[] CACHED;
-        if (value instanceof Double) {
-            CACHED = CACHED_DOUBLES;
-        } else if (value instanceof Integer) {
-            CACHED = CACHED_INTEGERS;
-        } else {
-            return value;
-        }
-        final int i = Arrays.binarySearch(CACHED, value);
-        return (i>=0) ? CACHED[i] : value;
     }
 
     /**
@@ -459,7 +385,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
             throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
         final Converter converter = this.unit.getConverterTo(unit);
-        final double[] values = (double[]) doubleValueList().clone();
+        final double[] values = doubleValueList().clone();
         for (int i=0; i<values.length; i++) {
             values[i] = converter.convert(values[i]);
         }
@@ -531,9 +457,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         Exception cause = null;
         try {
             if (value instanceof URL) {
-                // TODO: use the next line when we will be allowed to compile for J2SE 1.5.
-                return new URI(value.toString());
-//                return ((URL) value).toURI();
+                return ((URL) value).toURI();
             }
             if (value instanceof String) {
                 return new URI((String) value);
@@ -592,9 +516,9 @@ public class Parameter extends AbstractParameter implements ParameterValue {
             throw new InvalidParameterValueException(Errors.format(expectedID, unit),
                       descriptor.getName().getCode(), value);
         }
-        final Double converted = wrap(unit.getConverterTo(targetUnit).convert(value));
+        final Double converted = unit.getConverterTo(targetUnit).convert(value);
         ensureValidValue((ParameterDescriptor) descriptor, converted);
-        this.value = wrap(value);
+        this.value = value;
         this.unit  = unit;
     }
 
@@ -611,7 +535,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * @see #doubleValue()
      */
     public void setValue(final double value) throws InvalidParameterValueException {
-        final Double check = wrap(value);
+        final Double check = value;
         ensureValidValue((ParameterDescriptor) descriptor, check);
         this.value = check;
     }
@@ -632,7 +556,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
             setValue((double) value);
             return;
         }
-        final Integer check = wrap(value);
+        final Integer check = value;
         ensureValidValue(descriptor, check);
         this.value = check;
     }
@@ -687,7 +611,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         if (getUnitMessageID(unit) != expectedID) {
             throw new IllegalArgumentException(Errors.format(expectedID, unit));
         }
-        final double[] converted = (double[]) values.clone();
+        final double[] converted = values.clone();
         final Converter converter = unit.getConverterTo(targetUnit);
         for (int i=0; i<converted.length; i++) {
             converted[i] = converter.convert(converted[i]);
@@ -696,13 +620,14 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         this.value = values;
         this.unit  = unit;
     }
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      *
      * @param  object The object to compare to {@code this}.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -715,13 +640,14 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         int code = super.hashCode()*37;
         if (value != null) code +=   value.hashCode();

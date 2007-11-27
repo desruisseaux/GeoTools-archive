@@ -142,9 +142,9 @@ public class GeographicImageReadParam extends ImageReadParam {
     /**
      * Returns a string representation of this block of parameters.
      */
-    //@Override
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
         buffer.append('[');
         if (sourceRegion != null) {
             buffer.append("sourceRegion=(").

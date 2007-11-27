@@ -61,13 +61,13 @@ public class NetcdfReadParam extends GeographicImageReadParam {
      * The types of the dimension to use as image bands. If more than one type is specified,
      * only the first dimension with a suitable type will be assigned to bands.
      */
-    private Set/*<AxisType>*/ bandDimensionTypes;
+    private Set<AxisType> bandDimensionTypes;
 
     /**
      * For <var>n</var>-dimensional images, the indices to use for dimensions above 2.
      * Will be created only when first needed.
      */
-    private Map/*<AxisType,Integer>*/ sliceIndices;
+    private Map<AxisType,Integer> sliceIndices;
 
     /**
      * Creates a new, initially empty, set of parameters.
@@ -124,7 +124,7 @@ public class NetcdfReadParam extends GeographicImageReadParam {
         if (bandDimensionTypes == null) {
             return null;
         }
-        return (AxisType[]) bandDimensionTypes.toArray(new AxisType[bandDimensionTypes.size()]);
+        return bandDimensionTypes.toArray(new AxisType[bandDimensionTypes.size()]);
     }
 
     /**
@@ -139,13 +139,13 @@ public class NetcdfReadParam extends GeographicImageReadParam {
      * the {@linkplain AxisType#Height height} and {@linkplain AxisType#Pressure pressure} types.
      *
      * @param type The types of dimension to assign to bands.
-     * 
+     *
      * @todo Use vararg when we will be allowed to compile for J2SE 1.5.
      */
     public void setBandDimensionTypes(final AxisType[] types) {
         if (types != null && types.length != 0) {
             if (bandDimensionTypes == null) {
-                bandDimensionTypes = new HashSet/*<AxisType>*/();
+                bandDimensionTypes = new HashSet<AxisType>();
             } else {
                 bandDimensionTypes.clear();
             }
@@ -168,7 +168,7 @@ public class NetcdfReadParam extends GeographicImageReadParam {
      */
     public int getSliceIndice(final AxisType axis) {
         if (sliceIndices != null) {
-            final Integer indice = (Integer) sliceIndices.get(axis);
+            final Integer indice = sliceIndices.get(axis);
             if (indice != null) {
                 return indice.intValue();
             }
@@ -192,12 +192,11 @@ public class NetcdfReadParam extends GeographicImageReadParam {
      */
     public void setSliceIndice(final AxisType dimension, final int indice) {
         if (indice < 0) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                    "indice", new Integer(indice)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "indice", indice));
         }
         if (indice != DEFAULT_INDICE) {
             if (sliceIndices == null) {
-                sliceIndices = new HashMap/*<AxisType,Integer>*/();
+                sliceIndices = new HashMap<AxisType,Integer>();
             }
             sliceIndices.put(dimension, new Integer(indice));
         } else if (sliceIndices != null) {

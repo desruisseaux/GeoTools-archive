@@ -4,7 +4,7 @@
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2006, Institut de Recherche pour le Développement
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,7 +17,6 @@
  */
 package org.geotools.image.io.stream;
 
-// J2SE dependencies
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,10 +38,8 @@ import java.util.TimerTask;
 final class FinalizationStopper extends TimerTask {
     /**
      * Timer for stopping execution of {@link System#runFinalization}.
-     *
-     * @todo Uncomment the String argument when we will be allowed to compile for J2SE 1.5.
      */
-    private static final Timer TIMER = new Timer(/*"Finalization stopper",*/ true);
+    private static final Timer TIMER = new Timer("Finalization stopper", true);
 
     /**
      * The processus to stop.

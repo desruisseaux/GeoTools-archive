@@ -4,7 +4,7 @@
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2006, Institut de Recherche pour le Développement
  *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,16 +17,14 @@
  */
 package org.geotools.image.io.stream;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
-//import java.net.Proxy;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.SocketException;
-import java.net.InetSocketAddress;
 import javax.imageio.spi.ImageInputStreamSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.FileCacheImageInputStream;
@@ -50,26 +48,24 @@ public class UrlInputSpi extends ImageInputStreamSpi {
 
     /**
      * The proxy.
-     *
-     * @todo Uncomment when we will be allowed to compile for J2SE 1.5.
      */
-//    private final Proxy proxy;
+    private final Proxy proxy;
 
     /**
      * Creates a new instance with no proxy.
-     *
-     * @todo Uncomment when we will be allowed to compile for J2SE 1.5.
      */
-//    public UrlInputSpi() {
-//        this(Proxy.NO_PROXY);
-//    }
-//
-//    /**
-//     * Creates a new instance with the specified proxy.
-//     */
-    public UrlInputSpi(/*final Proxy proxy*/) {
-        super("Geotools", "2.4", URL.class);
-//        this.proxy = proxy;
+    public UrlInputSpi() {
+        this(Proxy.NO_PROXY);
+    }
+
+    /**
+     * Creates a new instance with the specified proxy.
+     *
+     * @since 2.5
+     */
+    public UrlInputSpi(final Proxy proxy) {
+        super("Geotools", "2.5", URL.class);
+        this.proxy = proxy;
     }
 
     /**
@@ -83,7 +79,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
     /**
      * Returns {@code true} since the input stream requires the use of a cache file.
      */
-    //@Override
+    @Override
     public boolean needsCacheFile() {
         return true;
     }

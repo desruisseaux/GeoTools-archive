@@ -83,7 +83,7 @@ public abstract class GeographicImageWriter extends ImageWriter {
     /**
      * Sets the output.
      */
-    //@Override
+    @Override
     public void setOutput(final Object output) {
         imageIndex = 0;
         thumbnailIndex = 0;
@@ -252,7 +252,7 @@ public abstract class GeographicImageWriter extends ImageWriter {
      * that subclasses will fetch pixels using the iterator returned by {@link #createRectIter
      * createRectIter}.
      */
-    //@Override
+    @Override
     public boolean canWriteRasters() {
         return true;
     }
@@ -391,7 +391,7 @@ public abstract class GeographicImageWriter extends ImageWriter {
     /**
      * Broadcasts the completion of an image write to all registered listeners.
      */
-    //@Override
+    @Override
     protected void processImageComplete() {
         super.processImageComplete();
         thumbnailIndex = 0;
@@ -410,7 +410,7 @@ public abstract class GeographicImageWriter extends ImageWriter {
     /**
      * Broadcasts the completion of a thumbnail write to all registered listeners.
      */
-    //@Override
+    @Override
     protected void processThumbnailComplete() {
         super.processThumbnailComplete();
         thumbnailIndex++;

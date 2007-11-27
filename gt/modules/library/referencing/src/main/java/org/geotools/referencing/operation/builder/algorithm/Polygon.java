@@ -214,7 +214,8 @@ class Polygon {
      *
      * @return copy of this object.
      */
-    public Object clone() {
+    @Override
+    public Polygon clone() {
         return new Polygon(vertices);
     }
 }

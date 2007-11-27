@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +33,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-// Geotools dependencies
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -114,7 +112,7 @@ public class MetadataAccessor {
     /**
      * The list of child elements. May be empty but never null.
      */
-    private final List/*<Node>*/ childs;
+    private final List<Node> childs;
 
     /**
      * The current element, or {@code null} if not yet selected.
@@ -157,6 +155,7 @@ public class MetadataAccessor {
      * @param  childPath  The path (relative to {@code parentPath}) to the child
      *                    {@linkplain Element elements}, or {@code null} if none.
      */
+    @SuppressWarnings("fallthrough")
     protected MetadataAccessor(final GeographicMetadata metadata, final String parentPath, final String childPath) {
         this.metadata = metadata;
         final Node root = metadata.getRootNode();
@@ -164,7 +163,7 @@ public class MetadataAccessor {
          * Fetchs the parent node and ensure that we got a singleton. If there is more nodes than
          * expected, log a warning and pickup the first one. If there is no node, create a new one.
          */
-        final List childs = new ArrayList(4);
+        final List<Node> childs = new ArrayList<Node>(4);
         if (parentPath != null) {
             listChilds(root, parentPath, 0, childs, true);
             final int count = childs.size();
@@ -175,7 +174,7 @@ public class MetadataAccessor {
                     // Fall through for picking the first node.
                 }
                 case 1: {
-                    parent = (Node) childs.get(0);
+                    parent = childs.get(0);
                     childs.clear();
                     break;
                 }
@@ -203,7 +202,7 @@ public class MetadataAccessor {
             listChilds(root, path, 0, childs, false);
             this.childs = childs;
         } else {
-            this.childs = Collections.EMPTY_LIST;
+            this.childs = Collections.emptyList();
         }
         if (parent instanceof Element) {
             current = (Element) parent;
@@ -221,7 +220,7 @@ public class MetadataAccessor {
      * @param  includeNodes {@code true} of adding nodes as well as elements.
      */
     private static void listChilds(final Node parent, final String path, final int base,
-                                   final List/*<Node>*/ childs, final boolean includeNodes)
+                                   final List<Node> childs, final boolean includeNodes)
     {
         final int upper = path.indexOf(SEPARATOR, base);
         final String name = ((upper >= 0) ? path.substring(base, upper)
@@ -392,14 +391,14 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
      * @see #getUserObject()
      * @see #setUserObject
      */
-    protected Object /*T*/ getUserObject(Class/*<T>*/ type) throws ClassCastException {
-        type = XMath.primitiveToWrapper(type);
+    protected <T> T getUserObject(Class<? extends T> type) throws ClassCastException {
+        type = XMath.primitiveToWrapper(type).asSubclass(type);
         Object value = getUserObject();
         if (value instanceof CharSequence) {
             if (Number.class.isAssignableFrom(type)) {
                 value = XMath.valueOf(type, value.toString());
             } else {
-                final Class component = XMath.primitiveToWrapper(type.getComponentType());
+                final Class<?> component = XMath.primitiveToWrapper(type.getComponentType());
                 if (Double.class.equals(component)) {
                     value = parseSequence(value.toString(), false, false);
                 } else if (Integer.class.equals(component)) {
@@ -407,7 +406,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
                 }
             }
         }
-        return value; // TODO: use type.cast with Java 5.
+        return type.cast(value);
     }
 
     /**
@@ -650,11 +649,11 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
         if (sequence == null) {
             return null;
         }
-        final Collection/*<Number>*/ numbers;
+        final Collection<Number> numbers;
         if (unique) {
-            numbers = new LinkedHashSet();
+            numbers = new LinkedHashSet<Number>();
         } else {
-            numbers = new ArrayList();
+            numbers = new ArrayList<Number>();
         }
         final StringTokenizer tokens = new StringTokenizer(sequence);
         while (tokens.hasMoreTokens()) {
@@ -720,8 +719,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
         String value = getString(attribute);
         if (value != null) {
             value = trimFractionalPart(value);
-            // TODO: remove the cast with J2SE 1.5.
-            return (Date) metadata.dateFormat().parse(value);
+            return metadata.dateFormat().parse(value);
         }
         return null;
     }
@@ -805,6 +803,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
     /**
      * Returns a string representation of metadata, mostly for debugging purpose.
      */
+    @Override
     public String toString() {
         return OptionalDependencies.toString(OptionalDependencies.xmlToSwing(parent));
     }

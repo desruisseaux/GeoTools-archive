@@ -16,18 +16,16 @@
  */
 package org.geotools.geometry;
 
-// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.Arrays;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -100,7 +98,7 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
      * The {@code ordinates} array will be copied.
      */
     public GeneralDirectPosition(final double[] ordinates) {
-        this.ordinates = (double[]) ordinates.clone();
+        this.ordinates = ordinates.clone();
     }
 
     /**
@@ -136,7 +134,7 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
      * @since 2.2
      */
     public GeneralDirectPosition(final DirectPosition point) {
-        ordinates = (double[]) point.getCoordinates(); // Should already be cloned.
+        ordinates = point.getCoordinates(); // Should already be cloned.
         crs = point.getCoordinateReferenceSystem();
     }
 
@@ -183,8 +181,9 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
      *
      * @return A copy of the {@linkplain #ordinates coordinates}.
      */
+    @Override
     public final double[] getCoordinates() {
-        return (double[]) ordinates.clone();
+        return ordinates.clone();
     }
 
     /**
@@ -250,8 +249,8 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
      */
     public final void setLocation(final Point2D point) throws MismatchedDimensionException {
         if (ordinates.length != 2) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
-                                                   new Integer(ordinates.length)));
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, ordinates.length));
         }
         ordinates[0] = point.getX();
         ordinates[1] = point.getY();
@@ -265,28 +264,18 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
      */
     public Point2D toPoint2D() throws IllegalStateException {
         if (ordinates.length != 2) {
-            throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
-                                            new Integer(ordinates.length)));
+            throw new IllegalStateException(Errors.format(
+                    ErrorKeys.NOT_TWO_DIMENSIONAL_$1, ordinates.length));
         }
         return new Point2D.Double(ordinates[0], ordinates[1]);
     }
 
     /**
-     * Formats the specified position.
-     *
-     * @since 2.3
-     *
-     * @deprecated Use {@link org.geotools.measure.CoordinateFormat} instead.
-     */
-    public static String toString(final DirectPosition position) {
-        return AbstractDirectPosition.toString(position);
-    }
-
-    /**
      * Returns a hash value for this coordinate.
      */
+    @Override
     public int hashCode() {
-        int code = hashCode(ordinates);
+        int code = Arrays.hashCode(ordinates);
         if (crs != null) {
             code += crs.hashCode();
         }
@@ -295,25 +284,10 @@ public class GeneralDirectPosition extends AbstractDirectPosition implements Ser
     }
 
     /**
-     * Returns a hash value for the specified ordinates.
-     *
-     * @todo Remove this method when we will alowed to use J2SE 1.5 runtime.
-     */
-    static int hashCode(final double[] ordinates) {
-        int code = 1;
-        if (ordinates != null) {
-            for (int i=0; i<ordinates.length; i++) {
-                final long bits = Double.doubleToLongBits(ordinates[i]);
-                code = 31 * code + ((int)(bits) ^ (int)(bits >>> 32));
-            }
-        }
-        return code;
-    }
-
-    /**
      * Returns a deep copy of this position.
      */
-    public Object clone() {
+    @Override
+    public GeneralDirectPosition clone() {
         return new GeneralDirectPosition(ordinates);
     }
 }

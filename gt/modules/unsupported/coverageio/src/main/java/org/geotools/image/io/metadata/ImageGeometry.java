@@ -16,12 +16,10 @@
  */
 package org.geotools.image.io.metadata;
 
-// OpenGIS dependencies
 import org.opengis.geometry.Envelope;                   // For javadoc
 import org.opengis.coverage.grid.GridRange;             // For javadoc
 import org.opengis.metadata.spatial.PixelOrientation;   // For javadoc
 
-// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.resources.i18n.ErrorKeys;
 

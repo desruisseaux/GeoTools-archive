@@ -34,12 +34,12 @@ final class PaletteDisposer extends Thread {
     /**
      * The reference queue.
      */
-    private static final ReferenceQueue/*<ColorModel>*/ queue = new ReferenceQueue();
+    private static final ReferenceQueue<ColorModel> queue = new ReferenceQueue<ColorModel>();
 
     /**
      * A weak reference to a color model created by a palette.
      */
-    static final class Reference extends WeakReference/*<ColorModel>*/ {
+    static final class Reference extends WeakReference<ColorModel> {
         /**
          * Starts the disposer thread when the {@link Reference} are about to be created.
          */
@@ -58,7 +58,7 @@ final class PaletteDisposer extends Thread {
         public Reference(final Palette palette, final ColorModel colors) {
             super(colors, queue);
             this.palette = palette;
-            final Set protectedPalettes = palette.factory.protectedPalettes;
+            final Set<Palette> protectedPalettes = palette.factory.protectedPalettes;
             synchronized (protectedPalettes) {
                 protectedPalettes.add(palette);
             }
@@ -76,7 +76,7 @@ final class PaletteDisposer extends Thread {
     /**
      * Removes the palette from the set of protected ones.
      */
-    //@Override
+    @Override
     public void run() {
         while (true) {
             final Reference ref;
@@ -85,7 +85,7 @@ final class PaletteDisposer extends Thread {
             } catch (InterruptedException e) {
                 continue;
             }
-            final Set protectedPalettes = ref.palette.factory.protectedPalettes;
+            final Set<Palette> protectedPalettes = ref.palette.factory.protectedPalettes;
             synchronized (protectedPalettes) {
                 protectedPalettes.remove(ref.palette);
             }

@@ -16,11 +16,9 @@
  */
 package org.geotools.image.io.text;
 
-// J2SE dependencies
 import java.util.Arrays;
 import javax.imageio.IIOException;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
@@ -60,21 +58,21 @@ final class RecordList {
      * de ce tableau est égale à {@link #dataColumnCount}.
      */
     private double[] min;
-    
+
     /**
      * Valeurs maximales des colonnes, ou {@code null} si
      * ces valeurs ne sont pas encore connues.  La longueur de
      * de ce tableau est égale à {@link #dataColumnCount}.
      */
     private double[] max;
-    
+
     /**
      * Intervals entre les données, ou {@code null} si ces valeurs
      * n'ont pas encore été calculées. La valeur 0 signifie que l'interval
      * pour une colonne en particulier n'a pas encore été calculée.
      */
     private float[] interval;
-    
+
     /**
      * Tableau des valeurs lues,  ou {@code null} si les
      * valeurs n'ont pas encore été lues. Ce tableau contient
@@ -82,27 +80,27 @@ final class RecordList {
      * égal à {@link #dataColumnCount}.
      */
     private float[] data;
-    
+
     /**
      * Nombre de colonnes retenues lors de la lecture, ou -1 si ce nombre
      * n'est pas encore connu. Ce nombre de colonnes peut être égal ou
      * inférieur à {@code min.length} et {@code max.length}.
      */
     private int columnCount = -1;
-    
+
     /**
      * Index suivant celui du dernier élément valide de {@link #data}.
      * Ce champ sera augmenté à chaque ajout d'une nouvelle ligne. Sa
      * valeur doit être un multiple entier de {@link #dataColumnCount}.
      */
     private int upper;
-    
+
     /**
      * Nombre de lignes attendues. Cette information n'est qu'à titre
      * indicative, mais accelerera la lecture si elle est exacte.
      */
     private int expectedLineCount = 1024;
-    
+
     /**
      * Construit un {@code ImageData} initiallement vide.
      * La première ligne de données lue déterminera le nombre
@@ -111,7 +109,7 @@ final class RecordList {
      */
     public RecordList() {
     }
-    
+
     /**
      * Construit un {@code ImageData} initiallement vide.
      * Pour chaque ligne lue, seule les {@code columnCount}
@@ -126,7 +124,7 @@ final class RecordList {
         this.columnCount       = columnCount;
         this.expectedLineCount = expectedLineCount;
     }
-    
+
     /**
      * Ajoute une ligne de données.  Si la ligne est plus courte que la longueur
      * attendues, les colonnes manquantes seront considérées comme contenant des
@@ -154,7 +152,7 @@ final class RecordList {
         Arrays.fill(data, upper+limit, nextUpper, Float.NaN);
         upper = nextUpper;
     }
-    
+
     /**
      * Libère la mémoire réservée en trop. Cette méthode peut être appelée
      * lorsqu'on a terminé de lire les données et qu'on veut les conserver
@@ -165,7 +163,7 @@ final class RecordList {
             data = XArray.resize(data, upper);
         }
     }
-    
+
     /**
      * Retourne une référence directe vers les données mémorisées par cet objet.
      * NE PAS MODIFIER CES DONNEES! Les index valides vont de 0 inclusivement
@@ -174,14 +172,14 @@ final class RecordList {
     final float[] getData() {
         return data;
     }
-    
+
     /**
      * Retourne le nombre de données qui ont été mémorisées.
      */
     final int getDataCount() {
         return upper;
     }
-    
+
     /**
      * Retourne le nombre de lignes qui ont été mémorisées.
      */
@@ -192,7 +190,7 @@ final class RecordList {
         assert (upper % columnCount) == 0;
         return upper / columnCount;
     }
-    
+
     /**
      * Retourne le nombre de colonnes, ou
      * -1 si ce nombre n'est pas connu.
@@ -200,7 +198,7 @@ final class RecordList {
     public int getColumnCount() {
         return columnCount;
     }
-    
+
     /**
      * Retourne la valeur minimale de la colonne spécifiée,
      * ou {@link Double#NaN} si cette valeur n'est pas connue.
@@ -208,7 +206,7 @@ final class RecordList {
     public double getMinimum(final int column) {
         return (min != null && min[column] <= max[column]) ? min[column] : Double.NaN;
     }
-    
+
     /**
      * Retourne la valeur maximale de la colonne spécifiée,
      * ou {@link Double#NaN} si cette valeur n'est pas connue.
@@ -216,7 +214,7 @@ final class RecordList {
     public double getMaximum(final int column) {
         return (max != null && max[column] >= min[column]) ? max[column] : Double.NaN;
     }
-    
+
     /**
      * Retourne l'interval entre les points de la colonne spécifiée, en supposant que les
      * points se trouvent à un interval régulier. Si ce n'est pas le cas, une exception
@@ -292,7 +290,7 @@ final class RecordList {
         }
         return interval[column] = Float.isInfinite(delta) ? Float.NaN : delta;
     }
-    
+
     /**
      * Retourne le nombre de points distincts dans la colonne spécifiée. Cette méthode
      * élimine d'abord tous les doublons avant d'effectuer le comptage. Elle vérifie
@@ -308,7 +306,7 @@ final class RecordList {
     public int getPointCount(final int column, final float eps) throws IIOException {
         return (int)Math.round((getMaximum(column) - getMinimum(column)) / getInterval(column, eps)) +1;
     }
-    
+
     /**
      * Retourne un résumé des informations que contient cet objet. Le résumé contiendra
      * notamment les valeurs minimales et maximales de chaque colonnes.
@@ -334,12 +332,13 @@ final class RecordList {
         return Vocabulary.format(VocabularyKeys.POINT_COUNT_IN_GRID_$3,
                 new Integer(upper), new Float(xCount), new Float(yCount));
     }
-    
+
     /**
      * Retourne une chaîne de caractères représentant cet objet.
      * Cette chaîne indiquera le nombre de lignes et de colonnes
      * mémorisées.
      */
+    @Override
     public String toString() {
         return Utilities.getShortClassName(this) +
                 '[' + getLineCount() + "\u00A0\u00D7\u00A0" + getColumnCount() + ']';

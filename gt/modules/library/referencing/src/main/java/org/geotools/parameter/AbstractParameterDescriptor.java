@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,10 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;
-
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -76,12 +71,12 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * @param properties Set of properties. Should contains at least {@code "name"}.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
      *        that values for this parameter group or parameter are required.
-     * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}
-     *        that values for this parameter group or parameter are required. This value
-     *        is used in order to check the range. For {@link ParameterValue}, it should
-     *        always be 1.
+     * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times} that values
+     *        for this parameter group or parameter are required. This value is used in order to
+     *        check the range. For {@link org.opengis.parameter.ParameterValue}, it should always
+     *        be 1.
      */
-    protected AbstractParameterDescriptor(final Map properties,
+    protected AbstractParameterDescriptor(final Map<String,?> properties,
                                           final int minimumOccurs,
                                           final int maximumOccurs)
     {
@@ -89,7 +84,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
         this.minimumOccurs = minimumOccurs;
         if (minimumOccurs < 0  ||  maximumOccurs < minimumOccurs) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
-                        new Integer(minimumOccurs), new Integer(maximumOccurs)));
+                        minimumOccurs, maximumOccurs));
         }
     }
 
@@ -105,7 +100,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * </pre>
      */
     public abstract GeneralParameterValue createValue();
-    
+
     /**
      * The minimum number of times that values for this parameter group or
      * parameter are required. The default value is one. A value of 0 means
@@ -126,7 +121,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * @see #getMinimumOccurs
      */
     public abstract int getMaximumOccurs();
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      *
@@ -135,6 +130,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final AbstractParameterDescriptor that = (AbstractParameterDescriptor) object;
@@ -142,17 +138,18 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
-        return (int)serialVersionUID ^ (int)minimumOccurs;
+        return (int)serialVersionUID ^ minimumOccurs;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -162,6 +159,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "PARAMETER"
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatter.setInvalidWKT(GeneralParameterDescriptor.class);
         return "PARAMETER";

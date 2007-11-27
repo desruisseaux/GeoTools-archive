@@ -66,7 +66,7 @@ final class SubsampledRectIter implements RectIter {
     public void startLines() {
         iterator.startLines();
     }
-      
+
     /**
      * Sets the iterator to the next line of the image.
      */
@@ -84,7 +84,7 @@ final class SubsampledRectIter implements RectIter {
         iterator.jumpLines(dy);
         return false;
     }
-    
+
     /**
      * Jumps downward num lines from the current position.
      */
@@ -105,14 +105,14 @@ final class SubsampledRectIter implements RectIter {
     public void startPixels() {
         iterator.startPixels();
     }
-      
+
     /**
      * Sets the iterator to the next pixel in image.
      */
     public void nextPixel() {
         nextPixelDone();
     }
-      
+
     /**
      * Sets the iterator to the next pixel in the image.
      */
@@ -123,14 +123,14 @@ final class SubsampledRectIter implements RectIter {
         iterator.jumpPixels(dx);
         return false;
     }
-      
+
     /**
      * Jumps rightward num pixels from the current position.
      */
     public void jumpPixels(final int num) {
         iterator.jumpPixels(num * (dx+1));
     }
-    
+
     /**
      * Returns true if the right edge of the bounding rectangle has been passed.
      */
@@ -148,7 +148,7 @@ final class SubsampledRectIter implements RectIter {
             iterator.nextBand();
         }
     }
-      
+
     /**
      * Sets the iterator to the next band in the image.
      */
@@ -177,7 +177,7 @@ final class SubsampledRectIter implements RectIter {
         }
         return false;
     }
-      
+
     /**
      * Returns true if the max band in the image has been exceeded.
      */

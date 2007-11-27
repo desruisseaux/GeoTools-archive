@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io;
 
-// Input/output
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -56,6 +55,7 @@ final class OutputStreamAdapter extends OutputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void write(final byte[] b) throws IOException {
         output.write(b);
     }
@@ -65,6 +65,7 @@ final class OutputStreamAdapter extends OutputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void write(final byte[] b, final int off, final int len) throws IOException {
         output.write(b, off, len);
     }
@@ -74,6 +75,7 @@ final class OutputStreamAdapter extends OutputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void flush() throws IOException {
         output.flush();
     }
@@ -83,6 +85,7 @@ final class OutputStreamAdapter extends OutputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void close() throws IOException {
         output.close();
     }

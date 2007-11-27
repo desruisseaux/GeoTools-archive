@@ -57,35 +57,35 @@ public class RawBinaryImageReadParam extends ImageReadParam {
      * The expected image model, or {@code null} if unknow.
      */
     private SampleModel model;
-    
+
     /**
      * The expected image size, or {@code null} if unknow.
      */
     private Dimension size;
-    
+
     /**
      * The expected data type, or {@link DataBuffer#TYPE_UNDEFINED} if unknow.
      */
     private int dataType = DataBuffer.TYPE_UNDEFINED;
-    
+
     /**
      * The target data type, or {@link DataBuffer#TYPE_UNDEFINED} if not
      * defined. In the later case, the target data type will be the same
      * than the raw one.
      */
     private int targetDataType = DataBuffer.TYPE_UNDEFINED;
-    
+
     /**
      * The pad value, or {@link Double#NaN} if there is none.
      */
     private double padValue = Double.NaN;
-    
+
     /**
      * Constructs a new {@code RawBinaryImageReadParam} with default parameters.
      */
     public RawBinaryImageReadParam() {
     }
-    
+
     /**
      * Specifies the image size in the input stream. Setting the size to {@code null}
      * reset the default size, which is reader dependent. Most readers will thrown an
@@ -96,7 +96,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
     public void setStreamImageSize(final Dimension size) {
         this.size = (size!=null) ? new Dimension(size.width, size.height) : null;
     }
-    
+
     /**
      * Returns the image size in the input stream, or {@code null} if unknow.
      * Image size is specified by the last call to {@link #setStreamImageSize} or
@@ -105,7 +105,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
     public Dimension getStreamImageSize() {
         return (size!=null) ? (Dimension) size.clone() : null;
     }
-    
+
     /**
      * Checks the validity of the specified data type.
      *
@@ -120,7 +120,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
             throw new IllegalArgumentException(String.valueOf(dataType));
         }
     }
-    
+
     /**
      * Specifies the data type in input stream. Setting data type to
      * {@link DataBuffer#TYPE_UNDEFINED} reset the default value, which
@@ -135,7 +135,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
         checkDataType(dataType);
         this.dataType = dataType;
     }
-    
+
     /**
      * Returns the data type in input stream, or {@link DataBuffer#TYPE_UNDEFINED}
      * if unknow. Data type is specified by the last call to {@link #setStreamDataType}
@@ -144,7 +144,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
     public int getStreamDataType() {
         return dataType;
     }
-    
+
     /**
      * Sets the desired image type for the destination image, using one of
      * {@link DataBuffer} enumeration constant. This setting will override
@@ -160,7 +160,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
         targetDataType = destType;
         setDestinationType(getDestinationType(model!=null ? model.getNumBands() : 1));
     }
-    
+
     /**
      * Creates a destination type with the specified number of bands.
      * If no such destination type is available, returns {@code null}.
@@ -223,7 +223,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
         }
         return new ImageTypeSpecifier(colorModel, sampleModel);
     }
-    
+
     /**
      * Returns a default color space for the destination sample model.
      * If no destination image has been specified, then a gray scale
@@ -261,7 +261,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
         }
         return new ScaledColorSpace(numBands, 0, 0, 1);
     }
-    
+
     /**
      * Set the pad value.
      *
@@ -270,14 +270,14 @@ public class RawBinaryImageReadParam extends ImageReadParam {
     public void setPadValue(final double padValue) {
         this.padValue = padValue;
     }
-    
+
     /**
      * Returns the pad value, or {@link Double#NaN} if there is none
      */
     public double getPadValue() {
         return padValue;
     }
-    
+
     /**
      * Set a sample model indicating the data layout in the input stream.
      * Indications comprise image size and data type, i.e. calling this
@@ -299,7 +299,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
             dataType = model.getDataType();
         }
     }
-    
+
     /**
      * Returns a sample model indicating the data layout in the input stream.
      * The {@link SampleModel}'s width and height should matches the image
@@ -311,7 +311,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
     public SampleModel getStreamSampleModel() {
         return model = getStreamSampleModel(null);
     }
-    
+
     /**
      * Returns a sample model indicating the data layout in the input stream.
      * The {@link SampleModel}'s width and height should matches the image
@@ -327,7 +327,7 @@ public class RawBinaryImageReadParam extends ImageReadParam {
     final SampleModel getStreamSampleModel(final SampleModel defaultSampleModel) {
         return getStreamSampleModel(defaultSampleModel, model, size, dataType);
     }
-    
+
     /**
      * Returns a sample model indicating the data layout in the input stream.
      * The {@link SampleModel}'s width and height should matches the image

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -29,11 +29,10 @@ import javax.units.Unit;
 import org.opengis.util.CodeList;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -52,7 +51,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * This class contains numerous convenience constructors. But all of them ultimately invoke
  * {@linkplain #DefaultParameterDescriptor(Map,Class,Object[],Object,Comparable,Comparable,Unit,boolean)
  * a single, full-featured constructor}. All other constructors are just shortcuts.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -61,8 +60,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @see Parameter
  * @see DefaultParameterDescriptorGroup
  */
-public class DefaultParameterDescriptor extends AbstractParameterDescriptor
-                                     implements ParameterDescriptor
+public class DefaultParameterDescriptor<T> extends AbstractParameterDescriptor
+        implements ParameterDescriptor
 {
     /**
      * Serial number for interoperability with different versions.
@@ -71,39 +70,30 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * The class that describe the type of the parameter.
-     * This class can never be a primitive.
+     * This is the value class that the user specified at construction time.
      */
-    private final Class valueClass;
-
-    /**
-     * The class that describe the type of the parameter, maybe as a primitive. This is the
-     * value class that the user specified at construction time.  This is usually identical
-     * to {@code valueClass}. However, some optimization may be done for some primitive
-     * types, for example a special implementation of {@link Parameter} for the
-     * {@code double} type.
-     */
-    private final Class primitiveClass;
+    private final Class<T> valueClass;
 
     /**
      * A immutable, finite set of valid values (usually from a {linkplain org.opengis.util.CodeList
      * code list}) or {@code null} if it doesn't apply. This set is immutable.
      */
-    private final Set validValues;
+    private final Set<T> validValues;
 
     /**
      * The default value for the parameter, or {@code null}.
      */
-    private final Object defaultValue;
+    private final T defaultValue;
 
     /**
      * The minimum parameter value, or {@code null}.
      */
-    private final Comparable minimum;
+    private final Comparable<T> minimum;
 
     /**
      * The maximum parameter value, or {@code null}.
      */
-    private final Comparable maximum;
+    private final Comparable<T> maximum;
 
     /**
      * The unit for default, minimum and maximum values, or {@code null}.
@@ -116,16 +106,15 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *
      * @since 2.2
      */
-    public DefaultParameterDescriptor(final ParameterDescriptor descriptor) {
+    public DefaultParameterDescriptor(final ParameterDescriptor/*<T>*/ descriptor) {
         super(descriptor);
-        valueClass   = descriptor.getValueClass();
-        validValues  = descriptor.getValidValues();
-        defaultValue = descriptor.getDefaultValue();
-        minimum      = descriptor.getMinimumValue();
-        maximum      = descriptor.getMaximumValue();
+        // TODO: remove cast after we uncommented <T> above.
+        valueClass   = (Class<T>)      descriptor.getValueClass();
+        validValues  = (Set<T>)        descriptor.getValidValues();
+        defaultValue = (T)             descriptor.getDefaultValue();
+        minimum      = (Comparable<T>) descriptor.getMinimumValue();
+        maximum      = (Comparable<T>) descriptor.getMaximumValue();
         unit         = descriptor.getUnit();
-        primitiveClass = (descriptor instanceof DefaultParameterDescriptor) ?
-            ((DefaultParameterDescriptor) descriptor).primitiveClass : valueClass;
     }
 
     /**
@@ -135,6 +124,8 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param defaultValue The default value for the parameter.
      * @param minimum The minimum parameter value, or {@link Integer#MIN_VALUE} if none.
      * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
+     *
+     * @deprecated Needs to move in a factory class.
      */
     public DefaultParameterDescriptor(final String name,
                                       final int defaultValue,
@@ -153,16 +144,18 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param minimum The minimum parameter value, or {@link Integer#MIN_VALUE} if none.
      * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
      * @param required {@code true} if this parameter is required, {@code false} otherwise.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
-    public DefaultParameterDescriptor(final Map properties,
+    public DefaultParameterDescriptor(final Map<String,?> properties,
                                       final int defaultValue,
                                       final int minimum,
                                       final int maximum,
                                       final boolean required)
     {
-        this(properties, required, Integer.class, null, Parameter.wrap(defaultValue),
-             minimum == Integer.MIN_VALUE ? null :  Parameter.wrap(minimum),
-             maximum == Integer.MAX_VALUE ? null :  Parameter.wrap(maximum), null);
+        this(properties, required, (Class<T>) Integer.class, null, (T) (Object) defaultValue,
+             (Comparable<T>) (minimum == Integer.MIN_VALUE ? null : minimum),
+             (Comparable<T>) (maximum == Integer.MAX_VALUE ? null : maximum), null);
     }
 
     /**
@@ -173,6 +166,8 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
     public DefaultParameterDescriptor(final String name,
                                       final double defaultValue,
@@ -193,38 +188,42 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
      * @param required {@code true} if this parameter is required, {@code false} otherwise.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
-    public DefaultParameterDescriptor(final Map     properties,
+    public DefaultParameterDescriptor(final Map<String,?> properties,
                                       final double  defaultValue,
                                       final double  minimum,
                                       final double  maximum,
                                       final Unit    unit,
                                       final boolean required)
     {
-        this(properties, required, Double.class, null,
-             Double.isNaN(defaultValue)          ? null : Parameter.wrap(defaultValue),
-             minimum == Double.NEGATIVE_INFINITY ? null : Parameter.wrap(minimum),
-             maximum == Double.POSITIVE_INFINITY ? null : Parameter.wrap(maximum), unit);
+        this(properties, required, (Class<T>) Double.class, null,
+             (T) (Double.isNaN(defaultValue)          ? null : defaultValue),
+             (Comparable<T>) (minimum == Double.NEGATIVE_INFINITY ? null : minimum),
+             (Comparable<T>) (maximum == Double.POSITIVE_INFINITY ? null : maximum), unit);
     }
 
     /**
      * Constructs a parameter for a name and a default value. The parameter type will
      * be assumed the same than the default value class.
-     * 
+     *
      * @param name         The parameter name.
      * @param remarks      An optional description as a {@link String} or an
      *                     {@link org.opengis.util.InternationalString}, or {@code null} if none.
      * @param defaultValue The default value.
      * @param required     {@code true} if this parameter is required, {@code false} otherwise.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
     public DefaultParameterDescriptor(final String       name,
                                       final CharSequence remarks,
-                                      final Object       defaultValue,
+                                      final T            defaultValue,
                                       final boolean      required)
     {
         this(toMap(name, remarks),
-             defaultValue.getClass(),
-             (defaultValue instanceof CodeList) ? getCodeLists(defaultValue.getClass()) : null,
+             (Class<T>) defaultValue.getClass(),
+             (T[]) ((defaultValue instanceof CodeList) ? getCodeLists((Class) defaultValue.getClass()) : null),
              defaultValue,
              null,
              null,
@@ -236,14 +235,14 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static final Map toMap(final String name, final CharSequence remarks) {
+    private static final Map<String,?> toMap(final String name, final CharSequence remarks) {
         if (remarks == null ){
             return Collections.singletonMap(NAME_KEY, name);
         }
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(NAME_KEY,    name);
         properties.put(REMARKS_KEY, remarks);
-        return properties;        
+        return properties;
     }
 
     /**
@@ -251,11 +250,13 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *
      * @param name         The parameter name.
      * @param defaultValue The default value.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
     public DefaultParameterDescriptor(final String   name,
                                       final CodeList defaultValue)
     {
-        this(name, defaultValue.getClass(), defaultValue);
+        this(name, (Class<T>) defaultValue.getClass(), defaultValue);
     }
 
     /**
@@ -266,21 +267,24 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param valueClass   The class that describe the type of the parameter.
      *                     Must be a subclass of {@link CodeList}.
      * @param defaultValue The default value, or {@code null}.
+     *
+     * @deprecated Should move to a static factory method (required for getting ride of warnings).
      */
     DefaultParameterDescriptor(final String   name,
-                               final Class    valueClass,
+                               final Class<T> valueClass,
                                final CodeList defaultValue)
     {
-        this(name, valueClass, getCodeLists(valueClass), defaultValue);
+        this(name, valueClass, (T[]) getCodeLists(valueClass.asSubclass(CodeList.class)), (T) defaultValue);
     }
 
     /**
      * Returns the enumeration found in the specified {@code CodeList} class.
      * Returns {@code null} if no values were found.
      */
-    private static CodeList[] getCodeLists(final Class type) {
+    @SuppressWarnings("unchecked")
+    private static <T extends CodeList> T[] getCodeLists(final Class<T> type) {
         try {
-            return (CodeList[]) type.getMethod("values", (Class[])null)
+            return (T[]) type.getMethod("values", (Class<?>[]) null)
                                     .invoke(null, (Object[]) null);
         } catch (Exception exception) {
             // No code list defined. Not a problem; we will just
@@ -300,9 +304,9 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param defaultValue The default value for the parameter, or {@code null}.
      */
     public DefaultParameterDescriptor(final String   name,
-                                      final Class    valueClass,
-                                      final Object[] validValues,
-                                      final Object   defaultValue)
+                                      final Class<T> valueClass,
+                                      final T[]      validValues,
+                                      final T        defaultValue)
     {
         this(Collections.singletonMap(NAME_KEY, name),
              valueClass, validValues, defaultValue, null, null, null, true);
@@ -327,15 +331,15 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *
      * @since 2.2
      */
-    public DefaultParameterDescriptor(final Citation   authority,
-                                      final String     name,
-                                      final Class      valueClass,
-                                      final Object[]   validValues,
-                                      final Object     defaultValue,
-                                      final Comparable minimum,
-                                      final Comparable maximum,
-                                      final Unit       unit,
-                                      final boolean    required)
+    public DefaultParameterDescriptor(final Citation      authority,
+                                      final String        name,
+                                      final Class<T>      valueClass,
+                                      final T[]           validValues,
+                                      final T             defaultValue,
+                                      final Comparable<T> minimum,
+                                      final Comparable<T> maximum,
+                                      final Unit          unit,
+                                      final boolean       required)
     {
         this(Collections.singletonMap(NAME_KEY, new NamedIdentifier(authority, name)),
              valueClass, validValues, defaultValue, minimum, maximum, unit, required);
@@ -358,21 +362,16 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param required {@code true} if this parameter is required,
      *                 or {@code false} if it is optional.
      */
-    public DefaultParameterDescriptor(final Map        properties,
-                                      final Class      valueClass,
-                                      final Object[]   validValues,
-                                      final Object     defaultValue,
-                                      final Comparable minimum,
-                                      final Comparable maximum,
-                                      final Unit       unit,
-                                      final boolean    required)
+    public DefaultParameterDescriptor(final Map<String,?> properties,
+                                      final Class<T>      valueClass,
+                                      final T[]           validValues,
+                                      final T             defaultValue,
+                                      final Comparable<T> minimum,
+                                      final Comparable<T> maximum,
+                                      final Unit          unit,
+                                      final boolean       required)
     {
-        this(properties, required, valueClass,
-             validValues,
-             defaultValue,
-             Parameter.replace(minimum),
-             Parameter.replace(maximum),
-             unit);
+        this(properties, required, valueClass, validValues, defaultValue, minimum, maximum, unit);
     }
 
     /**
@@ -394,39 +393,35 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param maximum The maximum parameter value, or {@code null}.
      * @param unit    The unit for default, minimum and maximum values.
      */
-    private DefaultParameterDescriptor(final Map        properties,
-                                       final boolean    required,
-                                             Class      valueClass,
-                                       final Object[]   validValues,
-                                       final Object     defaultValue,
-                                       final Comparable minimum,
-                                       final Comparable maximum,
-                                       final Unit       unit)
+    private DefaultParameterDescriptor(final Map<String,?> properties,
+                                       final boolean       required,
+                                       final Class<T>      valueClass,
+                                       final T[]           validValues,
+                                       final T             defaultValue,
+                                       final Comparable<T> minimum,
+                                       final Comparable<T> maximum,
+                                       final Unit          unit)
     {
         super(properties, required ? 1 : 0, 1);
-        this.primitiveClass = valueClass;
+        this.valueClass     = valueClass;
         this.defaultValue   = defaultValue;
         this.minimum        = minimum;
         this.maximum        = maximum;
         this.unit           = unit;
         ensureNonNull("valueClass", valueClass);
-        if (valueClass.isPrimitive()) {
-            valueClass = ClassChanger.toWrapper(valueClass);
-        }
-        this.valueClass = valueClass;
         AbstractParameter.ensureValidClass(valueClass, defaultValue);
         AbstractParameter.ensureValidClass(valueClass, minimum);
         AbstractParameter.ensureValidClass(valueClass, maximum);
         if (minimum!=null && maximum!=null) {
-            if (minimum.compareTo(maximum) > 0) {
+            if (minimum.compareTo(valueClass.cast(maximum)) > 0) {
                 throw new IllegalArgumentException(Errors.format(
                           ErrorKeys.BAD_RANGE_$2, minimum, maximum));
             }
         }
         if (validValues != null) {
-            final Set valids = new HashSet(Math.max(validValues.length*4/3 + 1, 8), 0.75f);
+            final Set<T> valids = new HashSet<T>(Math.max(validValues.length*4/3 + 1, 8), 0.75f);
             for (int i=0; i<validValues.length; i++) {
-                final Object value = validValues[i];
+                final T value = validValues[i];
                 AbstractParameter.ensureValidClass(valueClass, value);
                 valids.add(value);
             }
@@ -455,29 +450,20 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * initialized with the {@linkplain #getDefaultValue default value}.
      * The {@linkplain org.geotools.parameter.Parameter#getDescriptor parameter value
      * descriptor} for the created parameter value will be {@code this} object.
-     * <P>
-     * If the {@linkplain #getValueClass value class} specified at construction time was
-     * a primitive type (e.g. <code>Double.{@linkplain Double#TYPE TYPE}</code> instead
-     * of <code>{@linkplain Double}.class</code>), then this method may returns a specialized
-     * parameter value implementation for this primitive type. Specialized implementations may
-     * use less storage space and be more flexible during conversions (for example from
-     * {@code float} to {@link String}), but this flexibility is not always wanted.
      */
-    public GeneralParameterValue createValue() {
-        if (Double.TYPE.equals(primitiveClass)) {
+    public ParameterValue createValue() {
+        if (Double.class.equals(valueClass) && unit==null) {
             return new FloatParameter(this);
         }
         return new Parameter(this);
     }
 
     /**
-     * Returns the class that describe the type of the parameter. If the value class specified
-     * at construction time was a primitive type (e.g. {@code double}), it is converted to
-     * the corresponding wrapper class (e.g. {@link Double}).
+     * Returns the class that describe the type of the parameter.
      *
-     * @return The parameter value class (never a primitive type).
+     * @return The parameter value class.
      */
-    public Class getValueClass() {
+    public Class<T> getValueClass() {
         return valueClass;
     }
 
@@ -491,7 +477,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *         {linkplain org.opengis.util.CodeList code list}),
      *         or {@code null} if it doesn't apply.
      */
-    public Set getValidValues() {
+    public Set<T> getValidValues() {
         return validValues;
     }
 
@@ -502,7 +488,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *
      * @return The default value, or {@code null} in none.
      */
-    public Object getDefaultValue() {
+    public T getDefaultValue() {
         return defaultValue;
     }
 
@@ -513,7 +499,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *
      * @return The minimum parameter value (often an instance of {@link Double}), or {@code null}.
      */
-    public Comparable getMinimumValue() {
+    public Comparable<T> getMinimumValue() {
         return minimum;
     }
 
@@ -524,7 +510,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *
      * @return The minimum parameter value (often an instance of {@link Double}), or {@code null}.
      */
-    public Comparable getMaximumValue() {
+    public Comparable<T> getMaximumValue() {
         return maximum;
     }
 
@@ -542,7 +528,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     public Unit getUnit() {
         return unit;
     }
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      *
@@ -551,6 +537,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true;
@@ -572,22 +559,22 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                 }
             }
             final DefaultParameterDescriptor that = (DefaultParameterDescriptor) object;
-            return Utilities.equals(this.primitiveClass, that.primitiveClass)   &&
-                   Utilities.equals(this.validValues,    that.validValues)  &&
-                   Utilities.equals(this.defaultValue,   that.defaultValue) &&
-                   Utilities.equals(this.minimum,        that.minimum)      &&
-                   Utilities.equals(this.maximum,        that.maximum)      &&
+            return Utilities.equals(this.validValues,    that.validValues)    &&
+                   Utilities.equals(this.defaultValue,   that.defaultValue)   &&
+                   Utilities.equals(this.minimum,        that.minimum)        &&
+                   Utilities.equals(this.maximum,        that.maximum)        &&
                    Utilities.equals(this.unit,           that.unit);
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         int code = super.hashCode()*37 + valueClass.hashCode();
         if (defaultValue != null) code += (37)      *defaultValue.hashCode();

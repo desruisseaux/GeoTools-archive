@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,23 +16,19 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 
-// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -42,13 +38,15 @@ import org.geotools.resources.i18n.Errors;
  * The list to be returned by {@link Parameter#values}.
  * This class performs check on the parameter value to be added or removed.
  * This implementation supports {@link #add} and {@link #remove} operations.
- *  
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class ParameterValueList extends AbstractList implements RandomAccess, Serializable {
+final class ParameterValueList extends AbstractList<GeneralParameterValue>
+        implements RandomAccess, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -62,7 +60,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
     /**
      * The parameter values for this list.
      */
-    private final List/*<GeneralParameterValue>*/ values;
+    private final List<GeneralParameterValue> values;
 
     /**
      * Constructs a parameter list.
@@ -70,7 +68,9 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
      * @param descriptor The descriptor for this list.
      * @param values The parameter values for this list.
      */
-    public ParameterValueList(final ParameterDescriptorGroup descriptor, final List values) {
+    public ParameterValueList(final ParameterDescriptorGroup descriptor,
+                              final List<GeneralParameterValue> values)
+    {
         this.descriptor = descriptor;
         this.values     = values;
     }
@@ -80,24 +80,14 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
      *          This include all modification methods (add, set, remove, etc.).
      *          We must rely on the default AbstractList implementation for them.
      */
-    public boolean isEmpty    ()         {return values.isEmpty    ( );}
-    public int     size       ()         {return values.size       ( );}
-    public Object  get        (int i)    {return values.get        (i);}
-    public int     indexOf    (Object o) {return values.indexOf    (o);}
-    public int     lastIndexOf(Object o) {return values.lastIndexOf(o);}
-    public boolean equals     (Object o) {return values.equals     (o);}
-    public int     hashCode   ()         {return values.hashCode   ( );}
-    public String  toString   ()         {return values.toString   ( );}
-
-    /**
-     * Adds a value to this list. This method is automatically invoked by the default
-     * implementation of some collection methods like {@link #addAll}.
-     *
-     * Method to be removed with J2SE 1.5.
-     */
-    public boolean add(final Object object) {
-        return add((GeneralParameterValue) object);
-    }
+    @Override public boolean                isEmpty    ()         {return values.isEmpty    ( );}
+              public int                    size       ()         {return values.size       ( );}
+              public GeneralParameterValue  get        (int i)    {return values.get        (i);}
+    @Override public int                    indexOf    (Object o) {return values.indexOf    (o);}
+    @Override public int                    lastIndexOf(Object o) {return values.lastIndexOf(o);}
+    @Override public boolean                equals     (Object o) {return values.equals     (o);}
+    @Override public int                    hashCode   ()         {return values.hashCode   ( );}
+    @Override public String                 toString   ()         {return values.toString   ( );}
 
     /**
      * Adds a {@linkplain ParameterValue parameter value} or an other
@@ -112,7 +102,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
      *       increase the number past what is allowable by {@code maximumOccurs}, then
      *       an {@link IllegalStateException} will be thrown.</LI>
      * </UL>
-     * 
+     *
      * @param  parameter New parameter to be added to this group.
      * @return {@code true} if this object changed as a result of this call.
      * @throws IllegalArgumentException if the specified parameter is not allowable by the
@@ -120,18 +110,19 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
      * @throws InvalidParameterCardinalityException if adding this parameter would result in
      *         more parameters than allowed by {@code maximumOccurs}.
      */
+    @Override
     public boolean add(final GeneralParameterValue parameter) {
         modCount++;
         final GeneralParameterDescriptor type = parameter.getDescriptor();
-        final List descriptors = ((ParameterDescriptorGroup) descriptor).descriptors();
+        final List<GeneralParameterDescriptor> descriptors = descriptor.descriptors();
         final String name = type.getName().getCode();
         if (!descriptors.contains(type)) {
             /*
              * For a more accurate error message, check if the operation failed because
              * the parameter name was not found, or the parameter descriptor doesn't matches.
              */
-            for (final Iterator it=descriptors.iterator(); it.hasNext();) {
-                if (AbstractIdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
+            for (final GeneralParameterDescriptor descriptor : descriptors) {
+                if (AbstractIdentifiedObject.nameMatches(descriptor, name)) {
                     /*
                      * Found a matching name. Consequently, the operation failed because
                      * the descriptor was illegal.
@@ -159,7 +150,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
              * Optional or mandatory parameter - we will simply replace what is there.
              */
             for (int i=values.size(); --i>=0;) {
-                final GeneralParameterValue oldValue = (GeneralParameterValue) values.get(i);
+                final GeneralParameterValue oldValue = values.get(i);
                 final GeneralParameterDescriptor oldDescriptor = oldValue.getDescriptor();
                 if (type.equals(oldDescriptor)) {
                     assert AbstractIdentifiedObject.nameMatches(oldDescriptor, name) : parameter;
@@ -174,15 +165,14 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
              * Parameter added (usually a group). Check the cardinality.
              */
             int count = 0;
-            for (final Iterator it=values.iterator(); it.hasNext();) {
-                final GeneralParameterValue value = (GeneralParameterValue) it.next();
+            for (final GeneralParameterValue value : values) {
                 if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                     count++;
                 }
             }
             if (count >= max) {
                 throw new InvalidParameterCardinalityException(Errors.format(
-                          ErrorKeys.TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
+                          ErrorKeys.TOO_MANY_OCCURENCES_$2, name, count), name);
             }
         }
         values.add(parameter);
@@ -194,9 +184,9 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
      *
      * @param index The index of the value to remove.
      */
-    public Object remove(final int index) {
-        // Remove cast with J2SE 1.5.
-        return remove(((GeneralParameterValue) values.get(index)).getDescriptor(), index);
+    @Override
+    public GeneralParameterValue remove(final int index) {
+        return remove(values.get(index).getDescriptor(), index);
     }
 
     /**
@@ -209,8 +199,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
         modCount++;
         int count = 0;
         final String name = type.getName().getCode();
-        for (final Iterator it=values.iterator(); it.hasNext();) {
-            final GeneralParameterValue value = (GeneralParameterValue) it.next();
+        for (final GeneralParameterValue value : values) {
             if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                 count++;
             }
@@ -219,11 +208,9 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
         if (count <= min) {
             final int max = type.getMaximumOccurs();
             throw new InvalidParameterCardinalityException(Errors.format(
-                      ErrorKeys.ILLEGAL_OCCURS_FOR_PARAMETER_$4, name,
-                      new Integer(count-1), new Integer(min), new Integer(max)), name);
+                      ErrorKeys.ILLEGAL_OCCURS_FOR_PARAMETER_$4, name, count-1, min, max), name);
         }
-        // Note: remove cast with J2SE 1.5.
-        final GeneralParameterValue value = (GeneralParameterValue) values.remove(index);
+        final GeneralParameterValue value = values.remove(index);
         assert value!=null && type.equals(value.getDescriptor()) : value;
         return value;
     }

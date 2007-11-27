@@ -17,13 +17,11 @@
 package org.geotools.image.io;
 
 import java.awt.Color;
-import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import javax.imageio.ImageReader;   // For javadoc
 import javax.imageio.IIOException;
 import javax.imageio.spi.ServiceRegistry;
 import java.util.*;
@@ -130,19 +128,19 @@ public class PaletteFactory {
      * The locale to use for formatting error messages, or {@code null} for the current default.
      * This locale is informative only; there is no garantee that this locale will be really used.
      */
-    private transient ThreadLocal/*<Locale>*/ warningLocales;
+    private transient ThreadLocal<Locale> warningLocales;
 
     /**
      * The set of palettes already created.
      */
-    private final CanonicalSet/*<Palette>*/ palettes = new CanonicalSet();
+    private final CanonicalSet<Palette> palettes = CanonicalSet.newInstance(Palette.class);
 
     /**
      * The set of palettes protected from garbage collection. We protect a palette as long as it
      * holds a reference to a color model - this is necessary in order to prevent multiple creation
      * of the same {@link IndexColorModel}. The references are cleaned by {@link PaletteDisposer}.
      */
-    final Set protectedPalettes/*<Palette>*/ = new HashSet();
+    final Set<Palette>protectedPalettes = new HashSet<Palette>();
 
     /**
      * Gets the default palette factory. This method creates a default instance looking for
@@ -183,11 +181,11 @@ public class PaletteFactory {
      * @since 2.4
      */
     public synchronized static void scanForPlugins(final ClassLoader loader) {
-        final Set/*<Class>*/ existings = new HashSet/*<Class>*/();
+        final Set<Class<? extends PaletteFactory>> existings = new HashSet<Class<? extends PaletteFactory>>();
         for (PaletteFactory p=getDefault(); p!=null; p=p.fallback) {
             existings.add(p.getClass());
         }
-        final Iterator it = (loader == null) ?
+        final Iterator<? extends PaletteFactory> it = (loader == null) ?
                 ServiceRegistry.lookupProviders(PaletteFactory.class) :
                 ServiceRegistry.lookupProviders(PaletteFactory.class, loader);
         while (it.hasNext()) {
@@ -197,7 +195,7 @@ public class PaletteFactory {
              * the fallback field. It is okay in this context since we just created the factory
              * instance.
              */
-            final PaletteFactory factory = (PaletteFactory) it.next();
+            final PaletteFactory factory = it.next();
             if (existings.add(factory.getClass())) {
                 factory.fallback = defaultFactory;
                 defaultFactory = factory;
@@ -286,8 +284,8 @@ public class PaletteFactory {
 
     /**
      * Sets the locale to use for formatting warning or error messages. This is typically the
-     * {@linkplain ImageReader#getLocale image reader locale}. This locale is informative only;
-     * there is no garantee that this locale will be really used.
+     * {@linkplain javax.imageio.ImageReader#getLocale image reader locale}. This locale is
+     * informative only; there is no garantee that this locale will be really used.
      * <p>
      * This method sets the locale for the current thread only. It is safe to use this palette
      * factory concurrently in many threads, each with their own locale.
@@ -313,9 +311,9 @@ public class PaletteFactory {
      * method invokes itself recursively in order to assign the same {@link ThreadLocal}
      * to every factories in the chain.
      */
-    private synchronized ThreadLocal warningLocales() {
+    private synchronized ThreadLocal<Locale> warningLocales() {
         if (warningLocales == null) {
-            warningLocales = (fallback != null) ? fallback.warningLocales() : new ThreadLocal();
+            warningLocales = (fallback != null) ? fallback.warningLocales() : new ThreadLocal<Locale>();
         }
         return warningLocales;
     }
@@ -327,9 +325,12 @@ public class PaletteFactory {
      * @since 2.4
      */
     public Locale getWarningLocale() {
-        final ThreadLocal warningLocales = this.warningLocales;
+        final ThreadLocal<Locale> warningLocales = this.warningLocales;
         // Protected 'warningLocales' from changes so there is no need to synchronize.
-        return (warningLocales != null) ? (Locale) warningLocales.get() : null;
+        if (warningLocales != null) {
+            return warningLocales.get();
+        }
+        return null;
     }
 
     /**
@@ -373,19 +374,19 @@ public class PaletteFactory {
      *         is unable to fetch this information.
      */
     public String[] getAvailableNames() {
-        final Set names = new TreeSet();
+        final Set<String> names = new TreeSet<String>();
         PaletteFactory factory = this;
         do {
             factory.getAvailableNames(names);
             factory = factory.fallback;
         } while (factory != null);
-        return (String[]) names.toArray(new String[names.size()]);
+        return names.toArray(new String[names.size()]);
     }
 
     /**
      * Adds available palette names to the specified collection.
      */
-    private void getAvailableNames(final Collection names) {
+    private void getAvailableNames(final Collection<String> names) {
         /*
          * First, parses the content of every "list.txt" files found on the classpath. Those files
          * are optional. But if they are present, we assume that their content are accurate.
@@ -397,8 +398,8 @@ public class PaletteFactory {
                 readNames(in, names);
             }
             if (classloader != null) {
-                for (final Enumeration it=classloader.getResources(filename); it.hasMoreElements();) {
-                    final URL url = (URL) it.nextElement();
+                for (final Enumeration<URL> it=classloader.getResources(filename); it.hasMoreElements();) {
+                    final URL url = it.nextElement();
                     in = getReader(url.openStream());
                     readNames(in, names);
                 }
@@ -449,7 +450,9 @@ public class PaletteFactory {
      * Copies the content of the specified reader to the specified collection.
      * The reader is closed after this operation.
      */
-    private static void readNames(final BufferedReader in, final Collection names) throws IOException {
+    private static void readNames(final BufferedReader in, final Collection<String> names)
+            throws IOException
+    {
         String line;
         while ((line = in.readLine()) != null) {
             line = line.trim();
@@ -541,10 +544,11 @@ public class PaletteFactory {
      * @throws IOException if an I/O error occured.
      * @throws IIOException if a syntax error occured.
      */
+    @SuppressWarnings("fallthrough")
     private Color[] getColors(final LineNumberReader input, final String name) throws IOException {
         int values[] = null;
         final LineFormat reader = (locale!=null) ? new LineFormat(locale) : new LineFormat();
-        final List colors = new ArrayList();
+        final List<Color> colors = new ArrayList<Color>();
         String line; while ((line=input.readLine()) != null) try {
             line = line.trim();
             if (line.length() == 0)        continue;
@@ -579,7 +583,7 @@ public class PaletteFactory {
         } catch (ParseException exception) {
             throw syntaxError(input, name, exception);
         }
-        return (Color[]) colors.toArray(new Color[colors.size()]);
+        return colors.toArray(new Color[colors.size()]);
     }
 
     /**
@@ -587,33 +591,11 @@ public class PaletteFactory {
      */
     private IIOException syntaxError(final LineNumberReader input, final String name, final Exception cause) {
         String message = getErrorResources().getString(
-                ErrorKeys.BAD_LINE_IN_FILE_$2, name, new Integer(input.getLineNumber()));
+                ErrorKeys.BAD_LINE_IN_FILE_$2, name, input.getLineNumber());
         if (cause != null) {
             message += cause.getLocalizedMessage();
         }
         return new IIOException(message, cause);
-    }
-
-    /**
-     * Load colors from an URL.
-     *
-     * @param  url The palette's URL.
-     * @return The set of colors, or {@code null} if the set was not found.
-     * @throws IOException if an error occurs during reading.
-     * @throws IIOException if an error occurs during parsing.
-     *
-     * @deprecated This method should not be defined here since {@code PaletteFactory} is all
-     *             about name relative to a directory specified at construction time. If a user
-     *             wants the functionality provided by this method, he should consider creating
-     *             a new instance of {@code PaletteFactory}.
-     */
-    public Color[] getColors(final URL url) throws IOException {
-        final InputStream stream = url.openStream();
-        final LineNumberReader reader = new LineNumberReader((charset!=null) ?
-                new InputStreamReader(stream, charset) : new InputStreamReader(stream));
-        final Color[] colors = getColors(reader, url.getFile());
-        reader.close();
-        return colors;
     }
 
     /**
@@ -639,66 +621,7 @@ public class PaletteFactory {
     }
 
     /**
-     * Loads an index color model from a definition file.
-     * The returned model will use index from 0 to 255 inclusive.
-     *
-     * @param  name The palette's name to load. This name doesn't need to contains a path
-     *              or an extension. Path and extension are set according value specified
-     *              at construction time.
-     * @return The index color model, or {@code null} if the palettes was not found.
-     *
-     * @throws IOException if an error occurs during reading.
-     * @throws IIOException if an error occurs during parsing.
-     *
-     * @deprecated Replaced by {@link Palette#getColorModel}.
-     */
-    public IndexColorModel getIndexColorModel(final String name) throws IOException {
-        return getIndexColorModel(name, 0, 256);
-    }
-
-    /**
-     * Loads an index color model from a definition file.
-     * The returned model will use index from {@code lower} inclusive to
-     * {@code upper} exclusive. Other index will have a transparent color.
-     *
-     * @param  name The palette's name to load. This name doesn't need to contains a path
-     *              or an extension. Path and extension are set according value specified
-     *              at construction time.
-     * @param  lower Palette's lower index (inclusive).
-     * @param  upper Palette's upper index (exclusive).
-     * @return The index color model, or {@code null} if the palettes was not found.
-     *
-     * @throws IOException if an error occurs during reading.
-     * @throws IIOException if an error occurs during parsing.
-     *
-     * @since 2.3
-     *
-     * @deprecated Replaced by {@link Palette#getColorModel}.
-     */
-    public IndexColorModel getIndexColorModel(final String name,
-                                              final int    lower,
-                                              final int    upper)
-            throws IOException
-    {
-        if (lower < 0) {
-            throw new IllegalArgumentException(getErrorResources().getString(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "lower", new Integer(lower)));
-        }
-        if (upper <= lower) {
-            throw new IllegalArgumentException(getErrorResources().getString(
-                    ErrorKeys.BAD_RANGE_$2, new Integer(lower), new Integer(upper)));
-        }
-        final Color[] colors = getColors(name);
-        if (colors == null) {
-            return (fallback!=null) ? fallback.getIndexColorModel(name, lower, upper) : null;
-        }
-        final int[] ARGB = new int[1 << ColorUtilities.getBitCount(upper)];
-        ColorUtilities.expand(colors, ARGB, lower, upper);
-        return ColorUtilities.getIndexColorModel(ARGB);
-    }
-
-    /**
-     * Ensure that the specified valus is inside the {@code [0..255]} range.
+     * Ensures that the specified valus is inside the {@code [0..255]} range.
      * If the value is outside that range, a {@link ParseException} is thrown.
      */
     private int byteValue(final int value) throws ParseException {
@@ -775,7 +698,7 @@ public class PaletteFactory {
                               final int numBands, final int visibleBand)
     {
         Palette palette = new IndexedPalette(this, name, lower, upper, size, numBands, visibleBand);
-        palette = (Palette) palettes.unique(palette);
+        palette = palettes.unique(palette);
         return palette;
     }
 
@@ -785,8 +708,8 @@ public class PaletteFactory {
      * @param name        The palette name.
      * @param minimum     The minimal sample value expected.
      * @param maximum     The maximal sample value expected.
-     * @param dataType    The data type as a {@link DataBuffer#TYPE_FLOAT}
-     *                    or {@link DataBuffer#TYPE_DOUBLE} constant.
+     * @param dataType    The data type as a {@link java.awt.image.DataBuffer#TYPE_FLOAT}
+     *                    or {@link java.awt.image.DataBuffer#TYPE_DOUBLE} constant.
      * @param numBands    The number of bands (usually 1).
      * @param visibleBand The band to use for color computations (usually 0).
      *
@@ -799,7 +722,7 @@ public class PaletteFactory {
                                         final int dataType, final int numBands, final int visibleBand)
     {
         Palette palette = new ContinuousPalette(this, name, minimum, maximum, dataType, numBands, visibleBand);
-        palette = (Palette) palettes.unique(palette);
+        palette = palettes.unique(palette);
         return palette;
     }
 }

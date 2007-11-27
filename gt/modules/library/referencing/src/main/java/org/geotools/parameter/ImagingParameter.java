@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -296,10 +296,11 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
     public void setValue(double[] values, Unit unit) throws InvalidParameterValueException {
         throw unitlessParameter(descriptor);
     }
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -315,6 +316,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
     /**
      * Returns a hash value for this parameter.
      */
+    @Override
     public int hashCode() {
         int code = super.hashCode()*37;
         final Object value = getValue();
@@ -328,7 +330,8 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
      * Returns a clone of this parameter. Actually returns a different classes, since this
      * parameter is not really cloneable (it would requires a clone of {@link #parameters} first).
      */
-    public Object clone() {
+    @Override
+    public Parameter clone() {
         final Parameter parameter = new Parameter((ParameterDescriptor) descriptor);
         parameter.setValue(getValue());
         return parameter;

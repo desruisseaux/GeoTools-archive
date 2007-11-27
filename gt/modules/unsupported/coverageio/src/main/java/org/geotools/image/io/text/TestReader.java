@@ -16,13 +16,11 @@
  */
 package org.geotools.image.io.text;
 
-// J2SE dependencies
 import java.awt.image.BufferedImage;
 import java.io.*; // Many imports, including some for javadoc only.
 import java.text.ParseException;
 import javax.imageio.ImageReadParam;
 
-// Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.resources.XArray;
 
@@ -152,7 +150,7 @@ scan:   while (lower < readAheadLimit) {
                 try {
                     if (parser.setLine(line) != 0) {
                         if (rowCount == rows.length) {
-                            rows = (double[][]) XArray.resize(rows, rows.length * 2);
+                            rows = XArray.resize(rows, rows.length * 2);
                         }
                         rows[rowCount] = parser.getValues(rows[rowCount]);
                         rowCount++;
@@ -164,7 +162,7 @@ scan:   while (lower < readAheadLimit) {
             lower = upper;
         }
         if (originatingProvider instanceof TextImageReader.Spi) {
-            rows = (double[][]) XArray.resize(rows, rowCount);
+            rows = XArray.resize(rows, rowCount);
             return ((TextImageReader.Spi) originatingProvider).isValidContent(rows);
         }
         return true;
@@ -174,7 +172,7 @@ scan:   while (lower < readAheadLimit) {
      * Closes the reader created by this class, or {@linkplain Reader#reset reset} the
      * user's reader to its original position.
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         if (marked != null) {
             marked.reset();

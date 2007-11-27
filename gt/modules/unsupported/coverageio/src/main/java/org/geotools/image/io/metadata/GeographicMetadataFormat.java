@@ -16,12 +16,10 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
 import java.util.List;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadataFormatImpl;
 
-// OpenGIS dependencies
 import org.opengis.geometry.Envelope;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridGeometry;
@@ -30,8 +28,6 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.resources.UnmodifiableArrayList;
 
 
@@ -163,14 +159,14 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * Enumeration of valid coordinate reference system types.
      */
-    static final List/*<String>*/ CRS_TYPES = new UnmodifiableArrayList(new String[] {
+    static final List<String> CRS_TYPES = UnmodifiableArrayList.wrap(new String[] {
         GEOGRAPHIC, PROJECTED
     });
 
     /**
      * Enumeration of valid coordinate system types.
      */
-    static final List/*<String>*/ CS_TYPES = new UnmodifiableArrayList(new String[] {
+    static final List<String> CS_TYPES = UnmodifiableArrayList.wrap(new String[] {
         ELLIPSOIDAL, CARTESIAN
     });
 
@@ -179,7 +175,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
      * since they are already available as {@linkplain org.opengis.referencing.cs.AxisDirection
      * axis direction} code list.
      */
-    static final List/*<String>*/ DIRECTIONS = new UnmodifiableArrayList(new String[] {
+    static final List<String> DIRECTIONS = UnmodifiableArrayList.wrap(new String[] {
         "north", "east", "south", "west", "up", "down"
     });
 
@@ -188,14 +184,14 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
      * since they are already available as {@linkplain org.opengis.metadata.spatial.PixelOrientation
      * pixel orientation} code list.
      */
-    static final List/*<String>*/ PIXEL_ORIENTATIONS = new UnmodifiableArrayList(new String[] {
+    static final List<String> PIXEL_ORIENTATIONS = UnmodifiableArrayList.wrap(new String[] {
         "center", "lower left", "lower right", "upper right", "upper left"
     });
 
     /**
      * Enumeration of valid sample dimention types.
      */
-    static final List/*<String>*/ SAMPLE_TYPES = new UnmodifiableArrayList(new String[] {
+    static final List<String> SAMPLE_TYPES = UnmodifiableArrayList.wrap(new String[] {
         GEOPHYSICS, PACKED
     });
 
@@ -311,7 +307,7 @@ public class GeographicMetadataFormat extends IIOMetadataFormatImpl {
     /**
      * Adds an optional object value of the specified class.
      */
-    private void addObjectValue(final String elementName, final Class/*<*>*/ classType) {
+    private void addObjectValue(final String elementName, final Class<?> classType) {
         addObjectValue(elementName, classType, false, null);
     }
 

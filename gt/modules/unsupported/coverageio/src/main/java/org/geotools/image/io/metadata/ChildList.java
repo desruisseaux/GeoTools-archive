@@ -16,12 +16,9 @@
  */
 package org.geotools.image.io.metadata;
 
-// J2SE dependencies
 import java.util.ArrayList;
 import java.util.List;
-import org.w3c.dom.Node;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -34,11 +31,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccessor {
+abstract class ChildList<T extends MetadataAccessor> extends MetadataAccessor {
     /**
      * The list of childs.
      */
-    private final List/*<T>*/ childs;
+    private final List<T> childs;
 
     /**
      * Creates a parser for childs. The arguments are given unchanged to the
@@ -53,7 +50,7 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
     protected ChildList(final GeographicMetadata metadata, final String parentPath, final String childPath) {
         super(metadata, parentPath, childPath);
         final int count = childCount();
-        childs = new ArrayList(count != 0 ? count : 4);
+        childs = new ArrayList<T>(count != 0 ? count : 4);
     }
 
     /**
@@ -62,14 +59,14 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
      * @param  index the child index.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
-    public /*T*/MetadataAccessor getChild(final int index) throws IndexOutOfBoundsException {
+    public T getChild(final int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= childCount()) {
             throw new IndexOutOfBoundsException(Errors.format(outOfBounds(), new Integer(index)));
         }
         while (childs.size() <= index) {
             childs.add(null);
         }
-        MetadataAccessor candidate = (MetadataAccessor) childs.get(index);
+        T candidate = childs.get(index);
         if (candidate == null) {
             candidate = newChild(index);
             childs.set(index, candidate);
@@ -80,9 +77,9 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
     /**
      * Creates a new child, append to the list and returns it.
      */
-    public /*T*/MetadataAccessor addChild() {
+    public T addChild() {
         final int index = appendChild();
-        final MetadataAccessor candidate = newChild(index);
+        final T candidate = newChild(index);
         assert index == childs.size();
         childs.add(candidate);
         return candidate;
@@ -91,7 +88,7 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
     /**
      * Creates a new child at the specified index.
      */
-    protected abstract /*T*/MetadataAccessor newChild(int index);
+    protected abstract T newChild(int index);
 
     /**
      * Returns the key for "out of range" error localization.
@@ -103,18 +100,19 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
     /**
      * A list of {@linkplain Band bands}.
      */
-    static final class Bands extends ChildList/*<Band>*/ {
+    static final class Bands extends ChildList<Band> {
         /** Creates a parser for bands. */
         public Bands(final GeographicMetadata metadata) {
             super(metadata, "SampleDimensions", "SampleDimension");
         }
 
         /** Create a new band. */
-        protected /*<Band>*/ MetadataAccessor newChild(final int index) {
+        protected Band newChild(final int index) {
             return new Band(this, index);
         }
 
         /** Returns the key for "out of range" error localization. */
+        @Override
         int outOfBounds() {
             return ErrorKeys.BAD_BAND_NUMBER_$1;
         }
@@ -123,14 +121,14 @@ abstract class ChildList/*<T extends MetadataAccessor>*/ extends MetadataAccesso
     /**
      * A list of {@linkplain Axis axis}.
      */
-    static final class Axes extends ChildList/*<Axis>*/ {
+    static final class Axes extends ChildList<Axis> {
         /** Creates a parser for axis. */
         public Axes(final GeographicMetadata metadata) {
             super(metadata, "CoordinateReferenceSystem/CoordinateSystem", "Axis");
         }
 
         /** Create a new band. */
-        protected /*<Axis>*/ MetadataAccessor newChild(final int index) {
+        protected Axis newChild(final int index) {
             return new Axis(this, index);
         }
     }

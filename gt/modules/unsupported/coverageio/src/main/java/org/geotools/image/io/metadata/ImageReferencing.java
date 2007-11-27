@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.metadata;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.Datum;                     // For javadoc
 import org.opengis.referencing.datum.TemporalDatum;             // For javadoc
 import org.opengis.referencing.cs.AxisDirection;                // For javadoc
@@ -44,7 +43,7 @@ public class ImageReferencing extends MetadataAccessor {
     /**
      * The {@code "CoordinateReferenceSystem/CoordinateSystem"} node.
      */
-    final ChildList/*<Axis>*/ cs;
+    final ChildList<Axis> cs;
 
     /**
      * Creates a parser for a coordinate system. This constructor should not be invoked
@@ -146,7 +145,7 @@ public class ImageReferencing extends MetadataAccessor {
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
     public Axis getAxis(final int index) throws IndexOutOfBoundsException {
-        return (Axis) cs.getChild(index);
+        return cs.getChild(index);
     }
 
     /**
@@ -163,7 +162,7 @@ public class ImageReferencing extends MetadataAccessor {
      * @see AxisDirection
      */
     public Axis addAxis(final String name, final String direction, final String units) {
-        final Axis axis = (Axis) cs.addChild();
+        final Axis axis = cs.addChild();
         axis.setName(name);
         axis.setDirection(direction);
         axis.setUnits(units);

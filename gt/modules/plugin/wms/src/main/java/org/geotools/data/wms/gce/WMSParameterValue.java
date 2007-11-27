@@ -178,8 +178,8 @@ public class WMSParameterValue extends Parameter {
     /* (non-Javadoc)
      * @see java.lang.Object#clone()
      */
-    public Object clone() {
+    public WMSParameterValue clone() {
         // TODO Auto-generated method stub
-        return new WMSParameterValue(new String((String) value), descriptor);
+        return new WMSParameterValue(value, descriptor);
     }
 }

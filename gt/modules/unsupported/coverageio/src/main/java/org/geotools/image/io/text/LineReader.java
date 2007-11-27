@@ -16,7 +16,6 @@
  */
 package org.geotools.image.io.text;
 
-// Input/Output
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
@@ -77,6 +76,7 @@ final class LineReader extends LineNumberReader {
      * @return The character read, or -1 if the end of the stream has been reached.
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public int read() throws IOException {
         synchronized (lock) {
             final int c = super.read();
@@ -96,6 +96,7 @@ final class LineReader extends LineNumberReader {
      * @return The number of bytes read, or -1 if the end of the stream has already been reached.
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public int read(final char cbuf[], final int off, final int len) throws IOException {
         synchronized (lock) {
             final int n = super.read(cbuf, off, len);
@@ -116,6 +117,7 @@ final class LineReader extends LineNumberReader {
      *         stream has been reached
      * @throws IOException  If an I/O error occurs.
      */
+    @Override
     public String readLine() throws IOException {
         synchronized (lock) {
             // TODO: Position update is **approximative**. There is no way to
@@ -138,6 +140,7 @@ final class LineReader extends LineNumberReader {
      *         the stream may fail.
      * @throws IOException If an I/O error occurs.
      */
+    @Override
     public void mark(final int readAheadLimit) throws IOException {
         synchronized (lock) {
             super.mark(readAheadLimit);
@@ -150,6 +153,7 @@ final class LineReader extends LineNumberReader {
      *
      * @throws IOException If the stream has not been marked, or if the mark has been invalidated.
      */
+    @Override
     public void reset() throws IOException {
         synchronized (lock) {
             super.reset();

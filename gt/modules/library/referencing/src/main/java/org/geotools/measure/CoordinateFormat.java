@@ -419,8 +419,7 @@ public class CoordinateFormat extends Format {
         if (crs != null) {
             if (dimension != formats.length) {
                 throw new MismatchedDimensionException(Errors.format(
-                            ErrorKeys.MISMATCHED_DIMENSION_$3, "point",
-                            new Integer(dimension), new Integer(formats.length)));
+                            ErrorKeys.MISMATCHED_DIMENSION_$3, "point", dimension, formats.length));
             }
             cs = crs.getCoordinateSystem();
         } else {

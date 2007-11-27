@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,13 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies
 import java.io.Serializable;
+import static java.lang.Double.doubleToLongBits;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.util.Cloneable;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.matrix.Matrix4;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.wkt.Formattable;
@@ -56,31 +54,31 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 754825592343010900L;
-    
+
     /** Bursa Wolf shift in meters. */
     public double dx;
-    
+
     /** Bursa Wolf shift in meters. */
     public double dy;
-    
+
     /** Bursa Wolf shift in meters. */
     public double dz;
-    
+
     /** Bursa Wolf rotation in arc seconds. */
     public double ex;
-    
+
     /** Bursa Wolf rotation in arc seconds. */
     public double ey;
-    
+
     /** Bursa Wolf rotation in arc seconds. */
     public double ez;
-    
+
     /** Bursa Wolf scaling in parts per million. */
     public double ppm;
 
     /** The target datum for this parameters. */
     public final GeodeticDatum targetDatum;
-    
+
     /**
      * Constructs a transformation info with all parameters set to 0.
      *
@@ -199,48 +197,51 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         long code = serialVersionUID;
-        code = code*37 + Double.doubleToLongBits(dx );
-        code = code*37 + Double.doubleToLongBits(dy );
-        code = code*37 + Double.doubleToLongBits(dz );
-        code = code*37 + Double.doubleToLongBits(ex );
-        code = code*37 + Double.doubleToLongBits(ey );
-        code = code*37 + Double.doubleToLongBits(ez );
-        code = code*37 + Double.doubleToLongBits(ppm);
+        code = code*37 + doubleToLongBits(dx );
+        code = code*37 + doubleToLongBits(dy );
+        code = code*37 + doubleToLongBits(dz );
+        code = code*37 + doubleToLongBits(ex );
+        code = code*37 + doubleToLongBits(ey );
+        code = code*37 + doubleToLongBits(ez );
+        code = code*37 + doubleToLongBits(ppm);
         return (int)(code >>> 32) ^ (int)code;
     }
-    
+
     /**
      * Returns a copy of this object.
      */
-    public Object clone() {
+    @Override
+    public BursaWolfParameters clone() {
         try {
-            return super.clone();
+            return (BursaWolfParameters) super.clone();
         }  catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.
             throw new AssertionError(exception);
         }
     }
-    
+
     /**
      * Compares the specified object with this object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof BursaWolfParameters) {
             final BursaWolfParameters that = (BursaWolfParameters) object;
-            return Double.doubleToLongBits(this.dx)  == Double.doubleToLongBits(that.dx)  &&
-                   Double.doubleToLongBits(this.dy)  == Double.doubleToLongBits(that.dy)  &&
-                   Double.doubleToLongBits(this.dz)  == Double.doubleToLongBits(that.dz)  &&
-                   Double.doubleToLongBits(this.ex)  == Double.doubleToLongBits(that.ex)  &&
-                   Double.doubleToLongBits(this.ey)  == Double.doubleToLongBits(that.ey)  &&
-                   Double.doubleToLongBits(this.ez)  == Double.doubleToLongBits(that.ez)  &&
-                   Double.doubleToLongBits(this.ppm) == Double.doubleToLongBits(that.ppm) &&
+            return doubleToLongBits(this.dx)  == doubleToLongBits(that.dx)  &&
+                   doubleToLongBits(this.dy)  == doubleToLongBits(that.dy)  &&
+                   doubleToLongBits(this.dz)  == doubleToLongBits(that.dz)  &&
+                   doubleToLongBits(this.ex)  == doubleToLongBits(that.ex)  &&
+                   doubleToLongBits(this.ey)  == doubleToLongBits(that.ey)  &&
+                   doubleToLongBits(this.ez)  == doubleToLongBits(that.ez)  &&
+                   doubleToLongBits(this.ppm) == doubleToLongBits(that.ppm) &&
                    Utilities.equals(this.targetDatum, that.targetDatum);
         }
         return false;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -252,6 +253,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatter.append(dx);
         formatter.append(dy);

@@ -136,7 +136,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * The data type to accept in images. Used for automatic detection of which variables
      * to assign to images.
      */
-    private static final Set/*<DataType>*/ VALID_TYPES = new HashSet(12);
+    private static final Set<DataType> VALID_TYPES = new HashSet<DataType>(12);
     static {
         VALID_TYPES.add(DataType.BOOLEAN);
         VALID_TYPES.add(DataType.BYTE);
@@ -246,7 +246,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
         if (variableNames == null) {
             ensureFileOpen();
         }
-        return (String[]) variableNames.clone();
+        return variableNames.clone();
     }
 
     /**
@@ -258,7 +258,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * variables will be inferred from the content of the NetCDF file.
      */
     public void setVariables(final String[] variableNames) {
-        this.variableNames = (variableNames != null) ? (String[]) variableNames.clone() : null;
+        this.variableNames = (variableNames != null) ? variableNames.clone() : null;
     }
 
     /**
@@ -267,7 +267,7 @@ public class NetcdfImageReader extends FileImageReader implements CancelTask {
      * @throws IllegalStateException if the input source has not been set.
      * @throws IOException if an error occurs reading the information from the input source.
      */
-    //@Override
+    @Override
     public int getNumImages(final boolean allowSearch) throws IllegalStateException, IOException {
         ensureFileOpen();
         // TODO: consider returning the actual number of images in the file.
@@ -366,7 +366,7 @@ scan:       while (it.hasNext()) {
     /**
      * Returns the metadata associated with the input source as a whole.
      */
-    //@Override
+    @Override
     public IIOMetadata getStreamMetadata() throws IOException {
         if (streamMetadata == null && !ignoreMetadata) {
             ensureFileOpen();
@@ -379,7 +379,7 @@ scan:       while (it.hasNext()) {
     /**
      * Returns the metadata associated with the image at the specified index.
      */
-    //@Override
+    @Override
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         if (imageMetadata == null && !ignoreMetadata) {
             prepareVariable(imageIndex);
@@ -418,7 +418,7 @@ scan:       while (it.hasNext()) {
      * @return The data type, or {@link DataBuffer#TYPE_UNDEFINED} if unknown.
      * @throws IOException If an error occurs reading the format information from the input source.
      */
-    //@Override
+    @Override
     protected int getRawDataType(final int imageIndex) throws IOException {
         prepareVariable(imageIndex);
         return VariableMetadata.getRawDataType(variable);
@@ -567,7 +567,7 @@ scan:       while (it.hasNext()) {
                         filtered[count++] = candidate.getName();
                     }
                 }
-                variableNames = (String[]) XArray.resize(filtered, count);
+                variableNames = XArray.resize(filtered, count);
             }
         }
     }
@@ -639,11 +639,10 @@ scan:       while (it.hasNext()) {
          * We tried a case-sensitive search without success. Now tries a case-insensitive search
          * before to report a failure.
          */
-        final List/*<Variable>*/ variables = dataset.getVariables();
+        final List<Variable> variables = dataset.getVariables();
         if (variables != null) {
-            for (final java.util.Iterator/*<Variable>*/ it=variables.iterator(); it.hasNext();) {
-                candidate = (Variable) it.next();
-                if (candidate!=null && name.equalsIgnoreCase(candidate.getName())) {
+            for (final Variable variable : variables) {
+                if (variable!=null && name.equalsIgnoreCase(variable.getName())) {
                     return candidate;
                 }
             }
@@ -658,7 +657,7 @@ scan:       while (it.hasNext()) {
      * @return Parameters which may be used to control the decoding process using a set
      *         of default settings.
      */
-    //@Override
+    @Override
     public ImageReadParam getDefaultReadParam() {
         return new NetcdfReadParam(this);
     }
@@ -856,7 +855,7 @@ scan:       while (it.hasNext()) {
     /**
      * Closes the NetCDF file.
      */
-    //@Override
+    @Override
     protected void close() throws IOException {
         metadataLoaded = false;
         streamMetadata = null;

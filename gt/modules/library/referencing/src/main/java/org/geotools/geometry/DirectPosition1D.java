@@ -190,9 +190,9 @@ public class DirectPosition1D extends AbstractDirectPosition implements Serializ
      *
      * @todo Uncomment after we removed the super-class method.
      */
-//    public Object clone() {
+//    public DirectPosition1D clone() {
 //        try {
-//            return super.clone();
+//            return (DirectPosition1D) super.clone();
 //        } catch (CloneNotSupportedException exception) {
 //            // Should not happen, since we are cloneable.
 //            throw new AssertionError(exception);
