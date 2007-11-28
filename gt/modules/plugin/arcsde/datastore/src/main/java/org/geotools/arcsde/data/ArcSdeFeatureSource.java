@@ -87,22 +87,21 @@ public class ArcSdeFeatureSource implements FeatureSource {
                 }
             }
         }
-        if (LOGGER.isLoggable(Level.FINE)) {
-            if (ev != null) {
+        if (ev != null) {
+            if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("ArcSDE optimized getBounds call returned: " + ev);
-                final ReferencedEnvelope envelope;
-                final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
-                if (defaultGeometry == null) {
-                    envelope = ReferencedEnvelope.reference(ev);
-                } else {
-                    envelope = new ReferencedEnvelope(ev, defaultGeometry.getCRS());
-                }
-                return envelope;
-            } else {
-                LOGGER.finer("ArcSDE couldn't process all filters in this query, "
-                        + "so optimized getBounds() returns null.");
             }
+            final ReferencedEnvelope envelope;
+            final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
+            if (defaultGeometry == null) {
+                envelope = ReferencedEnvelope.reference(ev);
+            } else {
+                envelope = new ReferencedEnvelope(ev, defaultGeometry.getCRS());
+            }
+            return envelope;
         }
+        LOGGER.finer("ArcSDE couldn't process all filters in this query, "
+                + "so optimized getBounds() returns null.");
 
         return null;
     }
