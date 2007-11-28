@@ -66,11 +66,11 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 /**
- * Used to duplication Filters and/or Expressions. 
- * <p>Returns the copy.  
+ * Used to duplication Filters and/or Expressions - returned object is a copy.
+ * <p>
  * Extra data can be used to provide a {@link FilterFactory2} but this is NOT required.
- * Thread safe class.
- *  </ul>
+ * This class is thread safe.
+ * </ul>
  * @author Jesse
  *
  */

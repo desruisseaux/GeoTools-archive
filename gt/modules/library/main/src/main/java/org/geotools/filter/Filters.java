@@ -21,8 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -195,10 +194,9 @@ public class Filters {
      * </p>
      */
     public Filter duplicate( Filter filter ){
-    	DuplicatorFilterVisitor xerox = new DuplicatorFilterVisitor( ff );        
-    	Filters.accept( filter, xerox );
-    	return (Filter) xerox.getCopy();
-    	
+    	DuplicatingFilterVisitor xerox = new DuplicatingFilterVisitor( ff );
+    	Filter copy = (Filter) filter.accept( xerox, ff );
+    	return copy;
     }
         
     /**

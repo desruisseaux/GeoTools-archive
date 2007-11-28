@@ -300,10 +300,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * @see #getAccuracy()
      */
     public Collection<PositionalAccuracy> getPositionalAccuracy() {
-        if (positionalAccuracy == null) {
-            return Collections.emptySet();
-        }
-        return positionalAccuracy;
+        return getCoordinateOperationAccuracy();
     }
 
     /**
@@ -316,7 +313,19 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     public double getAccuracy() {
         return getAccuracy0(this);
     }
-
+    /**
+     * Estimate(s) of the impact of this operation on point accuracy. Gives
+     * position error estimates for target coordinates of this coordinate
+     * operation, assuming no errors in source coordinates.
+     *
+     * @return The position error estimates, or an empty collection if not available.
+     */
+    public Collection<PositionalAccuracy> getCoordinateOperationAccuracy() {
+        if (positionalAccuracy == null) {
+            return Collections.emptySet();
+        }
+        return positionalAccuracy;
+    }
     /**
      * Convenience method returning the accuracy in meters for the specified operation. This method
      * try each of the following procedures and returns the first successful one:
@@ -436,7 +445,14 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     public Extent getValidArea() {
         return validArea;
     }
-
+    /**
+     * Area or region or timeframe in which this coordinate operation is valid.
+     *
+     * @return The coordinate operation valid domain, or {@code null} if not available.
+     */
+    public Extent getDomainOfValidity() {
+        return validArea;
+    }
     /**
      * Description of domain of usage, or limitations of usage, for which this operation is valid.
      */

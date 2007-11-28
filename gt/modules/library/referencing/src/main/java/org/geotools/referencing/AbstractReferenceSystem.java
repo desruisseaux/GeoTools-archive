@@ -118,11 +118,21 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
     }
 
     /**
-     * Area for which the (coordinate) reference system is valid.
-     * Returns {@code null} if not available.
+     * Area or region or timeframe in which this datum is valid.
+     *
+     * @return The datum valid domain, or {@code null} if not available.
+     *
+     * @since GeoAPI 2.1
+     */
+    public Extent getDomainOfValidity() {
+        return validArea;
+    }
+    /**
+     * Area or region in which this datum object is valid.
+     * @deprecated Use getDomainOfValidity
      */
     public Extent getValidArea() {
-        return validArea;
+        return getDomainOfValidity();
     }
 
     /**
