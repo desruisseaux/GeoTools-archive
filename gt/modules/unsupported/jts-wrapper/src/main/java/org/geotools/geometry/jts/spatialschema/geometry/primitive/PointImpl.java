@@ -38,6 +38,7 @@ import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSUtils;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.geometry.complex.Composite;
 
 
 /**
@@ -165,6 +166,10 @@ public class PointImpl extends GeometryImpl implements Point {
 
     public Set getComplexes() {
         throw new UnsupportedOperationException();
+    }
+
+    public Composite getComposite() {
+        return null;
     }
 
     public OrientablePrimitive[] getProxy() {

@@ -27,6 +27,7 @@ import org.opengis.geometry.Geometry;
 import org.opengis.geometry.Precision;
 import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.Composite;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveBoundary;
@@ -108,6 +109,10 @@ public class OrientablePrimitiveProxy implements OrientablePrimitive, Serializab
 	public Set<Complex> getComplexes() {
 		return primitive.getComplexes();
 	}
+
+        public Composite getComposite() {
+            return null;
+        }
 
 	public OrientablePrimitive[] getProxy() {
 		return primitive.getProxy();

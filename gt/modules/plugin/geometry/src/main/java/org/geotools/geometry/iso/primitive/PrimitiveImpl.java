@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import org.geotools.geometry.iso.complex.ComplexImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.Composite;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveBoundary;
@@ -155,6 +156,10 @@ public abstract class PrimitiveImpl extends GeometryImpl implements Primitive {
 	public Set<Complex> getComplexes() {
 		return this.complex;
 	}
+
+        public Composite getComposite() {
+            return null;
+        }
 
 	/**
 	 * Adds a new subelement of same or lower dimension then this object. This

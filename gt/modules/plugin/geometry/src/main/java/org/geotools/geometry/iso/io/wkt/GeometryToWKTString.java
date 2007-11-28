@@ -17,6 +17,7 @@
 
 package org.geotools.geometry.iso.io.wkt;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -166,7 +167,7 @@ public class GeometryToWKTString {
 	
 	private String curveCoordToString(Curve c) {
 		String rString = "";
-		List<CurveSegment> segments = c.getSegments();
+		List<? extends CurveSegment> segments = c.getSegments();
 		rString += directPositionToString(c.getStartPoint());
 		for (int i = 0; i < segments.size(); i++) {
 			rString += ", ";
@@ -177,28 +178,27 @@ public class GeometryToWKTString {
 
 	private String curveCoordToStringWithoutFirstCoord(Curve c) {
 		String rString = "";
-		List<CurveSegment> segments = c.getSegments();
-		for (int i = 0; i < segments.size(); i++) {
+		for (CurveSegment segment : c.getSegments()) {
 			rString += ", ";
-			rString += lineStringCoordToStringWithoutFirstCoord(segments.get(i));
+			rString += lineStringCoordToStringWithoutFirstCoord(segment);
 		}
 		return rString;
 	}
 	
 	private String ringCoordToString(Ring r) {
-		List<OrientableCurve> orientableCurves = r.getGenerators();
-		String rString = directPositionToString(((Curve) orientableCurves.get(0)).getStartPoint());
-		for (int i = 0; i < orientableCurves.size(); i++) {
-			rString += curveCoordToStringWithoutFirstCoord((Curve) orientableCurves.get(i));
+		Collection<? extends Primitive> orientableCurves = r.getGenerators();
+		String rString = directPositionToString(((Curve) orientableCurves.iterator().next()).getStartPoint());
+		for (Primitive p : orientableCurves) {
+			rString += curveCoordToStringWithoutFirstCoord((Curve) p);
 		}
 		return rString;
 	}
 	
 	private String compositeCurveCoordToString(CompositeCurve cc) {
-		List<OrientableCurve> orientableCurves = cc.getGenerators();
-		String rString = directPositionToString(((Curve) orientableCurves.get(0)).getStartPoint());
-		for (int i = 0; i < orientableCurves.size(); i++) {
-			rString += curveCoordToStringWithoutFirstCoord((Curve) orientableCurves.get(i));
+		Collection<? extends Primitive> orientableCurves = cc.getGenerators();
+		String rString = directPositionToString(((Curve) orientableCurves.iterator().next()).getStartPoint());
+		for (Primitive p : orientableCurves) {
+			rString += curveCoordToStringWithoutFirstCoord((Curve) p);
 		}
 		return rString;
 	}

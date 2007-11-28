@@ -369,8 +369,8 @@ public class PicoCurveTest extends TestCase {
 		Curve curve = primF.createCurve(segs);		
 		
 		// get points from curve
-		List<CurveSegment> segs2 = curve.getSegments();
-		Iterator<CurveSegment> iter = segs2.iterator();
+		List<? extends CurveSegment> segs2 = curve.getSegments();
+		Iterator<? extends CurveSegment> iter = segs2.iterator();
 		PointArray samplePoints = null;
 		while (iter.hasNext()) {
 			if (samplePoints == null) {

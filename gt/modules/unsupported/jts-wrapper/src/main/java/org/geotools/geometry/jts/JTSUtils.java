@@ -289,9 +289,11 @@ public final class JTSUtils {
             pointList.add(coordinateToDirectPosition(jtsLinearRing.getCoordinateN(i), crs));
         }
         Curve curve = pf.createCurve(new ArrayList());
-        curve.getSegments().add(ls);
+        // Cast below can be removed when GeoAPI will be allowed to abandon Java 1.4 support.
+        ((List) curve.getSegments()).add(ls);
         Ring result = pf.createRing(new ArrayList());
-        result.getGenerators().add(curve);
+        // Cast below can be removed when GeoAPI will be allowed to abandon Java 1.4 support.
+        ((List) result.getGenerators()).add(curve);
         return result;
     }
 

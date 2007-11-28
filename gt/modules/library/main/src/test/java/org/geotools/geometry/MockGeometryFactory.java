@@ -15,6 +15,7 @@ import org.opengis.geometry.TransfiniteSet;
 import org.opengis.geometry.UnmodifiableGeometryException;
 import org.opengis.geometry.aggregate.MultiPrimitive;
 import org.opengis.geometry.complex.Complex;
+import org.opengis.geometry.complex.Composite;
 import org.opengis.geometry.complex.CompositeCurve;
 import org.opengis.geometry.coordinate.Arc;
 import org.opengis.geometry.coordinate.ArcByBulge;
@@ -571,6 +572,10 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             this.position = position;
         }
         public Set getComplexes() {
+            return null;
+        }
+
+        public Composite getComposite() {
             return null;
         }
 

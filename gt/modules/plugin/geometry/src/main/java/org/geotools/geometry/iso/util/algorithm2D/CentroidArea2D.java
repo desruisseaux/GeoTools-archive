@@ -87,7 +87,7 @@ public class CentroidArea2D {
 	public void add(GeometryImpl geom) {
 		if (geom instanceof SurfaceImpl) {
 			SurfaceBoundaryImpl sb = ((SurfaceImpl) geom).getBoundary();
-			this.setBasePoint( ((CurveImpl)sb.getExterior().getGenerators().get(0)).getStartPoint());
+			this.setBasePoint( ((CurveImpl)sb.getExterior().getGenerators().iterator().next()).getStartPoint());
 			this.addSurface(sb);
 		} else if (geom instanceof MultiSurfaceImpl) {
 			Iterator<OrientableSurface> surfaces = ((MultiSurfaceImpl) geom).getElements().iterator();

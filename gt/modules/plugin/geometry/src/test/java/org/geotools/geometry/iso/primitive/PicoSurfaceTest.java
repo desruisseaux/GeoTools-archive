@@ -308,8 +308,8 @@ public class PicoSurfaceTest extends TestCase {
 		PointArray samplePoints = null;
 		while (iter.hasNext()) {
 			Curve curve2 = (Curve) iter.next();
-			List<CurveSegment> segs2 = curve2.getSegments();
-			Iterator<CurveSegment> iter2 = segs2.iterator();
+			List<? extends CurveSegment> segs2 = curve2.getSegments();
+			Iterator<? extends CurveSegment> iter2 = segs2.iterator();
 			while (iter2.hasNext()) {
 				if (samplePoints == null) {
 					samplePoints = iter2.next().getSamplePoints();

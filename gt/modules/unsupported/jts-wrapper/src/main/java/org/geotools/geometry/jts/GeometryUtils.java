@@ -599,7 +599,8 @@ public final class GeometryUtils {
      * @return The populated List, or null if not valid
      */
     private static ArrayList getLineStrings(CompositeCurve cc, ArrayList lsList) {
-    	List elements = cc.getGenerators();
+        // Cast below can be removed when GeoAPI will be allowed to abandon Java 1.4 support.
+    	List elements = (List) cc.getGenerators();
     	boolean valid = true;
     	if (!elements.isEmpty()) {
     		Iterator it = elements.iterator();
@@ -641,7 +642,8 @@ public final class GeometryUtils {
     
     public static DirectPosition[] getDirectPositions(final Ring ring) {
         final List directPositionList = new ArrayList();
-        final List/*<Curve>*/ generators = ring.getGenerators();
+        // Cast below can be removed when GeoAPI will be allowed to abandon Java 1.4 support.
+        final List/*<Curve>*/ generators = (List) ring.getGenerators();
         for (int i = 0; i < generators.size(); i++) {
             final Curve curve = (Curve) generators.get(i);
             final List/*<CurveSegments>*/ segments = curve.getSegments();
