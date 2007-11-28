@@ -233,11 +233,15 @@ public class OracleDataStore extends JDBCDataStore {
         ResultSet result = null;
         try {
             String sqlStatement = //
-            "select meta.sdo_layer_gtype \n" + "from mdsys.USER_SDO_INDEX_INFO info \n"
+            "select meta.sdo_layer_gtype \n" + "from mdsys.ALL_SDO_INDEX_INFO info \n"
                     + " inner join mdsys.user_sdo_index_metadata meta \n"
                     + " on info.index_name = meta.sdo_index_name \n" //
                     + "where info.table_name = '" + tableName + "' \n" //
                     + "and info.column_name = '" + columnName + "'";
+            String schema = config.getDatabaseSchemaName();
+            if(schema != null && !"".equals(schema)) {
+                sqlStatement += " and info.table_owner = '" + schema + "'";
+            }
             conn = getConnection(Transaction.AUTO_COMMIT);
             LOGGER.finer("the sql statement for geometry type check is " + sqlStatement);
             statement = conn.createStatement();
@@ -280,9 +284,13 @@ public class OracleDataStore extends JDBCDataStore {
     protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
         Connection conn = null;        
 	 try {
-            String sqlStatement = "SELECT SRID FROM MDSYS.USER_SDO_GEOM_METADATA "
+            String sqlStatement = "SELECT SRID FROM MDSYS.ALL_SDO_GEOM_METADATA "
                 + "WHERE TABLE_NAME='" + tableName + "' AND COLUMN_NAME='"
                 + geometryColumnName + "'";
+            String schema = config.getDatabaseSchemaName();
+            if(schema != null && !"".equals(schema)) {
+                sqlStatement += " and OWNER = '" + schema + "'";
+            }
             conn = getConnection(Transaction.AUTO_COMMIT);
             LOGGER.finer("the sql statement for srid is " + sqlStatement);
             Statement statement = conn.createStatement();
