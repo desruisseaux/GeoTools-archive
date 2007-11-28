@@ -6,4 +6,5 @@ public class SeError {
 	public int getSdeError() { return -1; }
 	public String getSdeErrMsg() { return null; }
 	public int getExtError(){return 0;}
+    public String getExtErrMsg() {return null;}
 }

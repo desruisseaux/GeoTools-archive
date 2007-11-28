@@ -10,4 +10,6 @@ public class SeInsert {
 	public void execute() throws SeException{}
 	public void close()throws SeException {}
 
+    public SeObjectId lastInsertedRowId() {return null;}
+
 }

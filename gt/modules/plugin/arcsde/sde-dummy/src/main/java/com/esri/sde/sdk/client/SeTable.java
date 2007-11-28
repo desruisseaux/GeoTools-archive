@@ -18,4 +18,8 @@ public class SeTable {
 	}
     public int getPermissions() throws SeException{return 0;}
 	
+    public static class SeTableIdRange{
+        public SeObjectId getStartId() {return null;}
+    }
+    public SeTableIdRange getIds(int i)throws SeException {return null;}
 }

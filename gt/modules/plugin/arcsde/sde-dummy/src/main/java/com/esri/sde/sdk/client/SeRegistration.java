@@ -15,4 +15,6 @@ public class SeRegistration {
 	public void alter() {}
 	public String getTableName() { return null; }
 
+    public boolean isMultiVersion() {return false;}
+
 }

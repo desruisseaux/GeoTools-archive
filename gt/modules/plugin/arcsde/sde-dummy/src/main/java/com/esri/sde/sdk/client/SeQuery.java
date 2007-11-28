@@ -9,7 +9,7 @@ public class SeQuery {
 	
 	public static /* GEOT-947 final*/ short SE_OPTIMIZE = 0;
 	
-	public void prepareQuery() {}
+	public void prepareQuery()throws SeException {}
 	public void prepareQueryInfo(SeQueryInfo i)throws SeException {}
 	public SeExtent calculateLayerExtent(SeQueryInfo i) { return null; }
 	public void close() throws SeException {}
@@ -17,8 +17,8 @@ public class SeQuery {
 	public void flushBufferedWrites() {}
 	public void cancel(boolean b) {}
 	public void setRowLocking(int i) {}
-	public SeRow fetch() { return null; }
-	public void setSpatialConstraints(short i, boolean b, SeFilter[] f) {}
+	public SeRow fetch() throws SeException{ return null; }
+	public void setSpatialConstraints(short i, boolean b, SeFilter[] f)throws SeException {}
 	public SeTableStats calculateTableStatistics(String s, int i, SeQueryInfo q, int j) { return null; }
 	public void queryRasterTile(SeRasterConstraint c) {}
 	public void prepareSql(String s) {}
