@@ -456,7 +456,7 @@ public abstract class MathTransformBuilder {
         if (validArea != null) {
             final ExtentImpl extent = new ExtentImpl();
             extent.getGeographicElements().add(validArea);
-            properties.put(CoordinateReferenceSystem.VALID_AREA_KEY, extent.unmodifiable());
+            properties.put(CoordinateReferenceSystem.DOMAIN_OF_VALIDITY_KEY, extent.unmodifiable());
         }
         final CoordinateReferenceSystem oppositeCRS = target ? sourceCRS : targetCRS;
         final CoordinateSystem cs;
@@ -725,7 +725,7 @@ public abstract class MathTransformBuilder {
             if (validArea != null) {
                 final ExtentImpl extent = new ExtentImpl();
                 extent.getGeographicElements().add(validArea);
-                properties.put(Transformation.VALID_AREA_KEY, extent.unmodifiable());
+                properties.put(Transformation.DOMAIN_OF_VALIDITY_KEY, extent.unmodifiable());
             }
             /*
              * Computes the positional accuracy as the RMS value of differences
@@ -743,7 +743,7 @@ public abstract class MathTransformBuilder {
                 final PositionalAccuracyImpl accuracy = new PositionalAccuracyImpl(result);
                 accuracy.setEvaluationMethodType(EvaluationMethodType.DIRECT_INTERNAL);
                 accuracy.setEvaluationMethodDescription(description);
-                properties.put(Transformation.POSITIONAL_ACCURACY_KEY, accuracy.unmodifiable());
+                properties.put(Transformation.COORDINATE_OPERATION_ACCURACY_KEY, accuracy.unmodifiable());
             }
             /*
              * Now creates the transformation.

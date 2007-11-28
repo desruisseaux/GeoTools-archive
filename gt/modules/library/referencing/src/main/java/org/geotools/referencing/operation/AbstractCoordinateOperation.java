@@ -123,12 +123,12 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * Estimate(s) of the impact of this operation on point accuracy, or {@code null}
      * if none.
      */
-    private final Collection<PositionalAccuracy> positionalAccuracy;
+    private final Collection<PositionalAccuracy> coordinateOperationAccuracy;
 
     /**
      * Area in which this operation is valid, or {@code null} if not available.
      */
-    protected final Extent validArea;
+    protected final Extent domainOfValidity;
 
     /**
      * Description of domain of usage, or limitations of usage, for which this operation is valid.
@@ -152,13 +152,13 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                                 final MathTransform             transform)
     {
         super(definition);
-        this.sourceCRS          = sourceCRS;
-        this.targetCRS          = targetCRS;
-        this.operationVersion   = definition.getOperationVersion();
-        this.positionalAccuracy = definition.getPositionalAccuracy();
-        this.validArea          = definition.getValidArea();
-        this.scope              = definition.getScope();
-        this.transform          = transform;
+        this.sourceCRS                   = sourceCRS;
+        this.targetCRS                   = targetCRS;
+        this.operationVersion            = definition.getOperationVersion();
+        this.coordinateOperationAccuracy = definition.getCoordinateOperationAccuracy();
+        this.domainOfValidity            = definition.getDomainOfValidity();
+        this.scope                       = definition.getScope();
+        this.transform                   = transform;
     }
 
     /**
@@ -179,14 +179,14 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      *     <td nowrap>&nbsp;{@link #getOperationVersion}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#POSITIONAL_ACCURACY_KEY}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#COORDINATE_OPERATION_ACCURACY_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;<code>{@linkplain PositionalAccuracy}[]</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getPositionalAccuracy}</td>
+     *     <td nowrap>&nbsp;{@link #getCoordinateOperationAccuracy}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#VALID_AREA_KEY}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#DOMAIN_OF_VALIDITY_KEY}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getValidArea}</td>
+     *     <td nowrap>&nbsp;{@link #getDomainOfValidity}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@value org.opengis.referencing.operation.CoordinateOperation#SCOPE_KEY}&nbsp;</td>
@@ -221,19 +221,19 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     {
         super(properties, subProperties, LOCALIZABLES);
         PositionalAccuracy[] positionalAccuracy;
-        validArea          = (Extent)               subProperties.get(VALID_AREA_KEY         );
-        scope              = (InternationalString)  subProperties.get(SCOPE_KEY              );
-        operationVersion   = (String)               subProperties.get(OPERATION_VERSION_KEY  );
-        positionalAccuracy = (PositionalAccuracy[]) subProperties.get(POSITIONAL_ACCURACY_KEY);
+        domainOfValidity   = (Extent)               subProperties.get(DOMAIN_OF_VALIDITY_KEY);
+        scope              = (InternationalString)  subProperties.get(SCOPE_KEY);
+        operationVersion   = (String)               subProperties.get(OPERATION_VERSION_KEY);
+        positionalAccuracy = (PositionalAccuracy[]) subProperties.get(COORDINATE_OPERATION_ACCURACY_KEY);
         if (positionalAccuracy==null || positionalAccuracy.length==0) {
             positionalAccuracy = null;
         } else {
             positionalAccuracy = positionalAccuracy.clone();
             for (int i=0; i<positionalAccuracy.length; i++) {
-                ensureNonNull(POSITIONAL_ACCURACY_KEY, positionalAccuracy, i);
+                ensureNonNull(COORDINATE_OPERATION_ACCURACY_KEY, positionalAccuracy, i);
             }
         }
-        this.positionalAccuracy = asSet(positionalAccuracy);
+        this.coordinateOperationAccuracy = asSet(positionalAccuracy);
         this.sourceCRS = sourceCRS;
         this.targetCRS = targetCRS;
         this.transform = transform;
@@ -298,9 +298,32 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * @return The position error estimates, or an empty collection if not available.
      *
      * @see #getAccuracy()
+     *
+     * @since 2.4
+     */
+    public Collection<PositionalAccuracy> getCoordinateOperationAccuracy() {
+        if (coordinateOperationAccuracy == null) {
+            return Collections.emptySet();
+        }
+        return coordinateOperationAccuracy;
+    }
+
+    /**
+     * Estimate(s) of the impact of this operation on point accuracy. Gives
+     * position error estimates for target coordinates of this coordinate
+     * operation, assuming no errors in source coordinates.
+     *
+     * @return The position error estimates, or an empty collection if not available.
+     *
+     * @see #getAccuracy()
+     *
+     * @deprecated Renamed as {@link #getCoordinateOperationAccuracy}.
      */
     public Collection<PositionalAccuracy> getPositionalAccuracy() {
-        return getCoordinateOperationAccuracy();
+        if (coordinateOperationAccuracy == null) {
+            return Collections.emptySet();
+        }
+        return coordinateOperationAccuracy;
     }
 
     /**
@@ -313,19 +336,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     public double getAccuracy() {
         return getAccuracy0(this);
     }
-    /**
-     * Estimate(s) of the impact of this operation on point accuracy. Gives
-     * position error estimates for target coordinates of this coordinate
-     * operation, assuming no errors in source coordinates.
-     *
-     * @return The position error estimates, or an empty collection if not available.
-     */
-    public Collection<PositionalAccuracy> getCoordinateOperationAccuracy() {
-        if (positionalAccuracy == null) {
-            return Collections.emptySet();
-        }
-        return positionalAccuracy;
-    }
+
     /**
      * Convenience method returning the accuracy in meters for the specified operation. This method
      * try each of the following procedures and returns the first successful one:
@@ -373,7 +384,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * never-ending recursive calls.
      */
     private static double getAccuracy0(final CoordinateOperation operation) {
-        final Collection<PositionalAccuracy> accuracies = operation.getPositionalAccuracy();
+        final Collection<PositionalAccuracy> accuracies = operation.getCoordinateOperationAccuracy();
         if (accuracies != null) for (final PositionalAccuracy accuracy : accuracies) {
             if (accuracy != null) for (final Result result : accuracy.getResults()) {
                 if (result instanceof QuantitativeResult) {
@@ -438,21 +449,26 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     }
 
     /**
+     * Area or region or timeframe in which this coordinate operation is valid.
+     * Returns {@code null} if not available.
+     *
+     * @since 2.4
+     */
+    public Extent getDomainOfValidity() {
+        return domainOfValidity;
+    }
+
+    /**
      * Area in which this operation is valid.
      *
      * @return Coordinate operation valid area, or {@code null} if not available.
+     *
+     * @deprecated Renamed {@link #getDomainOfValidity}.
      */
     public Extent getValidArea() {
-        return validArea;
+        return domainOfValidity;
     }
-    /**
-     * Area or region or timeframe in which this coordinate operation is valid.
-     *
-     * @return The coordinate operation valid domain, or {@code null} if not available.
-     */
-    public Extent getDomainOfValidity() {
-        return validArea;
-    }
+
     /**
      * Description of domain of usage, or limitations of usage, for which this operation is valid.
      */
@@ -509,9 +525,9 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                 // See comment in DefaultOperation.equals(...) about why we compare MathTransform.
             {
                 if (compareMetadata) {
-                    if (!Utilities.equals(this.validArea,          that.validArea) ||
-                        !Utilities.equals(this.scope,              that.scope    ) ||
-                        !Utilities.equals(this.positionalAccuracy, that.positionalAccuracy))
+                    if (!Utilities.equals(this.domainOfValidity, that.domainOfValidity) ||
+                        !Utilities.equals(this.scope, that.scope) ||
+                        !Utilities.equals(this.coordinateOperationAccuracy, that.coordinateOperationAccuracy))
                     {
                         return false;
                     }

@@ -56,7 +56,7 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
     /**
      * Area for which the (coordinate) reference system is valid.
      */
-    private final Extent validArea;
+    private final Extent domainOfValidity;
 
     /**
      * Description of domain of usage, or limitations of usage, for which this
@@ -75,8 +75,8 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      */
     public AbstractReferenceSystem(final ReferenceSystem object) {
         super(object);
-        validArea = object.getValidArea();
-        scope     = object.getScope();
+        domainOfValidity = object.getDomainOfValidity();
+        scope            = object.getScope();
     }
 
     /**
@@ -92,9 +92,9 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VALID_AREA_KEY "validArea"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #DOMAIN_OF_VALIDITY_KEY "domainOfValidity"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getValidArea}</td>
+     *     <td nowrap>&nbsp;{@link #getDomainOfValidity}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #SCOPE_KEY "scope"}&nbsp;</td>
@@ -113,26 +113,28 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      */
     private AbstractReferenceSystem(final Map<String,?> properties, final Map<String,Object> subProperties) {
         super(properties, subProperties, LOCALIZABLES);
-        validArea = (Extent)              subProperties.get(VALID_AREA_KEY);
-        scope     = (InternationalString) subProperties.get(SCOPE_KEY);
+        domainOfValidity = (Extent)   subProperties.get(DOMAIN_OF_VALIDITY_KEY);
+        scope = (InternationalString) subProperties.get(SCOPE_KEY);
     }
 
     /**
-     * Area or region or timeframe in which this datum is valid.
+     * Area or region or timeframe in which this (coordinate) reference system is valid.
+     * Returns {@code null} if not available.
      *
-     * @return The datum valid domain, or {@code null} if not available.
-     *
-     * @since GeoAPI 2.1
+     * @since 2.4
      */
     public Extent getDomainOfValidity() {
-        return validArea;
+        return domainOfValidity;
     }
+
     /**
-     * Area or region in which this datum object is valid.
-     * @deprecated Use getDomainOfValidity
+     * Area for which the (coordinate) reference system is valid.
+     * Returns {@code null} if not available.
+     *
+     * @deprecated Renamed {@link #getDomainOfValidity}.
      */
     public Extent getValidArea() {
-        return getDomainOfValidity();
+        return domainOfValidity;
     }
 
     /**
@@ -161,8 +163,8 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
                 return true;
             }
             final AbstractReferenceSystem that = (AbstractReferenceSystem) object;
-            return Utilities.equals(validArea, that.validArea) &&
-                   Utilities.equals(scope,     that.scope    );
+            return Utilities.equals(domainOfValidity, that.domainOfValidity) &&
+                   Utilities.equals(scope,            that.scope);
         }
         return false;
     }

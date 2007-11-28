@@ -274,7 +274,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     private static Map mergeAccuracy(final Map properties,
                                      final List/*<CoordinateOperation>*/ operations)
     {
-        if (!properties.containsKey(POSITIONAL_ACCURACY_KEY)) {
+        if (!properties.containsKey(COORDINATE_OPERATION_ACCURACY_KEY)) {
             Set accuracy = null;
             for (final Iterator it=operations.iterator(); it.hasNext();) {
                 final CoordinateOperation op = (CoordinateOperation) it.next();
@@ -291,7 +291,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
             }
             if (accuracy != null) {
                 final Map merged = new HashMap(properties);
-                merged.put(POSITIONAL_ACCURACY_KEY,
+                merged.put(COORDINATE_OPERATION_ACCURACY_KEY,
                            accuracy.toArray(new PositionalAccuracy[accuracy.size()]));
                 return merged;
             }

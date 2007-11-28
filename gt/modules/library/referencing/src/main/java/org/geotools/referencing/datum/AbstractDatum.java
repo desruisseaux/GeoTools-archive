@@ -88,7 +88,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     /**
      * Area or region in which this datum object is valid.
      */
-    private final Extent validArea;
+    private final Extent domainOfValidity;
 
     /**
      * Description of domain of usage, or limitations of usage, for which this
@@ -109,7 +109,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
         super(datum);
         final Date epoch = datum.getRealizationEpoch();
         realizationEpoch = (epoch!=null) ? epoch.getTime() : Long.MIN_VALUE;
-        validArea        = datum.getValidArea();
+        domainOfValidity = datum.getDomainOfValidity();
         scope            = datum.getScope();
         anchorPoint      = datum.getAnchorPoint();
     }
@@ -137,9 +137,9 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      *     <td nowrap>&nbsp;{@link #getRealizationEpoch}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VALID_AREA_KEY "validArea"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #DOMAIN_OF_VALIDITY_KEY "domainOfValidity"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getValidArea}</td>
+     *     <td nowrap>&nbsp;{@link #getDomainOfValidity}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #SCOPE_KEY "scope"}&nbsp;</td>
@@ -159,10 +159,10 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     private AbstractDatum(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         final Date realizationEpoch;
-        anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_KEY     );
-        realizationEpoch = (Date)                subProperties.get(REALIZATION_EPOCH_KEY);
-        validArea        = (Extent)              subProperties.get(VALID_AREA_KEY       );
-        scope            = (InternationalString) subProperties.get(SCOPE_KEY            );
+        anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_KEY      );
+        realizationEpoch = (Date)                subProperties.get(REALIZATION_EPOCH_KEY );
+        domainOfValidity = (Extent)              subProperties.get(DOMAIN_OF_VALIDITY_KEY);
+        scope            = (InternationalString) subProperties.get(SCOPE_KEY             );
         this.realizationEpoch = (realizationEpoch != null) ?
                                  realizationEpoch.getTime() : Long.MIN_VALUE;
     }
@@ -208,19 +208,19 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     /**
      * Area or region or timeframe in which this datum is valid.
      *
-     * @return The datum valid domain, or {@code null} if not available.
-     *
-     * @since GeoAPI 2.1
+     * @since 2.4
      */
     public Extent getDomainOfValidity() {
-        return validArea;
+        return domainOfValidity;
     }
+
     /**
      * Area or region in which this datum object is valid.
-     * @deprecated Use getDomainOfValidity
+     *
+     * @deprecated Renamed {@link #getDomainOfValidity}.
      */
     public Extent getValidArea() {
-        return getDomainOfValidity();
+        return domainOfValidity;
     }
 
     /**
@@ -265,9 +265,9 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
             }
             final AbstractDatum that = (AbstractDatum) object;
             return this.realizationEpoch == that.realizationEpoch &&
-                   Utilities.equals(this.validArea,   that.validArea  ) &&
-                   Utilities.equals(this.anchorPoint, that.anchorPoint) &&
-                   Utilities.equals(this.scope,       that.scope);
+                   Utilities.equals(this.domainOfValidity, that.domainOfValidity) &&
+                   Utilities.equals(this.anchorPoint,      that.anchorPoint) &&
+                   Utilities.equals(this.scope,            that.scope);
         }
         return false;
     }

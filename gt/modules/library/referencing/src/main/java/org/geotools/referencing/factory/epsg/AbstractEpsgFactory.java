@@ -779,7 +779,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
         final Map properties = generateProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
             final Extent extent = generateExtent(area);
-            properties.put(Datum.VALID_AREA_KEY, extent);
+            properties.put(Datum.DOMAIN_OF_VALIDITY_KEY, extent);
         }
         if (scope != null &&  (scope=scope.trim()).length() != 0) {
             properties.put(Datum.SCOPE_KEY, scope);
@@ -2315,7 +2315,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                     accuracyElement = new AbsoluteExternalPositionalAccuracyImpl(accuracyResult);
                     accuracyElement.setMeasureDescription(TRANSFORMATION_ACCURACY);
                     accuracyElement.setEvaluationMethodType(EvaluationMethodType.DIRECT_EXTERNAL);
-                    properties.put(CoordinateOperation.POSITIONAL_ACCURACY_KEY,
+                    properties.put(CoordinateOperation.COORDINATE_OPERATION_ACCURACY_KEY,
                                    new PositionalAccuracy[] {
                                        (PositionalAccuracy)accuracyElement.unmodifiable()
                                    });

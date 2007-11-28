@@ -340,12 +340,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             switch (key.hashCode()) {
                 // Fix case for common keywords. They are not used
                 // by this class, but are used by some subclasses.
-                case -1528693765: if (key.equalsIgnoreCase("anchorPoint"))        key="anchorPoint";        break;
-                case -1805658881: if (key.equalsIgnoreCase("bursaWolf"))          key="bursaWolf";          break;
-                case   109688209: if (key.equalsIgnoreCase("operationVersion"))   key="operationVersion";   break;
-                case  1126917133: if (key.equalsIgnoreCase("positionalAccuracy")) key="positionalAccuracy"; break;
-                case  1127093059: if (key.equalsIgnoreCase("realizationEpoch"))   key="realizationEpoch";   break;
-                case -1109785975: if (key.equalsIgnoreCase("validArea"))          key="validArea";          break;
+                case -1528693765: if (key.equalsIgnoreCase("anchorPoint"))                 key="anchorPoint";                 break;
+                case -1805658881: if (key.equalsIgnoreCase("bursaWolf"))                   key="bursaWolf";                   break;
+                case   109688209: if (key.equalsIgnoreCase("operationVersion"))            key="operationVersion";            break;
+                case  1479434472: if (key.equalsIgnoreCase("coordinateOperationAccuracy")) key="coordinateOperationAccuracy"; break;
+                case  1126917133: if (key.equalsIgnoreCase("positionalAccuracy"))          key="positionalAccuracy";          break;
+                case  1127093059: if (key.equalsIgnoreCase("realizationEpoch"))            key="realizationEpoch";            break;
+                case  1790520781: if (key.equalsIgnoreCase("domainOfValidity"))            key="domainOfValidity";            break;
+                case -1109785975: if (key.equalsIgnoreCase("validArea"))                   key="validArea";                   break;
 
                 // -------------------------------------
                 // "name": String or ReferenceIdentifier

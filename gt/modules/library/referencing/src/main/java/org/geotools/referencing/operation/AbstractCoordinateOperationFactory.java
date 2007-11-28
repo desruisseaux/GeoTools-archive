@@ -295,7 +295,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
         if (name==DATUM_SHIFT || name==ELLIPSOID_SHIFT) {
             properties = new HashMap<String,Object>(4);
             properties.put(NAME_KEY, name);
-            properties.put(CoordinateOperation.POSITIONAL_ACCURACY_KEY,
+            properties.put(CoordinateOperation.COORDINATE_OPERATION_ACCURACY_KEY,
                   new PositionalAccuracy[] {
                       name==DATUM_SHIFT ? PositionalAccuracyImpl.DATUM_SHIFT_APPLIED
                                         : PositionalAccuracyImpl.DATUM_SHIFT_OMITTED});
@@ -329,7 +329,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
         final MathTransform transform = mtFactory.createAffineTransform(matrix);
         final Map<String,?> properties = getProperties(name);
         final Class<? extends Operation> type =
-                properties.containsKey(CoordinateOperation.POSITIONAL_ACCURACY_KEY)
+                properties.containsKey(CoordinateOperation.COORDINATE_OPERATION_ACCURACY_KEY)
                            ? Transformation.class : Conversion.class;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                ProjectiveTransform.ProviderAffine.getProvider(transform.getSourceDimensions(),

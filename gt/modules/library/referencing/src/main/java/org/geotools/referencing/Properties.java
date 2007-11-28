@@ -115,9 +115,9 @@ final class Properties extends AbstractMap<String,Object> {
         /*[2]*/IdentifiedObject    .ALIAS_KEY,
         /*[3]*/IdentifiedObject    .REMARKS_KEY,
         /*[4]*/CoordinateOperation .SCOPE_KEY,
-        /*[5]*/CoordinateOperation .VALID_AREA_KEY,
+        /*[5]*/CoordinateOperation .DOMAIN_OF_VALIDITY_KEY,
         /*[6]*/CoordinateOperation .OPERATION_VERSION_KEY,
-        /*[7]*/CoordinateOperation .POSITIONAL_ACCURACY_KEY
+        /*[7]*/CoordinateOperation .COORDINATE_OPERATION_ACCURACY_KEY
     };
 
     /**

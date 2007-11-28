@@ -88,7 +88,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
     static {
         final Map properties = new HashMap(4);
         properties.put(NAME_KEY, "WGS84");
-        properties.put(VALID_AREA_KEY, ExtentImpl.WORLD);
+        properties.put(DOMAIN_OF_VALIDITY_KEY, ExtentImpl.WORLD);
         WGS84    = new DefaultGeographicCRS(properties, DefaultGeodeticDatum.WGS84,
                                             DefaultEllipsoidalCS.GEODETIC_2D);
         WGS84_3D = new DefaultGeographicCRS(properties, DefaultGeodeticDatum.WGS84,
