@@ -29,7 +29,6 @@ import org.geotools.feature.LenientBuilder;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.Filters;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
-import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
@@ -92,9 +91,8 @@ public interface Action {
         public UpdateAction(String typeName, Filter f, Map properties) {
             DuplicatingFilterVisitor duplicator = new DuplicatingFilterVisitor();
             
-        	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(), false);
-        	Filters.accept( f, visitor);
-            filter = (Filter) visitor.getCopy();
+            DuplicatingFilterVisitor visitor=new DuplicatingFilterVisitor();
+            filter = (Filter) f.accept(visitor, null );
             this.properties = new HashMap(properties);
             this.typeName = typeName;
         }
@@ -183,15 +181,15 @@ public interface Action {
         private final String typeName;
 
         /**
-         * Represents a Delete Action.  Filter is copied so any further changes will not be included in filter of action.
+         * Represents a Delete Action.
+         * Filter is copied so any further changes will not be included in filter of action.
          * 
          * @param typeName TypeName
          * @param f Filter of Features to Delete
          */
         public DeleteAction(String typeName, Filter f) {
-        	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(),false);
-        	Filters.accept( f, visitor );
-            filter = (Filter) visitor.getCopy();
+            DuplicatingFilterVisitor visitor = new DuplicatingFilterVisitor();
+            filter = (Filter) f.accept(visitor, null);
             this.typeName = typeName;
         }
 
