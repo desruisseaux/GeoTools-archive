@@ -14,7 +14,6 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
@@ -32,7 +31,6 @@ public class ArcSdeFeatureSource implements FeatureSource {
 
     protected SimpleFeatureType featureType;
     protected ArcSDEDataStore dataStore;
-    protected Transaction transaction = Transaction.AUTO_COMMIT;
 
     public ArcSdeFeatureSource(final SimpleFeatureType featureType, final ArcSDEDataStore dataStore) {
         this.featureType = featureType;
@@ -92,20 +90,21 @@ public class ArcSdeFeatureSource implements FeatureSource {
         if (LOGGER.isLoggable(Level.FINE)) {
             if (ev != null) {
                 LOGGER.finer("ArcSDE optimized getBounds call returned: " + ev);
+                final ReferencedEnvelope envelope;
+                final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
+                if (defaultGeometry == null) {
+                    envelope = ReferencedEnvelope.reference(ev);
+                } else {
+                    envelope = new ReferencedEnvelope(ev, defaultGeometry.getCRS());
+                }
+                return envelope;
             } else {
                 LOGGER.finer("ArcSDE couldn't process all filters in this query, "
                         + "so optimized getBounds() returns null.");
             }
         }
 
-        final ReferencedEnvelope envelope;
-        final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
-        if (defaultGeometry == null) {
-            envelope = ReferencedEnvelope.reference(ev);
-        } else {
-            envelope = new ReferencedEnvelope(ev, defaultGeometry.getCRS());
-        }
-        return envelope;
+        return null;
     }
 
     /**

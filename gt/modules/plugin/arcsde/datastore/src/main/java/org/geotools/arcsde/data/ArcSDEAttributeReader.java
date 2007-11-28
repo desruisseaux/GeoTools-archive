@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
@@ -252,7 +253,7 @@ class ArcSDEAttributeReader implements AttributeReader {
                  */
                 value = geometryBuilder.construct(shape);
             } catch (SeException e) {
-                throw new DataSourceException(e);
+                throw new ArcSdeException(e);
             }
         }
 

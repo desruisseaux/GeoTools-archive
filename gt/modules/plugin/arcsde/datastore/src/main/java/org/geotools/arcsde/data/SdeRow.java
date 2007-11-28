@@ -18,6 +18,7 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -84,7 +85,7 @@ class SdeRow {
                 }
             }
         } catch (SeException e) {
-            throw new DataSourceException("getting property #" + i, e);
+            throw new ArcSdeException("getting property #" + i, e);
         } catch (Exception e) {
             System.err.println("statusIndicator=" + statusIndicator + ", i="
                 + i);

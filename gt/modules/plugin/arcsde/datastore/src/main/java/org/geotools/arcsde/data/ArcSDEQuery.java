@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.filter.FilterToSQLSDE;
 import org.geotools.arcsde.filter.GeometryEncoderException;
 import org.geotools.arcsde.filter.GeometryEncoderSDE;
@@ -179,7 +180,7 @@ class ArcSDEQuery {
                         layerName = layerName.substring(0, layerName.indexOf(" AS"));
                     }
                 } catch (SeException e) {
-                    throw new DataSourceException("shouldn't happen: " + e.getMessage(), e);
+                    throw new ArcSdeException("shouldn't happen: " + e.getMessage(), e);
                 }
                 sdeLayer = conn.getLayer(layerName);
             } else {
@@ -327,18 +328,13 @@ class ArcSDEQuery {
      * @throws SeException
      * @throws IOException
      */
-    private SeQuery getSeQuery() throws SeException, IOException {
+    private SeQuery getSeQuery() throws IOException {
         if (this.query == null) {
             try {
                 String[] propsToQuery = fidReader.getPropertiesToFetch(this.schema);
                 this.query = createSeQueryForFetch(connection, propsToQuery);
-            } catch (DataSourceException e) {
-                throw e;
-            } catch (IOException e) {
-                throw e;
             } catch (SeException e) {
-                e.printStackTrace();
-                throw e;
+                throw new ArcSdeException(e);
             }
         }
         return this.query;
@@ -372,8 +368,8 @@ class ArcSDEQuery {
      */
     private SeQuery createSeQueryForFetch(ArcSDEPooledConnection connection, String[] propertyNames)
             throws SeException, DataSourceException {
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("constructing new sql query with connection: " + connection
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("constructing new sql query with connection: " + connection
                     + ", propnames: " + java.util.Arrays.asList(propertyNames)
                     + " sqlConstruct where clause: '" + this.filters.getSeSqlConstruct().getWhere()
                     + "'");
@@ -398,7 +394,7 @@ class ArcSDEQuery {
                 query = new SeQuery(connection, propertyNames, filters.getSeSqlConstruct());
                 query.prepareQuery();
             } else {
-                throw e;
+                throw new ArcSdeException(e);
             }
         }
 
@@ -542,7 +538,8 @@ class ArcSDEQuery {
         final ArcSDEQuery boundsQuery = createQuery(connection, queryFt, realQuery);
         Envelope queryExtent = null;
         try {
-            if (boundsQuery.getFilters().getUnsupportedFilter() != Filter.INCLUDE) {
+            Filter unsupportedFilter = boundsQuery.getFilters().getUnsupportedFilter();
+            if (unsupportedFilter == Filter.INCLUDE) {
                 // we can only use an optimized bounds calculation if the
                 // query is fully supported by sde
                 queryExtent = boundsQuery.calculateQueryExtent();
@@ -714,7 +711,7 @@ class ArcSDEQuery {
         try {
             getSeQuery().execute();
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         }
     }
 
@@ -730,7 +727,7 @@ class ArcSDEQuery {
         try {
             getSeQuery().flushBufferedWrites();
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         }
     }
 
@@ -751,7 +748,7 @@ class ArcSDEQuery {
         try {
             getSeQuery().cancel(reset);
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         }
     }
 
@@ -840,7 +837,7 @@ class ArcSDEQuery {
         try {
             getSeQuery().setRowLocking(lockActions);
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         }
     }
 
@@ -862,7 +859,7 @@ class ArcSDEQuery {
         try {
             getSeQuery().prepareQuery();
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         }
     }
 
@@ -882,15 +879,15 @@ class ArcSDEQuery {
             throw new IllegalStateException("query closed or not yet executed");
         }
 
+        final SeQuery seQuery = getSeQuery();
         try {
-            SeQuery seQuery = getSeQuery();
             SeRow row = seQuery.fetch();
             SdeRow currentRow = (row == null) ? null : new SdeRow(row, previousRowValues);
             previousRowValues = currentRow == null ? null : currentRow.getAll();
             return currentRow;
         } catch (SeException e) {
             close();
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         } catch (Exception e) {
             close();
             LOGGER.log(Level.SEVERE, "fetching row: " + e.getMessage(), e);
@@ -914,7 +911,7 @@ class ArcSDEQuery {
         try {
             getSeQuery().setSpatialConstraints(SeQuery.SE_OPTIMIZE, false, filters);
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         }
     }
 
@@ -1116,8 +1113,8 @@ class ArcSDEQuery {
                     layerName = this.sdeLayer.getQualifiedName();
                     this.sdeSqlConstruct = new SeSqlConstruct(layerName);
                 } catch (SeException e) {
-                    throw new DataSourceException("Can't create SQL construct: "
-                            + e.getSeError().getErrDesc(), e);
+                    throw new ArcSdeException("Can't create SQL construct for "
+                            + sdeLayer.getName(), e);
                 }
 
                 Filter sqlFilter = getSqlFilter();

@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
@@ -408,15 +409,18 @@ public class ArcSDEDataStore implements DataStore {
             final FeatureReader reader = getFeatureReader(query, connection, handleConnection);
 
             FeatureWriter writer;
+            
+            final SeLayer layer = connection.getLayer(typeName);
+            final FIDReader fidReader = FIDReader.getFidReader(connection, layer);
 
             if (Transaction.AUTO_COMMIT == transaction) {
-                writer = new AutoCommitFeatureWriter(featureType, reader, connection);
+                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection);
             } else {
                 // if there's a transaction, the reader and the writer will
                 // share
                 // the connection
                 // held in the transaction state
-                writer = new TransactionFeatureWriter(featureType, reader, state);
+                writer = new TransactionFeatureWriter(fidReader, featureType, reader, state);
             }
             return writer;
         } catch (IOException e) {
@@ -505,7 +509,7 @@ public class ArcSDEDataStore implements DataStore {
                 try {
                     mainLayerName = qInfo.getConstruct().getTables()[0];
                 } catch (SeException e) {
-                    throw new RuntimeException(e.getMessage());
+                    throw new ArcSdeException(e);
                 }
                 layer = conn.getLayer(mainLayerName);
             } else {
@@ -596,7 +600,7 @@ public class ArcSDEDataStore implements DataStore {
                     }
                 }
             } catch (SeException e) {
-                throw new DataSourceException(e);
+                throw new ArcSdeException(e);
             } finally {
                 conn.close();
             }
@@ -744,7 +748,7 @@ public class ArcSDEDataStore implements DataStore {
                 LOGGER.fine("creating definition query info");
                 queryInfo = QueryInfoParser.parse(conn, qualifiedSelect);
             } catch (SeException e) {
-                throw new DataSourceException("Parsing select: " + e.getMessage(), e);
+                throw new ArcSdeException("Error Parsing select: " + qualifiedSelect, e);
             }
             SimpleFeatureType viewSchema = ArcSDEAdapter.fetchSchema(conn, typeName, namespace,
                     queryInfo);

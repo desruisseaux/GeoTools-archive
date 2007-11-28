@@ -6,11 +6,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -30,6 +32,8 @@ import com.esri.sde.sdk.client.SeTable;
 public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureStore {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
+
+    private Transaction transaction = Transaction.AUTO_COMMIT;
 
     public ArcSdeFeatureStore(final SimpleFeatureType featureType,
             final ArcSDEDataStore arcSDEDataStore) {
@@ -55,21 +59,33 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     public void setTransaction(final Transaction transaction) {
         if (transaction == null) {
             throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
-        } else if (!Transaction.AUTO_COMMIT.equals(super.transaction)) {
-            throw new IllegalStateException("Transactio already set");
         }
 
-        final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
-        try {
-            // set the transaction state so it grabs a connection and starts a
-            // transaction on it
-            ArcTransactionState state = ArcTransactionState.getState(transaction, connectionPool);
-            LOGGER.finer("ArcSDE transaction initialized: " + state);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
+        // this is hacky as a simple reference check should be enough but there
+        // seem to be some class loader issues with udig so it does not work
+        boolean isAutoCommit = Transaction.AUTO_COMMIT.equals(transaction);
+        if (!isAutoCommit) {
+            try {
+                transaction.getState(new Object());
+            } catch (UnsupportedOperationException e) {
+                isAutoCommit = true;
+            }
         }
 
-        super.transaction = transaction;
+        if (!isAutoCommit) {
+            final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
+            try {
+                // set the transaction state so it grabs a connection and starts
+                // a transaction on it
+                ArcTransactionState state = ArcTransactionState.getState(transaction,
+                        connectionPool);
+                LOGGER.finer("ArcSDE transaction initialized: " + state);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
+            }
+        }
+
+        this.transaction = transaction;
     }
 
     /**
@@ -80,11 +96,13 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      */
     @Override
     public FeatureCollection getFeatures(Query query) throws IOException {
-        final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
-        final Transaction transaction = getTransaction();
-        final FeatureReader featureReader = ds.getFeatureReader(query, transaction);
-        final FeatureCollection collection = DataUtilities.collection(featureReader);
+        FeatureCollection collection = new DefaultFeatureResults(this, query);
         return collection;
+//        final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
+//        final Transaction transaction = getTransaction();
+//        final FeatureReader featureReader = ds.getFeatureReader(query, transaction);
+//        final FeatureCollection collection = DataUtilities.collection(featureReader);
+//        return collection;
     }
 
     /**
@@ -228,7 +246,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                 LOGGER.fine("truncating table " + typeName);
                 table.truncate();
             } catch (SeException e) {
-                throw new DataSourceException("Cannot truncate table " + featureType, e);
+                throw new ArcSdeException("Cannot truncate table " + featureType, e);
             }
         }
     }

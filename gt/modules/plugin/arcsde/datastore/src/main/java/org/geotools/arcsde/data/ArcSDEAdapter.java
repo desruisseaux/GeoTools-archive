@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.AttributeTypeBuilder;
@@ -298,7 +299,7 @@ public class ArcSDEAdapter {
             attributeDescriptors = createAttributeDescriptors(layer, namespace, colDefs);
 
         } catch (SeException e) {
-            throw new DataSourceException(e.getSeError().getErrDesc(), e);
+            throw new ArcSdeException(e);
         } finally {
             if (testQuery != null) {
                 try {
@@ -333,7 +334,7 @@ public class ArcSDEAdapter {
         try {
             seColumns = table.describe();
         } catch (SeException e) {
-            throw new DataSourceException(e);
+            throw new ArcSdeException(e);
         }
 
         return createAttributeDescriptors(sdeLayer, namespace, seColumns);
@@ -1009,7 +1010,7 @@ public class ArcSDEAdapter {
 
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getSeError().getErrDesc(), e);
-            throw new DataSourceException(e.getMessage(), e);
+            throw new ArcSdeException(e);
         } finally {
             if ((error != null) && tableCreated) {
                 // TODO: remove table if created and then failed

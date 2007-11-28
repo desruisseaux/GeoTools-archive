@@ -29,6 +29,7 @@ class TransactionFeatureWriter extends AutoCommitFeatureWriter {
 
     /**
      * 
+     * @param fidReader
      * @param featureType
      * @param filteredContent
      * @param transactionalConnection
@@ -40,11 +41,11 @@ class TransactionFeatureWriter extends AutoCommitFeatureWriter {
      * @throws NoSuchElementException
      * @throws IOException
      */
-    public TransactionFeatureWriter(final SimpleFeatureType featureType,
+    public TransactionFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
             final FeatureReader filteredContent, final ArcTransactionState state)
             throws NoSuchElementException, IOException {
 
-        super(featureType, filteredContent, state.getConnection());
+        super(fidReader, featureType, filteredContent, state.getConnection());
         this.state = state;
         assert state.getConnection().isTransactionActive();
     }
