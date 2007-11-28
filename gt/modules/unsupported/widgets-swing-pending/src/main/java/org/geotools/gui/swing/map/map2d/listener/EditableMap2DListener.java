@@ -14,40 +14,20 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map;
+package org.geotools.gui.swing.map.map2d.listener;
+
+import java.util.EventListener;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
 
 /**
  *
- * @author johann sorel
+ * @author Johann Sorel
  */
+public interface EditableMap2DListener extends EventListener{
 
-
-public class MapConstants {
-
-    public static enum ACTION_STATE{
-        ZOOM_IN,
-        ZOOM_OUT,
-        PAN,
-        SELECT,
-        EDIT,
-        NONE
-    };
+    public void mapEditStateChanged(Map2DEditStateEvent event);
     
-    public static enum EDIT_STATE{
-        EDIT,
-        POINT,
-        MULTI_POINT,
-        LINE,
-        MULTI_LINE,
-        POLYGON,
-        MULTI_POLYGON,
-        NONE
-    };
+    public void mapEditLayerChanged(Map2DEditLayerEvent event);
     
-    public static enum MAP_GEOMETRIE{
-        POLYGON,
-        LINE,
-        POINT
-    };
-     
 }

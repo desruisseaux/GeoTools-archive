@@ -16,6 +16,8 @@
 
 package org.geotools.gui.swing.map.map2d;
 
+import org.geotools.gui.swing.map.MapConstants.EDIT_STATE;
+import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.map.MapLayer;
 
 /**
@@ -24,7 +26,14 @@ import org.geotools.map.MapLayer;
  */
 public interface EditableMap2D extends SelectableMap2D{
 
-    public void setEditedMapLayer(MapLayer layer);
-    
+    public void setEditedMapLayer(MapLayer layer);    
     public MapLayer getEditedMapLayer();
+    
+    public void setEditState(EDIT_STATE state);
+    public EDIT_STATE getEditState();
+    
+    
+    public void addEditableMap2DListener(EditableMap2DListener listener);
+    public void removeEditableMap2DListener(EditableMap2DListener listener);
+    public EditableMap2DListener[] getEditableMap2DListeners();
 }

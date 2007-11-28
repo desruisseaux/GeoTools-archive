@@ -15,7 +15,11 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
-import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
@@ -23,8 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -38,6 +41,9 @@ import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
+import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
+import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
@@ -45,11 +51,12 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
+import org.opengis.geometry.aggregate.MultiPoint;
 
 /**
  * @author johann sorel
  */
-public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap2DListener {
+public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap2DListener, EditableMap2DListener {
 
     private final ContextListener contextListener = new ContextListener();
     private EditableMap2D map = null;
@@ -57,6 +64,15 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
     private MapLayer editionLayer = null;
     private final JComboBox gui_layers = new JComboBox();
     private final JToggleButton gui_edit = buildToggleButton(IconBundle.getResource().getIcon("16_edit"));
+    private final JButton gui_config = buildButton(IconBundle.getResource().getIcon("16_map2d_optimize"));
+    private final JToggleButton gui_geom = buildToggleButton(IconBundle.getResource().getIcon("16_edit_geom"));
+    private final JToggleButton gui_s_point = buildToggleButton(IconBundle.getResource().getIcon("16_edit_single_point"));
+    private final JToggleButton gui_m_point = buildToggleButton(IconBundle.getResource().getIcon("16_edit_multi_point"));
+    private final JToggleButton gui_s_line = buildToggleButton(IconBundle.getResource().getIcon("16_edit_single_line"));
+    private final JToggleButton gui_m_line = buildToggleButton(IconBundle.getResource().getIcon("16_edit_multi_line"));
+    private final JToggleButton gui_s_poly = buildToggleButton(IconBundle.getResource().getIcon("16_edit_single_polygon"));
+    private final JToggleButton gui_m_poly = buildToggleButton(IconBundle.getResource().getIcon("16_edit_multi_polygon"));
+    private final JToggleButton gui_none = new JToggleButton();
 
     /**
      * Creates a new instance of DefaultLightMapPaneToolBar
@@ -73,8 +89,28 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
     }
 
     private void init() {
+        
+        ButtonGroup bg = new ButtonGroup();
+        
+        bg.add(gui_geom);
+        bg.add(gui_s_point);
+        bg.add(gui_m_point);
+        bg.add(gui_s_line);
+        bg.add(gui_m_line);
+        bg.add(gui_s_poly);
+        bg.add(gui_m_poly);
+        bg.add(gui_none);
+        
+        add(gui_config);
         add(gui_edit);
         add(gui_layers);
+        add(gui_geom);
+        add(gui_s_point);
+        add(gui_m_point);
+        add(gui_s_line);
+        add(gui_m_line);
+        add(gui_s_poly);
+        add(gui_m_poly);
 
         gui_layers.addItemListener(new ItemListener() {
 
@@ -86,6 +122,7 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
 
                     if (map != null) {
                         map.setEditedMapLayer(editionLayer);
+                                                
                     }
 
                 } else {
@@ -105,6 +142,69 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
             }
         });
 
+        gui_geom.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.EDIT);
+                }
+            }
+        });
+        
+        gui_s_point.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.POINT);
+                }
+            }
+        });
+        
+        gui_m_point.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.MULTI_POINT);
+                }
+            }
+        });
+        
+        gui_s_line.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.LINE);
+                }
+            }
+        });
+        
+        gui_m_line.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.MULTI_LINE);
+                }
+            }
+        });
+        
+        gui_s_poly.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.POLYGON);
+                }
+            }
+        });
+        
+        gui_m_poly.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                 if (map != null) {
+                    map.setEditState(MapConstants.EDIT_STATE.MULTI_POLYGON);
+                }
+            }
+        });
+        
 
     }
 
@@ -147,20 +247,19 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
 
     public void setMap(Map pane) {
 
-        if (map != null) {
+        if (map != null) {                   
             map.removeMap2DListener(this);
-            editionContext = map.getContext();
-            
             map.removeNavigableMap2DListener(this);
-            
+            map.removeEditableMap2DListener(this);            
         }
 
-        if (pane instanceof EditableMap2D) {
+        if (pane instanceof EditableMap2D) {              
             map = (EditableMap2D) pane;
+            editionContext = map.getContext();
             map.addMap2DListener(this);
             map.addNavigableMap2DListener(this);
+            map.addEditableMap2DListener(this);
             gui_layers.setEnabled(true);
-
 
         } else {
             map = null;
@@ -192,6 +291,95 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
         initComboBox();
     }
 
+    //----------------------NavigableMap2DListener------------------------------
+    
+    public void mapActionStateChanged(Map2DActionStateEvent event) {
+        switch (event.getNewState()) {
+            case EDIT:
+                gui_edit.setSelected(true);
+                break;
+            default:
+                gui_edit.setSelected(false);
+                break;
+        }
+    }
+    
+    //----------------------EditableMap2DListener-------------------------------
+    
+    public void mapEditStateChanged(Map2DEditStateEvent event) {
+        switch (event.getNewState()) {
+            case EDIT:
+                gui_edit.setSelected(true);
+                break;
+            case POINT :
+                gui_s_point.setSelected(true);
+                break;
+            case MULTI_POINT :
+                gui_m_point.setSelected(true);
+                break;
+            case LINE :
+                gui_s_line.setSelected(true);
+                break;
+            case MULTI_LINE :
+                gui_m_line.setSelected(true);
+                break;
+            case POLYGON :
+                gui_s_poly.setSelected(true);
+                break;
+            case MULTI_POLYGON :
+                gui_m_poly.setSelected(true);
+                break;
+            default:
+                gui_none.setSelected(false);
+                break;
+        }
+    }
+    
+    public void mapEditLayerChanged(Map2DEditLayerEvent event) {
+        
+        MapLayer layer = event.getNewEditLayer();
+        
+        gui_geom.setEnabled(false);
+        gui_s_line.setEnabled(false);
+        gui_s_point.setEnabled(false);
+        gui_s_poly.setEnabled(false);
+        gui_m_line.setEnabled(false);
+        gui_m_point.setEnabled(false);
+        gui_m_poly.setEnabled(false);
+        
+        if(layer != null){
+            
+            Class jtsClass = null;
+            
+            jtsClass = layer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
+            
+            if(jtsClass != null){
+                
+                if(jtsClass.equals(Point.class)){
+                    gui_geom.setEnabled(true);
+                    gui_s_point.setEnabled(true);
+                }else if(jtsClass.equals(MultiPoint.class)){
+                    gui_geom.setEnabled(true);
+                    gui_m_point.setEnabled(true);
+                }else if(jtsClass.equals(LinearRing.class)){
+                    gui_geom.setEnabled(true);
+                    gui_s_line.setEnabled(true);
+                }else if(jtsClass.equals(MultiLineString.class)){
+                    gui_geom.setEnabled(true);
+                    gui_m_line.setEnabled(true);
+                }else if(jtsClass.equals(Polygon.class)){
+                    gui_geom.setEnabled(true);
+                    gui_s_poly.setEnabled(true);
+                }else if(jtsClass.equals(MultiPolygon.class)){
+                    gui_geom.setEnabled(true);
+                    gui_m_poly.setEnabled(true);
+                }
+                
+            }
+            
+        }
+    }
+    
     //----------------private classes-------------------------------------------
     private class ContextListener implements MapLayerListListener {
 
@@ -212,14 +400,10 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
         }
     }
 
-    public void mapActionStateChanged(Map2DActionStateEvent event) {
-        switch (event.getNewState()) {
-            case EDIT:
-                gui_edit.setSelected(true);
-                break;
-            default:
-                gui_edit.setSelected(false);
-                break;
-        }
-    }
+    
+
+    
+
+    
+
 }

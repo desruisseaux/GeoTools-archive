@@ -14,40 +14,37 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.gui.swing.map;
+package org.geotools.gui.swing.map.map2d.event;
+
+import java.util.EventObject;
+import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.map.MapLayer;
 
 /**
  *
- * @author johann sorel
+ * @author Johann Sorel
  */
+public class Map2DEditLayerEvent extends EventObject{
 
-
-public class MapConstants {
-
-    public static enum ACTION_STATE{
-        ZOOM_IN,
-        ZOOM_OUT,
-        PAN,
-        SELECT,
-        EDIT,
-        NONE
-    };
+    private MapLayer oldLayer = null;
+    private MapLayer newLayer = null;
     
-    public static enum EDIT_STATE{
-        EDIT,
-        POINT,
-        MULTI_POINT,
-        LINE,
-        MULTI_LINE,
-        POLYGON,
-        MULTI_POLYGON,
-        NONE
-    };
     
-    public static enum MAP_GEOMETRIE{
-        POLYGON,
-        LINE,
-        POINT
-    };
-     
+    public Map2DEditLayerEvent(Map2D map, MapLayer oldone, MapLayer newone){
+        super(map);
+        oldLayer = oldone;
+        newLayer = newone;
+    }
+
+    public MapLayer getPreviousEditLayer() {
+        return oldLayer;
+    }
+
+    public MapLayer getNewEditLayer() {
+        return newLayer;
+    }
+    
+    
+    
+    
 }
