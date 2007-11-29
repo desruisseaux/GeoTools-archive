@@ -107,7 +107,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         fill = sb.createFill(Color.GREEN, 0f);
         stroke = sb.createStroke(Color.GREEN, 0);
-        
+
         Mark mark = sb.createMark("cross", fill, stroke);
         Graphic gra = sb.createGraphic();
         gra.setOpacity(sb.literalExpression(1f));
@@ -144,7 +144,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return new Coordinate(mapX, mapY);
     }
 
-    private void doMouseSelection(double mx, double my) {
+    protected Geometry mousePositionToGeometry(double mx, double my) {
         if (mapArea != null) {
             Rectangle bounds = getBounds();
             double width = mapArea.getWidth();
@@ -160,10 +160,33 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             coord[4] = coord[0];
 
             LinearRing lr1 = gf.createLinearRing(coord);
-            Geometry geometry = gf.createPolygon(lr1, null);
+            return gf.createPolygon(lr1, null);
+        }
 
+        return null;
+    }
+
+    protected Filter getFeatureInGeometry(Geometry geom, MapLayer layer) {
+        Filter f = null;
+
+
+        try {
+            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
+            if (name == "") {
+                name = "the_geom";
+            }
+            f = ff.intersects(ff.property(name), ff.literal(geom));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return f;
+    }
+
+    private void doMouseSelection(double mx, double my) {
+
+        Geometry geometry = mousePositionToGeometry(mx, my);
+        if (geometry != null) {
             findFeature(geometry);
-
         }
     }
 
@@ -320,18 +343,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
                 try {
                     f = ff.intersects(ff.property(name), ff.literal(geometry));
                     applyStyleFilter(f);
-//                    FeatureCollection col = layer.getFeatureSource().getFeatures(f);
-//                    FeatureIterator fi = col.features();
-//                    
-//                    while(fi.hasNext()){
-//                        SimpleFeature sf = fi.next();
-//                        
-//                        for(Object obj : sf.getAttributes()){
-//                            System.out.print(obj);
-//                        }
-//                        System.out.println("");
-//                    }
-//                    fi.close();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -451,9 +462,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             }
         }
         }
-
-    
-    
 }
 
 

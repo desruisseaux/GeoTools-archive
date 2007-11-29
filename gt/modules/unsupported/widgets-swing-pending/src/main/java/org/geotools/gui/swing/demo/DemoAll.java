@@ -29,6 +29,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.gui.swing.contexttree.JContextTree;
 import org.geotools.gui.swing.contexttree.JContextTreePopup;
 import org.geotools.gui.swing.contexttree.TreeContextEvent;
@@ -148,27 +149,21 @@ public class DemoAll extends javax.swing.JFrame {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            HashMap hash = new HashMap();
-            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
-            DataStore store = DataStoreFinder.getDataStore(hash);
+            DataStore store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
             FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
             Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");
             context.addLayer(layer);
 
-            hash = new HashMap();
-            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
-            store = DataStoreFinder.getDataStore(hash);
+            store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_line.shp");
             context.addLayer(layer);
 
-            hash = new HashMap();
-            hash.put("url", DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
-            store = DataStoreFinder.getDataStore(hash);
+            store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);

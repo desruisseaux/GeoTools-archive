@@ -262,7 +262,7 @@
                   <Component id="gui_map2dinfo" alignment="0" pref="544" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="gui_map2dcontrol" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="317" max="32767" attributes="0"/>
+                      <EmptySpace pref="92" max="32767" attributes="0"/>
                       <Component id="gui_map2dedit" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="pan_mappane" alignment="0" max="32767" attributes="0"/>

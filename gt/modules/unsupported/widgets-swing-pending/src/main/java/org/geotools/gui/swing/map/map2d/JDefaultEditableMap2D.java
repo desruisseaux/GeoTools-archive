@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -41,8 +42,11 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gui.swing.map.MapConstants;
@@ -58,6 +62,7 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.referencing.CRS;
 import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -73,7 +78,9 @@ import org.geotools.styling.StyleBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 /**
  *
@@ -153,34 +160,28 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         Class jtsClass = null;
         SimpleFeatureType featureType = null;
 
-        jtsClass = editionLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
+        try {
+            jtsClass = editionLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
+        } catch (Exception e) {
+
+        }
+
         if (jtsClass != null) {
             try {
                 featureType = DataUtilities.createType("memory", "geom:Geometry");
-//                if (jtsClass.equals(Point.class)) {
-//                    featureType = DataUtilities.createType("memory", "geom:Point");
-//                } else if (jtsClass.equals(MultiPoint.class)) {
-//                    featureType = DataUtilities.createType("memory", "geom:MultiPoint");
-//                } else if (jtsClass.equals(LineString.class)) {
-//                    featureType = DataUtilities.createType("memory", "geom:LineString");
-//                } else if (jtsClass.equals(MultiLineString.class)) {
-//                    featureType = DataUtilities.createType("memory", "geom:MultiLineString");
-//                } else if (jtsClass.equals(Polygon.class)) {
-//                    featureType = DataUtilities.createType("memory", "geom:Polygon");
-//                } else if (jtsClass.equals(MultiPolygon.class)) {
-//                    featureType = DataUtilities.createType("memory", "geom:MultiPolygon");
-//                }
             } catch (SchemaException se) {
                 se.printStackTrace();
             }
         }
 
-        try {
-            mds.createSchema(featureType);
-            FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-            return new DefaultMapLayer(fs, editionStyle);
-        } catch (IOException se) {
-            se.printStackTrace();
+        if (featureType != null) {
+            try {
+                mds.createSchema(featureType);
+                FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
+                return new DefaultMapLayer(fs, editionStyle);
+            } catch (IOException se) {
+                se.printStackTrace();
+            }
         }
 
         return null;
@@ -262,14 +263,14 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private MultiPoint createMultiPoint(List<Geometry> geoms) {
         List<Point> lst = new ArrayList<Point>();
-        for(Geometry go : geoms){
-            if(go instanceof Point){
-                lst.add((Point)go);
+        for (Geometry go : geoms) {
+            if (go instanceof Point) {
+                lst.add((Point) go);
             }
         }
-        return gf.createMultiPoint(lst.toArray(new Point[lst.size()]));        
+        return gf.createMultiPoint(lst.toArray(new Point[lst.size()]));
     }
-    
+
     private LineString createLine(List<Coordinate> coords) {
         return gf.createLineString(coords.toArray(EMPTY_COORDINATE_ARRAY));
     }
@@ -290,9 +291,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private MultiPolygon createMultiPolygon(List<Geometry> geoms) {
         List<Polygon> lst = new ArrayList<Polygon>();
-        for(Geometry go : geoms){
-            if(go instanceof Polygon){
-                lst.add((Polygon)go);
+        for (Geometry go : geoms) {
+            if (go instanceof Polygon) {
+                lst.add((Polygon) go);
             }
         }
         return gf.createMultiPolygon(lst.toArray(new Polygon[lst.size()]));
@@ -300,12 +301,12 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private MultiLineString createMultiLine(List<Geometry> geoms) {
         List<LineString> lst = new ArrayList<LineString>();
-        for(Geometry go : geoms){
-            if(go instanceof LineString){
-                lst.add((LineString)go);
+        for (Geometry go : geoms) {
+            if (go instanceof LineString) {
+                lst.add((LineString) go);
             }
         }
-        return gf.createMultiLineString(lst.toArray(new LineString[lst.size()]));        
+        return gf.createMultiLineString(lst.toArray(new LineString[lst.size()]));
     }
 
     private void editAddGeometry(Geometry[] geoms) {
@@ -369,6 +370,43 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             }
 
         }
+
+    }
+
+    private void validateModifiedGeometry(Geometry geo, SimpleFeature sf) {
+
+        FeatureStore store;
+        if (editionLayer.getFeatureSource() instanceof FeatureStore) {
+
+            store = (FeatureStore) editionLayer.getFeatureSource();
+            DefaultTransaction transaction = new DefaultTransaction("trans_maj");
+
+            
+            
+            store.setTransaction(transaction);
+            FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
+            Filter filter = ff.id(Collections.singleton(ff.featureId(sf.getID())));            
+            FeatureType schema = store.getSchema();
+            
+            SimpleFeatureType featureType = editionLayer.getFeatureSource().getSchema();
+            AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
+                        
+            try {
+                store.modifyFeatures(geomAttribut, geo, filter);
+                transaction.commit();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                try {
+                    transaction.rollback();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
+        
+        
 
     }
 
@@ -438,12 +476,19 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
     private void cleanMemoryGeometry() {
 
-        copyLayer = createCopyLayer(editionLayer);
+        try {
+            FeatureStore fst = (FeatureStore) copyLayer.getFeatureSource();
+            fst.removeFeatures(Filter.INCLUDE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            copyLayer = createCopyLayer(editionLayer);
+        }
+
         updateOverLayer();
     }
 
     private void stopEdition() {
-
+        mouseInputListener.fireStateChange();
     }
 
     private void fireEditStateChanged(MapConstants.EDIT_STATE oldone, MapConstants.EDIT_STATE newone) {
@@ -543,19 +588,27 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         private final List<Geometry> geoms = new ArrayList<Geometry>();
         private int nbRightClick = 0;
         private boolean inCreation = false;
+        private boolean hasEditionGeometry = false;
+        private SimpleFeature editFeature = null;
+        private int editedNodeIndex = -1;
 
         private void fireStateChange() {
             coords.clear();
             geoms.clear();
             nbRightClick = 0;
+            inCreation = false;
+            cleanMemoryGeometry();
+            updateMemoryGeometry(geoms);
+            updateOverLayer();
         }
 
         private void updateCreationGeoms() {
             int size = coords.size();
 
             if (inCreation) {
-                if(geoms.size()>0)
-                geoms.remove(geoms.size() - 1);
+                if (geoms.size() > 0) {
+                    geoms.remove(geoms.size() - 1);
+                }
             }
             inCreation = true;
 
@@ -574,6 +627,76 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             }
         }
 
+        private void grabGeometry(int mx, int my) {
+            Geometry geo = mousePositionToGeometry(mx, my);
+            Filter flt = getFeatureInGeometry(geo, editionLayer);
+
+            FeatureCollection editgeoms = null;
+            try {
+                editgeoms = editionLayer.getFeatureSource().getFeatures(flt);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (editgeoms != null) {
+                FeatureIterator fi = editgeoms.features();
+                if (fi.hasNext()) {
+                    SimpleFeature sf = fi.next();
+                    Object obj = sf.getDefaultGeometry();
+
+                    if (obj instanceof Geometry) {
+                        hasEditionGeometry = true;
+                        geoms.add((Geometry) obj);
+                        editFeature = sf;
+                    }
+                }
+            }
+        }
+
+        private void grabGeometryNode(int mx, int my) {
+            editedNodeIndex = -1;
+
+            Geometry geo = geoms.get(0);
+            Geometry mouseGeo = mousePositionToGeometry(mx, my);
+
+            if (geo.intersects(mouseGeo)) {
+                Coordinate[] coos = geo.getCoordinates();
+
+                for (int i = 0; i < coos.length; i++) {
+                    Coordinate coo = coos[i];
+                    Point p = createPoint(coo);
+                    if (p.intersects(mouseGeo)) {
+                        editedNodeIndex = i;
+                    }
+                }
+
+            }
+        }
+
+        private void dragGeometryNode(int mx, int my) {
+            Coordinate mouseCoord = toMapCoord(mx, my);
+
+            Geometry geo = geoms.get(0);
+            geo.getCoordinates()[editedNodeIndex].x = mouseCoord.x;
+            geo.getCoordinates()[editedNodeIndex].y = mouseCoord.y;
+
+            geo.geometryChanged();
+
+            cleanMemoryGeometry();
+            updateMemoryGeometry(geoms);
+            updateOverLayer();
+
+        }
+
+        private void validateGeometryEdit() {
+            validateModifiedGeometry(geoms.get(0), editFeature);
+            bufferPane.layerChanged(null);
+            hasEditionGeometry = false;
+            editFeature = null;
+            editedNodeIndex = -1;
+            inCreation = false;
+        }
+
         public void mouseClicked(MouseEvent e) {
 
             if (actionState == MapConstants.ACTION_STATE.EDIT) {
@@ -582,10 +705,27 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
                 switch (editState) {
 
+                    case EDIT:
+                        if (button == MouseEvent.BUTTON1) {
+                            if (!hasEditionGeometry) {
+                                grabGeometry(e.getX(), e.getY());
+                            }
+                        } else if (button == MouseEvent.BUTTON3) {
+                            validateGeometryEdit();
+                            geoms.clear();
+                            coords.clear();
+                        }
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
+                        break;
 
                     case POINT:
                         geo = createPoint(toMapCoord(e.getX(), e.getY()));
                         editAddGeometry(new Geometry[]{geo});
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
                         break;
 
                     case MULTI_POINT:
@@ -602,6 +742,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                             }
                             coords.clear();
                         }
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
                         break;
 
 
@@ -618,6 +761,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                             }
                             coords.clear();
                         }
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
                         break;
 
 
@@ -631,12 +777,16 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                             nbRightClick++;
                             if (nbRightClick == 1) {
                                 inCreation = false;
-                                if (coords.size() > 1) {                                    
-                                    if(geoms.size()>0) geoms.remove(geoms.size() - 1);
+                                if (coords.size() > 1) {
+                                    if (geoms.size() > 0) {
+                                        geoms.remove(geoms.size() - 1);
+                                    }
                                     geo = createLine(coords);
                                     geoms.add(geo);
-                                }else if(coords.size() > 0){
-                                    if(geoms.size()>0) geoms.remove(geoms.size() - 1);
+                                } else if (coords.size() > 0) {
+                                    if (geoms.size() > 0) {
+                                        geoms.remove(geoms.size() - 1);
+                                    }
                                 }
                             } else {
                                 if (geoms.size() > 0) {
@@ -648,6 +798,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                             }
                             coords.clear();
                         }
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
                         break;
 
                     case POLYGON:
@@ -658,11 +811,14 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                             inCreation = false;
                             if (coords.size() > 2) {
                                 geo = createPolygon(coords);
-                                editAddGeometry(new Geometry[]{geo});                                
+                                editAddGeometry(new Geometry[]{geo});
                                 geoms.clear();
                             }
                             coords.clear();
                         }
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
                         break;
 
                     case MULTI_POLYGON:
@@ -675,28 +831,33 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                             if (nbRightClick == 1) {
                                 inCreation = false;
                                 if (coords.size() > 2) {
-                                    if(geoms.size()>0) geoms.remove(geoms.size() - 1);
+                                    if (geoms.size() > 0) {
+                                        geoms.remove(geoms.size() - 1);
+                                    }
                                     geo = createPolygon(coords);
                                     geoms.add(geo);
-                                }else if(coords.size() > 0){
-                                    if(geoms.size()>0) geoms.remove(geoms.size() - 1);
+                                } else if (coords.size() > 0) {
+                                    if (geoms.size() > 0) {
+                                        geoms.remove(geoms.size() - 1);
+                                    }
                                 }
                             } else {
                                 if (geoms.size() > 0) {
                                     geo = createMultiPolygon(geoms);
                                     editAddGeometry(new Geometry[]{geo});
-                                    nbRightClick = 0;                                    
-                                    geoms.clear();                                    
+                                    nbRightClick = 0;
+                                    geoms.clear();
                                 }
                             }
                             coords.clear();
                         }
+                        cleanMemoryGeometry();
+                        updateMemoryGeometry(geoms);
+                        updateOverLayer();
                         break;
 
                 }
-                cleanMemoryGeometry();
-                updateMemoryGeometry(geoms);
-                updateOverLayer();
+
             }
         }
 
@@ -706,12 +867,31 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                 int button = e.getButton();
 
                 switch (editState) {
+                    case EDIT:
+                        if (button == MouseEvent.BUTTON1) {
 
+                            if (hasEditionGeometry) {
+                                grabGeometryNode(e.getX(), e.getY());
+                            }
+
+                        }
+                        break;
                 }
             }
         }
 
         public void mouseReleased(MouseEvent e) {
+
+            if (actionState == MapConstants.ACTION_STATE.EDIT) {
+                int button = e.getButton();
+
+                switch (editState) {
+                    case EDIT:
+                        editedNodeIndex = -1;
+                        break;
+                }
+            }
+
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -723,8 +903,16 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         public void mouseDragged(MouseEvent e) {
 
             if (actionState == MapConstants.ACTION_STATE.EDIT) {
+                int button = e.getButton();
 
                 switch (editState) {
+                    case EDIT:
+
+                        if (hasEditionGeometry && editedNodeIndex >= 0) {
+                            dragGeometryNode(e.getX(), e.getY());
+                        }
+
+                        break;
                 }
             }
         }
