@@ -124,7 +124,7 @@ public class TestUtilites {
                 "#0000ff"));
         myStroke.setWidth(TestUtilites.filterFactory.createLiteralExpression(
                 new Integer(5)));
-        Rendering2DTest.LOGGER.info("got new Stroke " + myStroke);
+        Rendering2DTest.LOGGER.fine("got new Stroke " + myStroke);
         linesym.setStroke(myStroke);
 
         PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
@@ -239,8 +239,8 @@ public class TestUtilites {
 
         boolean hasData = false; //All I can seem to check reliably.
 
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
+        for (int y = 0; !hasData && y < h; y++) {
+            for (int x = 0; !hasData && x < w; x++) {
                 if (image.getRGB(x, y) != -1) {
                     hasData = true;
                 }

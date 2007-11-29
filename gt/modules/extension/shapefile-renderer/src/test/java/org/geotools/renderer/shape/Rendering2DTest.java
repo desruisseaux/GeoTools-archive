@@ -106,7 +106,7 @@ public class Rendering2DTest extends TestCase {
 
     public void testSimpleRender() throws Exception {
         // same as the datasource test, load in some features into a table
-        System.err.println("starting rendering2DTest");
+        LOGGER.finer("starting rendering2DTest");
 
         DataStore ds = TestUtilites.getPolygons();
         FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
@@ -122,7 +122,7 @@ public class Rendering2DTest extends TestCase {
 
     public void testSimpleLineRender() throws Exception {
         // same as the datasource test, load in some features into a table
-        System.err.println("starting rendering2DTest");
+        //System.err.println("starting rendering2DTest");
 
         ShapefileRenderer renderer = createLineRenderer(TestUtilites.getLines());
         MapContext map = renderer.getContext();

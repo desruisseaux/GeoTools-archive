@@ -26,6 +26,7 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.styling.Style;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -47,7 +48,8 @@ public class RenderNonShapefileTest extends TestCase {
 		FeatureSource target = store.getFeatureSource(store.getTypeNames()[0]);
 		((FeatureStore)target).addFeatures(featureCollection);
 		
-		MapLayer layer=new DefaultMapLayer(target,TestUtilites.createTestStyle(target.getSchema().getTypeName(), null));
+		Style testStyle = TestUtilites.createTestStyle(target.getSchema().getTypeName(), null);
+        MapLayer layer=new DefaultMapLayer(target,testStyle);
 		MapContext context=new DefaultMapContext(new MapLayer[]{layer});
 		
 		ShapefileRenderer renderer=new ShapefileRenderer(context);
