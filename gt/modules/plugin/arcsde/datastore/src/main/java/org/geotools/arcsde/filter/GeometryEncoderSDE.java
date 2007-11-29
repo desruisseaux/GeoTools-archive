@@ -16,6 +16,7 @@
  */
 package org.geotools.arcsde.filter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -100,6 +101,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
         capabilities.addType(Intersects.class);
         capabilities.addType(Overlaps.class);
         capabilities.addType(Within.class);
+        capabilities.addType(And.class);
     }
 
     /** DOCUMENT ME! */
@@ -193,62 +195,12 @@ public class GeometryEncoderSDE implements FilterVisitor {
     }
 
     /**
-     * This is an internal handler so all the logic is in one place. The actual
-     * methods that call back to this method are the ones specified in the
-     * FilterVisitor interface
-     */
-    private Object visit(BinarySpatialOperator filter, Object extraData) {
-        try {
-            if (filter instanceof BBOX) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_ENVP, true);
-            } else if (filter instanceof Contains) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_PC, true);
-            } else if (filter instanceof Crosses) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_LCROSS_OR_CP, true);
-            } else if (filter instanceof Disjoint) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II_OR_ET, false);
-            } else if (filter instanceof Equals) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_IDENTICAL, true);
-            } else if (filter instanceof Intersects) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II_OR_ET, true);
-            } else if (filter instanceof Overlaps) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II, true);
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_PC, false);
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, false);
-            } else if (filter instanceof Within) {
-                addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, true);
-            } else {
-                // This shouldn't happen since we will have pulled out
-                // the unsupported parts before invoking this method
-                String msg = "unsupported filter type";
-                log.warning(msg);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error building SeFilter", e);
-        }
-        return extraData;
-    }
-
-    /**
-     * DOCUMENT ME!
      * 
      * @param filter
-     *            DOCUMENT ME!
      * @param sdeMethod
-     *            DOCUMENT ME!
      * @param truth
-     *            DOCUMENT ME!
-     * 
-     * @throws SeException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
-     * @throws GeometryBuildingException
-     *             DOCUMENT ME!
      */
-    private void addSpatialFilter(BinarySpatialOperator filter, int sdeMethod, boolean truth)
-            throws SeException, DataSourceException, ArcSDEGeometryBuildingException {
-
+    private void addSpatialFilter(BinarySpatialOperator filter, int sdeMethod, boolean truth) {
         org.opengis.filter.expression.Expression left, right;
         PropertyName propertyExpr;
         Literal geomLiteralExpr;
@@ -264,7 +216,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
         } else {
             String err = "SDE currently supports one geometry and one "
                     + "attribute expr.  You gave: " + left + ", " + right;
-            throw new DataSourceException(err);
+            throw new IllegalArgumentException(err);
         }
 
         // Should probably assert that attExpr's property name is equal to
@@ -282,7 +234,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
         }
         if (!rawPropName.equalsIgnoreCase(spatialCol)
                 && !localPropName.equalsIgnoreCase(spatialCol)) {
-            throw new DataSourceException("When querying against a spatial "
+            throw new IllegalArgumentException("When querying against a spatial "
                     + "column, your property name must match the spatial"
                     + " column name.You used '" + propertyExpr.getPropertyName()
                     + "', but the DB's spatial column name is '" + spatialCol + "'");
@@ -306,78 +258,110 @@ public class GeometryEncoderSDE implements FilterVisitor {
                     .getMaxX(), seExtent.getMaxY() + 100);
         }
 
-        SeShape extent = new SeShape(this.sdeLayer.getCoordRef());
-        extent.generateRectangle(seExtent);
+        try {
+            SeShape extent = new SeShape(this.sdeLayer.getCoordRef());
+            extent.generateRectangle(seExtent);
 
-        Geometry layerEnv = gb.construct(extent);
-        geom = geom.intersection(layerEnv); // does the work
+            Geometry layerEnv = gb.construct(extent);
+            geom = geom.intersection(layerEnv); // does the work
 
-        // Now make an SeShape
-        SeShape filterShape;
+            // Now make an SeShape
+            SeShape filterShape;
 
-        // this is a bit hacky, but I don't yet know this code well enough
-        // to do it right. Basically if the geometry collection is completely
-        // outside of the area of the layer then an intersection will return
-        // a geometryCollection (two seperate geometries not intersecting will
-        // be a collection of two). Passing this into GeometryBuilder causes
-        // an exception. So what I did was just look to see if it is a gc
-        // and if so then just make a null seshape, as it shouldn't match
-        // any features in arcsde. -ch
-        if (geom.getClass() == GeometryCollection.class) {
-            filterShape = new SeShape(this.sdeLayer.getCoordRef());
-        } else {
-            gb = ArcSDEGeometryBuilder.builderFor(geom.getClass());
-            filterShape = gb.constructShape(geom, this.sdeLayer.getCoordRef());
+            // this is a bit hacky, but I don't yet know this code well enough
+            // to do it right. Basically if the geometry collection is
+            // completely
+            // outside of the area of the layer then an intersection will return
+            // a geometryCollection (two seperate geometries not intersecting
+            // will
+            // be a collection of two). Passing this into GeometryBuilder causes
+            // an exception. So what I did was just look to see if it is a gc
+            // and if so then just make a null seshape, as it shouldn't match
+            // any features in arcsde. -ch
+            if (geom.getClass() == GeometryCollection.class) {
+                filterShape = new SeShape(this.sdeLayer.getCoordRef());
+            } else {
+                gb = ArcSDEGeometryBuilder.builderFor(geom.getClass());
+                filterShape = gb.constructShape(geom, this.sdeLayer.getCoordRef());
+            }
+            // Add the filter to our list
+            SeShapeFilter shapeFilter = new SeShapeFilter(getLayerName(), this.sdeLayer
+                    .getSpatialColumn(), filterShape, sdeMethod, truth);
+            this.sdeSpatialFilters.add(shapeFilter);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        } catch (SeException se) {
+            throw new RuntimeException(se);
+        } catch (ArcSDEGeometryBuildingException e) {
+            throw new RuntimeException(e);
         }
-        // Add the filter to our list
-        SeShapeFilter shapeFilter = new SeShapeFilter(getLayerName(), this.sdeLayer
-                .getSpatialColumn(), filterShape, sdeMethod, truth);
-        this.sdeSpatialFilters.add(shapeFilter);
     }
 
     // The Spatial Operator methods (these call to the above visit() method
-    public Object visit(BBOX arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(BBOX filter, Object extraData) {
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_ENVP, true);
+        return extraData;
     }
 
-    public Object visit(Beyond arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Beyond filter, Object extraData) {
+        // This shouldn't happen since we will have pulled out
+        // the unsupported parts before invoking this method
+        String msg = "unsupported filter type: " + filter.getClass().getName();
+        log.warning(msg);
+        return extraData;
     }
 
-    public Object visit(Contains arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Contains filter, Object extraData) {
+        addSpatialFilter(filter, SeFilter.METHOD_PC, true);
+        return extraData;
     }
 
-    public Object visit(Crosses arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Crosses filter, Object extraData) {
+        addSpatialFilter(filter, SeFilter.METHOD_LCROSS_OR_CP, true);
+        return extraData;
     }
 
-    public Object visit(Disjoint arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Disjoint filter, Object extraData) {
+        addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, false);
+        return extraData;
     }
 
-    public Object visit(DWithin arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(DWithin filter, Object extraData) {
+        // This shouldn't happen since we will have pulled out
+        // the unsupported parts before invoking this method
+        String msg = "unsupported filter type: " + filter.getClass().getName();
+        log.warning(msg);
+        return extraData;
     }
 
-    public Object visit(Equals arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Equals filter, Object extraData) {
+        addSpatialFilter(filter, SeFilter.METHOD_IDENTICAL, true);
+        return extraData;
     }
 
-    public Object visit(Intersects arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Intersects filter, Object extraData) {
+        addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, true);
+        return extraData;
     }
 
-    public Object visit(Overlaps arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Overlaps filter, Object extraData) {
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II, true);
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_PC, false);
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, false);
+        return extraData;
     }
 
-    public Object visit(Within arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Within filter, Object extraData) {
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, true);
+        return extraData;
     }
 
-    public Object visit(Touches arg0, Object arg1) {
-        return visit((BinarySpatialOperator) arg0, arg1);
+    public Object visit(Touches filter, Object extraData) {
+        // This shouldn't happen since we will have pulled out
+        // the unsupported parts before invoking this method
+        String msg = "unsupported filter type: " + filter.getClass().getName();
+        log.warning(msg);
+        return extraData;
     }
 
     // These are the 'just to implement the interface' methods.
@@ -385,60 +369,64 @@ public class GeometryEncoderSDE implements FilterVisitor {
         return extraData;
     }
 
-    public Object visit(And arg0, Object arg1) {
-        return arg1;
+    public Object visit(And filter, Object extraData) {
+        List<Filter> children = filter.getChildren();
+        for (Filter child : children) {
+            child.accept(this, extraData);
+        }
+        return extraData;
     }
 
-    public Object visit(ExcludeFilter arg0, Object arg1) {
-        return arg1;
+    public Object visit(ExcludeFilter filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(IncludeFilter arg0, Object arg1) {
-        return arg1;
+    public Object visit(IncludeFilter filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(Not arg0, Object arg1) {
-        return arg1;
+    public Object visit(Not filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(Or arg0, Object arg1) {
-        return arg1;
+    public Object visit(Or filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsBetween arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsBetween filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsEqualTo arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsEqualTo filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsGreaterThan arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsGreaterThan filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsGreaterThanOrEqualTo arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsGreaterThanOrEqualTo filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsLessThan arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsLessThan filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsLessThanOrEqualTo arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsLessThanOrEqualTo filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsLike arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsLike filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsNotEqualTo arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsNotEqualTo filter, Object extraData) {
+        return extraData;
     }
 
-    public Object visit(PropertyIsNull arg0, Object arg1) {
-        return arg1;
+    public Object visit(PropertyIsNull filter, Object extraData) {
+        return extraData;
     }
 
     public Object visitNullFilter(Object arg0) {
