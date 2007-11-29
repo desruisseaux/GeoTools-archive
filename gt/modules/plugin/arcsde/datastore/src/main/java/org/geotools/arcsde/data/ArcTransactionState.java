@@ -27,6 +27,7 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 
+import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 
 /**
@@ -183,6 +184,13 @@ class ArcTransactionState implements Transaction.State {
                     LOGGER.log(Level.SEVERE, "Unexpected exception at close(): "
                             + e.getSeError().getSdeErrMsg(), e);
                 }
+                try {
+                    connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+                } catch (SeException e) {
+                    LOGGER.log(Level.SEVERE,
+                            "Unexpected exception restoring connection to thread unprotected state "
+                                    + e.getSeError().getSdeErrMsg(), e);
+                }
                 // now its safe to return it to the pool
                 connection.close();
             } catch (IllegalStateException workflowError) {
@@ -239,7 +247,8 @@ class ArcTransactionState implements Transaction.State {
                 // start a transaction
                 final ArcSDEPooledConnection connection = connectionPool.getConnection();
                 try {
-                    // connection.setConcurrency(SeConnection.SE_TRYLOCK_POLICY);
+                    // TRY_LOCK: one thread at a time can use the connection
+                    connection.setConcurrency(SeConnection.SE_TRYLOCK_POLICY);
                     // do not auto commit
                     connection.setTransactionAutoCommit(0);
                     // and start a transaction

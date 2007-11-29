@@ -41,10 +41,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     /**
      * @see FeatureStore#getTransaction()
      */
-    public Transaction getTransaction() {
-        synchronized (this) {
-            return transaction;
-        }
+    public synchronized Transaction getTransaction() {
+        return transaction;
     }
 
     /**
@@ -56,41 +54,39 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * 
      * @see FeatureStore#setTransaction(Transaction)
      */
-    public void setTransaction(final Transaction transaction) {
-        synchronized (this) {
-            System.out.println(">>setTransaction called at " + Thread.currentThread().getName());
-            if (transaction == null) {
-                throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
-            }
-
-            // this is hacky as a simple reference check should be enough but
-            // there
-            // seem to be some class loader issues with udig so it does not work
-            boolean isAutoCommit = Transaction.AUTO_COMMIT.equals(transaction);
-            if (!isAutoCommit) {
-                try {
-                    transaction.getState(new Object());
-                } catch (UnsupportedOperationException e) {
-                    isAutoCommit = true;
-                }
-            }
-
-            if (!isAutoCommit) {
-                final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
-                try {
-                    // set the transaction state so it grabs a connection and
-                    // starts
-                    // a transaction on it
-                    ArcTransactionState state = ArcTransactionState.getState(transaction,
-                            connectionPool);
-                    LOGGER.finer("ArcSDE transaction initialized: " + state);
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
-                }
-            }
-
-            this.transaction = transaction;
+    public synchronized void setTransaction(final Transaction transaction) {
+        System.out.println(">>setTransaction called at " + Thread.currentThread().getName());
+        if (transaction == null) {
+            throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
         }
+
+        // this is hacky as a simple reference check should be enough but
+        // there
+        // seem to be some class loader issues with udig so it does not work
+        boolean isAutoCommit = Transaction.AUTO_COMMIT.equals(transaction);
+        if (!isAutoCommit) {
+            try {
+                transaction.getState(new Object());
+            } catch (UnsupportedOperationException e) {
+                isAutoCommit = true;
+            }
+        }
+
+        if (!isAutoCommit) {
+            final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
+            try {
+                // set the transaction state so it grabs a connection and
+                // starts
+                // a transaction on it
+                ArcTransactionState state = ArcTransactionState.getState(transaction,
+                        connectionPool);
+                LOGGER.finer("ArcSDE transaction initialized: " + state);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
+            }
+        }
+
+        this.transaction = transaction;
     }
 
     //
@@ -117,52 +113,44 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * @see FeatureStore#addFeatures(FeatureCollection)
      */
     public Set<String> addFeatures(final FeatureCollection collection) throws IOException {
-        synchronized (this) {
-            System.out.println(">>addFeatures called at " + Thread.currentThread().getName());
-            final String typeName = typeInfo.getFeatureTypeName();
-            final FeatureWriter writer = dataStore.getFeatureWriterAppend(typeName, transaction);
-            final FeatureIterator iterator = collection.features();
-            Set<String> featureIds = new HashSet<String>();
-            try {
-                SimpleFeature toAdd;
-                SimpleFeature newFeature;
-                while (iterator.hasNext()) {
-                    toAdd = iterator.next();
-                    newFeature = writer.next();
-                    newFeature.setAttributes(toAdd.getAttributes());
-                    writer.write();
-                    featureIds.add(newFeature.getID());
-                }
-            } finally {
-                iterator.close();
-                writer.close();
+        System.out.println(">>addFeatures called at " + Thread.currentThread().getName());
+        final String typeName = typeInfo.getFeatureTypeName();
+        final FeatureWriter writer = dataStore.getFeatureWriterAppend(typeName, transaction);
+        final FeatureIterator iterator = collection.features();
+        Set<String> featureIds = new HashSet<String>();
+        try {
+            SimpleFeature toAdd;
+            SimpleFeature newFeature;
+            while (iterator.hasNext()) {
+                toAdd = iterator.next();
+                newFeature = writer.next();
+                newFeature.setAttributes(toAdd.getAttributes());
+                writer.write();
+                featureIds.add(newFeature.getID());
             }
-            return featureIds;
+        } finally {
+            iterator.close();
+            writer.close();
         }
+        return featureIds;
     }
 
     @Override
     public final FeatureCollection getFeatures(final Query query) throws IOException {
-        synchronized (this) {
-            System.out.println(">>getFeatures called at " + Thread.currentThread().getName());
-            return super.getFeatures(query);
-        }
+        System.out.println(">>getFeatures called at " + Thread.currentThread().getName());
+        return super.getFeatures(query);
     }
 
     @Override
     public final ReferencedEnvelope getBounds(final Query query) throws IOException {
-        synchronized (this) {
-            System.out.println(">>getBounds called at " + Thread.currentThread().getName());
-            return super.getBounds(query);
-        }
+        System.out.println(">>getBounds called at " + Thread.currentThread().getName());
+        return super.getBounds(query);
     }
 
     @Override
     public final int getCount(final Query query) throws IOException {
-        synchronized (this) {
-            System.out.println(">>getCount called at " + Thread.currentThread().getName());
-            return super.getCount(query);
-        }
+        System.out.println(">>getCount called at " + Thread.currentThread().getName());
+        return super.getCount(query);
     }
 
     /**
