@@ -157,6 +157,9 @@ public class Encoder {
     /** namespace aware */
     private boolean namespaceAware = true;
 
+    /** true if we are encoding a full document */
+    private boolean encodeFullDocument = true;
+
     /**
      * Logger logger;
      */
@@ -252,6 +255,15 @@ public class Encoder {
     }
 
     /**
+     * True if we are encoding a full document, false if the xml headers should be omitted
+     * (the encoder is used to generate part of a large document)
+     * @param encodeFullDocument
+     */
+    public void setEncodeFullDocument(boolean encodeFullDocument) {
+        this.encodeFullDocument = encodeFullDocument;
+    }
+
+    /**
      * Sets the schema location for a particular namespace uri.
      * <p>
      * Registering a schema location will include it on the "schemaLocation" attribute of the
@@ -342,7 +354,10 @@ public class Encoder {
     public void encode(Object object, QName name, ContentHandler handler)
         throws IOException, SAXException {
         serializer = handler;
-        serializer.startDocument();
+
+        if (encodeFullDocument) {
+            serializer.startDocument();
+        }
 
         if (namespaceAware) {
             //write out all the namespace prefix value mappings
@@ -726,7 +741,9 @@ O:
             }
         }
 
-        serializer.endDocument();
+        if (encodeFullDocument) {
+            serializer.endDocument();
+        }
     }
 
     protected Node encode(Object object, XSDNamedComponent component) {
