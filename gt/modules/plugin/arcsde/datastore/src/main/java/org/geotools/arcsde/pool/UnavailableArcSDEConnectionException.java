@@ -24,26 +24,27 @@ import java.io.IOException;
  * <code>SdeConnectionPool instance's getMaxWaitTime()</code> milliseconds
  * 
  * @author Gabriel Roldan
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/pool/UnavailableArcSDEConnectionException.java $
+ * @version $Id: UnavailableArcSDEConnectionException.java 28039 2007-11-25
+ *          13:03:08Z groldan $
  */
 public class UnavailableArcSDEConnectionException extends IOException {
-	/**
+    /**
      * serial version id
      */
     private static final long serialVersionUID = -7964603239735118491L;
 
     /**
-	 * Creates a new UnavailableArcSDEConnectionException object.
-	 * 
-	 * @param usedConnections
-	 *            DOCUMENT ME!
-	 * @param config
-	 *            DOCUMENT ME!
-	 */
-	public UnavailableArcSDEConnectionException(int usedConnections,
-			ArcSDEConnectionConfig config) {
-		super("The maximun of " + usedConnections + " to " + config.toString()
-				+ " has been reached");
-	}
+     * Creates a new UnavailableArcSDEConnectionException object.
+     * 
+     * @param usedConnections
+     *            DOCUMENT ME!
+     * @param config
+     *            DOCUMENT ME!
+     */
+    public UnavailableArcSDEConnectionException(int usedConnections, ArcSDEConnectionConfig config) {
+        super("The maximun of " + usedConnections + " to " + config.toString()
+                + " has been reached");
+    }
 }

@@ -75,7 +75,8 @@ import com.esri.sde.sdk.client.SeRelease;
  */
 public class ArcSDEConnectionPool {
     /** package's logger */
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.arcsde.pool");
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.arcsde.pool");
 
     /** DOCUMENT ME! */
     protected static final Level INFO_LOG_LEVEL = Level.WARNING;
@@ -94,7 +95,7 @@ public class ArcSDEConnectionPool {
     /** this connection pool connection's parameters */
     private ArcSDEConnectionConfig config;
 
-    /** Apache commons-pool used to pool arcsde connections*/
+    /** Apache commons-pool used to pool arcsde connections */
     private ObjectPool pool;
 
     /**
@@ -173,7 +174,7 @@ public class ArcSDEConnectionPool {
             }
         }
     }
-    
+
     /**
      * Ensures proper closure of connection pool at this object's finalization
      * stage.
@@ -219,14 +220,14 @@ public class ArcSDEConnectionPool {
 
         try {
 //            String caller = null;
-//            if(LOGGER.isLoggable(Level.FINER)){
+//            if (LOGGER.isLoggable(Level.FINER)) {
 //                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 //                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
 //            }
-            
+
             ArcSDEPooledConnection connection = (ArcSDEPooledConnection) this.pool.borrowObject();
-            
-            if(LOGGER.isLoggable(Level.FINER)){
+
+            if (LOGGER.isLoggable(Level.FINER)) {
 //                System.err.println("-> " + caller + " got " + connection);
                 LOGGER.finer(connection + " out of connection pool");
             }
@@ -247,21 +248,24 @@ public class ArcSDEConnectionPool {
                     "Unknown problem fetching connection from connection pool", e);
         }
     }
-       
+
     /**
-     * Sometimes (and largely without reason) ArcSDEPooledConnections (really their underlying SeConnection objects)
-     * just poop out.  They start behaving strangely, or not behaving at all.  You can tell the pool that a particular
-     * SeConnection has 'Failed' using this method, and it will do its best to get it out of the pool as soon as you
-     * release your hold on it.
+     * Sometimes (and largely without reason) ArcSDEPooledConnections (really
+     * their underlying SeConnection objects) just poop out. They start behaving
+     * strangely, or not behaving at all. You can tell the pool that a
+     * particular SeConnection has 'Failed' using this method, and it will do
+     * its best to get it out of the pool as soon as you release your hold on
+     * it.
      * 
      * @param conn
      */
     public synchronized void markConnectionAsFailed(ArcSDEPooledConnection conn) {
-        LOGGER.warning("ArcSDE connection '" + conn + "' has been marked as failed.  Current pool state is " + getAvailableCount() + " avail/" + this.getPoolSize() + " total");
+        LOGGER.warning("ArcSDE connection '" + conn
+                + "' has been marked as failed.  Current pool state is " + getAvailableCount()
+                + " avail/" + this.getPoolSize() + " total");
         seConnectionFactory.markObjectInvalid(conn);
     }
 
- 
     /**
      * Gets the list of available layer names on the database
      * 
@@ -394,7 +398,7 @@ public class ArcSDEConnectionPool {
     class SeConnectionFactory extends BasePoolableObjectFactory {
         /** DOCUMENT ME! */
         private ArcSDEConnectionConfig config;
-        
+
         private List<SeConnection> invalidConnections = new ArrayList<SeConnection>(2);
 
         /**
@@ -407,10 +411,11 @@ public class ArcSDEConnectionPool {
             super();
             this.config = config;
         }
-        
+
         public void markObjectInvalid(Object o) {
             invalidConnections.add((SeConnection) o);
         }
+
         /**
          * Called whenever a new instance is needed.
          * 
@@ -448,7 +453,7 @@ public class ArcSDEConnectionPool {
             conn.markActive();
             LOGGER.finest("activating connection " + obj);
         }
-        
+
         @Override
         public void passivateObject(Object obj) {
             LOGGER.finest("passivating connection " + obj);
@@ -461,12 +466,13 @@ public class ArcSDEConnectionPool {
          * instance is still valid to be returned by the pool. It will only be
          * invoked on an "activated" instance.
          * 
-         * @param an instance of {@link ArcSDEPooledConnection} maintained by
+         * @param an
+         *            instance of {@link ArcSDEPooledConnection} maintained by
          *            this pool.
          * 
          * @return <code>true</code> if the connection is still alive and
-         *            operative (checked by asking its user name), <code>false</code>
-         *            otherwise.
+         *         operative (checked by asking its user name),
+         *         <code>false</code> otherwise.
          */
         public boolean validateObject(Object obj) {
             ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
@@ -475,7 +481,7 @@ public class ArcSDEConnectionPool {
             if (valid) {
                 if (invalidConnections.contains(obj))
                     valid = false;
-                
+
                 try {
                     LOGGER.finest("Validating SDE Connection");
                     String user = conn.getUser();
@@ -502,13 +508,13 @@ public class ArcSDEConnectionPool {
             conn.destroy();
         }
     }
-    
+
     public String toString() {
         StringBuffer ret = new StringBuffer();
         ret.append("[ACTIVE: ");
-        ret.append(pool.getNumActive() + "/" + ((GenericObjectPool)pool).getMaxActive());
+        ret.append(pool.getNumActive() + "/" + ((GenericObjectPool) pool).getMaxActive());
         ret.append("  INACTIVE: ");
-        ret.append(pool.getNumIdle() + "/" + ((GenericObjectPool)pool).getMaxIdle() + "]");
+        ret.append(pool.getNumIdle() + "/" + ((GenericObjectPool) pool).getMaxIdle() + "]");
         return ret.toString();
     }
 }
