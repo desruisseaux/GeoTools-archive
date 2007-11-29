@@ -8,8 +8,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.data.DataStore;
-import org.geotools.data.DefaultFeatureResults;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
@@ -59,34 +58,52 @@ public class ArcSdeFeatureSource implements FeatureSource {
     }
 
     /**
+     * @return The bounding box of the query or null if unknown and too
+     *         expensive for the method to calculate or any errors occur.
+     * 
      * @see FeatureSource#getBounds(Query)
      */
-    public final ReferencedEnvelope getBounds(final Query query) throws IOException {
-        Envelope ev;
-        {
-            final Query namedQuery = namedQuery(query);
-            final String typeName = namedQuery.getTypeName();
-            final ArcSDEPooledConnection connection = getConnection();
-            try {
-                if (query.getFilter().equals(Filter.INCLUDE)) {
-                    LOGGER.finer("getting bounds of entire layer.  Using optimized SDE call.");
-                    // we're really asking for a bounds of the WHOLE layer,
-                    // let's just ask SDE metadata for that, rather than doing
-                    // an
-                    // expensive query
-                    SeLayer thisLayer = connection.getLayer(typeName);
-                    SeExtent extent = thisLayer.getExtent();
-                    ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
-                            .getMaxY());
-                } else {
-                    ev = ArcSDEQuery.calculateQueryExtent(connection, featureType, namedQuery);
-                }
-            } finally {
-                if (!connection.isTransactionActive()) {
-                    connection.close();
-                }
+    public ReferencedEnvelope getBounds(final Query query) throws IOException {
+        final Query namedQuery = namedQuery(query);
+        final ArcSDEPooledConnection connection = getConnection();
+        ReferencedEnvelope ev;
+        try {
+            ev = getBounds(namedQuery, connection);
+        } finally {
+            if (!connection.isTransactionActive()) {
+                connection.close();
             }
         }
+        return ev;
+    }
+
+    /**
+     * 
+     * @param namedQuery
+     * @param connection
+     * @return The bounding box of the query or null if unknown and too
+     *         expensive for the method to calculate or any errors occur.
+     * @throws DataSourceException
+     * @throws IOException
+     */
+    final ReferencedEnvelope getBounds(final Query namedQuery,
+            final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
+        Envelope ev;
+        final String typeName = namedQuery.getTypeName();
+        if (namedQuery.getFilter().equals(Filter.INCLUDE)) {
+            LOGGER.finer("getting bounds of entire layer.  Using optimized SDE call.");
+            // we're really asking for a bounds of the WHOLE layer,
+            // let's just ask SDE metadata for that, rather than doing
+            // an
+            // expensive query
+            SeLayer thisLayer = connection.getLayer(typeName);
+            SeExtent extent = thisLayer.getExtent();
+            ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
+                    .getMaxY());
+        } else {
+            ev = ArcSDEQuery.calculateQueryExtent(connection, featureType, namedQuery);
+        }
+
         if (ev != null) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("ArcSDE optimized getBounds call returned: " + ev);
@@ -109,12 +126,12 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getCount(Query)
      */
-    public final int getCount(final Query query) throws IOException {
+    public int getCount(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
         final ArcSDEPooledConnection connection = getConnection();
         final int count;
         try {
-            count = ArcSDEQuery.calculateResultCount(connection, featureType, namedQuery);
+            count = getCount(namedQuery, connection);
         } finally {
             if (!connection.isTransactionActive()) {
                 connection.close();
@@ -124,9 +141,19 @@ public class ArcSdeFeatureSource implements FeatureSource {
     }
 
     /**
+     * @see FeatureSource#getCount(Query)
+     */
+    final int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
+            throws IOException {
+        final int count;
+        count = ArcSDEQuery.calculateResultCount(connection, featureType, namedQuery);
+        return count;
+    }
+
+    /**
      * convenient way to get a connection for {@link #getBounds()} and
-     * {@link #getCount(Query)}. {@link TransactionFeatureWriter} overrides to
-     * get the connection from the transaction instead of the pool.
+     * {@link #getCount(Query)}. {@link ArcSdeFeatureStore} overrides to get
+     * the connection from the transaction instead of the pool.
      * 
      * @return
      * @throws IOException
@@ -152,7 +179,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getDataStore()
      */
-    public final DataStore getDataStore() {
+    public final ArcSDEDataStore getDataStore() {
         return dataStore;
     }
 
@@ -160,7 +187,8 @@ public class ArcSdeFeatureSource implements FeatureSource {
      * @see FeatureSource#getFeatures(Query)
      */
     public FeatureCollection getFeatures(final Query query) throws IOException {
-        FeatureCollection collection = new DefaultFeatureResults(this, query);
+        final Query namedQuery = namedQuery(query);
+        FeatureCollection collection = new ArcSdeFeatureCollection(this, namedQuery);
         return collection;
     }
 

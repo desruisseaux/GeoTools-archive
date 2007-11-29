@@ -222,17 +222,17 @@ public class ArcSDEConnectionPool {
 //            if(LOGGER.isLoggable(Level.FINER)){
 //                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 //                caller = stackTrace[3].getClassName() + "." + stackTrace[3].getMethodName();
-//                System.err.print("-> " + caller);
 //            }
             
-            ArcSDEPooledConnection ret = (ArcSDEPooledConnection) this.pool.borrowObject();
+            ArcSDEPooledConnection connection = (ArcSDEPooledConnection) this.pool.borrowObject();
             
             if(LOGGER.isLoggable(Level.FINER)){
-//                System.err.println(" got " + ret);
-                LOGGER.finer(ret + " out of connection pool");
+//                System.err.println("-> " + caller + " got " + connection);
+                LOGGER.finer(connection + " out of connection pool");
             }
 
-            return ret;
+            connection.markActive();
+            return connection;
         } catch (NoSuchElementException e) {
             LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
             throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(), this.config);
@@ -442,9 +442,18 @@ public class ArcSDEConnectionPool {
          * 
          * @param obj
          */
+        @Override
         public void activateObject(Object obj) {
-            // no-op
+            final ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            conn.markActive();
             LOGGER.finest("activating connection " + obj);
+        }
+        
+        @Override
+        public void passivateObject(Object obj) {
+            LOGGER.finest("passivating connection " + obj);
+            final ArcSDEPooledConnection conn = (ArcSDEPooledConnection) obj;
+            conn.markInactive();
         }
 
         /**

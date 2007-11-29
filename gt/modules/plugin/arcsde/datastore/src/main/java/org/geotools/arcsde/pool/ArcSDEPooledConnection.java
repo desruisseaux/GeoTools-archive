@@ -35,7 +35,7 @@ import com.esri.sde.sdk.client.SeTable;
  * An SeConnection that returns itself to the connection pool instead of closing
  * on each call to close().
  * 
- * @author Gabriel Roldan, Axios Engineering
+ * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.3.x
  * 
@@ -55,6 +55,8 @@ public class ArcSDEPooledConnection extends SeConnection {
 
     private boolean transactionInProgress;
 
+    private boolean isPassivated;
+
     private Map<String, SeLayer> cachedLayers = new HashMap<String, SeLayer>();
 
     public ArcSDEPooledConnection(ObjectPool pool, ArcSDEConnectionConfig config)
@@ -70,7 +72,68 @@ public class ArcSDEPooledConnection extends SeConnection {
         }
     }
 
+    public final boolean isClosed() {
+        return super.isClosed();
+    }
+
+    /**
+     * Marks the connection as being active (i.e. its out of the pool and ready
+     * to be used).
+     * <p>
+     * Shall be called just before being returned from the connection pool
+     * </p>
+     * 
+     * @see #markInactive()
+     * @see #isPassivated
+     * @see #checkActive()
+     */
+    void markActive() {
+        this.isPassivated = false;
+    }
+
+    /**
+     * Marks the connection as being inactive (i.e. laying on the connection
+     * pool)
+     * <p>
+     * Shall be callled just before sending it back to the pool
+     * </p>
+     * 
+     * @see #markActive()
+     * @see #isPassivated
+     * @see #checkActive()
+     */
+    void markInactive() {
+        this.isPassivated = true;
+    }
+
+    /**
+     * Returns whether this connection is on the connection pool domain or not.
+     * 
+     * @return <code>true</code> if this connection has beed returned to the
+     *         pool and thus cannot be used, <code>false</code> if its safe to
+     *         keep using it.
+     */
+    public boolean isPassivated() {
+        return isPassivated;
+    }
+
+    /**
+     * Sanity check method called before every public operation delegates to the
+     * superclass.
+     * 
+     * @throws IllegalStateException
+     *             if {@link #isPassivated() isPassivated() == true} as this is
+     *             a serious workflow breackage.
+     */
+    private void checkActive() {
+        if (isPassivated()) {
+            throw new IllegalStateException("Unrecoverable error: " + toString()
+                    + " is passivated, shall not be used!");
+        }
+    }
+
     public synchronized SeLayer getLayer(final String layerName) throws DataSourceException {
+        checkActive();
         if (!cachedLayers.containsKey(layerName)) {
             try {
                 cacheLayers();
@@ -79,13 +142,14 @@ public class ArcSDEPooledConnection extends SeConnection {
             }
         }
         SeLayer seLayer = cachedLayers.get(layerName);
-        if(seLayer == null){
+        if (seLayer == null) {
             throw new NoSuchElementException("Layer '" + layerName + "' not found");
         }
         return seLayer;
     }
 
     public synchronized SeTable getTable(final String tableName) throws DataSourceException {
+        checkActive();
         try {
             return new SeTable(this, tableName);
         } catch (SeException e) {
@@ -102,21 +166,37 @@ public class ArcSDEPooledConnection extends SeConnection {
         }
     }
 
+    @Override
     public void startTransaction() throws SeException {
+        checkActive();
         super.startTransaction();
         transactionInProgress = true;
     }
 
+    @Override
     public void commitTransaction() throws SeException {
+        checkActive();
         super.commitTransaction();
         transactionInProgress = false;
     }
 
+    /**
+     * Returns whether a transaction is in progress over this connection
+     * <p>
+     * As for any other public method, this one can't be called if
+     * {@link #isPassivated()} is true.
+     * </p>
+     * 
+     * @return
+     */
     public boolean isTransactionActive() {
+        checkActive();
         return transactionInProgress;
     }
 
+    @Override
     public void rollbackTransaction() throws SeException {
+        checkActive();
         super.rollbackTransaction();
         transactionInProgress = false;
     }
@@ -128,7 +208,9 @@ public class ArcSDEPooledConnection extends SeConnection {
      *             if close() is called while a transaction is in progress
      * @see #destroy()
      */
+    @Override
     public void close() throws IllegalStateException {
+        checkActive();
         if (transactionInProgress) {
             throw new IllegalStateException(
                     "Transaction is in progress, should commit or rollback before closing");

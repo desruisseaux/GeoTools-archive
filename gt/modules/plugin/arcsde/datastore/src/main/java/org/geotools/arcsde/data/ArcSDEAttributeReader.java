@@ -110,9 +110,19 @@ class ArcSDEAttributeReader implements AttributeReader {
      * The query that defines this readers interaction with an ArcSDE instance.
      * 
      * @param query
+     *            the {@link SeQuery} wrapper where to fetch rows from. Must be
+     *            already {@link ArcSDEQuery#execute() executed}.
+     * 
      * @param connection
+     *            the connection the <code>query</code> is being ran over.
+     *            This attribute reader will close it only if it does not have a
+     *            transaction in progress.
+     * 
      * @param handleConnectionClosing
-     *            whether to close or not the connection when done.
+     *            whether to close or not the connection when done. Useful to
+     *            allow a feature reader working over this attribute reader to
+     *            stream out the filtered content of an
+     *            {@link AutoCommitFeatureWriter}.
      * 
      * @throws IOException
      */

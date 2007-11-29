@@ -258,6 +258,7 @@ public class ArcSDEDataStore implements DataStore {
         // if it's not inside a transaction.
         final boolean handleConnection = true;
         FeatureReader reader = getFeatureReader(query, connection, handleConnection);
+
         return reader;
     }
 
@@ -266,23 +267,27 @@ public class ArcSDEDataStore implements DataStore {
      * against the given connection.
      * <p>
      * Explicitly stating the connection to use allows for the feature reader to
-     * fetch the differencies (additions/modifications/deletions) made while a
+     * fetch the differences (additions/modifications/deletions) made while a
      * transaction is in progress.
      * </p>
      * 
      * @param query
      *            the Query containing the request criteria
      * @param connection
-     *            the connection to use to retrieve content
+     *            the connection to use to retrieve content. It'll be closed by
+     *            the returned FeatureReader only if the connection does not has
+     *            a
+     *            {@link ArcSDEPooledConnection#isTransactionActive() transaction in progress}.
      * @param readerClosesConnection
      *            flag indicating whether the reader should auto-close the
-     *            connection when exhausted or when close() is called.
+     *            connection when exhausted/closed. <code>false</code>
+     *            indicates never close it as its being used as the streamed
+     *            content of a feature writer.
      * @return
      * @throws IOException
      */
-    private FeatureReader getFeatureReader(final Query query,
-            final ArcSDEPooledConnection connection, final boolean readerClosesConnection)
-            throws IOException {
+    FeatureReader getFeatureReader(final Query query, final ArcSDEPooledConnection connection,
+            final boolean readerClosesConnection) throws IOException {
         final String typeName = query.getTypeName();
         final String propertyNames[] = query.getPropertyNames();
 
@@ -309,16 +314,17 @@ public class ArcSDEDataStore implements DataStore {
         if (isView(typeName)) {
             SeQueryInfo definitionQuery = getViewQueryInfo(typeName);
             PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, definitionQuery,
-                    viewSelectStatement);
+            sdeQuery = ArcSDEQuery.createInprocessViewQuery(connection, completeSchema, query,
+                    definitionQuery, viewSelectStatement);
         } else {
             sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query);
         }
 
         sdeQuery.execute();
 
-        final ArcSDEAttributeReader attReader = new ArcSDEAttributeReader(sdeQuery, connection,
-                readerClosesConnection);
+        // this is the one which's gonna close the connection when done
+        final ArcSDEAttributeReader attReader;
+        attReader = new ArcSDEAttributeReader(sdeQuery, connection, readerClosesConnection);
         FeatureReader reader;
         try {
             reader = new ArcSDEFeatureReader(attReader);
@@ -350,6 +356,7 @@ public class ArcSDEDataStore implements DataStore {
      *         user has write permissions over <code>typeName</code>
      */
     public FeatureSource getFeatureSource(final String typeName) throws IOException {
+        System.err.println("getFeatureSource(" + typeName + ")");
         FeatureSource fsource;
         final SimpleFeatureType featureType = getSchema(typeName);
         if (isView(typeName)) {
@@ -399,17 +406,12 @@ public class ArcSDEDataStore implements DataStore {
         try {
             final SimpleFeatureType featureType = getSchema(typeName, connection);
             final DefaultQuery query = new DefaultQuery(typeName, filter);
-
-            // get a reader over the requested content. It'll be used to stream
-            // out the writer's features and will share a connection and
-            // transaction. handleConnection in false means the reader shall not
-            // try to close the connection, the writer will take care of it if
-            // need be.
-            final boolean handleConnection = false;
-            final FeatureReader reader = getFeatureReader(query, connection, handleConnection);
+            //don't let the reader close the connection as the writer needs it
+            final boolean closeConnection = false;
+            final FeatureReader reader = getFeatureReader(query, connection, closeConnection);
 
             FeatureWriter writer;
-            
+
             final SeLayer layer = connection.getLayer(typeName);
             final FIDReader fidReader = FIDReader.getFidReader(connection, layer);
 

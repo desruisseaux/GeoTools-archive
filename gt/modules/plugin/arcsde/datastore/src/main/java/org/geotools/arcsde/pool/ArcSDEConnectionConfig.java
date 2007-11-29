@@ -307,7 +307,7 @@ public class ArcSDEConnectionConfig {
 		}
 
 		if (databaseName == null || databaseName.length() == 0) {
-			LOGGER.warning("No database name specified");
+			LOGGER.fine("No database name specified");
 		}
 
 		if (userName.length() == 0) {

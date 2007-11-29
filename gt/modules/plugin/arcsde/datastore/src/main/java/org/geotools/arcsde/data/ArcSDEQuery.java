@@ -40,6 +40,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -135,95 +136,160 @@ class ArcSDEQuery {
         this.fidReader = fidReader;
     }
 
-    public static ArcSDEQuery createQuery(final ArcSDEPooledConnection connection,
-            final SimpleFeatureType schema, final Query query) throws IOException {
-        return createQuery(connection, schema, query, null, null);
-    }
-
     /**
-     * @return the newly created ArcSDEQuery or null if <code>Filter.EXCLUDE ==
-     *         query.getFilter()</code>.
+     * Creates a Query to be executed over a registered ArcSDE layer (whether it
+     * is from a table or a spatial view).
      * 
+     * @param conn
+     *            the connection the query works over. As its managed by the
+     *            calling code its the calling code responsibility to close it
+     *            when done.
+     * @param fullSchema
+     * @param query
+     * @return
      * @throws IOException
-     *             see <i>throws DataSourceException</i> bellow.
      */
     public static ArcSDEQuery createQuery(final ArcSDEPooledConnection conn,
-            final SimpleFeatureType schema, final Query query, final SeQueryInfo definitionQuery,
-            final PlainSelect viewSelectStatement) throws IOException {
+            final SimpleFeatureType fullSchema, final Query query) throws IOException {
 
         Filter filter = query.getFilter();
 
-        if (filter == Filter.EXCLUDE) {
-            return null;
-        }
-
         LOGGER.fine("Creating new ArcSDEQuery");
 
+        final String typeName = fullSchema.getTypeName();
+        final SeLayer sdeLayer = conn.getLayer(typeName);
+        final FIDReader fidReader = FIDReader.getFidReader(conn, sdeLayer);
+        final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
+        // create the set of filters to work over
+        final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
+                querySchema, null, null, fidReader);
+
         final ArcSDEQuery sdeQuery;
+        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader);
+        return sdeQuery;
+    }
+
+    /**
+     * Creates a query to be executed over an inprocess view (a view defined by
+     * a SQL SELECT statement at the datastore configuration)
+     * 
+     * @return the newly created ArcSDEQuery.
+     * 
+     * @throws IOException
+     *             see <i>throws DataSourceException</i> bellow.
+     * @see ArcSDEDataStore#registerView(String, PlainSelect)
+     */
+    public static ArcSDEQuery createInprocessViewQuery(final ArcSDEPooledConnection conn,
+            final SimpleFeatureType schema, final Query query, final SeQueryInfo definitionQuery,
+            final PlainSelect viewSelectStatement) throws IOException {
+
+        final Filter filter = query.getFilter();
         final String typeName = schema.getTypeName();
-        final FIDReader fidReader;
+        final FIDReader fidReader = FIDReader.NULL_READER;
         final SeLayer sdeLayer;
 
+        // the first table has to be the main layer
+        final SeSqlConstruct construct;
         try {
-            if (definitionQuery != null) {
-                fidReader = FIDReader.NULL_READER;
-                // the first table has to be the main layer
-                String layerName;
-                try {
-                    layerName = definitionQuery.getConstruct().getTables()[0];
-                    // @REVISIT: HACK HERE!, look how to get rid of alias in
-                    // query info, or
-                    // better stop using queryinfo as definition query and use
-                    // the PlainSelect,
-                    // then construct the query info dynamically when needed?
-                    if (layerName.indexOf(" AS") > 0) {
-                        layerName = layerName.substring(0, layerName.indexOf(" AS"));
-                    }
-                } catch (SeException e) {
-                    throw new ArcSdeException("shouldn't happen: " + e.getMessage(), e);
+            construct = definitionQuery.getConstruct();
+        } catch (SeException e) {
+            throw new ArcSdeException("shouldn't happen: " + e.getMessage(), e);
+        }
+        final String[] tables = construct.getTables();
+        String layerName = tables[0];
+        // @REVISIT: HACK HERE!, look how to get rid of alias in
+        // query info, or
+        // better stop using queryinfo as definition query and use
+        // the PlainSelect,
+        // then construct the query info dynamically when needed?
+        if (layerName.indexOf(" AS") > 0) {
+            layerName = layerName.substring(0, layerName.indexOf(" AS"));
+        }
+        sdeLayer = conn.getLayer(layerName);
+
+        final SimpleFeatureType querySchema = getQuerySchema(query, schema);
+        // create the set of filters to work over
+        final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
+                querySchema, definitionQuery, viewSelectStatement, fidReader);
+
+        final ArcSDEQuery sdeQuery;
+        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader);
+        return sdeQuery;
+    }
+
+    /**
+     * Returns a {@link SimpleFeatureType} whichs a "view" of the
+     * <code>fullSchema</code> adapted as per the required query property
+     * names.
+     * 
+     * @param query
+     *            the query containing the list of property names required by
+     *            the output schema and the {@link Filter query predicate} from
+     *            which to fetch required properties to be used at runtime
+     *            filter evaluation.
+     * @param fullSchema
+     *            a feature type representing an ArcSDE layer full schema.
+     * @return a FeatureType derived from <code>fullSchema</code> which
+     *         contains the property names required by the <code>query</code>
+     *         and the ones referenced in the query filter.
+     * @throws DataSourceException
+     */
+    private static SimpleFeatureType getQuerySchema(final Query query,
+            final SimpleFeatureType fullSchema) throws DataSourceException {
+        // guess which properties need to actually be retrieved.
+        final List<String> queryColumns = getQueryColumns(query, fullSchema);
+        final String[] attNames = queryColumns.toArray(new String[queryColumns.size()]);
+
+        try {
+            // create the resulting feature type for the real attributes to
+            // retrieve
+            SimpleFeatureType querySchema = DataUtilities.createSubType(fullSchema, attNames);
+            return querySchema;
+        } catch (SchemaException ex) {
+            throw new DataSourceException(
+                    "Some requested attributes do not match the table schema: " + ex.getMessage(),
+                    ex);
+        }
+    }
+
+    private static List<String> getQueryColumns(Query query, final SimpleFeatureType fullSchema)
+            throws DataSourceException {
+        final List<String> columnNames = new ArrayList<String>();
+
+        final String[] queryColumns = query.getPropertyNames();
+
+        if ((queryColumns == null) || (queryColumns.length == 0)) {
+            final List<AttributeDescriptor> attNames = fullSchema.getAttributes();
+            for (Iterator<AttributeDescriptor> it = attNames.iterator(); it.hasNext();) {
+                AttributeDescriptor att = it.next();
+                String attName = att.getLocalName();
+                // de namespace-ify the names
+                // REVISIT: this shouldnt be needed!
+                if (attName.indexOf(":") != -1) {
+                    attName = attName.substring(attName.indexOf(":") + 1);
                 }
-                sdeLayer = conn.getLayer(layerName);
-            } else {
-                sdeLayer = conn.getLayer(typeName);
-                fidReader = FIDReader.getFidReader(conn, sdeLayer);
+                columnNames.add(attName);
             }
+        } else {
+            columnNames.addAll(Arrays.asList(queryColumns));
+        }
 
-            // guess which properties need to actually be retrieved.
-            List queryColumns = getQueryColumns(query, schema);
-
-            SimpleFeatureType querySchema = null;
-
-            String[] attNames = (String[]) queryColumns.toArray(new String[queryColumns.size()]);
-
-            try {
-                // create the resulting feature type for the real attributes to
-                // retrieve
-                querySchema = DataUtilities.createSubType(schema, attNames);
-            } catch (SchemaException ex) {
-                throw new DataSourceException(
-                        "Some requested attributes do not match the table schema: "
-                                + ex.getMessage(), ex);
-            }
-
-            // create the set of filters to work over
-            ArcSDEQuery.FilterSet filterSet = createFilters(sdeLayer, querySchema, filter,
-                    definitionQuery, viewSelectStatement, fidReader);
-
-            sdeQuery = new ArcSDEQuery(conn, querySchema, filterSet, fidReader);
-        } catch (Throwable t) {
-            // something went wrong while creating this connection. Be sure and
-            // close out the
-            // ArcSDE connection that we opened up.
-            if (conn != null)
-                conn.close();
-            if (t instanceof IOException) {
-                throw (IOException) t;
-            } else {
-                throw new DataSourceException("Error while creating ArcSDE Connection"
-                        + t.getMessage(), t);
+        // Ok, say we don't support the full filter natively and it references
+        // some properties, then they have to be retrieved in order to evaluate
+        // the filter at runtime
+        Filter f = query.getFilter();
+        if (f != null) {
+            final FilterAttributeExtractor attExtractor = new FilterAttributeExtractor(fullSchema);
+            f.accept(attExtractor, null);
+            final String[] filterAtts = attExtractor.getAttributeNames();
+            for (String attName : filterAtts) {
+                if (!columnNames.contains(attName)) {
+                    columnNames.add(attName);
+                }
             }
         }
-        return sdeQuery;
+
+        return columnNames;
     }
 
     /**
@@ -235,81 +301,6 @@ class ArcSDEQuery {
         return this.fidReader;
     }
 
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param queryColumns
-     *            DOCUMENT ME!
-     * @param schema
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     * 
-     * @throws DataSourceException
-     *             DOCUMENT ME!
-     */
-    private static List /* <String> */getQueryColumns(Query query, final SimpleFeatureType schema)
-            throws DataSourceException {
-        final HashSet columnNames;
-
-        String[] queryColumns = query.getPropertyNames();
-
-        if ((queryColumns == null) || (queryColumns.length == 0)) {
-            List attNames = schema.getAttributes();
-
-            columnNames = new HashSet(attNames.size());
-
-            for (Iterator it = attNames.iterator(); it.hasNext();) {
-                AttributeDescriptor att = (AttributeDescriptor) it.next();
-                String attName = att.getLocalName();
-                // de namespace-ify the names
-                if (attName.indexOf(":") != -1) {
-                    attName = attName.substring(attName.indexOf(":") + 1);
-                }
-                columnNames.add(attName);
-            }
-        } else {
-            columnNames = new HashSet();
-            columnNames.addAll(Arrays.asList(queryColumns));
-        }
-
-        Filter f = query.getFilter();
-        if (f != null) {
-            Set s = new HashSet();
-            f.accept(new DefaultFilterVisitor() {
-                public Object visit(PropertyName expr, Object data) {
-                    String attName = expr.getPropertyName();
-                    if (attName.indexOf(":") != -1) {
-                        attName = attName.substring(attName.indexOf(":") + 1);
-                    }
-                    columnNames.add(attName);
-                    return data;
-                }
-            }, s);
-        }
-
-        List ret = new ArrayList();
-        ret.addAll(columnNames);
-        return ret;
-    }
-
-    /**
-     * DOCUMENT ME!
-     * 
-     * @param store
-     *            DOCUMENT ME!
-     * @param typeName
-     *            DOCUMENT ME!
-     * @param filter
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     * 
-     * @throws NoSuchElementException
-     *             DOCUMENT ME!
-     * @throws IOException
-     *             DOCUMENT ME!
-     */
     public static ArcSDEQuery.FilterSet createFilters(SeLayer layer, SimpleFeatureType schema,
             Filter filter, SeQueryInfo qInfo, PlainSelect viewSelect, FIDReader fidReader)
             throws NoSuchElementException, IOException {
@@ -714,7 +705,6 @@ class ArcSDEQuery {
             throw new ArcSdeException(e);
         }
     }
-
 
     // //////////////////////////////////////////////////////////////////////
     // /////////////// METHODS WRAPPED FROM SeQuery /////////////////////

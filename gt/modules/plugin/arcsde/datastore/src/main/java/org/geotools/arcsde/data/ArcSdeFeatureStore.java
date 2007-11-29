@@ -11,8 +11,6 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -20,6 +18,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -88,22 +87,25 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
         this.transaction = transaction;
     }
 
-    /**
-     * Overrides {@link ArcSdeFeatureSource#getFeatures(Query)} to return a
-     * transaction aware collection.
-     * 
-     * @see ArcSDEDataStore#getFeatureReader(Query, Transaction)
-     */
-    @Override
-    public FeatureCollection getFeatures(Query query) throws IOException {
-        FeatureCollection collection = new DefaultFeatureResults(this, query);
-        return collection;
-//        final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
-//        final Transaction transaction = getTransaction();
-//        final FeatureReader featureReader = ds.getFeatureReader(query, transaction);
-//        final FeatureCollection collection = DataUtilities.collection(featureReader);
-//        return collection;
-    }
+    //
+    // /**
+    // * Overrides {@link ArcSdeFeatureSource#getFeatures(Query)} to return a
+    // * transaction aware collection.
+    // *
+    // * @see ArcSDEDataStore#getFeatureReader(Query, Transaction)
+    // */
+    // @Override
+    // public FeatureCollection getFeatures(Query query) throws IOException {
+    // FeatureCollection collection = new DefaultFeatureResults(this, query);
+    // return collection;
+    // // final ArcSDEDataStore ds = (ArcSDEDataStore) getDataStore();
+    // // final Transaction transaction = getTransaction();
+    // // final FeatureReader featureReader = ds.getFeatureReader(query,
+    // transaction);
+    // // final FeatureCollection collection =
+    // DataUtilities.collection(featureReader);
+    // // return collection;
+    // }
 
     /**
      * @see FeatureStore#addFeatures(FeatureCollection)
@@ -128,6 +130,21 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             writer.close();
         }
         return featureIds;
+    }
+
+    @Override
+    public final FeatureCollection getFeatures(final Query query) throws IOException {
+        return super.getFeatures(query);
+    }
+
+    @Override
+    public final ReferencedEnvelope getBounds(final Query query) throws IOException {
+        return super.getBounds(query);
+    }
+
+    @Override
+    public final int getCount(final Query query) throws IOException {
+        return super.getCount(query);
     }
 
     /**
@@ -156,7 +173,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
     /**
      * @see FeatureStore#modifyFeatures(AttributeDescriptor, Object, Filter)
      */
-    public void modifyFeatures(final AttributeDescriptor type, final Object value,
+    public final void modifyFeatures(final AttributeDescriptor type, final Object value,
             final Filter filter) throws IOException {
         modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, }, filter);
     }

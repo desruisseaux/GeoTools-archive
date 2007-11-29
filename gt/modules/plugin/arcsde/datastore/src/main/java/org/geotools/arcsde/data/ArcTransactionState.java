@@ -76,6 +76,7 @@ class ArcTransactionState implements Transaction.State {
      * </p>
      */
     public void commit() throws IOException {
+        System.err.println("commit()");
         failIfClosed();
         try {
             connection.commitTransaction();
@@ -99,6 +100,7 @@ class ArcTransactionState implements Transaction.State {
      * 
      */
     public void rollback() throws IOException {
+        System.err.println("commit()");
         failIfClosed();
         try {
             connection.rollbackTransaction();
@@ -129,6 +131,7 @@ class ArcTransactionState implements Transaction.State {
      *             if close() is called while a transaction is in progress
      */
     public void setTransaction(final Transaction transaction) {
+        System.err.println("setTransaction(" + transaction + ")");
         if (Transaction.AUTO_COMMIT.equals(transaction)) {
             throw new IllegalArgumentException("Cannot use Transaction.AUTO_COMMIT here");
         }
@@ -165,6 +168,7 @@ class ArcTransactionState implements Transaction.State {
      * to null)
      */
     private void close() {
+        System.err.println("ArcTransactionState.close()");
         // can't even try to use this state in any way from now on
         if (connection != null) {
             // may throw ISE if transaction is still in progress

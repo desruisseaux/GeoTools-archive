@@ -46,4 +46,5 @@ public class ArcSDEFeatureReader extends DefaultFeatureReader {
         SimpleFeature feature = featureBuilder.buildFeature(fid);
         return feature;
     }
+    
 }

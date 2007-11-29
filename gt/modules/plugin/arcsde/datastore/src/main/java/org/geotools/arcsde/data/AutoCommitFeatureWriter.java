@@ -108,7 +108,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
      */
     private FIDReader fidReader;
 
-    public AutoCommitFeatureWriter(FIDReader fidReader, final SimpleFeatureType featureType,
+    public AutoCommitFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
             final FeatureReader filteredContent, final ArcSDEPooledConnection connection)
             throws NoSuchElementException, IOException {
         assert fidReader != null;
