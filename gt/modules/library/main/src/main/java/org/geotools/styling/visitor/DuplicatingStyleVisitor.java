@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2006-2007, GeoTools Project Managment Committee (PMC)
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 package org.geotools.styling.visitor;
 
@@ -66,7 +78,7 @@ import org.opengis.filter.expression.Expression;
  */
 public class DuplicatingStyleVisitor implements StyleVisitor {
 	
-	private final StyleFactory sf;
+	protected final StyleFactory sf;
     protected final FilterFactory2 ff;
     /**
      * We are using aggregation here to contain our DuplicatingFilterVisitor.
@@ -439,14 +451,23 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
      * @param fonts
      * @return copy of provided fonts
      */
-    private Font[] copy(Font[] fonts) {
+    protected Font[] copy(Font[] fonts) {
         if( fonts == null ) return null;
         Font copy[] = new Font[ fonts.length ];
         for( int i=0; i<fonts.length; i++){
-            Font font = fonts[i];
-            if( font == null ) continue;
-            copy[i] = fonts[i];
+            copy[i] = copy( fonts[i] );
         }
+        return copy;
+    }
+    /** Null safe copy of a single font */
+    protected Font copy(Font font) {
+        if( font == null) return font;
+        
+        Expression fontFamily = copy( font.getFontFamily() );
+        Expression fontStyle = copy( font.getFontStyle() );
+        Expression fontWeight = copy( font.getFontWeight() );
+        Expression fontSize = copy( font.getFontSize() );
+        Font copy = sf.createFont(fontFamily, fontStyle, fontWeight, fontSize);
         return copy;
     }
     /**

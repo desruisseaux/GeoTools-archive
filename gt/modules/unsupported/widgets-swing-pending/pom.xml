@@ -303,13 +303,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- gt2-xml-xsd-2.5-SNAPSHOT.jar -->
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-xsd</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- hsqldb-1.8.0.7.jar -->
     <dependency>
       <groupId>hsqldb</groupId>
