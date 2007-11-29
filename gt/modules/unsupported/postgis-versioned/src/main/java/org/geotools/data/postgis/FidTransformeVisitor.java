@@ -22,12 +22,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.spatial.Equals;
 
 /**
  * Takes a filter that eventually contains a fid filter and builds a new filter that does not have
@@ -40,7 +41,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @since 2.4
  * 
  */
-class FidTransformeVisitor extends DuplicatorFilterVisitor {
+class FidTransformeVisitor extends DuplicatingFilterVisitor {
     /** The logger for the postgis module. */
     protected static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.postgis");
 
@@ -48,14 +49,14 @@ class FidTransformeVisitor extends DuplicatorFilterVisitor {
 
     private Object featureType;
 
-    public FidTransformeVisitor(FilterFactory factory, SimpleFeatureType featureType,
+    public FidTransformeVisitor(FilterFactory2 factory, SimpleFeatureType featureType,
             VersionedFIDMapper mapper) {
         super(factory);
         this.mapper = mapper;
         this.featureType = featureType;
     }
 
-    public void visit(FidFilter filter) {
+    public Object visit(Id filter, Object extraData) {
         Set ids = filter.getIDs();
         if (ids.isEmpty()) {
             throw new IllegalArgumentException(
@@ -81,31 +82,27 @@ class FidTransformeVisitor extends DuplicatorFilterVisitor {
                 String colName = mapper.getColumnName(j);
                 if ("revision".equals(colName))
                     continue;
-                CompareFilter equal = ff.createCompareFilter(Filter.COMPARE_EQUALS);
-                equal.addLeftValue(ff.createAttributeExpression(colName));
-                equal.addRightValue(ff.createLiteralExpression(attributes[i]));
+                PropertyIsEqualTo  equal = ff.equals(ff.property(colName), ff.literal(attributes[i]));
                 if (idf == null)
                     idf = equal;
                 else
-                    idf = idf.and(equal);
+                    idf = ff.and( idf,  equal);
                 i++;
             }
             if (external == null)
                 external = idf;
             else
-                external = external.or(idf);
+                external = ff.or( external, idf);
         }
         // if all the fids are in an improper format, the fid filter is equivalent to
         // a Filter that excludes everything... Since I cannot use Filter.EXCLUDE (it breaks
         // the filter splitter with a class cast exception) I'm falling back on the old  
         // "1 = 0" filter (ugly, but works...)
         if(external == null) {
-            CompareFilter equal = ff.createCompareFilter(Filter.COMPARE_EQUALS);
-            equal.addLeftValue(ff.createLiteralExpression(0));
-            equal.addRightValue(ff.createLiteralExpression(1));
-            pages.push(equal);
+            PropertyIsEqualTo equal = ff.equals(ff.literal(0),ff.literal(1));
+            return equal;
         } else
-            pages.push(external);
+            return external;
     }
 
 }

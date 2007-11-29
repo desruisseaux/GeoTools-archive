@@ -23,6 +23,7 @@ import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
+import org.geotools.data.postgis.PostgisTests.Fixture;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
@@ -32,7 +33,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
-    PostgisTests.Fixture f;
+    Fixture f;
 
     ManageableDataSource pool;
 

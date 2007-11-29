@@ -32,6 +32,7 @@ import org.geotools.data.jdbc.datasource.DataSourceUtil;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
+import org.geotools.data.postgis.PostgisTests.Fixture;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -41,7 +42,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 	static boolean WKB_ENABLED = true;
 	static boolean CHECK_TYPE = false;
 	
-	PostgisTests.Fixture f;
+	Fixture f;
 	ManageableDataSource pool;
 	DataStore data;
 	

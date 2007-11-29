@@ -1354,9 +1354,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         VersionedFIDMapper mapper = (VersionedFIDMapper) wrapped.getFIDMapper(featureTypeName);
         FidTransformeVisitor transformer = new FidTransformeVisitor(FilterFactoryFinder
                 .createFilterFactory(), featureType, mapper);
-        FilterVisitorFilterWrapper wrapper = new FilterVisitorFilterWrapper(transformer);
-        filter.accept(wrapper, null);
-        Filter clone = (Filter) transformer.getCopy();
+        
+        Filter clone = (Filter) filter.accept(transformer, null);
         return clone;
     }
 

@@ -76,7 +76,7 @@ import org.opengis.filter.spatial.Within;
  */
 public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisitor{
 
-	protected final FilterFactory2 factory;
+	protected final FilterFactory2 ff;
 
 	public DuplicatingFilterVisitor() {
 		this(findFactory2());
@@ -84,7 +84,7 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 	}
 	
 	public DuplicatingFilterVisitor(FilterFactory2 factory) {
-		this.factory = factory;
+		this.ff = factory;
 	}
 	
 	private static FilterFactory2 findFactory2() {
@@ -101,7 +101,7 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 	protected FilterFactory2 getFactory(Object extraData) {
 		if( extraData instanceof FilterFactory2)
 			return (FilterFactory2) extraData;
-		return factory;
+		return ff;
 	}
 
 	public Object visit(ExcludeFilter filter, Object extraData) {

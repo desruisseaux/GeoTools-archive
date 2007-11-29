@@ -75,7 +75,7 @@ public class DuplicateFilterVisitorTest extends TestCase {
                     Double number1 = (Double) expr1.evaluate(null,Double.class);
                     Double number2 = (Double) expr2.evaluate(null,Double.class);
                     
-                    return factory.literal( number1.doubleValue() + number2.doubleValue() );
+                    return ff.literal( number1.doubleValue() + number2.doubleValue() );
                 }
                 return super.visit(expression, extraData);
             }
