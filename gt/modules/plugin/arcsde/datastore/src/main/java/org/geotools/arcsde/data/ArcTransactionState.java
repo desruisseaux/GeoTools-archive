@@ -27,7 +27,6 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 
-import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 
 /**
@@ -177,7 +176,7 @@ class ArcTransactionState implements Transaction.State {
                 // connection to the pool
                 try {
                     connection.rollbackTransaction();
-                    //connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+                    // connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
                 } catch (SeException e) {
                     // TODO: this shouldn't happen, but if it does
                     // we should somehow invalidate the connection?
@@ -240,7 +239,7 @@ class ArcTransactionState implements Transaction.State {
                 // start a transaction
                 final ArcSDEPooledConnection connection = connectionPool.getConnection();
                 try {
-                    //connection.setConcurrency(SeConnection.SE_TRYLOCK_POLICY);
+                    // connection.setConcurrency(SeConnection.SE_TRYLOCK_POLICY);
                     // do not auto commit
                     connection.setTransactionAutoCommit(0);
                     // and start a transaction
@@ -252,8 +251,8 @@ class ArcTransactionState implements Transaction.State {
                         // bah, we're already failing
                     }
                     connection.close();
-                    throw new ArcSdeException("Exception initiating transaction on "
-                            + connection, e);
+                    throw new ArcSdeException("Exception initiating transaction on " + connection,
+                            e);
                 }
 
                 state = new ArcTransactionState(connection);

@@ -62,8 +62,8 @@ import org.geotools.data.DataSourceException;
  * @author Gabriel Roldan, Axios Engineering
  */
 public class ViewRegisteringFactoryHelper {
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ViewRegisteringFactoryHelper.class
-            .getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger(ViewRegisteringFactoryHelper.class.getPackage().getName());
 
     private ViewRegisteringFactoryHelper() {
         // no-op

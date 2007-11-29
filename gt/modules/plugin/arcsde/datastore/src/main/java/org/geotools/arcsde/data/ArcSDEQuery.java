@@ -19,11 +19,9 @@ package org.geotools.arcsde.data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,12 +39,10 @@ import org.geotools.data.Query;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FilterAttributeExtractor;
-import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
-import org.opengis.filter.expression.PropertyName;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
@@ -150,7 +146,8 @@ class ArcSDEQuery {
      * @throws IOException
      */
     public static ArcSDEQuery createQuery(final ArcSDEPooledConnection conn,
-            final SimpleFeatureType fullSchema, final Query query) throws IOException {
+            final SimpleFeatureType fullSchema, final Query query, final FIDReader fidReader)
+            throws IOException {
 
         Filter filter = query.getFilter();
 
@@ -158,7 +155,6 @@ class ArcSDEQuery {
 
         final String typeName = fullSchema.getTypeName();
         final SeLayer sdeLayer = conn.getLayer(typeName);
-        final FIDReader fidReader = FIDReader.getFidReader(conn, sdeLayer);
         final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
         // create the set of filters to work over
         final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
@@ -180,11 +176,11 @@ class ArcSDEQuery {
      * @see ArcSDEDataStore#registerView(String, PlainSelect)
      */
     public static ArcSDEQuery createInprocessViewQuery(final ArcSDEPooledConnection conn,
-            final SimpleFeatureType schema, final Query query, final SeQueryInfo definitionQuery,
-            final PlainSelect viewSelectStatement) throws IOException {
+            final SimpleFeatureType fullSchema, final Query query,
+            final SeQueryInfo definitionQuery, final PlainSelect viewSelectStatement)
+            throws IOException {
 
         final Filter filter = query.getFilter();
-        final String typeName = schema.getTypeName();
         final FIDReader fidReader = FIDReader.NULL_READER;
         final SeLayer sdeLayer;
 
@@ -207,7 +203,7 @@ class ArcSDEQuery {
         }
         sdeLayer = conn.getLayer(layerName);
 
-        final SimpleFeatureType querySchema = getQuerySchema(query, schema);
+        final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
         // create the set of filters to work over
         final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
                 querySchema, definitionQuery, viewSelectStatement, fidReader);
@@ -499,12 +495,21 @@ class ArcSDEQuery {
      * Convenient method to just calculate the result count of a given query.
      */
     public static int calculateResultCount(final ArcSDEPooledConnection connection,
-            final SimpleFeatureType featureType, final Query query) throws IOException {
-        ArcSDEQuery countQuery = null;
+            final FeatureTypeInfo typeInfo, final Query query) throws IOException {
 
-        int count;
+        ArcSDEQuery countQuery = null;
+        final int count;
         try {
-            countQuery = createQuery(connection, featureType, query);
+            final SimpleFeatureType fullSchema = typeInfo.getFeatureType();
+            if (typeInfo.isInProcessView()) {
+                final SeQueryInfo definitionQuery = typeInfo.getSdeDefinitionQuery();
+                final PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
+                countQuery = createInprocessViewQuery(connection, fullSchema, query,
+                        definitionQuery, viewSelectStatement);
+            } else {
+                final FIDReader fidStrategy = typeInfo.getFidStrategy();
+                countQuery = createQuery(connection, fullSchema, query, fidStrategy);
+            }
             count = countQuery.calculateResultCount();
         } finally {
             if (countQuery != null) {
@@ -519,14 +524,27 @@ class ArcSDEQuery {
      * query.
      */
     public static Envelope calculateQueryExtent(final ArcSDEPooledConnection connection,
-            final SimpleFeatureType queryFt, final Query query) throws IOException {
-        final String defaultGeomAttName = queryFt.getDefaultGeometry().getLocalName();
+            final FeatureTypeInfo typeInfo, final Query query) throws IOException {
+
+        final SimpleFeatureType fullSchema = typeInfo.getFeatureType();
+        final String defaultGeomAttName = fullSchema.getDefaultGeometry().getLocalName();
+
         // we're calculating the bounds, so we'd better be sure and add the
         // spatial column to the query's propertynames
-        DefaultQuery realQuery = new DefaultQuery(query);
+        final DefaultQuery realQuery = new DefaultQuery(query);
         realQuery.setPropertyNames(new String[] { defaultGeomAttName });
 
-        final ArcSDEQuery boundsQuery = createQuery(connection, queryFt, realQuery);
+        final ArcSDEQuery boundsQuery;
+
+        if (typeInfo.isInProcessView()) {
+            final SeQueryInfo definitionQuery = typeInfo.getSdeDefinitionQuery();
+            final PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
+            boundsQuery = createInprocessViewQuery(connection, fullSchema, realQuery,
+                    definitionQuery, viewSelectStatement);
+        } else {
+            boundsQuery = createQuery(connection, fullSchema, realQuery, FIDReader.NULL_READER);
+        }
+
         Envelope queryExtent = null;
         try {
             Filter unsupportedFilter = boundsQuery.getFilters().getUnsupportedFilter();

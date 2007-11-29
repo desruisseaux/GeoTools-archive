@@ -28,6 +28,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 import com.esri.sde.sdk.client.SeException;
+import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeShape;
 
 /**
@@ -128,6 +129,8 @@ class ArcSDEAttributeReader implements AttributeReader {
      */
     public ArcSDEAttributeReader(final ArcSDEQuery query, final ArcSDEPooledConnection connection,
             final boolean handleConnectionClosing) throws IOException {
+        System.err.println(">>>ArcSDEAttributeReader created on <"
+                + Thread.currentThread().getName() + ">");
         this.query = query;
         this.connection = connection;
         this.handleConnectionClosing = handleConnectionClosing;

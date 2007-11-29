@@ -21,29 +21,31 @@ package org.geotools.arcsde.data;
  * <code>Geometryy</code> from a <code>SeShape</code> or viceversa
  * 
  * @author Gabriel Rold?n
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSDEGeometryBuildingException.java $
+ * @version $Id: ArcSDEGeometryBuildingException.java 24660 2007-03-02 16:10:44Z
+ *          saul.farber $
  */
 public class ArcSDEGeometryBuildingException extends Exception {
-	/**
-	 * Creates a new ArcSDEGeometryBuildingException object.
-	 * 
-	 * @param msg
-	 *            DOCUMENT ME!
-	 */
-	public ArcSDEGeometryBuildingException(String msg) {
-		this(msg, null);
-	}
+    /**
+     * Creates a new ArcSDEGeometryBuildingException object.
+     * 
+     * @param msg
+     *            DOCUMENT ME!
+     */
+    public ArcSDEGeometryBuildingException(String msg) {
+        this(msg, null);
+    }
 
-	/**
-	 * Creates a new ArcSDEGeometryBuildingException object.
-	 * 
-	 * @param msg
-	 *            DOCUMENT ME!
-	 * @param cause
-	 *            DOCUMENT ME!
-	 */
-	public ArcSDEGeometryBuildingException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    /**
+     * Creates a new ArcSDEGeometryBuildingException object.
+     * 
+     * @param msg
+     *            DOCUMENT ME!
+     * @param cause
+     *            DOCUMENT ME!
+     */
+    public ArcSDEGeometryBuildingException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

@@ -26,14 +26,14 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 
-
 /**
  * Wrapper for an SeRow so it allows asking multiple times for the same
  * property.
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/SdeRow.java $
  * @since 2.4.0
  */
 class SdeRow {
@@ -45,14 +45,18 @@ class SdeRow {
 
     /**
      * Creates a new SdeRow object.
-     *
-     * @param row DOCUMENT ME!
-     * @param previousValues needed in case of its a joined
-     * result, thus arcsde does not returns geometry attributes
-     * duplicated, just on their first occurrence (sigh)
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * 
+     * @param row
+     *            DOCUMENT ME!
+     * @param previousValues
+     *            needed in case of its a joined result, thus arcsde does not
+     *            returns geometry attributes duplicated, just on their first
+     *            occurrence (sigh)
+     * 
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws DataSourceException
+     *             DOCUMENT ME!
      */
     public SdeRow(SeRow row, Object[] previousValues) throws IOException {
         this.row = row;
@@ -87,19 +91,20 @@ class SdeRow {
         } catch (SeException e) {
             throw new ArcSdeException("getting property #" + i, e);
         } catch (Exception e) {
-            System.err.println("statusIndicator=" + statusIndicator + ", i="
-                + i);
+            System.err.println("statusIndicator=" + statusIndicator + ", i=" + i);
         }
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @param index DOCUMENT ME!
-     *
+     * 
+     * @param index
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
+     * 
+     * @throws IOException
+     *             DOCUMENT ME!
      */
     public Object getObject(int index) throws IOException {
         return values[index];
@@ -107,7 +112,7 @@ class SdeRow {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public Object[] getAll() {
@@ -116,12 +121,14 @@ class SdeRow {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param index DOCUMENT ME!
-     *
+     * 
+     * @param index
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
+     * 
+     * @throws IOException
+     *             DOCUMENT ME!
      */
     public Long getLong(int index) throws IOException {
         return (Long) getObject(index);
@@ -129,12 +136,14 @@ class SdeRow {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param index DOCUMENT ME!
-     *
+     * 
+     * @param index
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
+     * 
+     * @throws IOException
+     *             DOCUMENT ME!
      */
     public SeShape getShape(int index) throws IOException {
         return (SeShape) getObject(index);
@@ -142,7 +151,7 @@ class SdeRow {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public SeColumnDefinition[] getColumns() {

@@ -16,7 +16,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSDEFeatureReader.java $
  */
 public class ArcSDEFeatureReader extends DefaultFeatureReader {
 
@@ -26,7 +27,7 @@ public class ArcSDEFeatureReader extends DefaultFeatureReader {
 
     public ArcSDEFeatureReader(final ArcSDEAttributeReader attributeReader) throws SchemaException {
         super(attributeReader, attributeReader.getFeatureType());
-        
+
         this.featureType = attributeReader.getFeatureType();
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
     }
@@ -46,5 +47,5 @@ public class ArcSDEFeatureReader extends DefaultFeatureReader {
         SimpleFeature feature = featureBuilder.buildFeature(fid);
         return feature;
     }
-    
+
 }

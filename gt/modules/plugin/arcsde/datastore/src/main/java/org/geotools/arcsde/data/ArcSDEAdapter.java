@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.jsqlparser.statement.select.PlainSelect;
+
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
@@ -45,6 +47,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
+import com.esri.sde.sdk.client.SeDefs;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeLayer;
@@ -243,34 +246,65 @@ public class ArcSDEAdapter {
      * Fetches the schema of a given ArcSDE featureclass and creates its
      * corresponding Geotools FeatureType
      * 
-     * @param sdeLayer
-     *            layer containing sde spatial attributes to create schema from
-     * @param sdeTable
-     *            layer containing sde non spatial attributes to create schema
-     *            from. The table qualified name is gonna be used as the feature
-     *            type name.
-     * @return the feature type representing the ArcSDE feature class given by
-     *         the layer and table.
+     * @return the feature type info representing the ArcSDE feature class given
+     *         by the layer and table.
      * 
      * @throws IOException
      *             if an exception is caught accessing the sde feature class
      *             metadata.
      */
-    public static SimpleFeatureType fetchSchema(final SeLayer sdeLayer, final SeTable sdeTable,
-            final String namespace) throws IOException {
-        final String typeName = sdeTable.getQualifiedName();
-        List<AttributeDescriptor> properties = createAttributeDescriptors(sdeLayer, sdeTable,
+    public static FeatureTypeInfo fetchSchema(final String typeName, final String namespace,
+            final ArcSDEPooledConnection connection) throws IOException {
+
+        final SeLayer layer = connection.getLayer(typeName);
+        final SeTable table = connection.getTable(typeName);
+
+        final List<AttributeDescriptor> properties = createAttributeDescriptors(layer, table,
                 namespace);
-        SimpleFeatureType type = createSchema(typeName, namespace, properties);
-        return type;
+
+        final SimpleFeatureType featureType = createSchema(typeName, namespace, properties);
+
+        SeRegistration registration;
+        try {
+            registration = new SeRegistration(connection, typeName);
+        } catch (SeException e) {
+            throw new ArcSdeException("Can't get a registration object for " + typeName, e);
+        }
+        final boolean isMultiVersioned = registration.isMultiVersion();
+        final boolean isView = registration.isView();
+        final boolean canWrite = isWritable(typeName, table);
+        final FIDReader fidStrategy;
+        fidStrategy = FIDReader.getFidReader(connection, table, layer, registration);
+
+        FeatureTypeInfo typeInfo = new FeatureTypeInfo(featureType, fidStrategy, canWrite,
+                isMultiVersioned, isView);
+        return typeInfo;
+    }
+
+    private static boolean isWritable(final String typeName, final SeTable table)
+            throws ArcSdeException {
+        final int permissions;
+        try {
+            permissions = table.getPermissions();
+        } catch (SeException e) {
+            throw new ArcSdeException("Can't get the permissions for " + typeName, e);
+        }
+        final int insertMask = SeDefs.SE_INSERT_PRIVILEGE;
+        final int updateMask = SeDefs.SE_UPDATE_PRIVILEGE;
+        boolean canWrite = false;
+        if (((insertMask & permissions) == insertMask)
+                && ((updateMask & permissions) == updateMask)) {
+            canWrite = true;
+        }
+        return canWrite;
     }
 
     /**
      * Fetchs the schema for the "SQL SELECT" like view definition
      */
-    public static SimpleFeatureType fetchSchema(final ArcSDEPooledConnection conn,
-            final String typeName, final String namespace, final SeQueryInfo queryInfo)
-            throws IOException {
+    public static FeatureTypeInfo fetchSchema(final ArcSDEPooledConnection conn,
+            final String typeName, final String namespace, final PlainSelect qualifiedSelect,
+            final SeQueryInfo queryInfo) throws IOException {
 
         List<AttributeDescriptor> attributeDescriptors;
 
@@ -308,8 +342,13 @@ public class ArcSDEAdapter {
                 }
             }
         }
-        SimpleFeatureType type = createSchema(typeName, namespace, attributeDescriptors);
-        return type;
+        final SimpleFeatureType type = createSchema(typeName, namespace, attributeDescriptors);
+        final FIDReader fidStrategy = FIDReader.NULL_READER;
+
+        FeatureTypeInfo typeInfo;
+        typeInfo = new FeatureTypeInfo(type, fidStrategy, qualifiedSelect, queryInfo);
+
+        return typeInfo;
     }
 
     /**
@@ -451,7 +490,9 @@ public class ArcSDEAdapter {
         return javaClass;
     }
 
-    private static SimpleFeatureType createSchema(String typeName, String namespace, List properties) {
+    private static SimpleFeatureType createSchema(final String typeName, final String namespace,
+            final List<AttributeDescriptor> properties) throws IOException {
+
         // TODO: use factory lookup mechanism once its in place
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 

@@ -103,7 +103,7 @@ public abstract class FIDReader {
         // /List attDescriptors = Descriptors.nodes(schema.getDescriptor());
         List<AttributeDescriptor> attDescriptors = schema.getAttributes();
 
-        for( AttributeDescriptor property : attDescriptors ){
+        for (AttributeDescriptor property : attDescriptors) {
             attNames.add(property.getLocalName());
         }
         String fidColumn = getFidColumn();
@@ -132,43 +132,34 @@ public abstract class FIDReader {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public static FIDReader getFidReader(ArcSDEPooledConnection conn, SeLayer layer)
-            throws IOException {
+    public static FIDReader getFidReader(ArcSDEPooledConnection conn, SeTable table, SeLayer layer,
+            SeRegistration reg) throws IOException {
         FIDReader fidReader = null;
-
-        final String tableName;
+        final String tableName = reg.getTableName();
         try {
-            tableName = layer.getQualifiedName();
-        } catch (SeException e) {
-            throw new ArcSdeException("asking qualified name of " + layer.getName(), e);
-        }
-        try {
-            SeRegistration reg = new SeRegistration(conn, tableName);
-
             // final int rowIdAllocationType = reg.getRowIdAllocation();
             final int rowIdColumnType = reg.getRowIdColumnType();
             final String rowIdColumnName = reg.getRowIdColumnName();
             int rowIdColumnIndex = -1;
-            SeTable table = conn.getTable(tableName);
             SeColumnDefinition[] schema = table.describe();
-            for(int index = 0; index < schema.length; index++){
-                if(schema[index].getName().equals(rowIdColumnName)){
+            for (int index = 0; index < schema.length; index++) {
+                if (schema[index].getName().equals(rowIdColumnName)) {
                     rowIdColumnIndex = index;
                     break;
                 }
             }
-            if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE){
+            if (rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE) {
                 // use column name, value maintained by sde
                 fidReader = new SdeManagedFidReader(tableName, rowIdColumnName);
-            }else if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER){
+            } else if (rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER) {
                 // use column name, value maintained by user
                 fidReader = new UserManagedFidReader(tableName, rowIdColumnName);
-            }else if(rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE){
+            } else if (rowIdColumnType == SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE) {
                 // use geometry id
                 String shapeColName = layer.getSpatialColumn();
                 String shapeIdColName = layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
                 fidReader = new ShapeFidReader(tableName, shapeColName, shapeIdColName);
-            }else{
+            } else {
                 // may have been returned 0, meaning there is no registered
                 // column id
                 throw new IllegalStateException("Unkown ArcSDE row ID registration type: "
@@ -177,18 +168,21 @@ public abstract class FIDReader {
             fidReader.setColumnIndex(rowIdColumnIndex);
             return fidReader;
         } catch (SeException e) {
-            throw new DataSourceException("Obtaining FID strategy for " + layer + ": " + e.getMessage(), e);
+            throw new DataSourceException("Obtaining FID strategy for " + tableName + ": "
+                    + e.getMessage(), e);
         }
     }
 
     public static class ShapeFidReader extends FIDReader {
         /**
-         * Name of the Shape, populated as a side effect of getPropertiesToFetch()
+         * Name of the Shape, populated as a side effect of
+         * getPropertiesToFetch()
          */
 
         private final String shapeColName;
         /**
-         * Index of the Shape, populated as a side effect of getPropertiesToFetch()
+         * Index of the Shape, populated as a side effect of
+         * getPropertiesToFetch()
          */
         private int shapeIndex;
 
@@ -224,11 +218,11 @@ public abstract class FIDReader {
             List<String> attNames = new ArrayList<String>(schema.getAttributeCount() + 1);
 
             // /List attDescriptors = Descriptors.nodes(schema.getDescriptor());
-            List<AttributeDescriptor> attDescriptors = schema.getAttributes();            
-            for( AttributeDescriptor property : attDescriptors ){
+            List<AttributeDescriptor> attDescriptors = schema.getAttributes();
+            for (AttributeDescriptor property : attDescriptors) {
                 attNames.add(property.getLocalName());
             }
-            
+
             shapeIndex = attNames.indexOf(shapeColName);
             if (shapeIndex == -1) {
                 String fidColumn = getFidColumn();

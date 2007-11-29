@@ -20,19 +20,17 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 
-import com.esri.sde.sdk.client.SeExtent;
-import com.esri.sde.sdk.client.SeLayer;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class ArcSdeFeatureSource implements FeatureSource {
 
     private static final Logger LOGGER = Logging.getLogger("org.geotools.arcsde.data");
 
-    protected SimpleFeatureType featureType;
+    protected FeatureTypeInfo typeInfo;
     protected ArcSDEDataStore dataStore;
 
-    public ArcSdeFeatureSource(final SimpleFeatureType featureType, final ArcSDEDataStore dataStore) {
-        this.featureType = featureType;
+    public ArcSdeFeatureSource(final FeatureTypeInfo typeInfo, final ArcSDEDataStore dataStore) {
+        this.typeInfo = typeInfo;
         this.dataStore = dataStore;
     }
 
@@ -90,26 +88,28 @@ public class ArcSdeFeatureSource implements FeatureSource {
             final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
         Envelope ev;
         final String typeName = namedQuery.getTypeName();
-        if (namedQuery.getFilter().equals(Filter.INCLUDE)) {
-            LOGGER.finer("getting bounds of entire layer.  Using optimized SDE call.");
-            // we're really asking for a bounds of the WHOLE layer,
-            // let's just ask SDE metadata for that, rather than doing
-            // an
-            // expensive query
-            SeLayer thisLayer = connection.getLayer(typeName);
-            SeExtent extent = thisLayer.getExtent();
-            ev = new Envelope(extent.getMinX(), extent.getMaxX(), extent.getMinY(), extent
-                    .getMaxY());
-        } else {
-            ev = ArcSDEQuery.calculateQueryExtent(connection, featureType, namedQuery);
-        }
+        // if (namedQuery.getFilter().equals(Filter.INCLUDE)) {
+        // LOGGER.finer("getting bounds of entire layer. Using optimized SDE
+        // call.");
+        // // we're really asking for a bounds of the WHOLE layer,
+        // // let's just ask SDE metadata for that, rather than doing
+        // // an
+        // // expensive query
+        // SeLayer thisLayer = connection.getLayer(typeName);
+        // SeExtent extent = thisLayer.getExtent();
+        // ev = new Envelope(extent.getMinX(), extent.getMaxX(),
+        // extent.getMinY(), extent
+        // .getMaxY());
+        // } else {
+        ev = ArcSDEQuery.calculateQueryExtent(connection, typeInfo, namedQuery);
+        // }
 
         if (ev != null) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("ArcSDE optimized getBounds call returned: " + ev);
             }
             final ReferencedEnvelope envelope;
-            final GeometryDescriptor defaultGeometry = featureType.getDefaultGeometry();
+            final GeometryDescriptor defaultGeometry = getSchema().getDefaultGeometry();
             if (defaultGeometry == null) {
                 envelope = ReferencedEnvelope.reference(ev);
             } else {
@@ -146,7 +146,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     final int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
             throws IOException {
         final int count;
-        count = ArcSDEQuery.calculateResultCount(connection, featureType, namedQuery);
+        count = ArcSDEQuery.calculateResultCount(connection, typeInfo, namedQuery);
         return count;
     }
 
@@ -165,7 +165,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     }
 
     private Query namedQuery(final Query query) {
-        final String localName = featureType.getName().getLocalPart();
+        final String localName = typeInfo.getFeatureTypeName();
         final String typeName = query.getTypeName();
         if (typeName != null && !localName.equals(typeName)) {
             throw new IllegalArgumentException("Wrong type name: " + typeName + " (this is "
@@ -196,7 +196,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
      * @see FeatureSource#getFeatures(Filter)
      */
     public final FeatureCollection getFeatures(final Filter filter) throws IOException {
-        DefaultQuery query = new DefaultQuery(featureType.getTypeName(), filter);
+        DefaultQuery query = new DefaultQuery(typeInfo.getFeatureTypeName(), filter);
         return getFeatures(query);
     }
 
@@ -211,7 +211,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
      * @see FeatureSource#getSchema();
      */
     public final SimpleFeatureType getSchema() {
-        return featureType;
+        return typeInfo.getFeatureType();
     }
 
     /**

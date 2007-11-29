@@ -20,12 +20,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +33,6 @@ import org.geotools.arcsde.data.view.QueryInfoParser;
 import org.geotools.arcsde.data.view.SelectQualifier;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -58,14 +54,11 @@ import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 
-import com.esri.sde.sdk.client.SeDefs;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeQueryInfo;
-import com.esri.sde.sdk.client.SeTable;
 
 /**
  * DataStore implementation to work upon an ArcSDE spatial database gateway.
@@ -85,31 +78,15 @@ public class ArcSDEDataStore implements DataStore {
     private final ArcSDEConnectionPool connectionPool;
 
     /**
-     * <code>Map&lt;typeName/FeatureType&gt;</code> of inprocess views feature
-     * type schemas registered through
+     * ArcSDE registered layers definitions
+     */
+    private final Map<String, FeatureTypeInfo> featureTypeInfos;
+
+    /**
+     * In process view definitions. This map is populated through
      * {@link #registerView(String, PlainSelect)}
      */
-    private final Map<String, FeatureType> viewSchemasCache = new HashMap<String, FeatureType>();
-
-    /**
-     * Per inprocess view typeName SQL query definitions
-     */
-    private final Map<String, PlainSelect> viewSelectStatements = new HashMap<String, PlainSelect>();
-
-    /**
-     * In process view definitions in ArcSDE Java API terms created from their
-     * SQL definitions
-     */
-    private final Map<String, SeQueryInfo> viewQueryInfos = new HashMap<String, SeQueryInfo>();
-
-    /** Cached feature types */
-    private final Map<String, FeatureType> schemasCache = new HashMap<String, FeatureType>();
-
-    /**
-     * Cached set of type names with write permissions to alleviate the task of
-     * {@link #canWrite(String)}
-     */
-    private final Set<String> writableTypeNames = new HashSet<String>();
+    private final Map<String, FeatureTypeInfo> inProcessFeatureTypeInfos;
 
     /**
      * Namespace URI to construct FeatureTypes and AttributeTypes with
@@ -141,6 +118,8 @@ public class ArcSDEDataStore implements DataStore {
     public ArcSDEDataStore(final ArcSDEConnectionPool connPool, final String namespaceUri) {
         this.connectionPool = connPool;
         this.namespace = namespaceUri;
+        this.featureTypeInfos = new HashMap<String, FeatureTypeInfo>();
+        this.inProcessFeatureTypeInfos = new HashMap<String, FeatureTypeInfo>();
     }
 
     /**
@@ -154,43 +133,12 @@ public class ArcSDEDataStore implements DataStore {
     /**
      * Obtains the schema for the given featuretype name.
      * 
-     * <p>
-     * Just for convenience, if the type name is not full qualified, it will be
-     * prepended by the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string.
-     * Anyway, it is strongly recommended that you use <b>only </b> full
-     * qualified type names. The rational for this is that the actual ArcSDE
-     * name of a featuretype is full qualified, and more than a single type can
-     * exist with the same non qualified name, if they pertein to different
-     * database users. So, if a non qualified name is passed, the user name
-     * which will be prepended to it is the user used to create the connections
-     * (i.e., the one you specified with the "user" parameter to create the
-     * datastore.
-     * </p>
-     * 
-     * @param typeName
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
-     * 
-     * @throws java.io.IOException
-     *             DOCUMENT ME!
-     * @throws NullPointerException
-     *             DOCUMENT ME!
-     * @throws DataSourceException
-     *             DOCUMENT ME!
      * @see DataStore#getSchema(String)
      */
     public synchronized SimpleFeatureType getSchema(final String typeName)
             throws java.io.IOException {
-        // connection used to retrieve the user name if a non qualified type
-        // name was passed in
-        final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
-        SimpleFeatureType schema;
-        try {
-            schema = getSchema(typeName, conn);
-        } finally {
-            conn.close();
-        }
+        FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName);
+        SimpleFeatureType schema = typeInfo.getFeatureType();
         return schema;
     }
 
@@ -210,7 +158,7 @@ public class ArcSDEDataStore implements DataStore {
      */
     public String[] getTypeNames() throws IOException {
         List<String> layerNames = new ArrayList<String>(connectionPool.getAvailableLayerNames());
-        layerNames.addAll(viewSchemasCache.keySet());
+        layerNames.addAll(inProcessFeatureTypeInfos.keySet());
         return layerNames.toArray(new String[layerNames.size()]);
     }
 
@@ -291,7 +239,8 @@ public class ArcSDEDataStore implements DataStore {
         final String typeName = query.getTypeName();
         final String propertyNames[] = query.getPropertyNames();
 
-        final SimpleFeatureType completeSchema = getSchema(typeName, connection);
+        final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, connection);
+        final SimpleFeatureType completeSchema = typeInfo.getFeatureType();
         final ArcSDEQuery sdeQuery;
 
         Filter filter = query.getFilter();
@@ -311,13 +260,14 @@ public class ArcSDEDataStore implements DataStore {
             return new EmptyFeatureReader(featureType);
         }
 
-        if (isView(typeName)) {
-            SeQueryInfo definitionQuery = getViewQueryInfo(typeName);
-            PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
+        if (typeInfo.isInProcessView()) {
+            SeQueryInfo definitionQuery = typeInfo.getSdeDefinitionQuery();
+            PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
             sdeQuery = ArcSDEQuery.createInprocessViewQuery(connection, completeSchema, query,
                     definitionQuery, viewSelectStatement);
         } else {
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query);
+            final FIDReader fidStrategy = typeInfo.getFidStrategy();
+            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy);
         }
 
         sdeQuery.execute();
@@ -333,7 +283,7 @@ public class ArcSDEDataStore implements DataStore {
                     e);
         }
 
-        filter = getUnsupportedFilter(typeName, filter, connection);
+        filter = getUnsupportedFilter(typeInfo, filter, connection);
         if (!filter.equals(Filter.INCLUDE)) {
             reader = new FilteringFeatureReader(reader, filter);
         }
@@ -357,14 +307,13 @@ public class ArcSDEDataStore implements DataStore {
      */
     public FeatureSource getFeatureSource(final String typeName) throws IOException {
         System.err.println("getFeatureSource(" + typeName + ")");
+        final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName);
+
         FeatureSource fsource;
-        final SimpleFeatureType featureType = getSchema(typeName);
-        if (isView(typeName)) {
-            fsource = new ArcSdeFeatureSource(featureType, this);
-        } else if (canWrite(typeName)) {
-            fsource = new ArcSdeFeatureStore(featureType, this);
+        if (typeInfo.isWritable()) {
+            fsource = new ArcSdeFeatureStore(typeInfo, this);
         } else {
-            fsource = new ArcSdeFeatureSource(featureType, this);
+            fsource = new ArcSdeFeatureSource(typeInfo, this);
         }
         return fsource;
     }
@@ -386,9 +335,6 @@ public class ArcSDEDataStore implements DataStore {
      */
     public FeatureWriter getFeatureWriter(final String typeName, final Filter filter,
             final Transaction transaction) throws IOException {
-        if (!canWrite(typeName)) {
-            throw new DataSourceException("No write permissions over " + typeName);
-        }
         // get the connection the streamed writer content has to work over
         // so the reader and writer share it
         final ArcSDEPooledConnection connection;
@@ -404,24 +350,26 @@ public class ArcSDEDataStore implements DataStore {
         }
 
         try {
-            final SimpleFeatureType featureType = getSchema(typeName, connection);
+            final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, connection);
+            if (!typeInfo.isWritable()) {
+                throw new DataSourceException(typeName + " is not writable");
+            }
+            final SimpleFeatureType featureType = typeInfo.getFeatureType();
+
             final DefaultQuery query = new DefaultQuery(typeName, filter);
-            //don't let the reader close the connection as the writer needs it
+            // don't let the reader close the connection as the writer needs it
             final boolean closeConnection = false;
             final FeatureReader reader = getFeatureReader(query, connection, closeConnection);
 
             FeatureWriter writer;
 
-            final SeLayer layer = connection.getLayer(typeName);
-            final FIDReader fidReader = FIDReader.getFidReader(connection, layer);
+            final FIDReader fidReader = typeInfo.getFidStrategy();
 
             if (Transaction.AUTO_COMMIT == transaction) {
                 writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection);
             } else {
                 // if there's a transaction, the reader and the writer will
-                // share
-                // the connection
-                // held in the transaction state
+                // share the connection held in the transaction state
                 writer = new TransactionFeatureWriter(fidReader, featureType, reader, state);
             }
             return writer;
@@ -491,22 +439,15 @@ public class ArcSDEDataStore implements DataStore {
      * <p>
      * If the complete filter is supported, returns <code>Filter.INCLUDE</code>
      * </p>
-     * 
-     * @param typeName
-     *            DOCUMENT ME!
-     * @param filter
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
      */
-    private org.opengis.filter.Filter getUnsupportedFilter(final String typeName,
+    private org.opengis.filter.Filter getUnsupportedFilter(final FeatureTypeInfo typeInfo,
             final Filter filter, final ArcSDEPooledConnection conn) {
         try {
             SeLayer layer;
             SeQueryInfo qInfo;
 
-            if (isView(typeName)) {
-                qInfo = getViewQueryInfo(typeName);
+            if (typeInfo.isInProcessView()) {
+                qInfo = typeInfo.getSdeDefinitionQuery();
                 String mainLayerName;
                 try {
                     mainLayerName = qInfo.getConstruct().getTables()[0];
@@ -515,14 +456,15 @@ public class ArcSDEDataStore implements DataStore {
                 }
                 layer = conn.getLayer(mainLayerName);
             } else {
-                layer = conn.getLayer(typeName);
+                layer = conn.getLayer(typeInfo.getFeatureTypeName());
                 qInfo = null;
             }
 
-            FIDReader fidReader = FIDReader.getFidReader(conn, layer);
+            FIDReader fidReader = typeInfo.getFidStrategy();
 
-            SimpleFeatureType schema = getSchema(typeName, conn);
-            PlainSelect viewSelectStatement = getViewSelectStatement(typeName);
+            SimpleFeatureType schema = typeInfo.getFeatureType();
+            PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
+
             ArcSDEQuery.FilterSet filters = ArcSDEQuery.createFilters(layer, schema, filter, qInfo,
                     viewSelectStatement, fidReader);
 
@@ -547,134 +489,46 @@ public class ArcSDEDataStore implements DataStore {
      * 
      * @return Connection Pool (as provided during construction)
      */
-    public ArcSDEConnectionPool getConnectionPool() {
+    ArcSDEConnectionPool getConnectionPool() {
         return this.connectionPool;
     }
 
-    /**
-     * Checks whether typeName is writable by the connection's user.
-     * <p>
-     * Will only return true if the user has both update and insert priviledges.
-     * </p>
-     * 
-     * @param typeName
-     * @return
-     * @throws DataSourceException
-     */
-    private boolean canWrite(final String typeName) throws DataSourceException {
-        if (writableTypeNames.isEmpty()) {
-            populateWritableTypeNamesCache();
-        }
-        final boolean writable = writableTypeNames.contains(typeName);
-        return writable;
-    }
+    FeatureTypeInfo getFeatureTypeInfo(final String typeName) throws java.io.IOException {
+        assert typeName != null;
 
-    private void populateWritableTypeNamesCache() throws DataSourceException {
-        synchronized (writableTypeNames) {
-            if (!writableTypeNames.isEmpty()) {
-                return;
-            }
-            final List<String> allLayerNames = connectionPool.getAvailableLayerNames();
-            final ArcSDEPooledConnection conn;
+        FeatureTypeInfo typeInfo = inProcessFeatureTypeInfos.get(typeName);
+        if (typeInfo != null) {
+            return typeInfo;
+        }
+        typeInfo = featureTypeInfos.get(typeName);
+        if (typeInfo == null) {
+            // connection used to retrieve the user name if a non qualified type
+            // name was passed in
+            final ArcSDEPooledConnection conn = getConnectionPool().getConnection();
             try {
-                conn = connectionPool.getConnection();
-            } catch (UnavailableArcSDEConnectionException e) {
-                throw new DataSourceException(e);
-            }
-            try {
-                SeTable sdeTable;
-                int permissions;
-                int insertMask;
-                int updateMask;
-                boolean canWrite;
-                for (String typeName : allLayerNames) {
-                    sdeTable = conn.getTable(typeName);
-                    permissions = sdeTable.getPermissions();
-                    insertMask = SeDefs.SE_INSERT_PRIVILEGE;
-                    updateMask = SeDefs.SE_UPDATE_PRIVILEGE;
-                    canWrite = false;
-                    if (((insertMask & permissions) == insertMask)
-                            && ((updateMask & permissions) == updateMask)) {
-                        canWrite = true;
-                    }
-                    if (canWrite) {
-                        writableTypeNames.add(typeName);
-                    }
-                }
-            } catch (SeException e) {
-                throw new ArcSdeException(e);
+                typeInfo = getFeatureTypeInfo(typeName, conn);
             } finally {
                 conn.close();
             }
         }
+        return typeInfo;
     }
 
-    /**
-     * Returns wether <code>typeName</code> refers to a FeatureType registered
-     * as an in-process view through {@link #registerView(String, PlainSelect)}.
-     * 
-     * @param typeName
-     * @return <code>true</code> if <code>typeName</code> is registered as a
-     *         view given a SQL SELECT query, <code>false</code> otherwise.
-     */
-    public boolean isView(String typeName) {
-        return viewSchemasCache.containsKey(typeName);
-    }
+    synchronized FeatureTypeInfo getFeatureTypeInfo(final String typeName,
+            final ArcSDEPooledConnection connection) throws IOException {
 
-    public SeQueryInfo getViewQueryInfo(String typeName) {
-        SeQueryInfo qInfo = (SeQueryInfo) viewQueryInfos.get(typeName);
-        return qInfo;
-    }
+        FeatureTypeInfo ftInfo = inProcessFeatureTypeInfos.get(typeName);
 
-    public PlainSelect getViewSelectStatement(String typeName) {
-        PlainSelect select = (PlainSelect) viewSelectStatements.get(typeName);
-        return select;
-    }
-
-    SimpleFeatureType getSchema(final String typeName, final ArcSDEPooledConnection conn)
-            throws java.io.IOException {
-        assert typeName != null;
-        assert conn != null;
-
-        SimpleFeatureType schema = (SimpleFeatureType) viewSchemasCache.get(typeName);
-
-        if (schema == null) {
-            // // check if it is not qualified and prepend it with
-            // "instance.user."
-            // if (typeName.indexOf('.') == -1) {
-            // try {
-            // LOGGER.warning("A non qualified type name was given, qualifying
-            // it...");
-            // if (conn.getDatabaseName() != null &&
-            // conn.getDatabaseName().length() != 0) {
-            // typeName = conn.getDatabaseName() + "." + conn.getUser() + "." +
-            // typeName;
-            // } else {
-            // typeName = conn.getUser() + "." + typeName;
-            // }
-            // LOGGER.info("full qualified name is " + typeName);
-            // } catch (SeException e) {
-            // throw new DataSourceException(
-            // "error obtaining the user name from a connection", e);
-            // }
-            // }
-
-            schema = (SimpleFeatureType) schemasCache.get(typeName);
-
-            if (schema == null) {
-                SeLayer layer;
-                try {
-                    layer = conn.getLayer(typeName);
-                } catch (NoSuchElementException e) {
-                    throw new DataSourceException("FeatureType does not exist: " + typeName, e);
+        if (ftInfo == null) {
+            synchronized (featureTypeInfos) {
+                ftInfo = featureTypeInfos.get(typeName);
+                if (ftInfo == null) {
+                    ftInfo = ArcSDEAdapter.fetchSchema(typeName, this.namespace, connection);
+                    featureTypeInfos.put(typeName, ftInfo);
                 }
-                SeTable table = conn.getTable(typeName);
-                schema = ArcSDEAdapter.fetchSchema(layer, table, this.namespace);
-                schemasCache.put(typeName, schema);
             }
         }
-
-        return schema;
+        return ftInfo;
     }
 
     /**
@@ -728,7 +582,7 @@ public class ArcSDEDataStore implements DataStore {
      * @param select
      * @throws IOException
      */
-    public void registerView(final String typeName, final PlainSelect select) throws IOException {
+    void registerView(final String typeName, final PlainSelect select) throws IOException {
         if (typeName == null)
             throw new NullPointerException("typeName");
         if (select == null)
@@ -752,13 +606,10 @@ public class ArcSDEDataStore implements DataStore {
             } catch (SeException e) {
                 throw new ArcSdeException("Error Parsing select: " + qualifiedSelect, e);
             }
-            SimpleFeatureType viewSchema = ArcSDEAdapter.fetchSchema(conn, typeName, namespace,
-                    queryInfo);
-            LOGGER.fine("view schema: " + viewSchema);
+            FeatureTypeInfo typeInfo = ArcSDEAdapter.fetchSchema(conn, typeName, namespace,
+                    qualifiedSelect, queryInfo);
 
-            this.viewQueryInfos.put(typeName, queryInfo);
-            this.viewSchemasCache.put(typeName, viewSchema);
-            this.viewSelectStatements.put(typeName, qualifiedSelect);
+            inProcessFeatureTypeInfos.put(typeName, typeInfo);
         } finally {
             conn.close();
         }

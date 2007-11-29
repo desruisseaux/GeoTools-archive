@@ -306,6 +306,8 @@ class AutoCommitFeatureWriter implements FeatureWriter {
         return update;
     }
 
+    private SeInsert insertStream;
+
     /**
      * Inserts a feature into an SeLayer.
      * 
@@ -324,7 +326,7 @@ class AutoCommitFeatureWriter implements FeatureWriter {
     protected final Long insertSeRow(final SimpleFeature feature, final SeLayer layer,
             final ArcSDEPooledConnection connection) throws SeException, IOException {
         // insert the record into ArcSDE
-        final SeInsert insert;
+        // final SeInsert insertStream;
         final SeCoordinateReference seCoordRef = layer.getCoordRef();
 
         Long newId = null;
@@ -355,23 +357,27 @@ class AutoCommitFeatureWriter implements FeatureWriter {
                     .toArray(new String[0]);
             SimpleFeatureType featureType = feature.getFeatureType();
             String typeName = featureType.getTypeName();
-            insert = new SeInsert(connection);
-            insert.intoTable(typeName, rowColumnNames);
-            insert.setWriteMode(true);
+            if (insertStream == null) {
+                insertStream = new SeInsert(connection);
+                insertStream.intoTable(typeName, rowColumnNames);
+                insertStream.setWriteMode(true);
+            }
         }
 
-        final SeRow row = insert.getRowToSet();
+        final SeRow row = insertStream.getRowToSet();
 
         setRowProperties(feature, seCoordRef, mutableColumns, row);
 
-        insert.execute();
+        insertStream.execute();
 
         if (fidReader instanceof FIDReader.SdeManagedFidReader) {
-            SeObjectId newRowId = insert.lastInsertedRowId();
+            SeObjectId newRowId = insertStream.lastInsertedRowId();
             newId = Long.valueOf(newRowId.longValue());
         }
 
-        insert.close();
+        insertStream.flushBufferedWrites();
+        insertStream.close();
+        insertStream = null;
 
         // TODO: handle SHAPE fid strategy (actually such a table shouldn't be
         // editable)
