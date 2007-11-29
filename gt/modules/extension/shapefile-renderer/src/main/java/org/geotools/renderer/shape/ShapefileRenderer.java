@@ -306,7 +306,7 @@ public class ShapefileRenderer implements GTRenderer {
             type = createFeatureType(query, style, datastore);
         } catch (Exception e) {
             fireErrorEvent(e);
-
+            LOGGER.logp(Level.WARNING, "org.geotools.renderer.shape.ShapefileRenderer", "processStylers", "Could not prep style for rendering", e);
             return;
         }
 
@@ -1385,7 +1385,8 @@ public class ShapefileRenderer implements GTRenderer {
                 if( query.getFilter() !=null ){
                     // now reproject the geometries in filter because geoms are retrieved projected to screen space
                     FilterTransformer transformer= new  FilterTransformer(dataCRS, destinationCrs, mt);
-                    query.setFilter((Filter) query.getFilter().accept(transformer, null));
+                    Filter transformedFilter = (Filter) query.getFilter().accept(transformer, null);
+                    query.setFilter(transformedFilter);
                 }
                 
                 // by processing the filter we can further restrict the maximum bounds that are

@@ -16,6 +16,7 @@
  */
 package org.geotools.resources;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -48,8 +49,26 @@ public final class Utilities {
      * Convenience method for testing two objects for equality. One or both objects may be null.
      */
     public static boolean equals(final Object object1, final Object object2) {
-        return (object1==object2) || (object1!=null && object1.equals(object2));
+        if( object1 == object2 ) return true;
+        if( object1 == null || object2 == null ) return false;
+        if( object1.getClass().isArray() && object2.getClass().isArray() ){
+            int length1 = Array.getLength( object1 ); 
+            int length2 = Array.getLength( object2 ); 
+            if( length1 != length2 ) {
+                return false;
+            }
+            for( int i = 0; i < length1; i++ ){
+                Object item1 = Array.get( object1, i );
+                Object item2 = Array.get( object2, i );
+                if( !equals( item1, item2 ) ){
+                    return false;
+                }
+            }
+            return true;
+        }
+        else return object1.equals( object2 );
     }
+
     public static boolean equals(final float array1[], final float array2[] ){
         if( array1==array2 ) return true;
         if( array1 == null || array2 == null ) return false;

@@ -561,6 +561,11 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         PointSymbolizer copy = sf.getDefaultPointSymbolizer();
         copy.setGeometryPropertyName( ps.getGeometryPropertyName());
         copy.setGraphic( copy( ps.getGraphic() ));
+        if( STRICT ){
+            if( !copy.equals( ps )){
+                throw new IllegalStateException("Was unable to duplicate provided Graphic:"+ps );
+            }
+        }
         pages.push(copy);
     }
 
@@ -588,6 +593,11 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         copy.setLabel( copy( text.getLabel()));
         copy.setPlacement( copy( text.getPlacement()));
         copy.setPriority( copy( text.getPriority()));
+        if( STRICT ){
+            if( !copy.equals( text )){
+                throw new IllegalStateException("Was unable to duplicate provided TextSymbolizer:"+text );
+            }
+        }
         pages.push(copy);
     }
     
@@ -601,45 +611,25 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         copy.setOpacity( copy( raster.getOpacity() ));
         copy.setOverlap( copy( raster.getOverlap()));
         copy.setShadedRelief( copy( raster.getShadedRelief()));
+        if( STRICT ){
+            if( !copy.equals( raster )){
+                throw new IllegalStateException("Was unable to duplicate provided raster:"+raster );
+            }
+        }
         pages.push(copy);
     }
 
     public void visit(Graphic gr) {
         Graphic copy = null;
 
-        Displacement displacementCopy = null;
-
-        if (gr.getDisplacement() != null) {
-            gr.getDisplacement().accept(this);
-            displacementCopy = (Displacement) pages.pop();
-        }
-
-        ExternalGraphic[] externalGraphics = gr.getExternalGraphics();
-        ExternalGraphic[] externalGraphicsCopy = new ExternalGraphic[externalGraphics.length];
-
-        int length=externalGraphics.length;
-        for (int i = 0; i < length; i++) {
-            externalGraphicsCopy[i] = copy( externalGraphics[i]);
-        }
-
-        Mark[] marks = gr.getMarks();
-        Mark[] marksCopy = new Mark[marks.length];
-        length=marks.length;
-        for (int i = 0; i < length; i++) {
-            marksCopy[i] = copy( marks[i]);
-        }
-
+        Displacement displacementCopy = copy( gr.getDisplacement() );
+        ExternalGraphic[] externalGraphicsCopy = copy( gr.getExternalGraphics() );
+        Mark[] marksCopy = copy( gr.getMarks() );
         Expression opacityCopy = copy( gr.getOpacity() );
         Expression rotationCopy = copy( gr.getRotation() );
-        Expression sizeCopy = copy( gr.getSize() );
-        
-        Symbol[] symbols = gr.getSymbols();
-        length=symbols.length;
-        Symbol[] symbolCopys = new Symbol[length];
-
-        for (int i = 0; i < length; i++) {
-            symbolCopys[i] = copy( symbols[i] );
-        }
+        Expression sizeCopy = copy( gr.getSize() );        
+        // Looks like Symbols are a "view" of marks and external graphics?
+        // Symbol[] symbolCopys = copy( gr.getSymbols() );
 
         copy = sf.createDefaultGraphic();
         copy.setGeometryPropertyName(gr.getGeometryPropertyName());
@@ -649,11 +639,41 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         copy.setOpacity((Expression) opacityCopy);
         copy.setRotation((Expression) rotationCopy);
         copy.setSize((Expression) sizeCopy);
-        copy.setSymbols(symbolCopys);
-
+        // copy.setSymbols(symbolCopys);
+        if( STRICT ){
+            if( !copy.equals( gr )){
+                throw new IllegalStateException("Was unable to duplicate provided Graphic:"+gr );
+            }
+        }
         pages.push(copy);
     }
-
+    static final boolean STRICT = true;
+    
+    private Mark[] copy(Mark[] marks) {
+        if( marks == null) return null;
+        Mark[] copy = new Mark[marks.length];
+        for (int i = 0; i < marks.length; i++) {
+            copy[i] = copy( marks[i]);
+        }
+        return copy;
+    }
+    private Symbol[] copy(Symbol[] symbols) {
+        if( symbols == null) return null;
+        Symbol[] copy = new Symbol[symbols.length];
+        for (int i = 0; i < symbols.length; i++) {
+            copy[i] = copy( symbols[i]);
+        }
+        return copy;
+    }
+    private ExternalGraphic[] copy(ExternalGraphic[] externalGraphics) {
+        if( externalGraphics == null) return null;
+        ExternalGraphic[] copy = new ExternalGraphic[externalGraphics.length];
+        for (int i = 0; i < externalGraphics.length; i++) {
+            copy[i] = copy( externalGraphics[i]);
+        }
+        return copy;
+    }
+    
     public void visit(Mark mark) {
         Mark copy = null;
 

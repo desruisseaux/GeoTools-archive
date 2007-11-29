@@ -180,9 +180,16 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
 
     /**
      * Provides a list of all the symbols which can be used to represent this
-     * graphic. A symbol is an ExternalGraphic, Mark or any other object which
+     * graphic
+     * <p>
+     * A symbol is an ExternalGraphic, Mark or any other object which
      * implements the Symbol interface. These are returned in the order they
      * were set.
+     * <p>
+     * This class operates as a "view" on getMarks() and getExternalGraphics()
+     * with the added magic that if nothing has been set ever a single default
+     * MarkImpl will be provided. This default will not effect the internal
+     * state it is only there as a sensible default for rendering.
      *
      * @return An array of symbols to use when displaying this Graphic. By
      *         default, a "square" with 50% gray fill and black outline with a
@@ -455,7 +462,9 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
             && Utilities.equals(this.size, other.size)
             && Utilities.equals(this.rotation, other.rotation)
             && Utilities.equals(this.opacity, other.opacity)
-            && Utilities.equals(this.symbols, other.symbols);
+            && Utilities.equals(this.getMarks(), other.getMarks() )
+            && Utilities.equals( this.getExternalGraphics(), other.getExternalGraphics() )
+            && Utilities.equals( this.getSymbols(), other.getSymbols() );                    
         }
 
         return false;
