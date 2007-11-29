@@ -12,7 +12,8 @@ import com.esri.sde.sdk.client.SeException;
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
- * @URL $URL$
+ * @URL $URL:
+ *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/ArcSdeException.java $
  */
 public class ArcSdeException extends DataSourceException {
 
@@ -43,7 +44,7 @@ public class ArcSdeException extends DataSourceException {
             String sdeErrMsg = error.getSdeErrMsg();
             String extErrMsg = error.getExtErrMsg();
             String errDesc = error.getErrDesc();
-            
+
             sb.append("[SDE error ").append(error.getSdeError());
             if (sdeErrMsg != null && !"".equals(sdeErrMsg)) {
                 sb.append(" ").append(sdeErrMsg);
