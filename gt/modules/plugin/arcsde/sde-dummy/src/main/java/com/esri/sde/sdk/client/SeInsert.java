@@ -1,5 +1,7 @@
 package com.esri.sde.sdk.client;
 
+import java.io.IOException;
+
 public class SeInsert {
 	
 	public SeInsert(SeConnection c) {}
@@ -11,5 +13,7 @@ public class SeInsert {
 	public void close()throws SeException {}
 
     public SeObjectId lastInsertedRowId() {return null;}
+
+    public void flushBufferedWrites()throws IOException {}
 
 }
