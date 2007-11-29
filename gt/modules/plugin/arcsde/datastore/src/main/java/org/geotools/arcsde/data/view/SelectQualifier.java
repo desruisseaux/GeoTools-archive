@@ -32,7 +32,6 @@ import net.sf.jsqlparser.statement.select.Union;
 
 import com.esri.sde.sdk.client.SeConnection;
 
-
 /**
  * Visitor on a PlainSelect that produces another one but with all the table
  * names and field names fully qualified as expected by ArcSDE.
@@ -44,6 +43,7 @@ import com.esri.sde.sdk.client.SeConnection;
  * 
  * <p>
  * Usage:
+ * 
  * <pre>
  * <code>
  *   PlainSelect unqualifiedSelect = ...
@@ -54,12 +54,14 @@ import com.esri.sde.sdk.client.SeConnection;
  *   PlainSelect qualifiedSelect = visitor.getQualifiedQuery();
  * </code>
  * </pre>
+ * 
  * </p>
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- *
- * @source $URL$
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/SelectQualifier.java $
  * @since 2.3.x
  */
 public class SelectQualifier implements net.sf.jsqlparser.statement.select.SelectVisitor {
@@ -71,25 +73,27 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
     /**
      * Creates a new SelectQualifier object.
-     *
-     * @param conn DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
      */
     public SelectQualifier(SeConnection conn) {
         this.conn = conn;
     }
-    
-    public static PlainSelect qualify(SeConnection conn, PlainSelect select){
-    	SelectQualifier q = new SelectQualifier(conn);
-    	select.accept(q);
-    	return q.qualifiedSelect;
+
+    public static PlainSelect qualify(SeConnection conn, PlainSelect select) {
+        SelectQualifier q = new SelectQualifier(conn);
+        select.accept(q);
+        return q.qualifiedSelect;
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
-     *
-     * @throws IllegalStateException DOCUMENT ME!
+     * 
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     public PlainSelect getQualifiedQuery() {
         if (qualifiedSelect == null) {
@@ -101,21 +105,23 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
     /**
      * DOCUMENT ME!
-     *
-     * @param plainSelect DOCUMENT ME!
-     *
-     * @throws IllegalStateException DOCUMENT ME!
+     * 
+     * @param plainSelect
+     *            DOCUMENT ME!
+     * 
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     public void visit(PlainSelect plainSelect) throws IllegalStateException {
         qualifiedSelect = new PlainSelect();
 
         List fromItems = qualifyFromItems(plainSelect.getFromItems());
         qualifiedSelect.setFromItems(fromItems);
-        
-        Map /*<String,Table>*/aliases = extractTableAliases(fromItems);
-        
+
+        Map /* <String,Table> */aliases = extractTableAliases(fromItems);
+
         fromItems = removeTableAliases(fromItems);
-        
+
         List selectItems = qualifySelectItems(aliases, plainSelect.getSelectItems());
         qualifiedSelect.setSelectItems(selectItems);
 
@@ -125,42 +131,43 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
         List orderByItems = qualifyOrderBy(aliases, plainSelect.getOrderByElements());
         qualifiedSelect.setOrderByElements(orderByItems);
     }
-    
-    private Map extractTableAliases(List fromItems){
-    	Map aliases = new HashMap();
-    	for(Iterator it = fromItems.iterator(); it.hasNext();){
-    		FromItem fromItem = (FromItem)it.next();
-    		if(fromItem instanceof Table){
-    			Table table = (Table)fromItem;
-    			String alias = table.getAlias();
-    			if(alias != null){
-    				aliases.put(alias, table);
-    			}
-    		}
-    	}
-    	return aliases;
+
+    private Map extractTableAliases(List fromItems) {
+        Map aliases = new HashMap();
+        for (Iterator it = fromItems.iterator(); it.hasNext();) {
+            FromItem fromItem = (FromItem) it.next();
+            if (fromItem instanceof Table) {
+                Table table = (Table) fromItem;
+                String alias = table.getAlias();
+                if (alias != null) {
+                    aliases.put(alias, table);
+                }
+            }
+        }
+        return aliases;
     }
 
-    private List removeTableAliases(List fromItems){
-    	fromItems = new ArrayList(fromItems);
-    	
-    	for(Iterator it = fromItems.iterator(); it.hasNext();){
-    	
-    		FromItem fromItem = (FromItem)it.next();
-    		
-    		if(fromItem instanceof Table){
-    			Table table = (Table)fromItem;
-    			table.setAlias(null);
-    		}
-    	}
-    	return fromItems;
+    private List removeTableAliases(List fromItems) {
+        fromItems = new ArrayList(fromItems);
+
+        for (Iterator it = fromItems.iterator(); it.hasNext();) {
+
+            FromItem fromItem = (FromItem) it.next();
+
+            if (fromItem instanceof Table) {
+                Table table = (Table) fromItem;
+                table.setAlias(null);
+            }
+        }
+        return fromItems;
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @param where DOCUMENT ME!
-     *
+     * 
+     * @param where
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
     private Expression qualifyWhere(Map tableAliases, Expression where) {
@@ -175,9 +182,10 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
     /**
      * DOCUMENT ME!
-     *
-     * @param orderByElements DOCUMENT ME!
-     *
+     * 
+     * @param orderByElements
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
     private List qualifyOrderBy(Map tableAliases, List orderByElements) {
@@ -201,9 +209,10 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
     /**
      * DOCUMENT ME!
-     *
-     * @param selectItems List&lt;{@link SelectItem}&gt;
-     *
+     * 
+     * @param selectItems
+     *            List&lt;{@link SelectItem}&gt;
+     * 
      * @return DOCUMENT ME!
      */
     private List qualifySelectItems(Map tableAlias, List selectItems) {
@@ -226,9 +235,10 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
     /**
      * DOCUMENT ME!
-     *
-     * @param fromItems List&lt;{@link FromItem}&gt;
-     *
+     * 
+     * @param fromItems
+     *            List&lt;{@link FromItem}&gt;
+     * 
      * @return DOCUMENT ME!
      */
     private List qualifyFromItems(List fromItems) {
@@ -251,10 +261,12 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
 
     /**
      * DOCUMENT ME!
-     *
-     * @param union DOCUMENT ME!
-     *
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * 
+     * @param union
+     *            DOCUMENT ME!
+     * 
+     * @throws UnsupportedOperationException
+     *             DOCUMENT ME!
      */
     public void visit(Union union) {
         throw new UnsupportedOperationException();

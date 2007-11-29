@@ -66,483 +66,481 @@ import com.esri.sde.sdk.client.SeConnection;
  * joined tables.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id$
- * @source $URL$
+ * @version $Id: ExpressionQualifier.java 27572 2007-10-22 09:20:45Z
+ *          desruisseaux $
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/ExpressionQualifier.java $
  * @since 2.3.x
  */
 class ExpressionQualifier implements ExpressionVisitor {
-	/** DOCUMENT ME! */
-	private Expression qualifiedExpression;
+    /** DOCUMENT ME! */
+    private Expression qualifiedExpression;
 
-	/** DOCUMENT ME! */
-	private SeConnection conn;
-	
-	private Map tableAliases;
+    /** DOCUMENT ME! */
+    private SeConnection conn;
 
-	/**
-	 * Creates a new ExpressionQualifier object.
-	 * 
-	 * @param conn
-	 *            DOCUMENT ME!
-	 */
-	private ExpressionQualifier(SeConnection conn, Map tableAliases) {
-		this.conn = conn;
-		this.tableAliases = tableAliases;
-	}
+    private Map tableAliases;
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param conn
-	 *            DOCUMENT ME!
-	 * @param exp
-	 *            DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
-	public static Expression qualify(SeConnection conn, Map tableAliases, Expression exp) {
-		if (exp == null) {
-			return null;
-		}
+    /**
+     * Creates a new ExpressionQualifier object.
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     */
+    private ExpressionQualifier(SeConnection conn, Map tableAliases) {
+        this.conn = conn;
+        this.tableAliases = tableAliases;
+    }
 
-		ExpressionQualifier qualifier = new ExpressionQualifier(conn, tableAliases);
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * @param exp
+     *            DOCUMENT ME!
+     * 
+     * @return DOCUMENT ME!
+     */
+    public static Expression qualify(SeConnection conn, Map tableAliases, Expression exp) {
+        if (exp == null) {
+            return null;
+        }
 
-		exp.accept(qualifier);
+        ExpressionQualifier qualifier = new ExpressionQualifier(conn, tableAliases);
 
-		return qualifier.qualifiedExpression;
-	}
+        exp.accept(qualifier);
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param nullValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(NullValue nullValue) {
-		qualifiedExpression = nullValue;
-	}
+        return qualifier.qualifiedExpression;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param function
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Function function) {
-		Function qfunction = new Function();
-		qfunction.setAllColumns(function.isAllColumns());
-		qfunction.setEscaped(function.isEscaped());
-		qfunction.setName(function.getName());
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param nullValue
+     *            DOCUMENT ME!
+     */
+    public void visit(NullValue nullValue) {
+        qualifiedExpression = nullValue;
+    }
 
-		ExpressionList parameters = function.getParameters();
-		ExpressionList qualifiedParams;
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param function
+     *            DOCUMENT ME!
+     */
+    public void visit(Function function) {
+        Function qfunction = new Function();
+        qfunction.setAllColumns(function.isAllColumns());
+        qfunction.setEscaped(function.isEscaped());
+        qfunction.setName(function.getName());
 
-		qualifiedParams = (ExpressionList) ItemsListQualifier.qualify(conn, tableAliases,
-				parameters);
+        ExpressionList parameters = function.getParameters();
+        ExpressionList qualifiedParams;
 
-		qfunction.setParameters(qualifiedParams);
+        qualifiedParams = (ExpressionList) ItemsListQualifier.qualify(conn, tableAliases,
+                parameters);
 
-		this.qualifiedExpression = qfunction;
-	}
+        qfunction.setParameters(qualifiedParams);
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param inverseExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(InverseExpression inverseExpression) {
-		InverseExpression qInv = new InverseExpression();
+        this.qualifiedExpression = qfunction;
+    }
 
-		Expression exp = inverseExpression.getExpression();
-		Expression qExp = ExpressionQualifier.qualify(conn, tableAliases, exp);
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param inverseExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(InverseExpression inverseExpression) {
+        InverseExpression qInv = new InverseExpression();
 
-		qInv.setExpression(qExp);
-		this.qualifiedExpression = qInv;
-	}
+        Expression exp = inverseExpression.getExpression();
+        Expression qExp = ExpressionQualifier.qualify(conn, tableAliases, exp);
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param jdbcParameter
-	 *            DOCUMENT ME!
-	 */
-	public void visit(JdbcParameter jdbcParameter) {
-		this.qualifiedExpression = jdbcParameter;
-	}
+        qInv.setExpression(qExp);
+        this.qualifiedExpression = qInv;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param doubleValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(DoubleValue doubleValue) {
-		this.qualifiedExpression = doubleValue;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param jdbcParameter
+     *            DOCUMENT ME!
+     */
+    public void visit(JdbcParameter jdbcParameter) {
+        this.qualifiedExpression = jdbcParameter;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param longValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(LongValue longValue) {
-		this.qualifiedExpression = longValue;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param doubleValue
+     *            DOCUMENT ME!
+     */
+    public void visit(DoubleValue doubleValue) {
+        this.qualifiedExpression = doubleValue;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param dateValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(DateValue dateValue) {
-		this.qualifiedExpression = dateValue;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param longValue
+     *            DOCUMENT ME!
+     */
+    public void visit(LongValue longValue) {
+        this.qualifiedExpression = longValue;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param timeValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(TimeValue timeValue) {
-		this.qualifiedExpression = timeValue;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param dateValue
+     *            DOCUMENT ME!
+     */
+    public void visit(DateValue dateValue) {
+        this.qualifiedExpression = dateValue;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param timestampValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(TimestampValue timestampValue) {
-		this.qualifiedExpression = timestampValue;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param timeValue
+     *            DOCUMENT ME!
+     */
+    public void visit(TimeValue timeValue) {
+        this.qualifiedExpression = timeValue;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param parenthesis
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Parenthesis parenthesis) {
-		Expression pExp = parenthesis.getExpression();
-		Expression qualifiedExpression;
-		qualifiedExpression = qualify(conn, tableAliases, pExp);
-		
-		Parenthesis qualified = new Parenthesis();
-		qualified.setExpression(qualifiedExpression);
-		this.qualifiedExpression = qualified;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param timestampValue
+     *            DOCUMENT ME!
+     */
+    public void visit(TimestampValue timestampValue) {
+        this.qualifiedExpression = timestampValue;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param stringValue
-	 *            DOCUMENT ME!
-	 */
-	public void visit(StringValue stringValue) {
-		this.qualifiedExpression = stringValue;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param parenthesis
+     *            DOCUMENT ME!
+     */
+    public void visit(Parenthesis parenthesis) {
+        Expression pExp = parenthesis.getExpression();
+        Expression qualifiedExpression;
+        qualifiedExpression = qualify(conn, tableAliases, pExp);
 
-	private void visitBinaryExpression(BinaryExpression exp) {
+        Parenthesis qualified = new Parenthesis();
+        qualified.setExpression(qualifiedExpression);
+        this.qualifiedExpression = qualified;
+    }
 
-		Expression left = ExpressionQualifier.qualify(conn, tableAliases, exp
-				.getLeftExpression());
-		Expression right = ExpressionQualifier.qualify(conn, tableAliases, exp
-				.getRightExpression());
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param stringValue
+     *            DOCUMENT ME!
+     */
+    public void visit(StringValue stringValue) {
+        this.qualifiedExpression = stringValue;
+    }
 
-		BinaryExpression qualified;
+    private void visitBinaryExpression(BinaryExpression exp) {
 
-		if (exp instanceof Addition)
-			qualified = new Addition();
-		else if (exp instanceof Division)
-			qualified = new Division();
-		else if (exp instanceof Multiplication)
-			qualified = new Multiplication();
-		else if (exp instanceof Subtraction)
-			qualified = new Subtraction();
-		else if (exp instanceof EqualsTo)
-			qualified = new EqualsTo();
-		else if (exp instanceof GreaterThan)
-			qualified = new GreaterThan();
-		else if (exp instanceof GreaterThanEquals)
-			qualified = new GreaterThanEquals();
-		else if (exp instanceof LikeExpression)
-			qualified = new LikeExpression();
-		else if (exp instanceof MinorThan)
-			qualified = new MinorThan();
-		else if (exp instanceof MinorThanEquals)
-			qualified = new MinorThanEquals();
-		else if (exp instanceof NotEqualsTo)
-			qualified = new NotEqualsTo();
-		else
-			throw new IllegalArgumentException("Unkown binary expression: "
-					+ exp);
+        Expression left = ExpressionQualifier.qualify(conn, tableAliases, exp.getLeftExpression());
+        Expression right = ExpressionQualifier
+                .qualify(conn, tableAliases, exp.getRightExpression());
 
-		qualified.setLeftExpression(left);
-		qualified.setRightExpression(right);
+        BinaryExpression qualified;
 
-		this.qualifiedExpression = qualified;
-	}
+        if (exp instanceof Addition)
+            qualified = new Addition();
+        else if (exp instanceof Division)
+            qualified = new Division();
+        else if (exp instanceof Multiplication)
+            qualified = new Multiplication();
+        else if (exp instanceof Subtraction)
+            qualified = new Subtraction();
+        else if (exp instanceof EqualsTo)
+            qualified = new EqualsTo();
+        else if (exp instanceof GreaterThan)
+            qualified = new GreaterThan();
+        else if (exp instanceof GreaterThanEquals)
+            qualified = new GreaterThanEquals();
+        else if (exp instanceof LikeExpression)
+            qualified = new LikeExpression();
+        else if (exp instanceof MinorThan)
+            qualified = new MinorThan();
+        else if (exp instanceof MinorThanEquals)
+            qualified = new MinorThanEquals();
+        else if (exp instanceof NotEqualsTo)
+            qualified = new NotEqualsTo();
+        else
+            throw new IllegalArgumentException("Unkown binary expression: " + exp);
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param addition
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Addition addition) {
-		visitBinaryExpression(addition);
-	}
+        qualified.setLeftExpression(left);
+        qualified.setRightExpression(right);
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param division
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Division division) {
-		visitBinaryExpression(division);
-	}
+        this.qualifiedExpression = qualified;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param multiplication
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Multiplication multiplication) {
-		visitBinaryExpression(multiplication);
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param addition
+     *            DOCUMENT ME!
+     */
+    public void visit(Addition addition) {
+        visitBinaryExpression(addition);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param subtraction
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Subtraction subtraction) {
-		visitBinaryExpression(subtraction);
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param division
+     *            DOCUMENT ME!
+     */
+    public void visit(Division division) {
+        visitBinaryExpression(division);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param andExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(AndExpression andExpression) {
-		Expression left = qualify(conn, tableAliases, andExpression.getLeftExpression());
-		Expression rigth = qualify(conn, tableAliases, andExpression.getRightExpression());
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param multiplication
+     *            DOCUMENT ME!
+     */
+    public void visit(Multiplication multiplication) {
+        visitBinaryExpression(multiplication);
+    }
 
-		AndExpression and = new AndExpression(left, rigth);
-		this.qualifiedExpression = and;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param subtraction
+     *            DOCUMENT ME!
+     */
+    public void visit(Subtraction subtraction) {
+        visitBinaryExpression(subtraction);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param orExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(OrExpression orExpression) {
-		Expression left = qualify(conn, tableAliases, orExpression.getLeftExpression());
-		Expression rigth = qualify(conn, tableAliases, orExpression.getRightExpression());
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param andExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(AndExpression andExpression) {
+        Expression left = qualify(conn, tableAliases, andExpression.getLeftExpression());
+        Expression rigth = qualify(conn, tableAliases, andExpression.getRightExpression());
 
-		OrExpression or = new OrExpression(left, rigth);
-		this.qualifiedExpression = or;
-	}
+        AndExpression and = new AndExpression(left, rigth);
+        this.qualifiedExpression = and;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param between
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Between between) {
-		Between qualified = new Between();
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param orExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(OrExpression orExpression) {
+        Expression left = qualify(conn, tableAliases, orExpression.getLeftExpression());
+        Expression rigth = qualify(conn, tableAliases, orExpression.getRightExpression());
 
-		Expression start = qualify(conn, tableAliases, between.getBetweenExpressionStart());
-		Expression end = qualify(conn, tableAliases, between.getBetweenExpressionEnd());
-		Expression left = qualify(conn, tableAliases, between.getLeftExpression());
+        OrExpression or = new OrExpression(left, rigth);
+        this.qualifiedExpression = or;
+    }
 
-		qualified.setBetweenExpressionStart(start);
-		qualified.setBetweenExpressionEnd(end);
-		qualified.setLeftExpression(left);
-		this.qualifiedExpression = qualified;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param between
+     *            DOCUMENT ME!
+     */
+    public void visit(Between between) {
+        Between qualified = new Between();
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param equalsTo
-	 *            DOCUMENT ME!
-	 */
-	public void visit(EqualsTo equalsTo) {
-		visitBinaryExpression(equalsTo);
-	}
+        Expression start = qualify(conn, tableAliases, between.getBetweenExpressionStart());
+        Expression end = qualify(conn, tableAliases, between.getBetweenExpressionEnd());
+        Expression left = qualify(conn, tableAliases, between.getLeftExpression());
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param greaterThan
-	 *            DOCUMENT ME!
-	 */
-	public void visit(GreaterThan greaterThan) {
-		visitBinaryExpression(greaterThan);
-	}
+        qualified.setBetweenExpressionStart(start);
+        qualified.setBetweenExpressionEnd(end);
+        qualified.setLeftExpression(left);
+        this.qualifiedExpression = qualified;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param greaterThanEquals
-	 *            DOCUMENT ME!
-	 */
-	public void visit(GreaterThanEquals greaterThanEquals) {
-		visitBinaryExpression(greaterThanEquals);
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param equalsTo
+     *            DOCUMENT ME!
+     */
+    public void visit(EqualsTo equalsTo) {
+        visitBinaryExpression(equalsTo);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param inExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(InExpression inExpression) {
-		Expression left = qualify(conn, tableAliases, inExpression.getLeftExpression());
-		ItemsList itemsList = ItemsListQualifier.qualify(conn, tableAliases, inExpression
-				.getItemsList());
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param greaterThan
+     *            DOCUMENT ME!
+     */
+    public void visit(GreaterThan greaterThan) {
+        visitBinaryExpression(greaterThan);
+    }
 
-		InExpression qualified = new InExpression();
-		qualified.setLeftExpression(left);
-		qualified.setItemsList(itemsList);
-		this.qualifiedExpression = qualified;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param greaterThanEquals
+     *            DOCUMENT ME!
+     */
+    public void visit(GreaterThanEquals greaterThanEquals) {
+        visitBinaryExpression(greaterThanEquals);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param isNullExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(IsNullExpression isNullExpression) {
-		IsNullExpression qualified = new IsNullExpression();
-		Expression left = qualify(conn, tableAliases, isNullExpression.getLeftExpression());
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param inExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(InExpression inExpression) {
+        Expression left = qualify(conn, tableAliases, inExpression.getLeftExpression());
+        ItemsList itemsList = ItemsListQualifier.qualify(conn, tableAliases, inExpression
+                .getItemsList());
 
-		qualified.setLeftExpression(left);
-		qualified.setNot(isNullExpression.isNot());
-		this.qualifiedExpression = qualified;
-	}
+        InExpression qualified = new InExpression();
+        qualified.setLeftExpression(left);
+        qualified.setItemsList(itemsList);
+        this.qualifiedExpression = qualified;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param likeExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(LikeExpression likeExpression) {
-		visitBinaryExpression(likeExpression);
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param isNullExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(IsNullExpression isNullExpression) {
+        IsNullExpression qualified = new IsNullExpression();
+        Expression left = qualify(conn, tableAliases, isNullExpression.getLeftExpression());
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param minorThan
-	 *            DOCUMENT ME!
-	 */
-	public void visit(MinorThan minorThan) {
-		visitBinaryExpression(minorThan);
-	}
+        qualified.setLeftExpression(left);
+        qualified.setNot(isNullExpression.isNot());
+        this.qualifiedExpression = qualified;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param minorThanEquals
-	 *            DOCUMENT ME!
-	 */
-	public void visit(MinorThanEquals minorThanEquals) {
-		visitBinaryExpression(minorThanEquals);
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param likeExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(LikeExpression likeExpression) {
+        visitBinaryExpression(likeExpression);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param notEqualsTo
-	 *            DOCUMENT ME!
-	 */
-	public void visit(NotEqualsTo notEqualsTo) {
-		visitBinaryExpression(notEqualsTo);
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param minorThan
+     *            DOCUMENT ME!
+     */
+    public void visit(MinorThan minorThan) {
+        visitBinaryExpression(minorThan);
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param tableColumn
-	 *            DOCUMENT ME!
-	 */
-	public void visit(Column tableColumn) {
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param minorThanEquals
+     *            DOCUMENT ME!
+     */
+    public void visit(MinorThanEquals minorThanEquals) {
+        visitBinaryExpression(minorThanEquals);
+    }
 
-		Column qualified = ColumnQualifier.qualify(conn, tableAliases, tableColumn);
-		this.qualifiedExpression = qualified;
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param notEqualsTo
+     *            DOCUMENT ME!
+     */
+    public void visit(NotEqualsTo notEqualsTo) {
+        visitBinaryExpression(notEqualsTo);
+    }
 
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param tableColumn
+     *            DOCUMENT ME!
+     */
+    public void visit(Column tableColumn) {
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param subSelect
-	 *            DOCUMENT ME!
-	 */
-	public void visit(SubSelect subSelect) {
-		SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
-		this.qualifiedExpression = qualified;
-	}
+        Column qualified = ColumnQualifier.qualify(conn, tableAliases, tableColumn);
+        this.qualifiedExpression = qualified;
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param caseExpression
-	 *            DOCUMENT ME!
-	 */
-	public void visit(CaseExpression caseExpression) {
-		Expression switchExpr = qualify(conn, tableAliases, caseExpression
-				.getSwitchExpression());
-		Expression elseExpr = qualify(conn, tableAliases, caseExpression.getElseExpression());
+    }
 
-		List whenClauses = null;
-		if (caseExpression.getWhenClauses() != null) {
-			whenClauses = new ArrayList();
-			for (Iterator it = caseExpression.getWhenClauses().iterator(); it
-					.hasNext();) {
-				WhenClause whenClause = (WhenClause) it.next();
-				WhenClause qWhen = (WhenClause) qualify(conn, tableAliases, whenClause);
-				whenClauses.add(qWhen);
-			}
-		}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param subSelect
+     *            DOCUMENT ME!
+     */
+    public void visit(SubSelect subSelect) {
+        SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
+        this.qualifiedExpression = qualified;
+    }
 
-		CaseExpression qualifiedWhen = new CaseExpression();
-		qualifiedWhen.setElseExpression(elseExpr);
-		qualifiedWhen.setSwitchExpression(switchExpr);
-		qualifiedWhen.setWhenClauses(whenClauses);
-		this.qualifiedExpression = qualifiedWhen;
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param caseExpression
+     *            DOCUMENT ME!
+     */
+    public void visit(CaseExpression caseExpression) {
+        Expression switchExpr = qualify(conn, tableAliases, caseExpression.getSwitchExpression());
+        Expression elseExpr = qualify(conn, tableAliases, caseExpression.getElseExpression());
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param whenClause
-	 *            DOCUMENT ME!
-	 */
-	public void visit(WhenClause whenClause) {
-		Expression whenExpr = qualify(conn, tableAliases, whenClause.getWhenExpression());
-		Expression thenExpr = qualify(conn, tableAliases, whenClause.getThenExpression());
+        List whenClauses = null;
+        if (caseExpression.getWhenClauses() != null) {
+            whenClauses = new ArrayList();
+            for (Iterator it = caseExpression.getWhenClauses().iterator(); it.hasNext();) {
+                WhenClause whenClause = (WhenClause) it.next();
+                WhenClause qWhen = (WhenClause) qualify(conn, tableAliases, whenClause);
+                whenClauses.add(qWhen);
+            }
+        }
 
-		WhenClause q = new WhenClause();
-		q.setWhenExpression(whenExpr);
-		q.setThenExpression(thenExpr);
-		this.qualifiedExpression = q;
-	}
+        CaseExpression qualifiedWhen = new CaseExpression();
+        qualifiedWhen.setElseExpression(elseExpr);
+        qualifiedWhen.setSwitchExpression(switchExpr);
+        qualifiedWhen.setWhenClauses(whenClauses);
+        this.qualifiedExpression = qualifiedWhen;
+    }
+
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param whenClause
+     *            DOCUMENT ME!
+     */
+    public void visit(WhenClause whenClause) {
+        Expression whenExpr = qualify(conn, tableAliases, whenClause.getWhenExpression());
+        Expression thenExpr = qualify(conn, tableAliases, whenClause.getThenExpression());
+
+        WhenClause q = new WhenClause();
+        q.setWhenExpression(whenExpr);
+        q.setThenExpression(thenExpr);
+        this.qualifiedExpression = q;
+    }
 }

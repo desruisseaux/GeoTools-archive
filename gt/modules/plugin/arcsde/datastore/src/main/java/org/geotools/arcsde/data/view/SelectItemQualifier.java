@@ -35,138 +35,141 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeTable;
 
 /**
- * Qualifies instances of {@link net.sf.jsqlparser.statement.select.SelectExpressionItem},
- * and creates a list of qualified {@link net.sf.jsqlparser.statement.select.SelectExpressionItem}
- * for each {@link net.sf.jsqlparser.statement.select.AllColumns} and 
- * {@link net.sf.jsqlparser.statement.select.AllTableColumns} instances. So, this visitor
- * may produce more items than the visited.
+ * Qualifies instances of
+ * {@link net.sf.jsqlparser.statement.select.SelectExpressionItem}, and creates
+ * a list of qualified
+ * {@link net.sf.jsqlparser.statement.select.SelectExpressionItem} for each
+ * {@link net.sf.jsqlparser.statement.select.AllColumns} and
+ * {@link net.sf.jsqlparser.statement.select.AllTableColumns} instances. So,
+ * this visitor may produce more items than the visited.
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id$
- * @source $URL$
+ * @version $Id: SelectItemQualifier.java 27572 2007-10-22 09:20:45Z
+ *          desruisseaux $
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/SelectItemQualifier.java $
  * @since 2.3.x
  */
-class SelectItemQualifier implements
-		net.sf.jsqlparser.statement.select.SelectItemVisitor {
-	/** DOCUMENT ME! */
-	private List /*<SelectExpressionItem>*/ qualifiedItems = Collections.EMPTY_LIST;
+class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectItemVisitor {
+    /** DOCUMENT ME! */
+    private List /* <SelectExpressionItem> */qualifiedItems = Collections.EMPTY_LIST;
 
-	/** DOCUMENT ME! */
-	private SeConnection conn;
+    /** DOCUMENT ME! */
+    private SeConnection conn;
 
-	private Map tableAliases;
-	
-	/**
-	 * Creates a new SelectItemQualifier object.
-	 * 
-	 * @param conn
-	 *            DOCUMENT ME!
-	 */
-	private SelectItemQualifier(SeConnection conn, Map tableAliases) {
-		this.conn = conn;
-		this.tableAliases = tableAliases;
-	}
+    private Map tableAliases;
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param conn
-	 *            DOCUMENT ME!
-	 * @param item
-	 *            DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 */
-	public static List qualify(SeConnection conn, Map tableAliases, SelectItem item) {
-		if (item == null) {
-			return null;
-		}
+    /**
+     * Creates a new SelectItemQualifier object.
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     */
+    private SelectItemQualifier(SeConnection conn, Map tableAliases) {
+        this.conn = conn;
+        this.tableAliases = tableAliases;
+    }
 
-		SelectItemQualifier qualifier = new SelectItemQualifier(conn, tableAliases);
-		item.accept(qualifier);
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * @param item
+     *            DOCUMENT ME!
+     * 
+     * @return DOCUMENT ME!
+     */
+    public static List qualify(SeConnection conn, Map tableAliases, SelectItem item) {
+        if (item == null) {
+            return null;
+        }
 
-		return qualifier.qualifiedItems;
-	}
+        SelectItemQualifier qualifier = new SelectItemQualifier(conn, tableAliases);
+        item.accept(qualifier);
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param allColumns
-	 *            DOCUMENT ME!
-	 */
-	public void visit(AllColumns allColumns) {
-		this.qualifiedItems = Collections.singletonList(allColumns);
-	}
+        return qualifier.qualifiedItems;
+    }
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param allTableColumns
-	 *            DOCUMENT ME!
-	 */
-	public void visit(AllTableColumns allTableColumns) {
-		AllTableColumns qualified = new AllTableColumns();
-		
-		Table qt = allTableColumns.getTable();
-		Table unaliasedTable = (Table)tableAliases.get(qt.getName());
-		
-		if(unaliasedTable == null){
-			//not an aliased table, qualify it
-			qt = TableQualifier.qualify(conn, allTableColumns.getTable());
-		}else{
-			//AllTableColumns is refering to an aliased table in the FROM clause,
-			//replace its table by the original one to get rid of the alias
-			qt = unaliasedTable;
-		}
-		
-		
-		qualified.setTable(qt);
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param allColumns
+     *            DOCUMENT ME!
+     */
+    public void visit(AllColumns allColumns) {
+        this.qualifiedItems = Collections.singletonList(allColumns);
+    }
 
-		String tableName = qt.getSchemaName() + "." + qt.getName();
-		SeTable table;
-		SeColumnDefinition []cols;
-		try{
-			table = new SeTable(conn, tableName);
-			cols = table.describe();
-		}catch(SeException e){
-			throw new RuntimeException(e.getMessage());
-		}
-		
-		qualifiedItems = new ArrayList(cols.length);
-		
-		for(int i = 0; i < cols.length; i++){
-			String colName = cols[i].getName();
-			
-			Column column = new Column();
-			column.setTable(qt);
-			column.setColumnName(colName);
-			
-			SelectExpressionItem item = new SelectExpressionItem();
-			item.setExpression(column);
-			
-			qualifiedItems.add(item);
-		}
-	}
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param allTableColumns
+     *            DOCUMENT ME!
+     */
+    public void visit(AllTableColumns allTableColumns) {
+        AllTableColumns qualified = new AllTableColumns();
 
-	/**
-	 * DOCUMENT ME!
-	 * 
-	 * @param selectExpressionItem
-	 *            DOCUMENT ME!
-	 */
-	public void visit(SelectExpressionItem selectExpressionItem) {
-		
-		SelectExpressionItem qualifiedItem = new SelectExpressionItem();
-		
-		qualifiedItem.setAlias(selectExpressionItem.getAlias());
+        Table qt = allTableColumns.getTable();
+        Table unaliasedTable = (Table) tableAliases.get(qt.getName());
 
-		Expression selectExpression = selectExpressionItem.getExpression();
+        if (unaliasedTable == null) {
+            // not an aliased table, qualify it
+            qt = TableQualifier.qualify(conn, allTableColumns.getTable());
+        } else {
+            // AllTableColumns is refering to an aliased table in the FROM
+            // clause,
+            // replace its table by the original one to get rid of the alias
+            qt = unaliasedTable;
+        }
 
-		Expression qualifiedExpression = ExpressionQualifier.qualify(conn, tableAliases, 
-				selectExpression);
+        qualified.setTable(qt);
 
-		qualifiedItem.setExpression(qualifiedExpression);
+        String tableName = qt.getSchemaName() + "." + qt.getName();
+        SeTable table;
+        SeColumnDefinition[] cols;
+        try {
+            table = new SeTable(conn, tableName);
+            cols = table.describe();
+        } catch (SeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
 
-		this.qualifiedItems = Collections.singletonList(qualifiedItem);
-	}
+        qualifiedItems = new ArrayList(cols.length);
+
+        for (int i = 0; i < cols.length; i++) {
+            String colName = cols[i].getName();
+
+            Column column = new Column();
+            column.setTable(qt);
+            column.setColumnName(colName);
+
+            SelectExpressionItem item = new SelectExpressionItem();
+            item.setExpression(column);
+
+            qualifiedItems.add(item);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     * 
+     * @param selectExpressionItem
+     *            DOCUMENT ME!
+     */
+    public void visit(SelectExpressionItem selectExpressionItem) {
+
+        SelectExpressionItem qualifiedItem = new SelectExpressionItem();
+
+        qualifiedItem.setAlias(selectExpressionItem.getAlias());
+
+        Expression selectExpression = selectExpressionItem.getExpression();
+
+        Expression qualifiedExpression = ExpressionQualifier.qualify(conn, tableAliases,
+                selectExpression);
+
+        qualifiedItem.setExpression(qualifiedExpression);
+
+        this.qualifiedItems = Collections.singletonList(qualifiedItem);
+    }
 }

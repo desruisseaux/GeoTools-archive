@@ -21,31 +21,33 @@ import net.sf.jsqlparser.schema.Table;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 
-
 /**
  * Utility used to qualify table names
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- *
- * @source $URL$
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/TableQualifier.java $
  * @since 2.3.x
  */
 class TableQualifier {
     /**
      * Returns a Table with the same name as the argument one but fully
      * qualified in the ArcSDE sense.
-     *
-     * @param conn connection to obtain database and user name from
-     * @param table table whose schema name is to be qualified
-     *
+     * 
+     * @param conn
+     *            connection to obtain database and user name from
+     * @param table
+     *            table whose schema name is to be qualified
+     * 
      * @return a qualified Table.
-     *
-     * @throws IllegalStateException if an SDE error is catched up while asking
-     *         <code>conn</code> for the database and user name.
+     * 
+     * @throws IllegalStateException
+     *             if an SDE error is catched up while asking <code>conn</code>
+     *             for the database and user name.
      */
-    public static Table qualify(SeConnection conn, Table table)
-        throws IllegalStateException {
+    public static Table qualify(SeConnection conn, Table table) throws IllegalStateException {
         if (table == null) {
             return null;
         }
@@ -59,26 +61,25 @@ class TableQualifier {
 
         String schema = table.getSchemaName(); // user name in sde land
 
-        //if (schema != null) {
-            try {
-                databaseName = conn.getDatabaseName();
-                userName = conn.getUser();
-            } catch (SeException e) {
-                throw new IllegalStateException("getting database name: "
-                    + e.getMessage());
-            }
+        // if (schema != null) {
+        try {
+            databaseName = conn.getDatabaseName();
+            userName = conn.getUser();
+        } catch (SeException e) {
+            throw new IllegalStateException("getting database name: " + e.getMessage());
+        }
 
-            // we'll replace the table schema name by
-            // databaseName.userName
-            String qualifiedSchema = databaseName;
-            if("".equals(qualifiedSchema)){
-            	qualifiedSchema = userName;
-            }else{
-            	qualifiedSchema += ("." + userName);
-            }
+        // we'll replace the table schema name by
+        // databaseName.userName
+        String qualifiedSchema = databaseName;
+        if ("".equals(qualifiedSchema)) {
+            qualifiedSchema = userName;
+        } else {
+            qualifiedSchema += ("." + userName);
+        }
 
-            qualifiedTable.setSchemaName(qualifiedSchema);
-        //}
+        qualifiedTable.setSchemaName(qualifiedSchema);
+        // }
 
         return qualifiedTable;
     }

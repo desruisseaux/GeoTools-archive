@@ -25,7 +25,6 @@ import net.sf.jsqlparser.statement.select.ColumnReferenceVisitor;
 
 import com.esri.sde.sdk.client.SeConnection;
 
-
 /**
  * Qualifies a column reference (aliased) the ArcSDE "table.user." prefix as
  * required by the ArcSDE java api to not get confused when using joined tables.
@@ -33,22 +32,24 @@ import com.esri.sde.sdk.client.SeConnection;
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id: ColumnReferenceQualifier.java 18656 2006-03-14 18:05:11Z
  *          groldan $
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/ColumnReferenceQualifier.java $
  * @since 2.3.x
  */
 public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private ColumnReference qualifiedReference;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeConnection conn;
-    
+
     private Map tableAliases;
 
     /**
      * Creates a new ColumnReferenceQualifier object.
-     *
-     * @param conn DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
      */
     private ColumnReferenceQualifier(SeConnection conn, Map tableAliases) {
         this.conn = conn;
@@ -57,14 +58,16 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param conn DOCUMENT ME!
-     * @param colRef DOCUMENT ME!
-     *
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * @param colRef
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
     public static ColumnReference qualify(SeConnection conn, Map tableAliases,
-        ColumnReference colRef) {
+            ColumnReference colRef) {
         if (colRef == null) {
             return null;
         }
@@ -77,8 +80,9 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param columnIndex DOCUMENT ME!
+     * 
+     * @param columnIndex
+     *            DOCUMENT ME!
      */
     public void visit(ColumnIndex columnIndex) {
         qualifiedReference = columnIndex;
@@ -86,8 +90,9 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param column DOCUMENT ME!
+     * 
+     * @param column
+     *            DOCUMENT ME!
      */
     public void visit(Column column) {
         this.qualifiedReference = ColumnQualifier.qualify(conn, tableAliases, column);

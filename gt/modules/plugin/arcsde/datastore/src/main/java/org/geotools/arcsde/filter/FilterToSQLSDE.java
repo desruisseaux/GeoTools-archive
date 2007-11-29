@@ -64,14 +64,15 @@ import org.opengis.filter.expression.PropertyName;
  */
 public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
     /** Standard java logger */
-    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
+    private static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.filter");
 
-    private String layerQualifiedName;
+    private final String layerQualifiedName;
 
-    private String layerFidFieldName;
+    private final String layerFidFieldName;
 
     /** DOCUMENT ME! */
-    private PlainSelect definitionQuery;
+    private final PlainSelect definitionQuery;
 
     /**
      * If definitionQuery != null, holds alias/unaliased attribute names from
@@ -88,7 +89,8 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @param ft
      * @param definitionQuery
      */
-    public FilterToSQLSDE(String layerQName, String layerFidColName, SimpleFeatureType ft, PlainSelect definitionQuery) {
+    public FilterToSQLSDE(String layerQName, String layerFidColName, SimpleFeatureType ft,
+            PlainSelect definitionQuery) {
         this.layerQualifiedName = layerQName;
         this.layerFidFieldName = layerFidColName;
         this.featureType = ft;
@@ -104,7 +106,11 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
                 item = (SelectItem) it.next();
 
                 if (!(item instanceof SelectExpressionItem)) {
-                    String msg = "for item '" + item + "': only SelectExpressionItems should be in query at this stage." + " AllColumns and AllTableColumns instances should be resolved to their list " + " of column names at view registration time.";
+                    String msg = "for item '"
+                            + item
+                            + "': only SelectExpressionItems should be in query at this stage."
+                            + " AllColumns and AllTableColumns instances should be resolved to their list "
+                            + " of column names at view registration time.";
                     LOGGER.severe(msg);
                     throw new IllegalStateException(msg);
                 }
@@ -112,7 +118,9 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
                 String alias = colDef.getAlias();
                 if (alias == null) {
                     if (!(colDef.getExpression() instanceof Column)) {
-                        throw new RuntimeException("if select item is not a plain column an alias should be provided: " + colDef);
+                        throw new RuntimeException(
+                                "if select item is not a plain column an alias should be provided: "
+                                        + colDef);
                     }
                     Column column = (Column) colDef.getExpression();
                     alias = column.getColumnName();
@@ -222,9 +230,9 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
                 }
                 if (i == 999) {
                     sb.deleteCharAt(sb.length() - 1); // delete the trailing
-                                                        // space
+                    // space
                     sb.deleteCharAt(sb.length() - 1); // delete the trailing
-                                                        // comma
+                    // comma
                     sb.append(")) OR (" + fidField + " IN(");
                 }
             }

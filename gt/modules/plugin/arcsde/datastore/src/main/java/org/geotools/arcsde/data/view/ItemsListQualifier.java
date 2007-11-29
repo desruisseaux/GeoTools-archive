@@ -29,28 +29,29 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 import com.esri.sde.sdk.client.SeConnection;
 
-
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/ItemsListQualifier.java $
  * @since 2.3.x
-  */
+ */
 class ItemsListQualifier implements ItemsListVisitor {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     ItemsList qualifiedList;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeConnection conn;
 
     private Map tableAliases;
-    
+
     /**
      * Creates a new ItemsListQualifier object.
-     *
-     * @param conn DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
      */
     public ItemsListQualifier(SeConnection conn, Map tableAliases) {
         this.conn = conn;
@@ -59,10 +60,12 @@ class ItemsListQualifier implements ItemsListVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param conn DOCUMENT ME!
-     * @param items DOCUMENT ME!
-     *
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * @param items
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
     public static ItemsList qualify(SeConnection conn, Map tableAliases, ItemsList items) {
@@ -78,8 +81,9 @@ class ItemsListQualifier implements ItemsListVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param subSelect DOCUMENT ME!
+     * 
+     * @param subSelect
+     *            DOCUMENT ME!
      */
     public void visit(SubSelect subSelect) {
         SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
@@ -88,8 +92,9 @@ class ItemsListQualifier implements ItemsListVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param expressionList DOCUMENT ME!
+     * 
+     * @param expressionList
+     *            DOCUMENT ME!
      */
     public void visit(ExpressionList expressionList) {
         List expressions = expressionList.getExpressions();

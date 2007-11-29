@@ -24,28 +24,30 @@ import net.sf.jsqlparser.statement.select.OrderByVisitor;
 
 import com.esri.sde.sdk.client.SeConnection;
 
-
 /**
  * Qualifies a column reference in an order by clause
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id$
- * @source $URL$
+ * @version $Id: OrderByElementQualifier.java 27572 2007-10-22 09:20:45Z
+ *          desruisseaux $
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/OrderByElementQualifier.java $
  * @since 2.3.x
-  */
+ */
 public class OrderByElementQualifier implements OrderByVisitor {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private OrderByElement qualifiedOrderBy;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeConnection conn;
-    
+
     private Map tableAliases;
 
     /**
      * Creates a new OrderByElementQualifier object.
-     *
-     * @param conn DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
      */
     private OrderByElementQualifier(SeConnection conn, Map tableAliases) {
         this.conn = conn;
@@ -54,14 +56,15 @@ public class OrderByElementQualifier implements OrderByVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param conn DOCUMENT ME!
-     * @param orderBy DOCUMENT ME!
-     *
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * @param orderBy
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
-    public static OrderByElement qualify(SeConnection conn, Map tableAliases,
-        OrderByElement orderBy) {
+    public static OrderByElement qualify(SeConnection conn, Map tableAliases, OrderByElement orderBy) {
         if (orderBy == null) {
             return null;
         }
@@ -74,8 +77,9 @@ public class OrderByElementQualifier implements OrderByVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param orderBy DOCUMENT ME!
+     * 
+     * @param orderBy
+     *            DOCUMENT ME!
      */
     public void visit(OrderByElement orderBy) {
         OrderByElement qualifiedOrderBy = new OrderByElement();

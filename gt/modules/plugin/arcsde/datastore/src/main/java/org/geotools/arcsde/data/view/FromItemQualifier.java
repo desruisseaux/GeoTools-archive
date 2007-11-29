@@ -23,39 +23,41 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 import com.esri.sde.sdk.client.SeConnection;
 
-
 /**
  * Fully qualifies a table names.
  * 
  * <p>
  * {@link net.sf.jsqlparser.schema.Table} has provitions only to store schema
- * and table names, in the traditional sense. ArcSDE uses fully qualified
- * names formed by "databaseName"."userName"."tableName". Though
- * "databaseName" is optional in some ArcSDE systems (sql server, for
- * example), it is required in Oracle. Schema and table stands for user and
- * table in sde land. So this visitor will create new Tables where schema if
- * formed by SDE's "databaseName"."userName"
+ * and table names, in the traditional sense. ArcSDE uses fully qualified names
+ * formed by "databaseName"."userName"."tableName". Though "databaseName" is
+ * optional in some ArcSDE systems (sql server, for example), it is required in
+ * Oracle. Schema and table stands for user and table in sde land. So this
+ * visitor will create new Tables where schema if formed by SDE's
+ * "databaseName"."userName"
  * </p>
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
- *
- * @source $URL$
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/view/FromItemQualifier.java $
  * @since 2.3.x
  */
 class FromItemQualifier implements FromItemVisitor {
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private SeConnection conn;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private FromItem qualifiedFromItem;
 
     /**
      * Creates a new FromItemQualifier object.
-     *
-     * @param conn DOCUMENT ME!
-     *
-     * @throws IllegalStateException DOCUMENT ME!
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * 
+     * @throws IllegalStateException
+     *             DOCUMENT ME!
      */
     private FromItemQualifier(SeConnection conn) throws IllegalStateException {
         this.conn = conn;
@@ -63,10 +65,12 @@ class FromItemQualifier implements FromItemVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param conn DOCUMENT ME!
-     * @param fromItem DOCUMENT ME!
-     *
+     * 
+     * @param conn
+     *            DOCUMENT ME!
+     * @param fromItem
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
     public static FromItem qualify(SeConnection conn, FromItem fromItem) {
@@ -82,8 +86,9 @@ class FromItemQualifier implements FromItemVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param tableName DOCUMENT ME!
+     * 
+     * @param tableName
+     *            DOCUMENT ME!
      */
     public void visit(Table tableName) {
         qualifiedFromItem = TableQualifier.qualify(conn, tableName);
@@ -91,8 +96,9 @@ class FromItemQualifier implements FromItemVisitor {
 
     /**
      * DOCUMENT ME!
-     *
-     * @param subSelect DOCUMENT ME!
+     * 
+     * @param subSelect
+     *            DOCUMENT ME!
      */
     public void visit(SubSelect subSelect) {
         this.qualifiedFromItem = SubSelectQualifier.qualify(conn, subSelect);
