@@ -18,6 +18,7 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
 
@@ -189,16 +190,10 @@ public class LineSymbolizerImpl extends AbstractGTComponent
             }
         }
 
-        if (this.stroke == null) {
-            if (other.stroke != null) {
-                return false;
-            }
-        } else {
-            if (!this.stroke.equals(other.stroke)) {
-                return false;
-            }
+        if(!Utilities.equals( getStroke(), other.getStroke())){
+            return false;
         }
-
+        
         return true;
     }
     public String toString() {

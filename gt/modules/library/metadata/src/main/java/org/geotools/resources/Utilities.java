@@ -50,7 +50,15 @@ public final class Utilities {
     public static boolean equals(final Object object1, final Object object2) {
         return (object1==object2) || (object1!=null && object1.equals(object2));
     }
-
+    public static boolean equals(final float array1[], final float array2[] ){
+        if( array1==array2 ) return true;
+        if( array1 == null || array2 == null ) return false;
+        if( array1.length != array2.length) return false;
+        for( int i=0; i<array1.length; i++){
+            if( array1[i] != array2[i]) return false;
+        }
+        return true;
+    }
     /**
      * Returns {@code true} if the two specified objects implements exactly the same set of
      * interfaces. Only interfaces assignable to {@code base} are compared. Declaration order

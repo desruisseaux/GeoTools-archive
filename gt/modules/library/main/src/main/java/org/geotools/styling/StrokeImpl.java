@@ -18,6 +18,7 @@ package org.geotools.styling;
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+import org.geotools.resources.Utilities;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -152,6 +153,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      * If an odd number of values is given, then the pattern is expanded by
      * repeating it twice to give an even number of values. The default is to
      * draw an unbroken line.<br>
+     * 
      * For example, "2 1 3 2" would produce:<br>
      * <code>--&nbsp;---&nbsp;&nbsp;--&nbsp;---&nbsp;&nbsp;
      * --&nbsp;---&nbsp;&nbsp;--&nbsp;---&nbsp;&nbsp;--&nbsp;
@@ -542,14 +544,8 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         }
 
         // check the dashOffset
-        if (this.dashOffset == null) {
-            if (other.dashOffset != null) {
-                return false;
-            }
-        } else {
-            if (!this.dashOffset.equals(other.dashOffset)) {
-                return false;
-            }
+        if(!Utilities.equals(getDashArray(), other.getDashArray())){
+            return false;
         }
 
         if (this.lineCap == null) {
@@ -602,7 +598,7 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
             }
         }
 
-        if (!Arrays.equals(dashArray, other.dashArray)) {
+        if (!Arrays.equals(getDashArray(), other.getDashArray())) {
             return false;
         }
 
