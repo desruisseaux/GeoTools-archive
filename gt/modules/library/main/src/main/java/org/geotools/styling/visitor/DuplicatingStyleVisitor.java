@@ -387,7 +387,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         mark.accept(this);
         return (Mark) pages.pop();
     }
-    private ColorMapEntry copy(ColorMapEntry entry) {
+    protected ColorMapEntry copy(ColorMapEntry entry) {
         if( entry == null ) return null;
         
         entry.accept( this );
@@ -424,7 +424,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         return copy;
     }
     
-    private SelectedChannelType copy(SelectedChannelType selectedChannelType) {
+    protected SelectedChannelType copy(SelectedChannelType selectedChannelType) {
         if( selectedChannelType == null ) return null;
         
         ContrastEnhancement enhancement = copy( selectedChannelType.getContrastEnhancement() );
@@ -434,7 +434,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         return copy;
     }
     
-    private ChannelSelection copy(ChannelSelection channelSelection) {
+    protected ChannelSelection copy(ChannelSelection channelSelection) {
         if( channelSelection == null ) return null;
      
         SelectedChannelType[] channels = copy( channelSelection.getSelectedChannels() );
@@ -491,7 +491,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         return (Displacement) getCopy();
     }
     
-    private Symbol copy(Symbol symbol) {
+    protected Symbol copy(Symbol symbol) {
         if( symbol == null ) return null;
         symbol.accept(this);
         return (Symbol) getCopy();
@@ -718,7 +718,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         pages.push(copy);
     }
 
-	private Extent[] copy(Extent[] extents) {
+    protected Extent[] copy(Extent[] extents) {
 	    if( extents == null ) return null;
 	    
 	    Extent[] copy = new Extent[ extents.length ];
@@ -728,7 +728,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
 	    return copy;
 	}
 	
-    private Extent copy(Extent extent) {
+    protected Extent copy(Extent extent) {
         String name = extent.getName();
         String value = extent.getValue();
         Extent copy = sf.createExtent(name, value);
