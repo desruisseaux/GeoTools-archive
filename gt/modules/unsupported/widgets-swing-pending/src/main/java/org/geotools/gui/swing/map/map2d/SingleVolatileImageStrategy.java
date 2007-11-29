@@ -34,10 +34,10 @@ import org.geotools.map.event.MapLayerListEvent;
 class SingleVolatileImageStrategy extends RenderingStrategy {
 
     private BufferComponent comp = new BufferComponent(this);
-    private DefaultMap2D map;
+    private JDefaultMap2D map;
 
     //optimize with hardware doublebuffer, also called backbuffer
-    SingleVolatileImageStrategy(DefaultMap2D map) {
+    SingleVolatileImageStrategy(JDefaultMap2D map) {
         this.map = map;
 
     }

@@ -16,7 +16,7 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.RenderingHints;
-import org.geotools.gui.swing.map.map2d.DefaultMap2D;
+import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.renderer.GTRenderer;
 
 /**
@@ -25,7 +25,7 @@ import org.geotools.renderer.GTRenderer;
  */
 public class JMap2DConfigPanel extends javax.swing.JPanel {
 
-    private DefaultMap2D map = null;
+    private JDefaultMap2D map = null;
 
     /** Creates new form JOptimizeMap2DPanel */
     public JMap2DConfigPanel() {
@@ -48,17 +48,17 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
 
     }
 
-    private void setRendering(DefaultMap2D.BUFFER_TYPE type) {
+    private void setRendering(JDefaultMap2D.BUFFER_TYPE type) {
         if (map != null) {
             map.setMapBufferType(type);
         }
     }
 
-    public DefaultMap2D getMap() {
+    public JDefaultMap2D getMap() {
         return map;
     }
 
-    public void setMap(DefaultMap2D map) {
+    public void setMap(JDefaultMap2D map) {
         this.map = map;
 
         if (map != null && map.getRenderer() != null) {
@@ -536,19 +536,19 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jcb_ditheringActionPerformed
 
     private void jrb_rendering_single_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_bufferActionPerformed
-        setRendering(DefaultMap2D.BUFFER_TYPE.SINGLE_BUFFER);
+        setRendering(JDefaultMap2D.BUFFER_TYPE.SINGLE_BUFFER);
 }//GEN-LAST:event_jrb_rendering_single_bufferActionPerformed
 
     private void jrb_rendering_multi_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_multi_bufferActionPerformed
-        setRendering(DefaultMap2D.BUFFER_TYPE.MULTI_BUFFER);
+        setRendering(JDefaultMap2D.BUFFER_TYPE.MULTI_BUFFER);
     }//GEN-LAST:event_jrb_rendering_multi_bufferActionPerformed
 
     private void jrb_rendering_merge_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_merge_bufferActionPerformed
-        setRendering(DefaultMap2D.BUFFER_TYPE.MERGE_BUFFER);
+        setRendering(JDefaultMap2D.BUFFER_TYPE.MERGE_BUFFER);
     }//GEN-LAST:event_jrb_rendering_merge_bufferActionPerformed
 
     private void jrb_rendering_single_volatileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_volatileActionPerformed
-        setRendering(DefaultMap2D.BUFFER_TYPE.SINGLE_VOLATILE);
+        setRendering(JDefaultMap2D.BUFFER_TYPE.SINGLE_VOLATILE);
     }//GEN-LAST:event_jrb_rendering_single_volatileActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

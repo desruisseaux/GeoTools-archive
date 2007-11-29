@@ -30,11 +30,11 @@ class SingleBufferedImageStrategy extends RenderingStrategy {
 
     private Thread thread = null;
     private BufferComponent comp = new BufferComponent();
-    private DefaultMap2D map;
+    private JDefaultMap2D map;
     private boolean mustupdate = false;
 
     //optimize with hardware doublebuffer, also called backbuffer
-    SingleBufferedImageStrategy(DefaultMap2D map) {
+    SingleBufferedImageStrategy(JDefaultMap2D map) {
         this.map = map;
 
     }

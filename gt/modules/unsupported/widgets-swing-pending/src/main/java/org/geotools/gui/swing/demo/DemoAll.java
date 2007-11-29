@@ -56,8 +56,8 @@ import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
 import org.geotools.gui.swing.datachooser.JFileDataPanel;
 import org.geotools.gui.swing.datachooser.JServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.map2d.DefaultEditableMap2D;
-import org.geotools.gui.swing.map.map2d.DefaultSelectableMap2D;
+import org.geotools.gui.swing.map.map2d.JDefaultEditableMap2D;
+import org.geotools.gui.swing.map.map2d.JDefaultSelectableMap2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
@@ -76,7 +76,7 @@ import org.geotools.styling.Style;
 public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
-    private final DefaultEditableMap2D map;
+    private final JDefaultEditableMap2D map;
     private final OpacityTreeTableColumn colOpacity = new OpacityTreeTableColumn();
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
@@ -90,7 +90,7 @@ public class DemoAll extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
 
-        map = new DefaultEditableMap2D(new ShapefileRenderer());
+        map = new JDefaultEditableMap2D(new ShapefileRenderer());
         map.getComponent().setOpaque(false);
         
         final MapContext context = buildContext();

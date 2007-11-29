@@ -33,18 +33,18 @@ import org.geotools.renderer.shape.ShapefileRenderer;
 /**
  * @author Johann Sorel
  */
-public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2D {
+public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMap2D {
 
     private final MouseInputListener mouseInputListener;
     private final ZoomPanOverLayer zoompanPanel = new ZoomPanOverLayer();
     private double zoomFactor = 2;
     protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
 
-    public DefaultNavigableMap2D() {
+    public JDefaultNavigableMap2D() {
         this(new ShapefileRenderer());
     }
 
-    public DefaultNavigableMap2D(GTRenderer renderer) {
+    public JDefaultNavigableMap2D(GTRenderer renderer) {
         super(renderer);
         mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
@@ -126,7 +126,7 @@ public class DefaultNavigableMap2D extends DefaultMap2D implements NavigableMap2
             if (mapArea != null) {
 
                 if ((x1 == x2) && (y1 == y2)) {
-                    this.mouseClicked(new MouseEvent((DefaultNavigableMap2D) THIS_MAP, 0, new Date().getTime(), 0, x1, y1, y2, false));
+                    this.mouseClicked(new MouseEvent((JDefaultNavigableMap2D) THIS_MAP, 0, new Date().getTime(), 0, x1, y1, y2, false));
                     return;
                 }
 

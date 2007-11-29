@@ -52,8 +52,10 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class RandomStyleFactory {
     
+    private final static StyleBuilder sb = new StyleBuilder();
+    
     private final String[] POINT_SHAPES = {"square","circle","triangle","star","cross","x"};
-    private final int[] SIZES = {8,10,12,14,16,18};
+    private final int[] SIZES = {8,10,12,14,16};
     private final int[] WIDTHS = {1,2};
     private final Color[] COLORS = {
         Color.BLACK,Color.BLUE,Color.CYAN,Color.DARK_GRAY,
@@ -64,8 +66,8 @@ public class RandomStyleFactory {
     public Style createPolygonStyle(){
         Style style = null;
         
-        StyleBuilder sb = new StyleBuilder();
-        Symbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
+        PolygonSymbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
+        ps.getFill().setOpacity(sb.literalExpression(0.6f));
         
         style = sb.createStyle();
         style.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
@@ -76,7 +78,6 @@ public class RandomStyleFactory {
     public Style createRandomVectorStyle(FeatureSource fs){
         Style style = null;
         
-        StyleBuilder sb = new StyleBuilder();
         Symbolizer ps = sb.createPolygonSymbolizer(randomColor(),randomWidth());
                 
         try {
@@ -87,7 +88,12 @@ public class RandomStyleFactory {
             Class cla = type.getBinding();
             
             if( cla.equals(Polygon.class) || cla.equals(MultiPolygon.class) ){
-                ps = sb.createPolygonSymbolizer(randomColor(), randomColor(), 1);
+                Color col = randomColor();
+                Fill fill = sb.createFill(col, 0.6f);
+                Stroke stroke = sb.createStroke(col, 1);
+                stroke.setOpacity(sb.literalExpression(1f));
+                PolygonSymbolizer pls = sb.createPolygonSymbolizer(stroke, fill);
+                ps = pls;
             }else if( cla.equals(LineString.class) || cla.equals(MultiLineString.class) ){
                 ps = sb.createLineSymbolizer(randomColor(),randomWidth());
             }else if( cla.equals(Point.class) || cla.equals(MultiPoint.class) ){
@@ -114,7 +120,6 @@ public class RandomStyleFactory {
     public Style createRasterStyle() {
         Style style = null;
         
-        StyleBuilder sb = new StyleBuilder();
         RasterSymbolizer raster = sb.createRasterSymbolizer();
         
         style = sb.createStyle(raster);

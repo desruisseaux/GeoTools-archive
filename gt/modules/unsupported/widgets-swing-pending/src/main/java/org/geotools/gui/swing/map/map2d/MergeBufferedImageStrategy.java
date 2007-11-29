@@ -39,13 +39,13 @@ class MergeBufferedImageStrategy extends RenderingStrategy {
     private final JLayeredPane pane = new JLayeredPane();
     private Map<MapLayer, BufferedImage> stock = new HashMap<MapLayer, BufferedImage>();
     private BufferComponent component = new BufferComponent();
-    private DefaultMap2D map;
+    private JDefaultMap2D map;
     private MapContext oldcontext = null;
     private Thread thread = null;
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    MergeBufferedImageStrategy(DefaultMap2D map) {
+    MergeBufferedImageStrategy(JDefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
         pane.add(component,new Integer(0));

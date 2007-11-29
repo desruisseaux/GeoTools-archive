@@ -55,7 +55,7 @@ import org.geotools.gui.swing.contexttree.popup.LayerPropertyItem;
 import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.datachooser.DataListener;
 import org.geotools.gui.swing.datachooser.JDatabaseDataPanel;
-import org.geotools.gui.swing.map.map2d.DefaultMap2D;
+import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.control.JMap2DControlBar;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
@@ -71,7 +71,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
  */
 public class DemoExplorer extends JFrame {
 
-    private DefaultMap2D map = new DefaultMap2D();
+    private JDefaultMap2D map = new JDefaultMap2D();
     private JContextTree tree = new JContextTree();
     private JMap2DControlBar control = new JMap2DControlBar(map);
     private JTabbedPane tabbed = null;

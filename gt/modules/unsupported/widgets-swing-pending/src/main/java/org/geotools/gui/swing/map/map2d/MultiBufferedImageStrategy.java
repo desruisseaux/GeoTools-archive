@@ -34,13 +34,13 @@ class MultiBufferedImageStrategy extends RenderingStrategy {
 
     private final JLayeredPane pane = new JLayeredPane();
     private Map<MapLayer, BufferComponent> stock = new HashMap<MapLayer, BufferComponent>();
-    private DefaultMap2D map;
+    private JDefaultMap2D map;
     private MapContext oldcontext = null;
     private Thread thread = null;
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    MultiBufferedImageStrategy(DefaultMap2D map) {
+    MultiBufferedImageStrategy(JDefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
     }

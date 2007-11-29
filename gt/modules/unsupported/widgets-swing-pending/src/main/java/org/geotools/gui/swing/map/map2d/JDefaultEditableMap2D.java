@@ -20,6 +20,10 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -68,7 +72,7 @@ import org.opengis.filter.Filter;
  *
  * @author Johann Sorel
  */
-public class DefaultEditableMap2D extends DefaultSelectableMap2D implements EditableMap2D {
+public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements EditableMap2D {
 
     private static final Coordinate[] EMPTY_COORDINATE_ARRAY = new Coordinate[0];
     private final FacilitiesFactory FF = new FacilitiesFactory();
@@ -78,13 +82,14 @@ public class DefaultEditableMap2D extends DefaultSelectableMap2D implements Edit
     protected MapConstants.EDIT_STATE editState = MapConstants.EDIT_STATE.NONE;
     private MapContext editionContext = new OneLayerContext();
     private MapLayer editionLayer = null;
+    private MapLayer copyLayer = null;
     private Style editionStyle = null;
 
-    public DefaultEditableMap2D() {
+    public JDefaultEditableMap2D() {
         this(new ShapefileRenderer());
     }
 
-    public DefaultEditableMap2D(GTRenderer renderer) {
+    public JDefaultEditableMap2D(GTRenderer renderer) {
         super(renderer);
 
         mouseInputListener = new MouseListen();
@@ -197,15 +202,38 @@ public class DefaultEditableMap2D extends DefaultSelectableMap2D implements Edit
         }
     }
 
-    private Geometry createPoint(Coordinate coord) {
+    private Point createPoint(Coordinate coord) {
         return gf.createPoint(coord);
     }
 
-    private Geometry createLine(List<Coordinate> coords) {
+    private LineString createLine(List<Coordinate> coords) {
         return gf.createLineString(coords.toArray(EMPTY_COORDINATE_ARRAY));
     }
+    
+    private LinearRing createLinearRing(List<Coordinate> coords){
+        if( !(coords.get(0).equals2D(coords.get(coords.size()-1))) ){
+            Coordinate coo = new Coordinate(coords.get(0));
+            coords.add(coo);
+        }
+        
+        return gf.createLinearRing(coords.toArray(EMPTY_COORDINATE_ARRAY));        
+    }
 
-    private Geometry createMultiLine(List<Geometry> geoms) {
+    private Polygon createPolygon(List<Coordinate> coords){
+        LinearRing ring = createLinearRing(coords);
+        return gf.createPolygon( ring, null );
+    }
+    
+    private MultiPolygon createMultiPolygon(List<Geometry> geoms) {
+        Geometry[] geo = geoms.toArray(new Geometry[0]);
+        Polygon[] poly = new Polygon[geo.length];
+        for (int i = 0; i < geo.length; i++) {
+            poly[i] = (Polygon) geo[i];
+        }
+        return gf.createMultiPolygon(poly);
+    }
+    
+    private MultiLineString createMultiLine(List<Geometry> geoms) {
         Geometry[] geo = geoms.toArray(new Geometry[0]);
         LineString[] lines = new LineString[geo.length];
         for (int i = 0; i < geo.length; i++) {
@@ -273,13 +301,6 @@ public class DefaultEditableMap2D extends DefaultSelectableMap2D implements Edit
 
 
             }
-
-
-
-
-
-
-
 
         }
 
@@ -428,8 +449,43 @@ public class DefaultEditableMap2D extends DefaultSelectableMap2D implements Edit
                                     coords.clear();
                                 }
                             } else {
-                                if (geoms.size() > 1) {
+                                if (geoms.size() > 0) {
                                     geo = createMultiLine(geoms);
+                                    editAddGeometry(new Geometry[]{geo});
+                                    nbRightClick = 0;
+                                    geoms.clear();
+                                }
+                            }
+                        }
+                        break;
+                        
+                   case POLYGON:
+                        if (button == MouseEvent.BUTTON1) {
+                            coords.add(toMapCoord(e.getX(), e.getY()));
+                        } else if (button == MouseEvent.BUTTON3) {
+                            if (coords.size() > 2) {
+                                geo = createPolygon(coords);
+                                editAddGeometry(new Geometry[]{geo});
+                                coords.clear();
+                            }
+                        }
+                        break;
+                        
+                    case MULTI_POLYGON:
+                        if (button == MouseEvent.BUTTON1) {
+                            nbRightClick = 0;
+                            coords.add(toMapCoord(e.getX(), e.getY()));
+                        } else if (button == MouseEvent.BUTTON3) {
+                            nbRightClick++;
+                            if (nbRightClick == 1) {
+                                if (coords.size() > 2) {
+                                    geo = createPolygon(coords);
+                                    geoms.add(geo);
+                                    coords.clear();
+                                }
+                            } else {
+                                if (geoms.size() > 0) {
+                                    geo = createMultiPolygon(geoms);
                                     editAddGeometry(new Geometry[]{geo});
                                     nbRightClick = 0;
                                     geoms.clear();

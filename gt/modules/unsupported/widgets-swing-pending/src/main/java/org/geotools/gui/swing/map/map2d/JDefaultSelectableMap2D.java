@@ -63,7 +63,7 @@ import org.opengis.filter.FilterFactory2;
  *
  * @author Johann Sorel
  */
-public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements SelectableMap2D {
+public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements SelectableMap2D {
 
     protected final GeometryFactory gf = new GeometryFactory();
     private static final FacilitiesFactory FF = new FacilitiesFactory();
@@ -77,11 +77,11 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private Style selectionStyle = null;
 
-    public DefaultSelectableMap2D() {
+    public JDefaultSelectableMap2D() {
         this(new ShapefileRenderer());
     }
 
-    public DefaultSelectableMap2D(GTRenderer renderer) {
+    public JDefaultSelectableMap2D(GTRenderer renderer) {
         super(renderer);
         mouseInputListener = new MouseListen();
         mapLayerListlistener = new MapLayerListListen();
@@ -99,17 +99,20 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
 
         StyleBuilder sb = new StyleBuilder();
 
-        Fill fill = sb.createFill(Color.RED, 0f);
-        Stroke stroke = sb.createStroke(Color.RED, 2);
-        stroke.setOpacity(sb.literalExpression(0.6f));
+        Fill fill = sb.createFill(Color.GREEN, 0.6f);
+        Stroke stroke = sb.createStroke(Color.GREEN, 2);
+        stroke.setOpacity(sb.literalExpression(1f));
 
         PolygonSymbolizer pls = sb.createPolygonSymbolizer(stroke, fill);
 
+        fill = sb.createFill(Color.GREEN, 1f);
+        stroke = sb.createStroke(Color.GREEN, 0);
+        
         Mark mark = sb.createMark("cross", fill, stroke);
         Graphic gra = sb.createGraphic();
-        gra.setOpacity(sb.literalExpression(0.6f));
+        gra.setOpacity(sb.literalExpression(1f));
         gra.setMarks(new Mark[]{mark});
-        gra.setSize(sb.literalExpression(12));
+        gra.setSize(sb.literalExpression(13));
         PointSymbolizer ps = sb.createPointSymbolizer(gra);
 
         LineSymbolizer ls = sb.createLineSymbolizer(stroke);
@@ -157,47 +160,10 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
             coord[4] = coord[0];
 
             LinearRing lr1 = gf.createLinearRing(coord);
-            LinearRing[] lr2 = {lr1};
-            Geometry geometry = gf.createPolygon(lr1, lr2);
+            Geometry geometry = gf.createPolygon(lr1, null);
 
             findFeature(geometry);
 
-        //----------------------------------------------------
-//        GeometryBuilder builder = new GeometryBuilder( DefaultGeographicCRS.WGS84 );   	
-//    	
-//// create a list of connected positions
-//List<Position> dps = new ArrayList<Position>();
-//dps.add(builder.createDirectPosition( new double[] {20, 10} ));
-//dps.add(builder.createDirectPosition( new double[] {40, 10} ));
-//dps.add(builder.createDirectPosition( new double[] {50, 40} ));
-//dps.add(builder.createDirectPosition( new double[] {30, 50} ));
-//dps.add(builder.createDirectPosition( new double[] {10, 30} ));
-//dps.add(builder.createDirectPosition( new double[] {20, 10} ));
-//
-//// create linestring from directpositions
-//LineString line = builder.createLineString(dps);
-//
-//// create curvesegments from line
-//ArrayList<CurveSegment> segs = new ArrayList<CurveSegment>();
-//segs.add(line);
-//
-//// Create list of OrientableCurves that make up the surface
-//OrientableCurve curve = builder.createCurve(segs);
-//List<OrientableCurve> orientableCurves = new ArrayList<OrientableCurve>();
-//orientableCurves.add(curve);
-//
-//// create the interior ring and a list of empty interior rings (holes)
-//Ring extRing = builder.createRing(orientableCurves);
-//List<Ring> intRings = new ArrayList<Ring>();
-//
-//// create the surfaceboundary from the rings
-//SurfaceBoundary sb = builder.createSurfaceBoundary(extRing, intRings);
-//    			
-//// create the surface
-//Surface surface = builder.createSurface(sb);
-//        //----------------------------------------------------
-//        
-//        findFeature(geometry);
         }
     }
 
@@ -215,8 +181,7 @@ public class DefaultSelectableMap2D extends DefaultNavigableMap2D implements Sel
             coord[4] = coord[0];
 
             LinearRing lr1 = gf.createLinearRing(coord);
-            LinearRing[] lr2 = {lr1};
-            Geometry geometry = gf.createPolygon(lr1, lr2);
+            Geometry geometry = gf.createPolygon(lr1, null);
 
             findFeature(geometry);
         }

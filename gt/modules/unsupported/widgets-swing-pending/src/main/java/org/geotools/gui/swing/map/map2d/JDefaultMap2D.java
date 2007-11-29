@@ -51,10 +51,9 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @author Johann Sorel
  */
-public class DefaultMap2D extends JPanel implements Map2D, Observer {
+public class JDefaultMap2D extends JPanel implements Map2D, Observer {
 
     public static enum BUFFER_TYPE {
-
         SINGLE_BUFFER,
         MULTI_BUFFER,
         MERGE_BUFFER,
@@ -77,11 +76,11 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
 
-    public DefaultMap2D() {
+    public JDefaultMap2D() {
         this(new ShapefileRenderer());
     }
 
-    public DefaultMap2D(GTRenderer renderer) {
+    public JDefaultMap2D(GTRenderer renderer) {
         this.renderer = renderer;
         this.THIS_MAP = this;
         mapLayerListlistener = new MapLayerListListen();
@@ -96,17 +95,7 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
 
         GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 
-
-//        GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        GraphicsDevice[] devices = gEnv.getScreenDevices();
-//
-//        
-//        if (devices.length>0) {
-//            GC = devices[0].getDefaultConfiguration();
-//            }
-//        
-
-    //opimizeRenderer();
+        opimizeRenderer();
     }
 
     private void opimizeRenderer() {
@@ -114,29 +103,22 @@ public class DefaultMap2D extends JPanel implements Map2D, Observer {
         Map rendererParams = new HashMap();
         rendererParams.put("optimizedDataLoadingEnabled", new Boolean(true));
         rendererParams.put("maxFiltersToSendToDatastore", new Integer(20));
+        //rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_STRING);
+        // rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_OUTLINE);
         rendererParams.put(ShapefileRenderer.SCALE_COMPUTATION_METHOD_KEY, ShapefileRenderer.SCALE_OGC);
         renderer.setRendererHints(rendererParams);
 
         RenderingHints rh;
-        rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        renderer.setJava2DHints(rh);
-        rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        renderer.setJava2DHints(rh);
-        rh = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-        renderer.setJava2DHints(rh);
-        rh = new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
-        renderer.setJava2DHints(rh);
-        rh = new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-        renderer.setJava2DHints(rh);
-        rh = new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE);
+        rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        rh.add(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
+        rh.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
+        rh.add(new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED));
+        rh.add(new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
+        rh.add(new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE));        
         renderer.setJava2DHints(rh);
 
 
-//if(){
-//rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_STRING);
-//} else {
-// rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_OUTLINE);
-//    }
+
 
     }
 

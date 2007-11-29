@@ -38,13 +38,13 @@ class MultiVolatileImageStrategy extends RenderingStrategy {
     private final MapContext buffercontext = new OneLayerContext();
     private Map<MapLayer, VolatileImage> stock = new HashMap<MapLayer, VolatileImage>();
     private BufferComponent component = new BufferComponent();
-    private DefaultMap2D map;
+    private JDefaultMap2D map;
     private MapContext oldcontext = null;
     private Thread thread = null;
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    MultiVolatileImageStrategy(DefaultMap2D map) {
+    MultiVolatileImageStrategy(JDefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
         pane.add(component, new Integer(0));

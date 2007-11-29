@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
-import org.geotools.gui.swing.map.map2d.DefaultMap2D;
+import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
@@ -35,7 +35,7 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
             this.map = (Map2D) map;
         }
 
-        if (map instanceof DefaultMap2D) {
+        if (map instanceof JDefaultMap2D) {
             gui_config.setEnabled(true);
         } else {
             gui_config.setEnabled(false);
@@ -80,10 +80,10 @@ public class JMap2DInfoBar extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void gui_configActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_configActionPerformed
-        if (map != null && map instanceof DefaultMap2D) {
+        if (map != null && map instanceof JDefaultMap2D) {
             
             JMap2DConfigPanel opt = new JMap2DConfigPanel();
-            opt.setMap((DefaultMap2D)map);
+            opt.setMap((JDefaultMap2D)map);
                         
             JDialog dia = new JDialog();
             dia.setContentPane(opt);
