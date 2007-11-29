@@ -39,6 +39,7 @@ import org.geotools.styling.Fill;
 import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Halo;
+import org.geotools.styling.LabelPlacement;
 import org.geotools.styling.LinePlacement;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
@@ -490,7 +491,12 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
         displacement.accept(this);
         return (Displacement) getCopy();
     }
-    
+    protected LabelPlacement copy(LabelPlacement placement) {
+        if( placement == null ) return null;
+        placement.accept(this);
+        return (LabelPlacement) getCopy();
+    }
+
     protected Symbol copy(Symbol symbol) {
         if( symbol == null ) return null;
         symbol.accept(this);
@@ -576,10 +582,12 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
     public void visit(TextSymbolizer text) {
         TextSymbolizer copy = sf.createTextSymbolizer();
         copy.setFill( copy( text.getFill()));
-        copy.setFonts(copy( text.getFonts()));
+        copy.setFonts( copy( text.getFonts()));
         copy.setGeometryPropertyName( text.getGeometryPropertyName() );
         copy.setHalo( copy( text.getHalo() ));
-        
+        copy.setLabel( copy( text.getLabel()));
+        copy.setPlacement( copy( text.getPlacement()));
+        copy.setPriority( copy( text.getPriority()));
         pages.push(copy);
     }
     

@@ -544,6 +544,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
 
             stroke.setDashOffset(filterFactory.literal(
                     new Integer(0)));
+            stroke.setDashArray(new float[0]);
             stroke.setLineCap(filterFactory.literal("butt"));
             stroke.setLineJoin(filterFactory.literal("miter"));
             stroke.setOpacity(filterFactory.literal(

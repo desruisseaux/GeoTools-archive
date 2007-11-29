@@ -201,4 +201,13 @@ public class LineSymbolizerImpl extends AbstractGTComponent
 
         return true;
     }
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("<LineSymbolizerImp property=");
+        buf.append( geometryName );
+        buf.append( " stroke=");
+        buf.append( stroke );
+        buf.append(">");
+        return buf.toString();
+    }
 }

@@ -803,6 +803,10 @@ public class ShapefileRenderer implements GTRenderer {
                 DuplicatingStyleVisitor dupeStyleVisitor = new DuplicatingStyleVisitor();
                 dupeStyleVisitor.visit(rule);
                 Rule clone = (Rule) dupeStyleVisitor.getCopy();
+                
+                if( !clone.equals( rule )){
+                    throw new IllegalStateException( "Could not accurately duplicate provided rule:"+rule.getName());
+                }
 
                 super.visit(clone);
             }

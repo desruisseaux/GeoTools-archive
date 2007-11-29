@@ -35,7 +35,7 @@ import java.util.List;
  * @version $Id$
  */
 public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
-    private List symbolizers = new GTList(this, "symbolizers");
+    private List<Symbolizer> symbolizers = new GTList(this, "symbolizers");
     private List graphics = new GTList(this, "graphics");
     private String name;
     private String title;
@@ -342,5 +342,25 @@ public class RuleImpl extends AbstractGTComponent implements Rule, Cloneable {
         }
 
         return false;
+    }
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append( "<RuleImpl");
+        if( name != null ){
+            buf.append(":");
+            buf.append( name );
+        }
+        buf.append("> ");
+        buf.append( filter );
+        if( symbolizers != null ){
+            buf.append( "\n" );
+            for( Symbolizer symbolizer : symbolizers ){
+                buf.append( "\t");
+                buf.append( symbolizer );
+                buf.append( "\n");            
+            }
+        }
+        return buf.toString();
     }
 }

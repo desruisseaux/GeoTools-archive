@@ -403,4 +403,14 @@ public class TextSymbolizerImpl extends AbstractGTComponent
         this.graphic = graphic;
         fireChildChanged("graphic", graphic, old);
     }
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("<TextSymbolizerImp property=");
+        buf.append( geometryPropertyName );
+        buf.append( " label=");
+        buf.append( label );
+        buf.append(">");
+        buf.append( this.fonts );
+        return buf.toString();
+    }
 }
