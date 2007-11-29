@@ -51,8 +51,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
@@ -62,7 +60,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/da/src/test/java/org/geotools/arcsde/data/ArcSDEFeatureStoreTest.java $
  * @version $Id$
  */
 public class ArcSDEFeatureStoreTest extends TestCase {
@@ -301,13 +299,15 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         // any kind of geometries.
         testData.truncateTempTable();
 
-        testInsertAutoCommit(Geometry.class);
+        // there are some commented out just because the server I'm hitting
+        // is slow, not because they don't work. Feel free to uncomment.
+        // testInsertAutoCommit(Geometry.class);
         testInsertAutoCommit(Point.class);
-        testInsertAutoCommit(MultiPoint.class);
+        // testInsertAutoCommit(MultiPoint.class);
         testInsertAutoCommit(LineString.class);
-        testInsertAutoCommit(MultiLineString.class);
+        // testInsertAutoCommit(MultiLineString.class);
         testInsertAutoCommit(Polygon.class);
-        testInsertAutoCommit(MultiPolygon.class);
+        // testInsertAutoCommit(MultiPolygon.class);
     }
 
     /**
@@ -388,18 +388,25 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final FeatureStore fStore = (FeatureStore) ds.getFeatureSource(typeName);
         final Transaction transaction = new DefaultTransaction("testInsertTransactionAndQueryByFid");
         fStore.setTransaction(transaction);
-        
-        final Set<String> addedFids = fStore.addFeatures(testFeatures);
-        final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-        
-        final Set<FeatureId> fids = new HashSet<FeatureId>();
-        for(String fid : addedFids){
-            fids.add(ff.featureId(fid));
+        try {
+            final Set<String> addedFids = fStore.addFeatures(testFeatures);
+            final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+
+            final Set<FeatureId> fids = new HashSet<FeatureId>();
+            for (String fid : addedFids) {
+                fids.add(ff.featureId(fid));
+            }
+            final Id newFidsFilter = ff.id(fids);
+
+            FeatureCollection features = fStore.getFeatures(newFidsFilter);
+            assertEquals(2, features.size());
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            transaction.close();
         }
-        final Id newFidsFilter = ff.id(fids);
-        
-        FeatureCollection features = fStore.getFeatures(newFidsFilter);
-        assertEquals(2, features.size());
     }
 
     public void testUpdateAutoCommit() throws Exception {
@@ -676,14 +683,15 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         // any kind of geometries.
         testData.insertTestData();
 
-        String typeName = testData.getTemp_table();
+        final String typeName = testData.getTemp_table();
 
-        DataStore ds = testData.getDataStore();
-        FeatureSource fsource = ds.getFeatureSource(typeName);
+        final DataStore ds = testData.getDataStore();
+        final FeatureSource fsource = ds.getFeatureSource(typeName);
 
         final int initialCount = fsource.getCount(Query.ALL);
         final int writeCount = initialCount + 2;
-        FeatureCollection features = testData.createTestFeatures(LineString.class, writeCount);
+        final FeatureCollection testFeatures = testData.createTestFeatures(LineString.class,
+                writeCount);
 
         // incremented on each feature added event to
         // ensure events are being raised as expected
@@ -692,28 +700,34 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         // inner class)
         // final int[] featureAddedEventCount = { 0 };
 
-        Transaction transaction = new DefaultTransaction();
-        FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.INCLUDE, transaction);
+        final Transaction transaction = new DefaultTransaction();
+        final FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.INCLUDE, transaction);
 
         SimpleFeature source;
         SimpleFeature dest;
 
         int count = 0;
-        for (FeatureIterator fi = features.features(); fi.hasNext(); count++) {
-            if (count < initialCount) {
-                assertTrue("at index " + count, writer.hasNext());
-            } else {
-                assertFalse("at index " + count, writer.hasNext());
+        try {
+            for (FeatureIterator fi = testFeatures.features(); fi.hasNext(); count++) {
+                if (count < initialCount) {
+                    assertTrue("at index " + count, writer.hasNext());
+                } else {
+                    assertFalse("at index " + count, writer.hasNext());
+                }
+
+                source = fi.next();
+                dest = writer.next();
+                dest.setAttributes(source.getAttributes());
+                writer.write();
             }
-
-            source = fi.next();
-            dest = writer.next();
-            dest.setAttributes(source.getAttributes());
-            writer.write();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            writer.close();
+            transaction.close();
         }
-
-        transaction.commit();
-        writer.close();
 
         // was the features really inserted?
         int fcount = fsource.getCount(Query.ALL);
@@ -737,20 +751,19 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         // any kind of geometries.
         testData.insertTestData();
 
-        String typeName = testData.getTemp_table();
-        FeatureCollection features = testData.createTestFeatures(LineString.class, 2);
+        final String typeName = testData.getTemp_table();
+        final FeatureCollection testFeatures = testData.createTestFeatures(LineString.class, 2);
 
-        DataStore ds = testData.getDataStore();
-        FeatureSource fsource = ds.getFeatureSource(typeName);
-
+        final DataStore ds = testData.getDataStore();
+        final FeatureSource fsource = ds.getFeatureSource(typeName);
         final int initialCount = fsource.getCount(Query.ALL);
 
-        FeatureWriter writer = ds.getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT);
+        final FeatureWriter writer = ds.getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT);
 
         SimpleFeature source;
         SimpleFeature dest;
 
-        for (FeatureIterator fi = features.features(); fi.hasNext();) {
+        for (FeatureIterator fi = testFeatures.features(); fi.hasNext();) {
             assertFalse(writer.hasNext());
             source = fi.next();
             dest = writer.next();
@@ -762,7 +775,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         // were the features really inserted?
         int fcount = fsource.getCount(Query.ALL);
-        assertEquals(features.size() + initialCount, fcount);
+        assertEquals(testFeatures.size() + initialCount, fcount);
     }
 
     /**
@@ -785,7 +798,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         // held on it, allowing State objects to release resources. After
         // close() the transaction
         // is no longer valid.
-        Transaction transaction = new DefaultTransaction("test_handle");
+        final Transaction transaction = new DefaultTransaction("test_handle");
         transFs.setTransaction(transaction);
 
         // create a feature to add
@@ -808,24 +821,30 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
         // ok transaction respected, assert the feature does not exist outside
         // it
-        FeatureReader reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
-        try {
-            assertFalse(reader.hasNext());
-        } finally {
-            reader.close();
+        {
+            FeatureReader autoCommitReader = ds.getFeatureReader(newFeatureQuery,
+                    Transaction.AUTO_COMMIT);
+            try {
+                assertFalse(autoCommitReader.hasNext());
+            } finally {
+                autoCommitReader.close();
+            }
         }
 
         // ok, but what if we ask for a feature reader with the same transaction
-        reader = ds.getFeatureReader(newFeatureQuery, transaction);
-        try {
-            assertTrue(reader.hasNext());
-            reader.next();
-            assertFalse(reader.hasNext());
-        } finally {
-            reader.close();
+        {
+            FeatureReader transactionReader = ds.getFeatureReader(newFeatureQuery, transaction);
+            try {
+                assertTrue(transactionReader.hasNext());
+                transactionReader.next();
+                assertFalse(transactionReader.hasNext());
+            } finally {
+                transactionReader.close();
+            }
         }
 
         // now commit, and Transaction.AUTO_COMMIT should carry it over
+        // do not close the transaction, we'll keep using it
         try {
             transaction.commit();
         } catch (IOException e) {
@@ -833,38 +852,50 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             throw e;
         }
 
-        try {
-            reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
-            assertTrue(reader.hasNext());
-        } finally {
-            reader.close();
+        {
+            FeatureReader autoCommitReader;
+            autoCommitReader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+            try {
+                assertTrue(autoCommitReader.hasNext());
+            } finally {
+                autoCommitReader.close();
+            }
         }
 
         // now keep using the transaction, it should still work
         transFs.removeFeatures(filterNewFeature);
 
-        // no change yet outside the transaction
-        try {
-            reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
-            assertTrue(reader.hasNext());
-        } finally {
-            reader.close();
+        // no features removed yet outside the transaction
+        {
+            FeatureReader autoCommitReader;
+            autoCommitReader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+            try {
+                assertTrue(autoCommitReader.hasNext());
+            } finally {
+                autoCommitReader.close();
+            }
         }
 
         // but yes inside it
-        try {
-            reader = ds.getFeatureReader(newFeatureQuery, transaction);
-            assertFalse(reader.hasNext());
-        } finally {
-            reader.close();
+        {
+            FeatureReader transactionReader;
+            transactionReader = ds.getFeatureReader(newFeatureQuery, transaction);
+            try {
+                assertFalse(transactionReader.hasNext());
+            } finally {
+                transactionReader.close();
+            }
         }
 
-        try {
-            transaction.commit();
-            reader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
-            assertFalse(reader.hasNext());
-        } finally {
-            transaction.close();
+        {
+            FeatureReader autoCommitReader;
+            try {
+                transaction.commit();
+                autoCommitReader = ds.getFeatureReader(newFeatureQuery, Transaction.AUTO_COMMIT);
+                assertFalse(autoCommitReader.hasNext());
+            } finally {
+                transaction.close();
+            }
         }
 
     }
@@ -925,8 +956,130 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
     }
 
-    //this is a test over a legacy table, it doesn't work as the tabe is versioned,
-    //so I'm just commenting it out    
+    /**
+     * Simultate an application where one thread works over a transaction adding
+     * features while another thread accesses the same FeatureStore with a
+     * query. Archetypical use case being a udig addFeatures command sends calls
+     * addFeatures and the rendering thread does getFeatures.
+     */
+    public void testTransactionMultithreadAccess() throws Exception {
+        // start with an empty table
+        final String typeName = testData.getTemp_table();
+        final int featureCount = 2;
+        final FeatureCollection testFeatures = testData.createTestFeatures(LineString.class,
+                featureCount);
+
+        final DataStore ds = testData.getDataStore();
+        final FeatureStore fStore = (FeatureStore) ds.getFeatureSource(typeName);
+        final Transaction transaction = new DefaultTransaction("testTransactionMultithreadAccess");
+        fStore.setTransaction(transaction);
+
+        final boolean[] done = { false, false };
+        final Exception[] errors = new Exception[2];
+
+        Runnable worker1 = new Runnable() {
+            public void run() {
+                try {
+                    System.err.println("adding..");
+                    Set<String> addedFids = fStore.addFeatures(testFeatures);
+                    System.err.println("got " + addedFids);
+                    final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+
+                    final Set<FeatureId> fids = new HashSet<FeatureId>();
+                    for (String fid : addedFids) {
+                        fids.add(ff.featureId(fid));
+                    }
+                    final Id newFidsFilter = ff.id(fids);
+
+                    System.err.println("querying..");
+                    FeatureCollection features = fStore.getFeatures(newFidsFilter);
+                    System.err.println("querying returned...");
+
+                    System.err.println("commiting...");
+                    transaction.commit();
+                    System.err.println("commited.");
+
+                    int size = fStore.getCount(new DefaultQuery(typeName, newFidsFilter));
+                    System.err.println("Size: " + size);
+                    assertEquals(2, size);
+
+                    size = features.size();
+                    System.err.println("Collection Size: " + size);
+                    assertEquals(2, size);
+                } catch (Exception e) {
+                    errors[0] = e;
+                    try {
+                        System.err.println("rolling back!.");
+                        transaction.rollback();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } finally {
+                    done[0] = true;
+                    try {
+                        System.err.println("closing transaction.");
+                        transaction.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        Runnable worker2 = new Runnable() {
+            public void run() {
+                try {
+                    System.err.println("worker2 calling getFeartures()");
+                    FeatureCollection collection = fStore.getFeatures();
+                    System.err.println("worker2 opening iterator...");
+                    FeatureIterator features = collection.features();
+                    try {
+                        System.err.println("worker2 iterating...");
+                        while (features.hasNext()) {
+                            SimpleFeature next = features.next();
+                            System.out.println("**Got feature " + next.getID());
+                        }
+                        System.err.println("wroker2 closing FeatureCollection");
+                    } finally {
+                        features.close();
+                    }
+                    System.err.println("wroker2 done.");
+                } catch (Exception e) {
+                    errors[1] = e;
+                } finally {
+                    done[1] = true;
+                }
+            }
+        };
+
+        Thread thread1 = new Thread(worker1, "worker1");
+        Thread thread2 = new Thread(worker2, "wroker2");
+        thread1.start();
+        thread2.start();
+        while (!(done[0] && done[1])) {
+            Thread.sleep(100);
+        }
+        Exception worker1Error = errors[0];
+        Exception worker2Error = errors[1];
+        if (worker1Error != null || worker2Error != null) {
+            String errMessg = "worker1: "
+                    + (worker1Error == null ? "ok." : worker1Error.getMessage());
+            errMessg += " -- worker2: "
+                    + (worker2Error == null ? "ok." : worker2Error.getMessage());
+
+            if (worker1Error != null) {
+                worker1Error.printStackTrace();
+            }
+            if (worker2Error != null) {
+                worker2Error.printStackTrace();
+            }
+            fail(errMessg);
+        }
+    }
+
+    // this is a test over a legacy table, it doesn't work as the tabe is
+    // versioned,
+    // so I'm just commenting it out
     public void _testSdeEditTableAutoCommit() throws Exception {
         final ArcSDEDataStore dataStore = testData.getDataStore();
 
