@@ -40,14 +40,16 @@ import com.esri.sde.sdk.client.SeTable;
  * Data setup and utilities for testing the support of in-process views
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/InProcessViewSupportTestData.java $
+ * @version $Id: InProcessViewSupportTestData.java 27989 2007-11-22 14:38:30Z
+ *          groldan $
  * @since 2.4.x
  */
 public class InProcessViewSupportTestData {
 
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(InProcessViewSupportTestData.class
-            .getPackage().getName());
+    private static final Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger(InProcessViewSupportTestData.class.getPackage().getName());
 
     public static final String MASTER_UNQUALIFIED = "GT_SDE_TEST_MASTER";
 
@@ -87,7 +89,7 @@ public class InProcessViewSupportTestData {
         CHILD = conn.getUser() + "." + CHILD_UNQUALIFIED;
         createMasterTable(conn);
         createChildTable(conn);
-        
+
         registerViewParams = new HashMap();
         registerViewParams.put("sqlView.1.typeName", typeName);
         registerViewParams.put("sqlView.1.sqlQuery", masterChildSql);
@@ -98,36 +100,30 @@ public class InProcessViewSupportTestData {
         SeTable table = new SeTable(conn, MASTER);
         SeLayer layer = null;
         try {
-
-            try {
-                table.delete();
-            } catch (SeException e) {
-                // no-op, table didn't existed
-            }
-
-            SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
-
-            layer = new SeLayer(conn);
-            layer.setTableName(MASTER);
-
-            colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
-            colDefs[1] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0,
-                    false);
-
-            table.create(colDefs, "DEFAULTS");
-
-            layer.setSpatialColumnName("SHAPE");
-            layer.setShapeTypes(SeLayer.SE_POINT_TYPE_MASK);
-            layer.setGridSizes(1100.0, 0.0, 0.0);
-            layer.setDescription("Geotools sde pluing join support testing master table");
-            SeCoordinateReference coordref = new SeCoordinateReference();
-            coordref.setCoordSysByDescription(testCrs.toWKT());
-            layer.create(3, 4);
-
-            insertMasterData(conn, layer);
-        } finally {
-            conn.close();
+            table.delete();
+        } catch (SeException e) {
+            // no-op, table didn't existed
         }
+
+        SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
+
+        layer = new SeLayer(conn);
+        layer.setTableName(MASTER);
+
+        colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
+        colDefs[1] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0, false);
+
+        table.create(colDefs, "DEFAULTS");
+
+        layer.setSpatialColumnName("SHAPE");
+        layer.setShapeTypes(SeLayer.SE_POINT_TYPE_MASK);
+        layer.setGridSizes(1100.0, 0.0, 0.0);
+        layer.setDescription("Geotools sde pluing join support testing master table");
+        SeCoordinateReference coordref = new SeCoordinateReference();
+        coordref.setCoordSysByDescription(testCrs.toWKT());
+        layer.create(3, 4);
+
+        insertMasterData(conn, layer);
         LOGGER.info("successfully created master table " + layer.getQualifiedName());
     }
 
@@ -135,35 +131,29 @@ public class InProcessViewSupportTestData {
             UnavailableArcSDEConnectionException, SeException {
         SeTable table = new SeTable(conn, CHILD);
         try {
-            try {
-                table.delete();
-            } catch (SeException e) {
-                // no-op, table didn't existed
-            }
-
-            SeColumnDefinition[] colDefs = new SeColumnDefinition[4];
-
-            colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
-            colDefs[1] = new SeColumnDefinition("MASTER_ID", SeColumnDefinition.TYPE_INTEGER, 10,
-                    0, false);
-            colDefs[2] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0,
-                    false);
-            colDefs[3] = new SeColumnDefinition("DESCRIPTION", SeColumnDefinition.TYPE_STRING, 255,
-                    0, false);
-
-            table.create(colDefs, "DEFAULTS");
-
-            /*
-             * SeRegistration tableRegistration = new SeRegistration(conn,
-             * CHILD);
-             * tableRegistration.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER);
-             * tableRegistration.setRowIdColumnName("ID");
-             * tableRegistration.alter();
-             */
-            insertChildData(conn, table);
-        } finally {
-            conn.close();
+            table.delete();
+        } catch (SeException e) {
+            // no-op, table didn't existed
         }
+
+        SeColumnDefinition[] colDefs = new SeColumnDefinition[4];
+
+        colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
+        colDefs[1] = new SeColumnDefinition("MASTER_ID", SeColumnDefinition.TYPE_INTEGER, 10, 0,
+                false);
+        colDefs[2] = new SeColumnDefinition("NAME", SeColumnDefinition.TYPE_STRING, 255, 0, false);
+        colDefs[3] = new SeColumnDefinition("DESCRIPTION", SeColumnDefinition.TYPE_STRING, 255, 0,
+                false);
+
+        table.create(colDefs, "DEFAULTS");
+
+        /*
+         * SeRegistration tableRegistration = new SeRegistration(conn, CHILD);
+         * tableRegistration.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER);
+         * tableRegistration.setRowIdColumnName("ID");
+         * tableRegistration.alter();
+         */
+        insertChildData(conn, table);
 
         LOGGER.info("successfully created child table " + CHILD);
     }

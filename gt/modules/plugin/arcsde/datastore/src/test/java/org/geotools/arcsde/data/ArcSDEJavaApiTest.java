@@ -832,31 +832,31 @@ public class ArcSDEJavaApiTest extends TestCase {
 
     public void testDeleteById() throws DataSourceException, UnavailableArcSDEConnectionException,
             SeException {
-     
+
         final String typeName = testData.getTemp_table();
-        final SeQuery query = new SeQuery(conn, new String[] {"ROW_ID", "INT32_COL" }, new SeSqlConstruct(
-                typeName));
+        final SeQuery query = new SeQuery(conn, new String[] { "ROW_ID", "INT32_COL" },
+                new SeSqlConstruct(typeName));
         query.prepareQuery();
         query.execute();
-        
+
         final int rowId;
-        try{
+        try {
             SeRow row = query.fetch();
             rowId = row.getInteger(0).intValue();
-        }finally{
+        } finally {
             query.close();
         }
-        
+
         SeDelete delete = new SeDelete(conn);
         delete.byId(typeName, new SeObjectId(rowId));
-        
+
         final String whereClause = "ROW_ID=" + rowId;
         final SeSqlConstruct sqlConstruct = new SeSqlConstruct(typeName, whereClause);
-        final SeQuery deletedQuery = new SeQuery(conn, new String[]{"ROW_ID"}, sqlConstruct);
-        
+        final SeQuery deletedQuery = new SeQuery(conn, new String[] { "ROW_ID" }, sqlConstruct);
+
         deletedQuery.prepareQuery();
         deletedQuery.execute();
-        
+
         SeRow row = deletedQuery.fetch();
         assertNull(whereClause + " should have returned no records as it was deleted", row);
     }
@@ -898,7 +898,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             row.setString(1, "inside transaction");
 
             insert.execute();
-            //IMPORTANT to call close for the diff to take effect
+            // IMPORTANT to call close for the diff to take effect
             insert.close();
 
             final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);

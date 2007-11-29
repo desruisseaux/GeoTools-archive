@@ -39,8 +39,10 @@ import com.esri.sde.sdk.client.SeException;
  * Test suite for {@link ArcSDEDataStoreFactory}
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @source $URL$
- * @version $Id$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/ArcSDEDataStoreFactoryTest.java $
+ * @version $Id: ArcSDEDataStoreFactoryTest.java 28042 2007-11-25 22:46:19Z
+ *          groldan $
  * @since 2.4.x
  */
 public class ArcSDEDataStoreFactoryTest extends TestCase {

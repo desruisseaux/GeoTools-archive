@@ -845,7 +845,6 @@ public class TestData {
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
             createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
-
             shapeTypeMask = SeLayer.SE_LINE_TYPE_MASK;
 
             tableName = "GT_TEST_LINE_ROWID_USER";
@@ -879,7 +878,8 @@ public class TestData {
     }
 
     private void createSimpleTestTable(final ArcSDEPooledConnection conn, final String tableName,
-            final String rowIdColName, final int rowIdColumnType, final int shapeTypeMask) throws SeException {
+            final String rowIdColName, final int rowIdColumnType, final int shapeTypeMask)
+            throws SeException {
         System.out.println("Creating layer " + tableName);
 
         final SeLayer layer = new SeLayer(conn);
@@ -887,18 +887,21 @@ public class TestData {
         layer.setTableName(tableName);
 
         final String configKeyword = "DEFAULTS";
-        
+
         final boolean isNullable = true;
 
-        //ROW_ID, INT_COL, DATE_COL, STRING_COL
+        // ROW_ID, INT_COL, DATE_COL, STRING_COL
         final int numCols = 4;
         final SeColumnDefinition[] colDefs = new SeColumnDefinition[numCols];
 
         // first column to be SDE managed feature id
         colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
-        colDefs[1] = new SeColumnDefinition("INT_COL", SeColumnDefinition.TYPE_INT32, 10, 0, isNullable);
-        colDefs[2] = new SeColumnDefinition("DATE_COL", SeColumnDefinition.TYPE_DATE, 1, 0, isNullable);
-        colDefs[3] = new SeColumnDefinition("STRING_COL", SeColumnDefinition.TYPE_STRING, 25, 0, isNullable);
+        colDefs[1] = new SeColumnDefinition("INT_COL", SeColumnDefinition.TYPE_INT32, 10, 0,
+                isNullable);
+        colDefs[2] = new SeColumnDefinition("DATE_COL", SeColumnDefinition.TYPE_DATE, 1, 0,
+                isNullable);
+        colDefs[3] = new SeColumnDefinition("STRING_COL", SeColumnDefinition.TYPE_STRING, 25, 0,
+                isNullable);
 
         /*
          * Create the table using the DBMS default configuration keyword. Valid
@@ -909,7 +912,7 @@ public class TestData {
         /*
          * Register the column to be used as feature id and managed by sde
          */
-        if(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType){
+        if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType) {
             SeRegistration reg = new SeRegistration(conn, table.getName());
             LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
             reg.setRowIdColumnName("ROW_ID");
@@ -923,7 +926,7 @@ public class TestData {
         layer.setSpatialColumnName("GEOM");
 
         /*
-         * Set the type of shapes that can be inserted into the layer. 
+         * Set the type of shapes that can be inserted into the layer.
          */
         layer.setShapeTypes(SeLayer.SE_NIL_TYPE_MASK | shapeTypeMask);
         layer.setGridSizes(1100.0, 0.0, 0.0);

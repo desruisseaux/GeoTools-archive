@@ -44,12 +44,12 @@ import org.opengis.filter.Id;
 import com.esri.sde.sdk.client.SeConnection;
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
  * Test suite for the {@link ArcSDEQuery} query wrapper
- *
+ * 
  * @author Gabriel Roldan
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/test/java/org/geotools/arcsde/data/ArcSDEQueryTest.java $
  * @version $Revision: 1.9 $
  */
 public class ArcSDEQueryTest extends TestCase {
@@ -65,21 +65,22 @@ public class ArcSDEQueryTest extends TestCase {
      * do not access it directly, use {@link #getQueryFiltered()}
      */
     private ArcSDEQuery queryFiltered;
-    
+
     private ArcSDEDataStore dstore;
-    
+
     private String typeName;
-	
+
     private Query filteringQuery;
-    
+
     private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
     private SimpleFeatureType ftype;
-    
+
     private static final int FILTERING_COUNT = 3;
-	/**
+
+    /**
      * Constructor for ArcSDEQueryTest.
-     *
+     * 
      * @param arg0
      */
     public ArcSDEQueryTest(String name) {
@@ -125,29 +126,31 @@ public class ArcSDEQueryTest extends TestCase {
         boolean cleanPool = true;
         testData.tearDown(cleanTestTable, cleanPool);
     }
-    
+
     /**
-     * loads {@code test-data/testparams.properties} into a Properties object, wich is
-     * used to obtain test tables names and is used as parameter to find the DataStore
-     *
-     * @throws Exception DOCUMENT ME!
+     * loads {@code test-data/testparams.properties} into a Properties object,
+     * wich is used to obtain test tables names and is used as parameter to find
+     * the DataStore
+     * 
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     protected void setUp() throws Exception {
         super.setUp();
-        if(testData == null){
+        if (testData == null) {
             oneTimeSetUp();
         }
         dstore = testData.getDataStore();
         typeName = testData.getTemp_table();
         this.ftype = dstore.getSchema(typeName);
-        
-        //grab some fids
+
+        // grab some fids
         FeatureSource source = dstore.getFeatureSource(typeName);
         FeatureCollection features = source.getFeatures();
         FeatureIterator iterator = features.features();
         List fids = new ArrayList();
-        for(int i = 0; i < FILTERING_COUNT; i++){
-        	fids.add(ff.featureId(iterator.next().getID()));
+        for (int i = 0; i < FILTERING_COUNT; i++) {
+            fids.add(ff.featureId(iterator.next().getID()));
         }
         iterator.close();
         Id filter = ff.id(new HashSet(fids));
@@ -156,131 +159,134 @@ public class ArcSDEQueryTest extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        try{
+        try {
             this.queryAll.close();
-        }catch(Exception e){
-            //no-op
+        } catch (Exception e) {
+            // no-op
         }
-        try{
+        try {
             this.queryFiltered.close();
-        }catch(Exception e){
-            //no-op
+        } catch (Exception e) {
+            // no-op
         }
         this.queryAll = null;
         this.queryFiltered = null;
     }
 
-    private ArcSDEQuery getQueryAll() throws IOException{
+    private ArcSDEQuery getQueryAll() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
-        this.queryAll = ArcSDEQuery.createQuery(connection, ftype, Query.ALL);
+        this.queryAll = ArcSDEQuery
+                .createQuery(connection, ftype, Query.ALL, FIDReader.NULL_READER);
         return this.queryAll;
     }
-    
-    private ArcSDEQuery getQueryFiltered() throws IOException{
+
+    private ArcSDEQuery getQueryFiltered() throws IOException {
         ArcSDEPooledConnection connection = dstore.getConnectionPool().getConnection();
-        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery);
+        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery,
+                FIDReader.NULL_READER);
         return this.queryFiltered;
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testClose()throws IOException {
+    public void testClose() throws IOException {
         ArcSDEQuery queryAll = getQueryAll();
-    	assertNotNull(queryAll.connection);
-    	
-    	queryAll.execute();
-    	
-    	assertNotNull(queryAll.connection);
-    	
-    	//should nevel do this, just to assert it is 
-    	//not closed by returned to the pool
-    	SeConnection conn = queryAll.connection;
-    	
-    	queryAll.close();
+        assertNotNull(queryAll.connection);
 
-    	assertNull(queryAll.connection);
-    	assertFalse(conn.isClosed());
+        queryAll.execute();
+
+        assertNotNull(queryAll.connection);
+
+        // should nevel do this, just to assert it is
+        // not closed by returned to the pool
+        SeConnection conn = queryAll.connection;
+
+        queryAll.close();
+
+        assertNull(queryAll.connection);
+        assertFalse(conn.isClosed());
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testFetch()throws IOException {
+    public void testFetch() throws IOException {
         ArcSDEQuery queryAll = getQueryAll();
-    	try {
-    		queryAll.fetch();
-    		fail("fetch without calling execute");
-    	}catch(IllegalStateException e){
-    		//ok
-    	}
-    	
-    	queryAll.execute();
-    	assertNotNull(queryAll.fetch());
-    	
-    	queryAll.close();
-    	try{
-    		queryAll.fetch();
-    		fail("fetch after close!");
-    	}catch(IllegalStateException e){
-    		//ok
-    	}
+        try {
+            queryAll.fetch();
+            fail("fetch without calling execute");
+        } catch (IllegalStateException e) {
+            // ok
+        }
+
+        queryAll.execute();
+        assertNotNull(queryAll.fetch());
+
+        queryAll.close();
+        try {
+            queryAll.fetch();
+            fail("fetch after close!");
+        } catch (IllegalStateException e) {
+            // ok
+        }
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testCalculateResultCount() throws Exception{
-    	FeatureCollection features = dstore.getFeatureSource(typeName).getFeatures();
-    	FeatureIterator reader = features.features();
-    	int read = 0;
-    	while(reader.hasNext()){
-    		reader.next();
-    		read++;
-    	}
-    	reader.close();
-    	
-    	int calculated = getQueryAll().calculateResultCount();
-    	assertEquals(read, calculated);
-    	
-    	calculated = getQueryFiltered().calculateResultCount();
-    	assertEquals(FILTERING_COUNT, calculated);
+    public void testCalculateResultCount() throws Exception {
+        FeatureCollection features = dstore.getFeatureSource(typeName).getFeatures();
+        FeatureIterator reader = features.features();
+        int read = 0;
+        while (reader.hasNext()) {
+            reader.next();
+            read++;
+        }
+        reader.close();
+
+        int calculated = getQueryAll().calculateResultCount();
+        assertEquals(read, calculated);
+
+        calculated = getQueryFiltered().calculateResultCount();
+        assertEquals(FILTERING_COUNT, calculated);
     }
 
     /**
      * DOCUMENT ME!
      */
-    public void testCalculateQueryExtent()throws Exception {
-    	FeatureCollection features = dstore.getFeatureSource(typeName).getFeatures();
-    	FeatureIterator reader = features.features();
-    	ReferencedEnvelope real = new ReferencedEnvelope();
-    	while(reader.hasNext()){
-    		real.include(reader.next().getBounds());
-    	}
-    	
-    	//TODO: make calculateQueryExtent to return ReferencedEnvelope
-    	Envelope actual = getQueryAll().calculateQueryExtent();
-    	Envelope expected = new Envelope(real);
-    	
-    	assertNotNull(actual);
-    	assertEquals(expected, actual);
-    	
-    	reader.close();
-    
-    	FeatureReader featureReader = dstore.getFeatureReader(filteringQuery, Transaction.AUTO_COMMIT);
-    	real = new ReferencedEnvelope();
-    	while(featureReader.hasNext()){
-    		real.include(featureReader.next().getBounds());
-    	}
-    	
-    	actual = getQueryFiltered().calculateQueryExtent();
-    	assertNotNull(actual);
-    	expected = new Envelope(real);	
-    	assertEquals(expected, actual);
-    	featureReader.close();
+    public void testCalculateQueryExtent() throws Exception {
+        FeatureCollection features = dstore.getFeatureSource(typeName).getFeatures();
+        FeatureIterator reader = features.features();
+        ReferencedEnvelope real = new ReferencedEnvelope();
+        while (reader.hasNext()) {
+            real.include(reader.next().getBounds());
+        }
+
+        // TODO: make calculateQueryExtent to return ReferencedEnvelope
+        Envelope actual = getQueryAll().calculateQueryExtent();
+        Envelope expected = new Envelope(real);
+
+        assertNotNull(actual);
+        assertEquals(expected, actual);
+
+        reader.close();
+
+        FeatureReader featureReader = dstore.getFeatureReader(filteringQuery,
+                Transaction.AUTO_COMMIT);
+        real = new ReferencedEnvelope();
+        while (featureReader.hasNext()) {
+            real.include(featureReader.next().getBounds());
+        }
+
+        actual = getQueryFiltered().calculateQueryExtent();
+        assertNotNull(actual);
+        expected = new Envelope(real);
+        assertEquals(expected, actual);
+        featureReader.close();
     }
 
-    private void assertEquals(Envelope e1, Envelope e2){
+    private void assertEquals(Envelope e1, Envelope e2) {
         final double tolerance = 1.0E-9;
         assertEquals(e1.getMinX(), e2.getMinX(), tolerance);
         assertEquals(e1.getMinY(), e2.getMinY(), tolerance);

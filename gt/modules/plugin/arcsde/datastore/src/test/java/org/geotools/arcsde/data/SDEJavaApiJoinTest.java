@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.extensions.TestSetup;
@@ -29,6 +30,7 @@ import junit.framework.TestSuite;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectBody;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
@@ -124,15 +126,16 @@ import com.vividsolutions.jts.geom.Point;
  * </ul> 
  * </p>
  * 
- *  @author Gabriel Roldan, Axios Engineering
- *  @source $URL$
- *  @version $Id$
- *  @since 2.3.x
+ *  &#064;author Gabriel Roldan, Axios Engineering
+ *  &#064;source $URL$
+ *  &#064;version $Id$
+ *  &#064;since 2.3.x
  * 
  */
 public class SDEJavaApiJoinTest extends TestCase {
     /** package logger */
-    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(SDEJavaApiJoinTest.class.getPackage().getName());
+    private static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger(SDEJavaApiJoinTest.class.getPackage().getName());
 
     /** Helper class that provides config loading and test data for unit tests */
     private static TestData testData;
@@ -205,6 +208,9 @@ public class SDEJavaApiJoinTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
+        if (testData == null) {
+            oneTimeSetUp();
+        }
         this.store = testData.getDataStore();
     }
 
@@ -290,7 +296,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      */
     public void testRegisterDuplicateViewName() throws IOException {
         final String plainSQL = InProcessViewSupportTestData.masterChildSql;
-        
+
         SelectBody select = ViewRegisteringFactoryHelper.parseSqlQuery(plainSQL);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
         try {
@@ -303,7 +309,7 @@ public class SDEJavaApiJoinTest extends TestCase {
 
     public void testRegisterViewListedInGetTypeNames() throws IOException {
         final String plainSQL = InProcessViewSupportTestData.masterChildSql;
-        
+
         SelectBody select = ViewRegisteringFactoryHelper.parseSqlQuery(plainSQL);
         store.registerView(InProcessViewSupportTestData.typeName, (PlainSelect) select);
 
@@ -521,6 +527,9 @@ public class SDEJavaApiJoinTest extends TestCase {
                 row = query.fetch();
             }
             assertEquals(expectedCount, count);
+        } catch (SeException e) {
+            LOGGER.log(Level.SEVERE, "", new ArcSdeException(e));
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
