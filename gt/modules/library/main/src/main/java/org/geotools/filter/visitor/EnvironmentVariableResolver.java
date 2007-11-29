@@ -27,7 +27,7 @@ import org.geotools.filter.parser.ParseException;
 
 /**
  * Finds instances of specific environment variable expressions within filters and
- * composite expressins and replaces them with simple literals.
+ * composite expressions and replaces them with simple literals.
  *
  * @author James Macgill, Penn State
  * @source $URL$

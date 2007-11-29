@@ -95,10 +95,6 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      * @throws IllegalArgumentException DOCUMENT ME!
      */
     public void setColor(Expression color) {
-        if (color == null) {
-            throw new IllegalArgumentException("Color must be provided");
-        }
-
         if (this.color == color) {
             return;
         }

@@ -3,6 +3,10 @@
  */
 package org.geotools.styling.visitor;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.geotools.event.GTCloneUtil;
@@ -10,13 +14,17 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
 import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.styling.AnchorPoint;
+import org.geotools.styling.ChannelSelection;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;
+import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.Displacement;
+import org.geotools.styling.Extent;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
+import org.geotools.styling.Font;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Halo;
 import org.geotools.styling.LinePlacement;
@@ -28,6 +36,8 @@ import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SelectedChannelType;
+import org.geotools.styling.ShadedRelief;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
@@ -43,31 +53,46 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 
 /**
- * Creates a deep copy of a Style.
+ * Creates a deep copy of a Style, this class is *NOT THREAD SAFE*.
+ * <p>
+ * This class makes use of an internal stack to story the copied result,
+ * retrieve with a call to getCopy() after visiting:<pre><code>
+ * DuplicatingStyleVisitor copyStyle = new DuplicatingStyleVisitor();
+ * rule.accepts( copyStyle );
+ * Rule rule = (Rule) copyStyle.getCopy();
+ * </code></pre>
  * 
- * @author Jesse
+ * @author Jesse Eichar
  */
-public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements StyleVisitor{
+public class DuplicatingStyleVisitor implements StyleVisitor {
 	
 	private final StyleFactory sf;
-
+    protected final FilterFactory2 ff;
+    /**
+     * We are using aggregation here to contain our DuplicatingFilterVisitor.
+     */
+    protected final DuplicatingFilterVisitor copyFilter;
+    /**
+     * This is our internal stack; used to maintain state as we copy sub elements.
+     */
+    protected Stack pages=new Stack();  
+    
 	public DuplicatingStyleVisitor() {
-		this( CommonFactoryFinder.getStyleFactory(GeoTools.getDefaultHints()) );
-	}
-	
+		this( CommonFactoryFinder.getStyleFactory( null ) );
+	}	
 	public DuplicatingStyleVisitor(StyleFactory styleFactory) {
-		this.sf=styleFactory;
+	    this( styleFactory, CommonFactoryFinder.getFilterFactory2( null ));
 	}
-	public DuplicatingStyleVisitor(StyleFactory styleFactory, FilterFactory2 factory) {
-		super( factory );
+	public DuplicatingStyleVisitor(StyleFactory styleFactory, FilterFactory2 filterFactory) {
+		this.copyFilter = new DuplicatingFilterVisitor( filterFactory );
 		this.sf=styleFactory;
+		this.ff=filterFactory;
 	}
-
-	private Stack pages=new Stack();
 	
 	public Object getCopy() {
 		return pages.peek();
 	}
+	
     public void visit(StyledLayerDescriptor sld) {
         StyledLayerDescriptor copy = null;
 
@@ -190,7 +215,7 @@ public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements
 
         if (rule.getFilter() != null) {
             Filter filter = rule.getFilter();
-            filterCopy = (Filter) filter.accept(this, null);
+            filterCopy = copy( rule.getFilter() );
         }
 
         Graphic[] legendGraphic = rule.getLegendGraphic();
@@ -252,93 +277,301 @@ public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements
         
         pages.push(copy);
     }
+    /**
+     * Null safe expression copy.
+     * <p>
+     * This method will perform a null check, and save you some lines of code:<pre><code>
+     * copy.setBackgroundColor( copyExpr( fill.getColor()) );
+     * </code></pre>
+     * @param sion
+     * @return copy of expression or null if expression was null
+     */    
+    protected Expression copy( Expression expression ){
+        if( expression == null  ) return null;
+        return (Expression) expression.accept( copyFilter, ff );
+    }
+    /**
+     * Null safe copy of filter.
+     */
+    protected Filter copy( Filter filter ){
+        if( filter == null ) return null;
+        return (Filter) filter.accept( copyFilter, ff );        
+    }
+    
+    /**
+     * Null safe graphic copy
+     * @param graphic
+     * @return copy of graphic or null if not provided
+     */
+    protected Graphic copy( Graphic graphic ){
+        if( graphic == null ) return null;
+        
+        graphic.accept(this);
+        return (Graphic) pages.pop();
+    }
+    /**
+     * Null safe fill copy
+     * @param graphic
+     * @return copy of graphic or null if not provided
+     */
+    protected Fill copy( Fill fill ){
+        if( fill == null ) return null;
+        
+        fill.accept(this);
+        return (Fill) pages.pop();
+    }
+    /**
+     * Null safe copy of float array.
+     * @param array
+     * @return copy of array or null if not provided
+     */
+    protected float[] copy(float[] array) {
+        if( array == null ) return null;
+        
+        float copy[] = new float[ array.length];
+        System.arraycopy( array, 0, copy, 0, array.length );
+        return copy;
+    }
+    /**
+     * Null safe map copy, used for external graphic custom properties.
+     * @param customProperties
+     * @return copy of map
+     */
+    @SuppressWarnings("unchecked")
+    protected Map copy(Map customProperties) {
+        return new HashMap( customProperties );
+    }
+    
+    /**
+     * Null safe copy of stroke.
+     * @param stroke
+     * @return copy of stroke if provided
+     */
+    protected Stroke copy( Stroke stroke ){
+        if( stroke == null ) return null;
+        stroke.accept(this);
+        return (Stroke) pages.pop();
+    }
+    /**
+     * Null safe copy of shaded relief.
+     * @param shaded
+     * @return copy of shaded or null if not provided
+     */
+    protected ShadedRelief copy(ShadedRelief shaded) {
+        if( shaded == null ) return null;
+        Expression reliefFactor = copy( shaded.getReliefFactor() );
+        ShadedRelief copy = sf.createShadedRelief( reliefFactor );
+        copy.setBrightnessOnly( shaded.isBrightnessOnly() );
+        
+        return copy;
+    }
+    protected ExternalGraphic copy( ExternalGraphic externalGraphic){
+        if( externalGraphic == null ) return null;
+        externalGraphic.accept(this);
+        return (ExternalGraphic) pages.pop();
+    }
+    protected Mark copy( Mark mark){
+        if( mark == null ) return null;
+        mark.accept(this);
+        return (Mark) pages.pop();
+    }
+    private ColorMapEntry copy(ColorMapEntry entry) {
+        if( entry == null ) return null;
+        
+        entry.accept( this );
+        return (ColorMapEntry) pages.pop();
+    }
+    
+    protected Symbolizer copy(Symbolizer symbolizer) {
+        if( symbolizer == null ) return null;
+        
+        symbolizer.accept(this);
+        return (Symbolizer) pages.pop();
+    }
+    protected ContrastEnhancement copy(ContrastEnhancement contrast) {
+        if( contrast == null ) return null;
+        
+        ContrastEnhancement copy = sf.createContrastEnhancement();
+        copy.setGammaValue( copy( contrast.getGammaValue()));
+        return copy;
+    }
+    protected ColorMap copy(ColorMap colorMap) {
+        if( colorMap == null ) return null;
+        
+        colorMap.accept(this);
+        return (ColorMap) getCopy();
+    }
+    
+    protected SelectedChannelType[] copy( SelectedChannelType[] channels){
+        if( channels == null ) return null;
+        
+        SelectedChannelType[] copy = new SelectedChannelType[ channels.length ];
+        for( int i=0; i< channels.length ; i++){
+            copy[i] = copy( channels[i] );
+        }
+        return copy;
+    }
+    
+    private SelectedChannelType copy(SelectedChannelType selectedChannelType) {
+        if( selectedChannelType == null ) return null;
+        
+        ContrastEnhancement enhancement = copy( selectedChannelType.getContrastEnhancement() );
+        String name = selectedChannelType.getChannelName();
+        SelectedChannelType copy = sf.createSelectedChannelType( name, enhancement);
+        
+        return copy;
+    }
+    
+    private ChannelSelection copy(ChannelSelection channelSelection) {
+        if( channelSelection == null ) return null;
+     
+        SelectedChannelType[] channels = copy( channelSelection.getSelectedChannels() );
+        ChannelSelection copy = sf.createChannelSelection( channels);
+        copy.setGrayChannel( copy( channelSelection.getGrayChannel() ));
+        copy.setRGBChannels( copy( channelSelection.getRGBChannels() ));
+        return copy;
+    }
+    
+    /**
+     * Null safe copy of font array.
+     * <p>
+     * Right now style visitor does not let us visit fonts!
+     * @param fonts
+     * @return copy of provided fonts
+     */
+    private Font[] copy(Font[] fonts) {
+        if( fonts == null ) return null;
+        Font copy[] = new Font[ fonts.length ];
+        for( int i=0; i<fonts.length; i++){
+            Font font = fonts[i];
+            if( font == null ) continue;
+            copy[i] = fonts[i];
+        }
+        return copy;
+    }
+    /**
+     * Null safe copy of halo.
+     * @param halo 
+     * @return copy of halo if provided
+     */
+    protected Halo copy( Halo halo){
+        if( halo == null ) return null;
+        halo.accept(this);
+        return (Halo) getCopy();
+    }
+    /**
+     * Null safe copy of displacement.
+     * @param displacement
+     * @return copy of displacement if provided
+     */
+    protected Displacement copy(Displacement displacement) {
+        if( displacement == null ) return null;
+        displacement.accept(this);
+        return (Displacement) getCopy();
+    }
+    
+    private Symbol copy(Symbol symbol) {
+        if( symbol == null ) return null;
+        symbol.accept(this);
+        return (Symbol) getCopy();
+    }
+    /**
+     * Null safe copy of anchor point.
+     * @param anchorPoint
+     * @return copy of anchor point if provided
+     */
+    protected AnchorPoint copy(AnchorPoint anchorPoint) {
+        if( anchorPoint == null ) return null;
+        anchorPoint.accept(this);
+        return (AnchorPoint) getCopy();
+    }
 
     public void visit(Fill fill) {
-        Fill copy = null;
-
-        try {
-            copy = (Fill) GTCloneUtil.clone(fill); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        Fill copy = sf.getDefaultFill();
+        copy.setBackgroundColor( copy( fill.getBackgroundColor()) );
+        copy.setColor(copy( fill.getColor()));
+        copy.setGraphicFill( copy(fill.getGraphicFill()));
+        copy.setOpacity( copy(fill.getOpacity()));
         pages.push(copy);
     }
 
     public void visit(Stroke stroke) {
-        Stroke copy = null;
-
-        try {
-            copy = (Stroke) GTCloneUtil.clone(stroke); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        Stroke copy = sf.getDefaultStroke();
+        copy.setColor( copy(stroke.getColor()));
+        copy.setDashArray( copy(stroke.getDashArray()));
+        copy.setDashOffset( copy( stroke.getDashOffset()));
+        copy.setGraphicFill( copy(stroke.getGraphicFill()));
+        copy.setGraphicStroke( copy( stroke.getGraphicStroke()));
+        copy.setLineCap(copy(stroke.getLineCap()));
+        copy.setLineJoin( copy(stroke.getLineJoin()));
+        copy.setOpacity( copy(stroke.getOpacity()));
+        copy.setWidth( copy(stroke.getWidth()));
         pages.push(copy);
     }
 
     public void visit(Symbolizer sym) {
-        // Should not happen?
-        throw new RuntimeException("visit(Symbolizer) unsupported");
+        if( sym instanceof RasterSymbolizer){
+            visit( (RasterSymbolizer) sym );            
+        }
+        else if( sym instanceof LineSymbolizer){
+            visit( (LineSymbolizer) sym );            
+        }
+        else if( sym instanceof PolygonSymbolizer){
+            visit( (PolygonSymbolizer) sym );            
+        }
+        else if( sym instanceof PointSymbolizer){
+            visit( (PointSymbolizer) sym );            
+        }
+        else if( sym instanceof TextSymbolizer){
+            visit( (TextSymbolizer) sym );            
+        }
+        else {
+            throw new RuntimeException("visit(Symbolizer) unsupported");
+        }
     }
 
     public void visit(PointSymbolizer ps) {
-        PointSymbolizer copy = null;
-
-        try {
-            copy = (PointSymbolizer) GTCloneUtil.clone(ps); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        PointSymbolizer copy = sf.getDefaultPointSymbolizer();
+        copy.setGeometryPropertyName( ps.getGeometryPropertyName());
+        copy.setGraphic( copy( ps.getGraphic() ));
         pages.push(copy);
     }
 
     public void visit(LineSymbolizer line) {
-        LineSymbolizer copy = null;
-
-        try {
-            copy = (LineSymbolizer) GTCloneUtil.clone(line); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        LineSymbolizer copy = sf.getDefaultLineSymbolizer();
+        copy.setGeometryPropertyName( line.getGeometryPropertyName());
+        copy.setStroke( copy( line.getStroke()));
         pages.push(copy);
     }
 
     public void visit(PolygonSymbolizer poly) {
-        PolygonSymbolizer copy = null;
-
-        try {
-            copy = (PolygonSymbolizer) GTCloneUtil.clone(poly); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        PolygonSymbolizer copy = sf.createPolygonSymbolizer();
+        copy.setFill( copy( poly.getFill()));
+        copy.setGeometryPropertyName( poly.getGeometryPropertyName());
+        copy.setStroke(copy(poly.getStroke()));
         pages.push(copy);
     }
 
     public void visit(TextSymbolizer text) {
-        TextSymbolizer copy = null;
-
-        try {
-            copy = (TextSymbolizer) GTCloneUtil.clone(text); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        TextSymbolizer copy = sf.createTextSymbolizer();
+        copy.setFill( copy( text.getFill()));
+        copy.setFonts(copy( text.getFonts()));
+        copy.setGeometryPropertyName( text.getGeometryPropertyName() );
+        copy.setHalo( copy( text.getHalo() ));
+        
         pages.push(copy);
     }
-
+    
     public void visit(RasterSymbolizer raster) {
-        RasterSymbolizer copy = null;
-
-        try {
-            copy = (RasterSymbolizer) GTCloneUtil.clone(raster); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        RasterSymbolizer copy = sf.createRasterSymbolizer();
+        copy.setChannelSelection( copy( raster.getChannelSelection() ));
+        copy.setColorMap( copy( raster.getColorMap() ));
+        copy.setContrastEnhancement( copy( raster.getContrastEnhancement()));
+        copy.setGeometryPropertyName( raster.getGeometryPropertyName());
+        copy.setImageOutline( copy( raster.getImageOutline()));
+        copy.setOpacity( copy( raster.getOpacity() ));
+        copy.setOverlap( copy( raster.getOverlap()));
+        copy.setShadedRelief( copy( raster.getShadedRelief()));
         pages.push(copy);
     }
 
@@ -357,49 +590,26 @@ public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements
 
         int length=externalGraphics.length;
         for (int i = 0; i < length; i++) {
-            if (externalGraphics[i] != null) {
-                externalGraphics[i].accept(this);
-                externalGraphicsCopy[i] = (ExternalGraphic) pages.pop();
-            }
+            externalGraphicsCopy[i] = copy( externalGraphics[i]);
         }
 
         Mark[] marks = gr.getMarks();
         Mark[] marksCopy = new Mark[marks.length];
         length=marks.length;
         for (int i = 0; i < length; i++) {
-            if (marks[i] != null) {
-                marks[i].accept(this);
-                marksCopy[i] = (Mark) pages.pop();
-            }
+            marksCopy[i] = copy( marks[i]);
         }
 
-        Expression opacityCopy = null;
-
-        if (gr.getOpacity() != null) {
-        	opacityCopy = (Expression) gr.getOpacity().accept(this, null);            
-        }
-
-        Expression rotationCopy = null;
-
-        if (gr.getRotation() != null) {
-        	rotationCopy = (Expression) gr.getRotation().accept(this, null);
-        }
-
-        Expression sizeCopy = null;
-
-        if (gr.getSize() != null) {
-        	sizeCopy  = (Expression) gr.getSize().accept(this, null);
-        }
-
+        Expression opacityCopy = copy( gr.getOpacity() );
+        Expression rotationCopy = copy( gr.getRotation() );
+        Expression sizeCopy = copy( gr.getSize() );
+        
         Symbol[] symbols = gr.getSymbols();
         length=symbols.length;
         Symbol[] symbolCopys = new Symbol[length];
 
         for (int i = 0; i < length; i++) {
-            if (symbols[i] != null) {
-                symbols[i].accept(this);
-                symbolCopys[i] = (Symbol) pages.pop();
-            }
+            symbolCopys[i] = copy( symbols[i] );
         }
 
         copy = sf.createDefaultGraphic();
@@ -414,141 +624,116 @@ public class DuplicatingStyleVisitor extends DuplicatingFilterVisitor implements
 
         pages.push(copy);
     }
-    
+
     public void visit(Mark mark) {
         Mark copy = null;
 
-        Fill fillCopy = null;
-
-        if (mark.getFill() != null) {
-            mark.accept( this );
-            fillCopy = (Fill) pages.pop();
-        }
-
-        Expression rotationCopy = null;
-
-        if (mark.getRotation() != null) {
-            rotationCopy = (Expression) mark.getRotation().accept(this, null);
-        }
-
-        Expression sizeCopy = null;
-
-        if (mark.getSize() != null) {
-            sizeCopy = (Expression) mark.getSize().accept(this, null);
-        }
-
-        Stroke strokeCopy = null;
-
-        if (mark.getStroke() != null) {
-            mark.getStroke().accept(this);
-            strokeCopy = (Stroke) pages.pop();
-        }
-
-        Expression wellKnownNameCopy = null;
-
-        if (mark.getWellKnownName() != null) {
-            wellKnownNameCopy = (Expression) mark.getWellKnownName().accept(this, null);
-        }
-
         copy = sf.createMark();
-        copy.setFill(fillCopy);
-        copy.setRotation((Expression) rotationCopy);
-        copy.setSize((Expression) sizeCopy);
-        copy.setStroke(strokeCopy);
-        copy.setWellKnownName((Expression) wellKnownNameCopy);
-
+        copy.setFill(copy( mark.getFill() ));
+        copy.setRotation( copy( mark.getRotation() ));
+        copy.setSize(copy( mark.getSize() ));
+        copy.setStroke(copy( mark.getStroke() ));
+        copy.setWellKnownName(copy( mark.getWellKnownName() ));
         pages.push(copy);
     }
 
     public void visit(ExternalGraphic exgr) {
-        ExternalGraphic copy = null;
-
+        URL uri = null;
         try {
-            copy = (ExternalGraphic) GTCloneUtil.clone(exgr); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
+            uri = exgr.getLocation();
         }
-
-        pages.push(copy);
+        catch (MalformedURLException huh ){
+            
+        }
+        String format = exgr.getFormat();
+        ExternalGraphic copy = sf.createExternalGraphic(uri, format);
+        copy.setCustomProperties( copy(exgr.getCustomProperties()));
+        pages.push(copy);       
     }
 
     public void visit(PointPlacement pp) {
-        PointPlacement copy = null;
-
-        try {
-            copy = (PointPlacement) GTCloneUtil.clone(pp); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        PointPlacement copy = sf.getDefaultPointPlacement();
+        copy.setAnchorPoint( copy( pp.getAnchorPoint() ));
+        copy.setDisplacement( copy(pp.getDisplacement()));
+        copy.setRotation( copy( pp.getRotation() ));
         pages.push(copy);
     }
 
-    public void visit(AnchorPoint ap) {
-        AnchorPoint copy = null;
-
-        try {
-            copy = (AnchorPoint) GTCloneUtil.clone(ap); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+    public void visit(AnchorPoint ap) {        
+        Expression x = copy( ap.getAnchorPointX() );
+        Expression y = copy( ap.getAnchorPointY() );
+        AnchorPoint copy = sf.createAnchorPoint(x, y);
+        
         pages.push(copy);
     }
 
     public void visit(Displacement dis) {
-        Displacement copy = null;
-
-        try {
-            copy = (Displacement) GTCloneUtil.clone(dis); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        Expression x = copy( dis.getDisplacementX() );
+        Expression y = copy( dis.getDisplacementY() );
+        Displacement copy = sf.createDisplacement(x, y);
         pages.push(copy);
     }
 
     public void visit(LinePlacement lp) {
-        LinePlacement copy = null;
-
-        try {
-            copy = (LinePlacement) GTCloneUtil.clone(lp); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        Expression offset = copy( lp.getPerpendicularOffset());
+        LinePlacement copy = sf.createLinePlacement(offset);
         pages.push(copy);
     }
 
     public void visit(Halo halo) {
-        Halo copy = null;
-
-        try {
-            copy = (Halo) GTCloneUtil.clone(halo); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
+        Fill fill = copy( halo.getFill());
+        Expression radius = copy( halo.getRadius() );
+        Halo copy = sf.createHalo(fill, radius);
 
         pages.push(copy);
     }
 
     public void visit(FeatureTypeConstraint ftc) {
-        FeatureTypeConstraint copy = null;
-
-        try {
-            copy = (FeatureTypeConstraint) GTCloneUtil.clone(ftc); //TODO: remove temporary hack
-        } catch (CloneNotSupportedException erp) {
-            throw new RuntimeException(erp);
-        }
-
+        String typeName = ftc.getFeatureTypeName();
+        Filter filter = copy( ftc.getFilter() );
+        Extent[] extents = copy( ftc.getExtents() );
+        FeatureTypeConstraint copy = sf.createFeatureTypeConstraint( typeName, filter, extents);
+        
         pages.push(copy);
     }
 
-	public void visit(ColorMap arg0) {
-		// TODO Auto-generated method stub
+	private Extent[] copy(Extent[] extents) {
+	    if( extents == null ) return null;
+	    
+	    Extent[] copy = new Extent[ extents.length ];
+	    for( int i=0; i<extents.length; i++){
+	        copy[i] = copy( extents[i] );
+	    }
+	    return copy;
 	}
+	
+    private Extent copy(Extent extent) {
+        String name = extent.getName();
+        String value = extent.getValue();
+        Extent copy = sf.createExtent(name, value);
+        return copy;
+    }
+    
+    public void visit(ColorMap colorMap) {	    
+	    ColorMap copy = sf.createColorMap();
+	    copy.setType( colorMap.getType() );	    
+	    ColorMapEntry[] entries = colorMap.getColorMapEntries();
+	    if( entries != null ){
+	        for( int i=0; i<entries.length;i++){
+	            ColorMapEntry entry = entries[i];
+                copy.addColorMapEntry( copy( entry ));
+	        }
+	    }
+	 	pages.push(copy);
+	}
+	
+    public void visit(ColorMapEntry colorMapEntry) {
+	    ColorMapEntry copy = sf.createColorMapEntry();
+	    copy.setColor( copy( colorMapEntry.getColor() ));
+	    copy.setLabel( colorMapEntry.getLabel() );
+	    copy.setOpacity( copy( colorMapEntry.getOpacity()));
+	    copy.setQuantity( copy.getQuantity());
 
-	public void visit(ColorMapEntry arg0) {
-		// TODO Auto-generated method stub
-	}
+	    pages.push(copy);
+    }
 }

@@ -83,7 +83,6 @@ public class DuplicatingFilterVisitor implements FilterVisitor, ExpressionVisito
 		
 	}
 	
-
 	public DuplicatingFilterVisitor(FilterFactory2 factory) {
 		this.factory = factory;
 	}
