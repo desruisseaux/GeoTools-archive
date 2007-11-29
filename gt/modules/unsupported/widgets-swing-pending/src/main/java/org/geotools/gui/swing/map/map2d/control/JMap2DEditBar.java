@@ -15,7 +15,7 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
-import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -361,7 +361,7 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
                 }else if(jtsClass.equals(MultiPoint.class)){
                     gui_geom.setEnabled(true);
                     gui_m_point.setEnabled(true);
-                }else if(jtsClass.equals(LinearRing.class)){
+                }else if(jtsClass.equals(LineString.class)){
                     gui_geom.setEnabled(true);
                     gui_s_line.setEnabled(true);
                 }else if(jtsClass.equals(MultiLineString.class)){

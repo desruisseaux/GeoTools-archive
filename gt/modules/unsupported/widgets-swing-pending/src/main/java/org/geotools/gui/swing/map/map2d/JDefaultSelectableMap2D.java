@@ -99,13 +99,13 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         StyleBuilder sb = new StyleBuilder();
 
-        Fill fill = sb.createFill(Color.GREEN, 0.6f);
+        Fill fill = sb.createFill(Color.GREEN, 0f);
         Stroke stroke = sb.createStroke(Color.GREEN, 2);
         stroke.setOpacity(sb.literalExpression(1f));
 
         PolygonSymbolizer pls = sb.createPolygonSymbolizer(stroke, fill);
 
-        fill = sb.createFill(Color.GREEN, 1f);
+        fill = sb.createFill(Color.GREEN, 0f);
         stroke = sb.createStroke(Color.GREEN, 0);
         
         Mark mark = sb.createMark("cross", fill, stroke);
