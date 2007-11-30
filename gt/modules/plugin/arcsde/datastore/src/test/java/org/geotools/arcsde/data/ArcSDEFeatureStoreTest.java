@@ -963,6 +963,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
      * addFeatures and the rendering thread does getFeatures.
      */
     public void testTransactionMultithreadAccess() throws Exception {
+        testData.insertTestData();
         // start with an empty table
         final String typeName = testData.getTemp_table();
         final int featureCount = 2;
@@ -995,16 +996,16 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                     FeatureCollection features = fStore.getFeatures(newFidsFilter);
                     System.err.println("querying returned...");
 
+                    int size = features.size();
+                    System.err.println("Collection Size: " + size);
+                    assertEquals(2, size);
+
                     System.err.println("commiting...");
                     transaction.commit();
                     System.err.println("commited.");
 
-                    int size = fStore.getCount(new DefaultQuery(typeName, newFidsFilter));
+                    size = fStore.getCount(new DefaultQuery(typeName, newFidsFilter));
                     System.err.println("Size: " + size);
-                    assertEquals(2, size);
-
-                    size = features.size();
-                    System.err.println("Collection Size: " + size);
                     assertEquals(2, size);
                 } catch (Exception e) {
                     errors[0] = e;
@@ -1039,11 +1040,11 @@ public class ArcSDEFeatureStoreTest extends TestCase {
                             SimpleFeature next = features.next();
                             System.out.println("**Got feature " + next.getID());
                         }
-                        System.err.println("wroker2 closing FeatureCollection");
+                        System.err.println("worker2 closing FeatureCollection");
                     } finally {
                         features.close();
                     }
-                    System.err.println("wroker2 done.");
+                    System.err.println("worker2 done.");
                 } catch (Exception e) {
                     errors[1] = e;
                 } finally {
@@ -1053,7 +1054,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         };
 
         Thread thread1 = new Thread(worker1, "worker1");
-        Thread thread2 = new Thread(worker2, "wroker2");
+        Thread thread2 = new Thread(worker2, "worker2");
         thread1.start();
         thread2.start();
         while (!(done[0] && done[1])) {
