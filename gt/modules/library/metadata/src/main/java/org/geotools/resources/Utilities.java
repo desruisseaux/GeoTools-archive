@@ -49,35 +49,43 @@ public final class Utilities {
      * Convenience method for testing two objects for equality. One or both objects may be null.
      */
     public static boolean equals(final Object object1, final Object object2) {
-        if( object1 == object2 ) return true;
-        if( object1 == null || object2 == null ) return false;
-        if( object1.getClass().isArray() && object2.getClass().isArray() ){
-            int length1 = Array.getLength( object1 ); 
-            int length2 = Array.getLength( object2 ); 
-            if( length1 != length2 ) {
+        return (object1==object2) || (object1!=null && object1.equals(object2));
+    }
+
+    /**
+     * Convenience method for testing two objects for equality. One or both objects may be null.
+     * If both are non-null and are arrays, then every array elements will be compared.
+     * <p>
+     * This method may be useful when the objects may or may not be array. If they are known
+     * to be arrays, consider using {@link Arrays#deepEquals(Object[],Object[])} or one of its
+     * primitive counter-part instead.
+     */
+    public static boolean deepEquals(final Object object1, final Object object2) {
+        if (object1 == object2) {
+            return true;
+        }
+        if (object1 == null || object2 == null) {
+            return false;
+        }
+        if (object1.getClass().isArray() && object2.getClass().isArray()) {
+            final int length1 = Array.getLength(object1);
+            final int length2 = Array.getLength(object2);
+            if (length1 != length2) {
                 return false;
             }
-            for( int i = 0; i < length1; i++ ){
-                Object item1 = Array.get( object1, i );
-                Object item2 = Array.get( object2, i );
-                if( !equals( item1, item2 ) ){
+            for (int i=0; i<length1; i++) {
+                final Object item1 = Array.get(object1, i);
+                final Object item2 = Array.get(object2, i);
+                if (!equals(item1, item2)) {
                     return false;
                 }
             }
             return true;
+        } else {
+            return object1.equals(object2);
         }
-        else return object1.equals( object2 );
     }
 
-    public static boolean equals(final float array1[], final float array2[] ){
-        if( array1==array2 ) return true;
-        if( array1 == null || array2 == null ) return false;
-        if( array1.length != array2.length) return false;
-        for( int i=0; i<array1.length; i++){
-            if( array1[i] != array2[i]) return false;
-        }
-        return true;
-    }
     /**
      * Returns {@code true} if the two specified objects implements exactly the same set of
      * interfaces. Only interfaces assignable to {@code base} are compared. Declaration order

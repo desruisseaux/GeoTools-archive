@@ -542,11 +542,6 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
             return false;
         }
 
-        // check the dashOffset
-        if(!Utilities.equals(getDashArray(), other.getDashArray())){
-            return false;
-        }
-
         if( !Utilities.equals( getLineCap(), other.getLineCap() )){
             return false;
         }

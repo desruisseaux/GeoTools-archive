@@ -26,6 +26,7 @@ import org.opengis.util.Cloneable;
 
 // J2SE dependencies
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 
@@ -462,9 +463,9 @@ public class GraphicImpl extends AbstractGTComponent implements Graphic,
             && Utilities.equals(this.size, other.size)
             && Utilities.equals(this.rotation, other.rotation)
             && Utilities.equals(this.opacity, other.opacity)
-            && Utilities.equals(this.getMarks(), other.getMarks() )
-            && Utilities.equals( this.getExternalGraphics(), other.getExternalGraphics() )
-            && Utilities.equals( this.getSymbols(), other.getSymbols() );                    
+            &&    Arrays.equals(this.getMarks(), other.getMarks() )
+            &&    Arrays.equals( this.getExternalGraphics(), other.getExternalGraphics() )
+            &&    Arrays.equals( this.getSymbols(), other.getSymbols() );                    
         }
 
         return false;

@@ -37,7 +37,7 @@ public class AttributeDescriptorImpl extends PropertyDescriptorImpl
 		
 		AttributeDescriptorImpl d = (AttributeDescriptorImpl)o;
 	
-		return super.equals(o) && Utilities.equals( defaultValue, d.defaultValue );
+		return super.equals(o) && Utilities.deepEquals( defaultValue, d.defaultValue );
 	}	
 	
 	public String toString() {

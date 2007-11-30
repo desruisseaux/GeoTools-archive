@@ -15,8 +15,8 @@
  */
 package org.geotools.styling;
 
+import java.util.Arrays;
 import org.geotools.event.AbstractGTComponent;
-import org.geotools.resources.Utilities;
 
 public class LayerFeatureConstraintsImpl extends AbstractGTComponent
 	implements LayerFeatureConstraints {
@@ -41,7 +41,7 @@ public class LayerFeatureConstraintsImpl extends AbstractGTComponent
 		
 		if (obj instanceof FeatureTypeConstraintImpl) {
 			LayerFeatureConstraintsImpl other = (LayerFeatureConstraintsImpl)obj;
-			return Utilities.equals(constraints,other.constraints);
+			return Arrays.equals(constraints,other.constraints);
 		}
 		
 		return false;

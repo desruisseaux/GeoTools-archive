@@ -15,6 +15,7 @@
  */
 package org.geotools.styling;
 
+import java.util.Arrays;
 import org.geotools.event.AbstractGTComponent;
 import org.opengis.filter.Filter;
 import org.geotools.resources.Utilities;
@@ -100,7 +101,7 @@ public class FeatureTypeConstraintImpl extends AbstractGTComponent
     		FeatureTypeConstraintImpl other = (FeatureTypeConstraintImpl)obj;
     		return Utilities.equals(featureTypeName,other.featureTypeName) && 
     			Utilities.equals(filter,other.filter) && 
-    			Utilities.equals(extents,other.extents);
+    			Arrays.equals(extents,other.extents);
     	}
     	
     	return false;

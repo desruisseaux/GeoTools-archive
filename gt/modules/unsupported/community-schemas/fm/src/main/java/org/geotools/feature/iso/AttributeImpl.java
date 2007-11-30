@@ -138,7 +138,7 @@ public class AttributeImpl implements Attribute {
         if (!Utilities.equals(ID, att.ID))
             return false;
 
-        if (!Utilities.equals(content, att.content))
+        if (!Utilities.deepEquals(content, att.content))
             return false;
 
         return true;

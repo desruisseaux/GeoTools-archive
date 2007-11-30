@@ -156,7 +156,7 @@ public class GeometryAttributeImpl extends AttributeImpl implements
 			}
 		}
 		else {
-		    return Utilities.equals(value, this.value);    
+		    return Utilities.deepEquals(value, this.value);    
 		}
 		
 		return true;

@@ -82,7 +82,7 @@ public class PropertyImpl implements Property {
         if (!Utilities.equals(descriptor, other.descriptor))
             return false;
 
-        if (!Utilities.equals(value, other.value))
+        if (!Utilities.deepEquals(value, other.value))
             return false;   
     
         return true;
