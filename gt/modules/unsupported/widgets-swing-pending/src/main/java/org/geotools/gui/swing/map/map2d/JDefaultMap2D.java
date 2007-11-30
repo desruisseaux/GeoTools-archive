@@ -211,7 +211,7 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
             if (!newRect.equals(oldRect)) {
                 changed = true;
                 oldRect = newRect;
-                mapArea = fixAspectRatio(newRect, mapArea);
+                rectangleChanged(newRect);                
             }
 
             if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
@@ -222,11 +222,15 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
 
             if (changed || complete) {
                 changed = false;
-                //System.out.println("la2");
                 bufferPane.redraw(complete);
             }
         }
     }
+        
+    protected void rectangleChanged(Rectangle newRect){
+        mapArea = fixAspectRatio(newRect, mapArea);
+    }
+    
 
     public void setMapBufferType(BUFFER_TYPE type) {
         if (this.type != type) {

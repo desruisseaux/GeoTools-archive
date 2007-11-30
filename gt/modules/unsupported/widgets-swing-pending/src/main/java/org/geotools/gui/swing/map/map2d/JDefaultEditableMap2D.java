@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -75,12 +76,14 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.Symbolizer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterVisitor;
 
 /**
  *
@@ -96,8 +99,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     protected MapConstants.EDIT_STATE editState = MapConstants.EDIT_STATE.NONE;
     private MapContext editionContext = new OneLayerContext();
     private MapLayer editionLayer = null;
-    private MapLayer copyLayer = null;
-    private Style editionStyle = null;
+    private final MapLayer copyLayer;
+    private final Style editionStyle;
 
     public JDefaultEditableMap2D() {
         this(new ShapefileRenderer());
@@ -113,15 +116,16 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         layerPane.add(editedPane, new Integer(NEXT_OVER_LAYER_INDEX));
         NEXT_OVER_LAYER_INDEX++;
 
-        buildEditionStyle();
+        editionStyle = buildEditionStyle();
+        copyLayer = createCopyLayer();
 
     }
 
-    private void buildEditionStyle() {
+    private Style buildEditionStyle() {
 
         StyleBuilder sb = new StyleBuilder();
 
-        Fill fill = sb.createFill(Color.RED, 0f);
+        Fill fill = sb.createFill(Color.RED, 0.4f);
         Stroke stroke = sb.createStroke(Color.RED, 2);
         stroke.setOpacity(sb.literalExpression(0.6f));
 
@@ -131,60 +135,50 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         Graphic gra = sb.createGraphic();
         gra.setOpacity(sb.literalExpression(0.6f));
         gra.setMarks(new Mark[]{mark});
-        gra.setSize(sb.literalExpression(12));
+        gra.setSize(sb.literalExpression(14));
         PointSymbolizer ps = sb.createPointSymbolizer(gra);
 
         LineSymbolizer ls = sb.createLineSymbolizer(stroke);
 
-        editionStyle = sb.createStyle();
-        editionStyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(pls));
-        editionStyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
-        editionStyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(ls));
+        Rule r1 = sb.createRule(new Symbolizer[]{ps});
+        r1.setFilter(new GeometryFilter(Point.class, MultiPoint.class));
+        Rule r2 = sb.createRule(new Symbolizer[]{ls});
+        r2.setFilter(new GeometryFilter(LineString.class, MultiLineString.class));
+        Rule r3 = sb.createRule(new Symbolizer[]{pls});
+        r3.setFilter(new GeometryFilter(Polygon.class, MultiPolygon.class));
 
+
+
+        Style stl = sb.createStyle();
+        stl.addFeatureTypeStyle(sb.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
+
+        return stl;
     }
 
-    private void applyStyleFilter(Filter f) {
-
-        for (FeatureTypeStyle fts : editionStyle.getFeatureTypeStyles()) {
-            for (Rule r : fts.getRules()) {
-                r.setFilter(f);
-            }
-        }
-    }
-
-    private MapLayer createCopyLayer(MapLayer editionLayer) {
+    private MapLayer createCopyLayer() {
 
         MemoryDataStore mds = new MemoryDataStore();
-
-
-        Class jtsClass = null;
         SimpleFeatureType featureType = null;
 
+        MapLayer layer = null;
+
         try {
-            jtsClass = editionLayer.getFeatureSource().getSchema().getDefaultGeometry().getType().getBinding();
-        } catch (Exception e) {
-
-        }
-
-        if (jtsClass != null) {
-            try {
-                featureType = DataUtilities.createType("memory", "geom:Geometry");
-            } catch (SchemaException se) {
-                se.printStackTrace();
-            }
+            featureType = DataUtilities.createType("memory", "geom:Geometry");
+        } catch (SchemaException se) {
+            se.printStackTrace();
         }
 
         if (featureType != null) {
             try {
                 mds.createSchema(featureType);
                 FeatureSource fs = ((DataStore) mds).getFeatureSource(((DataStore) mds).getTypeNames()[0]);
-                return new DefaultMapLayer(fs, editionStyle);
+                layer = new DefaultMapLayer(fs, editionStyle);
             } catch (IOException se) {
                 se.printStackTrace();
             }
         }
 
-        return null;
+        return layer;
     }
 
     private void updateOverLayer() {
@@ -381,16 +375,16 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             store = (FeatureStore) editionLayer.getFeatureSource();
             DefaultTransaction transaction = new DefaultTransaction("trans_maj");
 
-            
-            
+
+
             store.setTransaction(transaction);
             FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
-            Filter filter = ff.id(Collections.singleton(ff.featureId(sf.getID())));            
+            Filter filter = ff.id(Collections.singleton(ff.featureId(sf.getID())));
             FeatureType schema = store.getSchema();
-            
+
             SimpleFeatureType featureType = editionLayer.getFeatureSource().getSchema();
             AttributeDescriptor geomAttribut = featureType.getDefaultGeometry();
-                        
+
             try {
                 store.modifyFeatures(geomAttribut, geo, filter);
                 transaction.commit();
@@ -405,8 +399,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
 
         }
-        
-        
+
+
 
     }
 
@@ -481,7 +475,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             fst.removeFeatures(Filter.INCLUDE);
         } catch (Exception e) {
             e.printStackTrace();
-            copyLayer = createCopyLayer(editionLayer);
         }
 
         updateOverLayer();
@@ -518,7 +511,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     public void setMapArea(Envelope mapArea) {
         super.setMapArea(mapArea);
 
-    //updateOverLayer();
+        updateOverLayer();
     }
 
     @Override
@@ -535,6 +528,12 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         super.setContext(newcontext);
     }
 
+    @Override
+    protected void rectangleChanged(Rectangle newRect) {
+        super.rectangleChanged(newRect);
+        updateOverLayer();
+    }
+
     //--------------------EDITABLE MAP2D----------------------------------------
     public void setEditedMapLayer(MapLayer layer) {
 
@@ -543,10 +542,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             fireEditLayerChanged(editionLayer, layer);
             mouseInputListener.fireStateChange();
             editionLayer = layer;
-            copyLayer = FF.duplicateLayer(layer);
-            copyLayer.setStyle(editionStyle);
-
-            copyLayer = createCopyLayer(editionLayer);
+            cleanMemoryGeometry();
+            stopEdition();
         }
 
     }
@@ -597,6 +594,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             geoms.clear();
             nbRightClick = 0;
             inCreation = false;
+            hasEditionGeometry = false;
+            editFeature = null;
+            editedNodeIndex = -1;
             cleanMemoryGeometry();
             updateMemoryGeometry(geoms);
             updateOverLayer();
@@ -689,7 +689,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         }
 
         private void validateGeometryEdit() {
-            validateModifiedGeometry(geoms.get(0), editFeature);
+            if (!geoms.isEmpty()) {
+                validateModifiedGeometry(geoms.get(0), editFeature);
+            }
             bufferPane.layerChanged(null);
             hasEditionGeometry = false;
             editFeature = null;
@@ -961,6 +963,32 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             if (img != null) {
                 g.drawImage(img, 0, 0, this);
             }
+        }
+    }
+
+    private class GeometryFilter implements Filter {
+
+        private List<Class> valids = new ArrayList<Class>();
+
+        public GeometryFilter(Class... classes) {
+            for (Class cl : classes) {
+                valids.add(cl);
+            }
+        }
+
+        public boolean evaluate(Object obj) {
+            if (obj instanceof SimpleFeature) {
+                SimpleFeature sf = (SimpleFeature) obj;
+
+                if (valids.contains(sf.getDefaultGeometry().getClass())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Object accept(FilterVisitor arg0, Object arg1) {
+            return null;
         }
     }
 }

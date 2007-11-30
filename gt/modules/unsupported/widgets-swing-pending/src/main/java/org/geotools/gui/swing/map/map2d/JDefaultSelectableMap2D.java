@@ -210,7 +210,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
     }
 
-    //-------------------OVERLOAD MAP2D-----------------------------------------
+    
+    //-------------------MAP2D--------------------------------------------------
     @Override
     public void setContext(MapContext context) {
         selectionMapContext.clearLayerList();
@@ -234,6 +235,14 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         updateOverLayer();
     }
 
+    @Override
+    protected void rectangleChanged(Rectangle newRect) {
+        super.rectangleChanged(newRect);
+        updateOverLayer();
+    }
+
+    
+    
     //----------------------SELECTABLE MAP2D------------------------------------
     public void addSelectableLayer(MapLayer layer) {
         if (layer != null) {
