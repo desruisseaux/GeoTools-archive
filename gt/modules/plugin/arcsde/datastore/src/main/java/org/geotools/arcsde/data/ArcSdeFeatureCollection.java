@@ -26,7 +26,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcSdeFeatureCollection.java $
  * @see FeatureCollection
  */

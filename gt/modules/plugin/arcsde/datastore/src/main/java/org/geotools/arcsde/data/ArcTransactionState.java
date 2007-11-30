@@ -35,6 +35,7 @@ import com.esri.sde.sdk.client.SeException;
  * instances.
  * 
  * @author Jake Fear
+ * @author Gabriel Roldan
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcTransactionState.java $
  * @version $Id$

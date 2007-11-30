@@ -49,6 +49,7 @@ import com.esri.sde.sdk.client.SeTable;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
+ * @source $URL$
  */
 public abstract class FIDReader {
 

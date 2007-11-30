@@ -13,7 +13,7 @@ import com.esri.sde.sdk.client.SeQueryInfo;
  * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5
- * @URL $URL$
+ * @source $URL$
  */
 final class FeatureTypeInfo {
 

@@ -60,6 +60,8 @@ import org.geotools.data.DataSourceException;
  * </p>
  * 
  * @author Gabriel Roldan, Axios Engineering
+ * @version $Id$
+ * @source $URL$
  */
 public class ViewRegisteringFactoryHelper {
     private static final Logger LOGGER = org.geotools.util.logging.Logging

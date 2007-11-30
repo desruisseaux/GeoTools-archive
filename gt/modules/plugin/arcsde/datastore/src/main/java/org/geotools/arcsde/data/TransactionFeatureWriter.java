@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
-import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
-import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -17,7 +15,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @version $Id: TransactionFeatureWriter.java 28045 2007-11-25 22:56:34Z
  *          groldan $
  * @since 2.5
- * @URL $URL:
+ * @source $URL:
  *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/TransactionFeatureWriter.java $
  */
 class TransactionFeatureWriter extends ArcSdeFeatureWriter {
