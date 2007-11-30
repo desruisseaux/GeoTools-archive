@@ -48,9 +48,9 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
 
     }
 
-    private void setRendering(JDefaultMap2D.BUFFER_TYPE type) {
+    private void setRendering(JDefaultMap2D.STRATEGY type) {
         if (map != null) {
-            map.setMapBufferType(type);
+            map.setRenderingStrategy(type);
         }
     }
 
@@ -66,7 +66,7 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
             RenderingHints rh = renderer.getJava2DHints();
 
             
-            switch (map.getBufferType()){
+            switch (map.getRenderingStrategy()){
                     case SINGLE_BUFFER :
                         jrb_rendering_single_buffer.setSelected(true);
                         break;
@@ -536,19 +536,19 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jcb_ditheringActionPerformed
 
     private void jrb_rendering_single_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_bufferActionPerformed
-        setRendering(JDefaultMap2D.BUFFER_TYPE.SINGLE_BUFFER);
+        setRendering(JDefaultMap2D.STRATEGY.SINGLE_BUFFER);
 }//GEN-LAST:event_jrb_rendering_single_bufferActionPerformed
 
     private void jrb_rendering_multi_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_multi_bufferActionPerformed
-        setRendering(JDefaultMap2D.BUFFER_TYPE.MULTI_BUFFER);
+        setRendering(JDefaultMap2D.STRATEGY.MULTI_BUFFER);
     }//GEN-LAST:event_jrb_rendering_multi_bufferActionPerformed
 
     private void jrb_rendering_merge_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_merge_bufferActionPerformed
-        setRendering(JDefaultMap2D.BUFFER_TYPE.MERGE_BUFFER);
+        setRendering(JDefaultMap2D.STRATEGY.MERGE_BUFFER);
     }//GEN-LAST:event_jrb_rendering_merge_bufferActionPerformed
 
     private void jrb_rendering_single_volatileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_volatileActionPerformed
-        setRendering(JDefaultMap2D.BUFFER_TYPE.SINGLE_VOLATILE);
+        setRendering(JDefaultMap2D.STRATEGY.SINGLE_VOLATILE);
     }//GEN-LAST:event_jrb_rendering_single_volatileActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

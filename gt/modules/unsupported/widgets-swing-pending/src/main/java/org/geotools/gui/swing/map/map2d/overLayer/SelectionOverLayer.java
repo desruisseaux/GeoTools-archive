@@ -24,7 +24,7 @@ import javax.swing.JComponent;
  *
  * @author Johann Sorel
  */
-public class SelectionOverLayer extends JComponent{
+public class SelectionOverLayer extends JComponent implements OverLayer{
 
     private final Color borderColor = new Color(0,255,0);
     private final Color fillColor = new Color(0,255,0,30);
@@ -64,5 +64,13 @@ public class SelectionOverLayer extends JComponent{
             g.setColor(borderColor);
             g.drawRect(startx, starty, width, height);
             }
+    }
+
+    public void refresh() {
+        repaint();
+    }
+
+    public JComponent geComponent() {
+        return this;
     }
 }

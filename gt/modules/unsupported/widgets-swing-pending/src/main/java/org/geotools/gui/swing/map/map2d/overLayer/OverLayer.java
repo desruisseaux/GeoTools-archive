@@ -22,14 +22,10 @@ import javax.swing.JComponent;
  *
  * @author Johann Sorel
  */
-public class SmallMapOverLayer implements OverLayer {
+public interface OverLayer {
 
-    public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public JComponent geComponent() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    public void refresh();
+    
+    public JComponent geComponent();
+    
 }

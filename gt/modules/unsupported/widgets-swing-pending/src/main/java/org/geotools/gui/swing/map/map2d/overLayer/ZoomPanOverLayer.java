@@ -24,7 +24,7 @@ import javax.swing.JComponent;
  *
  * @author Johann Sorel
  */
-public class ZoomPanOverLayer extends JComponent{
+public class ZoomPanOverLayer extends JComponent implements OverLayer{
 
     private final Color borderColor = new Color(0,0,255);
     private final Color fillColor = new Color(0,0,255,60);
@@ -64,5 +64,13 @@ public class ZoomPanOverLayer extends JComponent{
             g.setColor(borderColor);
             g.drawRect(startx, starty, width, height);
             }
+    }
+
+    public void refresh() {
+        repaint();
+    }
+
+    public JComponent geComponent() {
+        return this;
     }
 }

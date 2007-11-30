@@ -21,6 +21,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.geotools.gui.swing.icon.IconBundle;
@@ -29,7 +30,7 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author Johann Sorel
  */
-public class NavigationOverLayer extends JPanel{
+public class NavigationOverLayer extends JPanel implements OverLayer{
 
     public JButton gui_east = new JButton(IconBundle.getResource().getIcon("CP32_actions_1rightarrow"));
     public JButton gui_north = new JButton(IconBundle.getResource().getIcon("CP32_actions_1uparrow"));
@@ -103,5 +104,13 @@ public class NavigationOverLayer extends JPanel{
         b.setOpaque(false);
         b.setContentAreaFilled(false);
         b.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    public void refresh() {
+        repaint();
+    }
+
+    public JComponent geComponent() {
+        return this;
     }
 }

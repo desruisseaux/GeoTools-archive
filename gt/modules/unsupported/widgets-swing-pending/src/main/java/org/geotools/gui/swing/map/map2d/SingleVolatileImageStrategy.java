@@ -18,6 +18,7 @@ package org.geotools.gui.swing.map.map2d;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.VolatileImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +34,8 @@ import org.geotools.map.event.MapLayerListEvent;
  */
 class SingleVolatileImageStrategy extends RenderingStrategy {
 
+    private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+    
     private BufferComponent comp = new BufferComponent(this);
     private JDefaultMap2D map;
 
@@ -45,24 +48,24 @@ class SingleVolatileImageStrategy extends RenderingStrategy {
     //----------------------Rendering-------------------------------------------
     public synchronized void renderOn(Graphics2D ig) {
         if (map.context != null && map.mapArea != null && map.mapRectangle.width > 0 && map.mapRectangle.height > 0) {
-            map.renderer.setContext(map.context);
+            map.getRenderer().setContext(map.context);
             try {
-                map.renderer.paint((Graphics2D) ig, map.mapRectangle, map.mapArea);
+                map.getRenderer().paint((Graphics2D) ig, map.mapRectangle, map.mapArea);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public synchronized void stopRendering() {
-        map.renderer.stopRendering();
-    }
+//    public synchronized void stopRendering() {
+//        map.renderer.stopRendering();
+//    }
 
     public synchronized VolatileImage createBackBuffer() {
         if (map.context != null && map.mapArea != null && map.mapRectangle.width > 0 && map.mapRectangle.height > 0) {
-            return map.GC.createCompatibleVolatileImage(map.mapRectangle.width, map.mapRectangle.height, VolatileImage.TRANSLUCENT);
+            return GC.createCompatibleVolatileImage(map.mapRectangle.width, map.mapRectangle.height, VolatileImage.TRANSLUCENT);
         } else {
-            return map.GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
+            return GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
         }
     }
 
@@ -97,22 +100,13 @@ class SingleVolatileImageStrategy extends RenderingStrategy {
     public JComponent getComponent() {
         return comp;
     }
-    private int nb = 0;
 
     public void raiseNB() {
-        nb++;
-        if (nb == 1) {
-            setChanged();
-            notifyObservers(1);
-        }
+        map.raiseDrawingNumber();
     }
 
     public void lowerNB() {
-        nb--;
-        if (nb == 0) {
-            setChanged();
-            notifyObservers(0);
-        }
+        map.lowerDrawingNumber();
     }
 
     //------------------------PRIVATES CLASSES----------------------------------
@@ -165,7 +159,7 @@ class BufferComponent extends JComponent {
             repainter.start();
         }
 
-        pane.stopRendering();
+        //pane.stopRendering();
         rerenderer = new RerenderingThread(this);
         rerenderer.setGraphics(g);
         rerenderer.start();

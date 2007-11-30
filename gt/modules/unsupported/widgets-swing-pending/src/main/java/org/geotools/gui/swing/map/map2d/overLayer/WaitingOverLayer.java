@@ -32,7 +32,7 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author Johann Sorel
  */
-public class WaitingOverLayer extends JComponent{
+public class WaitingOverLayer extends JComponent implements OverLayer{
 
     private final BufferedImage buffer;
     private boolean drawing = false;
@@ -70,6 +70,14 @@ public class WaitingOverLayer extends JComponent{
         if(drawing){
             g.drawImage(buffer, 0, 0, this);           
             }
+    }
+
+    public void refresh() {
+        repaint();
+    }
+
+    public JComponent geComponent() {
+        return this;
     }
 
     

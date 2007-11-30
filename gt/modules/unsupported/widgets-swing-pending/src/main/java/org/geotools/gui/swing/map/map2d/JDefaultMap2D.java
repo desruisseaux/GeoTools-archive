@@ -17,6 +17,7 @@ package org.geotools.gui.swing.map.map2d;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -36,6 +37,7 @@ import javax.swing.event.EventListenerList;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
+import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.WaitingOverLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -51,28 +53,34 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @author Johann Sorel
  */
-public class JDefaultMap2D extends JPanel implements Map2D, Observer {
+public class JDefaultMap2D extends JPanel implements Map2D {
 
-    public static enum BUFFER_TYPE {
+    public static enum STRATEGY {
         SINGLE_BUFFER,
         MULTI_BUFFER,
         MERGE_BUFFER,
         SINGLE_VOLATILE
     }
-    protected GraphicsConfiguration GC;
+    
     protected final EventListenerList MAP2DLISTENERS = new EventListenerList();
     protected final Map2D THIS_MAP;
-    protected int NEXT_OVER_LAYER_INDEX = 12;
-    protected GTRenderer renderer;
+    
+    private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+    protected Rectangle mapRectangle = new Rectangle(1, 1);    
+        
     protected MapContext context;
-    protected Envelope mapArea;
-    protected JLayeredPane layerPane = new JLayeredPane();
-    protected RenderingStrategy bufferPane = new MultiBufferedImageStrategy(this);
-    protected WaitingOverLayer waitingPane = new WaitingOverLayer();
-    private final MapLayerListListener mapLayerListlistener;
+    protected Envelope mapArea;    
+    protected RenderingStrategy renderingStrategy = new MultiBufferedImageStrategy(this);
+    
+    private final WaitingOverLayer informationOverLayer = new WaitingOverLayer();
+    private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
     private final MapContext buffercontext = new OneLayerContext();
-    private BUFFER_TYPE type = null;
-    protected Rectangle mapRectangle = new Rectangle(1, 1);
+    private final JLayeredPane mapOverLayerPane = new JLayeredPane();
+    private final JLayeredPane userOverLayerPane = new JLayeredPane();
+    private final JLayeredPane mainOverLayerPane = new JLayeredPane();
+    private int nextMapoverLayerIndex = 1;
+    private GTRenderer renderer;
+    private STRATEGY type = null;    
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
 
@@ -83,19 +91,21 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
     public JDefaultMap2D(GTRenderer renderer) {
         this.renderer = renderer;
         this.THIS_MAP = this;
-        mapLayerListlistener = new MapLayerListListen();
-        setLayout(new GridLayout(1, 1));
-        layerPane.setLayout(new BufferLayout());
+        
+        setLayout(new BorderLayout());
+        mapOverLayerPane.setLayout(new BufferLayout());
+        userOverLayerPane.setLayout(new BufferLayout());
+        mainOverLayerPane.setLayout(new BufferLayout());
+        
+        mainOverLayerPane.add( informationOverLayer, new Integer(3));
+        mainOverLayerPane.add( userOverLayerPane, new Integer(2));
+        mainOverLayerPane.add( mapOverLayerPane, new Integer(1));        
+        
+        add(BorderLayout.CENTER,mainOverLayerPane);
 
-        setMapBufferType(BUFFER_TYPE.SINGLE_VOLATILE);
-
-        layerPane.add(waitingPane, new Integer(NEXT_OVER_LAYER_INDEX));
-        NEXT_OVER_LAYER_INDEX++;
-        add(layerPane);
-
-        GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-
+        setRenderingStrategy(STRATEGY.SINGLE_VOLATILE);
         opimizeRenderer();
+        
     }
 
     private void opimizeRenderer() {
@@ -157,26 +167,15 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
 
     protected synchronized BufferedImage createBufferImage(MapLayer layer) {
 
-        buffercontext.clearLayerList();
-
-        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+        if (context != null) {
             try {
                 buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
             } catch (Exception e) {
             }
 
-            buffercontext.addLayer(layer);
-            renderer.setContext(buffercontext);
-
-            //NOT OPTIMIZED
-//            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
-//            Graphics2D ig = buf.createGraphics();
-
-            //GC ACCELERATION        
-            BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
-            Graphics2D ig = buf.createGraphics();
-
-            renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+            buffercontext.addLayer(layer);            
+            BufferedImage buf = createBufferImage(buffercontext);
+            buffercontext.clearLayerList();
             return buf;
         } else {
             return null;
@@ -184,14 +183,17 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
 
     }
 
-    
-
     protected synchronized BufferedImage createBufferImage(MapContext context) {
 
         if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
-            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+            //NOT OPTIMIZED
+//            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+//            Graphics2D ig = buf.createGraphics();
+            //GC ACCELERATION 
+            BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
             Graphics2D ig = buf.createGraphics();
-            renderer.setContext(context);
+            
+            renderer.setContext(context);            
             renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
             return buf;
         } else {
@@ -222,7 +224,7 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
 
             if (changed || complete) {
                 changed = false;
-                bufferPane.redraw(complete);
+                renderingStrategy.redraw(complete);
             }
         }
     }
@@ -231,36 +233,33 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
         mapArea = fixAspectRatio(newRect, mapArea);
     }
     
-
-    public void setMapBufferType(BUFFER_TYPE type) {
+    public void setRenderingStrategy(STRATEGY type) {
         if (this.type != type) {
             this.type = type;
-            bufferPane.deleteObserver(this);
-            layerPane.remove(bufferPane.getComponent());
+            mapOverLayerPane.remove(renderingStrategy.getComponent());
 
             switch (type) {
                 case SINGLE_BUFFER:
-                    bufferPane = new SingleBufferedImageStrategy(this);
+                    renderingStrategy = new SingleBufferedImageStrategy(this);
                     break;
                 case MULTI_BUFFER:
-                    bufferPane = new MultiBufferedImageStrategy(this);
+                    renderingStrategy = new MultiBufferedImageStrategy(this);
                     break;
                 case MERGE_BUFFER:
-                    bufferPane = new MergeBufferedImageStrategy(this);
+                    renderingStrategy = new MergeBufferedImageStrategy(this);
                     break;
                 case SINGLE_VOLATILE:
-                    bufferPane = new SingleVolatileImageStrategy(this);
+                    renderingStrategy = new SingleVolatileImageStrategy(this);
                     break;
             }
 
-            bufferPane.addObserver(this);
-            bufferPane.redraw(false);
+            renderingStrategy.redraw(false);
 
-            layerPane.add(bufferPane.getComponent(), new Integer(11));
+            mapOverLayerPane.add(renderingStrategy.getComponent(), new Integer(0));
         }
     }
 
-    public BUFFER_TYPE getBufferType() {
+    public STRATEGY getRenderingStrategy() {
         return type;
     }
 
@@ -271,19 +270,19 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
     }
 
     private void fireDelete(MapLayerListEvent event) {
-        bufferPane.layerDeleted(event);
+        renderingStrategy.layerDeleted(event);
     }
 
     private void fireChange(MapLayerListEvent event) {
-        bufferPane.layerChanged(event);
+        renderingStrategy.layerChanged(event);
     }
 
     private void fireAdd(MapLayerListEvent event) {
-        bufferPane.layerAdded(event);
+        renderingStrategy.layerAdded(event);
     }
 
     private void fireMove(MapLayerListEvent event) {
-        bufferPane.layerMoved(event);
+        renderingStrategy.layerMoved(event);
     }
 
     private void fireMapAreaChanged(Envelope oldone, Envelope newone) {
@@ -308,6 +307,33 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
 
     }
 
+    //----------------------Over/Sub/information layers-------------------------
+    
+    
+    
+    public void addOverLayer(OverLayer over){
+        
+    }
+    
+    public void showInformationMessage(String str){
+        
+    }
+    
+    protected void addMapOverLayer(OverLayer over){
+        mapOverLayerPane.add(over.geComponent(), new Integer(nextMapoverLayerIndex));
+        nextMapoverLayerIndex++;
+    }
+    
+    protected void raiseDrawingNumber(){
+        
+    }
+    
+    protected void lowerDrawingNumber(){
+        
+    }
+        
+    
+    
     //-----------------------MAP2D----------------------------------------------    
     public void setContext(MapContext context) {
         if (this.context != null) {
@@ -384,14 +410,14 @@ public class JDefaultMap2D extends JPanel implements Map2D, Observer {
         return this;
     }
 
-    public void update(Observable o, Object arg) {
-        int val = (Integer) arg;
-        if (val > 0) {
-            waitingPane.setDrawing(true);
-        } else {
-            waitingPane.setDrawing(false);
-        }
-    }
+//    public void update(Observable o, Object arg) {
+//        int val = (Integer) arg;
+//        if (val > 0) {
+//            informationOverLayer.setDrawing(true);
+//        } else {
+//            informationOverLayer.setDrawing(false);
+//        }
+//    }
 
     public void addMap2DListener(Map2DListener listener) {
         MAP2DLISTENERS.add(Map2DListener.class, listener);

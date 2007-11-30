@@ -125,20 +125,11 @@ class MergeBufferedImageStrategy extends RenderingStrategy {
     private int nb = 0;
 
     public void raiseNB() {
-        nb++;
-        if (nb == 1) {
-            setChanged();
-            notifyObservers(1);
-        }
-
+        map.raiseDrawingNumber();
     }
 
     public void lowerNB() {
-        nb--;
-        if (nb == 0) {
-            setChanged();
-            notifyObservers(0);
-        }
+        map.lowerDrawingNumber();
     }
 
     //-----------------------PRIVATES CLASSES-----------------------------------

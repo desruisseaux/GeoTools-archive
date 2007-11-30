@@ -23,7 +23,7 @@ import org.geotools.map.event.MapLayerListEvent;
  *
  * @author Johann Sorel
  */
-public abstract class RenderingStrategy extends Observable{
+public abstract class RenderingStrategy {
 
         
     public abstract void redraw(boolean complete);

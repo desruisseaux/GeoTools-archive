@@ -34,6 +34,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeometryBuilder;
+import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.SelectionOverLayer;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.map.DefaultMapContext;
@@ -87,10 +88,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         mapLayerListlistener = new MapLayerListListen();
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
-        layerPane.add(selectedPane, new Integer(NEXT_OVER_LAYER_INDEX));
-        NEXT_OVER_LAYER_INDEX++;
-        layerPane.add(selectionPane, new Integer(NEXT_OVER_LAYER_INDEX));
-        NEXT_OVER_LAYER_INDEX++;
+        
+        addMapOverLayer(selectedPane);
+        addMapOverLayer(selectionPane);
 
         buildSelectionStyle();
     }
@@ -138,7 +138,14 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         selectedPane.setBuffer(createBufferImage(selectionMapContext));
     }
 
-    private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
+    protected Coordinate toMapCoord(int mx, int my) {
+        Rectangle bounds = getBounds();
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        return toMapCoord(mx, my,width,height,bounds);
+    }
+    
+    protected Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
         double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
         return new Coordinate(mapX, mapY);
@@ -209,7 +216,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             findFeature(geometry);
         }
     }
-
     
     //-------------------MAP2D--------------------------------------------------
     @Override
@@ -241,7 +247,6 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         updateOverLayer();
     }
 
-    
     
     //----------------------SELECTABLE MAP2D------------------------------------
     public void addSelectableLayer(MapLayer layer) {
@@ -455,7 +460,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
     }
 
-    private class BufferComponent extends JComponent {
+    private class BufferComponent extends JComponent implements OverLayer{
 
         private BufferedImage img;
 
@@ -469,6 +474,12 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             if (img != null) {
                 g.drawImage(img, 0, 0, this);
             }
+        }
+
+        public void refresh() {}
+
+        public JComponent geComponent() {
+            return this;
         }
         }
 }

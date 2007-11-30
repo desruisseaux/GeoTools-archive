@@ -48,9 +48,8 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         super(renderer);
         mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
-        addMouseMotionListener(mouseInputListener);
-        layerPane.add(zoompanPanel, new Integer(NEXT_OVER_LAYER_INDEX));
-        NEXT_OVER_LAYER_INDEX++;
+        addMouseMotionListener(mouseInputListener);        
+        addMapOverLayer(zoompanPanel);
     }
 
     private void fireActionStateChanged(MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone) {
