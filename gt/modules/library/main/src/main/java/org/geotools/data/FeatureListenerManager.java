@@ -170,7 +170,12 @@ public class FeatureListenerManager {
      * will be notified.
      * </li>
      * </ul>
-     * 
+     * <p>
+     * <b>NOTE</b> requiring to fire this event at FeatureWriter.next() is quite
+     * a gap inherited from an old API when {@link FeatureWriter#write()} didn't
+     * exist yet. It's a good idea though to fire the event at FeatureWriter.write()
+     * instead of FeatureWriter.next() so there are actually changes to notify for.
+     * </p>
      *
      * @param typeName typeName being modified
      * @param transaction Transaction used for change
@@ -208,6 +213,12 @@ public class FeatureListenerManager {
      * Transaction will be notified.
      * </li>
      * </ul>
+     * <p>
+     * <b>NOTE</b> requiring to fire this event at FeatureWriter.next() is quite
+     * a gap inherited from an old API when {@link FeatureWriter#write()} didn't
+     * exist yet. It's a good idea though to fire the event at FeatureWriter.write()
+     * instead of FeatureWriter.next() so there are actually changes to notify for.
+     * </p>
      * 
      *
      * @param typeName typeName being modified
