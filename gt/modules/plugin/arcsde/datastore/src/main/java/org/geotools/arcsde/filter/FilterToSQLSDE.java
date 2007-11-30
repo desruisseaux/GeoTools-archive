@@ -16,11 +16,13 @@
  */
 package org.geotools.arcsde.filter;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +36,7 @@ import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.filter.FilterCapabilities;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
@@ -43,6 +46,7 @@ import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.identity.Identifier;
 
 /**
  * Encodes an attribute filter into a SQL WHERE statement for arcsde.
@@ -208,8 +212,14 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
      * @throws RuntimeException
      *             DOCUMENT ME!
      */
-    public Object visit(Id filter, Object unused) {
-        long[] fids = ArcSDEAdapter.getNumericFids(filter.getIdentifiers());
+    public Object visit(final Id filter, final Object unused) {
+        final Set<Identifier> identifiers = filter.getIdentifiers();
+        if (identifiers.size() == 0) {
+            Filter.EXCLUDE.accept(this, unused);
+            return unused;
+        }
+        long[] fids = ArcSDEAdapter.getNumericFids(identifiers);
+
         int nFids = fids.length;
 
         if (nFids == 0) {
@@ -275,6 +285,54 @@ public class FilterToSQLSDE extends FilterToSQL implements FilterVisitor {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         }
 
+        return extraData;
+    }
+
+    /**
+     * Overrides to avoid encoding an empty operator if <code>filter</code>
+     * has no children.
+     */
+    @Override
+    protected Object visit(BinaryLogicOperator filter, Object extraData) {
+        final List<Filter> children = filter.getChildren();
+        if (children.isEmpty()) {
+            return extraData;
+        }
+        return super.visit(filter, extraData);
+    }
+
+    /**
+     * @see {@link FilterVisitor#visit(ExcludeFilter, Object)}
+     * 
+     * Writes the SQL for the IncludeFilter by writing "FALSE".
+     * 
+     * @param the
+     *            filter to be visited
+     */
+    public Object visit(ExcludeFilter filter, Object extraData) {
+        try {
+            out.write("1 = 2");
+        } catch (IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }
+        return extraData;
+    }
+
+    /**
+     * @see {@link FilterVisitor#visit(IncludeFilter, Object)}
+     * 
+     * Writes the SQL for the IncludeFilter by writing "TRUE".
+     * 
+     * @param the
+     *            filter to be visited
+     * 
+     */
+    public Object visit(IncludeFilter filter, Object extraData) {
+        try {
+            out.write("1 = 1");
+        } catch (IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }
         return extraData;
     }
 }

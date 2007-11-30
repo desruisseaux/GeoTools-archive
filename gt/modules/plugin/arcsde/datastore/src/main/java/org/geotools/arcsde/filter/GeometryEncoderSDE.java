@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
 import org.geotools.arcsde.data.ArcSDEGeometryBuildingException;
-import org.geotools.data.DataSourceException;
 import org.geotools.filter.FilterCapabilities;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
@@ -93,6 +92,9 @@ public class GeometryEncoderSDE implements FilterVisitor {
     private static FilterCapabilities capabilities = new FilterCapabilities();
 
     static {
+        capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+        capabilities.addType(Id.class);
+        
         capabilities.addType(BBOX.class);
         capabilities.addType(Contains.class);
         capabilities.addType(Crosses.class);
@@ -101,7 +103,6 @@ public class GeometryEncoderSDE implements FilterVisitor {
         capabilities.addType(Intersects.class);
         capabilities.addType(Overlaps.class);
         capabilities.addType(Within.class);
-        capabilities.addType(And.class);
     }
 
     /** DOCUMENT ME! */
@@ -199,8 +200,19 @@ public class GeometryEncoderSDE implements FilterVisitor {
      * @param filter
      * @param sdeMethod
      * @param truth
+     *            de default truth value for <code>sdeMethod</code>
+     * @param extraData
+     *            if an instanceof java.lang.Boolean, <code>truth</code> is
+     *            and'ed with its boolean value. May have been set by
+     *            {@link #visit(Not, Object)} to revert the logical evaluation
+     *            criteria.
      */
-    private void addSpatialFilter(BinarySpatialOperator filter, int sdeMethod, boolean truth) {
+    private void addSpatialFilter(final BinarySpatialOperator filter, int sdeMethod, boolean truth,
+            final Object extraData) {
+        if (extraData instanceof Boolean) {
+            boolean andValue = ((Boolean) extraData).booleanValue();
+            truth = truth && andValue;
+        }
         org.opengis.filter.expression.Expression left, right;
         PropertyName propertyExpr;
         Literal geomLiteralExpr;
@@ -299,7 +311,7 @@ public class GeometryEncoderSDE implements FilterVisitor {
 
     // The Spatial Operator methods (these call to the above visit() method
     public Object visit(BBOX filter, Object extraData) {
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_ENVP, true);
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_ENVP, true, extraData);
         return extraData;
     }
 
@@ -312,17 +324,17 @@ public class GeometryEncoderSDE implements FilterVisitor {
     }
 
     public Object visit(Contains filter, Object extraData) {
-        addSpatialFilter(filter, SeFilter.METHOD_PC, true);
+        addSpatialFilter(filter, SeFilter.METHOD_PC, true, extraData);
         return extraData;
     }
 
     public Object visit(Crosses filter, Object extraData) {
-        addSpatialFilter(filter, SeFilter.METHOD_LCROSS_OR_CP, true);
+        addSpatialFilter(filter, SeFilter.METHOD_LCROSS_OR_CP, true, extraData);
         return extraData;
     }
 
     public Object visit(Disjoint filter, Object extraData) {
-        addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, false);
+        addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, false, extraData);
         return extraData;
     }
 
@@ -335,24 +347,24 @@ public class GeometryEncoderSDE implements FilterVisitor {
     }
 
     public Object visit(Equals filter, Object extraData) {
-        addSpatialFilter(filter, SeFilter.METHOD_IDENTICAL, true);
+        addSpatialFilter(filter, SeFilter.METHOD_IDENTICAL, true, extraData);
         return extraData;
     }
 
     public Object visit(Intersects filter, Object extraData) {
-        addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, true);
+        addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, true, extraData);
         return extraData;
     }
 
     public Object visit(Overlaps filter, Object extraData) {
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II, true);
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_PC, false);
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, false);
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_II, true, extraData);
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_PC, false, extraData);
+        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, false, extraData);
         return extraData;
     }
 
     public Object visit(Within filter, Object extraData) {
-        addSpatialFilter((BinarySpatialOperator) filter, SeFilter.METHOD_SC, true);
+        addSpatialFilter(filter, SeFilter.METHOD_SC, true, extraData);
         return extraData;
     }
 
@@ -377,19 +389,29 @@ public class GeometryEncoderSDE implements FilterVisitor {
         return extraData;
     }
 
+    public Object visit(Or filter, Object extraData) {
+        List<Filter> children = filter.getChildren();
+        for (Filter child : children) {
+            child.accept(this, extraData);
+        }
+        return extraData;
+    }
+
+    /**
+     * Sets <code>extraData</code> to Boolean.FALSE to revert the truth value
+     * of the spatial filter contained, if any.
+     */
+    public Object visit(Not filter, Object extraData) {
+        Boolean truth = Boolean.FALSE;
+        Filter negated = filter.getFilter();
+        return negated.accept(this, truth);
+    }
+
     public Object visit(ExcludeFilter filter, Object extraData) {
         return extraData;
     }
 
     public Object visit(IncludeFilter filter, Object extraData) {
-        return extraData;
-    }
-
-    public Object visit(Not filter, Object extraData) {
-        return extraData;
-    }
-
-    public Object visit(Or filter, Object extraData) {
         return extraData;
     }
 

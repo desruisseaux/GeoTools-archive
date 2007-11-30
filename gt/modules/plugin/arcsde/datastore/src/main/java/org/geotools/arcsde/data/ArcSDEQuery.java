@@ -770,7 +770,11 @@ class ArcSDEQuery {
             return currentRow;
         } catch (SeException e) {
             close();
-            throw new ArcSdeException(e);
+            String msg = "Error fetching row for " + this.schema.getTypeName() + "[";
+            msg += "\nFilter: " + filters.sourceFilter;
+            msg += "\n where clause sent: " + filters.sdeSqlConstruct.getWhere();
+            msg += "\ngeometry filter:" + filters.geometryFilter;
+            throw new ArcSdeException(msg, e);
         } catch (Exception e) {
             close();
             LOGGER.log(Level.SEVERE, "fetching row: " + e.getMessage(), e);

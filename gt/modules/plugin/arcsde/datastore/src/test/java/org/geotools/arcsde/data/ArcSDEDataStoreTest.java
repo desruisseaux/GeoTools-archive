@@ -18,6 +18,7 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -50,6 +51,7 @@ import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
+import org.opengis.filter.Not;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -578,11 +580,20 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         And mixedFilter = ff.and(sqlFilter, bboxFilter);
 
+        Not not = ff.not(ff.id(Collections.singleton(ff.featureId(testData.getTemp_table()
+                + ".90000"))));
+
+        mixedFilter = ff.and(mixedFilter, not);
+
         LOGGER.fine("Mixed filter: " + mixedFilter);
 
         // verify both filter constraints are met
-        testFilter(mixedFilter, fs, EXPECTED_RESULT_COUNT);
-
+        try {
+            testFilter(mixedFilter, fs, EXPECTED_RESULT_COUNT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
         // check that getBounds and size do function
         FeatureIterator reader = null;
         FeatureCollection results = fs.getFeatures(mixedFilter);
