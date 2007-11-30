@@ -539,7 +539,7 @@ public abstract class GeographicImageReader extends ImageReader {
                     }
                     final double extent = maximum - minimum;
                     if (extent >= 0 && (isFloat || extent <= (ceil - floor))) {
-                        allRanges = (allRanges != null) ? (NumberRange) allRanges.union(range) : range;
+                        allRanges = (allRanges != null) ? allRanges.union(range) : range;
                     } else {
                         // Use range.getMin/MaxValue() because they may be integers rather than doubles.
                         warningOccurred("getRawImageType", Errors.format(ErrorKeys.BAD_RANGE_$2,

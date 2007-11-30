@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies and extensions
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RasterFormatException;
@@ -32,11 +31,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import javax.units.Unit;
-
-// JAI dependencies
 import javax.media.jai.iterator.WritableRectIter;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.Matrix;
@@ -45,7 +41,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.wkt.UnformattableObjectException;
@@ -71,7 +66,7 @@ import org.geotools.util.NumberRange;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-class CategoryList extends AbstractList implements MathTransform1D, Comparator, Serializable {
+class CategoryList extends AbstractList implements MathTransform1D, Comparator<Category>, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -96,7 +91,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * only when first requested.
      */
     private transient NumberRange range;
-    
+
     /**
      * List of {@link Category#minimum} values for each category in {@link #categories}.
      * This array <strong>must</strong> be in increasing order. Actually, this is the
@@ -201,7 +196,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
          */
         final boolean isGeophysics = (this instanceof GeophysicsCategoryList);
         assert (inverse != null) == isGeophysics;
-        this.categories = categories = (Category[]) categories.clone();
+        this.categories = categories = categories.clone();
         for (int i=0; i<categories.length; i++) {
             categories[i] = categories[i].geophysics(isGeophysics);
         }
@@ -216,7 +211,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         minimums = new double[categories.length];
         for (int i=0; i<categories.length; i++) {
             final double minimum = minimums[i] = categories[i].minimum;
-            if (i!=0) {
+            if (i != 0) {
                 assert !(minimum < minimums[i-1]) : minimum; // Use '!' to accept NaN.
                 final Category previous = categories[i-1];
                 if (compare(minimum, previous.maximum) <= 0) {
@@ -315,17 +310,17 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Compare {@link Category} objects according their {@link Category#minimum} value.
+     * Compares {@link Category} objects according their {@link Category#minimum} value.
      * This is used for sorting the {@link #categories} array at construction time.
      */
-    public final int compare(final Object o1, final Object o2) {
-        return compare(((Category)o1).minimum, ((Category)o2).minimum);
+    public final int compare(final Category o1, final Category o2) {
+        return compare(o1.minimum, o2.minimum);
     }
 
     /**
-     * Compare deux valeurs de type {@code double}. Cette méthode
-     * est similaire à {@link Double#compare(double,double)}, excepté
-     * qu'elle ordonne aussi les différentes valeurs NaN.
+     * Compares two {@code double} values. This method is similar to
+     * {@link Double#compare(double,double)} except that it also order
+     * NaN values.
      */
     private static int compare(final double v1, final double v2) {
         if (Double.isNaN(v1) && Double.isNaN(v2)) {
@@ -336,7 +331,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return Double.compare(v1, v2);
     }
-    
+
     /**
      * Vérifie si le tableau de catégories spécifié est bien en ordre croissant.
      * La comparaison ne tient pas compte des valeurs {@code NaN}. Cette
@@ -353,7 +348,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return true;
     }
-    
+
     /**
      * Effectue une recherche bi-linéaire de la valeur spécifiée. Cette
      * méthode est semblable à {@link Arrays#binarySearch(double[],double)},
@@ -485,11 +480,12 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
 
         /** Returns the name in the default locale. */
+        @Override
         public String toString() {
             return toString(Locale.getDefault());
         }
     }
-    
+
     /**
      * Returns the unit information for quantitative categories in this list. May returns
      * {@code null} if there is no quantitative categories in this list, or if there is no
@@ -503,7 +499,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     public Unit getUnits() {
         return null;
     }
-    
+
     /**
      * Returns the range of values in this category list. This is the union of the range
      * of values of every categories, excluding {@code NaN} values. A {@link NumberRange}
@@ -523,7 +519,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                 final NumberRange extent = categories[i].getRange();
                 if (!Double.isNaN(extent.getMinimum()) && !Double.isNaN(extent.getMaximum())) {
                     if (range != null) {
-                        range = NumberRange.wrap(range.union(extent));
+                        range = range.union(extent);
                     } else {
                         range = extent;
                     }
@@ -533,7 +529,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return range;
     }
-    
+
     /**
      * Format the range of geophysics values.
      *
@@ -557,7 +553,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         buffer.append(']');
         return buffer;
     }
-    
+
     /**
      * Format the specified value using the specified locale convention. This method is to be
      * overridden by {@link GeophysicsCategoryList}. The default implementation do not format
@@ -576,7 +572,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     {
         return buffer.append(value);
     }
-    
+
     /**
      * Returns a color model for this category list. This method builds up the color model
      * from each category's colors (as returned by {@link Category#getColors}).
@@ -613,7 +609,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return ColorModelFactory.getColorModel(categories, type, visibleBand, numBands);
     }
-    
+
     /**
      * Returns a color model for this category list. This method builds up the color model
      * from each category's colors (as returned by {@link Category#getColors}).
@@ -631,7 +627,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     public final ColorModel getColorModel(final int visibleBand, final int numBands, final int type) {
         return ColorModelFactory.getColorModel(categories, type, visibleBand, numBands);
     }
-    
+
     /**
      * Returns the category of the specified sample value.
      * If no category fits, then this method returns {@code null}.
@@ -693,9 +689,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return null;
     }
-    
+
     /**
-     * Format a sample value. If {@code value} is a real number, then the value may
+     * Formats a sample value. If {@code value} is a real number, then the value may
      * be formatted with the appropriate number of digits and the units symbol. Otherwise,
      * if {@code value} is {@code NaN}, then the category name is returned.
      *
@@ -745,19 +741,21 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     /**
      * Returns all categories in this {@code CategoryList}.
      */
+    @Override
     public final Object[] toArray() {
-        return (Category[]) categories.clone();
+        return categories.clone();
     }
-    
+
     /**
      * Returns a string representation of this category list.
      * The returned string is implementation dependent.
      * It is usually provided for debugging purposes only.
      */
+    @Override
     public final String toString() {
         return toString(this);
     }
-    
+
     /**
      * Returns a string representation of this category list. The {@code owner}
      * argument allow for a different class name to be formatted.
@@ -781,12 +779,13 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return buffer.toString();
     }
-    
+
     /**
      * Compares the specified object with this category list for equality.
      * If the two objects are instances of {@link CategoryList}, then the
      * test is a little bit stricter than the default {@link AbstractList#equals}.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof CategoryList) {
             final CategoryList that = (CategoryList) object;
@@ -821,21 +820,21 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     public final int getSourceDimensions() {
         return 1;
     }
-    
+
     /**
      * Gets the dimension of output points, which is 1.
      */
     public final int getTargetDimensions() {
         return 1;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      */
     public boolean isIdentity() {
         return false;
     }
-    
+
     /**
      * Returns the inverse transform of this object.
      */
@@ -853,7 +852,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                     ErrorKeys.MISMATCHED_DIMENSION_$2, 1, dim));
         }
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
@@ -869,7 +868,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         ptDst.setOrdinate(0, transform(ptSrc.getOrdinate(0)));
         return ptDst;
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.
      */
@@ -877,7 +876,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         checkDimension(point);
         return new Matrix1(derivative(point.getOrdinate(0)));
     }
-    
+
     /**
      * Gets the derivative of this function at a value.
      *
@@ -898,7 +897,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         return category.transform.derivative(value);
     }
-    
+
     /**
      * Transforms the specified value.
      *
@@ -925,7 +924,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         assert category == inverse.getCategory(value).inverse : category;
         return value;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values. This implementation can work on
      * either float or double arrays, since the quasi-totality of the implementation is the
@@ -1063,7 +1062,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         last = category;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -1072,7 +1071,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     {
         transform(srcPts, null, srcOff, dstPts, null, dstOff, numPts, true);
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values.
      */
@@ -1081,7 +1080,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     {
         transform(null, srcPts, srcOff, null, dstPts, dstOff, numPts, false);
     }
-    
+
     /**
      * Transform a raster. Only the current band in {@code iterator} will be transformed.
      * The transformed value are write back in the {@code iterator}. If a different

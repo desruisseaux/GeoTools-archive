@@ -122,9 +122,6 @@ public class LoggedFormat<T> extends Format {
      *
      * @param caller The class to declare as the warning emitter, or {@code null} if none.
      * @param method The method to declare as the warning emitter, or {@code null} if none.
-     *
-     * @todo Use Class.getSimpleName() or something like that when we will be allowed to compile
-     *       for J2SE 1.5.
      */
     public void setCaller(final Class<?> caller, final String method) {
         this.className  = (caller != null) ? caller.getName() : null;

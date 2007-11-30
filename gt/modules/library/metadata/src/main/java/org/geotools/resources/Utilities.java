@@ -59,6 +59,26 @@ public final class Utilities {
      * This method may be useful when the objects may or may not be array. If they are known
      * to be arrays, consider using {@link Arrays#deepEquals(Object[],Object[])} or one of its
      * primitive counter-part instead.
+     * <p>
+     * <strong>Rules for choosing an {@code equals} or {@code deepEquals} method</strong>
+     * <ul>
+     *   <li>If <em>both</em> objects are declared as {@code Object[]} (not anything else like
+     *   {@code String[]}), consider using {@link java.util.Arrays#deepEquals(Object[],Object[])}
+     *   except if it is known that the array elements can never be other arrays.</li>
+     *
+     *   <li>Otherwise if both objects are arrays (e.g. {@code Expression[]}, {@code String[]},
+     *   {@code int[]}, <cite>etc.</cite>), use {@link java.util.Arrays#equals(Object[],Object[])}.
+     *   This rule is applicable to arrays of primitive type too, since {@code Arrays.equals} is
+     *   overriden with primitive counter-parts.</li>
+     *
+     *   <li>Otherwise if at least one object is anything else than {@code Object} (e.g.
+     *   {@code String}, {@code Expression}, <cite>etc.</cite>), use {@link #equals(Object,Object)}.
+     *   Using this {@code deepEquals} method would be an overkill since there is no chance that
+     *   {@code String} or {@code Expression} could be an array.</li>
+     *
+     *   <li>Otherwise if <em>both</em> objects are declared exactly as {@code Object} type and
+     *   it is known that they could be arrays, only then invoke this {@code deepEquals} method.</li>
+     * </ul>
      */
     public static boolean deepEquals(final Object object1, final Object object2) {
         if (object1 == object2) {
@@ -222,7 +242,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * @param error   The error.
      */
     public static void recoverableException(final String   paquet,
-                                            final Class    classe,
+                                            final Class<?> classe,
                                             final String   method,
                                             final Throwable error)
     {

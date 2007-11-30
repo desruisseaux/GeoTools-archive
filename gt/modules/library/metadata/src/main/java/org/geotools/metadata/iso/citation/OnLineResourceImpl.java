@@ -213,8 +213,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
         try {
             setLinkage(new URI(linkage));
         } catch (URISyntaxException exception) {
-            // Should never happen. TODO: chain the exception in J2SE 1.5.
-            throw new IllegalArgumentException(/*exception*/);
+            throw new IllegalArgumentException(exception);
         }
         setFunction(OnLineFunction.INFORMATION);
     }

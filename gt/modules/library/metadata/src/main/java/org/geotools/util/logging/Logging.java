@@ -429,7 +429,6 @@ public final class Logging {
     public static void unexpectedException(final String paquet, final Class classe,
                                            final String method, final Throwable error)
     {
-        // TODO: use getSimpleName() or getCanonicalName() when we will be allowed to target J2SE 1.5.
         unexpectedException(paquet, (classe != null) ? classe.getName() : (String) null, method, error);
     }
 

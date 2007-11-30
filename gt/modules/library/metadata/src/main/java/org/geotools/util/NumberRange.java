@@ -345,13 +345,13 @@ public class NumberRange extends Range {
     public boolean contains(final Number value) {
         final Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), value.getClass());
-        return castTo(type)._contains(ClassChanger.cast(value, type));
+        return castTo(type).containsImpl(ClassChanger.cast(value, type));
     }
 
     /**
      * Performs the contains test (no type check).
      */
-    private boolean _contains(final Number value) {
+    private boolean containsImpl(final Number value) {
         return super.contains((Comparable) value);
     }
 
@@ -362,13 +362,13 @@ public class NumberRange extends Range {
     public boolean contains(final Range range) {
         final Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        return castTo(type)._contains(convertAndCast(range, type));
+        return castTo(type).containsImpl(convertAndCast(range, type));
     }
 
     /**
      * Performs the test (no type check).
      */
-    private boolean _contains(final Range range) {
+    private boolean containsImpl(final NumberRange range) {
         return super.contains(range);
     }
 
@@ -379,51 +379,43 @@ public class NumberRange extends Range {
     public boolean intersects(final Range range) {
         final Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        return castTo(type)._intersects(convertAndCast(range, type));
+        return castTo(type).intersectsImpl(convertAndCast(range, type));
     }
 
     /**
      * Performs the test (no type check).
      */
-    private boolean _intersects(final Range range) {
+    private boolean intersectsImpl(final NumberRange range) {
         return super.intersects(range);
     }
 
     /**
      * Returns the union of this range with the given range.
      * Widening conversions will be applied as needed.
-     *
-     * @todo The return type will be changed to {@code NumberRange} when J2SE 1.5
-     *       will be available. We should then search for NumberRange.warp(...) in all
-     *       client classes; some 'warp' may no longer be needed.
      */
     @Override
-    public Range union(final Range range) {
+    public NumberRange union(final Range range) {
         final Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        return wrap(castTo(type)._union(convertAndCast(range, type)));
+        return wrap(castTo(type).unionImpl(convertAndCast(range, type)));
     }
 
     /**
      * Performs the union (no type check).
      */
-    private Range _union(final Range range) {
+    private Range unionImpl(final NumberRange range) {
         return super.union(range);
     }
 
     /**
      * Returns the intersection of this range with the given range.
      * Widening conversions will be applied as needed.
-     *
-     * @todo The return type will be changed to {@code NumberRange} when J2SE 1.5
-     *       will be available. We should then search for NumberRange.warp(...) in all
-     *       client classes; some 'warp' may no longer be needed.
      */
     @Override
-    public Range intersect(final Range range) {
+    public NumberRange intersect(final Range range) {
         Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        final Range result = castTo(type)._intersect(convertAndCast(range, type));
+        final Range result = castTo(type).intersectImpl(convertAndCast(range, type));
         /*
          * Use a finer type capable to holds the result (since the intersection may have
          * reduced the range), but not finer than the finest type of the ranges used in
@@ -440,33 +432,34 @@ public class NumberRange extends Range {
     /**
      * Performs the intersection (no type check).
      */
-    private Range _intersect(final Range range) {
+    private Range intersectImpl(final NumberRange range) {
         return super.intersect(range);
     }
 
     /**
      * Returns the range of values that are in this range but not in the given range.
-     *
-     * @todo Consider changing the return type to {@code NumberRange} when we will be allowed
-     *       to compile for J2SE 1.5.
      */
     @Override
-    public Range[] subtract(final Range range) {
+    public NumberRange[] subtract(final Range range) {
         Class<? extends Number> type =
                 ClassChanger.getWidestClass(getElementClass(), getElementClass(range));
-        final Range[] result = castTo(type)._subtract(convertAndCast(range, type));
+        final Range[] result = castTo(type).subtractImpl(convertAndCast(range, type));
+        final NumberRange[] casted;
         if (result != null) {
+            casted = new NumberRange[result.length];
             for (int i=0; i<result.length; i++) {
-                result[i] = wrap(result[i]);
+                casted[i] = wrap(result[i]);
             }
+        } else {
+            casted = null;
         }
-        return result;
+        return casted;
     }
 
     /**
      * Performs the substraction (no type check).
      */
-    private Range[] _subtract(final Range range) {
+    private Range[] subtractImpl(final NumberRange range) {
         return super.subtract(range);
     }
 
