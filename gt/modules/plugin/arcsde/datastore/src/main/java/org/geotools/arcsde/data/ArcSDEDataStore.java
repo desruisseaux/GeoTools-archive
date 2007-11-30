@@ -306,7 +306,6 @@ public class ArcSDEDataStore implements DataStore {
      *         user has write permissions over <code>typeName</code>
      */
     public FeatureSource getFeatureSource(final String typeName) throws IOException {
-        System.err.println("getFeatureSource(" + typeName + ")");
         final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName);
 
         FeatureSource fsource;

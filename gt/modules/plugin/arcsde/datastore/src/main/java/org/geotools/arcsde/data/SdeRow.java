@@ -90,8 +90,6 @@ class SdeRow {
             }
         } catch (SeException e) {
             throw new ArcSdeException("getting property #" + i, e);
-        } catch (Exception e) {
-            System.err.println("statusIndicator=" + statusIndicator + ", i=" + i);
         }
     }
 
