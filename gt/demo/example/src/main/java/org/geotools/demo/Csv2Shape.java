@@ -17,9 +17,11 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.wfs.CreateFeatureTypeTest;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -47,7 +49,7 @@ public class Csv2Shape {
 	 */
 	public static void main(String[] args) throws Exception {
 		File file = getCSVFile(args);
-		SimpleFeatureType type = DataUtilities.createType("Location", "location:Point,name:String");
+		final SimpleFeatureType TYPE = DataUtilities.createType("Location", "location:Point,name:String"); // see createFeatureType();
 
 		FeatureCollection collection = FeatureCollections.newCollection();
 		BufferedReader reader = new BufferedReader( new FileReader( file ));
@@ -63,7 +65,7 @@ public class Csv2Shape {
 				GeometryFactory factory = new GeometryFactory();
 				Point point = factory.createPoint( new Coordinate(longitude,latitude));
 
-                SimpleFeature feature = SimpleFeatureBuilder.build(  type, new Object[]{point, name}, null );
+                SimpleFeature feature = SimpleFeatureBuilder.build( TYPE, new Object[]{point, name}, null );
 
 				collection.add( feature );
 			}
@@ -80,7 +82,7 @@ public class Csv2Shape {
 		create.put("create spatial index",Boolean.TRUE);
 		
 		ShapefileDataStore newDataStore = (ShapefileDataStore) factory.createNewDataStore( create );
-		newDataStore.createSchema( type );
+		newDataStore.createSchema( TYPE );
 		newDataStore.forceSchemaCRS( DefaultGeographicCRS.WGS84 );
 		
 		Transaction transaction = new DefaultTransaction("create");
@@ -159,5 +161,26 @@ public class Csv2Shape {
 		}
 		return file;
 	}
-	
+	/**
+	 * Here is how you can use a SimpleFeatureType build to create
+	 * the schema for your shapefile dynamically.
+	 * <p>
+	 * This method is an improvement on the origional example as we
+	 * are specifying DefaultGeographicCRS.WGS84 and a maximum field length.
+	 * <p>
+	 * @return SimpleFeatureType
+	 */
+	static SimpleFeatureType createFeatureType(){
+	    
+	    SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+	    builder.setName( "Location" );
+	    builder.setCRS( DefaultGeographicCRS.WGS84 );
+	    
+	    //add attributes in order
+	    builder.add( "Location", Point.class );
+	    builder.length(15).add( "Name", String.class );
+	    
+	    //build the type
+	    return builder.buildFeatureType();
+	}
 }
