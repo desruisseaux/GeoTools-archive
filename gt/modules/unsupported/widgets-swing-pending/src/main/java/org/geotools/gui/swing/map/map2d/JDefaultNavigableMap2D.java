@@ -20,15 +20,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.Date;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.MouseInputListener;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanOverLayer;
-import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.shape.ShapefileRenderer;
 
 /**
  * @author Johann Sorel
@@ -41,11 +38,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
     protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
 
     public JDefaultNavigableMap2D() {
-        this(new ShapefileRenderer());
-    }
-
-    public JDefaultNavigableMap2D(GTRenderer renderer) {
-        super(renderer);
+        super();
         mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);        

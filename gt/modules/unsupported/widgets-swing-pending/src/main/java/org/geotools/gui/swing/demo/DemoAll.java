@@ -91,7 +91,7 @@ public class DemoAll extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
 
-        map = new JDefaultEditableMap2D(new ShapefileRenderer());
+        map = new JDefaultEditableMap2D();
         map.getComponent().setOpaque(false);
         
         final MapContext context = buildContext();

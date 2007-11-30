@@ -16,7 +16,6 @@
 package org.geotools.gui.swing.map.map2d.strategy;
 
 import org.geotools.gui.swing.map.map2d.*;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -28,24 +27,23 @@ import javax.swing.JLayeredPane;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.renderer.GTRenderer;
 
 /**
  * 
  * @author Johann Sorel
  */
-public class MergeBufferedImageStrategy implements RenderingStrategy {
+public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
 
     private final JLayeredPane pane = new JLayeredPane();
     private Map<MapLayer, BufferedImage> stock = new HashMap<MapLayer, BufferedImage>();
     private BufferComponent component = new BufferComponent();
-    private JDefaultMap2D map;
     private MapContext oldcontext = null;
     private Thread thread = null;
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    public MergeBufferedImageStrategy(JDefaultMap2D map) {
-        this.map = map;
+    public MergeBufferedImageStrategy() {
         pane.setLayout(new BufferLayout());
         pane.add(component,new Integer(0));
     }
@@ -56,11 +54,10 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
 
     private void mergeBuffer(){
-        MapContext context = map.getContext();
         MapLayer[] layers = context.getLayers();
         
         if(layers.length >0){
-            BufferedImage img = map.createBufferImage(layers[0]);
+            BufferedImage img = createBufferImage(layers[0]);
             Graphics2D g2d = (Graphics2D) img.getGraphics();
             
             for(int i=1, n = layers.length; i<n ; i++){
@@ -92,7 +89,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
     public void layerChanged(MapLayerListEvent event) {
         MapLayer layer = event.getLayer();
-        BufferedImage buffer = map.createBufferImage(layer);
+        BufferedImage buffer = createBufferImage(layer);
         stock.put(layer, buffer);
         
         mergeBuffer();
@@ -107,7 +104,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
 
     public void layerAdded(MapLayerListEvent event) {
         MapLayer layer = event.getLayer();
-        BufferedImage buffer = map.createBufferImage(layer);       
+        BufferedImage buffer = createBufferImage(layer);       
         stock.put(layer, buffer);    
         
         mergeBuffer();
@@ -123,11 +120,11 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
     private int nb = 0;
 
     public void raiseNB() {
-        map.raiseDrawingNumber();
+        //map.raiseDrawingNumber();
     }
 
     public void lowerNB() {
-        map.lowerDrawingNumber();
+        //map.lowerDrawingNumber();
     }
 
     //-----------------------PRIVATES CLASSES-----------------------------------
@@ -140,7 +137,6 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
             while (mustupdate) {
                 mustupdate = false;
 
-                MapContext context = map.getContext();
                 if (context != null) {
                     if (complete || getBufferSize() != context.getLayerCount() || context != oldcontext) {
                         oldcontext = context;
@@ -150,7 +146,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
                         stock.clear();
                         for (int i = contextsize - 1; i >= 0 && !mustupdate; i--) {
                             MapLayer layer = context.getLayer(i);
-                            BufferedImage buffer = map.createBufferImage(layer);
+                            BufferedImage buffer = createBufferImage(layer);
                             stock.put(layer, buffer);
                         }
 
@@ -161,7 +157,7 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
                         int contextsize = keys.length;
 
                         for (int i = contextsize - 1; i >= 0 && !mustupdate; i--) {
-                            stock.put(keys[i], map.createBufferImage(keys[i]));
+                            stock.put(keys[i], createBufferImage(keys[i]));
                         }
 
                     }
@@ -190,6 +186,22 @@ public class MergeBufferedImageStrategy implements RenderingStrategy {
                 g.drawImage(img, 0, 0, this);
             }
         }
+    }
+
+    public void setRenderer(GTRenderer renderer) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public GTRenderer getRenderer() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public BufferedImage createBufferImage(MapLayer layer) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public BufferedImage createBufferImage(MapContext context) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
 

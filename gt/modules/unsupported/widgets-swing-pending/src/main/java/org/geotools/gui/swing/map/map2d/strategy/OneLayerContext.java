@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.strategy;
 
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.geom.AffineTransform;

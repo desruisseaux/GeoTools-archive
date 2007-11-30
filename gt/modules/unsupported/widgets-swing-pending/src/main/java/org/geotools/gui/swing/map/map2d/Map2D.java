@@ -20,9 +20,8 @@ import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Component;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.map.MapContext;
-import org.geotools.renderer.GTRenderer;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  *
@@ -33,18 +32,15 @@ public interface Map2D extends Map{
     public void setContext(MapContext context);
     public MapContext getContext();
         
-    public void setRenderer(GTRenderer renderer);
-    public GTRenderer getRenderer();
-    
     public void setMapArea(Envelope mapArea);
     public Envelope getMapArea();
-   
-    public void setCoordinateReferenceSystem(CoordinateReferenceSystem crs);
-    public CoordinateReferenceSystem getCoordinateReferenceSystem();
-            
-    public void refresh();
-    public Component getComponent();
     
+    public void setRenderingStrategy(RenderingStrategy strategy);
+    public RenderingStrategy getRenderingStrategy();
+                    
+    public void refresh();
+    
+    public Component getComponent();    
     
     public void addMap2DListener(Map2DListener listener);
     public void removeMap2DListener(Map2DListener listener);

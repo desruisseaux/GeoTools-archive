@@ -15,82 +15,156 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.gui.swing.map.map2d.*;
-import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
-
+import org.geotools.renderer.GTRenderer;
+import org.geotools.renderer.shape.ShapefileRenderer;
 
 /**
  *
  * @author Johann Sorel
  */
-public class SingleVolatileImageStrategy implements RenderingStrategy {
+public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    
-    private BufferComponent comp = new BufferComponent(this);
-    private JDefaultMap2D map;
+    private final MapContext buffercontext = new OneLayerContext();
+    private final BufferComponent comp = new BufferComponent(this);
+    private int nbthread = 0;
 
-    //optimize with hardware doublebuffer, also called backbuffer
-    public SingleVolatileImageStrategy(JDefaultMap2D map) {
-        this.map = map;
+    public SingleVolatileImageStrategy() {
+        this(new ShapefileRenderer());
+    }
+
+    public SingleVolatileImageStrategy(GTRenderer renderer) {
+        this.renderer = renderer;
+        opimizeRenderer();
+    }
+
+    private void opimizeRenderer() {
+
+        if (renderer != null) {
+            Map rendererParams = new HashMap();
+            rendererParams.put("optimizedDataLoadingEnabled", new Boolean(true));
+            rendererParams.put("maxFiltersToSendToDatastore", new Integer(20));
+            //rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_STRING);
+            // rendererParams.put(ShapefileRenderer.TEXT_RENDERING_KEY, ShapefileRenderer.TEXT_RENDERING_OUTLINE);
+            rendererParams.put(ShapefileRenderer.SCALE_COMPUTATION_METHOD_KEY, ShapefileRenderer.SCALE_OGC);
+            renderer.setRendererHints(rendererParams);
+
+            RenderingHints rh;
+            rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            rh.add(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
+            rh.add(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
+            rh.add(new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED));
+            rh.add(new RenderingHints(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF));
+            rh.add(new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE));
+            renderer.setJava2DHints(rh);
+        }
 
     }
 
-    //----------------------Rendering-------------------------------------------
-    public synchronized void renderOn(Graphics2D ig) {
-        MapContext context = map.getContext();
-        Envelope mapArea = map.getMapArea();
-        
+    private synchronized void renderOn(Graphics2D ig) {
+
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
-        
+
         if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
-            map.getRenderer().setContext(context);
+            getRenderer().setContext(context);
             try {
-                map.getRenderer().paint((Graphics2D) ig, mapRectangle, mapArea);
+                getRenderer().paint((Graphics2D) ig, mapRectangle, mapArea);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-//    public synchronized void stopRendering() {
-//        map.renderer.stopRendering();
-//    }
+    private synchronized VolatileImage createBackBuffer() {
 
-    public synchronized VolatileImage createBackBuffer() {
-        MapContext context = map.getContext();
-        Envelope mapArea = map.getMapArea();
-        
         Rectangle newRect = comp.getBounds();
         Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
-        
-        
+
+
         if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
-            return GC.createCompatibleVolatileImage(mapRectangle.width,mapRectangle.height, VolatileImage.TRANSLUCENT);
+            return GC.createCompatibleVolatileImage(mapRectangle.width, mapRectangle.height, VolatileImage.TRANSLUCENT);
         } else {
             return GC.createCompatibleVolatileImage(1, 1, VolatileImage.TRANSLUCENT);
         }
     }
 
     private void fit() {
-        MapContext context = map.getContext();
-        if (context != null && map.getMapArea() != null) {
+        if (context != null && mapArea != null) {
             comp.refresh();
         }
+    }
+
+    private synchronized void raiseNB() {
+        nbthread++;
+        if (nbthread == 1) {
+            fireRenderingEvent(true);
+        }
+    }
+
+    private synchronized void lowerNB() {
+        nbthread--;
+        if (nbthread == 0) {
+            fireRenderingEvent(false);
+        }
+    }
+
+    //--------------------RenderingStrategy-------------------------------------
+    public synchronized BufferedImage createBufferImage(MapLayer layer) {
+
+        if (context != null) {
+            try {
+                buffercontext.setCoordinateReferenceSystem(context.getCoordinateReferenceSystem());
+            } catch (Exception e) {
+            }
+
+            buffercontext.addLayer(layer);
+            BufferedImage buf = createBufferImage(buffercontext);
+            buffercontext.clearLayerList();
+            return buf;
+        } else {
+            return null;
+        }
+
+    }
+
+    public synchronized BufferedImage createBufferImage(MapContext context) {
+
+        Rectangle newRect = comp.getBounds();
+        Rectangle mapRectangle = new Rectangle(newRect.width, newRect.height);
+
+        if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
+            //NOT OPTIMIZED
+//            BufferedImage buf = new BufferedImage(mapRectangle.width, mapRectangle.height, BufferedImage.TYPE_INT_ARGB);
+//            Graphics2D ig = buf.createGraphics();
+            //GC ACCELERATION 
+            BufferedImage buf = GC.createCompatibleImage(mapRectangle.width, mapRectangle.height, BufferedImage.TRANSLUCENT);
+            Graphics2D ig = buf.createGraphics();
+
+            renderer.setContext(context);
+            renderer.paint((Graphics2D) ig, mapRectangle, mapArea);
+            return buf;
+        } else {
+            return null;
+        }
+
     }
 
     public void redraw(boolean complete) {
@@ -117,149 +191,132 @@ public class SingleVolatileImageStrategy implements RenderingStrategy {
         return comp;
     }
 
-    public void raiseNB() {
-        map.raiseDrawingNumber();
-    }
-
-    public void lowerNB() {
-        map.lowerDrawingNumber();
-    }
-
     //------------------------PRIVATES CLASSES----------------------------------
-}
-class BufferComponent extends JComponent {
+    private class BufferComponent extends JComponent {
 
-    public Boolean ACTIF = false;
-    private GraphicsConfiguration GC;
-    private SingleVolatileImageStrategy pane;
-    private VolatileImage buffer;
-    private RepaintingThread repainter;
-    private RerenderingThread rerenderer;
-    private boolean update = true;
+        public Boolean ACTIF = false;
+        private GraphicsConfiguration GC;
+        private SingleVolatileImageStrategy pane;
+        private VolatileImage buffer;
+        private RepaintingThread repainter;
+        private RerenderingThread rerenderer;
+        private boolean update = true;
 
-    BufferComponent(SingleVolatileImageStrategy bufpane) {
-        this.pane = bufpane;
-        RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
-        setDoubleBuffered(true);
+        BufferComponent(SingleVolatileImageStrategy bufpane) {
+            this.pane = bufpane;
+            RepaintManager.currentManager(this).setDoubleBufferingEnabled(true);
+            setDoubleBuffered(true);
 
-        GC = this.getGraphicsConfiguration();
-    }
-
-    public void refresh() {
-
-//        buffer = pane.createBackBuffer();
-//        do {
-//            GraphicsConfiguration gc = this.getGraphicsConfiguration();
-//            int valCode = buffer.validate(gc);
-//            // This means the device doesn't match up to this hardware accelerated image.
-//            if (valCode == VolatileImage.IMAGE_INCOMPATIBLE) {
-//                buffer = pane.createBackBuffer(); // recreate the hardware accelerated image.
-//            }
-//
-//            final Graphics offscreenGraphics = buffer.getGraphics();
-//
-//            startRender(offscreenGraphics);
-//
-//        } while (buffer.contentsLost());
-        update = true;
-        repaint();
-    }
-
-    private void startRender(Graphics g) {
-
-        if (repainter != null && repainter.isAlive()) {
-            repainter.setActive(true);
-        } else {
-            repainter = new RepaintingThread(this);
-            repainter.setActive(true);
-            repainter.start();
+            GC = this.getGraphicsConfiguration();
         }
 
-        //pane.stopRendering();
-        rerenderer = new RerenderingThread(this);
-        rerenderer.setGraphics(g);
-        rerenderer.start();
-
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-
-
-        if (update || buffer == null || buffer.validate(GC) == VolatileImage.IMAGE_INCOMPATIBLE) {
-            update = false;
-
-            buffer = pane.createBackBuffer();
-
-            do {
-                int valCode = buffer.validate(GC);
-                if (valCode == VolatileImage.IMAGE_INCOMPATIBLE) {
-                    buffer = pane.createBackBuffer(); // recreate the hardware accelerated image.
-                }
-
-                final Graphics offscreenGraphics = buffer.getGraphics();
-                startRender(offscreenGraphics);
-
-                g.drawImage(buffer, 0, 0, this);
-
-            } while (buffer.contentsLost());
-
-        } else {
-            g.drawImage(buffer, 0, 0, this);
+        public void refresh() {
+            update = true;
+            repaint();
         }
 
-    }
+        private void startRender(Graphics g) {
 
-    private class RerenderingThread extends Thread {
-
-        private BufferComponent comp = null;
-        private Graphics g;
-
-        RerenderingThread(BufferComponent comp) {
-            this.comp = comp;
-        }
-
-        public void setGraphics(Graphics g) {
-            this.g = g;
-        }
-
-        public void run() {
-            pane.renderOn((Graphics2D) g);
-
-            if (repainter != null) {
-                repainter.setActive(false);
+            if (repainter != null && repainter.isAlive()) {
+                repainter.setActive(true);
+            } else {
+                repainter = new RepaintingThread(this);
+                repainter.setActive(true);
+                repainter.start();
             }
-        }
-    }
 
-    private class RepaintingThread extends Thread {
+            rerenderer = new RerenderingThread(this);
+            rerenderer.setGraphics(g);
+            rerenderer.start();
 
-        private BufferComponent comp = null;
-        private boolean marche = false;
-
-        RepaintingThread(BufferComponent comp) {
-            this.comp = comp;
-        }
-
-        public void setActive(boolean val) {
-            marche = val;
-
-            if (!val) {
-                comp.repaint();
-            }
         }
 
         @Override
-        public void run() {
+        public void paintComponent(Graphics g) {
 
-            while (marche) {
-                try {
-                    sleep(300);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(SingleVolatileImageStrategy.class.getName()).log(Level.SEVERE, null, ex);
+
+            if (update || buffer == null || buffer.validate(GC) == VolatileImage.IMAGE_INCOMPATIBLE) {
+                update = false;
+
+                buffer = pane.createBackBuffer();
+
+                do {
+                    int valCode = buffer.validate(GC);
+                    if (valCode == VolatileImage.IMAGE_INCOMPATIBLE) {
+                        buffer = pane.createBackBuffer(); // recreate the hardware accelerated image.
+                    }
+
+                    final Graphics offscreenGraphics = buffer.getGraphics();
+                    startRender(offscreenGraphics);
+
+                    g.drawImage(buffer, 0, 0, this);
+
+                } while (buffer.contentsLost());
+
+            } else {
+                g.drawImage(buffer, 0, 0, this);
+            }
+
+        }
+
+        private class RerenderingThread extends Thread {
+
+            private BufferComponent comp = null;
+            private Graphics g;
+
+            RerenderingThread(BufferComponent comp) {
+                this.comp = comp;
+            }
+
+            public void setGraphics(Graphics g) {
+                this.g = g;
+            }
+
+            public void run() {
+                pane.renderOn((Graphics2D) g);
+
+                if (repainter != null) {
+                    repainter.setActive(false);
                 }
-                comp.repaint();
+            }
+        }
+
+        private class RepaintingThread extends Thread {
+
+            private BufferComponent comp = null;
+            private boolean marche = false;
+
+            RepaintingThread(BufferComponent comp) {
+                this.comp = comp;
+            }
+
+            public void setActive(boolean val) {
+                marche = val;
+
+                if (!val) {
+                    comp.repaint();
+                }
+            }
+
+            @Override
+            public void run() {
+
+                raiseNB();
+                while (marche) {
+                    try {
+                        sleep(300);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(SingleVolatileImageStrategy.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    comp.repaint();
+                }
+                lowerNB();
             }
         }
     }
 }
+
+
+
+
+

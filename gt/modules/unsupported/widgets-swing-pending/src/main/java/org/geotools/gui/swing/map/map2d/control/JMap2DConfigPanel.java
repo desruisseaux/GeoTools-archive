@@ -40,14 +40,14 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
 
     private void setRenderingHints(RenderingHints.Key key, Object obj) {
 
-        if (map != null && map.getRenderer() != null) {
+        if (map != null && map.getRenderingStrategy().getRenderer() != null) {
             
-            RenderingHints hints = map.getRenderer().getJava2DHints();
+            RenderingHints hints = map.getRenderingStrategy().getRenderer().getJava2DHints();
 
             if (hints != null) {
                 hints.put(key,obj);
             }else{                
-                map.getRenderer().setJava2DHints(new RenderingHints(key,obj));
+                map.getRenderingStrategy().getRenderer().setJava2DHints(new RenderingHints(key,obj));
             }
            
         }
@@ -67,8 +67,8 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
     public void setMap(JDefaultMap2D map) {
         this.map = map;
 
-        if (map != null && map.getRenderer() != null) {
-            GTRenderer renderer = map.getRenderer();
+        if (map != null && map.getRenderingStrategy().getRenderer() != null) {
+            GTRenderer renderer = map.getRenderingStrategy().getRenderer();
             RenderingHints rh = renderer.getJava2DHints();
 
             RenderingStrategy cl = map.getRenderingStrategy();
@@ -536,19 +536,19 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jcb_ditheringActionPerformed
 
     private void jrb_rendering_single_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_bufferActionPerformed
-        setRendering(new SingleBufferedImageStrategy(map));
+        setRendering(new SingleBufferedImageStrategy());
 }//GEN-LAST:event_jrb_rendering_single_bufferActionPerformed
 
     private void jrb_rendering_multi_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_multi_bufferActionPerformed
-        setRendering(new MultiBufferedImageStrategy(map));
+        setRendering(new MultiBufferedImageStrategy());
     }//GEN-LAST:event_jrb_rendering_multi_bufferActionPerformed
 
     private void jrb_rendering_merge_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_merge_bufferActionPerformed
-        setRendering(new MergeBufferedImageStrategy(map));
+        setRendering(new MergeBufferedImageStrategy());
     }//GEN-LAST:event_jrb_rendering_merge_bufferActionPerformed
 
     private void jrb_rendering_single_volatileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_volatileActionPerformed
-        setRendering(new SingleVolatileImageStrategy(map));
+        setRendering(new SingleVolatileImageStrategy());
     }//GEN-LAST:event_jrb_rendering_single_volatileActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

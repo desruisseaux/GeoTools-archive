@@ -78,12 +78,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private Style selectionStyle = null;
 
+    
     public JDefaultSelectableMap2D() {
-        this(new ShapefileRenderer());
-    }
-
-    public JDefaultSelectableMap2D(GTRenderer renderer) {
-        super(renderer);
+        super();
         mouseInputListener = new MouseListen();
         mapLayerListlistener = new MapLayerListListen();
         addMouseListener(mouseInputListener);
@@ -135,7 +132,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     private void updateOverLayer() {
-        selectedPane.setBuffer(createBufferImage(selectionMapContext));
+        selectedPane.setBuffer(getRenderingStrategy().createBufferImage(selectionMapContext));
     }
 
     protected Coordinate toMapCoord(int mx, int my) {

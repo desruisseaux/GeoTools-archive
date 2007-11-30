@@ -256,7 +256,6 @@ public class DemoExplorer extends JFrame {
         pan_datastore.add(BorderLayout.NORTH, group);
         pan_datastore.add(BorderLayout.CENTER, tabbed);
 
-        map.setRenderer(new StreamingRenderer());
         map.setBackground(Color.WHITE);
 
         JPanel pan_map = new JPanel(new BorderLayout());

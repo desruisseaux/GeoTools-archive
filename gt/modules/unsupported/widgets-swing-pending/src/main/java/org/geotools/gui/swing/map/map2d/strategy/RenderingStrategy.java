@@ -15,8 +15,14 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
+import com.vividsolutions.jts.geom.Envelope;
+import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
+import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
+import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.renderer.GTRenderer;
 
 /**
  *
@@ -24,18 +30,31 @@ import org.geotools.map.event.MapLayerListEvent;
  */
 public interface RenderingStrategy {
 
+    
+    public void setRenderer(GTRenderer renderer);    
+    public GTRenderer getRenderer();
+    
+    public BufferedImage createBufferImage(MapLayer layer);
+    public BufferedImage createBufferImage(MapContext context);
+
+    public void setContext(MapContext context);
+    public MapContext getContext();
+    
+    public void setMapArea(Envelope area);
+    public Envelope getMapArea();
+    
         
     public void redraw(boolean complete);
-
     public void layerChanged(MapLayerListEvent event);
-
     public void layerDeleted(MapLayerListEvent event);
-
     public void layerAdded(MapLayerListEvent event);
-
     public void layerMoved(MapLayerListEvent event);
         
     public JComponent getComponent();
+    
+    public void addStrategyListener(StrategyListener listener);
+    public void removeStrategyListener(StrategyListener listener);
+    public StrategyListener[] getStrategyListeners();
     
     
     

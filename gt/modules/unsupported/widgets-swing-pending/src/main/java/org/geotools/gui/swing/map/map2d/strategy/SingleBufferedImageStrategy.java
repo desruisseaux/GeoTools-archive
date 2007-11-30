@@ -22,23 +22,22 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.renderer.GTRenderer;
 
 /**
  *
  * @author Johann Sorel
  */
-public class SingleBufferedImageStrategy implements RenderingStrategy {
+public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     private Thread thread = null;
     private BufferComponent comp = new BufferComponent();
-    private JDefaultMap2D map;
     private boolean mustupdate = false;
 
     //optimize with hardware doublebuffer, also called backbuffer
-    public SingleBufferedImageStrategy(JDefaultMap2D map) {
-        this.map = map;
-
+    public SingleBufferedImageStrategy() {
     }
 
     private void fit() {
@@ -80,11 +79,11 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
     private int nb = 0;
 
     public void raiseNB() {
-       map.raiseDrawingNumber();
+       //map.raiseDrawingNumber();
     }
 
     public void lowerNB() {
-        map.lowerDrawingNumber();
+        //map.lowerDrawingNumber();
     }
 
     //------------------------PRIVATES CLASSES----------------------------------
@@ -95,9 +94,8 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
             raiseNB();
             while (mustupdate) {
                 mustupdate = false;
-                MapContext context = map.getContext();
-                if (context != null && map.getMapArea() != null) {
-                    comp.setBuffer(map.createBufferImage(context));
+                if (context != null && mapArea != null) {
+                    comp.setBuffer(createBufferImage(context));
                 }
             }
             lowerNB();
@@ -121,6 +119,22 @@ public class SingleBufferedImageStrategy implements RenderingStrategy {
                 }
             }       
         };
+
+    public void setRenderer(GTRenderer renderer) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public GTRenderer getRenderer() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public BufferedImage createBufferImage(MapLayer layer) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public BufferedImage createBufferImage(MapContext context) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
    
         

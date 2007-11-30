@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
-import org.geotools.coverage.FactoryFinder;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -62,11 +61,6 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
-import org.geotools.referencing.CRS;
-import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.renderer.shape.ShapefileRenderer;
-import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.LineSymbolizer;
@@ -95,7 +89,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     protected MapConstants.EDIT_STATE editState = MapConstants.EDIT_STATE.NONE;
     
     private static final Coordinate[] EMPTY_COORDINATE_ARRAY = new Coordinate[0];
-    private final FacilitiesFactory FF = new FacilitiesFactory();
     private final BufferComponent editedPane = new BufferComponent();
     private final MouseListen mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;    
@@ -103,12 +96,10 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     private MapLayer editionLayer = null;    
     private final Style editionStyle;
 
-    public JDefaultEditableMap2D() {
-        this(new ShapefileRenderer());
-    }
+   
 
-    public JDefaultEditableMap2D(GTRenderer renderer) {
-        super(renderer);
+    public JDefaultEditableMap2D() {
+        super();
 
         mouseInputListener = new MouseListen();
         mapLayerListlistener = new MapLayerListListen();
@@ -441,7 +432,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     private void repaintMemoryLayer() {
 
         if (memoryLayer != null) {
-            editedPane.setBuffer(createBufferImage(memoryLayer));
+            editedPane.setBuffer(getRenderingStrategy().createBufferImage(memoryLayer));
         } else {
             editedPane.setBuffer(null);
         }
@@ -528,8 +519,10 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         private int nbRightClick = 0;
         private boolean inCreation = false;
         private boolean hasEditionGeometry = false;
+        private boolean hasGeometryChanged = false;
         private SimpleFeature editFeature = null;
         private int editedNodeIndex = -1;
+        
 
         private void fireStateChange() {
             coords.clear();
@@ -537,6 +530,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             nbRightClick = 0;
             inCreation = false;
             hasEditionGeometry = false;
+            hasGeometryChanged = false;
             editFeature = null;
             editedNodeIndex = -1;
             clearMemoryLayer();
@@ -629,11 +623,12 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         }
 
         private void validateGeometryEdit() {
-            if (!geoms.isEmpty()) {
+            if (!geoms.isEmpty() && hasGeometryChanged) {
                 validateModifiedGeometry(geoms.get(0), editFeature);
             }
             renderingStrategy.layerChanged(null);
             hasEditionGeometry = false;
+            hasGeometryChanged = false;
             editFeature = null;
             editedNodeIndex = -1;
             inCreation = false;
@@ -844,6 +839,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
                     case EDIT:
 
                         if (hasEditionGeometry && editedNodeIndex >= 0) {
+                            hasGeometryChanged = true;
                             dragGeometryNode(e.getX(), e.getY());
                         }
 
