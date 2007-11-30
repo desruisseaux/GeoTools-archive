@@ -738,13 +738,13 @@ class ArcSDEQuery {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public void prepareQuery() throws IOException {
-        try {
-            getSeQuery().prepareQuery();
-        } catch (SeException e) {
-            throw new ArcSdeException(e);
-        }
-    }
+//    public void prepareQuery() throws IOException {
+//        try {
+//            getSeQuery().prepareQuery();
+//        } catch (SeException e) {
+//            throw new ArcSdeException(e);
+//        }
+//    }
 
     /**
      * Fetches an SeRow of data.

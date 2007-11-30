@@ -108,7 +108,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     protected final Iterator openIterator() throws IOException {
         final ArcSDEDataStore dataStore = featureSource.getDataStore();
         final ArcSDEPooledConnection connection = getConnection();
-
+        
         final FeatureReader reader = dataStore.getFeatureReader(query, connection, false);
         // slight optimization here: store the child features schema if not yet
         // done
@@ -131,6 +131,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     private synchronized ArcSDEPooledConnection getConnection() throws IOException {
         if (connection == null || connection.isPassivated()) {
             connection = featureSource.getConnection();
+            connection.getLock().lock();
         }
         return connection;
     }
@@ -138,6 +139,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     private synchronized void closeConnection() {
         if (openIterators.size() == 0) {
             if (!connection.isPassivated()) {
+                connection.getLock().unlock();
                 if (!connection.isTransactionActive()) {
                     connection.close();
                 }

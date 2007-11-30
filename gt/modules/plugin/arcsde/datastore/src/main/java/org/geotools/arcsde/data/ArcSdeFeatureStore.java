@@ -55,7 +55,8 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * @see FeatureStore#setTransaction(Transaction)
      */
     public synchronized void setTransaction(final Transaction transaction) {
-        System.out.println(">>setTransaction called at " + Thread.currentThread().getName());
+        // System.err.println(">>setTransaction called at " +
+        // Thread.currentThread().getName());
         if (transaction == null) {
             throw new NullPointerException("mean Transaction.AUTO_COMMIT?");
         }
@@ -113,44 +114,56 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * @see FeatureStore#addFeatures(FeatureCollection)
      */
     public Set<String> addFeatures(final FeatureCollection collection) throws IOException {
-        System.out.println(">>addFeatures called at " + Thread.currentThread().getName());
+        // System.err.println(">>addFeatures called at " +
+        // Thread.currentThread().getName());
         final String typeName = typeInfo.getFeatureTypeName();
-        final FeatureWriter writer = dataStore.getFeatureWriterAppend(typeName, transaction);
-        final FeatureIterator iterator = collection.features();
-        Set<String> featureIds = new HashSet<String>();
+        final ArcSDEPooledConnection connection = getConnection();
+        connection.getLock().lock();
         try {
-            SimpleFeature toAdd;
-            SimpleFeature newFeature;
-            while (iterator.hasNext()) {
-                toAdd = iterator.next();
-                newFeature = writer.next();
-                newFeature.setAttributes(toAdd.getAttributes());
-                writer.write();
-                featureIds.add(newFeature.getID());
+            final FeatureWriter writer = dataStore.getFeatureWriterAppend(typeName, transaction);
+            final FeatureIterator iterator = collection.features();
+            Set<String> featureIds = new HashSet<String>();
+            try {
+                SimpleFeature toAdd;
+                SimpleFeature newFeature;
+                while (iterator.hasNext()) {
+                    toAdd = iterator.next();
+                    newFeature = writer.next();
+                    newFeature.setAttributes(toAdd.getAttributes());
+                    writer.write();
+                    featureIds.add(newFeature.getID());
+                }
+            } finally {
+                iterator.close();
+                writer.close();
             }
+            return featureIds;
         } finally {
-            iterator.close();
-            writer.close();
+            connection.getLock().unlock();
         }
-        return featureIds;
     }
 
     @Override
-    public final FeatureCollection getFeatures(final Query query) throws IOException {
-        System.out.println(">>getFeatures called at " + Thread.currentThread().getName());
-        return super.getFeatures(query);
+    protected final ReferencedEnvelope getBounds(final Query namedQuery,
+            final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
+        connection.getLock().lock();
+        try {
+            return super.getBounds(namedQuery, connection);
+        } finally {
+            connection.getLock().unlock();
+        }
     }
 
     @Override
-    public final ReferencedEnvelope getBounds(final Query query) throws IOException {
-        System.out.println(">>getBounds called at " + Thread.currentThread().getName());
-        return super.getBounds(query);
-    }
-
-    @Override
-    public final int getCount(final Query query) throws IOException {
-        System.out.println(">>getCount called at " + Thread.currentThread().getName());
-        return super.getCount(query);
+    protected int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
+            throws IOException {
+        connection.getLock().lock();
+        try {
+            final int count = super.getCount(namedQuery, connection);
+            return count;
+        } finally {
+            connection.getLock().unlock();
+        }
     }
 
     /**

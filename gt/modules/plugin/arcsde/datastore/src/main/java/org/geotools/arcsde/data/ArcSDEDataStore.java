@@ -270,7 +270,7 @@ public class ArcSDEDataStore implements DataStore {
             sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy);
         }
 
-        sdeQuery.execute();
+        ///sdeQuery.execute();
 
         // this is the one which's gonna close the connection when done
         final ArcSDEAttributeReader attReader;

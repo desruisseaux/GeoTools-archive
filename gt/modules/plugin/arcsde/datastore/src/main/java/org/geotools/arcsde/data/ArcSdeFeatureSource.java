@@ -61,7 +61,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
      * 
      * @see FeatureSource#getBounds(Query)
      */
-    public ReferencedEnvelope getBounds(final Query query) throws IOException {
+    public final ReferencedEnvelope getBounds(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
         final ArcSDEPooledConnection connection = getConnection();
         ReferencedEnvelope ev;
@@ -84,7 +84,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
      * @throws DataSourceException
      * @throws IOException
      */
-    final ReferencedEnvelope getBounds(final Query namedQuery,
+    protected ReferencedEnvelope getBounds(final Query namedQuery,
             final ArcSDEPooledConnection connection) throws DataSourceException, IOException {
         Envelope ev;
         final String typeName = namedQuery.getTypeName();
@@ -126,7 +126,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getCount(Query)
      */
-    public int getCount(final Query query) throws IOException {
+    public final int getCount(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
         final ArcSDEPooledConnection connection = getConnection();
         final int count;
@@ -143,7 +143,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getCount(Query)
      */
-    final int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
+    protected int getCount(final Query namedQuery, final ArcSDEPooledConnection connection)
             throws IOException {
         final int count;
         count = ArcSDEQuery.calculateResultCount(connection, typeInfo, namedQuery);
@@ -186,7 +186,7 @@ public class ArcSdeFeatureSource implements FeatureSource {
     /**
      * @see FeatureSource#getFeatures(Query)
      */
-    public FeatureCollection getFeatures(final Query query) throws IOException {
+    public final FeatureCollection getFeatures(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
         FeatureCollection collection = new ArcSdeFeatureCollection(this, namedQuery);
         return collection;
