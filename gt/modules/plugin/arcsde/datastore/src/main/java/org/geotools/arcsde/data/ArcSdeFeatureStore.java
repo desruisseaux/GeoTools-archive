@@ -80,7 +80,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                 // starts
                 // a transaction on it
                 ArcTransactionState state = ArcTransactionState.getState(transaction,
-                        connectionPool);
+                        connectionPool, dataStore.listenerManager);
                 LOGGER.finer("ArcSDE transaction initialized: " + state);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Can't initiate transaction: " + e.getMessage(), e);
@@ -133,6 +133,13 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                     writer.write();
                     featureIds.add(newFeature.getID());
                 }
+            }catch(IOException e){
+                //it was all wrong, let's rollback the transaction as we don't know
+                //where things messed up
+                if(Transaction.AUTO_COMMIT != transaction){
+                    transaction.rollback();
+                }
+                throw e;
             } finally {
                 iterator.close();
                 writer.close();

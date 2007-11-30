@@ -197,7 +197,7 @@ public class ArcSDEDataStore implements DataStore {
                 connection = connectionPool.getConnection();
             } else {
                 ArcTransactionState state = ArcTransactionState.getState(transaction,
-                        connectionPool);
+                        connectionPool, listenerManager);
                 connection = state.getConnection();
             }
         }
@@ -344,7 +344,7 @@ public class ArcSDEDataStore implements DataStore {
                 connection = connectionPool.getConnection();
                 state = null;
             } else {
-                state = ArcTransactionState.getState(transaction, connectionPool);
+                state = ArcTransactionState.getState(transaction, connectionPool, listenerManager);
                 connection = state.getConnection();
             }
         }
@@ -365,12 +365,13 @@ public class ArcSDEDataStore implements DataStore {
 
             final FIDReader fidReader = typeInfo.getFidStrategy();
 
+            final FeatureListenerManager listenerManager = this.listenerManager;
             if (Transaction.AUTO_COMMIT == transaction) {
-                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection);
+                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection, listenerManager);
             } else {
                 // if there's a transaction, the reader and the writer will
                 // share the connection held in the transaction state
-                writer = new TransactionFeatureWriter(fidReader, featureType, reader, state);
+                writer = new TransactionFeatureWriter(fidReader, featureType, reader, state, listenerManager);
             }
             return writer;
         } catch (IOException e) {

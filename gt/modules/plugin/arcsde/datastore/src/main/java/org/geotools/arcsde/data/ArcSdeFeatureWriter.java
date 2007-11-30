@@ -15,15 +15,19 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.ArcSdeException;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.MutableFIDFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.Converters;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.geometry.BoundingBox;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
@@ -50,7 +54,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
     /**
      * Complete feature type this writer acts upon
      */
-    protected SimpleFeatureType featureType;
+    protected final SimpleFeatureType featureType;
     /**
      * Connection to hold while this feature writer is alive.
      */
@@ -63,7 +67,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
      * Builder for new Features this writer creates when next() is called and
      * hasNext() == false
      */
-    protected SimpleFeatureBuilder featureBuilder;
+    protected final SimpleFeatureBuilder featureBuilder;
     /**
      * Map of {row index/mutable column names} in the SeTable structure. Not to
      * be accessed directly, but through
@@ -86,11 +90,13 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
     /**
      * Provides row_id column index
      */
-    protected FIDReader fidReader;
+    protected final FIDReader fidReader;
     private SeInsert insertStream;
+    
+    protected final FeatureListenerManager listenerManager;
 
-    public ArcSdeFeatureWriter(FIDReader fidReader, SimpleFeatureType featureType,
-            FeatureReader filteredContent, ArcSDEPooledConnection connection) {
+    public ArcSdeFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
+            final FeatureReader filteredContent, final ArcSDEPooledConnection connection, final FeatureListenerManager listenerManager) {
         assert fidReader != null;
         assert featureType != null;
         assert filteredContent != null;
@@ -100,6 +106,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
         this.featureType = featureType;
         this.filteredContent = filteredContent;
         this.connection = connection;
+        this.listenerManager = listenerManager;
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
     }
 
@@ -188,6 +195,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
             if (handleTransaction) {
                 connection.commitTransaction();
             }
+            fireRemoved(feature);
         } catch (SeException e) {
             if (handleTransaction) {
                 try {
@@ -210,6 +218,49 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
         }
     }
 
+    private void fireAdded(final SimpleFeature feature) {
+        final String typeName = featureType.getTypeName();
+        final BoundingBox bounds = feature.getBounds();
+        final ReferencedEnvelope referencedEnvelope;
+        if(bounds instanceof ReferencedEnvelope){
+            referencedEnvelope = (ReferencedEnvelope) bounds;
+        }else{
+            referencedEnvelope = new ReferencedEnvelope(bounds);
+        }
+        doFireFeaturesAdded(typeName, referencedEnvelope);
+    }
+
+    private void fireChanged(final SimpleFeature feature) {
+        final String typeName = featureType.getTypeName();
+        final BoundingBox bounds = feature.getBounds();
+        final ReferencedEnvelope referencedEnvelope;
+        if(bounds instanceof ReferencedEnvelope){
+            referencedEnvelope = (ReferencedEnvelope) bounds;
+        }else{
+            referencedEnvelope = new ReferencedEnvelope(bounds);
+        }
+        doFireFeaturesChanged(typeName, referencedEnvelope);
+    }
+
+    private void fireRemoved(final SimpleFeature feature) {
+        final String typeName = featureType.getTypeName();
+        final BoundingBox bounds = feature.getBounds();
+        final ReferencedEnvelope referencedEnvelope;
+        if(bounds instanceof ReferencedEnvelope){
+            referencedEnvelope = (ReferencedEnvelope) bounds;
+        }else{
+            referencedEnvelope = new ReferencedEnvelope(bounds);
+        }
+        doFireFeaturesRemoved(typeName, referencedEnvelope);
+    }
+
+
+    protected abstract void doFireFeaturesAdded(String typeName, ReferencedEnvelope bounds);
+
+    protected abstract void doFireFeaturesChanged(String typeName, ReferencedEnvelope bounds);
+
+    protected abstract void doFireFeaturesRemoved(String typeName, ReferencedEnvelope bounds);
+
     /**
      * @see FeatureWriter#write()
      */
@@ -221,6 +272,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
                 MutableFIDFeature mutableFidFeature = (MutableFIDFeature) feature;
                 String id = featureType.getTypeName() + "." + newId.longValue();
                 mutableFidFeature.setID(id);
+                fireAdded(mutableFidFeature);
             } catch (SeException e) {
                 ArcSdeException sdeEx = new ArcSdeException(e);
                 LOGGER.log(Level.WARNING, "Error inserting " + feature + ": " + sdeEx.getMessage(),
@@ -234,6 +286,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter{
                 // if (!connection.isTransactionActive()) {
                 // update.flushBufferedWrites();
                 // }
+                fireChanged(feature);
                 update.close();
             } catch (SeException e) {
                 ArcSdeException sdeEx = new ArcSdeException(e);

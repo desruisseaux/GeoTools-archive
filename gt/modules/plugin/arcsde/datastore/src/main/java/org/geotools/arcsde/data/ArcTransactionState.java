@@ -17,6 +17,10 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +29,9 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.Transaction;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -40,7 +46,7 @@ import com.esri.sde.sdk.client.SeException;
  *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/ArcTransactionState.java $
  * @version $Id$
  */
-class ArcTransactionState implements Transaction.State {
+final class ArcTransactionState implements Transaction.State {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(ArcTransactionState.class.getPackage().getName());
 
@@ -52,16 +58,43 @@ class ArcTransactionState implements Transaction.State {
 
     private Transaction transaction;
 
+    private final FeatureListenerManager listenerManager;
+
+    /**
+     * Set of typename changed to fire changed events for at commit and
+     * rollback.
+     */
+    private final Set<String> typesChanged = new HashSet<String>();
+
     /**
      * Creates a new ArcTransactionState object.
+     * 
+     * @param listenerManager
      * 
      * @param pool
      *            connection pool where to grab a connection and hold it while
      *            there's a transaction open (signaled by any use of
      *            {@link #getConnection()}
      */
-    private ArcTransactionState(ArcSDEPooledConnection connection) {
+    private ArcTransactionState(ArcSDEPooledConnection connection,
+            final FeatureListenerManager listenerManager) {
         this.connection = connection;
+        this.listenerManager = listenerManager;
+    }
+
+    /**
+     * Registers a feature change event over a feature type.
+     * <p>
+     * To be called by {@link TransactionFeatureWriter#write()} so this state
+     * can fire a changed event at {@link #commit()} and {@link #rollback()}.
+     * </p>
+     * 
+     * @param typeName
+     *            the type name of the feature changed
+     *            (inserted/removed/modified).
+     */
+    public void addChange(final String typeName) {
+        typesChanged.add(typeName);
     }
 
     /**
@@ -84,6 +117,8 @@ class ArcTransactionState implements Transaction.State {
             // and keep editing
             connection.setTransactionAutoCommit(0);
             connection.startTransaction();
+
+            fireChanges(true);
         } catch (SeException se) {
             try {
                 connection.rollbackTransaction();
@@ -108,12 +143,24 @@ class ArcTransactionState implements Transaction.State {
             // and keep editing
             connection.setTransactionAutoCommit(0);
             connection.startTransaction();
+            fireChanges(false);
         } catch (SeException se) {
             // release resources
             close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new ArcSdeException(se);
         }
+    }
+
+    /**
+     * Fires the per typename changes registered through
+     * {@link #addChange(String)} and clears the changes cache.
+     */
+    private void fireChanges(final boolean commit) {
+        for (String typeName : typesChanged) {
+            listenerManager.fireChanged(typeName, transaction, commit);
+        }
+        typesChanged.clear();
     }
 
     /**
@@ -225,6 +272,10 @@ class ArcTransactionState implements Transaction.State {
         return connection;
     }
 
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
     /**
      * Grab the ArcTransactionState (when not using AUTO_COMMIT).
      * <p>
@@ -234,11 +285,13 @@ class ArcTransactionState implements Transaction.State {
      * 
      * @param transaction
      *            non autocommit transaction
+     * @param listenerManager
      * @return the ArcTransactionState stored in the transaction with
      *         <code>connectionPool</code> as key.
      */
     public static ArcTransactionState getState(final Transaction transaction,
-            final ArcSDEConnectionPool connectionPool) throws IOException {
+            final ArcSDEConnectionPool connectionPool, final FeatureListenerManager listenerManager)
+            throws IOException {
         ArcTransactionState state;
 
         synchronized (ArcTransactionState.class) {
@@ -265,7 +318,7 @@ class ArcTransactionState implements Transaction.State {
                             e);
                 }
 
-                state = new ArcTransactionState(connection);
+                state = new ArcTransactionState(connection, listenerManager);
                 transaction.putState(connectionPool, state);
             }
         }

@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.Transaction;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -16,7 +19,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  *          groldan $
  * @since 2.5
  * @source $URL:
- *      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/TransactionFeatureWriter.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/datastore/src/main/java/org/geotools/arcsde/data/TransactionFeatureWriter.java $
  */
 class TransactionFeatureWriter extends ArcSdeFeatureWriter {
     private ArcTransactionState state;
@@ -26,6 +29,7 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
      * @param fidReader
      * @param featureType
      * @param filteredContent
+     * @param listenerManager
      * @param transactionalConnection
      *            the {@link ArcSDEPooledConnection} to work over, with a
      *            {@link ArcSDEPooledConnection#isTransactionActive() transaction active}
@@ -36,10 +40,11 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
      * @throws IOException
      */
     public TransactionFeatureWriter(final FIDReader fidReader, final SimpleFeatureType featureType,
-            final FeatureReader filteredContent, final ArcTransactionState state)
-            throws NoSuchElementException, IOException {
+            final FeatureReader filteredContent, final ArcTransactionState state,
+            final FeatureListenerManager listenerManager) throws NoSuchElementException,
+            IOException {
 
-        super(fidReader, featureType, filteredContent, state.getConnection());
+        super(fidReader, featureType, filteredContent, state.getConnection(), listenerManager);
         this.state = state;
         assert state.getConnection().isTransactionActive();
     }
@@ -78,6 +83,8 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
         connection.getLock().lock();
         try {
             super.write();
+            String typeName = feature.getFeatureType().getTypeName();
+            state.addChange(typeName);
         } finally {
             connection.getLock().unlock();
         }
@@ -91,4 +98,23 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
             connection.getLock().unlock();
         }
     }
+
+    @Override
+    protected void doFireFeaturesAdded(String typeName, ReferencedEnvelope bounds) {
+        Transaction transaction = state.getTransaction();
+        listenerManager.fireFeaturesAdded(typeName, transaction, bounds, false);
+    }
+
+    @Override
+    protected void doFireFeaturesChanged(String typeName, ReferencedEnvelope bounds) {
+        Transaction transaction = state.getTransaction();
+        listenerManager.fireFeaturesChanged(typeName, transaction, bounds, false);
+    }
+
+    @Override
+    protected void doFireFeaturesRemoved(String typeName, ReferencedEnvelope bounds) {
+        Transaction transaction = state.getTransaction();
+        listenerManager.fireFeaturesRemoved(typeName, transaction, bounds, false);
+    }
+
 }
