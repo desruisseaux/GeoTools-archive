@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import org.geotools.filter.expression.Value;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Literal;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -291,6 +292,11 @@ public class LiteralExpressionImpl extends DefaultExpression
             } else {
                 return true;
             }
+        }
+        else if (obj instanceof Literal) {
+            // some other Literal implementation like ConstantExpression
+            Literal other = (Literal) obj;
+            return equals( new LiteralExpressionImpl( other.getValue() ) );
         } else {
             return false;
         }

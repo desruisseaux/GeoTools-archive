@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
- * DOCUMENT ME!
+ * Try out our SLD parser and see how well it does.
  *
  * @author jamesm
  * @source $URL$

@@ -54,4 +54,8 @@ public class Value {
             
             return Converters.convert( value, context );
 	}
+
+	public String toString() {
+	    return String.valueOf( value );
+	}
 }

@@ -18,6 +18,7 @@ package org.geotools.styling;
 import org.geotools.event.AbstractGTComponent;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+import org.geotools.filter.ConstantExpression;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
@@ -266,6 +267,10 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      *         There is no defined default.
      */
     public Expression getLineCap() {
+        if( lineCap == null ){
+            // ConstantExpression.constant("miter")
+            return Stroke.DEFAULT.getLineCap();
+        }
         return lineCap;
     }
 
@@ -292,6 +297,10 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      *         "bevel".  There is no defined default.
      */
     public Expression getLineJoin() {
+        if( lineCap == null ){
+            // ConstantExpression.constant("miter")
+            return Stroke.DEFAULT.getLineJoin();
+        }
         return lineJoin;
     }
 
@@ -323,6 +332,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      *         and 1.0 is completely opaque.
      */
     public Expression getOpacity() {
+        if( lineCap == null ){
+            return Stroke.DEFAULT.getOpacity();
+        }
         return opacity;
     }
 
@@ -356,6 +368,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      *         not negative.
      */
     public Expression getWidth() {
+        if( width == null ){
+            return filterFactory.literal(1.0);
+        }
         return width;
     }
 
@@ -368,13 +383,9 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
      *        but not negative.
      */
     public void setWidth(Expression width) {
-        if (width == null) {
-            return;
-        }
-
-        Expression old = width;
+        Expression old = getWidth();
         this.width = width;
-        fireChildChanged("width", width, old);
+        fireChildChanged("width", getWidth(), old);
     }
 
     public String toString() {
@@ -522,25 +533,13 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
         StrokeImpl other = (StrokeImpl) oth;
 
         // check the color first - most likely to change
-        if (this.color == null) {
-            if (other.color != null) {
-                return false;
-            }
-        } else {
-            if (!this.color.equals(other.color)) {
-                return false;
-            }
+        if( !Utilities.equals( getColor(), other.getColor() )){
+            return false;
         }
 
         // check the width 
-        if (this.width == null) {
-            if (other.width != null) {
-                return false;
-            }
-        } else {
-            if (!this.width.equals(other.width)) {
-                return false;
-            }
+        if( !Utilities.equals( getWidth(), other.getWidth() )){
+            return false;
         }
 
         // check the dashOffset
@@ -548,54 +547,24 @@ public class StrokeImpl extends AbstractGTComponent implements Stroke,
             return false;
         }
 
-        if (this.lineCap == null) {
-            if (other.lineCap != null) {
-                return false;
-            }
-        } else {
-            if (!this.lineCap.equals(other.lineCap)) {
-                return false;
-            }
+        if( !Utilities.equals( getLineCap(), other.getLineCap() )){
+            return false;
         }
 
-        if (this.lineJoin == null) {
-            if (other.lineJoin != null) {
-                return false;
-            }
-        } else {
-            if (!this.lineJoin.equals(other.lineJoin)) {
-                return false;
-            }
+        if( !Utilities.equals( getLineJoin(), other.getLineJoin() )){
+            return false;
         }
 
-        if (this.opacity == null) {
-            if (other.opacity != null) {
-                return false;
-            }
-        } else {
-            if (!this.opacity.equals(other.opacity)) {
-                return false;
-            }
+        if( !Utilities.equals( getOpacity(), other.getOpacity() )){
+            return false;
         }
 
-        if (this.fillGraphic == null) {
-            if (other.fillGraphic != null) {
-                return false;
-            }
-        } else {
-            if (!this.fillGraphic.equals(other.fillGraphic)) {
-                return false;
-            }
+        if( !Utilities.equals( getGraphicFill(), other.getGraphicFill() )){
+            return false;
         }
 
-        if (this.strokeGraphic == null) {
-            if (other.strokeGraphic != null) {
-                return false;
-            }
-        } else {
-            if (!this.strokeGraphic.equals(other.strokeGraphic)) {
-                return false;
-            }
+        if( !Utilities.equals( getGraphicStroke(), other.getGraphicStroke() )){
+            return false;
         }
 
         if (!Arrays.equals(getDashArray(), other.getDashArray())) {

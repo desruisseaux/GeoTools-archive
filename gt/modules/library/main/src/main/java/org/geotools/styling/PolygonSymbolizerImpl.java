@@ -172,12 +172,12 @@ public class PolygonSymbolizerImpl extends AbstractGTComponent
         final int PRIME = 1000003;
         int result = 0;
 
-        if (fill != null) {
-            result = (PRIME * result) + fill.hashCode();
+        if (getFill() != null) {
+            result = (PRIME * result) + getFill().hashCode();
         }
 
-        if (stroke != null) {
-            result = (PRIME * result) + stroke.hashCode();
+        if (getStroke() != null) {
+            result = (PRIME * result) + getStroke().hashCode();
         }
 
         if (geometryPropertyName != null) {

@@ -378,6 +378,7 @@ public class DuplicatingStyleVisitor implements StyleVisitor {
      */
     @SuppressWarnings("unchecked")
     protected Map copy(Map customProperties) {
+        if( customProperties == null ) return null;
         return new HashMap( customProperties );
     }
     

@@ -21,7 +21,9 @@ package org.geotools.styling;
 //import java.util.logging.Logger;
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
@@ -195,4 +197,22 @@ public class FontImpl extends AbstractGTComponent implements Font, Cloneable {
 
         return false;
     }
+    /**
+     * Utility method to capture the default font in one place.
+     * @return
+     */
+    public static Font createDefault( FilterFactory filterFactory ) {
+        Font font = new FontImpl();
+        try {
+            font.setFontSize(filterFactory.literal(
+                    new Integer(10)));
+            font.setFontStyle(filterFactory.literal("normal"));
+            font.setFontWeight(filterFactory.literal("normal"));
+            font.setFontFamily(filterFactory.literal("Serif"));
+        } catch (org.geotools.filter.IllegalFilterException ife) {
+            throw new RuntimeException("Error creating default", ife);
+        }
+        return font;
+    }
+    
 }

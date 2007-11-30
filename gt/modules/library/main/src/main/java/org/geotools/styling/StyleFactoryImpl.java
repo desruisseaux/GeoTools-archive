@@ -585,19 +585,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
      * @throws RuntimeException DOCUMENT ME!
      */
     public Font getDefaultFont() {
-        Font font = new FontImpl();
-
-        try {
-            font.setFontSize(filterFactory.literal(
-                    new Integer(10)));
-            font.setFontStyle(filterFactory.literal("normal"));
-            font.setFontWeight(filterFactory.literal("normal"));
-            font.setFontFamily(filterFactory.literal("Serif"));
-        } catch (org.geotools.filter.IllegalFilterException ife) {
-            throw new RuntimeException("Error creating font", ife);
-        }
-
-        return font;
+        return FontImpl.createDefault( filterFactory );
     }
 
     public Graphic createDefaultGraphic() {

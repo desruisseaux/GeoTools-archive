@@ -118,10 +118,9 @@ public class TextSymbolizerImpl extends AbstractGTComponent
      */
     public Font[] getFonts() {
         if (fonts.size() == 0) {
-            fonts.add(new FontImpl());
+            fonts.add( FontImpl.createDefault( filterFactory ) );
         }
-
-        return (Font[]) fonts.toArray(new Font[] {  });
+        return (Font[]) fonts.toArray(new Font[ fonts.size()]);
     }
 
     /**
