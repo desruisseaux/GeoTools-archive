@@ -15,6 +15,8 @@
  */
 package org.geotools.gui.swing.map.map2d;
 
+import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.BorderLayout;
@@ -55,22 +57,17 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class JDefaultMap2D extends JPanel implements Map2D {
 
-    public static enum STRATEGY {
-        SINGLE_BUFFER,
-        MULTI_BUFFER,
-        MERGE_BUFFER,
-        SINGLE_VOLATILE
-    }
+    
     
     protected final EventListenerList MAP2DLISTENERS = new EventListenerList();
     protected final Map2D THIS_MAP;
     
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    protected Rectangle mapRectangle = new Rectangle(1, 1);    
+    private Rectangle mapRectangle = new Rectangle(1, 1);    
         
     protected MapContext context;
     protected Envelope mapArea;    
-    protected RenderingStrategy renderingStrategy = new MultiBufferedImageStrategy(this);
+    protected RenderingStrategy renderingStrategy;
     
     private final WaitingOverLayer informationOverLayer = new WaitingOverLayer();
     private final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
@@ -80,9 +77,9 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     private final JLayeredPane mainOverLayerPane = new JLayeredPane();
     private int nextMapoverLayerIndex = 1;
     private GTRenderer renderer;
-    private STRATEGY type = null;    
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
+    
 
     public JDefaultMap2D() {
         this(new ShapefileRenderer());
@@ -102,10 +99,9 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mainOverLayerPane.add( mapOverLayerPane, new Integer(1));        
         
         add(BorderLayout.CENTER,mainOverLayerPane);
-
-        setRenderingStrategy(STRATEGY.SINGLE_VOLATILE);
-        opimizeRenderer();
+        setRenderingStrategy( new SingleVolatileImageStrategy(this));
         
+        opimizeRenderer();        
     }
 
     private void opimizeRenderer() {
@@ -165,7 +161,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         return new Envelope(ll, ur);
     }
 
-    protected synchronized BufferedImage createBufferImage(MapLayer layer) {
+    public synchronized BufferedImage createBufferImage(MapLayer layer) {
 
         if (context != null) {
             try {
@@ -183,7 +179,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
     }
 
-    protected synchronized BufferedImage createBufferImage(MapContext context) {
+    public synchronized BufferedImage createBufferImage(MapContext context) {
 
         if (context != null && mapArea != null && mapRectangle.width > 0 && mapRectangle.height > 0) {
             //NOT OPTIMIZED
@@ -233,34 +229,21 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mapArea = fixAspectRatio(newRect, mapArea);
     }
     
-    public void setRenderingStrategy(STRATEGY type) {
-        if (this.type != type) {
-            this.type = type;
-            mapOverLayerPane.remove(renderingStrategy.getComponent());
-
-            switch (type) {
-                case SINGLE_BUFFER:
-                    renderingStrategy = new SingleBufferedImageStrategy(this);
-                    break;
-                case MULTI_BUFFER:
-                    renderingStrategy = new MultiBufferedImageStrategy(this);
-                    break;
-                case MERGE_BUFFER:
-                    renderingStrategy = new MergeBufferedImageStrategy(this);
-                    break;
-                case SINGLE_VOLATILE:
-                    renderingStrategy = new SingleVolatileImageStrategy(this);
-                    break;
-            }
-
+    public void setRenderingStrategy(RenderingStrategy stratege) {
+        
+        if(stratege != null){     
+            
+            if(renderingStrategy != null){
+                mapOverLayerPane.remove(renderingStrategy.getComponent());
+                }
+            renderingStrategy = stratege;
             renderingStrategy.redraw(false);
-
             mapOverLayerPane.add(renderingStrategy.getComponent(), new Integer(0));
-        }
+        }                
     }
 
-    public STRATEGY getRenderingStrategy() {
-        return type;
+    public RenderingStrategy getRenderingStrategy() {
+        return renderingStrategy;
     }
 
     @Override
@@ -324,11 +307,11 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         nextMapoverLayerIndex++;
     }
     
-    protected void raiseDrawingNumber(){
+    public void raiseDrawingNumber(){
         
     }
     
-    protected void lowerDrawingNumber(){
+    public void lowerDrawingNumber(){
         
     }
         

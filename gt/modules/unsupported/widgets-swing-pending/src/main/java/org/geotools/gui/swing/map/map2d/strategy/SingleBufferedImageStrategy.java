@@ -13,8 +13,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.strategy;
 
+import org.geotools.gui.swing.map.map2d.*;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -26,7 +28,7 @@ import org.geotools.map.event.MapLayerListEvent;
  *
  * @author Johann Sorel
  */
-class SingleBufferedImageStrategy extends RenderingStrategy {
+public class SingleBufferedImageStrategy implements RenderingStrategy {
 
     private Thread thread = null;
     private BufferComponent comp = new BufferComponent();
@@ -34,7 +36,7 @@ class SingleBufferedImageStrategy extends RenderingStrategy {
     private boolean mustupdate = false;
 
     //optimize with hardware doublebuffer, also called backbuffer
-    SingleBufferedImageStrategy(JDefaultMap2D map) {
+    public SingleBufferedImageStrategy(JDefaultMap2D map) {
         this.map = map;
 
     }
@@ -50,7 +52,6 @@ class SingleBufferedImageStrategy extends RenderingStrategy {
 
     }
 
-     @Override
     public JComponent getComponent() {
         return comp;
     }
@@ -94,7 +95,7 @@ class SingleBufferedImageStrategy extends RenderingStrategy {
             raiseNB();
             while (mustupdate) {
                 mustupdate = false;
-                MapContext context = map.context;
+                MapContext context = map.getContext();
                 if (context != null && map.getMapArea() != null) {
                     comp.setBuffer(map.createBufferImage(context));
                 }

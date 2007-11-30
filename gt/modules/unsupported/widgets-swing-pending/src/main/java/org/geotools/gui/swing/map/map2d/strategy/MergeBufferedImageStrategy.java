@@ -13,9 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.strategy;
 
+import org.geotools.gui.swing.map.map2d.*;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,19 +33,21 @@ import org.geotools.map.event.MapLayerListEvent;
  * 
  * @author Johann Sorel
  */
-class MultiBufferedImageStrategy extends RenderingStrategy {
+public class MergeBufferedImageStrategy implements RenderingStrategy {
 
     private final JLayeredPane pane = new JLayeredPane();
-    private Map<MapLayer, BufferComponent> stock = new HashMap<MapLayer, BufferComponent>();
+    private Map<MapLayer, BufferedImage> stock = new HashMap<MapLayer, BufferedImage>();
+    private BufferComponent component = new BufferComponent();
     private JDefaultMap2D map;
     private MapContext oldcontext = null;
     private Thread thread = null;
     private boolean mustupdate = false;
     private boolean complete = false;
 
-    MultiBufferedImageStrategy(JDefaultMap2D map) {
+    public MergeBufferedImageStrategy(JDefaultMap2D map) {
         this.map = map;
         pane.setLayout(new BufferLayout());
+        pane.add(component,new Integer(0));
     }
 
     private int getBufferSize() {
@@ -50,6 +55,28 @@ class MultiBufferedImageStrategy extends RenderingStrategy {
     }
 
 
+    private void mergeBuffer(){
+        MapContext context = map.getContext();
+        MapLayer[] layers = context.getLayers();
+        
+        if(layers.length >0){
+            BufferedImage img = map.createBufferImage(layers[0]);
+            Graphics2D g2d = (Graphics2D) img.getGraphics();
+            
+            for(int i=1, n = layers.length; i<n ; i++){
+                g2d.drawImage(stock.get(layers[i]), null, 0, 0);                
+            }
+            
+            component.setBuffer(img);
+            
+        }else{
+            component.setBuffer(null);
+        }
+        
+        
+        
+    }
+    
     public void redraw(boolean complete) {
         this.complete = complete;
         
@@ -66,62 +93,30 @@ class MultiBufferedImageStrategy extends RenderingStrategy {
     public void layerChanged(MapLayerListEvent event) {
         MapLayer layer = event.getLayer();
         BufferedImage buffer = map.createBufferImage(layer);
-        stock.get(layer).setBuffer(buffer);
-
+        stock.put(layer, buffer);
+        
+        mergeBuffer();
     }
 
     public void layerDeleted(MapLayerListEvent event) {
         MapLayer layer = event.getLayer();
-        MapContext context = map.context;
-        BufferComponent comp = stock.remove(layer);
-
-        int index = event.getFromIndex();
-        int size = context.getLayerCount();
-
-        pane.remove(comp);
-        for (int i = index; i < size; i++) {
-            BufferComponent moving = stock.get(context.getLayer(i));
-            int position = pane.getLayer(moving);
-            pane.setLayer(moving, position - 1);
-        }
-
+        stock.remove(layer);
+        
+        mergeBuffer();
     }
 
     public void layerAdded(MapLayerListEvent event) {
         MapLayer layer = event.getLayer();
-        MapContext context = map.context;
-        int index = event.getToIndex();
-
-        BufferComponent comp = new BufferComponent();
-        comp.setBuffer(map.createBufferImage(layer));
-
-        int size = context.getLayerCount();
-        for (int i = index + 1; i < size; i++) {
-            BufferComponent moving = stock.get(context.getLayer(i));
-            int position = pane.getLayer(moving);
-            pane.setLayer(moving, position + 1);
-        }
-
-        stock.put(layer, comp);
-        pane.add(comp, new Integer(index));
-
+        BufferedImage buffer = map.createBufferImage(layer);       
+        stock.put(layer, buffer);    
+        
+        mergeBuffer();
     }
 
     public void layerMoved(MapLayerListEvent event) {
-        MapContext context = map.context;
-        int to = event.getToIndex();
-        int from = event.getFromIndex();
-        int min = (from < to) ? from : to;
-
-        int size = context.getLayerCount();
-        for (int i = min; i < size; i++) {
-            BufferComponent moving = stock.get(context.getLayer(i));
-            pane.setLayer(moving, i);
-        }
-
+        mergeBuffer();
     }
 
-    @Override
     public JComponent getComponent() {
         return pane;
     }
@@ -145,22 +140,18 @@ class MultiBufferedImageStrategy extends RenderingStrategy {
             while (mustupdate) {
                 mustupdate = false;
 
-                MapContext context = map.context;
+                MapContext context = map.getContext();
                 if (context != null) {
                     if (complete || getBufferSize() != context.getLayerCount() || context != oldcontext) {
                         oldcontext = context;
                         complete = false;
-                        int contextsize = map.context.getLayerCount();
+                        int contextsize = context.getLayerCount();
 
                         stock.clear();
-                        pane.removeAll();
                         for (int i = contextsize - 1; i >= 0 && !mustupdate; i--) {
-                            MapLayer layer = map.context.getLayer(i);
+                            MapLayer layer = context.getLayer(i);
                             BufferedImage buffer = map.createBufferImage(layer);
-                            BufferComponent comp = new BufferComponent();
-                            comp.setBuffer(buffer);
-                            stock.put(layer, comp);
-                            pane.add(comp, new Integer(i));
+                            stock.put(layer, buffer);
                         }
 
                     } else {
@@ -170,10 +161,12 @@ class MultiBufferedImageStrategy extends RenderingStrategy {
                         int contextsize = keys.length;
 
                         for (int i = contextsize - 1; i >= 0 && !mustupdate; i--) {
-                            stock.get(keys[i]).setBuffer(map.createBufferImage(keys[i]));
+                            stock.put(keys[i], map.createBufferImage(keys[i]));
                         }
 
                     }
+                    
+                    mergeBuffer();
                 }
             }
             lowerNB();

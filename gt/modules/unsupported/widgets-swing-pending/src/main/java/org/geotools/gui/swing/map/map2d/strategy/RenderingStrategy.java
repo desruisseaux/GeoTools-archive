@@ -13,9 +13,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.gui.swing.map.map2d;
+package org.geotools.gui.swing.map.map2d.strategy;
 
-import java.util.Observable;
 import javax.swing.JComponent;
 import org.geotools.map.event.MapLayerListEvent;
 
@@ -23,20 +22,20 @@ import org.geotools.map.event.MapLayerListEvent;
  *
  * @author Johann Sorel
  */
-public abstract class RenderingStrategy {
+public interface RenderingStrategy {
 
         
-    public abstract void redraw(boolean complete);
+    public void redraw(boolean complete);
 
-    public abstract void layerChanged(MapLayerListEvent event);
+    public void layerChanged(MapLayerListEvent event);
 
-    public abstract void layerDeleted(MapLayerListEvent event);
+    public void layerDeleted(MapLayerListEvent event);
 
-    public abstract void layerAdded(MapLayerListEvent event);
+    public void layerAdded(MapLayerListEvent event);
 
-    public abstract void layerMoved(MapLayerListEvent event);
+    public void layerMoved(MapLayerListEvent event);
         
-    public abstract JComponent getComponent();
+    public JComponent getComponent();
     
     
     

@@ -16,7 +16,13 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.RenderingHints;
+import java.awt.image.BufferStrategy;
 import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
+import org.geotools.gui.swing.map.map2d.strategy.MergeBufferedImageStrategy;
+import org.geotools.gui.swing.map.map2d.strategy.MultiBufferedImageStrategy;
+import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
+import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
+import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
 import org.geotools.renderer.GTRenderer;
 
 /**
@@ -48,7 +54,7 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
 
     }
 
-    private void setRendering(JDefaultMap2D.STRATEGY type) {
+    private void setRendering(RenderingStrategy type) {
         if (map != null) {
             map.setRenderingStrategy(type);
         }
@@ -65,28 +71,22 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
             GTRenderer renderer = map.getRenderer();
             RenderingHints rh = renderer.getJava2DHints();
 
+            RenderingStrategy cl = map.getRenderingStrategy();
             
-            switch (map.getRenderingStrategy()){
-                    case SINGLE_BUFFER :
-                        jrb_rendering_single_buffer.setSelected(true);
-                        break;
-                    case MULTI_BUFFER :
-                        jrb_rendering_multi_buffer.setSelected(true);
-                        break;
-                    case MERGE_BUFFER :
-                        jrb_rendering_merge_buffer.setSelected(true);
-                        break;
-                    case SINGLE_VOLATILE :
-                        jrb_rendering_single_volatile.setSelected(true);
-                        break;
-                }
-            
+            if(cl instanceof SingleBufferedImageStrategy){
+                jrb_rendering_single_buffer.setSelected(true);
+            }else if(cl instanceof MergeBufferedImageStrategy){
+                jrb_rendering_merge_buffer.setSelected(true);
+            }else if(cl instanceof MultiBufferedImageStrategy){
+                jrb_rendering_multi_buffer.setSelected(true);
+            }else if(cl instanceof SingleBufferedImageStrategy){
+                jrb_rendering_single_volatile.setSelected(true);
+            }
+                       
             
             if (rh != null) {
                 Object value = null;
-
-                
-                
+                                
 
                 value = rh.get(RenderingHints.KEY_RENDERING);
                 if (RenderingHints.VALUE_RENDER_QUALITY.equals(value)) {
@@ -536,19 +536,19 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jcb_ditheringActionPerformed
 
     private void jrb_rendering_single_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_bufferActionPerformed
-        setRendering(JDefaultMap2D.STRATEGY.SINGLE_BUFFER);
+        setRendering(new SingleBufferedImageStrategy(map));
 }//GEN-LAST:event_jrb_rendering_single_bufferActionPerformed
 
     private void jrb_rendering_multi_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_multi_bufferActionPerformed
-        setRendering(JDefaultMap2D.STRATEGY.MULTI_BUFFER);
+        setRendering(new MultiBufferedImageStrategy(map));
     }//GEN-LAST:event_jrb_rendering_multi_bufferActionPerformed
 
     private void jrb_rendering_merge_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_merge_bufferActionPerformed
-        setRendering(JDefaultMap2D.STRATEGY.MERGE_BUFFER);
+        setRendering(new MergeBufferedImageStrategy(map));
     }//GEN-LAST:event_jrb_rendering_merge_bufferActionPerformed
 
     private void jrb_rendering_single_volatileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_single_volatileActionPerformed
-        setRendering(JDefaultMap2D.STRATEGY.SINGLE_VOLATILE);
+        setRendering(new SingleVolatileImageStrategy(map));
     }//GEN-LAST:event_jrb_rendering_single_volatileActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
