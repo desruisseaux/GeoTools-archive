@@ -808,8 +808,8 @@ public class DataUtilities {
             Object value = attributeType.getDefaultValue();
         
         if (value == null && !attributeType.isNillable()) {
-            throw new IllegalAttributeException(
-                "Got null default value for non-null type.");
+            return null; // sometimes there is no valid default value :-(
+            // throw new IllegalAttributeException("Got null default value for non-null type.");
         }
         return value;
     }
