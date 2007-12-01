@@ -55,7 +55,7 @@ import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
 import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
-import org.geotools.gui.swing.misc.FacilitiesFactory;
+import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -78,7 +78,6 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterVisitor;
 
 /**
  *
@@ -133,11 +132,11 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         LineSymbolizer ls = sb.createLineSymbolizer(stroke);
 
         Rule r1 = sb.createRule(new Symbolizer[]{ps});
-        r1.setFilter(new GeometryFilter(Point.class, MultiPoint.class));
+        r1.setFilter(new GeometryClassFilter(Point.class, MultiPoint.class));
         Rule r2 = sb.createRule(new Symbolizer[]{ls});
-        r2.setFilter(new GeometryFilter(LineString.class, MultiLineString.class));
+        r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
         Rule r3 = sb.createRule(new Symbolizer[]{pls});
-        r3.setFilter(new GeometryFilter(Polygon.class, MultiPolygon.class));
+        r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
 
 
 
@@ -626,7 +625,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
             if (!geoms.isEmpty() && hasGeometryChanged) {
                 validateModifiedGeometry(geoms.get(0), editFeature);
             }
-            renderingStrategy.layerChanged(null);
             hasEditionGeometry = false;
             hasGeometryChanged = false;
             editFeature = null;
@@ -901,30 +899,6 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         }
     }
 
-    private class GeometryFilter implements Filter {
-
-        private List<Class> valids = new ArrayList<Class>();
-
-        public GeometryFilter(Class... classes) {
-            for (Class cl : classes) {
-                valids.add(cl);
-            }
-        }
-
-        public boolean evaluate(Object obj) {
-            if (obj instanceof SimpleFeature) {
-                SimpleFeature sf = (SimpleFeature) obj;
-
-                if (valids.contains(sf.getDefaultGeometry().getClass())) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public Object accept(FilterVisitor arg0, Object arg1) {
-            return null;
-        }
-    }
+    
 }
 

@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import javax.swing.RepaintManager;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
@@ -41,6 +43,7 @@ import org.geotools.renderer.shape.ShapefileRenderer;
  */
 public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
+    
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private final MapContext buffercontext = new OneLayerContext();
     private final BufferComponent comp = new BufferComponent(this);
@@ -112,6 +115,23 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
         }
     }
 
+    protected void deletedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void changedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void addedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void movedLayer(MapLayerListEvent event) {
+        fit();
+    }
+    
+    
     private synchronized void raiseNB() {
         nbthread++;
         if (nbthread == 1) {
@@ -167,23 +187,7 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
     }
 
-    public void redraw(boolean complete) {
-        fit();
-    }
-
-    public void layerChanged(MapLayerListEvent event) {
-        fit();
-    }
-
-    public void layerDeleted(MapLayerListEvent event) {
-        fit();
-    }
-
-    public void layerAdded(MapLayerListEvent event) {
-        fit();
-    }
-
-    public void layerMoved(MapLayerListEvent event) {
+    public void reset() {
         fit();
     }
 
@@ -266,6 +270,7 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
             RerenderingThread(BufferComponent comp) {
                 this.comp = comp;
+                setOpaque(false);
             }
 
             public void setGraphics(Graphics g) {
@@ -314,6 +319,8 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             }
         }
     }
+    
+    
 }
 
 

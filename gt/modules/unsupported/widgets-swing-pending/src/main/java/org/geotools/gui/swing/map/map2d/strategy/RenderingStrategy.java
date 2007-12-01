@@ -21,7 +21,6 @@ import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.renderer.GTRenderer;
 
 /**
@@ -42,13 +41,8 @@ public interface RenderingStrategy {
     
     public void setMapArea(Envelope area);
     public Envelope getMapArea();
-    
-        
-    public void redraw(boolean complete);
-    public void layerChanged(MapLayerListEvent event);
-    public void layerDeleted(MapLayerListEvent event);
-    public void layerAdded(MapLayerListEvent event);
-    public void layerMoved(MapLayerListEvent event);
+            
+    public void reset();
         
     public JComponent getComponent();
     

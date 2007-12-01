@@ -32,12 +32,12 @@ import org.geotools.gui.swing.icon.IconBundle;
  *
  * @author Johann Sorel
  */
-public class WaitingOverLayer extends JComponent implements OverLayer{
+public class InformationOverLayer extends JComponent implements OverLayer{
 
     private final BufferedImage buffer;
     private boolean drawing = false;
     
-    public WaitingOverLayer(){
+    public InformationOverLayer(){
         ImageIcon anim = IconBundle.getResource().getIcon("JS_GT");
         String msg = TextBundle.getResource().getString("drawing_wait");
         

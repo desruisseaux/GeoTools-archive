@@ -74,8 +74,8 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         
     }
     
-    public void redraw(boolean complete) {
-        this.complete = complete;
+    public void reset() {
+        this.complete = true;
         
         if (thread != null && thread.isAlive()) {
             mustupdate = true;
@@ -201,6 +201,26 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
     }
 
     public BufferedImage createBufferImage(MapContext context) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void deletedLayer(MapLayerListEvent event) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void changedLayer(MapLayerListEvent event) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void addedLayer(MapLayerListEvent event) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected void movedLayer(MapLayerListEvent event) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

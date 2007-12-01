@@ -17,9 +17,12 @@
 package org.geotools.gui.swing.map.map2d.strategy;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
 import javax.swing.event.EventListenerList;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
 import org.geotools.map.MapContext;
+import org.geotools.map.event.MapLayerListEvent;
+import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 
 /**
@@ -28,10 +31,20 @@ import org.geotools.renderer.GTRenderer;
  */
 public abstract class AbstractRenderingStrategy implements RenderingStrategy{
 
+    
+    protected final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
     protected final EventListenerList listeners = new EventListenerList();
     protected MapContext context = null;
     protected Envelope mapArea = null;
     protected GTRenderer renderer = null;
+    
+    protected abstract void deletedLayer(MapLayerListEvent event);
+
+    protected abstract void changedLayer(MapLayerListEvent event);
+
+    protected abstract void addedLayer(MapLayerListEvent event);
+
+    protected abstract void movedLayer(MapLayerListEvent event);
     
     
     protected void fireRenderingEvent(boolean isRendering){
@@ -43,7 +56,6 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy{
         }
     }
     
-    
     public void setRenderer(GTRenderer renderer) {
         this.renderer = renderer;
     }
@@ -53,13 +65,23 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy{
     }
     
     public void setContext(MapContext context) {
-        this.context = context;
-    }
+        if (this.context != null) {
+            this.context.removeMapLayerListListener(mapLayerListlistener);
+        }
 
+        this.context = context;
+
+        if (context != null) {
+            this.context.addMapLayerListListener(mapLayerListlistener);
+        }
+
+        reset();
+    }
+    
     public MapContext getContext() {
         return context;
     }
-
+   
     public void setMapArea(Envelope area) {
         mapArea = area;
     }
@@ -79,6 +101,36 @@ public abstract class AbstractRenderingStrategy implements RenderingStrategy{
     
     public StrategyListener[] getStrategyListeners(){
         return listeners.getListeners(StrategyListener.class);
+    }
+    
+    
+    //--------------------private classes---------------------------------------
+    
+    private class MapLayerListListen implements MapLayerListListener {
+
+        public void layerAdded(MapLayerListEvent event) {
+
+            if (context.getLayers().length == 1) {
+                try {
+                    setMapArea(context.getLayerBounds());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            addedLayer(event);
+        }
+
+        public void layerRemoved(MapLayerListEvent event) {
+            deletedLayer(event);
+        }
+
+        public void layerChanged(MapLayerListEvent event) {
+            changedLayer(event);
+        }
+
+        public void layerMoved(MapLayerListEvent event) {
+            movedLayer(event);
+        }
     }
     
 }

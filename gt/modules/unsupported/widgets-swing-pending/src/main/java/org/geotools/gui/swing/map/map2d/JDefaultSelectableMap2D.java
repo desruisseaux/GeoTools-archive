@@ -19,7 +19,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -27,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 import org.geotools.factory.CommonFactoryFinder;
@@ -34,17 +41,17 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeometryBuilder;
+import org.geotools.gui.swing.map.map2d.overLayer.ImageOverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.SelectionOverLayer;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
+import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.renderer.GTRenderer;
-import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
@@ -56,6 +63,7 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.Symbolizer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
@@ -68,6 +76,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     protected final GeometryFactory gf = new GeometryFactory();
     private static final FacilitiesFactory FF = new FacilitiesFactory();
+    private static final StyleBuilder SB = new StyleBuilder();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MouseInputListener mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;
@@ -89,45 +98,58 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         addMapOverLayer(selectedPane);
         addMapOverLayer(selectionPane);
 
-        buildSelectionStyle();
+        buildSelectionStyle();        
     }
 
     private void buildSelectionStyle() {
 
-        StyleBuilder sb = new StyleBuilder();
+        
+        Fill fill = SB.createFill(Color.GREEN, 0.4f);
+        Stroke stroke = SB.createStroke(Color.GREEN, 2);
+        stroke.setOpacity(SB.literalExpression(0.6f));
 
-        Fill fill = sb.createFill(Color.GREEN, 0f);
-        Stroke stroke = sb.createStroke(Color.GREEN, 2);
-        stroke.setOpacity(sb.literalExpression(1f));
+        PolygonSymbolizer pls = SB.createPolygonSymbolizer(stroke, fill);
 
-        PolygonSymbolizer pls = sb.createPolygonSymbolizer(stroke, fill);
-
-        fill = sb.createFill(Color.GREEN, 0f);
-        stroke = sb.createStroke(Color.GREEN, 0);
-
-        Mark mark = sb.createMark("cross", fill, stroke);
-        Graphic gra = sb.createGraphic();
-        gra.setOpacity(sb.literalExpression(1f));
+        Mark mark = SB.createMark("circle", fill, stroke);
+        Graphic gra = SB.createGraphic();
+        gra.setOpacity(SB.literalExpression(0.6f));
         gra.setMarks(new Mark[]{mark});
-        gra.setSize(sb.literalExpression(13));
-        PointSymbolizer ps = sb.createPointSymbolizer(gra);
+        gra.setSize(SB.literalExpression(14));
+        PointSymbolizer ps = SB.createPointSymbolizer(gra);
 
-        LineSymbolizer ls = sb.createLineSymbolizer(stroke);
+        LineSymbolizer ls = SB.createLineSymbolizer(stroke);
 
-        selectionStyle = sb.createStyle();
-        selectionStyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(pls));
-        selectionStyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(ps));
-        selectionStyle.addFeatureTypeStyle(sb.createFeatureTypeStyle(ls));
+        Rule r1 = SB.createRule(new Symbolizer[]{ps});
+        r1.setFilter(new GeometryClassFilter(Point.class, MultiPoint.class));
+        Rule r2 = SB.createRule(new Symbolizer[]{ls});
+        r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
+        Rule r3 = SB.createRule(new Symbolizer[]{pls});
+        r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
+
+        
+        selectionStyle = SB.createStyle();
+        selectionStyle.addFeatureTypeStyle(SB.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
+
 
     }
 
     private void applyStyleFilter(Filter f) {
 
+        buildSelectionStyle();
+        
         for (FeatureTypeStyle fts : selectionStyle.getFeatureTypeStyles()) {
             for (Rule r : fts.getRules()) {
-                r.setFilter(f);
+                
+                Filter nf = SB.getFilterFactory().and(r.getFilter(), f);
+                
+                r.setFilter(nf);
             }
         }
+        
+        for(MapLayer layer : selectionMapContext.getLayers()){
+            layer.setStyle(selectionStyle);
+        }
+        
         updateOverLayer();
     }
 
