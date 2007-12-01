@@ -67,4 +67,36 @@ public class ArcSdeException extends DataSourceException {
         }
         return ex.getSeError();
     }
+    
+    /**
+     * SeException is pretty sad (Caused by: com.esri.sde.sdk.client.SeException: )
+     * leaving you to hunt and peck at the SeError for a good description of what
+     * went bad.
+     * <p>
+     * This class tries to grab as much information as possible form SeError.
+     * @return String describing the message from SeException.
+     */
+    public static String toMessage( SeException e ){
+        StringBuffer buf = new StringBuffer();
+        if( e.getSeError() != null ){
+            SeError error = e.getSeError();
+            buf.append("SDE Error ");
+            buf.append( error.getSdeError() );
+            buf.append( " ");
+            buf.append( error.getSdeErrMsg() );
+            if( error.getExtErrMsg() != null ){
+                buf.append( "\n" );
+                buf.append( error.getExtErrMsg() );
+            }
+            if( error.getErrDesc() != null ){
+                buf.append( "\n" );
+                buf.append( error.getErrDesc() );
+            }
+        }
+        if( e.getMessage() != null ){
+            buf.append( "\n" );
+            buf.append( e.getMessage() );
+        }
+        return buf.toString();
+    }
 }

@@ -31,6 +31,7 @@ import org.opengis.geometry.BoundingBox;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeDelete;
+import com.esri.sde.sdk.client.SeError;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;
@@ -204,10 +205,10 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
                     connection.rollbackTransaction();
                 } catch (SeException e1) {
                     LOGGER.log(Level.SEVERE, "Unrecoverable error rolling back delete transaction",
-                            e);
+                            new ArcSdeException("Unable to rollback", e));
                 }
             }
-            throw new DataSourceException("Error deleting " + featureId, e);
+            throw new ArcSdeException("Error deleting feature id:" + featureId, e);
         } finally {
             if (seDelete != null) {
                 try {
