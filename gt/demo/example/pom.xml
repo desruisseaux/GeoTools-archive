@@ -137,6 +137,12 @@
       <artifactId>gt2-widgets-swing</artifactId>
       <version>${project.version}</version>
     </dependency>
+        <!-- GeoTools unsupported -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>widgets-swing-pending</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <!-- =========================================================== -->
