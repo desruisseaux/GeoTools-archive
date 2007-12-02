@@ -27,7 +27,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -35,9 +34,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
-import javax.xml.transform.TransformerException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -61,7 +58,6 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
-import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
@@ -76,16 +72,15 @@ import org.opengis.filter.FilterFactory2;
  */
 public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements SelectableMap2D {
 
-    protected final GeometryFactory gf = new GeometryFactory();
-    private static final FacilitiesFactory FF = new FacilitiesFactory();
-    private static final StyleBuilder SB = new StyleBuilder();
+    protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    protected final FacilitiesFactory FACILITIES_FACTORY = new FacilitiesFactory();
+    protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MouseInputListener mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;
     private final SelectionOverLayer selectionPane = new SelectionOverLayer();
     private final BufferComponent selectedPane = new BufferComponent();
     private final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
-    GeometryBuilder geometryBuilder = new GeometryBuilder(DefaultGeographicCRS.WGS84);
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private Style selectionStyle = null;
 
@@ -106,31 +101,31 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private void buildSelectionStyle() {
 
         
-        Fill fill = SB.createFill(Color.GREEN, 0.4f);
-        Stroke stroke = SB.createStroke(Color.GREEN, 2);
-        stroke.setOpacity(SB.literalExpression(0.6f));
+        Fill fill = STYLE_BUILDER.createFill(Color.GREEN, 0.4f);
+        Stroke stroke = STYLE_BUILDER.createStroke(Color.GREEN, 2);
+        stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
 
-        PolygonSymbolizer pls = SB.createPolygonSymbolizer(stroke, fill);
+        PolygonSymbolizer pls = STYLE_BUILDER.createPolygonSymbolizer(stroke, fill);
 
-        Mark mark = SB.createMark("circle", fill, stroke);
-        Graphic gra = SB.createGraphic();
-        gra.setOpacity(SB.literalExpression(0.6f));
+        Mark mark = STYLE_BUILDER.createMark("circle", fill, stroke);
+        Graphic gra = STYLE_BUILDER.createGraphic();
+        gra.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
         gra.setMarks(new Mark[]{mark});
-        gra.setSize(SB.literalExpression(14));
-        PointSymbolizer ps = SB.createPointSymbolizer(gra);
+        gra.setSize(STYLE_BUILDER.literalExpression(14));
+        PointSymbolizer ps = STYLE_BUILDER.createPointSymbolizer(gra);
 
-        LineSymbolizer ls = SB.createLineSymbolizer(stroke);
+        LineSymbolizer ls = STYLE_BUILDER.createLineSymbolizer(stroke);
 
-        Rule r1 = SB.createRule(new Symbolizer[]{ps});
+        Rule r1 = STYLE_BUILDER.createRule(new Symbolizer[]{ps});
         r1.setFilter(new GeometryClassFilter(Point.class, MultiPoint.class));
-        Rule r2 = SB.createRule(new Symbolizer[]{ls});
+        Rule r2 = STYLE_BUILDER.createRule(new Symbolizer[]{ls});
         r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
-        Rule r3 = SB.createRule(new Symbolizer[]{pls});
+        Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{pls});
         r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
 
         
-        selectionStyle = SB.createStyle();
-        selectionStyle.addFeatureTypeStyle(SB.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
+        selectionStyle = STYLE_BUILDER.createStyle();
+        selectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
 
 
     }
@@ -140,7 +135,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         for (FeatureTypeStyle fts : selectionStyle.getFeatureTypeStyles()) {
             for (Rule r : fts.getRules()) {
                 
-                Filter nf = SB.getFilterFactory().and(r.getFilter(), f);
+                Filter nf = STYLE_BUILDER.getFilterFactory().and(r.getFilter(), f);
                 
                 r.setFilter(f);
             }
@@ -170,7 +165,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return toMapCoord(mx, my,width,height,bounds);
     }
     
-    protected Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
+    private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
         double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
         return new Coordinate(mapX, mapY);
@@ -191,8 +186,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             coord[3] = toMapCoord(mx + taille, my - taille, width, height, bounds);
             coord[4] = coord[0];
 
-            LinearRing lr1 = gf.createLinearRing(coord);
-            return gf.createPolygon(lr1, null);
+            LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
+            return GEOMETRY_FACTORY.createPolygon(lr1, null);
         }
 
         return null;
@@ -235,8 +230,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             coord[3] = toMapCoord(ex, my, width, height, bounds);
             coord[4] = coord[0];
 
-            LinearRing lr1 = gf.createLinearRing(coord);
-            Geometry geometry = gf.createPolygon(lr1, null);
+            LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
+            Geometry geometry = GEOMETRY_FACTORY.createPolygon(lr1, null);
 
             findFeature(geometry);
         }
@@ -265,18 +260,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         updateOverLayer();
     }
-
-//    @Override
-//    protected void rectangleChanged(Rectangle newRect) {
-//        super.rectangleChanged(newRect);
-//        updateOverLayer();
-//    }
-
     
     //----------------------SELECTABLE MAP2D------------------------------------
     public void addSelectableLayer(MapLayer layer) {
         if (layer != null) {
-            MapLayer copy = FF.duplicateLayer(layer);
+            MapLayer copy = FACILITIES_FACTORY.duplicateLayer(layer);
             copy.setStyle(selectionStyle);
             selectionMapContext.addLayer(copy);
             copies.put(layer, copy);
@@ -287,7 +275,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         if (layers != null) {
 
             for (MapLayer layer : layers) {
-                MapLayer copy = FF.duplicateLayer(layer);
+                MapLayer copy = FACILITIES_FACTORY.duplicateLayer(layer);
                 copy.setStyle(selectionStyle);
                 selectionMapContext.addLayer(copy);
                 copies.put(layer, copy);
@@ -315,7 +303,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
     public void doSelection(double x, double y) {
 
-        Geometry geometry = gf.createPoint(new Coordinate(x, y));
+        Geometry geometry = GEOMETRY_FACTORY.createPoint(new Coordinate(x, y));
         // org.opengis.geometry.Geometry geometry = new Point();
         findFeature(geometry);
     }
