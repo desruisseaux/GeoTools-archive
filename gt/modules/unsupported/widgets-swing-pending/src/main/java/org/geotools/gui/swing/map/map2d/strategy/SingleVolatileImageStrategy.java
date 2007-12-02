@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
+import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -46,7 +47,9 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
     
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private final MapContext buffercontext = new OneLayerContext();
-    private final BufferComponent comp = new BufferComponent(this);
+    private final BufferComponent comp = new BufferComponent(this);        
+    private Envelope oldMapArea = null;
+    private Rectangle oldRect = null;
     private int nbthread = 0;
 
     public SingleVolatileImageStrategy() {
@@ -114,22 +117,6 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             comp.refresh();
         }
     }
-
-    protected void deletedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-    protected void changedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-    protected void addedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-    protected void movedLayer(MapLayerListEvent event) {
-        fit();
-    }
     
     
     private synchronized void raiseNB() {
@@ -145,6 +132,32 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             fireRenderingEvent(false);
         }
     }
+    
+    private void checkAspect(boolean changed){
+                
+        Rectangle newRect = comp.getBounds();
+
+        if (!newRect.equals(oldRect)) {
+            changed = true;
+            oldRect = newRect;
+        }
+
+        if ( mapArea != null ) {
+
+            if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
+                changed = true;
+                oldMapArea = mapArea;
+                context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
+            }
+
+            if (changed) {
+                changed = false;
+                fit();
+            }
+        }
+    }
+    
+    
 
     //--------------------RenderingStrategy-------------------------------------
     public synchronized BufferedImage createBufferImage(MapLayer layer) {
@@ -188,13 +201,39 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
     }
 
     public void reset() {
-        fit();
+       checkAspect(true);
     }
 
     public JComponent getComponent() {
         return comp;
     }
 
+    
+
+    //------------------Abstract RenderingStrategy------------------------------    
+    
+    @Override
+    public void setMapArea(Envelope area) {
+        super.setMapArea(area);
+        checkAspect(false);
+    }
+    
+    protected void deletedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void changedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void addedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void movedLayer(MapLayerListEvent event) {
+        fit();
+    }
+    
     //------------------------PRIVATES CLASSES----------------------------------
     private class BufferComponent extends JComponent {
 
@@ -237,7 +276,7 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
 
         @Override
         public void paintComponent(Graphics g) {
-
+            checkAspect(false);
 
             if (update || buffer == null || buffer.validate(GC) == VolatileImage.IMAGE_INCOMPATIBLE) {
                 update = false;

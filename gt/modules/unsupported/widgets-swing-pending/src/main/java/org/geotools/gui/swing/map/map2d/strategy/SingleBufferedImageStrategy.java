@@ -15,6 +15,7 @@
  */
 package org.geotools.gui.swing.map.map2d.strategy;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.gui.swing.map.map2d.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -43,9 +44,11 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     private final MapContext buffercontext = new OneLayerContext();
     private final GraphicsConfiguration GC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private boolean mustupdate = false;
+    private Envelope oldMapArea = null;
+    private Rectangle oldRect = null;
     private int nbthread = 0;
 
-    //optimize with hardware doublebuffer, also called backbuffer
+    
     public SingleBufferedImageStrategy() {
         this(new ShapefileRenderer());
     }
@@ -89,82 +92,47 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     }
 
-    public JComponent getComponent() {
-        return comp;
-    }
-    
-    
-    public void reset() {
-        fit();
-    }
-
-    protected void changedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-    protected void deletedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-    protected void addedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-    protected void movedLayer(MapLayerListEvent event) {
-        fit();
-    }
-
-
-    public void raiseNB() {
-       nbthread++;
+    private void raiseNB() {
+        nbthread++;
         if (nbthread == 1) {
             fireRenderingEvent(true);
         }
     }
 
-    public void lowerNB() {
+    private void lowerNB() {
         nbthread--;
         if (nbthread == 0) {
             fireRenderingEvent(false);
         }
     }
 
-    //------------------------PRIVATES CLASSES----------------------------------
-    private class DrawingThread extends Thread {
+    private void checkAspect(boolean changed){
+                
+        Rectangle newRect = comp.getBounds();
 
-        @Override
-        public void run() {
-            raiseNB();
-            while (mustupdate) {
-                mustupdate = false;
-                if (context != null && mapArea != null) {
-                    comp.setBuffer(createBufferImage(context));
-                }
-            }
-            lowerNB();
+        if (!newRect.equals(oldRect)) {
+            changed = true;
+            oldRect = newRect;
         }
-    };
-         
 
-        private class BufferComponent extends JComponent {
+        if ( mapArea != null ) {
 
-            private BufferedImage img;
-
-            public void setBuffer(BufferedImage buf) {
-                img = buf;
-                repaint();
+            if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
+                changed = true;
+                oldMapArea = mapArea;
+                context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
             }
-            
-        @Override
-            public void paintComponent(Graphics g) {
-                if (img != null) {
-                    g.drawImage(img, 0, 0, this);
-                }
-            }       
-        };
+
+            if (changed) {
+                changed = false;
+                fit();
+            }
+        }
+    }
     
     
-        public synchronized BufferedImage createBufferImage(MapLayer layer) {
+    //-----------------------RenderingStrategy----------------------------------
+    public synchronized BufferedImage createBufferImage(MapLayer layer) {
 
         if (context != null) {
             try {
@@ -203,10 +171,70 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         }
 
     }
-   
+
+    public void reset() {
+        fit();
+    }
+    
+    public JComponent getComponent() {
+        return comp;
+    }
         
-        
-        
+    //------------------Abstract RenderingStrategy------------------------------
+    @Override
+    public void setMapArea(Envelope area) {
+        super.setMapArea(area);
+        checkAspect(false);
+    }
+    
+    protected void changedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void deletedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void addedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    protected void movedLayer(MapLayerListEvent event) {
+        fit();
+    }
+
+    //------------------------PRIVATES CLASSES----------------------------------
+    private class DrawingThread extends Thread {
+
+        @Override
+        public void run() {
+            raiseNB();
+            while (mustupdate) {
+                mustupdate = false;
+                if (context != null && mapArea != null) {
+                    comp.setBuffer(createBufferImage(context));
+                }
+            }
+            lowerNB();
+        }
+    }
+
+    private class BufferComponent extends JComponent {
+
+        private BufferedImage img;
+
+        public void setBuffer(BufferedImage buf) {
+            img = buf;
+            repaint();
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            if (img != null) {
+                g.drawImage(img, 0, 0, this);
+            }
+        }
+        }
 }
     
     

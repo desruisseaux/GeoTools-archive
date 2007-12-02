@@ -35,7 +35,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
+import javax.xml.transform.TransformerException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -68,6 +70,7 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
@@ -137,12 +140,24 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         r2.setFilter(new GeometryClassFilter(LineString.class, MultiLineString.class));
         Rule r3 = sb.createRule(new Symbolizer[]{pls});
         r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
+        Rule r4 = sb.createRule(new Symbolizer[]{ps});
+        r4.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
 
 
 
         Style stl = sb.createStyle();
         stl.addFeatureTypeStyle(sb.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
+        stl.addFeatureTypeStyle(sb.createFeatureTypeStyle(null, new Rule[]{r4}));
 
+//        SLDTransformer st = new SLDTransformer();
+//
+//            try {
+//                String xml = st.transform(stl);            
+//                JOptionPane.showInputDialog("haha",xml);
+//            } catch (TransformerException ex) {
+//                ex.printStackTrace();
+//            }
+        
         return stl;
     }
 
@@ -460,11 +475,11 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         super.setContext(newcontext);
     }
 
-    @Override
-    protected void rectangleChanged(Rectangle newRect) {
-        super.rectangleChanged(newRect);
-        repaintMemoryLayer();
-    }
+//    @Override
+//    protected void rectangleChanged(Rectangle newRect) {
+//        super.rectangleChanged(newRect);
+//        repaintMemoryLayer();
+//    }
 
     //--------------------EDITABLE MAP2D----------------------------------------
     public void setEditedMapLayer(MapLayer layer) {
@@ -879,6 +894,8 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     private class BufferComponent extends JComponent implements OverLayer{
 
         private BufferedImage img;
+        private Rectangle oldone = null;
+        private Rectangle newone = null;
 
         public void setBuffer(BufferedImage buf) {
             img = buf;
@@ -887,10 +904,17 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
 
         @Override
         public void paintComponent(Graphics g) {
-            if (img != null) {
+            newone = getBounds();
+            
+            if(!newone.equals(oldone)){
+                oldone = newone;
+                repaintMemoryLayer();
+            }else if(img != null){
                 g.drawImage(img, 0, 0, this);
             }
         }
+        
+        
 
         public void refresh() {}
 

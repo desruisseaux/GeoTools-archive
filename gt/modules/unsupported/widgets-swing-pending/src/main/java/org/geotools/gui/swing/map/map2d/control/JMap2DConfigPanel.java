@@ -16,10 +16,8 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.RenderingHints;
-import java.awt.image.BufferStrategy;
 import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.strategy.MergeBufferedImageStrategy;
-import org.geotools.gui.swing.map.map2d.strategy.MultiBufferedImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
@@ -77,8 +75,6 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
                 jrb_rendering_single_buffer.setSelected(true);
             }else if(cl instanceof MergeBufferedImageStrategy){
                 jrb_rendering_merge_buffer.setSelected(true);
-            }else if(cl instanceof MultiBufferedImageStrategy){
-                jrb_rendering_multi_buffer.setSelected(true);
             }else if(cl instanceof SingleBufferedImageStrategy){
                 jrb_rendering_single_volatile.setSelected(true);
             }
@@ -164,7 +160,6 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel8 = new javax.swing.JLabel();
         jrb_rendering_single_buffer = new javax.swing.JRadioButton();
-        jrb_rendering_multi_buffer = new javax.swing.JRadioButton();
         jrb_rendering_merge_buffer = new javax.swing.JRadioButton();
         jrb_rendering_single_volatile = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
@@ -199,14 +194,6 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
             }
         });
 
-        bg_rendering.add(jrb_rendering_multi_buffer);
-        jrb_rendering_multi_buffer.setText("Multiple buffered images");
-        jrb_rendering_multi_buffer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jrb_rendering_multi_bufferActionPerformed(evt);
-            }
-        });
-
         bg_rendering.add(jrb_rendering_merge_buffer);
         jrb_rendering_merge_buffer.setText("Merge buffered images");
         jrb_rendering_merge_buffer.addActionListener(new java.awt.event.ActionListener() {
@@ -233,14 +220,14 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jLabel7)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 103, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 131, Short.MAX_VALUE))
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(10, 10, 10)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jrb_rendering_single_buffer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                            .add(jrb_rendering_multi_buffer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                            .add(jrb_rendering_merge_buffer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
-                        .add(28, 28, 28)))
+                            .add(jrb_rendering_merge_buffer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(jrb_rendering_single_buffer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                                .add(28, 28, 28)))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -264,8 +251,6 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
                         .add(jLabel7)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jrb_rendering_single_buffer)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jrb_rendering_multi_buffer)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jrb_rendering_merge_buffer))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE))
@@ -539,10 +524,6 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
         setRendering(new SingleBufferedImageStrategy());
 }//GEN-LAST:event_jrb_rendering_single_bufferActionPerformed
 
-    private void jrb_rendering_multi_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_multi_bufferActionPerformed
-        setRendering(new MultiBufferedImageStrategy());
-    }//GEN-LAST:event_jrb_rendering_multi_bufferActionPerformed
-
     private void jrb_rendering_merge_bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb_rendering_merge_bufferActionPerformed
         setRendering(new MergeBufferedImageStrategy());
     }//GEN-LAST:event_jrb_rendering_merge_bufferActionPerformed
@@ -578,7 +559,6 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
     private javax.swing.JRadioButton jrb_render_quality;
     private javax.swing.JRadioButton jrb_render_speed;
     private javax.swing.JRadioButton jrb_rendering_merge_buffer;
-    private javax.swing.JRadioButton jrb_rendering_multi_buffer;
     private javax.swing.JRadioButton jrb_rendering_single_buffer;
     private javax.swing.JRadioButton jrb_rendering_single_volatile;
     // End of variables declaration//GEN-END:variables

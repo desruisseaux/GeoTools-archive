@@ -27,21 +27,22 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
+import javax.xml.transform.TransformerException;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeometryBuilder;
-import org.geotools.gui.swing.map.map2d.overLayer.ImageOverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.SelectionOverLayer;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
@@ -60,6 +61,7 @@ import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
@@ -134,21 +136,25 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     private void applyStyleFilter(Filter f) {
-
-        buildSelectionStyle();
         
         for (FeatureTypeStyle fts : selectionStyle.getFeatureTypeStyles()) {
             for (Rule r : fts.getRules()) {
                 
                 Filter nf = SB.getFilterFactory().and(r.getFilter(), f);
                 
-                r.setFilter(nf);
+                r.setFilter(f);
             }
         }
         
-        for(MapLayer layer : selectionMapContext.getLayers()){
-            layer.setStyle(selectionStyle);
-        }
+//        SLDTransformer st = new SLDTransformer();
+//
+//            try {
+//                String xml = st.transform(selectionStyle);            
+//                JOptionPane.showInputDialog("haha",xml);
+//            } catch (TransformerException ex) {
+//                ex.printStackTrace();
+//            }
+        
         
         updateOverLayer();
     }
@@ -260,11 +266,11 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         updateOverLayer();
     }
 
-    @Override
-    protected void rectangleChanged(Rectangle newRect) {
-        super.rectangleChanged(newRect);
-        updateOverLayer();
-    }
+//    @Override
+//    protected void rectangleChanged(Rectangle newRect) {
+//        super.rectangleChanged(newRect);
+//        updateOverLayer();
+//    }
 
     
     //----------------------SELECTABLE MAP2D------------------------------------
@@ -482,6 +488,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private class BufferComponent extends JComponent implements OverLayer{
 
         private BufferedImage img;
+        private Rectangle oldone = null;
+        private Rectangle newone = null;
 
         public void setBuffer(BufferedImage buf) {
             img = buf;
@@ -490,11 +498,18 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         @Override
         public void paintComponent(Graphics g) {
-            if (img != null) {
+            newone = getBounds();
+            
+            if(!newone.equals(oldone)){
+                oldone = newone;
+                updateOverLayer();
+            }else if(img != null){
                 g.drawImage(img, 0, 0, this);
             }
+            
         }
-
+       
+        
         public void refresh() {}
 
         public JComponent geComponent() {

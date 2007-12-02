@@ -20,11 +20,8 @@ import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.io.IOException;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -33,14 +30,12 @@ import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.listener.Map2DListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.StrategyListener;
-import org.geotools.gui.swing.map.map2d.overLayer.ImageOverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.InformationOverLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
-import org.jdesktop.swingx.JXImagePanel.Style;
 
 /**
  *
@@ -61,7 +56,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     private final JLayeredPane mainOverLayerPane = new JLayeredPane();
     private int nextMapoverLayerIndex = 1;
     private int drawingNumber = 0;
-    private boolean changed = false;
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
     private OverLayer backLayer;
@@ -81,8 +75,8 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         add(BorderLayout.CENTER, mainOverLayerPane);
         setRenderingStrategy(new SingleVolatileImageStrategy());
 
-        
-        
+
+
 //        ImageOverLayer back = new ImageOverLayer();
 //        Image icone = Toolkit.getDefaultToolkit().getImage("I:\\Images\\autres\\123t3_cover_16003.png");
 //        back.setImage(icone);
@@ -139,37 +133,33 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         return new Envelope(ll, ur);
     }
 
-    protected void rectangleChanged(Rectangle newRect) {
-        mapArea = fixAspectRatio(newRect, mapArea);
+    private void rectangleChanged(Rectangle newRect) {
+
+        Envelope newArea = fixAspectRatio(newRect, mapArea);
+        fireMapAreaChanged(this.mapArea, newArea);
+        this.mapArea = newArea;
         getRenderingStrategy().setMapArea(mapArea);
     }
 
-    private void redraw(boolean complete) {
-
+    private void checkAspect() {
 
         Rectangle newRect = getBounds();
 
         if (!newRect.equals(oldRect)) {
-            changed = true;
             oldRect = newRect;
             rectangleChanged(newRect);
         }
 
-        if (renderingStrategy != null && mapArea != null) {
+        if (mapArea != null) {
 
             if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
-                changed = true;
                 oldMapArea = mapArea;
                 context.setAreaOfInterest(mapArea, context.getCoordinateReferenceSystem());
             }
 
-            if (changed || complete) {
-                changed = false;
-                renderingStrategy.reset();
-            }
         }
     }
-    
+
     private void raiseDrawingNumber() {
         drawingNumber++;
         informationOverLayer.setDrawing(drawingNumber > 0);
@@ -206,7 +196,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
     @Override
     public void paintComponent(Graphics g) {
-        redraw(false);
+        checkAspect();
         super.paintComponent(g);
     }
 
@@ -214,7 +204,6 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     public InformationOverLayer getInformationLayer() {
         return informationOverLayer;
     }
-
 
     public void setBackLayer(OverLayer back) {
 
@@ -226,8 +215,8 @@ public class JDefaultMap2D extends JPanel implements Map2D {
             mainOverLayerPane.add(backLayer.geComponent(), new Integer(0));
         }
     }
-    
-    public OverLayer getBackLayer(){
+
+    public OverLayer getBackLayer() {
         return backLayer;
     }
 
@@ -262,23 +251,14 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         return context;
     }
 
-    public void setMapArea(Envelope mapArea) {
+    public void setMapArea(Envelope newArea) {
 
-        if (mapArea != null) {
-
+        if (newArea != null) {
             Rectangle newRect = getBounds();
-
-            if (!newRect.equals(oldRect)) {
-                changed = true;
-                oldRect = newRect;
-            }
-
-            Envelope newArea = fixAspectRatio(newRect, mapArea);
-            fireMapAreaChanged(this.mapArea, newArea);
-            this.mapArea = newArea;
-
-            getRenderingStrategy().setMapArea(newArea);
-            redraw(false);
+            Envelope fitArea = fixAspectRatio(newRect, newArea);
+            fireMapAreaChanged(mapArea, fitArea);
+            mapArea = fitArea;
+            getRenderingStrategy().setMapArea(fitArea);
         }
     }
 
@@ -291,22 +271,24 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         if (stratege != null) {
 
             GTRenderer ren = null;
-            
+
             if (renderingStrategy != null) {
                 ren = renderingStrategy.getRenderer();
+                renderingStrategy.setContext(null);
                 mapOverLayerPane.remove(renderingStrategy.getComponent());
                 renderingStrategy.removeStrategyListener(strategylisten);
             }
             renderingStrategy = stratege;
             renderingStrategy.addStrategyListener(strategylisten);
-            
-            if(ren != null){
+
+            if (ren != null) {
                 renderingStrategy.setRenderer(ren);
-                }
+            }
             renderingStrategy.setContext(context);
             renderingStrategy.setMapArea(mapArea);
-            renderingStrategy.reset();
             mapOverLayerPane.add(renderingStrategy.getComponent(), new Integer(0));
+            mapOverLayerPane.revalidate();
+
         }
     }
 
@@ -315,7 +297,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     public void refresh() {
-        redraw(true);
+        getRenderingStrategy().reset();
     }
 
     public JPanel getComponent() {
