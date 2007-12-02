@@ -16,14 +16,18 @@
  */
 package org.geotools.image.io.mosaic;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
@@ -33,13 +37,14 @@ import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.util.FrequencySortedSet;
 
 
 /**
  * An image reader built from a mosaic of other image readers.
  *
  * @since 2.5
- * @input $URL$
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -227,8 +232,111 @@ public class MosaicImageReader extends ImageReader {
         return (tiles != null) ? tiles.getTileSize(imageIndex).height : super.getTileHeight(imageIndex);
     }
 
+    /**
+     * Returns {@code true} if the storage format of the given image places no inherent impediment
+     * on random access to pixels. The default implementation returns {@code true} if the input of
+     * every tiles is a {@link File} and {@code isRandomAccessEasy} returned {@code true} for all
+     * tile readers.
+     *
+     * @throws IOException If an error occurs reading the information from the input source.
+     */
+    @Override
+    public boolean isRandomAccessEasy(final int imageIndex) throws IOException {
+        if (tiles == null) {
+            return super.isRandomAccessEasy(imageIndex);
+        }
+        for (final Tile tile : tiles.getTiles(imageIndex, null)) {
+            final Object input = tile.getInput();
+            if (!(input instanceof File)) {
+                return false;
+            }
+            if (!tile.getPreparedReader(true, true).isRandomAccessEasy(imageIndex)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns an image type which most closely represents the "raw" internal format of the
+     * image. The default implementation invokes {@code getRawImageType} for every tile readers,
+     * ommits the types that are not declared in <code>{@linkplain ImageReader#getImageTypes
+     * getImageTypes}(imageIndex)</code> for every tile readers, and returns the most common
+     * remainding value.
+     *
+     * @throws IOException If an error occurs reading the information from the input source.
+     */
+    @Override
+    public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
+        if (tiles != null) {
+            final Set<ImageTypeSpecifier> allowed = getImageTypeSet(imageIndex);
+            // Gets the list of every raw image types, with the most frequent type first.
+            final Set<ImageTypeSpecifier> types = new FrequencySortedSet<ImageTypeSpecifier>(true);
+            for (final Tile tile : tiles.getTiles(imageIndex, null)) {
+                final ImageReader reader = tile.getPreparedReader(true, true);
+                final Iterator<ImageTypeSpecifier> it = reader.getImageTypes(imageIndex);
+                while (it.hasNext()) {
+                    final ImageTypeSpecifier type = it.next();
+                    if (allowed.contains(type)) {
+                        types.add(type);
+                    }
+                }
+            }
+            final Iterator<ImageTypeSpecifier> it = types.iterator();
+            if (it.hasNext()) {
+                final ImageTypeSpecifier type = it.next();
+                if (it.hasNext()) {
+                    // TODO: log some low-level warnings here.
+                }
+                return type;
+            }
+        }
+        return super.getRawImageType(imageIndex);
+    }
+
+    /**
+     * Returns the possible image types to which the given image may be decoded. This method
+     * invokes <code>{@linkplain ImageReader#getImageTypes getImageTypes}(imageIndex)</code>
+     * on every tile readers and returns the intersection of all sets (i.e. only the types
+     * that are supported by every readers).
+     *
+     * @throws IOException If an error occurs reading the information from the input source.
+     */
+    private Set<ImageTypeSpecifier> getImageTypeSet(final int imageIndex) throws IOException {
+        int pass = 0;
+        final Map<ImageTypeSpecifier,Integer> types = new LinkedHashMap<ImageTypeSpecifier,Integer>();
+        for (final Tile tile : getTileCollection().getTiles(imageIndex, null)) {
+            final ImageReader reader = tile.getPreparedReader(true, true);
+            final Iterator<ImageTypeSpecifier> toAdd = reader.getImageTypes(imageIndex);
+            while (toAdd.hasNext()) {
+                final ImageTypeSpecifier type = toAdd.next();
+                final Integer old = types.put(type, pass);
+                if (old == null && pass != 0) {
+                    // Just added a type that did not exists in previous tiles, so remove it.
+                    types.remove(type);
+                }
+            }
+            // Remove all previous types not found in this pass.
+            for (final Iterator<Integer> it=types.values().iterator(); it.hasNext();) {
+                if (it.next().intValue() != pass) {
+                    it.remove();
+                }
+            }
+            pass++;
+        }
+        return types.keySet();
+    }
+
+    /**
+     * Returns possible image types to which the given image may be decoded. Default implementation
+     * invokes <code>{@linkplain ImageReader#getImageTypes getImageTypes}(imageIndex)</code> on
+     * every tile readers and returns the intersection of all sets (i.e. only the types that are
+     * supported by every readers).
+     *
+     * @throws IOException If an error occurs reading the information from the input source.
+     */
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getImageTypeSet(imageIndex).iterator();
     }
 
     public IIOMetadata getStreamMetadata() throws IOException {
@@ -241,5 +349,22 @@ public class MosaicImageReader extends ImageReader {
 
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void close() throws IOException {
+        if (tiles != null) {
+            tiles.close(false);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        if (tiles != null) try {
+            tiles.close(true);
+        } catch (IOException e) {
+            Tile.recoverableException(MosaicImageReader.class, "dispose", e);
+        }
+        tiles = null;
+        super.dispose();
     }
 }

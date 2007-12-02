@@ -33,8 +33,10 @@ import org.geotools.resources.i18n.Errors;
  * <p>
  * <ul>
  *   <li>An {@link ImageReader} instance. The same image reader is typically used for every tiles,
- *       but this is not mandatory. The {@linkplain #getInput input} will be assigned to the image
- *       reader before every tile to be read.</li>
+ *       but this is not mandatory (more image readers <em>may</em> improve performance at the
+ *       expanse of more memory and {@linkplain ImageInputStream image input stream} retention).
+ *       The {@linkplain #getInput input} will be assigned to the image reader before every tile
+ *       to be read.</li>
  *
  *   <li>An input, typically a {@linkplain java.io.File file} or {@linkplain java.net.URL URL}.
  *       The input is typically different for every tile to be read, but this is not mandatory.
@@ -58,11 +60,17 @@ import org.geotools.resources.i18n.Errors;
  * better if they are.
  *
  * @since 2.5
- * @input $URL$
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Tile {
+public class Tile implements Comparable<Tile> {
+    /**
+     * The tile collection that own this tile. Will be set by {@link TileCollection} constructor
+     * only, and should not be modified after that point.
+     */
+    TileCollection manager;
+
     /**
      * The image reader to use. The same reader is typically given to every {@code Tile} objects
      * to be given to the same {@link MosaicImageReader} instance, but this is not mandatory.
@@ -72,15 +80,12 @@ public class Tile {
     private final ImageReader reader;
 
     /**
-     * The input to be given to the image reader.
+     * The input to be given to the image reader. If the reader can not read that input
+     * directly, it will be wrapped in an {@linkplain ImageInputStream image input stream}.
+     * Note that this field must stay the <em>unwrapped</em> input. If the wrapped input is
+     * wanted, use {@link ImageReader#getInput} instead.
      */
     private final Object input;
-
-    /**
-     * If the reader can not read {@linkplain #input} directly, an image input stream
-     * wrapping it. Otherwise, {@code null}.
-     */
-    private ImageInputStream stream;
 
     /**
      * The image index of the tile to be read. This is often 0.
@@ -202,44 +207,42 @@ public class Tile {
      * then the reader is returned immediately. Otherwise if the image reader can accept the
      * {@linkplain #getInput input} directly, than that input is given to the image reader.
      * Otherwise the input is wrapped in an {@linkplain ImageInputStream image input stream}.
+     * <p>
+     * This method is invoked automatically by {@link MosaicImageReader} and should not needs
+     * to be invoked directly. If an {@linkplain ImageInputStream image input stream} has been
+     * created, it will be closed automatically when needed.
      *
-     * @param seekForwardOnly
-     *          If {@code true}, images and metadata may only be read in ascending order
-     *          from the input source.
-     * @param ignoreMetadata
-     *          If {@code true}, metadata may be ignored during reads.
-     * @return
-     *          An image reader with its {@linkplain ImageReader#getInput input} set.
+     * @param seekForwardOnly If {@code true}, images and metadata may only be read
+     *                        in ascending order from the input source.
+     * @param ignoreMetadata  If {@code true}, metadata may be ignored during reads.
+     * @return An image reader with its {@linkplain ImageReader#getInput input} set.
      * @throws IOException if the image reader can't be initialized.
      */
-    public ImageReader getPreparedReader(final boolean seekForwardOnly, final boolean ignoreMetadata)
+    protected ImageReader getPreparedReader(final boolean seekForwardOnly,
+                                            final boolean ignoreMetadata)
             throws IOException
     {
-        final ImageReader reader = getReader();
-        final Object input = getInput();
-        Object validInput = stream;
-        if (validInput == null) {
-            validInput = input;
-        }
+        final ImageReader  reader = getReader();
+        final Object        input = getInput();
+        final Object currentInput = (manager != null) ? manager.getRawInput(reader) : null;
         /*
          * If the current reader input is suitable, we will keep it in order to preserve
          * any data that may be cached in the ImageReader instance. Only if the input is
          * not suitable, we will invoke ImageReader.setInput(...).
          */
-        if (( validInput      != reader.getInput())          ||
+        if ((!Utilities.equals(input, currentInput))         ||
             ( getImageIndex() <  reader.getMinIndex())       ||
             (!seekForwardOnly && reader.isSeekForwardOnly()) ||
             (!ignoreMetadata  && reader.isIgnoringMetadata()))
         {
+            Object actualInput = reader.getInput();
             reader.setInput(null); // Necessary for releasing the stream, in case it holds it.
-            if (stream != null) try {
-                stream.seek(0);
-            } catch (IndexOutOfBoundsException e) {
-                // We tried to reuse the same stream in order to preserve cached data, but it was
-                // not possible to seek to the begining. Closes it; we will open a new one later.
-                recoverableException(Tile.class, "getPreparedReader", e);
-                stream.close();
-                stream = null;
+            if (manager != null) {
+                manager.setRawInput(reader, null); // For keeping the map consistent.
+            }
+            ImageInputStream stream = null;
+            if (actualInput instanceof ImageInputStream) {
+                stream = (ImageInputStream) actualInput;
             }
             final ImageReaderSpi spi = reader.getOriginatingProvider();
             if (spi == null || isValidInput(spi.getInputTypes(), input)) {
@@ -247,18 +250,29 @@ public class Tile {
                 // as a paranoiac safety (it should not be opened anyway).
                 if (stream != null) {
                     stream.close();
-                    stream = null;
                 }
-                validInput = input;
+                actualInput = input;
             } else {
                 // We are not allowed to use the input directly. Creates a new input
                 // stream, or reuse the previous one if it still useable.
+                if (stream != null) try {
+                    stream.seek(0);
+                } catch (IndexOutOfBoundsException e) {
+                    // We tried to reuse the same stream in order to preserve cached data, but it was
+                    // not possible to seek to the begining. Closes it; we will open a new one later.
+                    recoverableException(Tile.class, "getPreparedReader", e);
+                    stream.close();
+                    stream = null;
+                }
                 if (stream == null) {
                     stream = ImageIO.createImageInputStream(input);
                 }
-                validInput = stream;
+                actualInput = stream;
             }
-            reader.setInput(validInput, seekForwardOnly, ignoreMetadata);
+            reader.setInput(actualInput, seekForwardOnly, ignoreMetadata);
+            if (manager != null) {
+                manager.setRawInput(reader, input);
+            }
         }
         return reader;
     }
@@ -337,10 +351,100 @@ public class Tile {
     }
 
     /**
+     * Compares two tiles for order. Tiles are sorted by increasing image index. If the image
+     * index are the same, then they are sorted by increasing <var>y</var> coordinate first,
+     * then by <var>x</var> coordinate.
+     * <p>
+     * This ordering allows efficient access for tiles that use the same
+     * {@linkplain #getReader image reader} and {@linkplain #getInput input}.
+     */
+    public final int compareTo(final Tile other) {
+        int c = getImageIndex() - other.getImageIndex();
+        if (c == 0) {
+            final Point p1 = getOrigin();
+            final Point p2 = other.getOrigin();
+            c = p1.y - p2.y;
+            if (c == 0) {
+                c = p1.x - p2.x;
+            }
+        }
+        return c;
+    }
+
+    /**
+     * Compares this tile with the specified one for equality.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object != null && object.getClass().equals(getClass())) {
+            final Tile that = (Tile) object;
+            if (this.getImageIndex() == that.getImageIndex() &&
+                    Utilities.deepEquals(this.getInput(),  that.getInput())  &&
+                    Utilities.equals    (this.getReader(), that.getReader()) &&
+                    Utilities.equals    (this.getOrigin(), that.getOrigin()))
+            {
+                if (this.isGetAreaCheap() && that.isGetAreaCheap()) try {
+                    return Utilities.equals(this.getArea(), that.getArea());
+                } catch (IOException e) {
+                    // Should not occurs, since we checked that 'getArea()' should be cheap.
+                    recoverableException(Tile.class, "equals", e);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a hash code value for this tile.
+     */
+    @Override
+    public int hashCode() {
+        // reader, input and imageIndex should be suffisient for distinguish the tiles.
+        return getReader().hashCode() + Utilities.deepHashCode(getInput()) + 37*getImageIndex();
+    }
+
+    /**
+     * Returns a string representation of this tile.
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this)).append('[');
+        final ImageReader reader = getReader();
+        if (reader != null) {
+            final ImageReaderSpi spi = reader.getOriginatingProvider();
+            if (spi != null) {
+                final String[] formats = spi.getFormatNames();
+                if (formats != null && formats.length != 0) {
+                    buffer.append("reader=\"").append(formats[0]).append("\", ");
+                }
+            }
+        }
+        buffer.append("input=\"").append(Utilities.deepToString(getInput())).append("\", ");
+        if (!isGetAreaCheap()) {
+            final Point origin = getOrigin();
+            buffer.append("x=").append(origin.x).append(", y=").append(origin.y);
+        } else try {
+            final Rectangle area = getArea();
+            buffer.append("x=").append(area.x).append(", y=").append(area.y).
+                    append(", width=").append(area.width).append(", height=").append(area.height);
+        } catch (IOException e) {
+            // Should not happen since we checked that 'getArea' should be easy.
+            // If it happen anyway, put the exception message at the place where
+            // coordinates were supposed to appear, so we can debug.
+            buffer.append(e);
+        }
+        return buffer.append(']').toString();
+    }
+
+    /**
      * Invoked when an exception occured that can be safely ignored.
      */
     static void recoverableException(final Class<?> classe, final String method,
-                                     final RuntimeException exception)
+                                     final Exception exception)
     {
         Utilities.recoverableException("org.geotools.image.io.mosaic", classe, method, exception);
     }

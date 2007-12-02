@@ -16,7 +16,6 @@
  */
 package org.geotools.resources;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -63,12 +62,12 @@ public final class Utilities {
      * <strong>Rules for choosing an {@code equals} or {@code deepEquals} method</strong>
      * <ul>
      *   <li>If <em>both</em> objects are declared as {@code Object[]} (not anything else like
-     *   {@code String[]}), consider using {@link java.util.Arrays#deepEquals(Object[],Object[])}
-     *   except if it is known that the array elements can never be other arrays.</li>
+     *   {@code String[]}), consider using {@link Arrays#deepEquals(Object[],Object[])} except
+     *   if it is known that the array elements can never be other arrays.</li>
      *
      *   <li>Otherwise if both objects are arrays (e.g. {@code Expression[]}, {@code String[]},
-     *   {@code int[]}, <cite>etc.</cite>), use {@link java.util.Arrays#equals(Object[],Object[])}.
-     *   This rule is applicable to arrays of primitive type too, since {@code Arrays.equals} is
+     *   {@code int[]}, <cite>etc.</cite>), use {@link Arrays#equals(Object[],Object[])}. This
+     *   rule is applicable to arrays of primitive type too, since {@code Arrays.equals} is
      *   overriden with primitive counter-parts.</li>
      *
      *   <li>Otherwise if at least one object is anything else than {@code Object} (e.g.
@@ -77,7 +76,9 @@ public final class Utilities {
      *   {@code String} or {@code Expression} could be an array.</li>
      *
      *   <li>Otherwise if <em>both</em> objects are declared exactly as {@code Object} type and
-     *   it is known that they could be arrays, only then invoke this {@code deepEquals} method.</li>
+     *   it is known that they could be arrays, only then invoke this {@code deepEquals} method.
+     *   In such case, make sure that the hash code is computed using {@link #deepHashCode} for
+     *   consistency.</li>
      * </ul>
      */
     public static boolean deepEquals(final Object object1, final Object object2) {
@@ -87,23 +88,141 @@ public final class Utilities {
         if (object1 == null || object2 == null) {
             return false;
         }
-        if (object1.getClass().isArray() && object2.getClass().isArray()) {
-            final int length1 = Array.getLength(object1);
-            final int length2 = Array.getLength(object2);
-            if (length1 != length2) {
-                return false;
-            }
-            for (int i=0; i<length1; i++) {
-                final Object item1 = Array.get(object1, i);
-                final Object item2 = Array.get(object2, i);
-                if (!equals(item1, item2)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return object1.equals(object2);
+        if (object1 instanceof Object[]) {
+            return (object2 instanceof Object[]) &&
+                    Arrays.deepEquals((Object[]) object1, (Object[]) object2);
         }
+        if (object1 instanceof double[]) {
+            return (object2 instanceof double[]) &&
+                    Arrays.equals((double[]) object1, (double[]) object2);
+        }
+        if (object1 instanceof float[]) {
+            return (object2 instanceof float[]) &&
+                    Arrays.equals((float[]) object1, (float[]) object2);
+        }
+        if (object1 instanceof long[]) {
+            return (object2 instanceof long[]) &&
+                    Arrays.equals((long[]) object1, (long[]) object2);
+        }
+        if (object1 instanceof int[]) {
+            return (object2 instanceof int[]) &&
+                    Arrays.equals((int[]) object1, (int[]) object2);
+        }
+        if (object1 instanceof short[]) {
+            return (object2 instanceof short[]) &&
+                    Arrays.equals((short[]) object1, (short[]) object2);
+        }
+        if (object1 instanceof byte[]) {
+            return (object2 instanceof byte[]) &&
+                    Arrays.equals((byte[]) object1, (byte[]) object2);
+        }
+        if (object1 instanceof char[]) {
+            return (object2 instanceof char[]) &&
+                    Arrays.equals((char[]) object1, (char[]) object2);
+        }
+        if (object1 instanceof boolean[]) {
+            return (object2 instanceof boolean[]) &&
+                    Arrays.equals((boolean[]) object1, (boolean[]) object2);
+        }
+        return object1.equals(object2);
+    }
+
+    /**
+     * Returns a hash code for the specified object, which may be an array.
+     * This method returns one of the following values:
+     * <p>
+     * <ul>
+     *   <li>If the supplied object is {@code null}, then this method returns 0.</li>
+     *   <li>Otherwise if the object is an array of objects, then
+     *       {@link Arrays#deepHashCode(Object[])} is invoked.</li>
+     *   <li>Otherwise if the object is an array of primitive type, then the corresponding
+     *       {@link Arrays#hashCode(double[]) Arrays.hashCode(...)} method is invoked.</li>
+     *   <li>Otherwise {@link Object#hashCode()} is invoked.<li>
+     * </ul>
+     * <p>
+     * This method should be invoked <strong>only</strong> if the object type is declared
+     * exactly as {@code Object}, not as some subtype like {@code Object[]}, {@code String} or
+     * {@code float[]}. In the later cases, use the appropriate {@link Arrays} method instead.
+     */
+    public static int deepHashCode(final Object object) {
+        if (object == null) {
+            return 0;
+        }
+        if (object instanceof Object[]) {
+            return Arrays.deepHashCode((Object[]) object);
+        }
+        if (object instanceof double[]) {
+            return Arrays.hashCode((double[]) object);
+        }
+        if (object instanceof float[]) {
+            return Arrays.hashCode((float[]) object);
+        }
+        if (object instanceof long[]) {
+            return Arrays.hashCode((long[]) object);
+        }
+        if (object instanceof int[]) {
+            return Arrays.hashCode((int[]) object);
+        }
+        if (object instanceof short[]) {
+            return Arrays.hashCode((short[]) object);
+        }
+        if (object instanceof byte[]) {
+            return Arrays.hashCode((byte[]) object);
+        }
+        if (object instanceof char[]) {
+            return Arrays.hashCode((char[]) object);
+        }
+        if (object instanceof boolean[]) {
+            return Arrays.hashCode((boolean[]) object);
+        }
+        return object.hashCode();
+    }
+
+    /**
+     * Returns a string representation of the specified object, which may be an array.
+     * This method returns one of the following values:
+     * <p>
+     * <ul>
+     *   <li>If the object is an array of objects, then
+     *       {@link Arrays#deepToString(Object[])} is invoked.</li>
+     *   <li>Otherwise if the object is an array of primitive type, then the corresponding
+     *       {@link Arrays#toString(double[]) Arrays.toString(...)} method is invoked.</li>
+     *   <li>Otherwise {@link String#valueOf(String)} is invoked.<li>
+     * </ul>
+     * <p>
+     * This method should be invoked <strong>only</strong> if the object type is declared
+     * exactly as {@code Object}, not as some subtype like {@code Object[]}, {@code Number} or
+     * {@code float[]}. In the later cases, use the appropriate {@link Arrays} method instead.
+     */
+    public static String deepToString(final Object object) {
+        if (object instanceof Object[]) {
+            return Arrays.deepToString((Object[]) object);
+        }
+        if (object instanceof double[]) {
+            return Arrays.toString((double[]) object);
+        }
+        if (object instanceof float[]) {
+            return Arrays.toString((float[]) object);
+        }
+        if (object instanceof long[]) {
+            return Arrays.toString((long[]) object);
+        }
+        if (object instanceof int[]) {
+            return Arrays.toString((int[]) object);
+        }
+        if (object instanceof short[]) {
+            return Arrays.toString((short[]) object);
+        }
+        if (object instanceof byte[]) {
+            return Arrays.toString((byte[]) object);
+        }
+        if (object instanceof char[]) {
+            return Arrays.toString((char[]) object);
+        }
+        if (object instanceof boolean[]) {
+            return Arrays.toString((boolean[]) object);
+        }
+        return String.valueOf(object);
     }
 
     /**
