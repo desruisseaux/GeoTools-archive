@@ -23,6 +23,8 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
@@ -59,6 +61,8 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
     private OverLayer backLayer;
+    
+    private List<OverLayer> userOverLayers = new ArrayList<OverLayer>();
 
     public JDefaultMap2D() {
         this.THIS_MAP = this;
@@ -76,15 +80,7 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         setRenderingStrategy(new SingleVolatileImageStrategy());
 
 
-
-//        ImageOverLayer back = new ImageOverLayer();
-//        Image icone = Toolkit.getDefaultToolkit().getImage("I:\\Images\\autres\\123t3_cover_16003.png");
-//        back.setImage(icone);
-//        back.setStyle(Style.SCALED_KEEP_ASPECT_RATIO);
-//        back.setOpaque(true);
-//        back.setBackground(Color.WHITE);
-//                
-//        setBackLayer(back);
+        setOpaque(false);
     }
 
     protected Envelope fixAspectRatio(Rectangle r, Envelope mapArea) {
@@ -207,19 +203,44 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
     public void setBackLayer(OverLayer back) {
 
+        if (backLayer != null) {
+            mainOverLayerPane.remove(backLayer.geComponent());
+        }
+        backLayer = back;
+
         if (back != null) {
-            if (backLayer != null) {
-                mainOverLayerPane.remove(backLayer.geComponent());
-            }
-            backLayer = back;
             mainOverLayerPane.add(backLayer.geComponent(), new Integer(0));
         }
+
+        mainOverLayerPane.revalidate();
+        mainOverLayerPane.repaint();
     }
 
     public OverLayer getBackLayer() {
         return backLayer;
     }
 
+    public void addOverLayer(OverLayer layer){
+        if(layer != null && !userOverLayers.contains(layer)){
+            layer.setMap2D(THIS_MAP);
+            userOverLayers.add(layer);
+            userOverLayerPane.add(layer.geComponent(),new Integer(0));
+            userOverLayerPane.revalidate();
+            userOverLayerPane.repaint();
+        }
+    }
+    
+    public void removeOverLayer(OverLayer layer){
+        if(layer != null){
+            layer.setMap2D(null);
+            userOverLayerPane.remove(layer.geComponent());
+            userOverLayers.remove(layer);
+            userOverLayerPane.revalidate();
+            userOverLayerPane.repaint();
+        }
+        
+    }
+    
     protected void addMapOverLayer(OverLayer over) {
         mapOverLayerPane.add(over.geComponent(), new Integer(nextMapoverLayerIndex));
         nextMapoverLayerIndex++;

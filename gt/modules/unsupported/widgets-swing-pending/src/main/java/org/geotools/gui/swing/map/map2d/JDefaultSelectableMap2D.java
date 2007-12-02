@@ -84,23 +84,22 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private Style selectionStyle = null;
 
-    
     public JDefaultSelectableMap2D() {
         super();
         mouseInputListener = new MouseListen();
         mapLayerListlistener = new MapLayerListListen();
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
-        
+
         addMapOverLayer(selectedPane);
         addMapOverLayer(selectionPane);
 
-        buildSelectionStyle();        
+        buildSelectionStyle();
     }
 
     private void buildSelectionStyle() {
 
-        
+
         Fill fill = STYLE_BUILDER.createFill(Color.GREEN, 0.4f);
         Stroke stroke = STYLE_BUILDER.createStroke(Color.GREEN, 2);
         stroke.setOpacity(STYLE_BUILDER.literalExpression(0.6f));
@@ -123,7 +122,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         Rule r3 = STYLE_BUILDER.createRule(new Symbolizer[]{pls});
         r3.setFilter(new GeometryClassFilter(Polygon.class, MultiPolygon.class));
 
-        
+
         selectionStyle = STYLE_BUILDER.createStyle();
         selectionStyle.addFeatureTypeStyle(STYLE_BUILDER.createFeatureTypeStyle(null, new Rule[]{r1, r2, r3}));
 
@@ -131,16 +130,16 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     }
 
     private void applyStyleFilter(Filter f) {
-        
+
         for (FeatureTypeStyle fts : selectionStyle.getFeatureTypeStyles()) {
             for (Rule r : fts.getRules()) {
-                
+
                 Filter nf = STYLE_BUILDER.getFilterFactory().and(r.getFilter(), f);
-                
+
                 r.setFilter(f);
             }
         }
-        
+
 //        SLDTransformer st = new SLDTransformer();
 //
 //            try {
@@ -149,8 +148,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 //            } catch (TransformerException ex) {
 //                ex.printStackTrace();
 //            }
-        
-        
+
+
         updateOverLayer();
     }
 
@@ -162,9 +161,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         Rectangle bounds = getBounds();
         double width = mapArea.getWidth();
         double height = mapArea.getHeight();
-        return toMapCoord(mx, my,width,height,bounds);
+        return toMapCoord(mx, my, width, height, bounds);
     }
-    
+
     private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
         double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
@@ -236,7 +235,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             findFeature(geometry);
         }
     }
-    
+
     //-------------------MAP2D--------------------------------------------------
     @Override
     public void setContext(MapContext context) {
@@ -260,7 +259,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         updateOverLayer();
     }
-    
+
     //----------------------SELECTABLE MAP2D------------------------------------
     public void addSelectableLayer(MapLayer layer) {
         if (layer != null) {
@@ -473,7 +472,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
     }
 
-    private class BufferComponent extends JComponent implements OverLayer{
+    private class BufferComponent extends JComponent implements OverLayer {
 
         private BufferedImage img;
         private Rectangle oldone = null;
@@ -487,21 +486,29 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         @Override
         public void paintComponent(Graphics g) {
             newone = getBounds();
-            
-            if(!newone.equals(oldone)){
+
+            if (!newone.equals(oldone)) {
                 oldone = newone;
                 updateOverLayer();
-            }else if(img != null){
+            } else if (img != null) {
                 g.drawImage(img, 0, 0, this);
             }
-            
+
         }
-       
-        
-        public void refresh() {}
+
+        public void refresh() {
+        }
 
         public JComponent geComponent() {
             return this;
+        }
+
+        public void setMap2D(Map2D map) {
+
+        }
+
+        public Map2D getMap2D() {
+            return null;
         }
         }
 }

@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d.overLayer;
 
 import javax.swing.JComponent;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
@@ -25,6 +26,10 @@ import javax.swing.JComponent;
 public interface OverLayer {
 
     public void refresh();
+    
+    public void setMap2D(Map2D map);
+    
+    public Map2D getMap2D();
     
     public JComponent geComponent();
     

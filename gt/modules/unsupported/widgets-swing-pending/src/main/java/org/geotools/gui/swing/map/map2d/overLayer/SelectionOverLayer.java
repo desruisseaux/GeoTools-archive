@@ -19,6 +19,7 @@ package org.geotools.gui.swing.map.map2d.overLayer;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JComponent;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
@@ -72,5 +73,13 @@ public class SelectionOverLayer extends JComponent implements OverLayer{
 
     public JComponent geComponent() {
         return this;
+    }
+    
+    public void setMap2D(Map2D map) {
+        
+    }
+
+    public Map2D getMap2D() {
+        return null;
     }
 }

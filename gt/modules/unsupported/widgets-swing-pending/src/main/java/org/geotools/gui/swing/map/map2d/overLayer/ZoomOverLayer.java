@@ -17,6 +17,7 @@
 package org.geotools.gui.swing.map.map2d.overLayer;
 
 import javax.swing.JComponent;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
@@ -30,6 +31,14 @@ public class ZoomOverLayer implements OverLayer{
 
     public JComponent geComponent() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public void setMap2D(Map2D map) {
+        
+    }
+
+    public Map2D getMap2D() {
+        return null;
     }
 
 }

@@ -13,36 +13,28 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.map.map2d.overLayer;
 
-import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.Map2D;
-import org.jdesktop.swingx.JXImagePanel;
 
 /**
  *
  * @author Johann Sorel
  */
-public class ImageOverLayer extends JXImagePanel implements OverLayer{
+public abstract class AbstractOverLayer implements OverLayer{
 
+    protected Map2D map = null;
     
-    public ImageOverLayer(){}
     
-    public void refresh() {
-        revalidate();
-        repaint();
-    }
 
-    public JComponent geComponent() {
-        return this;
-    }
-    
     public void setMap2D(Map2D map) {
-        
+        this.map = map;
     }
 
     public Map2D getMap2D() {
-        return null;
+        return map;
     }
+
+    
+
 }

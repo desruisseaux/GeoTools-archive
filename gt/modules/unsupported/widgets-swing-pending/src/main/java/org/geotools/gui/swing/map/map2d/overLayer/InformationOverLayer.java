@@ -27,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
+import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
@@ -78,6 +79,14 @@ public class InformationOverLayer extends JComponent implements OverLayer{
 
     public JComponent geComponent() {
         return this;
+    }
+    
+    public void setMap2D(Map2D map) {
+        
+    }
+
+    public Map2D getMap2D() {
+        return null;
     }
 
     

@@ -943,6 +943,14 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         public JComponent geComponent() {
             return this;
         }
+        
+        public void setMap2D(Map2D map) {
+        
+        }
+
+        public Map2D getMap2D() {
+            return null;
+        }
     }
 }
 
