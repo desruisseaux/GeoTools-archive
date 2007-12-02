@@ -53,6 +53,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.EDIT_STATE;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
@@ -88,7 +89,7 @@ import org.opengis.filter.FilterFactory;
  * @author Johann Sorel
  */
 public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements EditableMap2D {
-
+    
     protected MapConstants.EDIT_STATE editState = MapConstants.EDIT_STATE.NONE;
     private static final Coordinate[] EMPTY_COORDINATE_ARRAY = new Coordinate[0];
     private final BufferComponent editedPane = new BufferComponent();
