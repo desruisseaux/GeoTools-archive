@@ -133,10 +133,11 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                     writer.write();
                     featureIds.add(newFeature.getID());
                 }
-            }catch(IOException e){
-                //it was all wrong, let's rollback the transaction as we don't know
-                //where things messed up
-                if(Transaction.AUTO_COMMIT != transaction){
+            } catch (IOException e) {
+                // it was all wrong, let's rollback the transaction as we don't
+                // know
+                // where things messed up
+                if (Transaction.AUTO_COMMIT != transaction) {
                     transaction.rollback();
                 }
                 throw e;
@@ -178,21 +179,27 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      */
     public void modifyFeatures(final AttributeDescriptor[] attributes, final Object[] values,
             final Filter filter) throws IOException {
-        final String typeName = typeInfo.getFeatureTypeName();
-        final Transaction transaction = getTransaction();
-        final FeatureWriter writer = dataStore.getFeatureWriter(typeName, filter, transaction);
-
+        final ArcSDEPooledConnection connection = getConnection();
+        connection.getLock().lock();
         try {
-            SimpleFeature feature;
-            while (writer.hasNext()) {
-                feature = writer.next();
-                for (int i = 0; i < values.length; i++) {
-                    feature.setAttribute(attributes[i].getLocalName(), values[i]);
+            final String typeName = typeInfo.getFeatureTypeName();
+            final Transaction transaction = getTransaction();
+            final FeatureWriter writer = dataStore.getFeatureWriter(typeName, filter, transaction);
+
+            try {
+                SimpleFeature feature;
+                while (writer.hasNext()) {
+                    feature = writer.next();
+                    for (int i = 0; i < values.length; i++) {
+                        feature.setAttribute(attributes[i].getLocalName(), values[i]);
+                    }
+                    writer.write();
                 }
-                writer.write();
+            } finally {
+                writer.close();
             }
         } finally {
-            writer.close();
+            connection.getLock().unlock();
         }
     }
 
@@ -209,22 +216,27 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      */
     public void removeFeatures(final Filter filter) throws IOException {
         final ArcSDEPooledConnection connection = getConnection();
-        final String typeName = typeInfo.getFeatureTypeName();
-        // short circuit cut if needed to remove all features
-        if (Filter.INCLUDE == filter) {
-            truncate(typeName, connection);
-            return;
-        }
-        // just remove some features, go the slow way
-        final Transaction transaction = getTransaction();
-        final FeatureWriter writer = dataStore.getFeatureWriter(typeName, filter, transaction);
+        connection.getLock().lock();
         try {
-            while (writer.hasNext()) {
-                writer.next();
-                writer.remove();
+            final String typeName = typeInfo.getFeatureTypeName();
+            // short circuit cut if needed to remove all features
+            if (Filter.INCLUDE == filter) {
+                truncate(typeName, connection);
+                return;
+            }
+            // just remove some features, go the slow way
+            final Transaction transaction = getTransaction();
+            final FeatureWriter writer = dataStore.getFeatureWriter(typeName, filter, transaction);
+            try {
+                while (writer.hasNext()) {
+                    writer.next();
+                    writer.remove();
+                }
+            } finally {
+                writer.close();
             }
         } finally {
-            writer.close();
+            connection.getLock().unlock();
         }
     }
 
@@ -240,6 +252,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
 
         final String typeName = typeInfo.getFeatureTypeName();
         final ArcSDEPooledConnection connection = getConnection();
+        connection.getLock().lock();
         try {
             // truncate using this connection to apply or not depending on
             // whether a transaction is in progress
@@ -253,8 +266,12 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
             }
             writer.close();
         } finally {
-            if (!connection.isTransactionActive()) {
-                connection.close();
+            try {
+                if (!connection.isTransactionActive()) {
+                    connection.close();
+                }
+            } finally {
+                connection.getLock().unlock();
             }
         }
     }

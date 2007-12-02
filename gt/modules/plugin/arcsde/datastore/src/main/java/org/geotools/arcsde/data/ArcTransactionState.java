@@ -17,9 +17,7 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +29,6 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.Transaction;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -111,6 +108,8 @@ final class ArcTransactionState implements Transaction.State {
      */
     public void commit() throws IOException {
         failIfClosed();
+        final ArcSDEPooledConnection connection = this.connection;
+        connection.getLock().lock();
         try {
             connection.commitTransaction();
             // and keep editing
@@ -128,6 +127,8 @@ final class ArcTransactionState implements Transaction.State {
             close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new ArcSdeException(se);
+        }finally{
+            connection.getLock().unlock();
         }
     }
 
@@ -136,6 +137,8 @@ final class ArcTransactionState implements Transaction.State {
      */
     public void rollback() throws IOException {
         failIfClosed();
+        final ArcSDEPooledConnection connection = this.connection;
+        connection.getLock().lock();
         try {
             connection.rollbackTransaction();
             // and keep editing
@@ -147,6 +150,8 @@ final class ArcTransactionState implements Transaction.State {
             close();
             LOGGER.log(Level.WARNING, se.getMessage(), se);
             throw new ArcSdeException(se);
+        }finally{
+            connection.getLock().unlock();
         }
     }
 
@@ -209,47 +214,50 @@ final class ArcTransactionState implements Transaction.State {
     }
 
     /**
-     * Releases resources and invalidates this state (signaled by setting pool
-     * to null)
+     * Releases resources and invalidates this state (signaled by setting the
+     * connection to null)
      */
     private void close() {
+        if (connection == null) {
+            return;
+        }
+        connection.getLock().lock();
         // can't even try to use this state in any way from now on
-        if (connection != null) {
-            // may throw ISE if transaction is still in progress
+        // may throw ISE if transaction is still in progress
+        try {
+            // release current transaction before returning the
+            // connection to the pool
             try {
-                // release current transaction before returning the
-                // connection to the pool
-                try {
-                    connection.rollbackTransaction();
-                    // connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
-                } catch (SeException e) {
-                    // TODO: this shouldn't happen, but if it does
-                    // we should somehow invalidate the connection?
-                    LOGGER.log(Level.SEVERE, "Unexpected exception at close(): "
-                            + e.getSeError().getSdeErrMsg(), e);
-                }
-                try {
-                    connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
-                } catch (SeException e) {
-                    LOGGER.log(Level.SEVERE,
-                            "Unexpected exception restoring connection to thread unprotected state "
-                                    + e.getSeError().getSdeErrMsg(), e);
-                }
-                // now its safe to return it to the pool
-                connection.close();
-            } catch (IllegalStateException workflowError) {
-                // fail fast but put the connection in a healthy state first
-                try {
-                    connection.rollbackTransaction();
-                } catch (SeException e) {
-                    // well, it's totally messed up, just log though
-                    LOGGER.log(Level.SEVERE, "rolling back connection " + connection, e);
-                    connection.close();
-                }
-                throw workflowError;
-            } finally {
-                connection = null;
+                connection.rollbackTransaction();
+                // connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+            } catch (SeException e) {
+                // TODO: this shouldn't happen, but if it does
+                // we should somehow invalidate the connection?
+                LOGGER.log(Level.SEVERE, "Unexpected exception at close(): "
+                        + e.getSeError().getSdeErrMsg(), e);
             }
+            try {
+                connection.setConcurrency(SeConnection.SE_UNPROTECTED_POLICY);
+            } catch (SeException e) {
+                LOGGER.log(Level.SEVERE,
+                        "Unexpected exception restoring connection to thread unprotected state "
+                                + e.getSeError().getSdeErrMsg(), e);
+            }
+            // now its safe to return it to the pool
+            connection.close();
+        } catch (IllegalStateException workflowError) {
+            // fail fast but put the connection in a healthy state first
+            try {
+                connection.rollbackTransaction();
+            } catch (SeException e) {
+                // well, it's totally messed up, just log though
+                LOGGER.log(Level.SEVERE, "rolling back connection " + connection, e);
+                connection.close();
+            }
+            throw workflowError;
+        } finally {
+            connection.getLock().unlock();
+            connection = null;
         }
     }
 
