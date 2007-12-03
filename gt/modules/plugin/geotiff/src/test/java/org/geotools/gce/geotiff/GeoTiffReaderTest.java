@@ -49,7 +49,8 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/test/org/geotools/gce/geotiff/GeoTiffReaderTest.java $
  */
 public class GeoTiffReaderTest extends TestCase {
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(GeoTiffReaderTest.class.toString());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger(GeoTiffReaderTest.class.toString());
 
 	/**
 	 * Constructor for GeoTiffReaderTest.
@@ -103,7 +104,8 @@ public class GeoTiffReaderTest extends TestCase {
 				if (reader != null) {
 
 					// reading the coverage
-					GridCoverage2D coverage = (GridCoverage2D) reader.read(null);
+					GridCoverage2D coverage = (GridCoverage2D) reader
+							.read(null);
 
 					// Crs and envelope
 					if (TestData.isInteractiveTest()) {
@@ -114,11 +116,13 @@ public class GeoTiffReaderTest extends TestCase {
 								coverage.getEnvelope().toString()).append("\n");
 					}
 					// display metadata
-					IIOMetadataDumper iIOMetadataDumper = new IIOMetadataDumper(
-							((GeoTiffReader) reader).getMetadata()
-									.getRootNode());
-					buffer.append("TIFF metadata: ").append(
-							iIOMetadataDumper.getMetadata()).append("\n");
+					if (org.geotools.TestData.isExtensiveTest()) {
+						IIOMetadataDumper iIOMetadataDumper = new IIOMetadataDumper(
+								((GeoTiffReader) reader).getMetadata()
+										.getRootNode());
+						buffer.append("TIFF metadata: ").append(
+								iIOMetadataDumper.getMetadata()).append("\n");
+					}
 					// showing it
 					if (TestData.isInteractiveTest())
 						coverage.show();
