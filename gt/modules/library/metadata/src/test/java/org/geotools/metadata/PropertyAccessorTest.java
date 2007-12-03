@@ -62,8 +62,8 @@ public class PropertyAccessorTest extends TestCase {
      * Creates a property accessor for the given citation.
      */
     private static PropertyAccessor createPropertyAccessor(final Citation citation) {
-        final Class implementation = citation.getClass();
-        final Class type = PropertyAccessor.getType(implementation, "org.opengis.metadata");
+        final Class<?> implementation = citation.getClass();
+        final Class<?> type = PropertyAccessor.getType(implementation, "org.opengis.metadata");
         assertNotNull(type);
         return new PropertyAccessor(implementation, type);
     }

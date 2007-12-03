@@ -116,7 +116,7 @@ public final class MetadataStandard {
         synchronized (accessors) {
             PropertyAccessor accessor = accessors.get(implementation);
             if (accessor == null) {
-                Class type = getType(implementation);
+                Class<?> type = getType(implementation);
                 if (type != null) {
                     accessor = new PropertyAccessor(implementation, type);
                     accessors.put(implementation, accessor);

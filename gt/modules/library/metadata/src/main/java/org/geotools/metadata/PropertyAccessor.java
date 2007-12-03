@@ -19,9 +19,12 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.LinkedHashSet;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -146,21 +149,56 @@ final class PropertyAccessor {
      * @param  interfacePackage The root package for metadata interfaces.
      * @return The single interface, or {@code null} if none where found.
      */
-    static Class<?> getType(final Class<?> implementation, final String interfacePackage) {
-        if (!implementation.isInterface()) {
-            final Class<?>[] interfaces = implementation.getInterfaces();
-            int count = 0;
-            for (int i=0; i<interfaces.length; i++) {
-                final Class<?> candidate = interfaces[i];
-                if (candidate.getName().startsWith(interfacePackage)) {
-                    interfaces[count++] = candidate;
+    static Class<?> getType(Class<?> implementation, final String interfacePackage) {
+        if (implementation != null && !implementation.isInterface()) {
+            /*
+             * Gets every interfaces from the supplied package in declaration order,
+             * including the ones declared in the super-class.
+             */
+            final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
+            do {
+                getInterfaces(implementation, interfacePackage, interfaces);
+                implementation = implementation.getSuperclass();
+            } while (implementation != null);
+            /*
+             * If we found more than one interface, removes the
+             * ones that are sub-interfaces of the other.
+             */
+            for (final Iterator<Class<?>> it=interfaces.iterator(); it.hasNext();) {
+                final Class<?> candidate = it.next();
+                for (final Class<?> child : interfaces) {
+                    if (candidate != child && candidate.isAssignableFrom(child)) {
+                        it.remove();
+                        break;
+                    }
                 }
             }
-            if (count == 1) {
-                return interfaces[0];
+            final Iterator<Class<?>> it=interfaces.iterator();
+            if (it.hasNext()) {
+                final Class<?> candidate = it.next();
+                if (!it.hasNext()) {
+                    return candidate;
+                }
+                // Found more than one interface; we don't know which one to pick.
+                // Returns 'null' for now; the caller will thrown an exception.
             }
         }
         return null;
+    }
+
+    /**
+     * Puts every interfaces for the given type in the specified collection.
+     * This method invokes itself recursively for scanning parent interfaces.
+     */
+    private static void getInterfaces(final Class<?> type, final String interfacePackage,
+            final Collection<Class<?>> interfaces)
+    {
+        for (final Class<?> candidate : type.getInterfaces()) {
+            if (candidate.getName().startsWith(interfacePackage)) {
+                interfaces.add(candidate);
+            }
+            getInterfaces(candidate, interfacePackage, interfaces);
+        }
     }
 
     /**
