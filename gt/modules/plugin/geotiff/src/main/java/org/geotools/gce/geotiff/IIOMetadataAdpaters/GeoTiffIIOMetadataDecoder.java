@@ -442,7 +442,7 @@ public final class GeoTiffIIOMetadataDecoder {
 		final double[] modelTransformation = getTiffDoubles(node);
 		if (modelTransformation == null)
 			return false;
-		return false;
+		return true;
 	}
 
 	// private utility methods
