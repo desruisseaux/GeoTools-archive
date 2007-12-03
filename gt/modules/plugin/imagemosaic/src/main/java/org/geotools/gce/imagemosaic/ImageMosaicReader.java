@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -54,6 +55,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
+import javax.media.jai.TileCache;
 import javax.media.jai.operator.MosaicDescriptor;
 import javax.media.jai.operator.PatternDescriptor;
 
@@ -74,6 +76,7 @@ import org.geotools.image.ImageWorker;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.util.SoftValueHashMap;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -128,6 +131,31 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * {@link ImageMosaicReader}.
 	 */
 	private final URL sourceURL;
+
+	/**
+	 * Caches the tiles as we read them in order to not reload them all the
+	 * time.
+	 * 
+	 * <p>
+	 * Note that here we are just keeping the references in memory between two
+	 * reads, we are not really caching the single tiles for the mages. This is
+	 * done by the underlying {@link JAI} {@link TileCache} implementation and
+	 * we do not really control that here.
+	 * 
+	 * <p>
+	 * This code is done in order to kep the references to the image around in
+	 * order to NOT remove them from {@link JAI} {@link TileCache};
+	 * 
+	 * <p>
+	 * Note: we don't keep around any hard references
+	 * TODO we miight want two things:
+	 * <ol>
+	 * 		<li>The possibility to actually flush these cache</li>
+	 * 		<li>The possibility to specify a {@link JAI} {@link TileCache} to use for all the various operations</li>
+	 * </ol>
+	 */
+	private final SoftValueHashMap<Integer, RenderedImage> tileCache = new SoftValueHashMap<Integer, RenderedImage>(
+			0);
 
 	/** {@link AbstractDataStore} pointd to the index shapefile. */
 	private final AbstractDataStore tileIndexStore;
@@ -1156,7 +1184,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				LOGGER.fine("Index Loaded");
 		}
 		features = ((MemorySpatialIndex) o).findFeatures(envelope);
-		return features!=null?features:Collections.EMPTY_LIST;
+		return features != null ? features : Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -1536,5 +1564,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		hints.add(ImageUtilities.EXTEND_BORDER_BY_COPYING);
 		return JAI.create("Affine", pbjAffine, hints);
 
+	}
+
+	@Override
+	public synchronized void dispose() {
+		tileCache.clear();
+		super.dispose();
 	}
 }
