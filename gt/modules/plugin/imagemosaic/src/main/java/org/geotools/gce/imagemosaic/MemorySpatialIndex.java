@@ -97,7 +97,7 @@ public final class MemorySpatialIndex {
 	 * @return List of {@link Feature} that intersect the providede
 	 *         {@link Envelope}.
 	 */
-	public List findFeatures(Envelope envelope) {
+	public List<SimpleFeature> findFeatures(Envelope envelope) {
 		return index.query(envelope);
 
 	}

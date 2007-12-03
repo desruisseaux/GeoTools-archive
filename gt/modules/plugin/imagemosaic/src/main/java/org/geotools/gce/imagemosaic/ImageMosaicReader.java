@@ -147,15 +147,21 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * order to NOT remove them from {@link JAI} {@link TileCache};
 	 * 
 	 * <p>
-	 * Note: we don't keep around any hard references
-	 * TODO we miight want two things:
+	 * Note: we don't keep around any hard references TODO we miight want two
+	 * things:
 	 * <ol>
-	 * 		<li>The possibility to actually flush these cache</li>
-	 * 		<li>The possibility to specify a {@link JAI} {@link TileCache} to use for all the various operations</li>
+	 * <li>The possibility to actually flush these cache</li>
+	 * <li>The possibility to specify a {@link JAI} {@link TileCache} to use
+	 * for all the various operations</li>
 	 * </ol>
 	 */
 	private final SoftValueHashMap<Integer, RenderedImage> tileCache = new SoftValueHashMap<Integer, RenderedImage>(
 			0);
+
+	/**
+	 * Mutex for accessing the cache above.
+	 */
+	private final byte[] mutexForCache = new byte[1];
 
 	/** {@link AbstractDataStore} pointd to the index shapefile. */
 	private final AbstractDataStore tileIndexStore;
@@ -799,7 +805,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			final File tempFile = new File(this.sourceURL.getFile());
 			final String parentLocation = tempFile.getParent();
-			PlanarImage loadedImage = null;
 			final ROI[] rois = new ROI[numImages];
 			final PlanarImage[] alphaChannels = new PlanarImage[numImages];
 			final Area finalLayout = new Area();
@@ -814,9 +819,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Boolean readThumbnails = Boolean.FALSE;
 			Boolean verifyInput = Boolean.FALSE;
 			ColorModel model = null;
-
+			RenderedImage loadedImage = null;
 			String location = null;
 			do {
+
 				// /////////////////////////////////////////////////////////////////////
 				//
 				// Get location and envelope of the image to load.
@@ -851,17 +857,30 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					i++;
 					continue;
 				}
-				final ParameterBlock pbjImageRead = new ParameterBlock();
-				pbjImageRead.add(ImageIO.createImageInputStream(imageFile));
-				pbjImageRead.add(imageChoice);
-				pbjImageRead.add(readMetadata);
-				pbjImageRead.add(readThumbnails);
-				pbjImageRead.add(verifyInput);
-				pbjImageRead.add(null);
-				pbjImageRead.add(null);
-				pbjImageRead.add(readP);
-				pbjImageRead.add(null);
-				loadedImage = JAI.create("ImageRead", pbjImageRead);
+				// //
+				//
+				// Check in the cache
+				//
+				// //
+				synchronized (mutexForCache) {
+					if (tileCache.containsKey(i)) {
+						loadedImage = tileCache.get(i);
+					} else {
+						final ParameterBlock pbjImageRead = new ParameterBlock();
+						pbjImageRead.add(ImageIO
+								.createImageInputStream(imageFile));
+						pbjImageRead.add(imageChoice);
+						pbjImageRead.add(readMetadata);
+						pbjImageRead.add(readThumbnails);
+						pbjImageRead.add(verifyInput);
+						pbjImageRead.add(null);
+						pbjImageRead.add(null);
+						pbjImageRead.add(readP);
+						pbjImageRead.add(null);
+						loadedImage = JAI.create("ImageRead", pbjImageRead);
+					}
+				}
+
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Just read image number " + i);
 
@@ -1062,7 +1081,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 *            is the value that is suggested to be used for the threshold.
 	 * @return true in case the threshold is to be performed, false otherwise.
 	 */
-	private boolean checkIfThresholdIsNeeded(PlanarImage loadedImage,
+	private boolean checkIfThresholdIsNeeded(RenderedImage loadedImage,
 			double thresholdValue) {
 		if (Double.isNaN(thresholdValue) || Double.isInfinite(thresholdValue))
 			return false;
@@ -1371,7 +1390,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @throws IOException
 	 */
 	private void addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
-			Point2D ulc, double[] res, PlanarImage loadedImage,
+			Point2D ulc, double[] res, RenderedImage loadedImage,
 			boolean doInputImageThreshold, ROI[] rois, int i,
 			double inputImageThresholdValue, boolean alphaIn, int[] alphaIndex,
 			PlanarImage[] alphaChannels, Area finalLayout, File imageFile,
@@ -1384,7 +1403,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// positioning the actual image correctly in final mosaic.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		PlanarImage readyToMosaicImage = scaleAndTranslate(bound, ulc, res,
+		RenderedImage readyToMosaicImage = scaleAndTranslate(bound, ulc, res,
 				loadedImage);
 
 		// ///////////////////////////////////////////////////////////////////
@@ -1485,7 +1504,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		pbjMosaic.addSource(readyToMosaicImage);
-		finalLayout.add(new Area(readyToMosaicImage.getBounds()));
+		finalLayout.add(new Area(PlanarImage.wrapRenderedImage(
+				readyToMosaicImage).getBounds()));
 
 	}
 
@@ -1501,8 +1521,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param image
 	 * @return
 	 */
-	private PlanarImage scaleAndTranslate(Envelope bound, Point2D ulc,
-			double[] res, PlanarImage image) {
+	private RenderedImage scaleAndTranslate(Envelope bound, Point2D ulc,
+			double[] res, RenderedImage image) {
 		// evaluate translation and scaling factors.
 		double resX = (bound.getMaxX() - bound.getMinX()) / image.getWidth();
 		double resY = (bound.getMaxY() - bound.getMinY()) / image.getHeight();
