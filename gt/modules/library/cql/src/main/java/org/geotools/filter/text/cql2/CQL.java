@@ -213,6 +213,32 @@ public class CQL {
     }
 
     /**
+     * WARNING THIS IS A WORK IN PROGRESS.
+     * 
+     * @param filter
+     * @return
+     */
+    public static String toCQL( Filter filter ){
+        FilterToCQL toCQL = new FilterToCQL();
+        
+        StringBuffer output = (StringBuffer) filter.accept( toCQL, new StringBuffer() );
+        
+        return output.toString();        
+    }
+    /**
+     * WARNING THIS IS A WORK IN PROGRESS.
+     * 
+     * @param filter
+     * @return
+     */
+    public static String toCQL( Expression expression ){
+        FilterToCQL toCQL = new FilterToCQL();
+        
+        StringBuffer output = (StringBuffer) expression.accept( toCQL, new StringBuffer() );
+        
+        return output.toString();        
+    }
+    /**
      * Parses the input string, which has to be a list of OGC CQL predicates
      * separated by <code>|</code> into a <code>List</code> of
      * <code>Filter</code>s, using the provided FilterFactory.
