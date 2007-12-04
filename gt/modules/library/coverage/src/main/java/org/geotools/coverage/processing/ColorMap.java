@@ -604,7 +604,7 @@ public class ColorMap implements Serializable {
     /**
      * Returns a hash code value for this color map.
      */
-    //@Override
+    @Override
     public int hashCode() {
         return (int) serialVersionUID ^
               ((colorMap    != null ? colorMap   .hashCode() : 31) + 37*
@@ -614,7 +614,7 @@ public class ColorMap implements Serializable {
     /**
      * Compares this color map with the specified object for equality.
      */
-    //@Override
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && getClass().equals(object.getClass())) {
             final ColorMap that = (ColorMap) object;
@@ -627,7 +627,7 @@ public class ColorMap implements Serializable {
     /**
      * Returns a string representation of this color map.
      */
-    //@Override
+    @Override
     public String toString() {
         final CharSequence[] names = getCategoryNames();
         final TableWriter writer = new TableWriter(null, 1);

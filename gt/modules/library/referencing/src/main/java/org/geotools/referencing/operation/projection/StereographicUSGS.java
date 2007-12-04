@@ -189,7 +189,7 @@ class StereographicUSGS extends Stereographic {
     /**
      * Maximal error (in metres) tolerated for assertions, if enabled.
      */
-    //@Override
+    @Override
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
         final double delta = Math.abs(longitude - centralMeridian)/2 +
                              Math.abs(latitude  - latitudeOfOrigin);

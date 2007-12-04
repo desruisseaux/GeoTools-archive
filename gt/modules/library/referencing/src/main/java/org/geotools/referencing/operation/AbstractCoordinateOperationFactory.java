@@ -46,6 +46,7 @@ import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -665,7 +666,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
                     break;
                 }
             }
-            String name = Utilities.getShortName(type);
+            String name = Classes.getShortName(type);
             final ReferenceIdentifier id = object.getName();
             if (id != null) {
                 name = name + '[' + id.getCode() + ']';

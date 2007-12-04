@@ -289,6 +289,9 @@ public class GeographicMetadata extends IIOMetadata {
      *
      * @param formatName The desired metadata format.
      * @param root An XML DOM Node object forming the root of a tree.
+     *
+     * @todo We need to performs a real merge; this is required by mosaic image readers.
+     *       See {@link MetadataMerge}.
      */
     public void mergeTree(final String formatName, final Node root) throws IIOInvalidTreeException {
         checkFormatName(formatName);
@@ -298,7 +301,7 @@ public class GeographicMetadata extends IIOMetadata {
 
     /**
      * Alters the internal state of this metadata from a tree defined by the specified metadata.
-     * The default implementation expect the {@value GeographicMetadataFormat#FORMAT_NAME} format.
+     * The default implementation expects the {@value GeographicMetadataFormat#FORMAT_NAME} format.
      *
      * @param metadata The metadata to merge to this object.
      */

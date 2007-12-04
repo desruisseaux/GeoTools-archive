@@ -29,6 +29,7 @@ import javax.swing.tree.TreeNode;
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
 import org.geotools.resources.XMath;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.OptionalDependencies;
 
@@ -99,7 +100,7 @@ final class PropertyTree {
      * Creates a tree for the specified metadata.
      */
     public MutableTreeNode asTree(final Object metadata) {
-        final String name = Utilities.getShortName(standard.getInterface(metadata.getClass()));
+        final String name = Classes.getShortName(standard.getInterface(metadata.getClass()));
         final DefaultMutableTreeNode root =
                 OptionalDependencies.createTreeNode(localize(name), metadata, true);
         append(root, metadata);

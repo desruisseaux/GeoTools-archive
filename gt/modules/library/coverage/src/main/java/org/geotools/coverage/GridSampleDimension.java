@@ -51,6 +51,7 @@ import org.opengis.util.InternationalString;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
@@ -1527,7 +1528,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         if (categories != null) {
             return categories.toString(this);
         } else {
-            return Utilities.getShortClassName(this);
+            return Classes.getShortClassName(this);
         }
     }
 

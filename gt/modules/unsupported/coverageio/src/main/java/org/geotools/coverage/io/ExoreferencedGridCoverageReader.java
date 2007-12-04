@@ -107,7 +107,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      *
      * @throws IOException if an error occurs while disposing resources.
      */
-    //@Override
+    @Override
     public synchronized void reset() throws IOException {
         metadata.clear();
         super.reset();
@@ -118,7 +118,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * A value of {@code null} removes any previous setting, and indicates that the reader should
      * localize as it sees fit.
      */
-    //@Override
+    @Override
     public synchronized void setLocale(final Locale locale) {
         super.setLocale(locale);
         metadata.setUserLocale(locale);
@@ -137,7 +137,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * @throws IllegalArgumentException if input is not an instance
      *         of a classe supported by this reader.
      */
-    //@Override
+    @Override
     public synchronized void setInput(Object input, final boolean seekForwardOnly)
             throws IOException
     {
@@ -225,7 +225,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * @throws IOException if an error occurs reading the width information from
      *         the input source.
      */
-    //@Override
+    @Override
     public synchronized GridRange getGridRange(final int index) throws IOException {
         checkImageIndex(index);
         return metadata.getGridRange();
@@ -246,7 +246,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * @throws IOException if an error occurs reading the width information from
      *         the input source.
      */
-    //@Override
+    @Override
     public synchronized GridSampleDimension[] getSampleDimensions(final int index) throws IOException {
         checkImageIndex(index);
         return metadata.getSampleDimensions();

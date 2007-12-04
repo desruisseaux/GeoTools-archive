@@ -23,6 +23,7 @@ import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -109,7 +110,7 @@ public abstract class AbstractEnvelope implements Envelope {
      * Formats the specified envelope.
      */
     static String toString(final Envelope envelope) {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(envelope)).append('[');
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(envelope)).append('[');
         final int dimension = envelope.getDimension();
         for (int i=0; i<dimension; i++) {
             if (i != 0) {

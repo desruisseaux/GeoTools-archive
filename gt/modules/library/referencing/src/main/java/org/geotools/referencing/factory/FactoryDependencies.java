@@ -46,7 +46,7 @@ import org.geotools.factory.BufferedFactory;
 import org.geotools.factory.OptionalFactory;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.resources.OptionalDependencies;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.X364;
 
 
@@ -207,7 +207,7 @@ public class FactoryDependencies {
      */
     private DefaultMutableTreeNode createNode(final Factory factory) {
         final StringBuilder buffer =
-                new StringBuilder(Utilities.getShortClassName(factory)).append('[');
+                new StringBuilder(Classes.getShortClassName(factory)).append('[');
         if (factory instanceof AuthorityFactory) {
             final Citation authority = ((AuthorityFactory) factory).getAuthority();
             if (authority != null) {

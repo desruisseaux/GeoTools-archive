@@ -25,7 +25,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
@@ -191,9 +191,8 @@ public abstract class StreamImageReader extends GeographicImageReader {
                 stream = ((URLConnection) input).getInputStream();
                 closeOnReset = stream;
             } else {
-                throw new IllegalStateException(getErrorResources().getString(ErrorKeys.ILLEGAL_CLASS_$2,
-                        Utilities.getShortClassName(input),
-                        Utilities.getShortClassName(InputStream.class)));
+                throw new IllegalStateException(getErrorResources().getString(
+                        ErrorKeys.ILLEGAL_CLASS_$2, Classes.getClass(input), InputStream.class));
             }
         }
         return stream;

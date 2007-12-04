@@ -22,7 +22,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.*;
 import javax.imageio.ImageReader;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.UnmodifiableArrayList;
 
 
 /**
@@ -46,6 +48,11 @@ class TileCollection {
      * order.
      */
     private final Tile[] tiles;
+    
+    /**
+     * All tiles wrapped in an unmodifiable list.
+     */
+    private final Collection<Tile> allTiles;
 
     /**
      * The tiles in the area of interest. Elements can be {@code null} if not yet computed.
@@ -150,6 +157,7 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             }
             throw new IllegalArgumentException("Tile already in use"); // TODO: localize
         }
+        allTiles = UnmodifiableArrayList.wrap(this.tiles);
         /*
          * Now initializes the various caches.
          */
@@ -187,6 +195,29 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     }
 
     /**
+     * Returns a reader sample, or {@code null}. This method tries to returns an instance of the
+     * most specific reader class. If no suitable instance is found, then it returns {@code null}.
+     * <p>
+     * This method is typically invoked for fetching an instance of {@code ImageReadParam}. We
+     * look for the most specific class because it may contains additional parameters that are
+     * ignored by super-classes. If we fail to find a suitable instance, then the caller shall
+     * fallback on the {@link ImageReader} default implementation.
+     */
+    final ImageReader getReader() {
+        final Set<ImageReader> readers = getReaders();
+        Class<?> type = Classes.specializedClass(readers);
+        while (type!=null && ImageReader.class.isAssignableFrom(type)) {
+            for (final ImageReader candidate : readers) {
+                if (type.equals(candidate.getClass())) {
+                    return candidate;
+                }
+            }
+            type = type.getSuperclass();
+        }
+        return null;
+    }
+
+    /**
      * Returns the number of images.
      */
     public int getNumImages() {
@@ -215,6 +246,13 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             areas[imageIndex] = area;
         }
         return area;
+    }
+
+    /**
+     * Returns all tiles.
+     */
+    public Collection<Tile> getTiles() {
+        return allTiles;
     }
 
     /**

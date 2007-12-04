@@ -40,7 +40,7 @@ import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -431,13 +431,13 @@ public final class ImageUtilities {
     public static String getInterpolationName(final Interpolation interp) {
         final String prefix = "Interpolation";
         for (Class classe = interp.getClass(); classe!=null; classe=classe.getSuperclass()) {
-            String name = Utilities.getShortName(classe);
+            String name = Classes.getShortName(classe);
             int index = name.lastIndexOf(prefix);
             if (index >= 0) {
                 return name.substring(index + prefix.length());
             }
         }
-        return Utilities.getShortClassName(interp);
+        return Classes.getShortClassName(interp);
     }
 
     /**
@@ -467,7 +467,7 @@ public final class ImageUtilities {
             final String[] formats = provider.getFormatNames();
             for (int i=0; i<formats.length; i++) {
                 if (formats[i].equalsIgnoreCase(format)) {
-                    if (Utilities.getShortClassName(provider).startsWith("CLib")) {
+                    if (Classes.getShortClassName(provider).startsWith("CLib")) {
                         codeclib = provider;
                     } else {
                         standard = provider;

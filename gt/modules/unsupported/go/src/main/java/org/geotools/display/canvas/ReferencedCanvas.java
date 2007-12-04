@@ -1512,7 +1512,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
      * added} or {@linkplain #removePropertyChangeListener removed}.
      */
-    //@Override
+    @Override
     void listenersChanged() {
         super.listenersChanged();
         hasScaleListeners    = listeners.hasListeners(SCALE_PROPERTY);

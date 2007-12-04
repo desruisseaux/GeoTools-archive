@@ -99,7 +99,7 @@ final class CachedOperation {
     /**
      * Compares the specified object with this key for equality.
      */
-    //@Override
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof CachedOperation) {
             final CachedOperation that = (CachedOperation) object;
@@ -119,7 +119,7 @@ final class CachedOperation {
     /**
      * Returns a hash code value for this key.
      */
-    //@Override
+    @Override
     public int hashCode() {
         return hashCode;
     }

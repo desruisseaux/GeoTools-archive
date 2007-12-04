@@ -16,7 +16,8 @@
  */
 package org.geotools.util;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -50,9 +51,8 @@ public class UnsupportedImplementationException extends UnsupportedOperationExce
      *
      * @param classe The unexpected implementation class.
      */
-    public UnsupportedImplementationException(final Class classe) {
-        // TODO: Provides a localized message.
-        super(Utilities.getShortName(classe));
+    public UnsupportedImplementationException(final Class<?> classe) {
+        super(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, classe));
     }
 
     /**
@@ -63,7 +63,6 @@ public class UnsupportedImplementationException extends UnsupportedOperationExce
      * @param cause The cause for the exception.
      */
     public UnsupportedImplementationException(final Class classe, final Exception cause) {
-        // TODO: Provides a localized message.
-        super(Utilities.getShortName(classe), cause);
+        super(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, classe), cause);
     }
 }

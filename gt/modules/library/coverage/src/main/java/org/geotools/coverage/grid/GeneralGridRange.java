@@ -34,7 +34,7 @@ import org.opengis.coverage.grid.GridCoordinates;
 import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -376,18 +376,15 @@ public class GeneralGridRange implements GridRange, Serializable {
      */
     @Override
     public String toString() {
-        final int dimension = index.length/2;
-        final StringBuilder buffer=new StringBuilder(Utilities.getShortClassName(this));
+        final int dimension = index.length / 2;
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         for (int i=0; i<dimension; i++) {
             if (i!=0) {
                 buffer.append(", ");
             }
-            buffer.append(index[i]);
-            buffer.append("..");
-            buffer.append(index[i+dimension]);
+            buffer.append(index[i]).append("..").append(index[i+dimension]);
         }
-        buffer.append(']');
-        return buffer.toString();
+        return buffer.append(']').toString();
     }
 }

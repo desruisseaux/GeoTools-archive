@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.geotools.resources.XMath;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.OptionalDependencies;
@@ -441,7 +441,7 @@ search: for (int upper; (upper = path.indexOf(SEPARATOR, lower)) >= 0; lower=upp
             ((IIOMetadataNode) element).setUserObject(value);
         } else if (value!=null && asText==null) {
             throw new UnsupportedImplementationException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                    Utilities.getShortClassName(element), Utilities.getShortName(IIOMetadataNode.class)));
+                    Classes.getClass(element), IIOMetadataNode.class));
         }
         element.setNodeValue(asText);
     }

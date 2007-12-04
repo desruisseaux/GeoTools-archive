@@ -282,8 +282,8 @@ public final class Logging {
                 throw factoryNotFound(className, error);
             }
             if (!LoggerFactory.class.isAssignableFrom(factoryClass)) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                        Utilities.getShortName(factoryClass), Utilities.getShortName(LoggerFactory.class)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_CLASS_$2, factoryClass, LoggerFactory.class));
             }
             try {
                 final Method method = factoryClass.getMethod("getInstance", (Class[]) null);
@@ -305,8 +305,8 @@ public final class Logging {
                 if (cause instanceof NoClassDefFoundError) {
                     throw factoryNotFound(className, (NoClassDefFoundError) cause);
                 }
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
-                        className, cause));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.CANT_CREATE_FACTORY_$1, className, cause));
             }
         }
         setLoggerFactory(factory);

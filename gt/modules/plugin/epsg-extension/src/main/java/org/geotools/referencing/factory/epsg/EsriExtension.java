@@ -68,7 +68,7 @@ public class EsriExtension extends FactoryUsingWKT {
      * The default implementation returns {@linkplain Citations#ESRI ESRI} and
      * {@linkplain Citations#EPSG EPSG} authorities.
      */
-    //@Override
+    @Override
     protected Citation[] getAuthorities() {
         return new Citation[] {
             Citations.ESRI,

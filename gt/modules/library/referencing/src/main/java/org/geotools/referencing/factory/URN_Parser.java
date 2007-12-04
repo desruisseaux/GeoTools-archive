@@ -23,7 +23,7 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 import org.geotools.util.Version;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -144,7 +144,7 @@ final class URN_Parser {
                     LoggingKeys.MISMATCHED_URN_TYPE_$1, urn);
             // Set the source to the public or protected method.
             record.setSourceClassName(URN_AuthorityFactory.class.getName());
-            record.setSourceMethodName("get" + Utilities.getShortName(expected));
+            record.setSourceMethodName("get" + Classes.getShortName(expected));
             AbstractAuthorityFactory.LOGGER.log(record);
         }
     }

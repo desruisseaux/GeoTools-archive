@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Locale;
 
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
@@ -673,7 +674,7 @@ public class AngleFormat extends Format {
             return numberFormat.format(obj, toAppendTo, (pos!=null) ? pos : dummy);
         }
         throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_AN_ANGLE_OBJECT_$1,
-                                           Utilities.getShortClassName(obj)));
+                Classes.getClass(obj)));
     }
 
     /**
@@ -1329,6 +1330,6 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
      */
     @Override
     public String toString() {
-        return Utilities.getShortClassName(this) + '[' + toPattern() + ']';
+        return Classes.getShortClassName(this) + '[' + toPattern() + ']';
     }
 }

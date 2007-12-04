@@ -36,7 +36,7 @@ import org.geotools.coverage.processing.Operation2D;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.image.ColorUtilities;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -88,7 +88,7 @@ abstract class IndexColorOperation extends Operation2D {
             if (!(candidate instanceof IndexColorModel)) {
                 // Current implementation supports only sources that use an index color model.
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                        Utilities.getShortClassName(candidate), Utilities.getShortName(IndexColorModel.class)));
+                        Classes.getClass(candidate), IndexColorModel.class));
             }
             final IndexColorModel colors = (IndexColorModel) candidate;
             final int mapSize = colors.getMapSize();

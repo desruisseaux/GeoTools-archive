@@ -21,7 +21,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -88,7 +88,7 @@ public class ImageDimension extends Dimension {
     /**
      * Checks whether two dimension objects have equal values.
      */
-    //@Override
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object) && object.getClass().equals(getClass())) {
 	    final ImageDimension that = (ImageDimension) object;
@@ -101,7 +101,7 @@ public class ImageDimension extends Dimension {
     /**
      * Returns the hash code for this dimension.
      */
-    //@Override
+    @Override
     public int hashCode() {
         return super.hashCode() + 37*numBands;
     }
@@ -109,9 +109,9 @@ public class ImageDimension extends Dimension {
     /**
      * Returns a string representation of this dimension.
      */
-    //@Override
+    @Override
     public String toString() {
-	return Utilities.getShortClassName(this) + "[width=" + width + ",height=" + height +
+	return Classes.getShortClassName(this) + "[width=" + width + ",height=" + height +
                 ",numBands=" + numBands + ']';
     }
 }

@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -412,7 +413,7 @@ public class Tile implements Comparable<Tile> {
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this)).append('[');
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this)).append('[');
         final ImageReader reader = getReader();
         if (reader != null) {
             final ImageReaderSpi spi = reader.getOriginatingProvider();

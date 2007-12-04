@@ -68,7 +68,7 @@ public final class RendererUtilities {
      */
     private static final ThreadLocal/*<GridToEnvelopeMapper>*/ gridToEnvelopeMappers =
             new ThreadLocal/*<GridToEnvelopeMapper>*/() {
-                //@Override
+                @Override
                 protected Object/*<GridToEnvelopeMapper>*/ initialValue() {
                     final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper();
                     mapper.setGridType(PixelInCell.CELL_CORNER);

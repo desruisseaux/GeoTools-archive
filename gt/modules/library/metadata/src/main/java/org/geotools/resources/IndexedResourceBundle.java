@@ -61,7 +61,7 @@ public class IndexedResourceBundle extends ResourceBundle {
      * {@link #summarize}. Resource strings are never cut to this length. However, text replacing
      * "{0}" in a string like "Parameter name is {0}." will be cut to this length.
      */
-    private static final int MAX_STRING_LENGTH = 80;
+    private static final int MAX_STRING_LENGTH = 200;
 
     /**
      * The resource name of the binary file containing resources.
@@ -400,9 +400,11 @@ public class IndexedResourceBundle extends ResourceBundle {
             } else if (element instanceof Throwable) {
                 String message = ((Throwable) element).getLocalizedMessage();
                 if (message == null) {
-                    message = Utilities.getShortClassName(element);
+                    message = Classes.getShortClassName(element);
                 }
                 array[i] = message;
+            } else if (element instanceof Class) {
+                array[i] = Classes.getShortName((Class<?>) element);
             }
         }
         return array;
@@ -713,7 +715,7 @@ public class IndexedResourceBundle extends ResourceBundle {
      */
     @Override
     public synchronized String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         if (values != null) {
             int count = 0;

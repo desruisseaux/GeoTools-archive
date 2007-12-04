@@ -25,7 +25,7 @@ import java.util.prefs.Preferences;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -223,7 +223,7 @@ public class Formattable {
                 break;
             }
         }
-        return Utilities.getShortName(type);
+        return Classes.getShortName(type);
     }
 
     /**

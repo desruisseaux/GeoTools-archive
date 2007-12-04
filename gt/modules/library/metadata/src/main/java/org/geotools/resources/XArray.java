@@ -930,6 +930,27 @@ public final class XArray {
     }
 
     /**
+     * Returns {@code true} if the specified array contains the specified value. This method
+     * should be used only for very small arrays, or for search to be performed only once,
+     * because it performs a linear search. If more than one search need to be done on the
+     * same array, consider using {@link java.util.HashSet} instead.
+     *
+     * @param  array The array to search in. May be {@code null} and may contains null elements.
+     * @param  value The value to search. May be {@code null}.
+     * @return {@code true} if the array contains the value.
+     */
+    public static boolean contains(final Object[] array, final Object value) {
+        if (array != null) {
+            for (final Object element : array) {
+                if (Utilities.equals(element, value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns a string representation of an array of numbers. Current implementation
      * supports only primitive or subclasses of {@link Number}.
      *

@@ -394,7 +394,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * @param  code The code to trim.
      * @return The code without the authority scope.
      */
-    //@Override
+    @Override
     protected String trimAuthority(String code) {
         code = code.trim();
         final GenericName name  = NameFactory.create(code);

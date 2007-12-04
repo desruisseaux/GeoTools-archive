@@ -90,7 +90,7 @@ public class InterpolatorTest extends GridCoverageTest {
      * The default implementation applies a set of interpolations
      * on <code>coverage</code>.
      */
-    //@Override
+    @Override
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return Interpolator2D.create(coverage, interpolations);
     }
@@ -100,7 +100,7 @@ public class InterpolatorTest extends GridCoverageTest {
      * at the center of pixels, all interpolations results should be identical to
      * a result without interpolation.
      */
-    //@Override
+    @Override
     public void testGridCoverage() {
         final GridCoverage2D coverage = getRandomCoverage();
         assertTrue(coverage instanceof Interpolator2D);

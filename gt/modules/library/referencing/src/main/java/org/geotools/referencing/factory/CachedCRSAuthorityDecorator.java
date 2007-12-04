@@ -383,7 +383,7 @@ public final class CachedCRSAuthorityDecorator extends AbstractAuthorityFactory
      *
      * @since 2.4
      */
-    //@Override
+    @Override
     public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
             final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
     {        
@@ -421,7 +421,7 @@ public final class CachedCRSAuthorityDecorator extends AbstractAuthorityFactory
          * to the specified object. The default implementation performs the same lookup than
          * the backing store and caches the result.
          */
-        //@Override
+        @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             /*
              * Do not synchronize on 'BufferedAuthorityFactory.this'. This method may take a
@@ -459,7 +459,7 @@ public final class CachedCRSAuthorityDecorator extends AbstractAuthorityFactory
         /**
          * Returns the identifier for the specified object.
          */
-        //@Override
+        @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
             candidate = (IdentifiedObject) findCache.get(object);            

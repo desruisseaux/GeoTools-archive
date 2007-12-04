@@ -689,7 +689,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
      * added} or {@linkplain #removePropertyChangeListener removed}.
      */
-    //@Override
+    @Override
     void listenersChanged() {
         super.listenersChanged();
         hasScaleListeners = hasListeners(SCALE_PROPERTY);

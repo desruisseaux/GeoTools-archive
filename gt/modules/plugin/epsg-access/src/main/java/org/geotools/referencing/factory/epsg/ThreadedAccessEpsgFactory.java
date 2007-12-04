@@ -62,7 +62,7 @@ public class ThreadedAccessEpsgFactory extends ThreadedEpsgFactory {
     /**
      * Returns a data source using the JDBC-ODBC bridge for the "EPSG" database.
      */
-    //@Override
+    @Override
     protected DataSource createDataSource() throws SQLException {
         DataSource candidate = super.createDataSource();
         if (candidate == null) {

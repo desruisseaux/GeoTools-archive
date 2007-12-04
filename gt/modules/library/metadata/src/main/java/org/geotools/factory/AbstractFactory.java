@@ -30,6 +30,7 @@ import javax.imageio.spi.RegisterableService;
 
 import org.opengis.referencing.AuthorityFactory;
 import org.geotools.io.TableWriter;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -397,7 +398,7 @@ public class AbstractFactory implements Factory, RegisterableService {
      * Formats a name for the specified factory.
      */
     private static String format(final Factory factory) {
-        String name = Utilities.getShortClassName(factory);
+        String name = Classes.getShortClassName(factory);
         if (factory instanceof AuthorityFactory) {
             name = name + "[\"" + ((AuthorityFactory) factory).getAuthority().getTitle() + "\"]";
         }

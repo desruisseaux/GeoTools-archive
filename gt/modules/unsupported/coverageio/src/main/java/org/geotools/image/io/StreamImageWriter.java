@@ -25,7 +25,7 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 
 
@@ -138,9 +138,8 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
                 stream = ((URLConnection) output).getOutputStream();
                 closeOnReset = stream;
             } else {
-                throw new IllegalStateException(getErrorResources().getString(ErrorKeys.ILLEGAL_CLASS_$2,
-                        Utilities.getShortClassName(output),
-                        Utilities.getShortClassName(OutputStream.class)));
+                throw new IllegalStateException(getErrorResources().getString(
+                        ErrorKeys.ILLEGAL_CLASS_$2, Classes.getClass(output), OutputStream.class));
             }
         }
         return stream;

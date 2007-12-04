@@ -130,8 +130,8 @@ public abstract class AbstractParameter extends Formattable
     {
         if (value != null) {
             if (!valueClass.isAssignableFrom(value.getClass())) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                          Utilities.getShortClassName(value), Utilities.getShortName(valueClass)));
+                throw new IllegalArgumentException(Errors.format(
+                        ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), valueClass));
             }
         }
     }

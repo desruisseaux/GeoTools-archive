@@ -15,7 +15,6 @@
  */
 package org.geotools.factory;
 
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -46,8 +45,8 @@ public class RecursiveSearchException extends FactoryRegistryException {
     /**
      * Creates a new exception with a default message determined from the specified category.
      */
-    public RecursiveSearchException(final Class category) {
-        super(Errors.format(ErrorKeys.RECURSIVE_CALL_$1, Utilities.getShortName(category)));
+    public RecursiveSearchException(final Class<?> category) {
+        super(Errors.format(ErrorKeys.RECURSIVE_CALL_$1, category));
     }
 
     /**

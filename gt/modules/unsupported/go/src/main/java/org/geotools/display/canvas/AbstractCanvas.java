@@ -826,7 +826,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
     /**
      * {@inheritDoc}
      */
-    //@Override
+    @Override
     void listenersChanged() {
         super.listenersChanged();
         hasGraphicsListeners = listeners.hasListeners(GRAPHICS_PROPERTY);

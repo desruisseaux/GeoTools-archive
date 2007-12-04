@@ -32,7 +32,7 @@ import org.opengis.referencing.AuthorityFactory;
 
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.io.TableWriter;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -66,8 +66,8 @@ final class FactoryPrinter implements Comparator<Class<?>> {
             return 0;
         } else {
             // Or sort by name
-            return Utilities.getShortName(factory1).compareToIgnoreCase(
-                   Utilities.getShortName(factory2));
+            return Classes.getShortName(factory1).compareToIgnoreCase(
+                   Classes.getShortName(factory2));
         }
     }
 
@@ -115,7 +115,7 @@ final class FactoryPrinter implements Comparator<Class<?>> {
              * Writes the category name (CRSFactory, DatumFactory, etc.)
              */
             final Class<?> category = it.next();
-            table.write(Utilities.getShortName(category));
+            table.write(Classes.getShortName(category));
             table.nextColumn();
             /*
              * Writes the authorities in a single cell. Same for vendors and implementations.
@@ -130,7 +130,7 @@ final class FactoryPrinter implements Comparator<Class<?>> {
                 final Factory provider = (Factory) providers.next();
                 final Citation vendor = provider.getVendor();
                 vendors.append(vendor.getTitle().toString(locale));
-                implementations.append(Utilities.getShortClassName(provider));
+                implementations.append(Classes.getShortClassName(provider));
                 if (provider instanceof AuthorityFactory) {
                     final Citation authority = ((AuthorityFactory) provider).getAuthority();
                     final Iterator<? extends Identifier> identifiers =

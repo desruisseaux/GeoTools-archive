@@ -33,7 +33,7 @@ import org.opengis.referencing.operation.*;
 import org.opengis.parameter.ParameterDescriptor;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -203,7 +203,7 @@ abstract class AuthorityFactoryProxy {
     /**
      * Returns a string representation of this proxy, for debugging purpose only.
      */
-    //@Override
+    @Override
     public String toString() {
         return toString(AuthorityFactoryProxy.class);
     }
@@ -213,9 +213,9 @@ abstract class AuthorityFactoryProxy {
      */
     final String toString(final Class owner) {
         final AuthorityFactory factory = getAuthorityFactory();
-        return Utilities.getShortName(owner) + '[' +
-               Utilities.getShortName(getType()) + " in " +
-               Utilities.getShortClassName(factory) + "(\"" +
+        return Classes.getShortName(owner) + '[' +
+               Classes.getShortName(getType()) + " in " +
+               Classes.getShortClassName(factory) + "(\"" +
                factory.getAuthority().getTitle() + "\")]";
     }
 
@@ -347,12 +347,12 @@ abstract class AuthorityFactoryProxy {
             super(factory);
         }
 
-        //@Override
+        @Override
         public Class getType() {
             return GeographicCRS.class;
         }
 
-        //@Override
+        @Override
         public IdentifiedObject create(final String code) throws FactoryException {
             return factory.createGeographicCRS(code);
         }
@@ -370,12 +370,12 @@ abstract class AuthorityFactoryProxy {
             super(factory);
         }
 
-        //@Override
+        @Override
         public Class getType() {
             return ProjectedCRS.class;
         }
 
-        //@Override
+        @Override
         public IdentifiedObject create(final String code) throws FactoryException {
             return factory.createProjectedCRS(code);
         }

@@ -33,7 +33,7 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -326,7 +326,7 @@ public abstract class AbstractConsole implements Runnable {
             Logging.unexpectedException("org.geotools.referencing.wkt",
                                         AbstractConsole.class, "reportError", ignore);
         }
-        err.print(Utilities.getShortClassName(exception));
+        err.print(Classes.getShortClassName(exception));
         err.print(" at line ");
         err.print(in.getLineNumber());
         Throwable cause = exception;
@@ -342,7 +342,7 @@ public abstract class AbstractConsole implements Runnable {
                 break;
             }
             err.print("Caused by ");
-            err.print(Utilities.getShortClassName(cause));
+            err.print(Classes.getShortClassName(cause));
         }
         err.println("Type 'stacktrace' for stack trace information.");
         if (line!=null && exception instanceof ParseException) {

@@ -27,7 +27,6 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -74,8 +73,8 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         final Class type = descriptor.getValueClass();
         final Class expected = Double.class;
         if (!expected.equals(type) && !Double.TYPE.equals(type)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                      Utilities.getShortName(type), Utilities.getShortName(expected)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, type, expected));
         }
         final Number value = (Number) descriptor.getDefaultValue();
         this.value = (value!=null) ? value.doubleValue() : Double.NaN;
@@ -209,7 +208,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * Format an error message for illegal method call for the current value type.
      */
     private static String getClassTypeError() {
-        return Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1, "Double");
+        return Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1, Double.class);
     }
 
     /**

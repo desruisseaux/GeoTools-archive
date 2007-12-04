@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Collections;
 import javax.units.SI;
-import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.Converter;
 import javax.units.ConversionException;
@@ -43,6 +42,7 @@ import org.geotools.measure.Measure;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -158,8 +158,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
             if (!isCompatibleDirection(direction)) {
                 // TOOD: localize name()
                 throw new IllegalArgumentException(Errors.format(
-                            ErrorKeys.ILLEGAL_AXIS_ORIENTATION_$2,
-                            direction.name(), Utilities.getShortClassName(this)));
+                        ErrorKeys.ILLEGAL_AXIS_ORIENTATION_$2, direction.name(), getClass()));
             }
             final Unit unit = axis[i].getUnit();
             ensureNonNull("unit", unit);
@@ -319,9 +318,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                                           final CoordinateSystem targetCS)
             throws IllegalArgumentException, ConversionException
     {
-        if (!Utilities.sameInterfaces(sourceCS.getClass(), targetCS.getClass(),
-                                      CoordinateSystem.class))
-        {
+        if (!Classes.sameInterfaces(sourceCS.getClass(), targetCS.getClass(), CoordinateSystem.class)) {
             throw new IllegalArgumentException(Errors.format(
                       ErrorKeys.INCOMPATIBLE_COORDINATE_SYSTEM_TYPE));
         }

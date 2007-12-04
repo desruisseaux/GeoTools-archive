@@ -39,12 +39,11 @@ import org.opengis.referencing.operation.*;
 // Geotools dependencies
 import org.geotools.util.CanonicalSet;
 import org.geotools.factory.Hints;
-import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
@@ -252,7 +251,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
         for (int i=0; i<dimension; i++) {
             if (!orderedAxis[i].equals(cs.getAxis(i))) {
                 CoordinateSystem modified = createCS(cs.getClass(), getProperties(cs), orderedAxis);
-                assert Utilities.sameInterfaces(cs.getClass(), modified.getClass(), CoordinateSystem.class);
+                assert Classes.sameInterfaces(cs.getClass(), modified.getClass(), CoordinateSystem.class);
                 modified = (CoordinateSystem) pool.unique(modified);
                 return modified;
             }
@@ -466,8 +465,7 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
                 case 3: return csFactory.createUserDefinedCS(properties, axis[0], axis[1], axis[2]);
             }
         }
-        throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_COORDINATE_SYSTEM_$1,
-                                   Utilities.getShortName(type)));
+        throw new FactoryException(Errors.format(ErrorKeys.UNSUPPORTED_COORDINATE_SYSTEM_$1, type));
     }
 
     /**

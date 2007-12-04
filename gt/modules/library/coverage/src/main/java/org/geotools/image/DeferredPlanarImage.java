@@ -50,7 +50,7 @@ import javax.media.jai.TileRequest;
 import javax.media.jai.TileScheduler;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
@@ -423,7 +423,7 @@ public final class DeferredPlanarImage extends PlanarImage
                      */
                     String message = cause.getLocalizedMessage();
                     if (message == null) {
-                        message = Utilities.getShortClassName(cause);
+                        message = Classes.getShortClassName(cause);
                     }
                     final LogRecord record = new LogRecord(Level.WARNING, message);
                     record.setSourceClassName(observers[i].getClass().getName());

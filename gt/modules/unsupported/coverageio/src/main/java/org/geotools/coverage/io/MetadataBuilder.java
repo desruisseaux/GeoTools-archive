@@ -80,6 +80,7 @@ import org.opengis.util.Cloneable;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -648,14 +649,14 @@ public class MetadataBuilder {
      *         the default locale-dependent pattern.
      * @throws IllegalArgumentException if {@code type} is not valid.
      */
-    public String getFormatPattern(final Class type) {
+    public String getFormatPattern(final Class<?> type) {
         if (Date.class.isAssignableFrom(type)) {
             return datePattern;
         }
         if (Number.class.isAssignableFrom(type)) {
             return numberPattern;
         }
-        throw new IllegalArgumentException(Utilities.getShortName(type));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 
     /**
@@ -676,7 +677,7 @@ public class MetadataBuilder {
      *         for the default locale-dependent pattern.
      * @throws IllegalArgumentException if {@code type} is not valid.
      */
-    public synchronized void setFormatPattern(final Class type, final String pattern) {
+    public synchronized void setFormatPattern(final Class<?> type, final String pattern) {
         if (Date.class.isAssignableFrom(type)) {
             datePattern = pattern;
             cache = null;
@@ -687,7 +688,7 @@ public class MetadataBuilder {
             cache = null;
             return;
         }
-        throw new IllegalArgumentException(Utilities.getShortName(type));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 
     /**
@@ -1123,7 +1124,7 @@ public class MetadataBuilder {
             return ((IdentifiedObject) value).getName().getCode();
         }
         throw new MetadataException(Errors.getResources(userLocale).getString(
-              ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, Utilities.getShortClassName(value)), key, alias);
+              ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, Classes.getClass(value)), key, alias);
     }
 
     /**

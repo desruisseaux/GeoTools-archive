@@ -50,7 +50,7 @@ import org.geotools.io.TableWriter;
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -300,7 +300,7 @@ public class ParameterWriter extends FilterWriter {
              */
             if (generalDescriptor instanceof ParameterDescriptor) {
                 final ParameterDescriptor descriptor = (ParameterDescriptor) generalDescriptor;
-                table.write(Utilities.getShortName(descriptor.getValueClass()));
+                table.write(Classes.getShortName(descriptor.getValueClass()));
                 table.nextColumn();
                 table.setAlignment(TableWriter.ALIGN_RIGHT);
                 Object value = descriptor.getMinimumValue();

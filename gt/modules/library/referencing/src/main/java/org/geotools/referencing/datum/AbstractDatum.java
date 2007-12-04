@@ -33,6 +33,7 @@ import org.opengis.util.InternationalString;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -284,8 +285,9 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatter.append(getLegacyDatumType());
-        return Utilities.getShortClassName(this);
+        return Classes.getShortClassName(this);
     }
 }

@@ -36,6 +36,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -483,6 +484,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * Returns a hash value for this grid geometry. This value need not remain
      * consistent between different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         if (gridToCRS != null) {
@@ -499,6 +501,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
      * Compares the specified object with this grid geometry for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final GeneralGridGeometry that = (GeneralGridGeometry) object;
@@ -513,13 +516,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      * Returns a string representation of this grid geometry. The returned string
      * is implementation dependent. It is usually provided for debugging purposes.
      */
+    @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
-        buffer.append('[');
-        buffer.append(gridRange);
-        buffer.append(", ");
-        buffer.append(gridToCRS);
-        buffer.append(']');
-        return buffer.toString();
+        return Classes.getShortClassName(this) + '[' + gridRange + ", " + gridToCRS + ']';
     }
 }

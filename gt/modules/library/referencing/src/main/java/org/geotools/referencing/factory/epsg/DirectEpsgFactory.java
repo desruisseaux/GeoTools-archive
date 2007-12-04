@@ -75,7 +75,6 @@ import org.geotools.referencing.operation.DefaultConcatenatedOperation;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultOperation;
 import org.geotools.referencing.operation.DefiningConversion;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -1959,8 +1958,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
                         result.close();
                         throw new FactoryException(Errors.format(
                                 ErrorKeys.ILLEGAL_COORDINATE_SYSTEM_FOR_CRS_$2,
-                                Utilities.getShortClassName(cs),
-                                Utilities.getShortName(GeocentricCRS.class)));
+                                cs.getClass(), GeocentricCRS.class));
                     }
                 }
                 /* ----------------------------------------------------------------------
@@ -2756,7 +2754,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * @return A finder to use for looking up unidentified objects.
      * @throws FactoryException if the finder can not be created.
      */
-    //@Override
+    @Override
     public IdentifiedObjectFinder getIdentifiedObjectFinder(
             final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
     {
@@ -2783,7 +2781,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
          * than the specified one. This implementation tries to get a smaller set than what
          * {@link DirectEpsgFactory#getAuthorityCodes} would produce.
          */
-        //@Override
+        @Override
         protected Set getCodeCandidates(final IdentifiedObject object) throws FactoryException {
             String select = "COORD_REF_SYS_CODE";
             String from   = "[Coordinate Reference System]";
@@ -2837,8 +2835,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
      * Constructs an exception for recursive calls.
      */
     private static FactoryException recursiveCall(final Class type, final String code) {
-        return new FactoryException(Errors.format(ErrorKeys.RECURSIVE_CALL_$2,
-                   Utilities.getShortName(type), code));
+        return new FactoryException(Errors.format(ErrorKeys.RECURSIVE_CALL_$2, type, code));
     }
 
     /**
@@ -2847,8 +2844,7 @@ public abstract class DirectEpsgFactory extends DirectAuthorityFactory
     private static FactoryException databaseFailure(final Class type, final String code,
                                                     final SQLException cause)
     {
-        return new FactoryException(Errors.format(ErrorKeys.DATABASE_FAILURE_$2,
-                   Utilities.getShortName(type), code), cause);
+        return new FactoryException(Errors.format(ErrorKeys.DATABASE_FAILURE_$2, type, code), cause);
     }
 
     /**

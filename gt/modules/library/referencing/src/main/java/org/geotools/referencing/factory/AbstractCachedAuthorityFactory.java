@@ -695,7 +695,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
      *
      * @since 2.4
      */
-    //@Override
+    @Override
     public synchronized IdentifiedObjectFinder getIdentifiedObjectFinder(
             final Class/*<? extends IdentifiedObject>*/ type) throws FactoryException
     {        
@@ -729,7 +729,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
          * to the specified object. The default implementation performs the same lookup than
          * the backing store and caches the result.
          */
-        //@Override
+        @Override
         public IdentifiedObject find(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
             
@@ -759,7 +759,7 @@ public abstract class AbstractCachedAuthorityFactory extends AbstractAuthorityFa
         /**
          * Returns the identifier for the specified object.
          */
-        //@Override
+        @Override
         public String findIdentifier(final IdentifiedObject object) throws FactoryException {
             IdentifiedObject candidate;
             candidate = (IdentifiedObject) findCache.get(object);

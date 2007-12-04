@@ -427,8 +427,7 @@ public final class XMath {
         if (isInteger(type)) {
             return value + amount;
         }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE_$1,
-                                                         Utilities.getShortName(type)));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.UNSUPPORTED_DATA_TYPE_$1, type));
     }
 
     /**

@@ -21,7 +21,6 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -139,7 +138,7 @@ parse:  for (int i=0; /*stop condition in the 'switch' statement below*/; i++) {
     {
         final String authority = "AUTO";
         return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
-                   code, authority, Utilities.getShortName(type)), authority, code);
+                   code, authority, type), authority, code);
     }
 
     /**

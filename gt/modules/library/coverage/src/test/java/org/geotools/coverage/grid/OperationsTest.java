@@ -116,7 +116,7 @@ public final class OperationsTest extends GridCoverageTest {
      *
      * @todo Applies some operation.
      */
-    //@Override
+    @Override
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return ((GridCoverage2D) processor.nodataFilter(coverage.geophysics(true))).geophysics(false);
     }

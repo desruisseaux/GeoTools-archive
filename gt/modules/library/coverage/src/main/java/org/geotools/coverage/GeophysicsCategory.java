@@ -30,7 +30,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.util.NumberRange;
@@ -112,10 +112,8 @@ final class GeophysicsCategory extends Category {
             range = new Range(min, minIncluded, max, maxIncluded, min2, max2);
 
         } catch (TransformException cause) {
-            IllegalStateException exception = new IllegalStateException(Errors.format(
-                    ErrorKeys.BAD_TRANSFORM_$1, Utilities.getShortClassName(inverse.transform)));
-            exception.initCause(cause);
-            throw exception;
+            throw new IllegalStateException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
+                    Classes.getClass(inverse.transform)), cause);
         }
         return range;
     }

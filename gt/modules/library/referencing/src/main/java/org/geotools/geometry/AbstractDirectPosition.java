@@ -20,6 +20,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -122,7 +123,7 @@ public abstract class AbstractDirectPosition implements DirectPosition {
      * Formats the specified position.
      */
     static String toString(final DirectPosition position) {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(position)).append('[');
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(position)).append('[');
         final int dimension = position.getDimension();
         for (int i=0; i<dimension; i++) {
             if (i != 0) {

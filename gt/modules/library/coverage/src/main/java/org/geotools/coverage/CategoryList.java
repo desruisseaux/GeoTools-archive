@@ -44,6 +44,7 @@ import org.opengis.util.InternationalString;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.Matrix1;
 import org.geotools.referencing.wkt.UnformattableObjectException;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -762,7 +763,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator<C
      */
     final String toString(final Object owner) {
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(owner));
+        StringBuffer buffer = new StringBuffer(Classes.getShortClassName(owner));
         buffer = formatRange(buffer, null);
         if (hasGaps) {
             buffer.append(" with gaps");
@@ -772,10 +773,10 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator<C
          * Ecrit la liste des catégories en dessous.
          */
         for (int i=0; i<categories.length; i++) {
-            buffer.append("   ");
-            buffer.append(categories[i]==main ? '*' : ' ');
-            buffer.append(categories[i]);
-            buffer.append(lineSeparator);
+            buffer.append("   ")
+                  .append(categories[i] == main ? '*' : ' ')
+                  .append(categories[i])
+                  .append(lineSeparator);
         }
         return buffer.toString();
     }
@@ -1168,7 +1169,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator<C
             while (!iterator.nextLineDone());
         } catch (TransformException cause) {
             RasterFormatException exception = new RasterFormatException(Errors.format(
-                    ErrorKeys.BAD_TRANSFORM_$1, Utilities.getShortClassName(tr)));
+                    ErrorKeys.BAD_TRANSFORM_$1, Classes.getClass(tr)));
             exception.initCause(cause);
             throw exception;
         }

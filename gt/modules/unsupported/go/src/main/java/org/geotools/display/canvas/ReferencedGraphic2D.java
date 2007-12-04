@@ -284,7 +284,7 @@ public abstract class ReferencedGraphic2D extends ReferencedGraphic {
      * Invoked when a property change listener has been {@linkplain #addPropertyChangeListener
      * added} or {@linkplain #removePropertyChangeListener removed}.
      */
-    //@Override
+    @Override
     void listenersChanged() {
         super.listenersChanged();
         hasBoundsListeners = hasListeners(DISPLAY_BOUNDS_PROPERTY);

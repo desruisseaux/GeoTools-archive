@@ -47,7 +47,7 @@ import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.Matrix4;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -1496,9 +1496,8 @@ search: for (int j=0; j<targets.length; j++) {
             }
             if (!shift && sourceGeodetic==targetGeodetic) {
                 shift = !equalsIgnoreMetadata(sourceDatum, targetDatum);
-                assert Utilities.sameInterfaces(sourceDatum.getClass(),
-                                                targetDatum.getClass(),
-                                                Datum.class);
+                assert Classes.sameInterfaces(sourceDatum.getClass(),
+                                              targetDatum.getClass(), Datum.class);
             }
         }
         return horizontal && vertical &&

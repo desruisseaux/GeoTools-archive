@@ -16,25 +16,26 @@
  */
 package org.geotools.image.io.mosaic;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
-import org.geotools.resources.Utilities;
+import org.geotools.image.io.metadata.MetadataMerge;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.util.FrequencySortedSet;
@@ -70,6 +71,18 @@ public class MosaicImageReader extends ImageReader {
                          final boolean seekForwardOnly,
                          final boolean ignoreMetadata)
     {
+        /*
+         * Closes previous streams, if any. This is not a big deal if this operation fails,
+         * since we will not use anymore the old streams anyway. However it is worth to log.
+         */
+        try {
+            close();
+        } catch (IOException exception) {
+            Tile.recoverableException(MosaicImageReader.class, "setInput", exception);
+        }
+        /*
+         * Gets the new collection of tiles.
+         */
         tiles = null;
         super.setInput(input, seekForwardOnly, ignoreMetadata);
         if (input == null) {
@@ -83,7 +96,7 @@ public class MosaicImageReader extends ImageReader {
             inputTiles = c.toArray(new Tile[c.size()]);
         } else {
             throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                    Utilities.getShortClassName(input), Utilities.getShortClassName(Tile[].class)));
+                    Classes.getClass(input), Tile[].class));
         }
         tiles = new TileCollection(inputTiles);
         /*
@@ -339,24 +352,163 @@ public class MosaicImageReader extends ImageReader {
         return getImageTypeSet(imageIndex).iterator();
     }
 
+    /**
+     * Returns default parameters appropriate for this format. The default implementation tries
+     * to delegate to an {@linkplain Tile#getReader tile image reader} which is an instance of
+     * the most specialized class. We look for the most specialized subclass because it may
+     * declares additional parameters that are ignored by super-classes. If we fail to find
+     * a suitable instance, then the default parameters are returned.
+     */
+    @Override
+    public ImageReadParam getDefaultReadParam() {
+        if (tiles != null) {
+            final ImageReader reader = tiles.getReader();
+            if (reader != null) {
+                return reader.getDefaultReadParam();
+            }
+        }
+        return super.getDefaultReadParam();
+    }
+
+    /**
+     * Returns the metadata associated with the input source as a whole, or {@code null}.
+     * The default implementation tries to {@linkplain IIOMetadata#mergeTree merge} the
+     * metadata from every tiles.
+     *
+     * @throws IOException if an error occurs during reading.
+     */
     public IIOMetadata getStreamMetadata() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        IIOMetadata metadata = null;
+        for (final Tile tile : getTileCollection().getTiles()) {
+            final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
+            final IIOMetadata candidate = reader.getStreamMetadata();
+            metadata = MetadataMerge.merge(candidate, metadata);
+        }
+        return metadata;
     }
 
+    /**
+     * Returns the stream metadata for the given format and nodes, or {@code null}.
+     * The default implementation tries to {@linkplain IIOMetadata#mergeTree merge}
+     * the metadata from every tiles.
+     *
+     * @throws IOException if an error occurs during reading.
+     */
+    @Override
+    public IIOMetadata getStreamMetadata(final String formatName, final Set<String> nodeNames)
+            throws IOException
+    {
+        IIOMetadata metadata = null;
+        for (final Tile tile : getTileCollection().getTiles()) {
+            final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
+            final IIOMetadata candidate = reader.getStreamMetadata(formatName, nodeNames);
+            metadata = MetadataMerge.merge(candidate, metadata);
+        }
+        return metadata;
+    }
+
+    /**
+     * Returns the metadata associated with the given image, or {@code null}. The
+     * default implementation tries to {@linkplain IIOMetadata#mergeTree merge}
+     * the metadata from every tiles.
+     *
+     * @param  imageIndex the index of the image whose metadata is to be retrieved.
+     * @return The metadata, or {@code null}.
+     * @throws IllegalStateException if the input source has not been set.
+     * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
+     * @throws IOException if an error occurs during reading.
+     */
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        IIOMetadata metadata = null;
+        for (final Tile tile : getTileCollection().getTiles(imageIndex, null)) {
+            final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
+            final IIOMetadata candidate = reader.getImageMetadata(imageIndex);
+            metadata = MetadataMerge.merge(candidate, metadata);
+        }
+        return metadata;
     }
 
+    /**
+     * Returns the image metadata for the given format and nodes, or {@code null}.
+     * The default implementation tries to {@linkplain IIOMetadata#mergeTree merge}
+     * the metadata from every tiles.
+     *
+     * @throws IOException if an error occurs during reading.
+     */
+    @Override
+    public IIOMetadata getImageMetadata(final int imageIndex,
+            final String formatName, final Set<String> nodeNames) throws IOException
+    {
+        IIOMetadata metadata = null;
+        for (final Tile tile : getTileCollection().getTiles(imageIndex, null)) {
+            final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
+            final IIOMetadata candidate = reader.getImageMetadata(imageIndex, formatName, nodeNames);
+            metadata = MetadataMerge.merge(candidate, metadata);
+        }
+        return metadata;
+    }
+
+    /**
+     * Reads the image indexed by {@code imageIndex} using a supplied parameters.
+     *
+     * @param  imageIndex The index of the image to be retrieved.
+     * @param  param The parameters used to control the reading process, or {@code null}.
+     * @return The desired portion of the image.
+     * @throws IOException if an error occurs during reading.
+     */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
+        clearAbortRequest();
+        final int[]      sourceBands;
+        final int[] destinationBands;
+        final int sourceXSubsampling;
+        final int sourceYSubsampling;
+        final int subsamplingXOffset;
+        final int subsamplingYOffset;
+        final int destinationXOffset;
+        final int destinationYOffset;
+        if (param != null) {
+            sourceBands        = param.getSourceBands();
+            destinationBands   = param.getDestinationBands();
+            final Point offset = param.getDestinationOffset();
+            sourceXSubsampling = param.getSourceXSubsampling();
+            sourceYSubsampling = param.getSourceYSubsampling();
+            subsamplingXOffset = param.getSubsamplingXOffset();
+            subsamplingYOffset = param.getSubsamplingYOffset();
+            destinationXOffset = offset.x;
+            destinationYOffset = offset.y;
+        } else {
+            sourceBands        = null;
+            destinationBands   = null;
+            sourceXSubsampling = 1;
+            sourceYSubsampling = 1;
+            subsamplingXOffset = 0;
+            subsamplingYOffset = 0;
+            destinationXOffset = 0;
+            destinationYOffset = 0;
+        }
+        final int width  = getWidth (imageIndex);
+        final int height = getHeight(imageIndex);
+        final Rectangle sourceRegion = getSourceRegion(param, width, height);
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * Closes any image input streams thay may be held by tiles.
+     * The streams will be opened again when they will be first needed.
+     *
+     * @throws IOException if error occured while closing a stream.
+     */
     public void close() throws IOException {
         if (tiles != null) {
             tiles.close(false);
         }
     }
 
+    /**
+     * Allows any resources held by this reader to be released. The default implementation
+     * closes any image input streams thay may be held by tiles, then disposes every
+     * {@linkplain Tile#getReader tile image readers}.
+     */
     @Override
     public void dispose() {
         if (tiles != null) try {

@@ -45,7 +45,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -208,8 +208,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
                        list, factory, false);
             } else {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                                                   Utilities.getShortClassName(op),
-                                                   Utilities.getShortName(SingleOperation.class)));
+                        Classes.getClass(op), SingleOperation.class));
             }
             /*
              * Check the CRS dimensions.

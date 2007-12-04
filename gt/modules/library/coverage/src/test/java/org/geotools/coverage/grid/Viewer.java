@@ -43,6 +43,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -182,7 +183,7 @@ public class Viewer extends JPanel {
     public void printPalette(final PrintWriter out) {
         final Locale locale = getLocale();
         final ColorModel model = image.getColorModel();
-        out.print(Utilities.getShortClassName(model));
+        out.print(Classes.getShortClassName(model));
         out.println(':');
         if (model instanceof IndexColorModel) {
             out.println();

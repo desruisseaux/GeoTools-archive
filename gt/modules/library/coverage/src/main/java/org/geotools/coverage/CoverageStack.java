@@ -61,7 +61,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.IIOReadProgressAdapter;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -1002,7 +1002,7 @@ public class CoverageStack extends AbstractCoverage {
         } catch (IOException exception) {
             String message = exception.getLocalizedMessage();
             if (message == null) {
-                message = Utilities.getShortClassName(exception);
+                message = Classes.getShortClassName(exception);
             }
             throw new CannotEvaluateException(message, exception);
         }

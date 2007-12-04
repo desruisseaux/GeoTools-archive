@@ -27,6 +27,7 @@ import java.util.SortedSet;
 import javax.media.jai.util.Range;
 
 import org.geotools.resources.ClassChanger;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -191,8 +192,7 @@ public class RangeSet extends AbstractSet<Range>
             }
         }
         if (!Comparable.class.isAssignableFrom(type)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_COMPARABLE_CLASS_$1,
-                                               Utilities.getShortClassName(type)));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_COMPARABLE_CLASS_$1, type));
         }
         Class elementType = ClassChanger.getTransformedClass(type); // e.g. change Date --> Long
         useClassChanger   = (elementType != type);
@@ -1089,22 +1089,17 @@ public class RangeSet extends AbstractSet<Range>
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         boolean first = true;
-        for (java.util.Iterator it=iterator(); it.hasNext();) {
-            final Range range = (Range) it.next();
+        for (final Range range : this) {
             if (!first) {
                 buffer.append(',');
             }
-            buffer.append('{');
-            buffer.append(range.getMinValue());
-            buffer.append("..");
-            buffer.append(range.getMaxValue());
-            buffer.append('}');
+            buffer.append('{') .append(range.getMinValue())
+                  .append("..").append(range.getMaxValue()).append('}');
             first = false;
         }
-        buffer.append(']');
-        return buffer.toString();
+        return buffer.append(']').toString();
     }
 }

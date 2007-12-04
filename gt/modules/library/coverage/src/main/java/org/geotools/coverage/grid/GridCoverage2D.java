@@ -691,7 +691,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * {inheritDoc}
      */
-    //@Override
+    @Override
     public void show(String title, final int xAxis, final int yAxis) {
         ensureValid();
         final GridCoverage2D displayable = geophysics(false);
@@ -716,7 +716,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * {inheritDoc}
      */
-    //@Override
+    @Override
     public void show(final String title) {
         show(title, gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
     }
@@ -1178,7 +1178,7 @@ testLinear: for (int i=0; i<numBands; i++) {
      *
      * @since 2.4
      */
-    //@Override
+    @Override
     public synchronized boolean dispose(final boolean force) {
         if (disposed) {
             // Recursive invocation of this method.

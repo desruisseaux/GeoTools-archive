@@ -38,8 +38,7 @@ import javax.media.jai.WarpPolynomial;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.referencing.operation.transform.AffineTransform2D;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -119,7 +118,7 @@ public final class WarpTransformTest extends TestCase {
          * Checks Warp properties.
          */
         final Warp warp = transform.getWarp();
-        assertTrue("Expected a polynomial warp but got "+Utilities.getShortClassName(warp),
+        assertTrue("Expected a polynomial warp but got " + Classes.getShortClassName(warp),
                    warp instanceof WarpPolynomial);
         final WarpPolynomial poly = (WarpPolynomial) warp;
         /*
@@ -182,7 +181,7 @@ public final class WarpTransformTest extends TestCase {
                     point.y *= scaleY;
                 }
             }, 1, 1E-5f);
-            assertTrue("Expected an affine warp but got "+Utilities.getShortClassName(warp),
+            assertTrue("Expected an affine warp but got " + Classes.getShortClassName(warp),
                        warp instanceof WarpAffine);
         }
     }
@@ -205,7 +204,7 @@ public final class WarpTransformTest extends TestCase {
                     point.y *= scaleY;
                 }
             }, 2, 1E-2f);
-            assertTrue("Expected a quatratic warp but got "+Utilities.getShortClassName(warp),
+            assertTrue("Expected a quatratic warp but got " + Classes.getShortClassName(warp),
                        warp instanceof WarpQuadratic);
         }
     }

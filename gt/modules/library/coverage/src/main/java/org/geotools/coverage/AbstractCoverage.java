@@ -96,7 +96,7 @@ import org.geotools.util.SimpleInternationalString;
 
 // Resources
 import org.geotools.io.LineWriter;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -492,15 +492,14 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * Returns a localized error message for the specified array.
      */
     private static String formatErrorMessage(final Object array) {
-        String text = "<null>";
+        Class<?> type = null;
         if (array != null) {
-            Class type = array.getClass();
+            type = array.getClass();
             if (type.isArray()) {
                 type = type.getComponentType();
             }
-            text = Utilities.getShortName(type);
         }
-        return Errors.format(ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, text);
+        return Errors.format(ErrorKeys.CANT_CONVERT_FROM_TYPE_$1, type);
     }
 
     /**
@@ -1294,10 +1293,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * Returns a string representation of this coverage. This string is for
      * debugging purpose only and may change in future version.
      */
-    //@Override
+    @Override
     public String toString() {
         final StringWriter buffer = new StringWriter();
-        buffer.write(Utilities.getShortClassName(this));
+        buffer.write(Classes.getShortClassName(this));
         buffer.write("[\"");
         buffer.write(String.valueOf(getName()));
         buffer.write('"');
@@ -1308,7 +1307,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         }
         if (crs != null) {
             buffer.write(", ");
-            buffer.write(Utilities.getShortClassName(crs));
+            buffer.write(Classes.getShortClassName(crs));
             buffer.write("[\"");
             buffer.write(crs.getName().getCode());
             buffer.write("\"]");

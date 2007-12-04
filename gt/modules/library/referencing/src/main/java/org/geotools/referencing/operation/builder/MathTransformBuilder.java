@@ -48,7 +48,6 @@ import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.geotools.factory.Hints;
 import org.geotools.io.TableWriter;
 import org.geotools.math.Statistics;
-import org.geotools.resources.XMath;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -65,7 +64,7 @@ import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -171,7 +170,7 @@ public abstract class MathTransformBuilder {
      * be created by this builder.
      */
     public String getName() {
-        return Utilities.getShortClassName(this) + " fit";
+        return Classes.getShortClassName(this) + " fit";
     }
 
     /**

@@ -498,7 +498,7 @@ public class Arguments {
      * @since 2.3
      */
     public void printSummary(final Exception exception) {
-        final String type = Utilities.getShortClassName(exception);
+        final String type = Classes.getShortClassName(exception);
         String message = exception.getLocalizedMessage();
         if (message == null) {
             message = Vocabulary.format(VocabularyKeys.NO_DETAILS_$1, type);

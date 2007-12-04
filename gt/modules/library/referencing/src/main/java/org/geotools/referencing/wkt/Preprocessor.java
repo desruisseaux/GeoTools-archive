@@ -42,7 +42,7 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.Console;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -215,11 +215,11 @@ public class Preprocessor extends Format {
             if (type.isAssignableFrom(actualType)) {
                 return value;
             }
-            throw new FactoryException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                      Utilities.getShortName(actualType), Utilities.getShortName(type)));
+            throw new FactoryException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, actualType, type));
         }
-        throw new NoSuchIdentifierException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$2,
-                  Utilities.getShortName(type), text), text);
+        throw new NoSuchIdentifierException(Errors.format(
+                ErrorKeys.NO_SUCH_AUTHORITY_CODE_$2, type, text), text);
     }
 
     /**
@@ -399,7 +399,7 @@ public class Preprocessor extends Format {
             final Object   object = ((Definition) entry.getValue()).asObject;
             table.write(String.valueOf(entry.getKey()));
             table.nextColumn();
-            table.write(Utilities.getShortClassName(object));
+            table.write(Classes.getShortClassName(object));
             table.nextColumn();
             if (object instanceof IdentifiedObject) {
                 table.write(((IdentifiedObject) object).getName().getCode());

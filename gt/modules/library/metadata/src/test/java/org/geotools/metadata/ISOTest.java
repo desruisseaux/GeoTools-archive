@@ -33,7 +33,7 @@ import org.opengis.metadata.maintenance.ScopeDescription;
 import org.opengis.metadata.identification.AggregateInformation;
 import org.opengis.metadata.identification.RepresentativeFraction;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.util.CheckedCollection;
 import org.geotools.metadata.iso.MetaDataImpl;
 
@@ -258,7 +258,7 @@ public class ISOTest extends TestCase {
              * Iterates over all properties defined in the interface,
              * and checks for the existences of a setter method.
              */
-            final String classname = Utilities.getShortName(accessor.type) + '.';
+            final String classname = Classes.getShortName(accessor.type) + '.';
             final int count = accessor.count();
             for (int i=0; i<count; i++) {
                 final String name = accessor.name(i);

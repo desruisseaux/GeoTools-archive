@@ -24,7 +24,7 @@ import java.text.NumberFormat;
 import java.io.Serializable;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -578,8 +578,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @return a {@code String} representing this {@code Rectangle2D}.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuffer buffer = new StringBuffer(Classes.getShortClassName(this));
         final NumberFormat format = NumberFormat.getNumberInstance();
         final FieldPosition dummy = new FieldPosition(0);
         buffer.append("[xmin="); format.format(xmin, buffer, dummy);

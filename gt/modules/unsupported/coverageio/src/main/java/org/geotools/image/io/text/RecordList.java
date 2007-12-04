@@ -19,7 +19,7 @@ package org.geotools.image.io.text;
 import java.util.Arrays;
 import javax.imageio.IIOException;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -339,7 +339,7 @@ final class RecordList {
      */
     @Override
     public String toString() {
-        return Utilities.getShortClassName(this) +
+        return Classes.getShortClassName(this) +
                 '[' + getLineCount() + "\u00A0\u00D7\u00A0" + getColumnCount() + ']';
     }
 }

@@ -18,7 +18,6 @@ package org.geotools.util;
 import java.util.LinkedHashMap;
 
 import org.opengis.util.Cloneable;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -86,8 +85,8 @@ public class CheckedHashMap<K,V> extends LinkedHashMap<K,V> implements Cloneable
             throws IllegalArgumentException
     {
         if (element!=null && !type.isInstance(element)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                      Utilities.getShortClassName(element), Utilities.getShortName(type)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, element.getClass(), type));
         }
     }
 

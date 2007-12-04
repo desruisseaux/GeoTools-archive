@@ -25,7 +25,7 @@ import javax.media.jai.OperationDescriptorImpl;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -76,6 +76,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
      * @param param The parameter block for the operation to performs.
      * @param message A buffer for formatting an error message if any.
      */
+    @Override
     protected boolean validateSources(final String      modeName,
                                       final ParameterBlock param,
                                       final StringBuffer message)
@@ -85,7 +86,7 @@ public class CombineDescriptor extends OperationDescriptorImpl {
                 final Object source = param.getSource(i);
                 if (!(source instanceof RenderedImage)) {
                     message.append(Errors.format(ErrorKeys.BAD_PARAMETER_TYPE_$2,
-                                   "source"+i, Utilities.getShortClassName(source)));
+                                   "source"+i, Classes.getClass(source)));
                     return false;
                 }
             }

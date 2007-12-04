@@ -24,7 +24,7 @@ import org.opengis.metadata.Identifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;  // For javadoc
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -167,6 +167,6 @@ public final class NameFactory {
             return names;
         }
         // TODO: localize
-        throw new ClassCastException("Cannot convert "+Utilities.getShortClassName(value)+ " to GenericName[]");
+        throw new ClassCastException("Cannot convert " + Classes.getShortClassName(value) + " to GenericName[]");
     }
 }

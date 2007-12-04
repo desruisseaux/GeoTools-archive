@@ -39,6 +39,7 @@ import org.opengis.util.CodeList;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.measure.Units;
 
 
@@ -182,8 +183,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String error;
         if (!descriptor.getValueClass().isAssignableFrom(value.getClass())) {
-            error = Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
-                    Utilities.getShortClassName(value));
+            error = Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1, Classes.getClass(value));
         } else {
             final Comparable minimum = descriptor.getMinimumValue();
             final Comparable maximum = descriptor.getMaximumValue();
@@ -208,7 +208,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     private String getClassTypeError() {
         return Errors.format(ErrorKeys.ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
-               Utilities.getShortName(((ParameterDescriptor)descriptor).getValueClass()));
+               ((ParameterDescriptor) descriptor).getValueClass());
     }
 
     /**

@@ -17,6 +17,8 @@
 package org.geotools.resources;
 
 import java.util.Date;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -271,7 +273,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
         if (Byte     .class.equals(c)) return Byte     .TYPE;
         if (Boolean  .class.equals(c)) return Boolean  .TYPE;
         if (Character.class.equals(c)) return Character.TYPE;
-        throw new IllegalArgumentException(Utilities.getShortName(c));
+        throw unknownType(c);
     }
 
     /**
@@ -291,7 +293,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
         if (Byte     .TYPE.equals(c)) return Byte     .class;
         if (Boolean  .TYPE.equals(c)) return Boolean  .class;
         if (Character.TYPE.equals(c)) return Character.class;
-        throw new IllegalArgumentException(Utilities.getShortName(c));
+        throw unknownType(c);
     }
 
     /**
@@ -309,7 +311,7 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
         if (Long   .class.equals(c)) return (N) Long   .valueOf(n.  longValue());
         if (Float  .class.equals(c)) return (N) Float  .valueOf(n. floatValue());
         if (Double .class.equals(c)) return (N) Double .valueOf(n.doubleValue());
-        throw new IllegalArgumentException(Utilities.getShortName(c));
+        throw unknownType(c);
     }
 
     /**
@@ -375,6 +377,13 @@ public abstract class ClassChanger<S extends Comparable<S>, T extends Number> {
                 return i;
             }
         }
-        throw new IllegalArgumentException(Utilities.getShortName(c));
+        throw unknownType(c);
+    }
+
+    /**
+     * Returns an exception for an unnkown type.
+     */
+    private static IllegalArgumentException unknownType(final Class<?> type) {
+        return new IllegalArgumentException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
     }
 }

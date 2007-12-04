@@ -39,6 +39,7 @@ import org.geotools.referencing.operation.matrix.Matrix3;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -288,7 +289,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                 }
             }
         }
-        return Utilities.getShortClassName(transform);
+        return Classes.getShortClassName(transform);
     }
     
     /**

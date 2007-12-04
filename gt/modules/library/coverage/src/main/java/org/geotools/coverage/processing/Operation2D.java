@@ -34,7 +34,7 @@ import org.geotools.coverage.grid.ViewType;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -153,8 +153,7 @@ public abstract class Operation2D extends AbstractOperation {
             Object candidate = parameters.parameter(sourceNames[i]).getValue();
             if (!(candidate instanceof GridCoverage2D)) {
                 throw new InvalidParameterValueException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                        Utilities.getShortClassName(candidate),
-                        Utilities.getShortName(GridCoverage2D.class)), sourceNames[i], candidate);
+                        Classes.getClass(candidate), GridCoverage2D.class), sourceNames[i], candidate);
             }
             GridCoverage2D source = (GridCoverage2D) candidate;
             if (computeOnGeophysicsValues) {

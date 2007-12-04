@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.logging.Logger;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -34,7 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -165,7 +164,7 @@ public class GridCoverageTest extends TestCase {
          */
         assertSame(coverage.getRenderedImage(), coverage.getRenderableImage(0,1).createDefaultRendering());
         if (!coverage.getCoordinateReferenceSystem().equals(crs)) {
-            assertEquals("Resampler2D", Utilities.getShortClassName(coverage));
+            assertEquals("Resampler2D", Classes.getShortClassName(coverage));
         }
         /*
          * Tests the creation of a "geophysics" view. This test make sure that the

@@ -19,6 +19,7 @@ package org.geotools.util;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 
 
@@ -110,6 +111,6 @@ public class MapEntry<K,V> implements Map.Entry<K,V>, Serializable {
      */
     @Override
     public String toString() {
-        return Utilities.getShortClassName(this) + "[key=" + key + ", value=" + value + ']';
+        return Classes.getShortClassName(this) + "[key=" + key + ", value=" + value + ']';
     }
 }

@@ -128,7 +128,7 @@ public final class ResampleTest extends GridCoverageTest {
      * Applies an operation on the specified coverage.
      * This is invoked before to run the tests defined in the super-class.
      */
-    //@Override
+    @Override
     protected GridCoverage2D transform(final GridCoverage2D coverage) {
         return (GridCoverage2D) Operations.DEFAULT.resample(coverage, getProjectedCRS(coverage));
     }

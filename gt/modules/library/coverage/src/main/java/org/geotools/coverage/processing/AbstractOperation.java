@@ -32,6 +32,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -206,6 +207,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
     /**
      * Compares the specified object with this operation for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final AbstractOperation that = (AbstractOperation) object;
@@ -218,7 +220,8 @@ public abstract class AbstractOperation implements Operation, Serializable {
      * Returns a string représentation of this operation. The returned string is
      * implementation dependent. It is usually provided for debugging purposes only.
      */
+    @Override
     public String toString() {
-        return Utilities.getShortClassName(this) + '[' + getName() + ']';
+        return Classes.getShortClassName(this) + '[' + getName() + ']';
     }
 }

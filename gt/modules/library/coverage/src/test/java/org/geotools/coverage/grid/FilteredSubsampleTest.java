@@ -92,7 +92,7 @@ public class FilteredSubsampleTest extends GridCoverageTest {
     /**
      * Set up common objects used for all tests.
      */
-    //@Override
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         originallyIndexedCoverage       = GridCoverageExamples.getExample(0);

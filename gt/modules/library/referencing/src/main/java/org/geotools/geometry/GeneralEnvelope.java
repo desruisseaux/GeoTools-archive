@@ -35,6 +35,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 
 import org.geotools.referencing.CRS;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -260,7 +261,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
             transformed = CRS.transform(gridToCRS, this);
         } catch (TransformException exception) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
-                        Utilities.getShortClassName(gridToCRS)), exception);
+                    Classes.getClass(gridToCRS)), exception);
         }
         assert transformed.ordinates.length == this.ordinates.length;
         System.arraycopy(transformed.ordinates, 0, this.ordinates, 0, ordinates.length);

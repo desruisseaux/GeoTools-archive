@@ -37,7 +37,6 @@ import org.opengis.util.GenericName;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.Utilities;
 import org.geotools.util.NameFactory;
 
 
@@ -853,6 +852,6 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     {
         final InternationalString authority = getAuthority().getTitle();
         return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
-                   code, authority, Utilities.getShortName(type)), authority.toString(), code);
+                   code, authority, type), authority.toString(), code);
     }
 }

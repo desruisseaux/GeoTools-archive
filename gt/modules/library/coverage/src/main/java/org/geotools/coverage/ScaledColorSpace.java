@@ -16,11 +16,8 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.color.ColorSpace;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -129,6 +126,7 @@ final class ScaledColorSpace extends ColorSpace {
     /**
      * Retourne la valeur minimale autorisée.
      */
+    @Override
     public float getMinValue(final int component) {
         return MIN_VALUE*scale + offset;
     }
@@ -136,6 +134,7 @@ final class ScaledColorSpace extends ColorSpace {
     /**
      * Retourne la valeur maximale autorisée.
      */
+    @Override
     public float getMaxValue(final int component) {
         return MAX_VALUE*scale + offset;
     }
@@ -143,7 +142,8 @@ final class ScaledColorSpace extends ColorSpace {
     /**
      * Returns a string representation of this color model.
      */
+    @Override
     public String toString() {
-        return Utilities.getShortClassName(this)+'['+getMinValue(band)+", "+getMaxValue(band)+']';
+        return Classes.getShortClassName(this) + '[' + getMinValue(band) + ", " + getMaxValue(band) + ']';
     }
 }

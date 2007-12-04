@@ -18,7 +18,7 @@ package org.geotools.math;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -282,7 +282,7 @@ public class Polynom implements Serializable {
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         for (int i=0; i<c.length; i++) {
             if (i != 0) {

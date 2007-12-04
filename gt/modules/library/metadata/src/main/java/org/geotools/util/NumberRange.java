@@ -19,7 +19,6 @@ package org.geotools.util;
 import javax.media.jai.util.Range;
 
 import org.geotools.resources.ClassChanger;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -286,8 +285,8 @@ public class NumberRange extends Range {
         @SuppressWarnings("unchecked")
         final Class<? extends Number> type = range.getElementClass();
         if (!Number.class.isAssignableFrom(type)) {
-            throw new ClassCastException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                    Utilities.getShortName(type), Utilities.getShortName(Number.class)));
+            throw new ClassCastException(Errors.format(
+                    ErrorKeys.ILLEGAL_CLASS_$2, type, Number.class));
         }
         return type;
     }

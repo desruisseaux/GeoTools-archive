@@ -17,7 +17,7 @@
 package org.geotools.image.io;
 
 import java.awt.color.ColorSpace;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -142,7 +142,7 @@ final class ScaledColorSpace extends ColorSpace {
      */
     @Override
     public String toString() {
-        return Utilities.getShortClassName(this) +
+        return Classes.getShortClassName(this) +
                 '[' + getMinValue(visibleBand) + ", " + getMaxValue(visibleBand) + ']';
     }
 }

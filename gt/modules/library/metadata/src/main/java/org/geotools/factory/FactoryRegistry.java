@@ -23,6 +23,7 @@ import java.lang.ref.Reference;
 import java.awt.RenderingHints;
 import javax.imageio.spi.ServiceRegistry;
 
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -344,7 +345,7 @@ public class FactoryRegistry extends ServiceRegistry {
             debug("THROW", category, key, "could not find implementation.", null);
         }
         throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
-                  Utilities.getShortName(implementation!=null ? implementation : category)));
+                  implementation!=null ? implementation : category));
     }
 
     /**
@@ -365,7 +366,7 @@ public class FactoryRegistry extends ServiceRegistry {
     {
         final StringBuilder buffer = new StringBuilder(status);
         buffer.append(Utilities.spaces(Math.max(1, 7-status.length())))
-              .append('(').append(Utilities.getShortName(category));
+              .append('(').append(Classes.getShortName(category));
         if (key != null) {
             buffer.append(", ").append(key);
         }
@@ -374,7 +375,7 @@ public class FactoryRegistry extends ServiceRegistry {
             buffer.append(": ").append(message);
         }
         if (type != null) {
-            buffer.append(' ').append(Utilities.getShortName(type)).append('.');
+            buffer.append(' ').append(Classes.getShortName(type)).append('.');
         }
         final LogRecord record = new LogRecord(DEBUG_LEVEL, buffer.toString());
         record.setSourceClassName(FactoryRegistry.class.getName());
@@ -805,7 +806,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
                 throw error;
             } catch (Error error) {
-                if (!Utilities.getShortClassName(error).equals("ServiceConfigurationError")) {
+                if (!Classes.getShortClassName(error).equals("ServiceConfigurationError")) {
                     // We want to handle sun.misc.ServiceConfigurationError only. Unfortunatly, we
                     // need to rely on reflection because this error class is not a commited API.
                     // TODO: Check if the error is catchable with JSE 6.
@@ -911,8 +912,8 @@ public class FactoryRegistry extends ServiceRegistry {
     private static void loadingFailure(final Class<?> category, final Throwable error,
                                        final boolean showStackTrace)
     {
-        final String         name = Utilities.getShortName(category);
-        final StringBuilder cause = new StringBuilder(Utilities.getShortClassName(error));
+        final String         name = Classes.getShortName(category);
+        final StringBuilder cause = new StringBuilder(Classes.getShortClassName(error));
         final String      message = error.getLocalizedMessage();
         if (message != null) {
             cause.append(": ");
@@ -933,7 +934,7 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     private static StringBuilder getLogHeader(final Class<?> category) {
         return new StringBuilder(Logging.getResources(null).getString(
-                LoggingKeys.FACTORY_IMPLEMENTATIONS_$1, Utilities.getShortName(category)));
+                LoggingKeys.FACTORY_IMPLEMENTATIONS_$1, category));
     }
 
     /**

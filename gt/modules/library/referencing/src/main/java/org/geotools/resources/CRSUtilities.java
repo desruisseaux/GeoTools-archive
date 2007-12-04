@@ -355,7 +355,7 @@ public final class CRSUtilities {
      */
     public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
         Exception exception;
-        StringBuffer buffer = new StringBuffer();
+        final StringBuffer buffer = new StringBuffer();
         try {
             crs = getCRS2D(crs);
             if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
@@ -364,21 +364,20 @@ public final class CRSUtilities {
                 bounds = CRS.transform(op, bounds, null);
             }
             final AngleFormat fmt = new AngleFormat("DD°MM.m'");
-            buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
-            buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
-            buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');
-            buffer = fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
+            fmt.format(new  Latitude(bounds.getMinY()), buffer, null).append('-');
+            fmt.format(new  Latitude(bounds.getMaxY()), buffer, null).append(' ');
+            fmt.format(new Longitude(bounds.getMinX()), buffer, null).append('-');
+            fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
             return buffer.toString();
         } catch (TransformException e) {
             exception = e;
         } catch (FactoryException e) {
             exception = e;
         }
-        buffer.append(Utilities.getShortClassName(exception));
+        buffer.append(Classes.getShortClassName(exception));
         final String message = exception.getLocalizedMessage();
         if (message != null) {
-            buffer.append(": ");
-            buffer.append(message);
+            buffer.append(": ").append(message);
         }
         return buffer.toString();
     }

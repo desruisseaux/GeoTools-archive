@@ -35,7 +35,6 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.InternationalString;
 
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -114,8 +113,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         ensureNonNull("type", type);
         ensureNonNull("factories", factories);
         if (factories.isEmpty()) {
-            throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
-                    Utilities.getShortName(type)));
+            throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1, type));
         }
         return type.cast(create(false, interfaceMask(type), factories.iterator()));
     }
@@ -138,8 +136,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     {
         ensureNonNull("factories", factories);
         if (factories.isEmpty()) {
-            throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
-                    Utilities.getShortName(AuthorityFactory.class)));
+            throw new FactoryNotFoundException(Errors.format(
+                    ErrorKeys.FACTORY_NOT_FOUND_$1, AuthorityFactory.class));
         }
         return create(false, interfaceMask(factories), factories.iterator());
     }

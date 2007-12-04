@@ -441,7 +441,7 @@ public class TextMatrixImageReader extends TextImageReader {
          * columns. This is an arbitrary choice, which is why this method is not public. It may
          * be changed in any future Geotools version.
          */
-        //@Override
+        @Override
         boolean isValidColumnCount(final int count) {
             return count > 10;
         }

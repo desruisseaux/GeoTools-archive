@@ -119,7 +119,7 @@ public class DirectPosition1D extends AbstractDirectPosition implements Serializ
      *
      * @return The coordinates.
      */
-    //@Override
+    @Override
     public double[] getCoordinates() {
         return new double[] {ordinate};
     }

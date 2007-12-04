@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -281,8 +280,8 @@ public class FactoryCreator extends FactoryRegistry {
                 throw (FactoryRegistryException) cause;
             }
         }
-        throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
-                                           Utilities.getShortName(implementation)), cause);
+        throw new FactoryRegistryException(Errors.format(
+                ErrorKeys.CANT_CREATE_FACTORY_$1, implementation), cause);
     }
 
     /**

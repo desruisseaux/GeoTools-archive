@@ -24,9 +24,8 @@ import java.text.ParsePosition;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -257,8 +256,8 @@ public class LoggedFormat<T> extends Format {
      */
     @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this))
-                .append('[').append(Utilities.getShortClassName(format));
+        final StringBuffer buffer = new StringBuffer(Classes.getShortClassName(this))
+                .append('[').append(Classes.getShortClassName(format));
         if (logger != null) {
             buffer.append(", logger=").append(logger);
         }

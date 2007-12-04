@@ -77,7 +77,7 @@ final class NullImageReader extends GeographicImageReader {
     /**
      * Returns the metadata specified at construction time.
      */
-    //@Override
+    @Override
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         final GeographicMetadata metadata = new GeographicMetadata(this);
         final Band band = metadata.addBand("Dummy");
@@ -89,7 +89,7 @@ final class NullImageReader extends GeographicImageReader {
     /**
      * Returns the data type specified at construction time.
      */
-    //@Override
+    @Override
     protected int getRawDataType(final int imageIndex) throws IOException {
         super.getRawDataType(imageIndex);
         return dataType;

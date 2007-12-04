@@ -1145,7 +1145,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * @return {@code true} if the primary name of at least one alias
      *         matches the specified {@code name}.
      */
-    //@Override
+    @Override
     public boolean nameMatches(final String name) {
         if (super.nameMatches(name)) {
             return true;

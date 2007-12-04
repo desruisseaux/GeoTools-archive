@@ -427,7 +427,7 @@ public class IdentifiedObjectFinder {
     /**
      * Returns a string representation of this finder, for debugging purpose only.
      */
-    //@Override
+    @Override
     public String toString() {
         return getProxy().toString(IdentifiedObjectFinder.class);
     }
@@ -470,7 +470,7 @@ public class IdentifiedObjectFinder {
         /**
          * Set whatever an exhaustive scan against all registered objects is allowed.
          */
-        //@Override
+        @Override
         public void setFullScanAllowed(final boolean fullScan) {
             finder.setFullScanAllowed(fullScan);
             super .setFullScanAllowed(fullScan);
@@ -480,7 +480,7 @@ public class IdentifiedObjectFinder {
          * Returns a set of authority codes that <strong>may</strong> identify the same object
          * than the specified one. The default implementation delegates to the backing finder.
          */
-        //@Override
+        @Override
         protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object) throws FactoryException {
             return finder.getCodeCandidates(object);
         }
@@ -490,7 +490,7 @@ public class IdentifiedObjectFinder {
          * {@linkplain CRS#equalsIgnoreMetadata equals ignoring metadata} to the specified
          * model. The default implementation delegates to the backing finder.
          */
-        //@Override
+        @Override
         protected IdentifiedObject deriveEquivalent(final IdentifiedObject candidate,
                                                     final IdentifiedObject model)
                 throws FactoryException

@@ -17,7 +17,7 @@
 package org.geotools.image.io;
 
 import org.geotools.resources.XMath;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -167,7 +167,7 @@ public abstract class SampleConverter {
      */
     @Override
     public String toString() {
-        return Utilities.getShortClassName(this) + "[offset=" + getOffset() + ']';
+        return Classes.getShortClassName(this) + "[offset=" + getOffset() + ']';
     }
 
     /**

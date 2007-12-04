@@ -51,7 +51,7 @@ import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -944,8 +944,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      */
     private FactoryException missingFactory(final Class category, final String code) {
         return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
-                Utilities.getShortName(category)),
-                Citations.getIdentifier(getAuthority()), trimAuthority(code));
+                category), Citations.getIdentifier(getAuthority()), trimAuthority(code));
     }
 
     /**
@@ -994,8 +993,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
             f = getCoordinateOperationAuthorityFactory(code);
         } else {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type",
-                    Utilities.getShortClassName(type)));
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
         }
         return type.cast(f);
     }

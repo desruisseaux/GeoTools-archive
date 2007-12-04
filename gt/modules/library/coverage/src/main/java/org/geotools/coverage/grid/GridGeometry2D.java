@@ -46,7 +46,7 @@ import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -389,11 +389,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
         } else try {
             return (MathTransform2D) gridToCRS2D.inverse();
         } catch (NoninvertibleTransformException exception) {
-            final IllegalArgumentException e;
-            e = new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
-                                             Utilities.getShortClassName(gridToCRS2D)));
-            e.initCause(exception); // TODO: move into contructor call with J2SE 1.5.
-            throw e;
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
+                    Classes.getClass(gridToCRS2D)), exception);
         }
     }
 

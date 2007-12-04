@@ -235,48 +235,14 @@ public final class Utilities {
      * <blockquote><code>
      * if (sameInterfaces(cs1, cs2, {@linkplain org.opengis.referencing.cs.CoordinateSystem}.class))
      * </code></blockquote>
+     *
+     * @deprecated Moved to {@link Classes}.
      */
     public static <T> boolean sameInterfaces(final Class<? extends T> object1,
                                              final Class<? extends T> object2,
                                              final Class<T> base)
     {
-        if (object1 == object2) {
-            return true;
-        }
-        if (object1==null || object2==null) {
-            return false;
-        }
-        final Class<?>[] c1 = object1.getInterfaces();
-        final Class<?>[] c2 = object2.getInterfaces();
-        /*
-         * Trim all interfaces that are not assignable to 'base' in the 'c2' array.
-         * Doing this once will avoid to redo the same test many time in the inner
-         * loops j=[0..n].
-         */
-        int n = 0;
-        for (int i=0; i<c2.length; i++) {
-            final Class<?> c = c2[i];
-            if (base.isAssignableFrom(c)) {
-                c2[n++] = c;
-            }
-        }
-        /*
-         * For each interface assignable to 'base' in the 'c1' array, check if
-         * this interface exists also in the 'c2' array. Order doesn't matter.
-         */
-compare:for (int i=0; i<c1.length; i++) {
-            final Class<?> c = c1[i];
-            if (base.isAssignableFrom(c)) {
-                for (int j=0; j<n; j++) {
-                    if (c.equals(c2[j])) {
-                        System.arraycopy(c2, j+1, c2, j, --n-j);
-                        continue compare;
-                    }
-                }
-                return false; // Interface not found in 'c2'.
-            }
-        }
-        return n==0; // If n>0, at least one interface was not found in 'c1'.
+        return Classes.sameInterfaces(object1, object2, base);
     }
 
     /**
@@ -319,21 +285,11 @@ compare:for (int i=0; i<c1.length; i++) {
      *
      * @param  classe The object class (may be {@code null}).
      * @return A short class name for the specified object.
+     *
+     * @deprecated Moved to {@link Classes}.
      */
     public static String getShortName(Class<?> classe) {
-        if (classe == null) {
-            return "<*>";
-        }
-        String name = classe.getSimpleName();
-        Class<?> enclosing = classe.getEnclosingClass();
-        if (enclosing != null) {
-            final StringBuilder buffer = new StringBuilder();
-            do {
-                buffer.insert(0, '.').insert(0, enclosing.getSimpleName());
-            } while ((enclosing = enclosing.getEnclosingClass()) != null);
-            name = buffer.append(name).toString();
-        }
-        return name;
+        return Classes.getShortName(classe);
     }
 
     /**
@@ -343,9 +299,11 @@ compare:for (int i=0; i<c1.length; i++) {
      *
      * @param  object The object (may be {@code null}).
      * @return A short class name for the specified object.
+     *
+     * @deprecated Moved to {@link Classes}.
      */
     public static String getShortClassName(final Object object) {
-        return getShortName(object!=null ? object.getClass() : null);
+        return Classes.getShortClassName(object);
     }
 
     /**
@@ -376,7 +334,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * Returns a log record for the specified exception.
      */
     public static LogRecord getLogRecord(final Throwable error) {
-        final StringBuilder buffer = new StringBuilder(getShortClassName(error));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(error));
         final String message = error.getLocalizedMessage();
         if (message != null) {
             buffer.append(": ");

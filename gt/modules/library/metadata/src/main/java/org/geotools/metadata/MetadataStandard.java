@@ -238,7 +238,7 @@ public final class MetadataStandard {
         if (!accessor.type.isInstance(source)) {
             ensureNonNull("source", source);
             throw new ClassCastException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
-                    source.getClass().getName(), accessor.type.getName()));
+                    source.getClass(), accessor.type));
         }
         if (!accessor.shallowCopy(source, target, skipNulls)) {
             throw new UnmodifiableMetadataException(Errors.format(ErrorKeys.UNMODIFIABLE_METADATA));

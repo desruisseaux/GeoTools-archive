@@ -76,7 +76,7 @@ public class ColorMapTest extends TestCase {
     /**
      * Creates a sample dimension and a color map for testing purpose.
      */
-    //@Override
+    @Override
     public void setUp() {
         band = new GridSampleDimension("Temperature", new Category[] {
             new Category("Sea",         Color.BLUE,  2),

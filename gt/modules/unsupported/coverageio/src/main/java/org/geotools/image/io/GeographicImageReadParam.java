@@ -20,7 +20,7 @@ import java.util.Locale;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.IndexedResourceBundle;
@@ -144,7 +144,7 @@ public class GeographicImageReadParam extends ImageReadParam {
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         if (sourceRegion != null) {
             buffer.append("sourceRegion=(").

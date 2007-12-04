@@ -37,6 +37,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -498,10 +499,8 @@ public class Category implements Serializable {
         } catch (TransformException exception) {
             cause = exception;
         }
-        IllegalArgumentException exception = new IllegalArgumentException(Errors.format(
-            ErrorKeys.BAD_TRANSFORM_$1, Utilities.getShortClassName(sampleToGeophysics)));
-        exception.initCause(cause);
-        throw exception;
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
+                Classes.getClass(sampleToGeophysics)), cause);
     }
 
     /**
@@ -864,29 +863,21 @@ public class Category implements Serializable {
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
-        buffer.append("(\"");
-        buffer.append(name);
-        buffer.append("\":[");
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
+        buffer.append("(\"").append(name).append("\":[");
         if (Double.isNaN(minimum) && Double.isNaN(maximum)) {
-            buffer.append("NaN(");
-            buffer.append(Math.round(inverse.minimum));
-            buffer.append("...");
-            buffer.append(Math.round(inverse.maximum));
-            buffer.append(')');
+            buffer.append("NaN(").append(Math.round(inverse.minimum))
+                  .append("...") .append(Math.round(inverse.maximum)).append(')');
         } else {
             if (XMath.isInteger(getRange().getElementClass())) {
-                buffer.append(Math.round(minimum));
-                buffer.append("...");
-                buffer.append(Math.round(maximum)); // Inclusive
+                buffer.append(Math.round(minimum)).append("...")
+                      .append(Math.round(maximum)); // Inclusive
             } else {
-                buffer.append(minimum);
-                buffer.append(" ... ");
-                buffer.append(maximum); // Inclusive
+                buffer.append(minimum).append(" ... ")
+                      .append(maximum); // Inclusive
             }
         }
-        buffer.append("])");
-        return buffer.toString();
+        return buffer.append("])").toString();
     }
 
     /**

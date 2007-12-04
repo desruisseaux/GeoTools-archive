@@ -25,6 +25,7 @@ import org.opengis.util.Cloneable;
 import org.opengis.referencing.operation.MathTransform1D;
 
 import org.geotools.util.NumberRange;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 
 
@@ -211,7 +212,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         if (range != null) {
             buffer.append(range);

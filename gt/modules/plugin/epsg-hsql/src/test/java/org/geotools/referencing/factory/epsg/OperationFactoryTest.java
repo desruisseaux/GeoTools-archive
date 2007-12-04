@@ -23,7 +23,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -40,7 +39,7 @@ import org.geotools.referencing.operation.AuthorityBackedFactory;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -134,7 +133,7 @@ public class OperationFactoryTest extends TestCase {
                 count++;
             } else {
                 assertTrue("Expected Conversion but got " +
-                           Utilities.getShortName(AbstractCoordinateOperation.getType(op)) + ". ",
+                           Classes.getShortName(AbstractCoordinateOperation.getType(op)) + ". ",
                            (op instanceof Conversion));
             }
         }
