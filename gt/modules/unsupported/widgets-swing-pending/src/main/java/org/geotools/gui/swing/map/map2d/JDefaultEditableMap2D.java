@@ -53,7 +53,6 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.EDIT_STATE;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;

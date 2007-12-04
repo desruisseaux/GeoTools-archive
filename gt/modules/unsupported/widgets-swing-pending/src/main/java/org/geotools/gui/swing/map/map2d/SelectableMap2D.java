@@ -16,6 +16,7 @@
 
 package org.geotools.gui.swing.map.map2d;
 
+import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
 import org.geotools.map.MapLayer;
 
 /**
@@ -35,5 +36,11 @@ public interface SelectableMap2D extends NavigableMap2D{
     
 //    public void setSelection(FeatureCollection selection);
 //    public FeatureCollection getSelection();
+    
+    
+    public void addSelectableMap2DListener(SelectableMap2DListener listener);
+    public void removeSelectableMap2DListener(SelectableMap2DListener listener);
+    public SelectableMap2DListener[] getSelectableMap2DListeners();
+    
       
 }

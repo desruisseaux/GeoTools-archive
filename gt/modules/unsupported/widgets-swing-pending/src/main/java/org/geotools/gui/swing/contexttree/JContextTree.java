@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.contexttree.column.OpacityTreeTableColumn;
+import org.geotools.gui.swing.contexttree.column.SelectionTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.StyleTreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.column.VisibleTreeTableColumn;
@@ -39,6 +40,7 @@ import org.geotools.gui.swing.contexttree.popup.LayerZoomItem;
 import org.geotools.gui.swing.contexttree.popup.PasteItem;
 import org.geotools.gui.swing.contexttree.popup.SeparatorItem;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.geotools.gui.swing.map.map2d.SelectableMap2D;
 import org.geotools.map.MapContext;
 
 /**
@@ -88,7 +90,10 @@ public class JContextTree extends JComponent{
         tree.addColumn(new OpacityTreeTableColumn());
         tree.addColumn(new StyleTreeTableColumn());
         
-        
+        if(map instanceof SelectableMap2D){
+            tree.addColumn(new SelectionTreeTableColumn( (SelectableMap2D)map));
+        }
+                
         
         JContextTreePopup popup = tree.getPopupMenu();        
                 

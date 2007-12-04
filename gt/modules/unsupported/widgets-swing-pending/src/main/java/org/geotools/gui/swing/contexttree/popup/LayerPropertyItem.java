@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.contexttree.popup;
 
 import java.awt.Component;
@@ -33,52 +32,49 @@ import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
 
-
 /**
  * @author johann sorel
  * Default popup control for property page of MapLayer, use for JContextTreePopup
  */
-public class LayerPropertyItem extends JMenuItem implements TreePopupItem{
-    
+public class LayerPropertyItem extends JMenuItem implements TreePopupItem {
+
     private MapLayer layer;
     private List<PropertyPanel> lst = new ArrayList<PropertyPanel>();
-    
+
     /** 
      * Creates a new instance of DefaultContextPropertyPop 
      */
     public LayerPropertyItem() {
-        super( TextBundle.getResource().getString("properties")  );
+        super(TextBundle.getResource().getString("properties"));
         init();
     }
-            
+
     /**
      * set the list of PropertyPanel to use
      * @param liste
      */
-    public void setPropertyPanels(List<PropertyPanel> liste){
+    public void setPropertyPanels(List<PropertyPanel> liste) {
         lst.clear();
         lst.addAll(liste);
     }
-    
-    private void init(){
+
+    private void init() {
         lst.add(new LayerFilterPropertyPanel());
-                lst.add(new LayerStylePropertyPanel());
-                lst.add(new LayerFeaturePropertyPanel());
-        
+        lst.add(new LayerStylePropertyPanel());
+
         addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                                
+
                 JPropertyDialog.showDialog(lst, layer);
-                
+
             }
-        }
-        );
+        });
     }
-    
-   
+
     public boolean isValid(SelectionData[] selection) {
         if (selection.length == 1) {
-            return (selection[0].layer != null) ;
+            return (selection[0].layer != null);
         }
         return false;
     }
@@ -87,5 +83,4 @@ public class LayerPropertyItem extends JMenuItem implements TreePopupItem{
         layer = selection[0].layer;
         return this;
     }
-    
 }

@@ -241,9 +241,14 @@ public class DemoAll extends javax.swing.JFrame {
         pan_mappane = new javax.swing.JPanel();
         gui_map2dinfo = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
         jPanel4 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
         gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -321,6 +326,8 @@ public class DemoAll extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Swing Widgets Demo");
+        setIconImage(IconBundle.getResource().getIcon("about").getImage());
 
         jSplitPane1.setDividerLocation(300);
 
@@ -357,18 +364,61 @@ public class DemoAll extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jpanel8);
 
+        jTabbedPane1.addTab("ContextTree", tree);
+
+        jLabel2.setText("Not yet, but it's the next step after the map2D");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(35, 35, 35)
+                .add(jLabel2)
+                .addContainerGap(34, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(82, 82, 82)
+                .add(jLabel2)
+                .addContainerGap(408, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("ToolBox", jPanel1);
+
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
+
+        jButton1.setIcon(IconBundle.getResource().getIcon("16_new_context"));
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setIcon(IconBundle.getResource().getIcon("16_add_data"));
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
@@ -528,18 +578,26 @@ public class DemoAll extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jButton1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton2)
+                .add(16, 16, 16)
                 .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(350, Short.MAX_VALUE))
+                .addContainerGap(312, Short.MAX_VALUE))
             .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jButton1)
+                        .add(jButton2)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE))
         );
@@ -650,6 +708,44 @@ public class DemoAll extends javax.swing.JFrame {
         }
 }//GEN-LAST:event_gui_ChknavigationlayerActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        DefaultMapContext context;
+        context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        context.setTitle("Context " + nb);
+        tree.addContext(context);
+        nb++;
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        
+        if (tree.getActiveContext() != null) {
+            List<DataPanel> lst = new ArrayList<DataPanel>();
+
+            if (chk_file.isSelected()) {
+                lst.add(new JFileDataPanel());
+            }
+            if (chk_database.isSelected()) {
+                lst.add(new JDatabaseDataPanel());
+            }
+            if (chk_server.isSelected()) {
+                lst.add(new JServerDataPanel());
+            }
+
+            JDataChooser jdc = new JDataChooser(null,lst);
+            
+            JDataChooser.ACTION ret = jdc.showDialog();
+
+            if (ret == JDataChooser.ACTION.APPROVE) {
+                List<MapLayer> layers = jdc.getLayers();
+                for (MapLayer layer : layers) {
+                    tree.getActiveContext().addLayer(layer);
+                }
+            }
+
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -685,7 +781,10 @@ public class DemoAll extends javax.swing.JFrame {
     private org.geotools.gui.swing.map.map2d.control.JMap2DControlBar gui_map2dcontrol;
     private org.geotools.gui.swing.map.map2d.control.JMap2DEditBar gui_map2dedit;
     private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar gui_map2dinfo;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -700,6 +799,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
@@ -708,6 +808,7 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;

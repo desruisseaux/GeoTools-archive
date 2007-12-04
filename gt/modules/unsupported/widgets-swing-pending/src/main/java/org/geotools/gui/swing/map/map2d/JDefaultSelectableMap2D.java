@@ -40,6 +40,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeometryBuilder;
+import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
+import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
 import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
 import org.geotools.gui.swing.map.map2d.overLayer.SelectionOverLayer;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
@@ -235,6 +237,17 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             findFeature(geometry);
         }
     }
+    
+    private void fireSelectionChanged(Geometry geo) {
+        Map2DSelectionEvent mce = new Map2DSelectionEvent(this, geo);
+
+        SelectableMap2DListener[] lst = getSelectableMap2DListeners();
+
+        for (SelectableMap2DListener l : lst) {
+            l.mapSelectionChanged(mce);
+        }
+
+    }
 
     //-------------------MAP2D--------------------------------------------------
     @Override
@@ -357,6 +370,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             return;
         }
 
+        fireSelectionChanged(geometry);
+        
         try {
 
             for (MapLayer layer : selectionMapContext.getLayers()) {
@@ -383,6 +398,18 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return;
     }
 
+    public void addSelectableMap2DListener(SelectableMap2DListener listener) {
+        MAP2DLISTENERS.add(SelectableMap2DListener.class, listener);
+    }
+
+    public void removeSelectableMap2DListener(SelectableMap2DListener listener) {
+        MAP2DLISTENERS.remove(SelectableMap2DListener.class, listener);
+    }
+
+    public SelectableMap2DListener[] getSelectableMap2DListeners() {
+        return MAP2DLISTENERS.getListeners(SelectableMap2DListener.class);
+    }
+    
     //---------------------PRIVATE CLASSES--------------------------------------
     private class MouseListen implements MouseInputListener {
 
@@ -511,6 +538,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             return null;
         }
         }
+
+    
 }
 
 
