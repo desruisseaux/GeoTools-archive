@@ -60,6 +60,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL$
  * @version GeoTools 2.2 Revised to take a FilterFactory.
  * @author  Ian Schneider
+ * @deprecated Please use CQL
  */
 public class ExpressionBuilder {
 	private org.opengis.filter.FilterFactory factory;
