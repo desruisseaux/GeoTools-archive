@@ -41,9 +41,13 @@ import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -155,7 +159,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * for all the various operations</li>
 	 * </ol>
 	 */
-	private final SoftValueHashMap<Integer, RenderedImage> tileCache = new SoftValueHashMap<Integer, RenderedImage>(
+	private final SoftValueHashMap<String, Map<Integer,Map<Long, RenderedImage>>> tileCache = new SoftValueHashMap<String,  Map<Integer,Map<Long, RenderedImage>>>(
 			0);
 
 	/**
@@ -400,7 +404,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		try {
 			expandMe = properties.getProperty("ExpandToRGB").equalsIgnoreCase(
 					"true");
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			expandMe = false;
 		}
 
@@ -853,32 +857,76 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 						|| !imageFile.isFile()) {
 					if (LOGGER.isLoggable(Level.INFO))
 						LOGGER.info("Unable to read image for file "
-								+ imageFile.toString());
+								+ imageFile.getAbsolutePath());
 					i++;
 					continue;
 				}
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("Cache hit");
 				// //
 				//
 				// Check in the cache
 				//
 				// //
 				synchronized (mutexForCache) {
-					if (tileCache.containsKey(i)) {
-						loadedImage = tileCache.get(i);
+					// //
+					//
+					// We are assuming each file has the same number of
+					// overviews but we are not taking into account the
+					// subsampling factors here.
+					//
+					// //
+					boolean found = false;
+					final String filePath = imageFile.getAbsolutePath();
+					final long key = readP.getSourceXSubsampling()
+							+ (readP.getSourceYSubsampling() << 32);
+					Map<Integer,Map<Long, RenderedImage>> overviewsMap = null;
+					Map<Long, RenderedImage> subsamplingsMap = null;
+					if (tileCache.containsKey(filePath)) {
+						overviewsMap = tileCache.get(filePath);
+
 					} else {
-						final ParameterBlock pbjImageRead = new ParameterBlock();
-						pbjImageRead.add(ImageIO
-								.createImageInputStream(imageFile));
-						pbjImageRead.add(imageChoice);
-						pbjImageRead.add(readMetadata);
-						pbjImageRead.add(readThumbnails);
-						pbjImageRead.add(verifyInput);
-						pbjImageRead.add(null);
-						pbjImageRead.add(null);
-						pbjImageRead.add(readP);
-						pbjImageRead.add(null);
-						loadedImage = JAI.create("ImageRead", pbjImageRead);
+						overviewsMap = new HashMap<Integer,Map<Long, RenderedImage>>(this.numOverviews);
+						tileCache.put(filePath, overviewsMap);
 					}
+
+					if (overviewsMap.containsKey(imageChoice))
+						subsamplingsMap = overviewsMap.get(imageChoice);
+					else {
+						subsamplingsMap = new HashMap<Long, RenderedImage>();
+						overviewsMap.put(imageChoice, subsamplingsMap);
+					}
+					if (subsamplingsMap.containsKey(key)) {
+						found = true;
+						loadedImage = subsamplingsMap.get(key);
+					}
+
+					try {
+						if (!found) {
+							final ParameterBlock pbjImageRead = new ParameterBlock();
+							pbjImageRead.add(ImageIO
+									.createImageInputStream(imageFile));
+							pbjImageRead.add(imageChoice);
+							pbjImageRead.add(readMetadata);
+							pbjImageRead.add(readThumbnails);
+							pbjImageRead.add(verifyInput);
+							pbjImageRead.add(null);
+							pbjImageRead.add(null);
+							pbjImageRead.add(readP);
+							pbjImageRead.add(null);
+							loadedImage = JAI.create("ImageRead", pbjImageRead);
+							// add to cache
+							subsamplingsMap.put(key, loadedImage);
+							
+
+						}
+
+					} catch (Throwable t) {
+						if (LOGGER.isLoggable(Level.INFO))
+							LOGGER.info("Unable to load file "
+									+ imageFile.getAbsolutePath());
+					}
+
 				}
 
 				if (LOGGER.isLoggable(Level.FINE))
