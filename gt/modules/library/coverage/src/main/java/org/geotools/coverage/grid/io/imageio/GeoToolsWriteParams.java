@@ -127,8 +127,7 @@ public abstract class GeoToolsWriteParams extends ImageWriteParam {
 
 	public void setTiling(int tileWidth, int tileHeight) {
 
-		adaptee.setTiling(tileWidth, tileHeight, 0,
-				0);
+		adaptee.setTiling(tileWidth, tileHeight, 0, 0);
 	}
 
 	public void setTilingMode(int mode) {
@@ -233,15 +232,14 @@ public abstract class GeoToolsWriteParams extends ImageWriteParam {
 	}
 
 	public void setSourceRegion(Rectangle sourceRegion) {
-		throw new UnsupportedOperationException(
-				"This operation is not currently supported by this API");
+		adaptee.setSourceRegion(sourceRegion);
 	}
 
 	public void setSourceSubsampling(int sourceXSubsampling,
 			int sourceYSubsampling, int subsamplingXOffset,
 			int subsamplingYOffset) {
-		throw new UnsupportedOperationException(
-				"This operation is not currently supported by this API");
+		adaptee.setSourceSubsampling(sourceXSubsampling, sourceYSubsampling,
+				subsamplingXOffset, subsamplingYOffset);
 	}
 
 	/**
@@ -263,7 +261,5 @@ public abstract class GeoToolsWriteParams extends ImageWriteParam {
 	public final ImageWriteParam getAdaptee() {
 		return adaptee;
 	}
-	
-
 
 }
