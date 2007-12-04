@@ -413,13 +413,10 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		final Integer imageChoice;
 		try {
 			imageChoice = setReadParams(readP, requestedEnvelope, dim);
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
 		} catch (TransformException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			throw new DataSourceException(e);
 		}
+
 
 		// /////////////////////////////////////////////////////////////////////
 		//

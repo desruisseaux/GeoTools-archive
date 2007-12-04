@@ -460,12 +460,9 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		// ok we got something to return
 		try {
 			return loadRequestedTiles(requestedEnvelope, dim, params);
-		} catch (DataSourceException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (TransformException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			throw new DataSourceException(e);
 		}
-		return null;
 
 	}
 

@@ -75,19 +75,17 @@ public final class MrSIDVisualizationTest extends AbstractMrSIDTestCase {
 		final AbstractGridCoverage2DReader reader = new MrSIDReader(TestData
 				.file(this, fileName));
 
-		ParameterValueGroup params;
-		params = reader.getFormat().getReadParameters();
-
+		final ParameterValueGroup params = reader.getFormat().getReadParameters();
 		params.parameter(
 				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
 				.setValue(
 						new GridGeometry2D(reader.getOriginalGridRange(),
 								reader.getOriginalEnvelope()));
-		GeneralParameterValue[] gpv = { params
+		final GeneralParameterValue[] gpv = { params
 				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 						.toString()) };
 
-		GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
+		final GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
 
 		if (TestData.isInteractiveTest()) {
 			gc.show();
