@@ -130,7 +130,7 @@ public class FilterSample {
     public static final String NOT_BETWEEN_FILTER = "ATTR1 NOT BETWEEN 10 AND 20";
 
     /** Catalog of samples */
-    private static Map SAMPLES = new HashMap();
+    public static Map<String,Object> SAMPLES = new HashMap<String,Object>();
 
     static {
         // Samples initialization
