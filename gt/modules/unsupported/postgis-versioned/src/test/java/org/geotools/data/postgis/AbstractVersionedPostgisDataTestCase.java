@@ -72,6 +72,8 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         setUpRailTable();
         setUpNoPrimaryKeyTable();
         setUpTreeTable();
+        setUpEmptyTable();
+        setUpPointTable();
 
         // make sure versioned metadata is not in the way
         SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
@@ -323,56 +325,76 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         }
     }
 
-    protected void killTestTables() throws Exception {
-        Connection conn = pool.getConnection();
-
-        try {
-            Statement s = conn.createStatement();
-
-            try {
-                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','road','geom')");
-            } catch (Exception ignore) {
-            }
-
-            try {
-                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','river','geom')");
-            } catch (Exception ignore) {
-            }
-
-            try {
-                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','lake','geom')");
-            } catch (Exception ignore) {
-            }
-            
-            try {
-                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','rail','geom')");
-            } catch (Exception ignore) {
-            }
-
-            try {
-                s.execute("DROP TABLE " + f.schema + ".road");
-            } catch (Exception ignore) {
-            }
-
-            try {
-                s.execute("DROP TABLE " + f.schema + ".river");
-            } catch (Exception ignore) {
-            }
-
-            try {
-                s.execute("DROP TABLE " + f.schema + ".lake");
-            } catch (Exception ignore) {
-            }
-            
-            try {
-                s.execute("DROP TABLE " + f.schema + ".rail");
-            } catch (Exception ignore) {
-            }
-
-        } finally {
-            conn.close();
-        }
-    }
+//    protected void killTestTables() throws Exception {
+//        Connection conn = pool.getConnection();
+//
+//        try {
+//            Statement s = conn.createStatement();
+//
+//            try {
+//                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','road','geom')");
+//            } catch (Exception ignore) {
+//            }
+//
+//            try {
+//                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','river','geom')");
+//            } catch (Exception ignore) {
+//            }
+//
+//            try {
+//                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','lake','geom')");
+//            } catch (Exception ignore) {
+//            }
+//            
+//            try {
+//                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','rail','geom')");
+//            } catch (Exception ignore) {
+//            }
+//            
+//            try {
+//                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','empty','geom')");
+//            } catch (Exception ignore) {
+//            }
+//            
+//            try {
+//                s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','point','geom')");
+//            } catch (Exception ignore) {
+//            }
+//
+//            try {
+//                s.execute("DROP TABLE " + f.schema + ".road");
+//            } catch (Exception ignore) {
+//            }
+//
+//            try {
+//                s.execute("DROP TABLE " + f.schema + ".river");
+//            } catch (Exception ignore) {
+//            }
+//
+//            try {
+//                s.execute("DROP TABLE " + f.schema + ".lake");
+//            } catch (Exception ignore) {
+//            }
+//            
+//            try {
+//                s.execute("DROP TABLE " + f.schema + ".rail");
+//            } catch (Exception ignore) {
+//            }
+//            
+//            try {
+//                s.execute("DROP TABLE " + f.schema + ".empty");
+//            } catch (Exception ignore) {
+//            }
+//            
+//            try {
+//                s.execute("DROP TABLE " + f.schema + ".point");
+//            } catch (Exception ignore) {
+//            }
+//
+//        } finally {
+//            conn.close();
+//        }
+//    }
 
     protected void setUpRiverTable() throws Exception {
         Connection conn = pool.getConnection();
@@ -411,6 +433,66 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
                                 + feature.getAttribute("river") + "',"
                                 + feature.getAttribute("flow") + ")");
             }
+        } finally {
+            conn.close();
+        }
+    }
+    
+    protected void setUpEmptyTable() throws Exception {
+        Connection conn = pool.getConnection();
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','empty','geom')");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("DROP TABLE " + f.schema + ".empty");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+
+            // postgis = new PostgisDataSource(connection, FEATURE_TABLE);
+            s.execute("CREATE TABLE " + f.schema
+                    + ".empty(fid varchar PRIMARY KEY, id int)");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
+                    + "', 'empty', 'geom', 0, 'POINT', 2);");
+        } finally {
+            conn.close();
+        }
+    }
+    
+    protected void setUpPointTable() throws Exception {
+        Connection conn = pool.getConnection();
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','point','geom')");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("DROP TABLE " + f.schema + ".point");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+
+            // postgis = new PostgisDataSource(connection, FEATURE_TABLE);
+            s.execute("CREATE TABLE " + f.schema
+                    + ".point(fid varchar PRIMARY KEY, id int)");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
+                    + "', 'point', 'geom', 4326, 'POINT', 2);");
+            
+            s.execute("INSERT INTO " + f.schema
+                    + ".point (fid, id, geom) VALUES (" + "'point1',1," +
+                    "GeometryFromText('POINT (0.0 0.0)',4326))");
         } finally {
             conn.close();
         }

@@ -69,6 +69,8 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
     private WrappedPostgisDataStore wrapped;
 
     private Transaction transaction;
+    
+    private static final double EPS = 0.000001;
 
     public VersionedJdbcTransactionState(Connection connection, WrappedPostgisDataStore wrapped)
             throws IOException {
@@ -183,18 +185,14 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
                             + "versioned jdbc state creation");
                 }
                 
-                // make sure we're not committing an empty, non null, bbox
-                if(!bbox.isNull() && bbox.getHeight() == 0 && bbox.getWidth() == 0)
-                    bbox = expandBBox(bbox);
-
                 // update it
                 f = writer.next();
                 f.setDefaultGeometry(toLatLonRectange(bbox));
                 writer.write();
             } catch (IllegalAttributeException e) {
                 // if this happens there's a programming error
-                throw new IOException("Could not set an attribute in changesets, "
-                        + "most probably the table schema has been tampered with.");
+                throw new DataSourceException("Could not set an attribute in changesets, "
+                        + "most probably the table schema has been tampered with.", e);
             } finally {
                 if (writer != null)
                     writer.close();
@@ -228,22 +226,6 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
         reset();
     }
 
-    /** 
-     * Used to expand a single point bbox the very minimum required to make it a polygon
-     * @param bbox
-     */
-    private ReferencedEnvelope expandBBox(ReferencedEnvelope bbox) {
-        // we have to expand both directions using the minimum offset possible,
-        // which we'll compute on the binary presentation of a double
-        double cmax = Math.max(bbox.getMaxX(), bbox.getMaxY());
-        long bits = Double.doubleToLongBits(cmax);
-        // get the minimum offset that will make the biggest coordinate change too
-        double diff = Double.longBitsToDouble(bits++);
-        ReferencedEnvelope result = new ReferencedEnvelope(bbox);
-        result.expandBy(diff);
-        return result;
-    }
-
     public boolean isRevisionSet() {
         return revision == Long.MIN_VALUE;
     }
@@ -255,16 +237,21 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
      * @return
      * @throws TransformException
      */
-    Geometry toLatLonRectange(ReferencedEnvelope envelope) throws IOException {
+    Geometry toLatLonRectange(final ReferencedEnvelope env) throws IOException {
+        ReferencedEnvelope envelope = new ReferencedEnvelope(env);
         try {
             // since we cannot work with a null geometry in commits to
             // changesets, let's return a very small envelope...
             // an empty envelope gets turned into a point
-            if (envelope == null || envelope.isEmpty())
-                envelope = new ReferencedEnvelope(new Envelope(0, 1, 0, 1),
+            if (envelope == null || envelope.isEmpty()) {
+                envelope = new ReferencedEnvelope(new Envelope(0, EPS , 0, EPS),
                         DefaultGeographicCRS.WGS84);
-            else
+            } else {
                 envelope = envelope.transform(DefaultGeographicCRS.WGS84, true);
+                if(envelope.getHeight() == 0.0 || envelope.getWidth() == 0.0)
+                    envelope.expandBy(EPS);
+            }
+                
 
             GeometryFactory gf = new GeometryFactory();
             return gf.toGeometry(envelope);
@@ -294,12 +281,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
             f.setAttribute("message", message);
             f.setAttribute("date", new Date());
             
-            // make sure we're not writing an empty, non null, bbox
-            ReferencedEnvelope currentBox = bbox;
-            if(!bbox.isNull() && bbox.getHeight() == 0 && bbox.getWidth() == 0)
-                currentBox = expandBBox(bbox);
-            
-            f.setDefaultGeometry(toLatLonRectange(currentBox));
+            f.setDefaultGeometry(toLatLonRectange(bbox));
             writer.write();
         } catch (IllegalAttributeException e) {
             // if this happens there's a programming error

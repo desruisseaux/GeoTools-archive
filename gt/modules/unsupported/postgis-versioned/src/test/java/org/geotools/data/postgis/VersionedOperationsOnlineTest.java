@@ -117,6 +117,25 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         } catch (IOException e) {
         }
     }
+    
+    public void testVersionEnableEmptyTable() throws IOException {
+        VersionedPostgisDataStore ds = getDataStore();
+        assertFalse(ds.isVersioned("empty"));
+
+        // try version enable, should go well despite the table being empty
+        ds.setVersioned("empty", true, "gimbo", "Version enable deep space void");
+        assertTrue(ds.isVersioned("empty"));
+    }
+    
+    public void testVersionEnablePointTable() throws IOException {
+        VersionedPostgisDataStore ds = getDataStore();
+        assertFalse(ds.isVersioned("point"));
+
+        // try version enable, should go well despite the single geom not making up a bbox
+        // for the changeset
+        ds.setVersioned("point", true, "gimbo", "Version enable a tiny damn point");
+        assertTrue(ds.isVersioned("point"));
+    }
 
     public void testGetFeatureReader() throws IOException, NoSuchElementException, Exception {
         VersionedPostgisDataStore ds = getDataStore();
