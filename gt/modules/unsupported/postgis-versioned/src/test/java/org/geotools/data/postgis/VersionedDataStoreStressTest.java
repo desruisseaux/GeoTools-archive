@@ -59,6 +59,7 @@ public class VersionedDataStoreStressTest extends
                     // some feature types cannot be versioned, np
                 }
             }
+            ds.dispose();
         }
     }
     
