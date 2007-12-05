@@ -121,6 +121,19 @@ public abstract class AbstractGridFormat implements Format {
 	public static final DefaultParameterDescriptor GEOTOOLS_WRITE_PARAMS = new DefaultParameterDescriptor(
 			"WriteParameters", GeoToolsWriteParams.class, null, null);
 
+
+	/**
+	 * This {@link GeneralParameterValue} can be provided to the
+	 * {@link GridCoverageReader}s through the
+	 * {@link GridCoverageReader#read(GeneralParameterValue[])} method in order
+	 * to specify the type of image read operation requested: using a JAI 
+	 * ImageRead operation (leveraging on Deferred Execution Model, 
+     * Tile Caching,...), or the direct {@code ImageReader}'s read methods.
+	 */
+	public static final DefaultParameterDescriptor USE_JAI_IMAGEREAD = new DefaultParameterDescriptor(
+			"UseJaiImageRead", Boolean.class, null, null);
+	
+	
 	/**
 	 * @see org.opengis.coverage.grid.Format#getName()
 	 */

@@ -635,6 +635,15 @@ public final class Hints extends RenderingHints {
     public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
 
     /**
+     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to read
+     * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model, 
+     * Tile Caching,...) or the direct {@code ImageReader}'s read methods.
+     *
+     * @since 2.4
+     */
+    public static final Key USE_JAI_IMAGEREAD = new Key(Boolean.class);
+    
+    /**
      * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
      * processor} to perform operations on the non-geophysics view.
      * <p>
