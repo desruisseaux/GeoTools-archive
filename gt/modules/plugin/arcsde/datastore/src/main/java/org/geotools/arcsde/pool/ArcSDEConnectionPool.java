@@ -16,6 +16,7 @@
  */
 package org.geotools.arcsde.pool;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SeConnection;
@@ -424,7 +426,7 @@ public class ArcSDEConnectionPool {
          * @throws SeException
          *             if the connection can't be created
          */
-        public Object makeObject() throws SeException, DataSourceException {
+        public Object makeObject() throws IOException {
             NegativeArraySizeException cause = null;
             for (int i = 0; i < 3; i++) {
                 try {
@@ -435,6 +437,8 @@ public class ArcSDEConnectionPool {
                     LOGGER.warning("Strange failed ArcSDE connection error.  Trying again (try "
                             + (i + 1) + " of 3)");
                     cause = nase;
+                } catch (SeException e) {
+                    throw new ArcSdeException(e);
                 }
             }
             throw new DataSourceException(
