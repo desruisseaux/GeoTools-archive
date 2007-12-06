@@ -31,7 +31,6 @@ import org.opengis.geometry.BoundingBox;
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeDelete;
-import com.esri.sde.sdk.client.SeError;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeInsert;
 import com.esri.sde.sdk.client.SeLayer;

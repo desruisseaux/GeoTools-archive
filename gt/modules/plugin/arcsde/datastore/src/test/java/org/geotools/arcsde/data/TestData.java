@@ -246,7 +246,7 @@ public class TestData {
         }
     }
 
-    public void deleteTable(final String typeName) throws DataSourceException {
+    public void deleteTable(final String typeName) throws DataSourceException, UnavailableArcSDEConnectionException {
         ArcSDEConnectionPool connectionPool = getConnectionPool();
         deleteTable(connectionPool, typeName);
     }
@@ -267,10 +267,9 @@ public class TestData {
         }
     }
 
-    private void deleteTable(final ArcSDEConnectionPool pool, final String tableName) {
-        ArcSDEPooledConnection conn = null;
-        try {
-            conn = pool.getConnection();
+    private void deleteTable(final ArcSDEConnectionPool pool, final String tableName) throws DataSourceException, UnavailableArcSDEConnectionException {
+        ArcSDEPooledConnection conn = pool.getConnection();
+        try{
             SeTable table = new SeTable(conn, tableName);
             table.delete();
         } catch (Exception e) {

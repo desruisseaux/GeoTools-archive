@@ -1,8 +1,10 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -33,8 +35,11 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.text.cql2.CQL;
+import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -512,6 +517,71 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             assertTrue(reader.hasNext());
         } finally {
             reader.close();
+        }
+    }
+
+    public void testModifyFeaturesTransaction() throws Exception {
+        testData.insertTestData();
+
+        final String typeName = testData.getTemp_table();
+        final DataStore ds = testData.getDataStore();
+        final FeatureStore store = (FeatureStore) ds.getFeatureSource(typeName);
+        final SimpleFeatureType schema = store.getSchema();
+        final Filter oldValueFilter = CQL.toFilter("INT32_COL = 3");
+        final Filter newValueFilter = CQL.toFilter("INT32_COL = -1000");
+
+        FeatureCollection features = store.getFeatures(oldValueFilter);
+        final int initialSize = features.size();
+        assertEquals(1, initialSize);// just to not go forward with bad data
+        final SimpleFeature originalFeature;
+        FeatureIterator iterator = features.features();
+        try {
+            originalFeature = iterator.next();
+        } finally {
+            iterator.close();
+        }
+
+        {
+            final Transaction transaction = new DefaultTransaction("testModifyFeaturesTransaction");
+            store.setTransaction(transaction);
+
+            try {
+                final AttributeDescriptor propDescriptor = schema.getAttribute("INT32_COL");
+                store.modifyFeatures(propDescriptor, Integer.valueOf(-1000), oldValueFilter);
+                transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+            } finally {
+                transaction.close();
+            }
+        }
+        store.setTransaction(Transaction.AUTO_COMMIT);
+
+        final Query oldValueQuery = new DefaultQuery(typeName, oldValueFilter);
+        final Query newValueQuery = new DefaultQuery(typeName, newValueFilter);
+
+        assertEquals(0, store.getCount(oldValueQuery));
+        assertEquals(1, store.getCount(newValueQuery));
+
+        final FeatureIterator newFeatures = store.getFeatures(newValueQuery).features();
+        final SimpleFeature modifiedFeature;
+        try {
+            modifiedFeature = newFeatures.next();
+        } finally {
+            newFeatures.close();
+        }
+
+        // verify the non modified properties stay the same
+        final List<Attribute> originalValues = (List<Attribute>) originalFeature.getValue();
+        final List<Attribute> actualValues = (List<Attribute>) modifiedFeature.getValue();
+        for (int i = 0; i < originalValues.size(); i++) {
+            Attribute originalAtt = originalValues.get(i);
+            Attribute actualAtt = actualValues.get(i);
+            Name name = originalAtt.getName();
+            //bah, date equals does not work, I don't care for this test
+            if (!"INT32_COL".equals(name.getLocalPart()) && !"DATE_COL".equals(name.getLocalPart())) {
+                assertEquals(name + " does not match", originalAtt, actualAtt);
+            }
         }
     }
 
