@@ -120,7 +120,8 @@ public final class InternationalStringTest extends TestCase {
     /**
      * Performs basic test on the given object.
      */
-    private <T extends Comparable<T>> void basicTests(final T toTest)
+    @SuppressWarnings("unchecked")
+    private <T extends Comparable> void basicTests(final T toTest)
             throws IOException, ClassNotFoundException
     {
         assertEquals("CompareTo: ", 0, toTest.compareTo(toTest));

@@ -19,7 +19,7 @@ import java.util.Set;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.complex.CompositeSurface;
-import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfacePatch;
@@ -27,6 +27,7 @@ import org.opengis.geometry.primitive.SurfacePatch;
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSGeometry;
 import org.geotools.geometry.jts.JTSUtils;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 
 /**
@@ -71,6 +72,10 @@ public class SurfaceImpl extends GeometryImpl implements Surface {
         return patches;
     }
 
+    public SurfaceBoundary getBoundary() {
+        return (SurfaceBoundary) super.getBoundary();
+    }
+
     public double [] getUpNormal(DirectPosition point) {
         return new double [] { 0, 0, 1 };
     }
@@ -91,7 +96,7 @@ public class SurfaceImpl extends GeometryImpl implements Surface {
         return 0;
     }
 
-    public Primitive getPrimitive() {
+    public Surface getPrimitive() {
         return this;
     }
 
@@ -103,7 +108,7 @@ public class SurfaceImpl extends GeometryImpl implements Surface {
         return null;
     }
 
-    public OrientablePrimitive[] getProxy() {
+    public OrientableSurface[] getProxy() {
         return null;
     }
 

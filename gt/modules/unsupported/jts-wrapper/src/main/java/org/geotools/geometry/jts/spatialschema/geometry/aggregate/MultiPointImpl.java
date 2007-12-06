@@ -24,4 +24,8 @@ public class MultiPointImpl extends AggregateImpl
     public MultiPointImpl(final CoordinateReferenceSystem crs) {
         super(crs);
     }
+
+    public MultiPointImpl clone() {
+        return (MultiPointImpl) super.clone();
+    }
 }

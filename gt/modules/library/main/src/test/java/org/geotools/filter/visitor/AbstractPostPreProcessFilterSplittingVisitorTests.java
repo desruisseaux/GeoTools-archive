@@ -265,9 +265,9 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
             // TODO Auto-generated method stub
             return null;
         }
-        public Object clone() throws CloneNotSupportedException {
+        public MockGeometryImpl clone() throws CloneNotSupportedException {
             // TODO Auto-generated method stub
-            return super.clone();
+            return (MockGeometryImpl) super.clone();
         }
         public Precision getPrecision() {
             // TODO Auto-generated method stub

@@ -26,7 +26,6 @@ import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
-
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -92,6 +91,14 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
     public FloatParameter(final ParameterDescriptor descriptor, final double value) {
         this(descriptor);
         setValue(value);
+    }
+
+    /**
+     * Returns the abstract definition of this parameter.
+     */
+    @Override
+    public ParameterDescriptor getDescriptor() {
+        return (ParameterDescriptor) super.getDescriptor();
     }
 
     /**
@@ -303,6 +310,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @param  object The object to compare to {@code this}.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final FloatParameter that = (FloatParameter) object;
@@ -318,8 +326,17 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32) + super.hashCode()*37;
+    }
+
+    /**
+     * Returns a clone of this parameter.
+     */
+    @Override
+    public FloatParameter clone() {
+        return (FloatParameter) super.clone();
     }
 }

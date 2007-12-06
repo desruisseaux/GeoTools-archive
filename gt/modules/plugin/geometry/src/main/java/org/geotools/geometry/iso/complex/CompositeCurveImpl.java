@@ -342,7 +342,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 		// TODO documentation
 		return false;
 	}
-
+   
 
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.primitive.OrientableCurve#getComposite()
@@ -369,7 +369,7 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getPrimitive()
 	 */
-	public Primitive getPrimitive() {
+	public Curve getPrimitive() {
 		// TODO semantic SJ, JR
 		// TODO implementation
 		// TODO test

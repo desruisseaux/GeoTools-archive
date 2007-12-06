@@ -231,6 +231,14 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
     }
 
     /**
+     * Returns the abstract definition of this group of parameters.
+     */
+    @Override
+    public ParameterDescriptorGroup getDescriptor() {
+        return (ParameterDescriptorGroup) super.getDescriptor();
+    }
+
+    /**
      * Returns the values in this group. Changes in this list are reflected on this
      * {@code ParameterValueGroup}. The returned list supports the
      * {@link List#add(Object) add} operation.
@@ -299,17 +307,10 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
          * If such a descriptor is found, create it, add it to the list of values
          * and returns it.
          */
-        // TODO: The following lines should be considerably shorter with J2SE 1.5:
-        // for (GeneralParameterDescriptor descriptor : getDescriptor().descriptors()) {
-        for (final Iterator it=((ParameterDescriptorGroup)
-             getDescriptor()).descriptors().iterator(); it.hasNext();)
-        {
-            final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) it.next();
+        for (final GeneralParameterDescriptor descriptor : getDescriptor().descriptors()) {
             if (descriptor instanceof ParameterDescriptor) {
                 if (AbstractIdentifiedObject.nameMatches(descriptor, name)) {
-                    // TODO: remove the first cast with J2SE 1.5.
-                    final ParameterValue value = (ParameterValue)
-                            ((ParameterDescriptor) descriptor).createValue();
+                    final ParameterValue value = ((ParameterDescriptor) descriptor).createValue();
                     values.add(value);
                     return value;
                 }
@@ -393,8 +394,7 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
             throw new InvalidParameterCardinalityException(Errors.format(
                       ErrorKeys.TOO_MANY_OCCURENCES_$2, name, count), name);
         }
-        final ParameterValueGroup value = (ParameterValueGroup) // Remove this cast for J2SE 1.5
-              ((ParameterDescriptorGroup) check).createValue();
+        final ParameterValueGroup value = ((ParameterDescriptorGroup) check).createValue();
         values.add(value);
         return value;
     }
@@ -440,7 +440,7 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
         copy.values = (ArrayList<GeneralParameterValue>) copy.values.clone();
         for (int i=copy.values.size(); --i>=0;) {
             // TODO: remove cast with J2SE 1.5
-            copy.values.set(i, (GeneralParameterValue) copy.values.get(i).clone());
+            copy.values.set(i, copy.values.get(i).clone());
         }
         copy.asList = null;
         return copy;

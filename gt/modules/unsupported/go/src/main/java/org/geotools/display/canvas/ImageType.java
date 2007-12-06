@@ -48,7 +48,7 @@ public final class ImageType extends CodeList<ImageType> {
      * List of all enumerations of this type.
      * Must be declared before any enum declaration.
      */
-    private static final List/*<ImageType>*/ VALUES = new ArrayList/*<ImageType>*/(3);
+    private static final List<ImageType> VALUES = new ArrayList<ImageType>(3);
 
     /**
      * The enum for layers not backed by any offscreen buffer.
@@ -94,14 +94,14 @@ public final class ImageType extends CodeList<ImageType> {
      */
     public static ImageType[] values() {
         synchronized (VALUES) {
-            return (ImageType[]) VALUES.toArray(new ImageType[VALUES.size()]);
+            return VALUES.toArray(new ImageType[VALUES.size()]);
         }
     }
 
     /**
      * Returns the list of enumerations of the same kind than this enum.
      */
-    public /*{ImageType}*/ CodeList[] family() {
+    public ImageType[] family() {
         return values();
     }
 }

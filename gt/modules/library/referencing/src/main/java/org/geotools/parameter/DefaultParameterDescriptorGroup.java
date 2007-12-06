@@ -22,7 +22,6 @@ package org.geotools.parameter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ import java.util.Set;
 
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -194,7 +193,7 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
      * The {@linkplain org.opengis.parameter.ParameterValueGroup#getDescriptor parameter
      * value descriptor} for the created group will be {@code this} object.
      */
-    public GeneralParameterValue createValue() {
+    public ParameterValueGroup createValue() {
         return new ParameterGroup(this);
     }
 

@@ -18,7 +18,6 @@ package org.geotools.parameter;
 
 import java.io.Serializable;
 import java.util.AbstractList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 

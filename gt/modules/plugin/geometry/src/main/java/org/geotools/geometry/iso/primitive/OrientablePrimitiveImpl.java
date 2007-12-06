@@ -154,7 +154,7 @@ public abstract class OrientablePrimitiveImpl extends PrimitiveImpl implements
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getPrimitive()
 	 */
-	public PrimitiveImpl getPrimitive() {
+	public Primitive getPrimitive() {
 		return this;
 	}
 

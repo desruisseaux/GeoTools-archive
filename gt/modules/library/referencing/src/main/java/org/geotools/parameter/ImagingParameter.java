@@ -16,20 +16,15 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies and extensions
 import java.net.URI;
 import javax.units.Unit;
-
-// JAI dependencies
 import javax.media.jai.ParameterList;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -60,6 +55,14 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
     public ImagingParameter(final ParameterDescriptor descriptor, final ParameterList parameters) {
         super(descriptor);
         this.parameters = parameters;
+    }
+
+    /**
+     * Returns the abstract definition of this parameter.
+     */
+    @Override
+    public ParameterDescriptor getDescriptor() {
+        return (ParameterDescriptor) super.getDescriptor();
     }
 
     /**

@@ -307,7 +307,7 @@ public class RangeSet extends AbstractSet<Range>
                 upper = (Comparable) ClassChanger.toNumber(upper);
             } catch (ClassNotFoundException exception) {
                 // Should not happen, since this operation is legal according the constructor.
-                final ClassCastException e=new ClassCastException(exception.getLocalizedMessage());
+                final ClassCastException e = new ClassCastException(exception.getLocalizedMessage());
                 e.initCause(exception);
                 throw e;
             }

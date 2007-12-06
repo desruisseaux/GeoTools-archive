@@ -21,8 +21,10 @@ import org.opengis.geometry.complex.CompositeCurve;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Curve;
 
 import org.geotools.geometry.jts.JTSGeometry;
+import org.opengis.geometry.primitive.CurveBoundary;
 
 /**
  * A {@linkplain Complex complex} with all the geometric properties of a curve. Thus, this
@@ -62,6 +64,9 @@ public class CompositeCurveImpl extends CompositeImpl implements CompositeCurve 
     //  implement the CompositeCurve interface
     //*************************************************************************
 
+    public CurveBoundary getBoundary() {
+        return (CurveBoundary) super.getBoundary();
+    }
     /**
      * Returns the list of orientable curves in this composite.
      *
@@ -73,7 +78,7 @@ public class CompositeCurveImpl extends CompositeImpl implements CompositeCurve 
      * @return The list of orientable curves in this composite.
      * @UML association generator
      */
-    public final List/*<OrientableCurve>*/ getGenerators() {
+    public final List<OrientableCurve> getGenerators() {
         return getElementList();
     }
 
@@ -109,22 +114,22 @@ public class CompositeCurveImpl extends CompositeImpl implements CompositeCurve 
     /**
      * This returns the "positive orientation" primitive.  In this
      * implementation, we only support positively oriented primitives, so this
-     * method always returns "this".  (In the future, it might return the
+     * method always returns "null".  (In the future, it might return the
      * positively oriented object for which this object is the negative proxy.)
      */
-    public Primitive getPrimitive() {
-        return this;
+    public Curve getPrimitive() {
+        return null;
     }
 
     /**
      * This implementation doesn't support traversing this association in
      * this direction, so this method always returns null.
      */
-    public final Set/*<Primitive>*/ getContainingPrimitives() {
+    public final Set<Primitive> getContainingPrimitives() {
         return null;
     }
 
-    public final Set/*<Complex>*/ getComplexes() {
+    public final Set<Complex> getComplexes() {
         return null;
     }
 
@@ -139,7 +144,7 @@ public class CompositeCurveImpl extends CompositeImpl implements CompositeCurve 
      * proxies for the positively and negatively oriented versions of this
      * primitive.
      */
-    public OrientablePrimitive [] getProxy() {
+    public OrientablePrimitive[] getProxy() {
         return null;
     }
 }

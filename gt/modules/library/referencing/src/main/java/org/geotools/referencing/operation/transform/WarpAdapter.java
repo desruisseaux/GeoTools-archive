@@ -127,10 +127,8 @@ final class WarpAdapter extends Warp {
         try {
             result = inverse.transform(result, result);
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
-                            ErrorKeys.BAD_PARAMETER_$2, "destPt", destPt));
-            e.initCause(exception);
-            throw e;
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_PARAMETER_$2, "destPt", destPt), exception);
         }
         result.setLocation(result.getX()-0.5, result.getY()-0.5);
         return result;
@@ -147,10 +145,8 @@ final class WarpAdapter extends Warp {
         try {
             result = ((MathTransform2D)inverse.inverse()).transform(result, result);
         } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Errors.format(
-                            ErrorKeys.BAD_PARAMETER_$2, "sourcePt", sourcePt));
-            e.initCause(exception);
-            throw e;
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.BAD_PARAMETER_$2, "sourcePt", sourcePt), exception);
         }
         result.setLocation(result.getX()-0.5, result.getY()-0.5);
         return result;

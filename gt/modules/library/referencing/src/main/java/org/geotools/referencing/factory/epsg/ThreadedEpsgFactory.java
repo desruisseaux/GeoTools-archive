@@ -268,7 +268,7 @@ public class ThreadedEpsgFactory extends DeferredAuthorityFactory
                 }
                 // Not really an SQL exception, but we should not reach this point anyway.
                 final SQLException e = new SQLException(exception.getLocalizedMessage());
-                e.initCause(exception);
+                e.initCause(exception); // TODO: inline when we will be allowed to target Java 6.
                 throw e;
             }
             this.datasource = datasource;

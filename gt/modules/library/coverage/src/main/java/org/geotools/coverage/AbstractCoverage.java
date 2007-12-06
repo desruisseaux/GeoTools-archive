@@ -1009,11 +1009,8 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                     } while (!iterator.nextLineDone());
                     assert (y == gridBounds.y + gridBounds.height);
                 } catch (NoninvertibleTransformException exception) {
-                    // TODO: give cause to constructor when we will be allowed to target J2SE 1.5.
-                    final IllegalArgumentException e = new IllegalArgumentException(
-                            Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "context"));
-                    e.initCause(exception);
-                    throw e;
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$1, "context"), exception);
                 }
                 image = tiled;
             }

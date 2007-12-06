@@ -23,14 +23,14 @@ import org.opengis.geometry.coordinate.ParamForPoint;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveSegment;
-import org.opengis.geometry.primitive.OrientablePrimitive;
-import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.OrientableCurve;
 
 import org.geotools.geometry.jts.spatialschema.geometry.NotifyingArrayList;
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.geometry.LineStringImpl;
 import org.geotools.geometry.jts.JTSGeometry;
 import org.geotools.geometry.jts.JTSUtils;
+import org.opengis.geometry.primitive.CurveBoundary;
 
 /**
  * Simple implementation of the Curve interface that does not implement any
@@ -68,6 +68,9 @@ public class CurveImpl extends GeometryImpl implements Curve {
     //  
     //*************************************************************************
 
+    public CurveBoundary getBoundary() {
+        return (CurveBoundary) super.getBoundary();
+    }
     /**
      * @inheritDoc
      * @see org.opengis.geometry.primitive.Curve#getSegments()
@@ -224,7 +227,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
     /**
      * Returns "this".  Should return the containing primitive, if any.
      */
-    public Primitive getPrimitive() {
+    public Curve getPrimitive() {
         return this;
     }
 
@@ -256,7 +259,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
     /**
      * Not implemented.  Returns null.
      */
-    public OrientablePrimitive[] getProxy() {
+    public OrientableCurve[] getProxy() {
         return null;
     }
 

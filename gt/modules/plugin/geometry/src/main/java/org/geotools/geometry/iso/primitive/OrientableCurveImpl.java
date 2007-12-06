@@ -17,6 +17,8 @@
 
 package org.geotools.geometry.iso.primitive;
 
+import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -45,7 +47,7 @@ public abstract class OrientableCurveImpl extends OrientablePrimitiveImpl
 		super(crs);
 	}
 
-	/**
+	/*
 	 * TODO fuer was brauchen wir diesen constructor ? (SJ) Curves enthalten
 	 * keine primitives, und sind auch in keien enthalten; verwechslung mit
 	 * complexes?!?!
@@ -60,7 +62,15 @@ public abstract class OrientableCurveImpl extends OrientablePrimitiveImpl
 	// Set<Primitive> containingPrimitive, Set<Complex> complex) {
 	// super(factory, containedPrimitive,containingPrimitive,complex);
 	// }
-	
+
+    public Curve getPrimitive() {
+        return (Curve) super.getPrimitive();
+    }
+
+    public CompositeCurve getComposite() {
+        return (CompositeCurve) super.getComposite();
+    }
+
 	/**
 	 * Returns an array with two orientable primitives, whereas the first one is
 	 * "this" object and the second one the field proxy

@@ -212,6 +212,14 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     }
 
     /**
+     * Returns the abstract definition of this parameter.
+     */
+    @Override
+    public ParameterDescriptor getDescriptor() {
+        return (ParameterDescriptor) super.getDescriptor();
+    }
+
+    /**
      * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}.
      * If the parameter value has no unit (for example because it is a {@link String} type),
      * then this method returns {@code null}. Note that "no unit" doesn't means
@@ -653,5 +661,13 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         if (value != null) code +=   value.hashCode();
         if (unit  != null) code += 37*unit.hashCode();
         return code ^ (int)serialVersionUID;
+    }
+
+    /**
+     * Returns a clone of this parameter.
+     */
+    @Override
+    public Parameter clone() {
+        return (Parameter) super.clone();
     }
 }

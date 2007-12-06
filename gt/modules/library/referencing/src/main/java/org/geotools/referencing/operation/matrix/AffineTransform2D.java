@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,15 +16,8 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import javax.vecmath.SingularMatrixException;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -206,7 +199,16 @@ public class AffineTransform2D extends AffineTransform implements Matrix {
      * Returns a string representation of this matrix. The returned string is implementation
      * dependent. It is usually provided for debugging purposes only.
      */
+    @Override
     public String toString() {
         return GeneralMatrix.toString(this);
+    }
+
+    /**
+     * Returns a clone of this affine transform.
+     */
+    @Override
+    public AffineTransform2D clone() {
+        return (AffineTransform2D) super.clone();
     }
 }

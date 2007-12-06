@@ -29,6 +29,8 @@ import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Bearing;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
+import org.opengis.geometry.complex.Composite;
 
 //geotools dependencies
 import org.geotools.factory.BasicFactories;
@@ -38,7 +40,6 @@ import org.geotools.geometry.jts.spatialschema.geometry.DirectPositionImpl;
 import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
 import org.geotools.geometry.jts.JTSUtils;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.geometry.complex.Composite;
 
 
 /**
@@ -140,6 +141,10 @@ public class PointImpl extends GeometryImpl implements Point {
         else {
             throw new UnmodifiableGeometryException();
         }
+    }
+
+    public PrimitiveBoundary getBoundary() {
+        return (PrimitiveBoundary) super.getBoundary();
     }
 
     /**

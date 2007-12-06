@@ -112,6 +112,9 @@ public class TriangleImpl extends PolygonImpl implements Triangle {
 		return this.corner2;
 	}
 
+    public TriangulatedSurface getSurface() {
+        return (TriangulatedSurface) super.getSurface();
+    }
 
 	/**
 	 * @param tsi

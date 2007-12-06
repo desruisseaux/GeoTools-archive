@@ -187,7 +187,7 @@ public abstract class GeometryImpl
      * Returns the boundary of this geometry.  Returns null if the boundary is
      * empty.
      */
-    public final Boundary getBoundary() {
+    public Boundary getBoundary() {
         // PENDING(CSD):
         // Need to find out if MultiPrimitives are handled correctly.  (I think
         // they are, but 19107's boundary semantics for multi-primitives are
@@ -489,12 +489,12 @@ public abstract class GeometryImpl
      * that all of the (private) members of GeometryImpl are already immutable
      * so this method simply delegates to the superclass (Object) clone.
      */
-    public Object clone() {
+    public GeometryImpl clone() {
         try {
-            return super.clone();
+            return (GeometryImpl) super.clone();
         }
         catch (CloneNotSupportedException cnse) {
-            throw new Error(cnse);
+            throw new AssertionError(cnse);
         }
     }
 

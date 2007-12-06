@@ -98,7 +98,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * the alias, it still possible to consider two objects are equivalent even if their names
      * were formatted in different locales.
      */
-    static Map name(final int key) {
+    static Map<String,?> name(final int key) {
         final Map<String,Object> properties = new HashMap<String,Object>(4);
         final InternationalString name = Vocabulary.formatInternational(key);
         properties.put(NAME_KEY,  name.toString());

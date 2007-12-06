@@ -956,10 +956,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         try {
             return getAuthorityFactory(null);
         } catch (FactoryException cause) {
-            IllegalStateException e = new IllegalStateException(
-                    Errors.format(ErrorKeys.UNDEFINED_PROPERTY));
-            e.initCause(cause); // TODO: inline when we will be allowed to compile for J2SE 1.5.
-            throw e;
+            throw new IllegalStateException(Errors.format(ErrorKeys.UNDEFINED_PROPERTY), cause);
         }
     }
 

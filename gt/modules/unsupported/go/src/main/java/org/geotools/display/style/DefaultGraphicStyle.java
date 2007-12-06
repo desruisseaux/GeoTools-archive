@@ -195,7 +195,7 @@ public class DefaultGraphicStyle extends DisplayObject implements GraphicStyle {
      * referenced by this object will also be referenced by the result. These objects include
      * the values for {@linkplain #getImplHint implementation hints}, <cite>etc.</cite>
      */
-    public Object clone() {
+    public GraphicStyle clone() {
         final DefaultGraphicStyle clone;
         try {
             clone = (DefaultGraphicStyle) super.clone();

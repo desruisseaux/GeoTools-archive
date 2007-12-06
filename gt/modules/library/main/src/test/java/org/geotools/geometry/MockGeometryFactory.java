@@ -40,9 +40,11 @@ import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveInterpolation;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Solid;
@@ -150,7 +152,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
         public DirectPosition getPosition() {
             return this;
         }
-        public Object clone() {
+        public MockDirectPosition clone() {
             return new MockDirectPosition(this);
         }
     }
@@ -345,7 +347,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
         public List getSegments() {
             return segments;
         }
-        public Object clone() {
+        public MockCurve clone() {
             return new MockCurve(getSegments());
         }
         public CompositeCurve getComposite() {
@@ -355,7 +357,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
         public int getOrientation() {
             return 0;
         }
-        public Primitive getPrimitive() {
+        public MockCurve getPrimitive() {
             return this;
         }
 
@@ -372,11 +374,11 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             return null;
         }
 
-        public OrientablePrimitive[] getProxy() {
+        public OrientableCurve[] getProxy() {
             return null;
         }
 
-        public Boundary getBoundary() {
+        public CurveBoundary getBoundary() {
             return null;
         }
 
@@ -558,7 +560,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
         MockPoint( DirectPosition position ) {
             this.position = position;
         }
-        public Object clone() {
+        public MockPoint clone() {
             return new MockPoint(new MockDirectPosition(position));
         }
         public Bearing getBearing( Position toPoint ) {
@@ -591,7 +593,7 @@ public class MockGeometryFactory implements GeometryFactory, PrimitiveFactory {
             return null;
         }
 
-        public Boundary getBoundary() {
+        public PrimitiveBoundary getBoundary() {
             return null;
         }
 

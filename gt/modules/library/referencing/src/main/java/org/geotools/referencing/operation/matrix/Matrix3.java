@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,14 +16,9 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// J2SE dependencies and extensions
 import javax.vecmath.Matrix3d;
 import java.awt.geom.AffineTransform;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -183,7 +178,16 @@ public class Matrix3 extends Matrix3d implements XMatrix {
      * Returns a string representation of this matrix. The returned string is implementation
      * dependent. It is usually provided for debugging purposes only.
      */
+    @Override
     public String toString() {
         return GeneralMatrix.toString(this);
+    }
+
+    /**
+     * Returns a clone of this matrix.
+     */
+    @Override
+    public Matrix3 clone() {
+        return (Matrix3) super.clone();
     }
 }

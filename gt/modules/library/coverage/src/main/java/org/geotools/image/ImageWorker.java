@@ -2321,6 +2321,7 @@ public class ImageWorker {
 			} catch (UnsupportedOperationException e) {
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				throw (IOException) new IOException().initCause(e);
+                                // TODO: inline cause when we will be allowed to target Java 6.
 			}
 
 		}

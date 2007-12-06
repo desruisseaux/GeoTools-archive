@@ -9,13 +9,16 @@
  *************************************************************************************************/
 package org.geotools.geometry.jts.spatialschema.geometry.complex;
 
-// J2SE direct dependencies
 import java.util.List;
 import java.util.Set;
 
+import org.opengis.geometry.complex.Complex;
 import org.opengis.geometry.complex.CompositeSurface;
 import org.opengis.geometry.primitive.OrientablePrimitive;
+import org.opengis.geometry.primitive.OrientableSurface;
 import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 
 /**
@@ -52,7 +55,7 @@ public class CompositeSurfaceImpl extends CompositeImpl implements CompositeSurf
      * @return The list of orientable surfaces in this composite.
      * @UML association generator
      */
-    public List/*<OrientableSurface>*/ getGenerators() {
+    public Set<OrientableSurface> getGenerators() {
         return null;
     }
     
@@ -78,7 +81,9 @@ public class CompositeSurfaceImpl extends CompositeImpl implements CompositeSurf
      * @return The sets of positions on the boundary.
      * @UML operation boundary
      */
-/// public SurfaceBoundary getBoundary();
+    public SurfaceBoundary getBoundary() {
+        return (SurfaceBoundary) super.getBoundary();
+    }
 
     /**
      * Returns the owner of this orientable surface, or {@code null} if none.
@@ -122,7 +127,7 @@ public class CompositeSurfaceImpl extends CompositeImpl implements CompositeSurf
      *
      * @see Primitive#getProxy
      */
-    public Primitive getPrimitive() {
+    public Surface getPrimitive() {
         return null;
     }
     
@@ -166,7 +171,7 @@ public class CompositeSurfaceImpl extends CompositeImpl implements CompositeSurf
      *
      * @see #getContainingPrimitives
      */
-    public Set/*<Primitive>*/ getContainedPrimitives() {
+    public Set<Primitive> getContainedPrimitives() {
         return null;
     }
 
@@ -186,7 +191,7 @@ public class CompositeSurfaceImpl extends CompositeImpl implements CompositeSurf
      *
      * @see #getContainedPrimitives
      */
-    public Set/*<Primitive>*/ getContainingPrimitives() {
+    public Set<Primitive> getContainingPrimitives() {
         return null;
     }
 
@@ -201,7 +206,7 @@ public class CompositeSurfaceImpl extends CompositeImpl implements CompositeSurf
      * @revisit Does it means that {@code Primitive} can't be immutable, since
      *          adding this primitive to a complex will change this set?
      */
-    public Set/*<Complex>*/ getComplexes() {
+    public Set<Complex> getComplexes() {
         return null;
     }
 

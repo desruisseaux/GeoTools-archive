@@ -49,6 +49,7 @@ import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.OrientablePrimitive;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.PrimitiveFactory;
@@ -278,6 +279,10 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 			return new CurveBoundaryImpl(getCoordinateReferenceSystem(), start, end);
 			//return this.getFeatGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
 	}
+
+    public OrientableCurve[] getProxy() {
+        return (OrientableCurve[]) super.getProxy();
+    }
 
 	/*
 	 * (non-Javadoc)

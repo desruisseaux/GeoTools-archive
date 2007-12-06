@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
 import java.text.ParseException;
 import java.text.FieldPosition;
@@ -28,13 +27,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import javax.vecmath.GMatrix;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.io.LineFormat;
 import org.geotools.io.ContentFormatException;
 import org.geotools.resources.XArray;
@@ -64,7 +61,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 8447482612423035360L;
-    
+
     /**
      * Defaul tolerance value for floating point comparisons.
      *
@@ -73,14 +70,14 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
      * @deprecated Doesn't seem to be used...
      */
     public static final double EPS = 1E-6;
-    
+
     /**
      * Constructs a square identity matrix of size {@code size}&nbsp;&times;&nbsp;{@code size}.
      */
     public GeneralMatrix(final int size) {
         super(size, size);
     }
-    
+
     /**
      * Creates a matrix of size {@code numRow}&nbsp;&times;&nbsp;{@code numCol}.
      * Elements on the diagonal <var>j==i</var> are set to 1.
@@ -88,7 +85,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     public GeneralMatrix(final int numRow, final int numCol) {
         super(numRow, numCol);
     }
-    
+
     /**
      * Constructs a {@code numRow}&nbsp;&times;&nbsp;{@code numCol} matrix
      * initialized to the values in the {@code matrix} array. The array values
@@ -103,7 +100,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
             throw new IllegalArgumentException(String.valueOf(matrix.length));
         }
     }
-    
+
     /**
      * Constructs a new matrix from a two-dimensional array of doubles.
      *
@@ -122,7 +119,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
             setRow(j, matrix[j]);
         }
     }
-    
+
     /**
      * Constructs a new matrix and copies the initial values from the parameter matrix.
      */
@@ -136,14 +133,14 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
             }
         }
     }
-    
+
     /**
      * Constructs a new matrix and copies the initial values from the parameter matrix.
      */
     public GeneralMatrix(final GMatrix matrix) {
         super(matrix);
     }
-    
+
     /**
      * Constructs a 3&times;3 matrix from the specified affine transform.
      */
@@ -155,7 +152,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         });
         assert isAffine() : this;
     }
-    
+
     /**
      * Constructs a transform that maps a source region to a destination region.
      * Axis order and direction are left unchanged.
@@ -190,7 +187,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         setElement(dstDim, srcDim, 1);
         assert (srcDim != dstDim) || isAffine() : this;
     }
-    
+
     /**
      * Constructs a transform changing axis order and/or direction.
      * For example, the transform may converts (NORTH,WEST) coordinates
@@ -217,7 +214,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     {
         this(null, srcAxis, null, dstAxis, false);
     }
-    
+
     /**
      * Constructs a transform mapping a source region to a destination region.
      * Axis order and/or direction can be changed during the process.
@@ -249,7 +246,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     {
         this(srcRegion, srcAxis, dstRegion, dstAxis, true);
     }
-    
+
     /**
      * Implementation of constructors expecting envelope and/or axis directions.
      *
@@ -315,7 +312,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         setElement(dstAxis.length, srcAxis.length, 1);
         assert (srcAxis.length != dstAxis.length) || isAffine() : this;
     }
-    
+
     /**
      * Convenience method for checking object dimension validity.
      * This method is usually invoked for argument checking.
@@ -336,7 +333,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
                         ErrorKeys.MISMATCHED_DIMENSION_$3, name, dim, dimension));
         }
     }
-    
+
     /**
      * Retrieves the specifiable values in the transformation matrix into a
      * 2-dimensional array of double precision values. The values are stored
@@ -359,7 +356,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         }
         return rows;
     }
-    
+
     /**
      * Retrieves the specifiable values in the transformation matrix into a
      * 2-dimensional array of double precision values. The values are stored
@@ -375,7 +372,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         }
         return rows;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -392,7 +389,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         }
         return true;
     }
-    
+
     /**
      * Returns {@code true} if this matrix is an identity matrix.
      */
@@ -413,7 +410,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         assert isIdentity(0) : this;
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      *
@@ -422,7 +419,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     public final boolean isIdentity(double tolerance) {
     	return isIdentity(this, tolerance);
     }
-    
+
     /**
      * Returns {@code true} if the matrix is an identity matrix using the provided tolerance.
      */
@@ -447,7 +444,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         // Note: we can't assert matrix.isAffine().
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -481,7 +478,7 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         }
         throw new IllegalStateException(Errors.format(ErrorKeys.NOT_AN_AFFINE_TRANSFORM));
     }
-    
+
     /**
      * Loads data from the specified file until the first blank line or end of file.
      *
@@ -549,15 +546,16 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         data = (data!=null) ? XArray.resize(data, numData) : new double[0];
         return new GeneralMatrix(numRow, numData/numRow, data);
     }
-    
+
     /**
      * Returns a string representation of this matrix. The returned string is implementation
      * dependent. It is usually provided for debugging purposes only.
      */
+    @Override
     public String toString() {
         return toString(this);
     }
-    
+
     /**
      * Returns a string representation of the specified matrix. The returned string is
      * implementation dependent. It is usually provided for debugging purposes only.
@@ -583,5 +581,13 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
             buffer.append(lineSeparator);
         }
         return buffer.toString();
+    }
+
+    /**
+     * Returns a clone of this matrix.
+     */
+    @Override
+    public GeneralMatrix clone() {
+        return (GeneralMatrix) super.clone();
     }
 }

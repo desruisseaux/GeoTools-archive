@@ -122,6 +122,7 @@ public class HsqlEpsgDatabase {
                 forceReadOnly(directory);
             } catch (IOException file) {
                 throw (SQLException) new SQLException("Can't read the SQL script.").initCause(file);
+                // TODO: inline cause when we will be allowed to target Java 6.
             }
         }
         return dataSource;
@@ -182,7 +183,7 @@ public class HsqlEpsgDatabase {
             in.close();
         } catch (IOException exception) {
             SQLException e = new SQLException("Can't read the SQL script."); // TODO: localize
-            e.initCause(exception);
+            e.initCause(exception); // TODO: inline cause when we will be allowed to target Java 6.
             throw e;
         } finally {
             statement.close();

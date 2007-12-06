@@ -16,14 +16,9 @@
  */
 package org.geotools.referencing.operation.matrix;
 
-// J2SE dependencies
 import java.io.Serializable;
 import javax.vecmath.SingularMatrixException;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 

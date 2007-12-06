@@ -368,10 +368,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
                 cause = exception;
             }
         }
-        IllegalArgumentException e = new IllegalArgumentException(Errors.format(
-                                         ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
-        e.initCause(cause); // TODO: Move in constructor's argument when we
-        throw e;            //       will be allowed to compile for J2SE 1.5.
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE), cause);
     }
 
     /**
@@ -416,10 +413,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
         try {
             crs2D = FACTORIES.separate(crs, new int[] {axisDimensionX, axisDimensionY});
         } catch (FactoryException exception) {
-            final InvalidGridGeometryException e = new InvalidGridGeometryException(
-                    Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()));
-            e.initCause(exception); // TODO: inline in the constructor with J2SE 1.5.
-            throw e;
+            throw new InvalidGridGeometryException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()), exception);
         }
         assert crs2D.getCoordinateSystem().getDimension() == 2 : crs2D;
         return crs2D;

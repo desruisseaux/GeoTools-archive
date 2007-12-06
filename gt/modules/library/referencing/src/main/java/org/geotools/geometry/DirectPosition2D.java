@@ -16,14 +16,13 @@
  */
 package org.geotools.geometry;
 
-// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-// OpenGIS dependencies
+import org.geotools.resources.Utilities;
 import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
@@ -44,7 +43,7 @@ import org.opengis.geometry.MismatchedDimensionException;
  * The rational for avoiding axis orientation restriction is that other {@link DirectPosition}
  * implementation do not have such restriction, and anyway it would be hard to generalize (what
  * to do with {@linkplain AxisDirection#NORTH_EAST North-East} direction?).
- * 
+ *
  * @since 2.0
  * @source $URL$
  * @version $Id$
@@ -220,14 +219,14 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
         x = position.getOrdinate(0);
         y = position.getOrdinate(1);
     }
-    
+
     /**
      * Returns a {@link Point2D} with the same coordinate as this direct position.
      */
     public Point2D toPoint2D() {
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Returns a string representation of this coordinate. The default implementation formats
      * this coordinate using a shared instance of {@link org.geotools.measure.CoordinateFormat}.
@@ -235,20 +234,45 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
      * is a lot of positions to format, users will get better performance and more control by
      * using their own instance of {@link org.geotools.measure.CoordinateFormat}.
      */
+    @Override
     public String toString() {
         return AbstractDirectPosition.toString(this);
     }
-    
+
     /**
-     * Returns a hash value for this coordinate. This value need not remain consistent between
-     * different implementations of the same class.
+     * Returns a hash value for this coordinate. This method do <strong>not</strong> takes
+     * the {@linkplain #getCoordinateReferenceSystem coordinate reference system} in account,
+     * and can not be overriden on purpose. This is necessary in order to stay consistent with
+     * the {@code hashCode} and {@code equals} contract defined in {@link Point2D}.
      */
-    public int hashCode() {
-        int code = super.hashCode();
-        if (crs != null) {
-            code ^= crs.hashCode();
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
+     * Compares this point with the specified object for equality.
+     */
+    @Override
+    public final boolean equals(final Object object) {
+        if (!super.equals(object)) {
+            return false;
         }
-        return code;
+        if (!(object instanceof DirectPosition)) {
+            // Do NOT check the CRS if the given object is an ordinary Point2D.
+            // This is necessary in order to respect the contract defined in Point2D.
+            return true;
+        }
+        return Utilities.equals(getCoordinateReferenceSystem(),
+                ((DirectPosition) object).getCoordinateReferenceSystem());
+    }
+
+    /**
+     * Returns a clone of this point.
+     */
+    @Override
+    public DirectPosition2D clone() {
+        return (DirectPosition2D) super.clone();
     }
 
     /**

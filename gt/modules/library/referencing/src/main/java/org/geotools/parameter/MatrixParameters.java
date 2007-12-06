@@ -16,15 +16,14 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -32,8 +31,8 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.util.InternationalString;
+import org.opengis.util.GenericName;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.resources.UnmodifiableArrayList;
@@ -94,7 +93,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * parameter values.
      */
     @Override
-    public GeneralParameterDescriptor getDescriptor() {
+    public ParameterDescriptorGroup getDescriptor() {
         return this;
     }
 
@@ -110,7 +109,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
-    public Collection/*<GenericName>*/ getAlias() {
+    public Collection<GenericName> getAlias() {
         return descriptor.getAlias();
     }
 
@@ -118,7 +117,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
-    public Set/*<Identifier>*/ getIdentifiers() {
+    public Set<ReferenceIdentifier> getIdentifiers() {
         return descriptor.getIdentifiers();
     }
 
@@ -161,8 +160,8 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     public GeneralParameterDescriptor descriptor(final String name)
             throws ParameterNotFoundException
     {
-        return ((MatrixParameterDescriptors) descriptor).descriptor(name, numRow.intValue(),
-                                                                          numCol.intValue());
+        return ((MatrixParameterDescriptors) descriptor).descriptor(name,
+                numRow.intValue(), numCol.intValue());
     }
 
     /**
@@ -203,7 +202,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
         try {
             return super.parameter(name);
         } catch (ParameterNotFoundException exception) {
-            if (cause!=null) try {
+            if (cause != null) try {
                 exception.initCause(cause);
             } catch (IllegalStateException ignore) {
                 // A cause has already be given to the exception. Forget the cause then.
@@ -268,9 +267,9 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Returns the parameters descriptors in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
      */
-    public List/*<GeneralParameterDescriptor>*/ descriptors() {
-        return ((MatrixParameterDescriptors) descriptor).descriptors(numRow.intValue(),
-                                                                     numCol.intValue());
+    public List<GeneralParameterDescriptor> descriptors() {
+        return ((MatrixParameterDescriptors) descriptor).descriptors(
+                numRow.intValue(), numCol.intValue());
     }
 
     /**
@@ -280,7 +279,8 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * least once by one of {@code parameter(...)} methods. Never requested elements
      * are left to their default value and omitted from the returned array.
      */
-    public List/*<GeneralParameterValue>*/ values() {
+    @Override
+    public List<GeneralParameterValue> values() {
         final int numRow = this.numRow.intValue();
         final int numCol = this.numCol.intValue();
         final ParameterValue[] parameters = new ParameterValue[numRow*numCol + 2];
@@ -302,19 +302,19 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
                 }
             }
         }
-        return UnmodifiableArrayList.wrap((ParameterValue[]) XArray.resize(parameters, k));
+        return UnmodifiableArrayList.wrap((GeneralParameterValue[]) XArray.resize(parameters, k));
     }
 
     /**
-     * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
+     * Forwards the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
-    public GeneralParameterValue createValue() {
-        return descriptor.createValue();
+    public ParameterValueGroup createValue() {
+        return (ParameterValueGroup) descriptor.createValue();
     }
 
     /**
-     * Create a matrix from this group of parameters.
+     * Creates a matrix from this group of parameters.
      *
      * @return A matrix created from this group of parameters.
      */
@@ -339,7 +339,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     }
 
     /**
-     * Set all parameter values to the element value in the specified matrix.
+     * Sets all parameter values to the element value in the specified matrix.
      * After this method call, {@link #values} will returns only the elements
      * different from the default value.
      *
@@ -425,7 +425,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
                     copy.matrixValues[j] = array = array.clone();
                     for (int i=0; i<array.length; i++) {
                         if (array[i] != null) {
-                            array[i] = (ParameterValue) array[i].clone();
+                            array[i] = array[i].clone();
                         }
                     }
                 }

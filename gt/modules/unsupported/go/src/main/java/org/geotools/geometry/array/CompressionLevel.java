@@ -54,7 +54,7 @@ public final class CompressionLevel extends CodeList<CompressionLevel> {
      * List of all enumerations of this type.
      * Must be declared before any enum declaration.
      */
-    private static final List/*<CompressionLevel>*/ VALUES = new ArrayList/*<CompressionLevel>*/(2);
+    private static final List<CompressionLevel> VALUES = new ArrayList<CompressionLevel>(2);
 
     /**
      * Transforms coordinate points into direct positions stored as {@code float} values.
@@ -96,14 +96,14 @@ public final class CompressionLevel extends CodeList<CompressionLevel> {
      */
     public static CompressionLevel[] values() {
         synchronized (VALUES) {
-            return (CompressionLevel[]) VALUES.toArray(new CompressionLevel[VALUES.size()]);
+            return VALUES.toArray(new CompressionLevel[VALUES.size()]);
         }
     }
 
     /**
      * Returns the list of enumerations of the same kind than this enum.
      */
-    public /*{CompressionLevel}*/ CodeList[] family() {
+    public CompressionLevel[] family() {
         return values();
     }
 }

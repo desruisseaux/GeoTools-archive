@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,15 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Map;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.SphericalCS;
 import org.opengis.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.datum.GeodeticDatum;
 
-// Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -61,7 +58,7 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6784642848287659827L;
-    
+
     /**
      * The default geocentric CRS with a
      * {@linkplain DefaultCartesianCS#GEOCENTRIC cartesian coordinate system}.
@@ -73,7 +70,7 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
     public static final DefaultGeocentricCRS CARTESIAN = new DefaultGeocentricCRS(
                         name(VocabularyKeys.CARTESIAN),
                         DefaultGeodeticDatum.WGS84, DefaultCartesianCS.GEOCENTRIC);
-    
+
     /**
      * The default geocentric CRS with a
      * {@linkplain DefaultSphericalCS#GEOCENTRIC spherical coordinate system}.
@@ -132,9 +129,9 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultGeocentricCRS(final Map      properties,
+    public DefaultGeocentricCRS(final Map<String,?> properties,
                                 final GeodeticDatum datum,
-                                final CartesianCS      cs)
+                                final CartesianCS   cs)
     {
         super(properties, datum, cs);
     }
@@ -148,23 +145,32 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultGeocentricCRS(final Map      properties,
+    public DefaultGeocentricCRS(final Map<String,?> properties,
                                 final GeodeticDatum datum,
-                                final SphericalCS      cs)
+                                final SphericalCS   cs)
     {
         super(properties, datum, cs);
     }
-    
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public GeodeticDatum getDatum() {
+        return (GeodeticDatum) super.getDatum();
+    }
+
     /**
      * Returns a hash value for this geocentric CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -173,6 +179,7 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type, which is {@code "GEOCCS"}.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final Unit unit = getUnit();
         formatter.append(datum);

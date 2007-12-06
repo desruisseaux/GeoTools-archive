@@ -10,6 +10,7 @@ import org.opengis.geometry.primitive.SurfaceInterpolation;
 import org.geotools.geometry.jts.spatialschema.geometry.primitive.SurfacePatchImpl;
 import org.geotools.geometry.jts.JTSGeometry;
 import org.geotools.geometry.jts.JTSUtils;
+import org.opengis.geometry.coordinate.PolyhedralSurface;
 
 public class PolygonImpl extends SurfacePatchImpl implements Polygon {
     
@@ -64,6 +65,10 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
         com.vividsolutions.jts.geom.Polygon result =
             JTSUtils.GEOMETRY_FACTORY.createPolygon(jtsExterior, jtsInterior);
         return result;
+    }
+
+    public PolyhedralSurface getSurface() {
+        return (PolyhedralSurface) super.getSurface();
     }
 
     /**

@@ -75,7 +75,7 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
         return sequence;
     }
     
-    private class FlyWeightDirectPosition implements DirectPosition{
+    private class FlyWeightDirectPosition implements DirectPosition {
         PackedCoordinateSequence sequence;
         int offset=0;
         private int dimension;
@@ -141,7 +141,7 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
         /**
          * @see org.opengis.geometry.coordinate.DirectPosition#clone()
          */
-        public Object clone() {
+        public FlyWeightDirectPosition clone() {
             throw new UnsupportedOperationException();
         }
 

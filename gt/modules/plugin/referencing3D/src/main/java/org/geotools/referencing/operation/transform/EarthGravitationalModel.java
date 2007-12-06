@@ -241,7 +241,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
                  */
                 final IOException exception = new IOException(Errors.format(
                         ErrorKeys.BAD_LINE_IN_FILE_$2, filename, in.getLineNumber()));
-                exception.initCause(cause);
+                exception.initCause(cause); // TODO: Inline when we will be allowed to target Java 6.
                 throw exception;
             }
         }

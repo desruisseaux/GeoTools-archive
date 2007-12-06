@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,14 +19,12 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.units.NonSI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -36,7 +34,6 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.referencing.wkt.Formatter;
@@ -86,7 +83,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      */
     public static final DefaultGeographicCRS WGS84_3D;
     static {
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(NAME_KEY, "WGS84");
         properties.put(DOMAIN_OF_VALIDITY_KEY, ExtentImpl.WORLD);
         WGS84    = new DefaultGeographicCRS(properties, DefaultGeodeticDatum.WGS84,
@@ -130,11 +127,27 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultGeographicCRS(final Map      properties,
+    public DefaultGeographicCRS(final Map<String,?> properties,
                                 final GeodeticDatum datum,
-                                final EllipsoidalCS    cs)
+                                final EllipsoidalCS cs)
     {
         super(properties, datum, cs);
+    }
+
+    /**
+     * Returns the coordinate system.
+     */
+    @Override
+    public EllipsoidalCS getCoordinateSystem() {
+        return (EllipsoidalCS) super.getCoordinateSystem();
+    }
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public GeodeticDatum getDatum() {
+        return (GeodeticDatum) super.getDatum();
     }
 
     /**
@@ -148,6 +161,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      *         distances.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
+    @Override
     public Measure distance(final double[] coord1, final double[] coord2)
             throws UnsupportedOperationException, MismatchedDimensionException
     {
@@ -174,13 +188,14 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
                                                  cs.getLongitude(coord2),
                                                  cs.getLatitude (coord2)), e.getAxisUnit());
     }
-    
+
     /**
      * Returns a hash value for this geographic CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }
@@ -203,7 +218,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
         }
         return unit;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -212,6 +227,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type, which is {@code "GEOGCS"}.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final Unit oldUnit = formatter.getAngularUnit();
         final Unit unit = getAngularUnit(coordinateSystem);

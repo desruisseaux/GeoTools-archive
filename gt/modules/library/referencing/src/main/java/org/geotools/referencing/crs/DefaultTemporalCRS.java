@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -27,12 +26,10 @@ import javax.units.Converter;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.datum.TemporalDatum;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractReferenceSystem;
 
 
@@ -111,9 +108,9 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
      * @param cs The coordinate system.
      * @param datum The datum.
      */
-    public DefaultTemporalCRS(final Map      properties,
+    public DefaultTemporalCRS(final Map<String,?> properties,
                               final TemporalDatum datum,
-                              final TimeCS           cs)
+                              final TimeCS        cs)
     {
         super(properties, datum, cs);
     }
@@ -137,6 +134,22 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
     private void initializeConverter() {
         origin   = ((TemporalDatum)datum).getOrigin().getTime();
         toMillis = coordinateSystem.getAxis(0).getUnit().getConverterTo(MILLISECOND);
+    }
+
+    /**
+     * Returns the coordinate system.
+     */
+    @Override
+    public TimeCS getCoordinateSystem() {
+        return (TimeCS) super.getCoordinateSystem();
+    }
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public TemporalDatum getDatum() {
+        return (TemporalDatum) super.getDatum();
     }
 
     /**
@@ -166,13 +179,14 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
         }
         return toMillis.inverse().convert(time.getTime() - origin);
     }
-    
+
     /**
      * Returns a hash value for this geographic CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }

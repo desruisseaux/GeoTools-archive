@@ -53,5 +53,6 @@ public class ContentFormatException extends IOException {
     public ContentFormatException(final String message, final Throwable cause) {
         super(message);
         initCause(cause);
+        // TODO: use super(message, cause) when we will be allowed to compile for Java 6.
     }
 }

@@ -160,11 +160,11 @@ public abstract class AbstractInternationalString implements InternationalString
     }
 
     /**
-     * Compare this string with the specified object for order. This method compare
+     * Compares this string with the specified object for order. This method compare
      * the string in the {@linkplain Locale#getDefault default locale}, as returned
      * by {@link #toString()}.
      */
-    public int compareTo(final Object object) {
+    public int compareTo(final InternationalString object) {
         return toString().compareTo(object.toString());
     }
 }

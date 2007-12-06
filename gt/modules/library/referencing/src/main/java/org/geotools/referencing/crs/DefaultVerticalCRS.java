@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,23 +19,18 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.datum.VerticalDatum;
 
-// Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.DefaultVerticalCS;
 import org.geotools.referencing.AbstractReferenceSystem;
-import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.resources.i18n.Vocabulary;
 
 
 /**
@@ -62,7 +57,7 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 3565878468719941800L;
-    
+
     /**
      * Default vertical coordinate reference system using ellipsoidal datum.
      * Ellipsoidal heights are measured along the normal to the ellipsoid
@@ -107,23 +102,40 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultVerticalCRS(final Map      properties,
+    public DefaultVerticalCRS(final Map<String,?> properties,
                               final VerticalDatum datum,
-                              final VerticalCS       cs)
+                              final VerticalCS    cs)
     {
         super(properties, datum, cs);
     }
-    
+
+    /**
+     * Returns the coordinate system.
+     */
+    @Override
+    public VerticalCS getCoordinateSystem() {
+        return (VerticalCS) super.getCoordinateSystem();
+    }
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public VerticalDatum getDatum() {
+        return (VerticalDatum) super.getDatum();
+    }
+
     /**
      * Returns a hash value for this geographic CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -132,6 +144,7 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type, which is {@code "VERT_CS"}.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatDefaultWKT(formatter);
         return "VERT_CS";

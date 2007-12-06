@@ -230,7 +230,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
         try {
             return super.descriptor(name);
         } catch (ParameterNotFoundException exception) {
-            if (cause!=null) try {
+            if (cause != null) try {
                 exception.initCause(cause);
             } catch (IllegalStateException ignore) {
                 // A cause has already be given to the exception. Forget the cause then.
@@ -340,7 +340,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
      * value associated to the {@link #numRow} and {@link #numCol numCol} parameters.
      */
     @Override
-    public GeneralParameterValue createValue() {
+    public ParameterValueGroup createValue() {
         return new MatrixParameters(this);
     }
 

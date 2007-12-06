@@ -23,6 +23,8 @@ import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.complex.CompositeCurve;
+import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.OrientableCurve;
 
 /**
@@ -44,6 +46,14 @@ public class OrientableCurveProxy extends OrientablePrimitiveProxy implements
 	private CurveImpl curve() {
 		return (CurveImpl) getPrimitive();
 	}
+
+    public Curve getPrimitive() {
+        return (Curve) super.getPrimitive();
+    }
+
+    public CurveBoundary getBoundary() {
+        return (CurveBoundary) super.getBoundary();
+    }
 
 	/**
 	 * @return

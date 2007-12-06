@@ -12,8 +12,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.complex.CompositeSurface;
 import org.opengis.geometry.coordinate.PolyhedralSurface;
-import org.opengis.geometry.primitive.OrientablePrimitive;
-import org.opengis.geometry.primitive.Primitive;
+import org.opengis.geometry.primitive.OrientableSurface;
+import org.opengis.geometry.primitive.Surface;
+import org.opengis.geometry.primitive.SurfaceBoundary;
 
 /**
  * The {@code PolyhedralSurfaceImpl} class/interface...
@@ -37,6 +38,10 @@ public class PolyhedralSurfaceImpl extends GeometryImpl implements PolyhedralSur
     
     public PolyhedralSurfaceImpl() {
         this(null);
+    }
+
+    public SurfaceBoundary getBoundary() {
+        return (SurfaceBoundary) super.getBoundary();
     }
 
     @SuppressWarnings("unchecked")
@@ -64,7 +69,7 @@ public class PolyhedralSurfaceImpl extends GeometryImpl implements PolyhedralSur
         return 0;
     }
 
-    public Primitive getPrimitive() {
+    public Surface getPrimitive() {
         return this;
     }
 
@@ -76,7 +81,7 @@ public class PolyhedralSurfaceImpl extends GeometryImpl implements PolyhedralSur
         return null;
     }
 
-    public OrientablePrimitive[] getProxy() {
+    public OrientableSurface[] getProxy() {
         return null;
     }
 
@@ -100,5 +105,9 @@ public class PolyhedralSurfaceImpl extends GeometryImpl implements PolyhedralSur
             return JTSUtils.GEOMETRY_FACTORY.createMultiPolygon(polygons);
         }
         return ((JTSGeometry) patches.get(0)).getJTSGeometry();
+    }
+
+    public PolyhedralSurfaceImpl clone() {
+        return (PolyhedralSurfaceImpl) super.clone();
     }
 }

@@ -34,25 +34,24 @@ public class InvalidGridGeometryException extends IllegalStateException {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7386283388753448743L;
-    
+
     /**
-     * Construct an exception with no detail message.
+     * Constructs an exception with no detail message.
      */
     public InvalidGridGeometryException() {
     }
-    
+
     /**
-     * Construct an exception with the specified detail message.
+     * Constructs an exception with the specified detail message.
      */
     public InvalidGridGeometryException(final String message) {
         super(message);
     }
-    
+
     /**
-     * Construct an exception with the specified detail message and cause.
+     * Constructs an exception with the specified detail message and cause.
      */
     public InvalidGridGeometryException(final String message, final Throwable cause) {
-        super(message);
-        initCause(cause);
+        super(message, cause);
     }
 }

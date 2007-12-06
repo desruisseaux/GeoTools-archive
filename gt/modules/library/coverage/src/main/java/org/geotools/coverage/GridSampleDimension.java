@@ -1208,10 +1208,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         } catch (TransformException exception) {
             cause = exception;
         }
-        IllegalStateException exception = new IllegalStateException(Errors.format(
-                                              ErrorKeys.NON_LINEAR_RELATION));
-        exception.initCause(cause);
-        throw exception;
+        throw new IllegalStateException(Errors.format(ErrorKeys.NON_LINEAR_RELATION), cause);
     }
 
     /**

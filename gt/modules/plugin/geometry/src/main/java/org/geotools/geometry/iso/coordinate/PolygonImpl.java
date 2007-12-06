@@ -25,6 +25,7 @@ import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.coordinate.Polygon;
+import org.opengis.geometry.coordinate.PolyhedralSurface;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -136,6 +137,10 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
 		return (this.getBoundary() != null) ? this.getBoundary().getEnvelope()
 				: null;
 	}
+        
+    public PolyhedralSurface getSurface() {
+        return (PolyhedralSurface) super.getSurface();
+    }
 
 	// /**
 	// * This method returns the neighbours of the SurfacePatch within the

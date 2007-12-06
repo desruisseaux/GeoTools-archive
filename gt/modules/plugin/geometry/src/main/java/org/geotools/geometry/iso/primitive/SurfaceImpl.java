@@ -320,6 +320,14 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		return null;
 	}
 
+    public Surface getPrimitive() {
+        return null;
+    }
+
+    public OrientableSurface[] getProxy() {
+        return null;
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * 

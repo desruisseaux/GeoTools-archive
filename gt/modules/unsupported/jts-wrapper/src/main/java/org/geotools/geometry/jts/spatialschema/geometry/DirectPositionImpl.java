@@ -220,7 +220,7 @@ public class DirectPositionImpl implements Cloneable, DirectPosition, Position, 
      * @inheritDoc
      * @see java.lang.Object#clone()
      */
-    public Object clone() {
+    public DirectPositionImpl clone() {
         /*DirectPositionImpl result = (DirectPositionImpl) super.clone();
         result.ordinates = (double []) ordinates.clone();
         return result;*/

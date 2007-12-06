@@ -140,9 +140,9 @@ public class DefaultCanvasState implements CanvasState, Cloneable, Serializable 
     /**
      * Returns a copy of this canvas state.
      */
-    public Object clone() {
+    public CanvasState clone() {
         try {
-            return super.clone();
+            return (CanvasState) super.clone();
         } catch (CloneNotSupportedException e) {
             // Should never happen, since we are cloneable.
             throw new AssertionError(e);

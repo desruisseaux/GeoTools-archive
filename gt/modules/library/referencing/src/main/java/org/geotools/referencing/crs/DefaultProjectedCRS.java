@@ -31,7 +31,9 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystem; // For javadoc
+import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -158,6 +160,38 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
             throws MismatchedDimensionException
     {
         super(properties, conversionFromBase, base, baseToDerived, derivedCS);
+    }
+
+    /**
+     * Returns the coordinate system.
+     */
+    @Override
+    public CartesianCS getCoordinateSystem() {
+        return (CartesianCS) super.getCoordinateSystem();
+    }
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public GeodeticDatum getDatum() {
+        return (GeodeticDatum) super.getDatum();
+    }
+
+    /**
+     * Returns the base coordinate reference system, which must be geographic.
+     */
+    @Override
+    public GeographicCRS getBaseCRS() {
+        return (GeographicCRS) super.getBaseCRS();
+    }
+
+    /**
+     * Returns the map projection from the {@linkplain #getBaseCRS base CRS} to this CRS.
+     */
+    @Override
+    public Projection getConversionFromBase() {
+        return (Projection) super.getConversionFromBase();
     }
 
     /**

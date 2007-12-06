@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,22 +15,18 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies and extensions
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
@@ -40,7 +36,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterTypeException;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.util.logging.Logging;
 
@@ -81,7 +76,13 @@ import org.geotools.util.logging.Logging;
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  */
-public class Parameters {
+public final class Parameters {
+    /**
+     * Do not allows instantiation of this utility class.
+     */
+    private Parameters() {
+    }
+
     /**
      * Small number for floating point comparaisons.
      */
@@ -113,9 +114,9 @@ public class Parameters {
      * @see Parameter#ensureValidValue
      */
     public static boolean isValid(final ParameterValue parameter) {
-        final ParameterDescriptor descriptor = (ParameterDescriptor) parameter.getDescriptor();
+        final ParameterDescriptor descriptor = parameter.getDescriptor();
         final Object value = parameter.getValue();
-        final Class  type  = (value == null) ? Void.TYPE : value.getClass();                
+        final Class  type  = (value == null) ? Void.TYPE : value.getClass();
         final Class  kind  = descriptor.getValueClass();
 
         if (kind.isInstance(value)) {
@@ -158,7 +159,7 @@ public class Parameters {
      * @see Parameter#ensureValidValue
      */
     private static boolean isValidValue(final Object value, final ParameterDescriptor descriptor) {
-        final Class  type = (value == null) ? Void.TYPE : value.getClass();                
+        final Class  type = (value == null) ? Void.TYPE : value.getClass();
         final Class  expected = descriptor.getValueClass();
         final Set validValues = descriptor.getValidValues();
         if (validValues!=null && !validValues.contains(value)) {

@@ -133,7 +133,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.complex.Composite#getGenerators()
 	 */
-	public List<OrientableSurface> getGenerators() {
+	public Set<OrientableSurface> getGenerators() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -165,7 +165,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.primitive.OrientablePrimitive#getPrimitive()
 	 */
-	public Primitive getPrimitive() {
+	public Surface getPrimitive() {
 		// TODO Auto-generated method stub
 		return null;
 	}

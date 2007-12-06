@@ -219,9 +219,7 @@ public final class Interpolator2D extends GridCoverage2D {
             //       than nearest-neighbor.
             toGrid = (MathTransform2D) transform.inverse();
         } catch (NoninvertibleTransformException exception) {
-            final IllegalArgumentException e = new IllegalArgumentException();
-            e.initCause(exception);
-            throw e;
+            throw new IllegalArgumentException(exception);
         }
         
         final int left   = interpolation.getLeftPadding();

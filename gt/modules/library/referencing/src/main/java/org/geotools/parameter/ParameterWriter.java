@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -15,7 +15,6 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -25,14 +24,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -45,7 +42,6 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.util.InternationalString;
 import org.opengis.util.GenericName;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
@@ -184,10 +180,8 @@ public class ParameterWriter extends FilterWriter {
      * @throws IOException if an error occured will writing to the stream.
      */
     public void format(final ParameterValueGroup values) throws IOException {
-        final ParameterDescriptorGroup descriptor =
-             (ParameterDescriptorGroup) values.getDescriptor();
+        final ParameterDescriptorGroup descriptor = values.getDescriptor();
         synchronized (lock) {
-            // TODO: remove cast when we will be allowe to use J2SE 1.5.
             format(descriptor.getName().getCode(), descriptor, values);
         }
     }
@@ -213,11 +207,10 @@ public class ParameterWriter extends FilterWriter {
         out.write(' ');
         out.write(name);
         out.write(lineSeparator);
-        Collection/*<GenericName>*/ alias = group.getAlias();
+        Collection<GenericName> alias = group.getAlias();
         if (alias != null) {
             boolean first = true;
-            for (final Iterator i=alias.iterator(); i.hasNext();) {
-                final GenericName a = (GenericName) i.next();
+            for (final GenericName a : alias) {
                 out.write(first ? " alias " : "       ");
                 out.write(a.toInternationalString().toString(locale));
                 out.write(lineSeparator);
@@ -251,11 +244,10 @@ public class ParameterWriter extends FilterWriter {
          * the descriptor can't know which optional values are included and which one are
          * omitted.
          */
-        List deferredGroups = null;
+        List<Object> deferredGroups = null;
         final Object[] array1 = new Object[1];
-        final Collection elements = (values!=null) ? values.values() : group.descriptors();
-        for (final Iterator it=elements.iterator(); it.hasNext();) {
-            final Object                     element = it.next();
+        final Collection<?> elements = (values!=null) ? values.values() : group.descriptors();
+        for (final Object element : elements) {
             final GeneralParameterValue      generalValue;
             final GeneralParameterDescriptor generalDescriptor;
             if (values != null) {
@@ -271,7 +263,7 @@ public class ParameterWriter extends FilterWriter {
              */
             if (generalDescriptor instanceof ParameterDescriptorGroup) {
                 if (deferredGroups == null) {
-                    deferredGroups = new ArrayList();
+                    deferredGroups = new ArrayList<Object>();
                 }
                 deferredGroups.add(element);
                 continue;
@@ -284,8 +276,7 @@ public class ParameterWriter extends FilterWriter {
             table.write(identifier.getCode());
             alias = generalDescriptor.getAlias();
             if (alias != null) {
-                for (final Iterator i=alias.iterator(); i.hasNext();) {
-                    final GenericName a = (GenericName) i.next();
+                for (final GenericName a : alias) {
                     if (!identifier.equals(a)) {
                         table.write(lineSeparator);
                         table.write(a.asLocalName().toInternationalString().toString(locale));
@@ -355,14 +346,12 @@ public class ParameterWriter extends FilterWriter {
          * Most of the time, there is no such group.
          */
         if (deferredGroups != null) {
-            for (final Iterator it=deferredGroups.iterator(); it.hasNext();) {
-                final Object element = it.next();
+            for (final Object element : deferredGroups) {
                 final ParameterValueGroup value;
                 final ParameterDescriptorGroup descriptor;
                 if (element instanceof ParameterValueGroup) {
                     value = (ParameterValueGroup) element;
-                    descriptor = (ParameterDescriptorGroup) value.getDescriptor();
-                    // TODO: remove cast when we will be allowed to use J2SE 1.5.
+                    descriptor = value.getDescriptor();
                 } else {
                     value = null;
                     descriptor = (ParameterDescriptorGroup) element;
@@ -374,7 +363,7 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Format a summary of a collection of {@linkplain IdentifiedObject identified objects}.
+     * Formats a summary of a collection of {@linkplain IdentifiedObject identified objects}.
      * The summary contains the identifier name and alias aligned in a table.
      *
      * @param  parameters The collection of parameters to format.
@@ -382,7 +371,9 @@ public class ParameterWriter extends FilterWriter {
      *                    of them. A restricted a set will produce a table with less columns.
      * @throws IOException if an error occured will writing to the stream.
      */
-    public void summary(final Collection parameters, final Set/*<Sring>*/ scopes) throws IOException {
+    public void summary(final Collection<? extends IdentifiedObject> parameters,
+                        final Set<String> scopes) throws IOException
+    {
         /*
          * Prepares the list of alias before any write to the output stream.
          * We need to prepare the list first, because not all identified objects
@@ -396,9 +387,8 @@ public class ParameterWriter extends FilterWriter {
         final Locale              locale = this.locale; // Protect from changes.
         String[] descriptions = null;
         titles.put(null, 0); // Special value for the identifier column.
-        for (final Iterator it=parameters.iterator(); it.hasNext();) {
-            final IdentifiedObject element = (IdentifiedObject) it.next();
-            final Collection/*<GenericName>*/ aliases = element.getAlias();
+        for (final IdentifiedObject element : parameters) {
+            final Collection<GenericName> aliases = element.getAlias();
             String[] elementNames = new String[titles.size()];
             elementNames[0] = element.getName().getCode();
             if (aliases != null) {
@@ -408,8 +398,7 @@ public class ParameterWriter extends FilterWriter {
                  * (i.e. names without their scope) to the 'elementNames' row.
                  */
                 int count = 0;
-                for (final Iterator i=aliases.iterator(); i.hasNext();) {
-                    final GenericName alias = (GenericName) i.next();
+                for (final GenericName alias : aliases) {
                     final GenericName scope = alias.getScope();
                     final GenericName name  = alias.asLocalName();
                     final Object title;
@@ -446,7 +435,7 @@ public class ParameterWriter extends FilterWriter {
                      */
                     final int index = position.intValue();
                     if (index >= elementNames.length) {
-                        elementNames = (String[]) XArray.resize(elementNames, index+1);
+                        elementNames = XArray.resize(elementNames, index+1);
                     }
                     final String oldName = elementNames[index];
                     final String newName = name.toInternationalString().toString(locale);
@@ -480,8 +469,7 @@ public class ParameterWriter extends FilterWriter {
          */
         final boolean[] hide = new boolean[titles.size()];
 trim:   for (int column=hide.length; --column>=1;) {
-            for (final Iterator it=names.iterator(); it.hasNext();) {
-                final String[] alias = (String[]) it.next();
+            for (final String[] alias : names) {
                 if (alias.length > column) {
                     final String name = alias[column];
                     if (name!=null && !name.equals(alias[0])) {
@@ -507,8 +495,7 @@ trim:   for (int column=hide.length; --column>=1;) {
             /*
              * Writes all column headers.
              */
-            for (final Iterator it=titles.keySet().iterator(); it.hasNext();) {
-                final Object element = it.next();
+            for (final Object element : titles.keySet()) {
                 if (hide[column++]) {
                     continue;
                 }
@@ -531,8 +518,7 @@ trim:   for (int column=hide.length; --column>=1;) {
              * Writes all row.
              */
             int counter = 0;
-            for (final Iterator it=names.iterator(); it.hasNext();) {
-                final String[] aliases = (String[]) it.next();
+            for (final String[] aliases : names) {
                 for (column=0; column<hide.length; column++) {
                     if (hide[column]) {
                         continue;

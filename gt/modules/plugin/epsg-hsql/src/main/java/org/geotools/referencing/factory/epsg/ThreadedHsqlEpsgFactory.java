@@ -382,7 +382,7 @@ public class ThreadedHsqlEpsgFactory extends ThreadedEpsgFactory {
             } catch (IOException exception) {
                 statement.close();
                 SQLException e = new SQLException(Errors.format(ErrorKeys.CANT_READ_$1, SQL_FILE));
-                e.initCause(exception);
+                e.initCause(exception); // TODO: inline cause when we will be allowed to target Java 6.
                 throw e;
             }
             statement.close();

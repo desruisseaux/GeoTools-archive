@@ -168,6 +168,7 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
      * Returns a string representation of this coordinate. The returned string is
      * implementation dependent. It is usually provided for debugging purposes.
      */
+    @Override
     public String toString() {
         return DirectPosition2D.toString(this, getCoordinates());
     }
@@ -176,6 +177,7 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
      * Returns a hash value for this coordinate. This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         final long value = Double.doubleToLongBits(ordinate);
         int code = (int)value ^ (int)(value >>> 32);
@@ -188,9 +190,10 @@ public class DirectPosition1D implements DirectPosition, Serializable, Cloneable
     /**
      * Returns a copy of this position.
      */
-    public Object clone() {
+    @Override
+    public DirectPosition1D clone() {
         try {
-            return super.clone();
+            return (DirectPosition1D) super.clone();
         } catch (CloneNotSupportedException exception) {
             // Should not happen, since we are cloneable.
             throw new AssertionError(exception);

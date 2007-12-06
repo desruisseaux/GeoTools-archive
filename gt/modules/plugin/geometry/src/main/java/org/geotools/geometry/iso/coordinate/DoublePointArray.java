@@ -260,7 +260,7 @@ class DoubleDirectPosition implements DirectPosition, Serializable {
     public DirectPosition getPosition() {
         return this;
     }
-    public Object clone() {
+    public DirectPosition clone() {
         return new DoubleDirectPosition( crs, getCoordinates() );                                
     }
     @Override

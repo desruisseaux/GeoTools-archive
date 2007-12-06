@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,20 +19,14 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
-import java.util.Collection;
 import java.util.Map;
 import javax.units.SI;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.EngineeringCRS;
 import org.opengis.referencing.datum.EngineeringDatum;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.datum.DefaultEngineeringDatum;
@@ -40,10 +34,8 @@ import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.NameFactory;
- 
+
 
 /**
  * A contextually local coordinate reference system. It can be divided into two broad categories:
@@ -94,6 +86,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
          * because, otherwise, {@code CARTESIAN_xD} and {@code GENERIC_xD} would be considered
          * equals when metadata are ignored.
          */
+        @Override
         public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
             if (super.equals(object, compareMetadata)) {
                 if (compareMetadata) {
@@ -196,23 +189,32 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultEngineeringCRS(final Map         properties,
-                                 final EngineeringDatum datum,
-                                 final CoordinateSystem    cs)
+    public DefaultEngineeringCRS(final Map<String,?> properties,
+                                 final EngineeringDatum   datum,
+                                 final CoordinateSystem      cs)
     {
         super(properties, datum, cs);
     }
-    
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public EngineeringDatum getDatum() {
+        return (EngineeringDatum) super.getDatum();
+    }
+
     /**
      * Returns a hash value for this derived CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -221,6 +223,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * @param  formatter The formatter to use.
      * @return The name of the WKT element type, which is {@code "LOCAL_CS"}.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatDefaultWKT(formatter);
         return "LOCAL_CS";

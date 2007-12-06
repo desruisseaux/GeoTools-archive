@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,13 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AffineCS;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.ImageDatum;
 import org.opengis.referencing.crs.ImageCRS;
-
-// Geotools dependencies
 import org.geotools.referencing.AbstractReferenceSystem;
 
 
@@ -91,19 +87,36 @@ public class DefaultImageCRS extends AbstractSingleCRS implements ImageCRS {
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultImageCRS(final Map   properties,
-                           final ImageDatum datum,
+    public DefaultImageCRS(final Map<String,?> properties,
+                           final ImageDatum    datum,
                            final AffineCS      cs)
     {
         super(properties, datum, cs);
     }
-    
+
+    /**
+     * Returns the coordinate system.
+     */
+    @Override
+    public AffineCS getCoordinateSystem() {
+        return (AffineCS) super.getCoordinateSystem();
+    }
+
+    /**
+     * Returns the datum.
+     */
+    @Override
+    public ImageDatum getDatum() {
+        return (ImageDatum) super.getDatum();
+    }
+
     /**
      * Returns a hash value for this geographic CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode();
     }

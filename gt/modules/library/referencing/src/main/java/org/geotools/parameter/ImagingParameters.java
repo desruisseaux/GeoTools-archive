@@ -222,7 +222,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
                  * The value will be stored separatly, and the coverage framework will need
                  * to handle it itself.
                  */
-                value = (ParameterValue) d.createValue();
+                value = d.createValue();
             }
             values[i] = value;
         }
@@ -244,6 +244,14 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
         }
         this.values = UnmodifiableArrayList.wrap(values);
         return values;
+    }
+
+    /**
+     * Returns the abstract definition of this parameter.
+     */
+    @Override
+    public ParameterDescriptorGroup getDescriptor() {
+        return (ParameterDescriptorGroup) super.getDescriptor();
     }
 
     /**
@@ -341,10 +349,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
             paramField.set(copy, cloneMethod.invoke(parameters, (Object[]) null));
         } catch (Exception exception) {
             // TODO: localize.
-            // TODO: Use constructor with Throwable when we will be allowed to compile for J2SE 1.5.
-            UnsupportedOperationException e = new UnsupportedOperationException("Clone not supported.");
-            e.initCause(exception);
-            throw e;
+            throw new UnsupportedOperationException("Clone not supported.", exception);
         }
         /*
          * Most elements in the values list are ImagingParameter instances, which are backed by the
@@ -361,7 +366,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
             assert values.size() == cloned.length : values;
             for (int i=0; i<cloned.length; i++) {
                 if (!(cloned[i] instanceof ImagingParameter)) {
-                    cloned[i] = (ParameterValue) ((ParameterValue) values.get(i)).clone();
+                    cloned[i] = ((ParameterValue) values.get(i)).clone();
                 }
             }
         }

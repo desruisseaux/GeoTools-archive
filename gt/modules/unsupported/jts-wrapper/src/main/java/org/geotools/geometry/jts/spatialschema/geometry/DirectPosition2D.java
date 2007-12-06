@@ -213,6 +213,11 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
         return code;
     }
 
+    @Override
+    public DirectPosition2D clone() {
+        return (DirectPosition2D) super.clone();
+    }
+
     /**
      * Write this object to the specified stream. This method is necessary
      * because the super-class is not serializable.

@@ -28,6 +28,7 @@ import org.opengis.geometry.coordinate.ParamForPoint;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
 import org.opengis.geometry.primitive.CurveSegment;
+import org.opengis.geometry.primitive.OrientableCurve;
 
 /**
  * @author roehrig
@@ -47,6 +48,10 @@ public class CurveProxy extends OrientableCurveProxy implements Curve {
 	private CurveImpl proxy() {
 		return (CurveImpl) this.getPrimitive();
 	}
+
+    public OrientableCurve[] getProxy() {
+        return (OrientableCurve[]) super.getProxy();
+    }
 
 	public DirectPosition getStartPoint() {
 		return this.proxy().getEndPoint();

@@ -22,6 +22,7 @@ import java.io.Serializable;
 import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.primitive.Surface;
 import org.opengis.geometry.primitive.SurfaceInterpolation;
 import org.opengis.geometry.primitive.SurfacePatch;
 
@@ -126,7 +127,7 @@ public abstract class SurfacePatchImpl implements SurfacePatch, Serializable {
 	/* (non-Javadoc)
 	 * @see org.opengis.geometry.primitive.SurfacePatch#getSurface()
 	 */
-	public SurfaceImpl getSurface() {
+	public Surface getSurface() {
 		// ok
 		return this.surface;
 	}

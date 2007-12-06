@@ -9,11 +9,11 @@
  *************************************************************************************************/
 package org.geotools.geometry.jts.spatialschema.geometry.complex;
 
-// J2SE direct dependencies
-import java.util.List;
+import java.util.Collection;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.complex.Composite;
+import org.opengis.geometry.primitive.Primitive;
 
 /**
  * A geometric complex with an underlying core geometry that is isomorphic to a primitive. Thus,
@@ -49,7 +49,7 @@ public abstract class CompositeImpl
      * @return The list of primitives in this composite.
      * @UML association generator
      */
-    public List/*<? extends Primitive>*/ getGenerators() {
+    public Collection<? extends Primitive> getGenerators() {
         return null;
     }
 }
