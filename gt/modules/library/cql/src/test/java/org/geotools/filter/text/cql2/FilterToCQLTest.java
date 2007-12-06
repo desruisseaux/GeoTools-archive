@@ -58,9 +58,9 @@ public class FilterToCQLTest extends TestCase {
         return suite;
     }
     */
-    static class CQLTest extends Assert implements Test {
+    static class CQLTest2 extends Assert implements Test {
         String cql;
-        CQLTest( String cql ){
+        CQLTest2( String cql ){
             this.cql = cql;
         }
         public int countTestCases() {
