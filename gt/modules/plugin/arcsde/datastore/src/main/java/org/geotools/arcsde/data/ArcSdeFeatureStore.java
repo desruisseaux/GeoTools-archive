@@ -208,6 +208,7 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      */
     public final void modifyFeatures(final AttributeDescriptor type, final Object value,
             final Filter filter) throws IOException {
+        System.err.println("modifyFeatures: " + type.getLocalName() + ": " + value + " : " + filter);
         modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, }, filter);
     }
 
@@ -215,17 +216,21 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      * @see FeatureStore#removeFeatures(Filter)
      */
     public void removeFeatures(final Filter filter) throws IOException {
-        final ArcSDEPooledConnection connection = getConnection();
-        connection.getLock().lock();
+        final ArcSDEPooledConnection connection;
+        final Transaction transaction = getTransaction();
+        if (Transaction.AUTO_COMMIT == transaction) {
+            connection = null;
+        } else {
+            connection = getConnection();
+            connection.getLock().lock();
+        }
         try {
             final String typeName = typeInfo.getFeatureTypeName();
             // short circuit cut if needed to remove all features
-            if (Filter.INCLUDE == filter) {
-                truncate(typeName, connection);
-                return;
-            }
-            // just remove some features, go the slow way
-            final Transaction transaction = getTransaction();
+//            if (Filter.INCLUDE == filter) {
+//                truncate(typeName, connection);
+//                return;
+//            }
             final FeatureWriter writer = dataStore.getFeatureWriter(typeName, filter, transaction);
             try {
                 while (writer.hasNext()) {
@@ -236,7 +241,9 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
                 writer.close();
             }
         } finally {
-            connection.getLock().unlock();
+            if (connection != null) {
+                connection.getLock().unlock();
+            }
         }
     }
 

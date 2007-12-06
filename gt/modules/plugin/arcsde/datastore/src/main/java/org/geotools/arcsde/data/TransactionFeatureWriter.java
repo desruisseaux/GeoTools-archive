@@ -85,6 +85,9 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
             super.write();
             String typeName = feature.getFeatureType().getTypeName();
             state.addChange(typeName);
+        } catch (IOException e) {
+            state.getTransaction().rollback();
+            throw e;
         } finally {
             connection.getLock().unlock();
         }
@@ -94,6 +97,9 @@ class TransactionFeatureWriter extends ArcSdeFeatureWriter {
         connection.getLock().lock();
         try {
             super.remove();
+        } catch (IOException e) {
+            state.getTransaction().rollback();
+            throw e;
         } finally {
             connection.getLock().unlock();
         }

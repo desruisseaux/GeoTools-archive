@@ -1,6 +1,7 @@
 package org.geotools.arcsde.data;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -56,6 +58,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
@@ -578,9 +581,110 @@ public class ArcSDEFeatureStoreTest extends TestCase {
             Attribute originalAtt = originalValues.get(i);
             Attribute actualAtt = actualValues.get(i);
             Name name = originalAtt.getName();
-            //bah, date equals does not work, I don't care for this test
+            // bah, date equals does not work, I don't care for this test
             if (!"INT32_COL".equals(name.getLocalPart()) && !"DATE_COL".equals(name.getLocalPart())) {
                 assertEquals(name + " does not match", originalAtt, actualAtt);
+            }
+        }
+    }
+
+    public void testUpdateAdjacentPolygonsTransaction() throws Exception {
+        final WKTReader reader = new WKTReader();
+         final MultiPolygon p1 = (MultiPolygon) reader
+         .read("MULTIPOLYGON(((-10 -10, -10 10, 0 10, 0 -10, -10 -10)))");
+         final MultiPolygon p2 = (MultiPolygon) reader
+         .read("MULTIPOLYGON(((0 -10, 0 10, 10 10, 10 -10, 0 -10)))");
+        
+         final MultiPolygon modif1 = (MultiPolygon) reader
+         .read("MULTIPOLYGON (((-10 -10, -10 10, 5 10, -5 -10, -10 -10)))");
+         final MultiPolygon modif2 = (MultiPolygon) reader
+         .read("MULTIPOLYGON (((-5 -10, 5 10, 10 10, 10 -10, -5 -10)))");
+
+//        final MultiPolygon p1 = (MultiPolygon) reader
+//                .read("MULTIPOLYGON (((320000 545000, 320000 545100, 320100 545100, 320100 545000, 320000 545000)))");
+//        final MultiPolygon p2 = (MultiPolygon) reader
+//                .read("MULTIPOLYGON (((320100 545000, 320100 545100, 320200 545100, 320200 545000, 320100 545000)))");
+//
+//        final MultiPolygon modif1 = (MultiPolygon) reader
+//                .read("MULTIPOLYGON (((320000 545000, 320000 545100, 320150 545100, 320050 545000, 320000 545000)))");
+//        final MultiPolygon modif2 = (MultiPolygon) reader
+//                .read("MULTIPOLYGON (((320050 545000, 320150 545100, 320200 545100, 320200 545000, 320050 545000)))");
+
+        final String typeName = testData.getTemp_table(); //"SDE.CJ_TST_1";
+        final ArcSDEDataStore dataStore = testData.getDataStore();
+        // String[] typeNames = dataStore.getTypeNames();
+        // System.err.println(typeNames);
+        final FeatureStore store = (FeatureStore) dataStore.getFeatureSource(typeName);
+        final SimpleFeatureType schema = store.getSchema();
+        GeometryDescriptor defaultGeometry = schema.getDefaultGeometry();
+        String fid1;
+        String fid2;
+        // insert polygons p1, p2 and grab the fids for later retrieval
+        {
+            FeatureWriter writer = dataStore.getFeatureWriterAppend(typeName,
+                    Transaction.AUTO_COMMIT);
+            SimpleFeature feature;
+            try {
+                feature = writer.next();
+                feature.setAttribute(defaultGeometry.getName(), p1);
+                writer.write();
+                fid1 = feature.getID();
+
+                feature = writer.next();
+                feature.setAttribute(defaultGeometry.getName(), p2);
+                writer.write();
+                fid2 = feature.getID();
+            } finally {
+                writer.close();
+            }
+        }
+
+        final Transaction transaction = new DefaultTransaction("testUpdateAdjacentPolygons");
+        store.setTransaction(transaction);
+        final FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+        Filter fid1Filter = ff.id(Collections.singleton(ff.featureId(fid1)));
+        Filter fid2Filter = ff.id(Collections.singleton(ff.featureId(fid2)));
+        try {
+            store.modifyFeatures(defaultGeometry, modif2, fid2Filter);
+            store.modifyFeatures(defaultGeometry, modif1, fid1Filter);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            transaction.close();
+        }
+        store.setTransaction(Transaction.AUTO_COMMIT);
+
+        try {
+            FeatureCollection features;
+            FeatureIterator iterator;
+
+            features = store.getFeatures(fid1Filter);
+            iterator = features.features();
+            final SimpleFeature feature1 = iterator.next();
+            iterator.close();
+
+            features = store.getFeatures(fid2Filter);
+            iterator = features.features();
+            final SimpleFeature feature2 = iterator.next();
+            iterator.close();
+
+            MultiPolygon actual1 = (MultiPolygon) feature1.getAttribute(defaultGeometry
+                    .getLocalName());
+            MultiPolygon actual2 = (MultiPolygon) feature2.getAttribute(defaultGeometry
+                    .getLocalName());
+            System.out.println(actual1);
+            System.out.println(actual2);
+            assertTrue(modif1.equals(actual1));
+            assertTrue(modif2.equals(actual2));
+        } finally {
+            try {
+                store.removeFeatures(fid1Filter);
+                store.removeFeatures(fid2Filter);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
             }
         }
     }
@@ -850,7 +954,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
 
     /**
      * Ensure modified features for a given FeatureStore are returned by
-     * subsequent queries even if the transaction has not beeb commited.
+     * subsequent queries even if the transaction has not been committed.
      * 
      * @throws Exception
      */

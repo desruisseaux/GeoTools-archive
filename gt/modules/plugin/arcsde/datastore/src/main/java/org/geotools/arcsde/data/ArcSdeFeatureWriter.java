@@ -41,7 +41,10 @@ import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeTable;
 import com.esri.sde.sdk.client.SeUpdate;
 import com.esri.sde.sdk.client.SeTable.SeTableIdRange;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.operation.valid.IsValidOp;
+import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 abstract class ArcSdeFeatureWriter implements FeatureWriter {
 
@@ -312,7 +315,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
             final ArcSDEPooledConnection connection) throws SeException, NoSuchElementException,
             IOException {
         final SeUpdate updateStream = new SeUpdate(connection);
-        //updateStream.setWriteMode(true);
+        // updateStream.setWriteMode(true);
 
         final SeCoordinateReference seCoordRef = layer.getCoordRef();
 
@@ -420,7 +423,8 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
             seRowIndex = entry.getKey().intValue();
             attName = entry.getValue();
             value = feature.getAttribute(attName);
-            setRowValue(row, seRowIndex, value, seCoordRef);
+            setRowValue(row, seRowIndex, value, seCoordRef, attName, feature.getType()
+                    .getTypeName(), feature.getID());
         }
     }
 
@@ -480,8 +484,11 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
      *             DOCUMENT ME!
      */
     private void setRowValue(final SeRow row, final int index, Object value,
-            final SeCoordinateReference coordRef) throws SeException, IOException {
+            final SeCoordinateReference coordRef, final String attName, final String typeName,
+            final String fid) throws SeException, IOException {
+
         final SeColumnDefinition seColumnDefinition = row.getColumnDef(index);
+
         final int colType = seColumnDefinition.getType();
         if (colType == SeColumnDefinition.TYPE_INT16) {
             value = Converters.convert(value, Short.class);
@@ -515,18 +522,21 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter {
             }
         } else if (colType == SeColumnDefinition.TYPE_SHAPE) {
             if (value != null) {
-                try {
-                    ArcSDEGeometryBuilder geometryBuilder = ArcSDEGeometryBuilder.builderFor(value
-                            .getClass());
-                    Geometry geom = (Geometry) value;
-                    SeShape shape = geometryBuilder.constructShape(geom, coordRef);
-                    row.setShape(index, shape);
-                } catch (Exception e) {
-                    String msg = e instanceof SeException ? ((SeException) e).getSeError()
-                            .getErrDesc() : e.getMessage();
-                    LOGGER.log(Level.WARNING, msg, e);
-                    throw new DataSourceException(msg, e);
+                final Geometry geom = (Geometry) value;
+                IsValidOp validator = new IsValidOp(geom);
+                if (!validator.isValid()) {
+                    TopologyValidationError validationError = validator.getValidationError();
+                    String validationErrorMessage = validationError.getMessage();
+                    Coordinate coordinate = validationError.getCoordinate();
+                    String errorMessage = "Topology validation error at or near point "
+                            + coordinate + ": " + validationErrorMessage;
+                    throw new DataSourceException("Invalid geometry passed to " + typeName + "."
+                            + attName + "\n Geomerty: " + geom + "\n" + errorMessage);
                 }
+                ArcSDEGeometryBuilder geometryBuilder;
+                geometryBuilder = ArcSDEGeometryBuilder.builderFor(geom.getClass());
+                SeShape shape = geometryBuilder.constructShape(geom, coordRef);
+                row.setShape(index, shape);
             } else {
                 row.setShape(index, null);
             }

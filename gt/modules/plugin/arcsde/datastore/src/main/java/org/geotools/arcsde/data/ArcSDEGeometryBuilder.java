@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.ArcSdeException;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SDEPoint;
@@ -177,16 +178,16 @@ public abstract class ArcSDEGeometryBuilder {
      * @throws ArcSDEGeometryBuildingException
      *             DOCUMENT ME!
      */
-    public SeShape constructShape(Geometry geometry, SeCoordinateReference seSrs)
-            throws ArcSDEGeometryBuildingException {
+    public SeShape constructShape(final Geometry geometry, SeCoordinateReference seSrs)
+            throws ArcSdeException {
         SeShape shape = null;
 
         try {
             shape = new SeShape(seSrs);
         } catch (SeException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new ArcSDEGeometryBuildingException(ex.getSeError().getErrDesc() + ": "
-                    + geometry, ex);
+            ArcSdeException e = new ArcSdeException("Can't create SeShape with SeCrs " + seSrs, ex);
+            LOGGER.log(Level.WARNING, e.getMessage(), e);
+            throw e;
         }
 
         if (geometry.isEmpty()) {
@@ -235,9 +236,10 @@ public abstract class ArcSDEGeometryBuilder {
                 shape.generatePolygon(points.length, numParts, partOffsets, points);
             }
         } catch (SeException e) {
-            LOGGER.warning(e.getSeError().getErrDesc() + ":\nGEOM=" + geometry + "\nShape=" + shape
-                    + "\nCRS: " + seSrs);
-            throw new ArcSDEGeometryBuildingException(e.getSeError().getErrDesc(), e);
+            ArcSdeException sdeEx = new ArcSdeException("Can't generate SeShape from " + geometry
+                    + "\n", e);
+            LOGGER.log(Level.WARNING, sdeEx.getMessage());
+            throw sdeEx;
         }
 
         return shape;

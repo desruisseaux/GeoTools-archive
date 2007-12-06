@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
-import org.geotools.arcsde.data.ArcSDEGeometryBuildingException;
 import org.geotools.filter.FilterCapabilities;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.And;
@@ -304,8 +303,6 @@ public class GeometryEncoderSDE implements FilterVisitor {
             throw new RuntimeException(ioe);
         } catch (SeException se) {
             throw new RuntimeException(se);
-        } catch (ArcSDEGeometryBuildingException e) {
-            throw new RuntimeException(e);
         }
     }
 
