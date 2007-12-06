@@ -208,7 +208,6 @@ public class ArcSdeFeatureStore extends ArcSdeFeatureSource implements FeatureSt
      */
     public final void modifyFeatures(final AttributeDescriptor type, final Object value,
             final Filter filter) throws IOException {
-        System.err.println("modifyFeatures: " + type.getLocalName() + ": " + value + " : " + filter);
         modifyFeatures(new AttributeDescriptor[] { type, }, new Object[] { value, }, filter);
     }
 
