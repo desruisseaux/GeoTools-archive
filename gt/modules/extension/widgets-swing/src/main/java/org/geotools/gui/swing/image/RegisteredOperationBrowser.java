@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing.image;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.Arrays;
 import java.util.Locale;
@@ -46,16 +45,14 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import java.awt.image.renderable.ParameterBlock; // For javadoc
 
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RegistryElementDescriptor;
 
-// Geotools dependencies
+import org.geotools.resources.Classes;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 import org.geotools.gui.swing.IconFactory;
 import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.TreeNode;
@@ -92,6 +89,7 @@ import org.geotools.util.logging.Logging;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class RegisteredOperationBrowser extends JPanel {
     /**
      * The text area for operation's description.
@@ -102,14 +100,14 @@ public class RegisteredOperationBrowser extends JPanel {
      * The text area for the version and vendor.
      */
     private final JLabel version = new JLabel(" ");
-    
+
     /**
      * Constructs a new operation browser for the default {@link JAI} instance.
      */
     public RegisteredOperationBrowser() {
         this(getTree());
     }
-    
+
     /**
      * Constructs a new operation browser for the specified operation registry.
      *
@@ -269,11 +267,12 @@ public class RegisteredOperationBrowser extends JPanel {
         for (int i=0; i<modes.length; i++) {
             final String mode = modes[i];
             final DefaultMutableTreeNode modeNode = new DefaultMutableTreeNode(mode);
-            final List descriptors/*<RegistryElementDescriptor>*/ = registry.getDescriptors(mode);
-            Collections.sort(descriptors, new Comparator() {
-                public int compare(final Object obj1, final Object obj2) {
-                    final RegistryElementDescriptor desc1 = (RegistryElementDescriptor) obj1;
-                    final RegistryElementDescriptor desc2 = (RegistryElementDescriptor) obj2;
+            @SuppressWarnings("unchecked")
+            final List<RegistryElementDescriptor> descriptors = registry.getDescriptors(mode);
+            Collections.sort(descriptors, new Comparator<RegistryElementDescriptor>() {
+                public int compare(final RegistryElementDescriptor desc1,
+                                   final RegistryElementDescriptor desc2)
+                {
                     return desc1.getName().compareTo(desc2.getName());
                 }
             });
@@ -318,7 +317,7 @@ public class RegisteredOperationBrowser extends JPanel {
                             for (final Iterator itf=factories.iterator(); itf.hasNext();) {
                                 final Object factory = itf.next();
                                 productNode.add(new NamedTreeNode(
-                                        Utilities.getShortClassName(factory), factory, false));
+                                        Classes.getShortClassName(factory), factory, false));
                                 // The node class (NamedTreeNode) should be different from the
                                 // node for parameters (see above), in order to differentiate
                                 // those leafs in the cell renderer.
@@ -386,6 +385,7 @@ public class RegisteredOperationBrowser extends JPanel {
         /**
          * Configures the renderer based on the passed in components.
          */
+        @Override
         public Component getTreeCellRendererComponent(final JTree tree, final Object value,
                                                       final boolean selelected,
                                                       final boolean expanded,

@@ -17,12 +17,10 @@
  */
 package org.geotools.gui.swing.image;
 
-// Graphical user interface
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 
-// Graphics
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -33,35 +31,29 @@ import java.awt.image.IndexColorModel;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 
-// Geometry
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 
-// Miscellaneous
 import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.PaletteInterpretation;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
-// Axis
 import org.geotools.axis.Graduation;
 import org.geotools.axis.TickIterator;
 import org.geotools.axis.NumberGraduation;
 import org.geotools.axis.AbstractGraduation;
 import org.geotools.axis.LogarithmicNumberGraduation;
-
-// Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
@@ -221,7 +213,7 @@ public class ColorRamp extends JComponent {
      * @return The colors (never {@code null}).
      */
     public Color[] getColors() {
-        return (colors.length!=0) ? (Color[])colors.clone() : colors;
+        return (colors.length!=0) ? colors.clone() : colors;
     }
 
     /**
@@ -239,7 +231,7 @@ public class ColorRamp extends JComponent {
      */
     public boolean setColors(final Color[] colors) {
         final Color[] oldColors = this.colors;
-        this.colors = (colors!=null && colors.length!=0) ? (Color[])colors.clone() : EMPTY;
+        this.colors = (colors!=null && colors.length!=0) ? colors.clone() : EMPTY;
         final boolean changed = !Arrays.equals(oldColors, this.colors);
         if (changed) {
             repaint();
@@ -454,6 +446,7 @@ public class ColorRamp extends JComponent {
      *
      * @see #getForeground
      */
+    @Override
     public void setForeground(final Color color) {
         super.setForeground(color);
         autoForeground = (color==null);
@@ -687,7 +680,7 @@ public class ColorRamp extends JComponent {
         } else {
             org.geotools.util.logging.Logging.getLogger("org.geotools.gui.swing").
                     log(Logging.format(Level.WARNING, LoggingKeys.UNRECOGNIZED_SCALE_TYPE_$1,
-                        Utilities.getShortClassName(tr)));
+                        Classes.getShortClassName(tr)));
             graduation = new NumberGraduation(units);
         }
         if (graduation == reuse) {
@@ -715,6 +708,7 @@ public class ColorRamp extends JComponent {
     /**
      * Returns a string representation for this color ramp.
      */
+    @Override
     public String toString() {
         int count=0;
         int i = 0;
@@ -728,13 +722,14 @@ public class ColorRamp extends JComponent {
                 }
             }
         }
-        return Utilities.getShortClassName(this) + '[' + count + " colors]";
+        return Classes.getShortClassName(this) + '[' + count + " colors]";
     }
 
     /**
      * Notifies this component that it now has a parent component. This method
      * is invoked by <cite>Swing</cite> and shouldn't be directly used.
      */
+    @Override
     public void addNotify() {
         super.addNotify();
         if (graduation != null) {
@@ -747,6 +742,7 @@ public class ColorRamp extends JComponent {
      * Notifies this component that it no longer has a parent component.
      * This method is invoked by <em>Swing</em> and shouldn't be directly used.
      */
+    @Override
     public void removeNotify() {
         if (graduation != null) {
             graduation.removePropertyChangeListener(ui);
@@ -770,6 +766,7 @@ public class ColorRamp extends JComponent {
         /**
          * Retourne la dimension minimale de cette rampe de couleurs.
          */
+        @Override
         public Dimension getMinimumSize(final JComponent c) {
             return (((ColorRamp) c).horizontal) ? new Dimension(2*MARGIN, 16)
                                                : new Dimension(16, 2*MARGIN);
@@ -778,6 +775,7 @@ public class ColorRamp extends JComponent {
         /**
          * Retourne la dimension préférée de cette rampe de couleurs.
          */
+        @Override
         public Dimension getPreferredSize(final JComponent c) {
             return (((ColorRamp) c).horizontal) ? new Dimension(256, 16) : new Dimension(16, 256);
         }
@@ -790,6 +788,7 @@ public class ColorRamp extends JComponent {
          * On n'a pas cet avantage lorsque l'on ne fait que redéfinir
          * {@link JComponent#paintComponent}.
          */
+        @Override
         public void paint(final Graphics graphics, final JComponent component) {
             final ColorRamp ramp = (ColorRamp) component;
             if (ramp.colors != null) {

@@ -16,24 +16,20 @@
  */
 package org.geotools.gui.swing;
 
-// Graphics and geometry
 import java.awt.Rectangle;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 
-// User interface
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Window;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 import javax.swing.JComponent;
-import javax.swing.LookAndFeel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -42,18 +38,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
 import javax.swing.AbstractButton;
 
-// Events
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.EventQueue;
 
-// Miscellaneous
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-// Resources
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.GraphicsUtilities;
@@ -149,6 +141,7 @@ public final class ExceptionMonitor {
      * @version $Id$
      * @author Martin Desruisseaux
      */
+    @SuppressWarnings("serial")
     private static final class Pane extends JOptionPane implements ActionListener {
         /**
          * Default width (in number of columns) of the component which displays
@@ -160,7 +153,7 @@ public final class ExceptionMonitor {
          * Minimum height (in pixels) of the dialog box when it also displays the trace.
          */
         private static final int HEIGHT = 300;
-    
+
         /**
          * Displayed dialog box.  It will be a {@link JDialog} object or a
          * {@link JInternalFrame} object.
@@ -172,7 +165,7 @@ public final class ExceptionMonitor {
          * will be called to obtain the message to display.
          */
         private final Throwable exception;
-    
+
         /**
          * Box which will contain the "message" part of the constructed dialog box.  This box
          * will be expanded if the user asks to see the exception trace.  It will arrange the
@@ -233,7 +226,7 @@ public final class ExceptionMonitor {
              * Constructs the dialog box.  Automatically detects if we can use InternalFrame or if
              * we should be happy with JDialog. The exception trace will not be written immediately.
              */
-            final String classname = Utilities.getShortClassName(exception);
+            final String classname = Classes.getShortClassName(exception);
             final String title = resources.getString(VocabularyKeys.ERROR_$1, classname);
             final JDesktopPane desktop = getDesktopPaneForComponent(owner);
             if (desktop != null) {
@@ -263,7 +256,7 @@ public final class ExceptionMonitor {
             if (message == null) {
                 message = exception.getLocalizedMessage();
                 if (message == null) {
-                    final String classname = Utilities.getShortClassName(exception);
+                    final String classname = Classes.getShortClassName(exception);
                     message = resources.getString(VocabularyKeys.NO_DETAILS_$1, classname);
                 }
             }
@@ -313,13 +306,13 @@ public final class ExceptionMonitor {
                     final JScrollPane scroll = new JScrollPane(text);
                     if (traceComponent != null) {
                         if (!(traceComponent instanceof JTabbedPane)) {
-                            String classname = Utilities.getShortClassName(exception);
-                            JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP, 
+                            String classname = Classes.getShortClassName(exception);
+                            JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP,
                                                                JTabbedPane.SCROLL_TAB_LAYOUT);
                             tabs.addTab(classname, traceComponent);
                             traceComponent = tabs;
                         }
-                        String classname = Utilities.getShortClassName(cause);
+                        String classname = Classes.getShortClassName(cause);
                         ((JTabbedPane) traceComponent).addTab(classname, scroll);
                     } else {
                         traceComponent = scroll;
@@ -335,12 +328,12 @@ public final class ExceptionMonitor {
                 trace = traceComponent;
             }
             /*
-             * Inserts or hides the exception trace.  Even if the trace is 
+             * Inserts or hides the exception trace.  Even if the trace is
              * hidden, it will not be destroyed if the user would like to
              * redisplay it.
              */
-            traceButton.setText(resources.format(traceVisible ? VocabularyKeys.DEBUG
-                                                              : VocabularyKeys.HIDE));
+            traceButton.setText(resources.getString(
+                    traceVisible ? VocabularyKeys.DEBUG : VocabularyKeys.HIDE));
             traceVisible = !traceVisible;
             if (dialog instanceof Dialog) {
                 ((Dialog) dialog).setResizable(traceVisible);

@@ -16,11 +16,9 @@
  */
 package org.geotools.gui.swing.referencing;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Collection;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -38,16 +36,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-// OpenGIS dependencies
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
+import org.geotools.resources.Classes;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -68,6 +64,7 @@ import org.geotools.gui.swing.IconFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class AuthorityCodesComboBox extends JComponent {
     /**
      * The authority factory responsible for creating objects from a list of codes.
@@ -141,19 +138,18 @@ public class AuthorityCodesComboBox extends JComponent {
     public AuthorityCodesComboBox(final String authority)
             throws FactoryRegistryException, FactoryException
     {
-        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        this((CRSAuthorityFactory)
-                FallbackAuthorityFactory.create(CRSAuthorityFactory.class,
-                filter(ReferencingFactoryFinder.getCRSAuthorityFactories(null), authority)));
+        this(FallbackAuthorityFactory.create(CRSAuthorityFactory.class,
+             filter(ReferencingFactoryFinder.getCRSAuthorityFactories(null), authority)));
     }
 
     /**
      * Returns a collection containing only the factories of the specified authority.
      */
-    private static Collection filter(final Collection factories, final String authority) {
-        final List filtered = new ArrayList();
-        for (final Iterator it=factories.iterator(); it.hasNext();) {
-            final AuthorityFactory factory = (AuthorityFactory) it.next();
+    private static Collection<CRSAuthorityFactory> filter(
+            final Collection<? extends CRSAuthorityFactory> factories, final String authority)
+    {
+        final List<CRSAuthorityFactory> filtered = new ArrayList<CRSAuthorityFactory>();
+        for (final CRSAuthorityFactory factory : factories) {
             if (Citations.identifierMatches(factory.getAuthority(), authority)) {
                 filtered.add(factory);
             }
@@ -271,7 +267,7 @@ public class AuthorityCodesComboBox extends JComponent {
         } catch (FactoryException e) {
             String message = e.getLocalizedMessage();
             if (message == null) {
-                message = Utilities.getShortClassName(e);
+                message = Classes.getShortClassName(e);
             }
             properties.setErrorMessage(message);
             return;
@@ -364,7 +360,7 @@ public class AuthorityCodesComboBox extends JComponent {
         final JFrame frame = new JFrame(chooser.getAuthority());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(chooser, BorderLayout.CENTER);
-        
+
         frame.pack();
         frame.setVisible(true);
     }

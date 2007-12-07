@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing.image;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.JLabel;
@@ -34,7 +33,6 @@ import java.awt.EventQueue;
 import java.awt.Dimension;
 import java.lang.reflect.Array;
 
-// Image and JAI
 import java.awt.Image;
 import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
@@ -48,8 +46,7 @@ import javax.media.jai.PropertyChangeEmitter;
 import javax.media.jai.RegistryElementDescriptor;
 import javax.media.jai.OperationDescriptor;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -256,7 +253,7 @@ public class ImageProperties extends JPanel {
                 name = resources.getString(VocabularyKeys.OPERATION_$1, name);
             }
         } else if (image != null) {
-            name = Utilities.getShortClassName(image);
+            name = Classes.getShortClassName(image);
             name = resources.getString(VocabularyKeys.IMAGE_CLASS_$1, name);
         }
         operationName       .setText(name       );
@@ -396,9 +393,9 @@ public class ImageProperties extends JPanel {
         if (object == null) {
             return resources.getString(VocabularyKeys.UNDEFINED);
         }
-        final String         name = Utilities.getShortClassName(object);
-        final int          length = name.length();
-        final StringBuffer buffer = new StringBuffer(length+8);
+        final String name = Classes.getShortClassName(object);
+        final int length = name.length();
+        final StringBuilder buffer = new StringBuilder(length + 8);
         int last = 0;
         for (int i=1; i<=length; i++) {
             if (i==length ||
@@ -416,9 +413,7 @@ public class ImageProperties extends JPanel {
         }
         if (object instanceof IndexColorModel) {
             final IndexColorModel cm = (IndexColorModel) object;
-            buffer.append(" (");
-            buffer.append(resources.getString(VocabularyKeys.COLOR_COUNT_$1,
-                          new Integer(cm.getMapSize())));
+            buffer.append(" (").append(resources.getString(VocabularyKeys.COLOR_COUNT_$1, cm.getMapSize()));
             buffer.append(')');
         }
         return buffer.toString().trim();

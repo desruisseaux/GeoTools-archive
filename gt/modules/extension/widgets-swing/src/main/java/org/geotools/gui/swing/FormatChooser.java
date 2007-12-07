@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Map;
 import java.util.Date;
@@ -29,10 +28,8 @@ import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-// Swing and AWT dependencies
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import javax.swing.JFrame;
 import javax.swing.JComboBox;
 import javax.swing.MutableComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -43,14 +40,14 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import static java.awt.GridBagConstraints.*;
 
-// Geotools dependencies
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
 import org.geotools.measure.CoordinateFormat;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -66,6 +63,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class FormatChooser extends JPanel {
     /**
      * The maximum number of items to keep in the history list.
@@ -144,7 +142,7 @@ public class FormatChooser extends JPanel {
         c.gridx=0; c.insets.right=6;
         c.gridy=0;                 add(new JLabel(resources.getLabel(VocabularyKeys.FORMAT )), c);
         c.gridy++; c.insets.top=3; add(new JLabel(resources.getLabel(VocabularyKeys.PREVIEW)), c);
-        c.insets.right=0; c.gridx++; c.weightx=1; c.fill=c.HORIZONTAL;
+        c.insets.right=0; c.gridx++; c.weightx=1; c.fill=HORIZONTAL;
         c.gridy=0; c.insets.top=0; add(choices, c);
         c.gridy++; c.insets.top=3; add(preview, c);
         choices.getEditor().getEditorComponent().requestFocus();
@@ -194,7 +192,7 @@ public class FormatChooser extends JPanel {
      * Note: this method is costly and should be invoked only once for a given locale.
      */
     private static String[] getNumberPatterns(final Locale locale) {
-        final Set patterns = new LinkedHashSet();
+        final Set<String> patterns = new LinkedHashSet<String>();
         int type = 0;
   fill: while (true) {
             final int digits;
@@ -216,7 +214,7 @@ public class FormatChooser extends JPanel {
                 }
             }
         }
-        return (String[]) patterns.toArray(new String[patterns.size()]);
+        return patterns.toArray(new String[patterns.size()]);
     }
 
     /**
@@ -230,7 +228,7 @@ public class FormatChooser extends JPanel {
             SimpleDateFormat.LONG,
             SimpleDateFormat.FULL
         };
-        final Set patterns = new LinkedHashSet();
+        final Set<String> patterns = new LinkedHashSet<String>();
         for (int i=0; i<codes.length; i++) {
             for (int j=-1; j<codes.length; j++) {
                 final DateFormat format;
@@ -244,7 +242,7 @@ public class FormatChooser extends JPanel {
                 }
             }
         }
-        return (String[]) patterns.toArray(new String[patterns.size()]);
+        return patterns.toArray(new String[patterns.size()]);
     }
 
     /**
@@ -362,7 +360,7 @@ public class FormatChooser extends JPanel {
                 }
             }
         }
-        throw new IllegalStateException(Utilities.getShortClassName(format));
+        throw new IllegalStateException(Classes.getShortClassName(format));
     }
 
     /**
@@ -386,7 +384,7 @@ public class FormatChooser extends JPanel {
         } else if (format instanceof CoordinateFormat) {
             ((CoordinateFormat) format).setAnglePattern(pattern);
         } else {
-            throw new IllegalStateException(Utilities.getShortClassName(format));
+            throw new IllegalStateException(Classes.getShortClassName(format));
         }
         update();
     }
@@ -485,8 +483,7 @@ public class FormatChooser extends JPanel {
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
         Locale.setDefault(arguments.locale);
-        new FormatChooser(new AngleFormat())
-            .showDialog(null, Utilities.getShortName(FormatChooser.class));
+        new FormatChooser(new AngleFormat()).showDialog(null, Classes.getShortName(FormatChooser.class));
         System.exit(0);
     }
 }

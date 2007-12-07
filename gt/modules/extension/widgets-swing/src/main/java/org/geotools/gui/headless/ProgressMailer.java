@@ -17,20 +17,17 @@
  */
 package org.geotools.gui.headless;
 
-// J2SE dependencies
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// Formatting
 import java.io.PrintWriter;
 import java.io.CharArrayWriter;
 import java.text.NumberFormat;
 import java.text.FieldPosition;
 
-// Java Mail
 import javax.mail.Session;
 import javax.mail.Address;
 import javax.mail.Message;
@@ -40,11 +37,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.AddressException;
 
-// Geotools dependencies
 import org.geotools.util.ProgressListener;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.opengis.util.InternationalString;
@@ -202,7 +198,7 @@ public class ProgressMailer implements ProgressListener {
             Transport.send(message);
         } catch (MessagingException exception) {
             final LogRecord warning = new LogRecord(Level.WARNING,
-                    "CATCH "+Utilities.getShortClassName(exception));
+                    "CATCH " + Classes.getShortClassName(exception));
             warning.setSourceClassName(ProgressMailer.class.getName());
             warning.setSourceMethodName(method);
             warning.setThrown(exception);

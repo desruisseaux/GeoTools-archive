@@ -17,7 +17,6 @@
  */
 package org.geotools.geometry.array;
 
-// J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
@@ -26,15 +25,13 @@ import java.io.Serializable;
 import java.util.RandomAccess;
 import java.util.List;
 
-// GeoAPI dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.geometry.DirectPosition2D;
@@ -229,7 +226,7 @@ public abstract class PointArray2D implements PointArray, Serializable {
     PathIterator getPathIterator(final AffineTransform at) {
         return new ShapeAdapter.Iterator(iterator(0), at);
     }
-    
+
     /**
      * Returns the bounding box of all <var>x</var> and <var>y</var> ordinates. If this array
      * is empty, then this method returns {@code null}. The default implementation iterates
@@ -417,29 +414,19 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * purpose and may change in any future Geotools version. Current implementation returns
      * the class name, the number of points and the start and end coordinates.
      */
+    @Override
     public final String toString() {
         final DirectPosition2D point = new DirectPosition2D();
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         final int length = length();
-        buffer.append('[');
-        buffer.append(length);
-        buffer.append(" points");
+        buffer.append('[').append(length).append(" points");
         if (length != 0) {
             get(0, point);
-            buffer.append(" (");
-            buffer.append(point.x);
-            buffer.append(", ");
-            buffer.append(point.y);
-            buffer.append(")-(");
-
+            buffer.append(" (").append(point.x).append(", ").append(point.y).append(")-(");
             get(length()-1, point);
-            buffer.append(point.x);
-            buffer.append(", ");
-            buffer.append(point.y);
-            buffer.append(')');
+            buffer.append(point.x).append(", ").append(point.y).append(')');
         }
-        buffer.append(']');
-        return buffer.toString();
+        return buffer.append(']').toString();
     }
 
     /**
@@ -467,6 +454,7 @@ public abstract class PointArray2D implements PointArray, Serializable {
      * Compares this array with the specified object for equality. This method performs the same
      * comparaison than {@link #equals(PointArray2D)}.
      */
+    @Override
     public final boolean equals(final Object that) {
         return (that instanceof PointArray2D) && equals((PointArray2D) that);
     }
@@ -474,6 +462,7 @@ public abstract class PointArray2D implements PointArray, Serializable {
     /**
      * Returns a hash value for this array.
      */
+    @Override
     public final int hashCode() {
         final DirectPosition point = get(0, null);
         return length() ^ Float.floatToIntBits((float)point.getOrdinate(0))

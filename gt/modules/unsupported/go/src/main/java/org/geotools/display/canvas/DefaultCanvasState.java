@@ -19,19 +19,16 @@
  */
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.go.display.canvas.Canvas;        // For javadoc
 import org.opengis.go.display.canvas.CanvasState;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
-import org.geotools.measure.CoordinateFormat;
 import org.geotools.geometry.GeneralDirectPosition;
 
 
@@ -114,6 +111,7 @@ public class DefaultCanvasState implements CanvasState, Cloneable, Serializable 
     /**
      * Returns a hash code value for this canvas state.
      */
+    @Override
     public int hashCode() {
         int code = (int) serialVersionUID;
         if (title  != null) code ^= title .hashCode();
@@ -125,6 +123,7 @@ public class DefaultCanvasState implements CanvasState, Cloneable, Serializable 
      * Determines if the given object is the same type of canvas state object and has
      * values equal to this one.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -140,6 +139,7 @@ public class DefaultCanvasState implements CanvasState, Cloneable, Serializable 
     /**
      * Returns a copy of this canvas state.
      */
+    @Override
     public CanvasState clone() {
         try {
             return (CanvasState) super.clone();
@@ -152,20 +152,16 @@ public class DefaultCanvasState implements CanvasState, Cloneable, Serializable 
     /**
      * Returns a string representation of this canvas state.
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append('[');
         if (title != null) {
-            buffer.append('"');
-            buffer.append(title);
-            buffer.append('"');
+            buffer.append('"').append(title).append('"');
         }
         if (center != null) {
-            buffer.append(", (");
-            buffer.append(center);
-            buffer.append(')');
+            buffer.append(", (").append(center).append(')');
         }
-        buffer.append(']');
-        return buffer.toString();
+        return buffer.append(']').toString();
     }
 }

@@ -20,7 +20,6 @@
 
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.text.NumberFormat;
@@ -28,7 +27,6 @@ import java.text.FieldPosition;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-// OpenGIS dependencies
 import org.opengis.go.display.canvas.Canvas;
 import org.opengis.go.display.primitive.Graphic;
 import org.opengis.go.display.event.GraphicEvent;
@@ -36,8 +34,7 @@ import org.opengis.go.display.event.GraphicListener;
 import org.opengis.go.display.style.GraphicStyle;
 import org.opengis.go.display.style.Symbology;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -153,6 +150,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * {@linkplain AbstractCanvas canvas}, then the default implementation returns the canvas
      * locale. Otherwise, this method returns the {@linkplain Locale#getDefault system locale}.
      */
+    @Override
     public Locale getLocale() {
         final Canvas canvas = getCanvas();
         if (canvas instanceof DisplayObject) {
@@ -196,7 +194,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     }
 
     /**
-     * Returns the parent of this {@code Graphic}, or {@code null} if none. Usually, only 
+     * Returns the parent of this {@code Graphic}, or {@code null} if none. Usually, only
      * {@link org.opengis.go.display.primitive.AggregateGraphic}s have {@code Graphic} children.
      */
     public Graphic getParent() {
@@ -363,7 +361,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     }
 
     /**
-     * Removes the given {@code GraphicListener} from this {@code Graphic}'s list of listeners.  
+     * Removes the given {@code GraphicListener} from this {@code Graphic}'s list of listeners.
      *
      * @todo Not yet implemented.
      */
@@ -664,6 +662,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * @return The cloned graphic.
      * @throws CloneNotSupportedException if this graphic is not cloneable.
      */
+    @Override
     protected Object clone() throws CloneNotSupportedException {
         assert Thread.holdsLock(getTreeLock());
         final AbstractGraphic clone = (AbstractGraphic) super.clone();
@@ -675,6 +674,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose() {
         synchronized (getTreeLock()) {
             final Canvas canvas = getCanvas();
@@ -720,6 +720,7 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * canvas}, then the default implementation returns the canvas logger. Otherwise, this method
      * returns a default one.
      */
+    @Override
     protected Logger getLogger() {
         final Canvas canvas = getCanvas();
         if (canvas instanceof DisplayObject) {
@@ -741,7 +742,8 @@ public abstract class AbstractGraphic extends DisplayObject implements Graphic {
      * Returns a string representation of this graphic. This method is for debugging purpose
      * only and may changes in any future version.
      */
+    @Override
     public String toString() {
-        return Utilities.getShortClassName(this) + '[' + getName() + ']';
+        return Classes.getShortClassName(this) + '[' + getName() + ']';
     }
 }

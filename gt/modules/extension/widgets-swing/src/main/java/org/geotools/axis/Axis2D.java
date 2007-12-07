@@ -44,7 +44,7 @@ import org.opengis.util.Cloneable;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.cs.AxisDirection;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -605,11 +605,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      */
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
-        buffer.append("[\"");
-        buffer.append(graduation.getTitle(true));
-        buffer.append("\"]");
-        return buffer.toString();
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
+        return buffer.append("[\"").append(graduation.getTitle(true)).append("\"]").toString();
     }
 
     /**

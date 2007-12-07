@@ -16,19 +16,16 @@
  */
 package org.geotools.gui.swing.image;
 
-// JAI dependencies
 import javax.media.jai.KernelJAI;
 import javax.media.jai.operator.ConvolveDescriptor; // For Javadoc
 
-// Graphical user interface
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.IllegalComponentStateException;
+import static java.awt.GridBagConstraints.*;
 
-// Graphical user interface (Swing)
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -41,7 +38,6 @@ import javax.swing.ComboBoxModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 
-// Events
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.event.ChangeEvent;
@@ -49,7 +45,6 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataListener;
 
-// Utilities
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.HashMap;
@@ -59,9 +54,8 @@ import java.util.Iterator;
 import java.util.Arrays;
 import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.SwingUtilities;
@@ -93,6 +87,7 @@ import org.geotools.resources.SwingUtilities;
  * @see ConvolveDescriptor
  * @see org.geotools.coverage.processing.operation.GradientMagnitude
  */
+@SuppressWarnings("serial")
 public class KernelEditor extends JComponent {
     /**
      * The matrix coefficient as a table.
@@ -147,7 +142,7 @@ public class KernelEditor extends JComponent {
         ////    Put combo box for predefined kernels    ////
         ////                                            ////
         ////////////////////////////////////////////////////
-        c.gridx=0; c.fill=c.HORIZONTAL;
+        c.gridx=0; c.fill=HORIZONTAL;
         c.gridy=2; predefinedKernels.add(new JLabel(resources.getLabel(VocabularyKeys.CATEGORY), JLabel.RIGHT ), c);
         c.gridy=3; predefinedKernels.add(new JLabel(resources.getLabel(VocabularyKeys.KERNEL),   JLabel.RIGHT ), c);
 
@@ -155,7 +150,7 @@ public class KernelEditor extends JComponent {
         c.gridy=2; predefinedKernels.add(categorySelector, c);
         c.gridy=3; predefinedKernels.add(kernelSelector,   c);
 
-        c.gridx=0; c.gridy=2; c.gridwidth=c.REMAINDER; add(predefinedKernels, c);
+        c.gridx=0; c.gridy=2; c.gridwidth=REMAINDER; add(predefinedKernels, c);
         predefinedKernels.setBorder(
             BorderFactory.createCompoundBorder(
             BorderFactory.createTitledBorder(resources.getString(VocabularyKeys.PREDEFINED_KERNELS)),
@@ -182,7 +177,7 @@ public class KernelEditor extends JComponent {
         ////    Put table for kernel coefficients    ////
         ////                                         ////
         /////////////////////////////////////////////////
-        c.gridx=0; c.gridwidth=c.REMAINDER; c.fill=c.BOTH; c.insets.bottom=9;
+        c.gridx=0; c.gridwidth=REMAINDER; c.fill=BOTH; c.insets.bottom=9;
         c.gridy=1; c.weighty=1; c.insets.top=6; add(new JScrollPane(matrixView), c);
         setPreferredSize(new Dimension(300,220));
     }
@@ -391,7 +386,7 @@ public class KernelEditor extends JComponent {
      *
      * @param comparator The comparator, or {@code null} for the natural ordering.
      */
-    public void sortKernelNames(final Comparator comparator) {
+    public void sortKernelNames(final Comparator<String> comparator) {
         model.sortKernelNames(comparator);
     }
 
@@ -402,7 +397,7 @@ public class KernelEditor extends JComponent {
      * @return The name of all kernels in the current category.
      */
     public String[] getKernelNames() {
-        return (String[]) model.getKernelNames().clone();
+        return model.getKernelNames().clone();
     }
 
     /**
@@ -438,15 +433,13 @@ public class KernelEditor extends JComponent {
     {
         /**
          * Dictionnary of kernels by their name.
-         * Keys are {@link String} and values are {@link KernelJAI}.
          */
-        private final Map kernels = new HashMap();
+        private final Map<String,KernelJAI> kernels = new HashMap<String,KernelJAI>();
 
         /**
          * List of categories by kernel's name.
-         * Keys and values are both {@link String}.
          */
-        private final Map categories = new LinkedHashMap();
+        private final Map<String,String> categories = new LinkedHashMap<String,String>();
 
         /**
          * {@code true} if the keys into {@link #categories}
@@ -499,6 +492,7 @@ public class KernelEditor extends JComponent {
          * Returns {@code true} regardless of row and column index
          * Used by the table of kernel values.
          */
+        @Override
         public boolean isCellEditable(final int rowIndex, final int columnIndex) {
             return true;
         }
@@ -507,7 +501,8 @@ public class KernelEditor extends JComponent {
          * Returns {@code Float.class} regardless of column index
          * Used by the table of kernel values.
          */
-        public Class getColumnClass(final int columnIndex) {
+        @Override
+        public Class<?> getColumnClass(final int columnIndex) {
             return Float.class;
         }
 
@@ -516,13 +511,14 @@ public class KernelEditor extends JComponent {
          * This method is automatically invoked in order to paint the kernel as a table.
          */
         public Object getValueAt(final int rowIndex, final int columnIndex) {
-            return new Float(elements[rowIndex][columnIndex]);
+            return Float.valueOf(elements[rowIndex][columnIndex]);
         }
 
         /**
          * Set the value for the cell at {@code columnIndex} and {@code rowIndex}.
          * This method is automatically invoked when the user edited one of kernel values.
          */
+        @Override
         public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
             elements[rowIndex][columnIndex] = (value!=null) ? ((Number) value).floatValue() : 0;
             fireTableCellUpdated(rowIndex, columnIndex);
@@ -553,7 +549,7 @@ public class KernelEditor extends JComponent {
             final String newName = item.toString();
             if (!newName.equals(name)) {
                 // 'kernel' may be null if 'item' is the "Personalized" kernel name.
-                final KernelJAI kernel = (KernelJAI) kernels.get(newName);
+                final KernelJAI kernel = kernels.get(newName);
                 if (kernel != null) {
                     setKernel(kernel);
                 }
@@ -611,7 +607,7 @@ public class KernelEditor extends JComponent {
             final int oldRowCount = elements.length;
             final int oldColCount = oldRowCount!=0 ? elements[0].length : 0;
             if (rowCount!=oldRowCount || colCount!=oldColCount) {
-                elements = (float[][]) XArray.resize(elements, rowCount);
+                elements = XArray.resize(elements, rowCount);
                 for (int i=0; i<elements.length; i++) {
                     if (elements[i] == null) {
                         elements[i] = new float[colCount];
@@ -712,13 +708,13 @@ public class KernelEditor extends JComponent {
          */
         public void removeKernel(final KernelJAI kernel) {
             final String cc = getKernelCategory();
-            for (final Iterator it=kernels.entrySet().iterator(); it.hasNext();) {
-                final Map.Entry entry = (Map.Entry) it.next();
+            for (final Iterator<Map.Entry<String,KernelJAI>> it=kernels.entrySet().iterator(); it.hasNext();) {
+                final Map.Entry<String,KernelJAI> entry = it.next();
                 if (kernel.equals(entry.getValue())) {
                     // Found the kernel to remove.
-                    final String name     = (String) entry.getKey();
+                    final String name     = entry.getKey();
                     final int    index    = indexOf(cc, name); // Must be before any remove.
-                    final String category = (String) categories.remove(name);
+                    final String category = categories.remove(name);
                     if (!categories.values().contains(category)) {
                         // No other kernel in this category.
                         categorySelector.removeItem(category);
@@ -755,7 +751,7 @@ public class KernelEditor extends JComponent {
          * @return The kernel, or {@code null} if there is no kernel for the specified name.
          */
         public KernelJAI getKernel(final String name) {
-            return (KernelJAI) kernels.get(name);
+            return kernels.get(name);
         }
 
         /**
@@ -776,7 +772,7 @@ public class KernelEditor extends JComponent {
                     }
                 }
                 names[count++] = getString(VocabularyKeys.PERSONALIZED);
-                names = (String[]) XArray.resize(names, count);
+                names = XArray.resize(names, count);
             }
             return names;
         }
@@ -824,8 +820,8 @@ public class KernelEditor extends JComponent {
          *
          * @see KernelEditor#sortKernelNames
          */
-        public void sortKernelNames(final Comparator comparator) {
-            final Map sorted = new TreeMap(comparator);
+        public void sortKernelNames(final Comparator<String> comparator) {
+            final Map<String,String> sorted = new TreeMap<String,String>(comparator);
             sorted.putAll(categories);
             categories.clear();
             categories.putAll(sorted);
@@ -833,7 +829,7 @@ public class KernelEditor extends JComponent {
             this.sorted = (comparator == null);
             fireListChanged(ListDataEvent.CONTENTS_CHANGED, 0, categories.size()-1);
         }
-        
+
         /**
          * Invoked when a {@link JSpinner} has changed its state.
          * This method reset the matrix size according the new
@@ -871,7 +867,7 @@ public class KernelEditor extends JComponent {
         public void addListDataListener(final ListDataListener listener) {
             listenerList.add(ListDataListener.class, listener);
         }
-        
+
         /**
          * Removes a listener from the list that's notified
          * each time a change to the data model occurs.
@@ -928,6 +924,6 @@ public class KernelEditor extends JComponent {
     public static void main(final String[] args) {
         final KernelEditor editor = new KernelEditor();
         editor.addDefaultKernels();
-        editor.showDialog(null, Utilities.getShortClassName(editor));
+        editor.showDialog(null, Classes.getShortClassName(editor));
     }
 }

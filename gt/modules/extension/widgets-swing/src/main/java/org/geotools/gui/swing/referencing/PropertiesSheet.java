@@ -16,18 +16,15 @@
  */
 package org.geotools.gui.swing.referencing;
 
-// J2SE dependencies
 import java.awt.BorderLayout;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-// OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.referencing.wkt.UnformattableObjectException;
@@ -43,6 +40,7 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  * @source $URL$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class PropertiesSheet extends JComponent {
     /**
      * Provides different view of the CRS object (properties, WKT, etc.).
@@ -78,7 +76,7 @@ public class PropertiesSheet extends JComponent {
         } catch (UnsupportedOperationException e) {
             text = e.getLocalizedMessage();
             if (text == null) {
-                text = Utilities.getShortClassName(e);
+                text = Classes.getShortClassName(e);
             }
             final String lineSeparator = System.getProperty("line.separator", "\n");
             if (e instanceof UnformattableObjectException) {

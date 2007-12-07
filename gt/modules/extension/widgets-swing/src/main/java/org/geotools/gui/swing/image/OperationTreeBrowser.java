@@ -53,7 +53,7 @@ import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.KernelJAI;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -105,9 +105,17 @@ import org.geotools.resources.i18n.Errors;
  * @see ParameterEditor
  * @see RegisteredOperationBrowser
  */
+@SuppressWarnings("serial")
 public class OperationTreeBrowser extends JPanel {
-    /** Key for {@link PropertySource}. */  private static final String IMAGE     = "Image";
-    /** Key for parameter card.         */  private static final String PARAMETER = "Parameter";
+    /**
+     * Key for {@link PropertySource}.
+     */
+    private static final String IMAGE = "Image";
+
+    /**
+     * Key for parameter card.
+     */
+    private static final String PARAMETER = "Parameter";
 
     /**
      * The image properties panel. Will be constructed only when first needed,
@@ -202,7 +210,7 @@ public class OperationTreeBrowser extends JPanel {
         if (image instanceof CharSequence) {
             return image.toString();
         }
-        return Utilities.getShortClassName(image);
+        return Classes.getShortClassName(image);
     }
 
     /**
@@ -467,7 +475,7 @@ public class OperationTreeBrowser extends JPanel {
      * Implementation of public {@link #show} methods.
      */
     private void showFrame(final Object image) {
-        final JFrame frame = new JFrame(Utilities.getShortClassName(this) + " - " + getName(image));
+        final JFrame frame = new JFrame(Classes.getShortClassName(this) + " - " + getName(image));
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().add(this);
         frame.pack();
@@ -530,6 +538,7 @@ public class OperationTreeBrowser extends JPanel {
         /**
          * Configures the renderer based on the passed in components.
          */
+        @Override
         public Component getTreeCellRendererComponent(final JTree tree, final Object value,
                                                       final boolean selelected,
                                                       final boolean expanded,

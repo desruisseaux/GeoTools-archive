@@ -19,25 +19,21 @@
  */
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-// Java2D dependencies for javadoc only (except RenderingHints).
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.GraphicsConfiguration;
 import java.awt.geom.AffineTransform;
 
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.go.display.DisplayFactory;
 import org.opengis.go.display.canvas.Canvas;
@@ -56,8 +52,8 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -79,7 +75,7 @@ import org.geotools.resources.UnmodifiableArrayList;
  * reference systems} involved in rendering. {@code AbstractCanvas} declares abstract methods
  * for three of them, but the actual CRS management is performed in the {@link ReferencedCanvas}
  * subclass. The CRS are enumerated below (arrows are {@linkplain MathTransform transforms}):
- * 
+ *
  * <p align="center">                       data CRS  &nbsp; <img src="doc-files/right.png">
  * &nbsp; {@linkplain #getObjectiveCRS objective CRS} &nbsp; <img src="doc-files/right.png">
  * &nbsp; {@linkplain #getDisplayCRS     display CRS} &nbsp; <img src="doc-files/right.png">
@@ -235,7 +231,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      */
     protected AbstractCanvas(final DisplayFactory factory, final Hints hints) {
         this.factory   = factory;
-        this.UID       = Utilities.getShortClassName(this) + '-' + String.valueOf(++nextUID);
+        this.UID       = Classes.getShortClassName(this) + '-' + String.valueOf(++nextUID);
         this.hints     = new Hints(hints);
     }
 
@@ -255,7 +251,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * current execution of the Java Virtual Machine. There is no warranty that UID will
      * stay the same in an other execution of the same program. It may also change in future
      * Geotools versions.
-     * 
+     *
      * @return the UID of this {@code Canvas}.
      */
     public String getUID() {
@@ -518,7 +514,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
 
     /**
      * Returns the {@code EventManager} subinterface, based on the class type.
-     * 
+     *
      * @param  type The class type of the {@code EventManager} subinterface.
      * @return a class that implements the requested {@code EventManager} subinterface,
      *         or {@code null} if there is no implementing class.
@@ -644,7 +640,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      *             the zoom changes.
      */
     public void setObjectiveCoordinateReferenceSystem(final CoordinateReferenceSystem crs,
-                                                      final MathTransform objectiveToDisplay, 
+                                                      final MathTransform objectiveToDisplay,
                                                       final MathTransform displayToObjective)
             throws IncompatibleOperationException
     {
@@ -881,16 +877,13 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * if any, appears in the right column. This method is for debugging purpose
      * only and may change in any future version.
      */
+    @Override
     public synchronized String toString() {
         final List/*<Graphic>*/ graphics = getGraphics();
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
-        buffer.append("[\"");
-        buffer.append(getTitle());
-        buffer.append("\", ");
-        buffer.append(graphics.size());
-        buffer.append(" graphics]");
-        buffer.append(lineSeparator);
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
+        buffer.append("[\"").append(getTitle()).append("\", ")
+              .append(graphics.size()).append(" graphics]").append(lineSeparator);
         int maxLength = 0;
         final String[] names = new String[graphics.size()];
         for (int i=0; i<names.length; i++) {
@@ -903,14 +896,11 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
         }
         for (int i=0; i<names.length; i++) {
             final Graphic graphic = (Graphic) graphics.get(i);
-            buffer.append("    ");
-            buffer.append(names[i]);
+            buffer.append("    ").append(names[i]);
             final String ext = toStringExt(graphic);
             if (ext != null) {
-                buffer.append(Utilities.spaces(maxLength-names[i].length() + 3));
-                buffer.append('(');
-                buffer.append(ext);
-                buffer.append(')');
+                buffer.append(Utilities.spaces(maxLength-names[i].length() + 3))
+                      .append('(').append(ext).append(')');
             }
             buffer.append(lineSeparator);
         }

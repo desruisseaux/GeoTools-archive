@@ -19,21 +19,17 @@
  */
 package org.geotools.display.canvas;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.beans.PropertyChangeEvent;
 import java.awt.geom.Rectangle2D;
-import java.awt.RenderingHints;
 import javax.swing.Action;
 
-// OpenGIS dependencies
 import org.opengis.go.display.DisplayFactory;
 import org.opengis.go.display.canvas.CanvasState;
 import org.opengis.go.display.primitive.Graphic;
@@ -47,16 +43,14 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -161,7 +155,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * {@link CoordinateOperationFactory#createOperation} as much as possible. If a
      * transformation is not available in this collection, then the usual factory will be used.
      */
-    private final transient Map/*<CoordinateReferenceSystem,MathTransform>*/ transforms = new HashMap();
+    private final transient Map<CoordinateReferenceSystem,MathTransform> transforms =
+            new HashMap<CoordinateReferenceSystem,MathTransform>();
 
     /**
      * The {@code "affine"} operation method. Cached here because used often. Will be created
@@ -496,6 +491,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * This method fires {@value org.geotools.display.canvas.DisplayObject#GRAPHICS_PROPERTY} and
      * {@value org.geotools.display.canvas.DisplayObject#ENVELOPE_PROPERTY} property change events.
      */
+    @Override
     public synchronized Graphic add(Graphic graphic) {
         Envelope oldEnvelope = null;
         graphic = super.add(graphic);
@@ -544,6 +540,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void remove(final Graphic graphic) {
         Envelope oldEnvelope = null;
         if (graphic instanceof ReferencedGraphic) {
@@ -567,6 +564,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void removeAll() {
         final Envelope oldEnvelope = new GeneralEnvelope(envelope);
         super.removeAll();
@@ -577,6 +575,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void graphicPropertyChanged(final AbstractGraphic graphic,
                                           final PropertyChangeEvent event)
     {
@@ -1020,7 +1019,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             final int sourceDim, targetDim;
             final Matrix identity;
             final MathTransform mt;
-            
+
             crsFactories      = getFactoryGroup();
             objectiveCRS      = getObjectiveCRS();
             displayCS         = DefaultCartesianCS.DISPLAY;
@@ -1092,6 +1091,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * Returns the Coordinate Reference System associated with the device of this {@code Canvas}.
      */
+    @Override
     public final synchronized DerivedCRS getDeviceCRS() {
         final DerivedCRS displayCRS = getDisplayCRS();
         if (deviceCRS == null) try {
@@ -1375,7 +1375,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         final CoordinateReferenceSystem objectiveCRS = getObjectiveCRS();
         final boolean cachedTransform = CRS.equalsIgnoreMetadata(targetCRS, objectiveCRS);
         if (cachedTransform) {
-            tr = (MathTransform) transforms.get(sourceCRS);
+            tr = transforms.get(sourceCRS);
             if (tr != null) {
                 return tr;
             }
@@ -1450,7 +1450,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
      * used for formatting a logging message in {@link #getMathTransform}.
      */
     private static String toString(final CoordinateReferenceSystem crs) {
-        return Utilities.getShortClassName(crs) + "[\"" + crs.getName().getCode() + "\"]";
+        return Classes.getShortClassName(crs) + "[\"" + crs.getName().getCode() + "\"]";
     }
 
     /**
@@ -1523,6 +1523,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void clearCache() {
         super.clearCache();
         transforms.clear();

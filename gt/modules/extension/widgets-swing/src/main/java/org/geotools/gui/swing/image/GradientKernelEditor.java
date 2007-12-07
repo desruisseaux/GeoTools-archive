@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing.image;
 
-// J2SE dependencies
 import javax.swing.JLabel;
 import javax.swing.JComponent;
 import javax.swing.BorderFactory;
@@ -24,14 +23,12 @@ import javax.swing.border.Border;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Component;
-import java.awt.Color;
+import static java.awt.GridBagConstraints.*;
 
-// JAI dependencies
 import javax.media.jai.KernelJAI;
 import javax.media.jai.operator.GradientMagnitudeDescriptor; // For Javadoc
 
-// Seagis dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -56,6 +53,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @see GradientMagnitudeDescriptor
  * @see org.geotools.coverage.processing.operation.GradientMagnitude
  */
+@SuppressWarnings("serial")
 public class GradientKernelEditor extends JComponent {
     /**
      * Square root of 2.
@@ -159,9 +157,9 @@ public class GradientKernelEditor extends JComponent {
         labelH = new JLabel(resources.getString(VocabularyKeys.HORIZONTAL_COMPONENT), JLabel.CENTER);
         labelV = new JLabel(resources.getString(VocabularyKeys.VERTICAL_COMPONENT),   JLabel.CENTER);
         final GridBagConstraints c = new GridBagConstraints();
-        
+
         c.insets.top = 6;
-        c.gridy=0; c.weightx=1; c.gridwidth=1; c.gridheight=1; c.fill=c.BOTH;
+        c.gridy=0; c.weightx=1; c.gridwidth=1; c.gridheight=1; c.fill=BOTH;
         c.gridx=0; add(labelH, c);
         c.gridx=1; add(labelV, c);
         c.gridy=1; c.weighty=1; c.insets.bottom = 6;
@@ -218,6 +216,7 @@ public class GradientKernelEditor extends JComponent {
         /**
          * Add a set of predefined kernels.
          */
+        @Override
         public void addDefaultKernels() {
             final String GRADIENT_MASKS = getResources().getString(VocabularyKeys.GRADIENT_MASKS);
             final KernelJAI prewitt, isotropic, kirsch, sobel;
@@ -312,6 +311,6 @@ public class GradientKernelEditor extends JComponent {
     public static void main(final String[] args) {
         final GradientKernelEditor editor = new GradientKernelEditor();
         editor.addDefaultKernels();
-        editor.showDialog(null, Utilities.getShortClassName(editor));
+        editor.showDialog(null, Classes.getShortClassName(editor));
     }
 }

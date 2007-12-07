@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
@@ -59,7 +60,7 @@ public class MosaicImageReader extends ImageReader {
      * Constructs an image reader with the specified provider.
      */
     public MosaicImageReader(final ImageReaderSpi spi) {
-        super(spi);
+        super(spi != null ? spi : Spi.DEFAULT);
     }
 
     /**
@@ -207,7 +208,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getWidth(final int imageIndex) throws IOException {
-        return getTileCollection().getArea(imageIndex).width;
+        return getTileCollection().getRegion(imageIndex).width;
     }
 
     /**
@@ -218,7 +219,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getHeight(final int imageIndex) throws IOException {
-        return getTileCollection().getArea(imageIndex).height;
+        return getTileCollection().getRegion(imageIndex).height;
     }
 
     /**
@@ -275,36 +276,58 @@ public class MosaicImageReader extends ImageReader {
      * image. The default implementation invokes {@code getRawImageType} for every tile readers,
      * ommits the types that are not declared in <code>{@linkplain ImageReader#getImageTypes
      * getImageTypes}(imageIndex)</code> for every tile readers, and returns the most common
-     * remainding value.
+     * remainding value. If none is found, then some {@linkplain ImageReader#getRawImageType
+     * default specifier} is returned.
      *
+     * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
+     * @return A raw image type specifier.
      * @throws IOException If an error occurs reading the information from the input source.
      */
     @Override
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
         if (tiles != null) {
-            final Set<ImageTypeSpecifier> allowed = getImageTypeSet(imageIndex);
-            // Gets the list of every raw image types, with the most frequent type first.
-            final Set<ImageTypeSpecifier> types = new FrequencySortedSet<ImageTypeSpecifier>(true);
-            for (final Tile tile : tiles.getTiles(imageIndex, null)) {
-                final ImageReader reader = tile.getPreparedReader(true, true);
-                final Iterator<ImageTypeSpecifier> it = reader.getImageTypes(imageIndex);
-                while (it.hasNext()) {
-                    final ImageTypeSpecifier type = it.next();
-                    if (allowed.contains(type)) {
-                        types.add(type);
-                    }
-                }
-            }
-            final Iterator<ImageTypeSpecifier> it = types.iterator();
-            if (it.hasNext()) {
-                final ImageTypeSpecifier type = it.next();
-                if (it.hasNext()) {
-                    // TODO: log some low-level warnings here.
-                }
+            final ImageTypeSpecifier type =
+                    getRawImageType(imageIndex, tiles.getTiles(imageIndex, null));
+            if (type != null) {
                 return type;
             }
         }
         return super.getRawImageType(imageIndex);
+    }
+
+    /**
+     * Returns an image type which most closely represents the "raw" internal format of the
+     * given set of tiles. If none is found, returns {@code null}.
+     *
+     * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
+     * @param  tiles       The tiles to iterate over.
+     * @return A raw image type specifier acceptable for all tiles, or {@code null} if none.
+     * @throws IOException If an error occurs reading the information from the input source.
+     */
+    private ImageTypeSpecifier getRawImageType(final int imageIndex, final Collection<Tile> tiles)
+            throws IOException
+    {
+        // Gets the list of every raw image types, with the most frequent type first.
+        final Set<ImageTypeSpecifier> rawTypes = new FrequencySortedSet<ImageTypeSpecifier>(true);
+        final Set<ImageTypeSpecifier> allowed = getImageTypes(imageIndex, tiles, rawTypes);
+        rawTypes.retainAll(allowed);
+        Iterator<ImageTypeSpecifier> it = rawTypes.iterator();
+        if (it.hasNext()) {
+            final ImageTypeSpecifier type = it.next();
+            if (it.hasNext()) {
+                // TODO: log some low-level warnings here.
+            }
+            return type;
+        }
+        /*
+         * No raw image reader type. Returns the first allowed type even if it is not "raw".
+         */
+        it = allowed.iterator();
+        if (it.hasNext()) {
+            // TODO: log some low-level warnings here.
+            return it.next();
+        }
+        return null;
     }
 
     /**
@@ -313,13 +336,25 @@ public class MosaicImageReader extends ImageReader {
      * on every tile readers and returns the intersection of all sets (i.e. only the types
      * that are supported by every readers).
      *
+     * @param  imageIndex  The image index, from 0 inclusive to {@link #getNumImages} exclusive.
+     * @param  tiles       The tiles to iterate over.
+     * @param  rawTypes    If non-null, a collection where to store the raw image types.
+     *                     No filtering is applied on this collection.
+     * @return The image type specifiers that are common to all tiles.
      * @throws IOException If an error occurs reading the information from the input source.
      */
-    private Set<ImageTypeSpecifier> getImageTypeSet(final int imageIndex) throws IOException {
+    private Set<ImageTypeSpecifier> getImageTypes(final int imageIndex,
+                                                  final Collection<Tile> tiles,
+                                                  final Collection<ImageTypeSpecifier> rawTypes)
+            throws IOException
+    {
         int pass = 0;
         final Map<ImageTypeSpecifier,Integer> types = new LinkedHashMap<ImageTypeSpecifier,Integer>();
-        for (final Tile tile : getTileCollection().getTiles(imageIndex, null)) {
+        for (final Tile tile : tiles) {
             final ImageReader reader = tile.getPreparedReader(true, true);
+            if (rawTypes != null) {
+                rawTypes.add(reader.getRawImageType(imageIndex));
+            }
             final Iterator<ImageTypeSpecifier> toAdd = reader.getImageTypes(imageIndex);
             while (toAdd.hasNext()) {
                 final ImageTypeSpecifier type = toAdd.next();
@@ -346,10 +381,13 @@ public class MosaicImageReader extends ImageReader {
      * every tile readers and returns the intersection of all sets (i.e. only the types that are
      * supported by every readers).
      *
+     * @param  imageIndex  The image index, from 0 inclusive to {@link #getNumImages} exclusive.
+     * @return The image type specifiers that are common to all tiles.
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
-        return getImageTypeSet(imageIndex).iterator();
+        final Collection<Tile> tiles = getTileCollection().getTiles(imageIndex, null);
+        return getImageTypes(imageIndex, tiles, null).iterator();
     }
 
     /**
@@ -455,41 +493,93 @@ public class MosaicImageReader extends ImageReader {
      * @param  param The parameters used to control the reading process, or {@code null}.
      * @return The desired portion of the image.
      * @throws IOException if an error occurs during reading.
+     *
+     * @todo Delegates directly to the underlying reader when there is only one tile in the source region.
      */
-    public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
+    public BufferedImage read(final int imageIndex, ImageReadParam param) throws IOException {
         clearAbortRequest();
+        BufferedImage image;
         final int[]      sourceBands;
         final int[] destinationBands;
         final int sourceXSubsampling;
         final int sourceYSubsampling;
-        final int subsamplingXOffset;
-        final int subsamplingYOffset;
-        final int destinationXOffset;
-        final int destinationYOffset;
         if (param != null) {
+            image              = param.getDestination();
             sourceBands        = param.getSourceBands();
             destinationBands   = param.getDestinationBands();
-            final Point offset = param.getDestinationOffset();
             sourceXSubsampling = param.getSourceXSubsampling();
             sourceYSubsampling = param.getSourceYSubsampling();
-            subsamplingXOffset = param.getSubsamplingXOffset();
-            subsamplingYOffset = param.getSubsamplingYOffset();
-            destinationXOffset = offset.x;
-            destinationYOffset = offset.y;
         } else {
+            image              = null;
             sourceBands        = null;
             destinationBands   = null;
             sourceXSubsampling = 1;
             sourceYSubsampling = 1;
-            subsamplingXOffset = 0;
-            subsamplingYOffset = 0;
-            destinationXOffset = 0;
-            destinationYOffset = 0;
         }
-        final int width  = getWidth (imageIndex);
-        final int height = getHeight(imageIndex);
-        final Rectangle sourceRegion = getSourceRegion(param, width, height);
-        throw new UnsupportedOperationException("Not supported yet.");
+        final int          srcWidth  = getWidth (imageIndex);
+        final int          srcHeight = getHeight(imageIndex);
+        final Rectangle sourceRegion = getSourceRegion(param, srcWidth, srcHeight);
+        final Rectangle   destRegion = new Rectangle(); // Will be computed later.
+        final Collection<Tile> tiles = getTileCollection().getTiles(imageIndex, sourceRegion);
+        computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
+        if (image == null) {
+            /*
+             * If no image was explicitly specified, creates one using a raw image type acceptable
+             * for all tiles. An exception will be thrown if no such raw type was found. Note that
+             * this fallback may be a little bit costly since it may imply to open, close and
+             * reopen later some streams.
+             */
+            ImageTypeSpecifier imageType = null;
+            if (param != null) {
+                imageType = param.getDestinationType();
+            }
+            if (imageType == null) {
+                imageType = getRawImageType(imageIndex, tiles);
+                if (imageType == null) {
+                    throw new IIOException(Errors.format(ErrorKeys.DESTINATION_NOT_SET));
+                }
+            }
+            image = imageType.createBufferedImage(destRegion.x + destRegion.width,
+                                                  destRegion.y + destRegion.height);
+            computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
+        }
+        final int numDstBands = image.getSampleModel().getNumBands();
+        final int numSrcBands = (sourceBands != null) ? sourceBands.length : numDstBands;
+        checkReadParamBandSettings(param, numSrcBands, numDstBands);
+        final int  destinationXOffset = destRegion.x - sourceRegion.x;
+        final int  destinationYOffset = destRegion.y - sourceRegion.y;
+        final Point destinationOffset = new Point();
+        if (param == null) {
+            param = getDefaultReadParam();
+        }
+        for (final Tile tile : tiles) {
+            final Rectangle tileRegion = tile.getRegion();
+            final Rectangle sourceTileRegion = tileRegion.intersection(sourceRegion);
+            if (sourceTileRegion.isEmpty()) {
+                continue;
+            }
+            destinationOffset.move(sourceTileRegion.x, sourceTileRegion.y);
+            destinationOffset.translate(destinationXOffset, destinationYOffset);
+            sourceTileRegion .translate(-tileRegion.x, -tileRegion.y);
+            param.setController(null);
+            param.setDestinationType(null);
+            param.setDestination(image); // Must be after setDestinationType.
+            param.setDestinationOffset(destinationOffset);
+            param.setSourceRegion(sourceTileRegion);
+            if (param.canSetSourceRenderSize()) {
+                param.setSourceRenderSize(null); // TODO.
+            }
+            final ImageReader reader = tile.getPreparedReader(seekForwardOnly, ignoreMetadata);
+            final BufferedImage output = reader.read(imageIndex, param);
+            if (output != image) {
+                /*
+                 * The read operation ignored our destination image. Copy the pixels (slower)
+                 * (todo: not yet implemented).
+                 */
+                throw new IIOException("Not yet implemented.");
+            }
+        }
+        return image;
     }
 
     /**
@@ -518,5 +608,82 @@ public class MosaicImageReader extends ImageReader {
         }
         tiles = null;
         super.dispose();
+    }
+
+    /**
+     * Service provider for {@link MosaicImageReader}.
+     *
+     * @since 2.5
+     * @source $URL$
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static class Spi extends ImageReaderSpi {
+        /**
+         * The format names.
+         */
+        private static final String[] NAMES = new String[] {
+            "mosaic"
+        };
+
+        /**
+         * The input types.
+         */
+        private static final Class<?>[] INPUT_TYPES = new Class[] {
+            Tile[].class,
+            Collection.class
+        };
+
+        /**
+         * The default instance.
+         */
+        static final Spi DEFAULT = new Spi();
+
+        /**
+         * Creates a default provider.
+         */
+        public Spi() {
+            vendorName      = "GeoTools";
+            version         = "1.0";
+            names           = NAMES;
+            inputTypes      = INPUT_TYPES;
+            pluginClassName = "org.geotools.image.io.mosaic.MosaicImageReader";
+        }
+
+        /**
+         * Returns {@code true} if the image reader can decode the given input. The default
+         * implementation returns {@code true} if the given object is non-null and an instance
+         * of an {@linkplain #inputTypes input types}, or {@code false} otherwise.
+         */
+        @Override
+        public boolean canDecodeInput(final Object source) throws IOException {
+            if (source != null) {
+                final Class<?> type = source.getClass();
+                for (final Class<?> inputType : inputTypes) {
+                    if (inputType.isAssignableFrom(type)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Returns a new {@link MosaicImageReader}.
+         */
+        @Override
+        public ImageReader createReaderInstance(final Object extension) throws IOException {
+            return new MosaicImageReader(this);
+        }
+
+        /**
+         * Returns a brief, human-readable description of this service provider.
+         *
+         * @todo Localize.
+         */
+        @Override
+        public String getDescription(final Locale locale) {
+            return "Mosaic Image Reader";
+        }
     }
 }

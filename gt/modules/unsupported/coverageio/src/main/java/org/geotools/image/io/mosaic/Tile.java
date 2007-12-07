@@ -18,6 +18,7 @@ package org.geotools.image.io.mosaic;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -106,7 +107,7 @@ public class Tile implements Comparable<Tile> {
     /**
      * Creates a tile for the given reader, input and origin. This constructor can be used when
      * the size of the image to be read by the supplied reader is unknown. This size will be
-     * fetched automatically the first time {@link #getArea} is invoked.
+     * fetched automatically the first time {@link #getRegion} is invoked.
      *
      * @param reader
      *          The image reader to use. The same reader is typically given to every {@code Tile}
@@ -133,9 +134,9 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Creates a tile for the given reader, input and area. This constructor can be used when
+     * Creates a tile for the given reader, input and region. This constructor can be used when
      * the size of the image to be read by the supplied reader is known. It avoid the cost of
-     * fetched the size from the reader when {@link #getArea} will be invoked.
+     * fetched the size from the reader when {@link #getRegion} will be invoked.
      *
      * @param reader
      *          The image reader to use. The same reader is typically given to every {@code Tile}
@@ -146,25 +147,25 @@ public class Tile implements Comparable<Tile> {
      *          The input to be given to the image reader.
      * @param imageIndex
      *          The image index of the tile to be read. This is often 0.
-     * @param area
-     *          The area in the destination image. The {@linkplain Rectangle#width width} and
+     * @param region
+     *          The region in the destination image. The {@linkplain Rectangle#width width} and
      *          {@linkplain Rectangle#height height} should match the image size.
      */
-    public Tile(final ImageReader reader, final Object input, final int imageIndex, final Rectangle area) {
+    public Tile(final ImageReader reader, final Object input, final int imageIndex, final Rectangle region) {
         ensureNonNull("reader", reader);
         ensureNonNull("input",  input);
-        ensureNonNull("area",   area);
-        if (area.isEmpty()) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, area));
+        ensureNonNull("region", region);
+        if (region.isEmpty()) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RECTANGLE_$1, region));
         }
         checkImageIndex(imageIndex);
         this.reader     = reader;
         this.input      = input;
         this.imageIndex = imageIndex;
-        this.x          = area.x;
-        this.y          = area.y;
-        this.width      = area.width;
-        this.height     = area.height;
+        this.x          = region.x;
+        this.y          = region.y;
+        this.width      = region.width;
+        this.height     = region.height;
     }
 
     /**
@@ -231,7 +232,8 @@ public class Tile implements Comparable<Tile> {
          * any data that may be cached in the ImageReader instance. Only if the input is
          * not suitable, we will invoke ImageReader.setInput(...).
          */
-        if ((!Utilities.equals(input, currentInput))         ||
+        final boolean sameInput = Utilities.equals(input, currentInput);
+        if ( !sameInput                                      ||
             ( getImageIndex() <  reader.getMinIndex())       ||
             (!seekForwardOnly && reader.isSeekForwardOnly()) ||
             (!ignoreMetadata  && reader.isIgnoringMetadata()))
@@ -256,17 +258,26 @@ public class Tile implements Comparable<Tile> {
             } else {
                 // We are not allowed to use the input directly. Creates a new input
                 // stream, or reuse the previous one if it still useable.
-                if (stream != null) try {
-                    stream.seek(0);
-                } catch (IndexOutOfBoundsException e) {
-                    // We tried to reuse the same stream in order to preserve cached data, but it was
-                    // not possible to seek to the begining. Closes it; we will open a new one later.
-                    recoverableException(Tile.class, "getPreparedReader", e);
-                    stream.close();
-                    stream = null;
+                if (stream != null) {
+                    if (sameInput) try {
+                        stream.seek(0);
+                    } catch (IndexOutOfBoundsException e) {
+                        // We tried to reuse the same stream in order to preserve cached data, but it was
+                        // not possible to seek to the begining. Closes it; we will open a new one later.
+                        recoverableException(Tile.class, "getPreparedReader", e);
+                        stream.close();
+                        stream = null;
+                    } else {
+                        stream.close();
+                        stream = null;
+                    }
                 }
                 if (stream == null) {
                     stream = ImageIO.createImageInputStream(input);
+                    if (stream == null) {
+                        throw new FileNotFoundException(Errors.format(
+                                ErrorKeys.FILE_DOES_NOT_EXIST_$1, input));
+                    }
                 }
                 actualInput = stream;
             }
@@ -314,11 +325,11 @@ public class Tile implements Comparable<Tile> {
      * {@linkplain ImageReader#getHeight height} are read from the image reader and
      * cached for future usage.
      *
-     * @return The area in the destination image.
+     * @return The region in the destination image.
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getReader reader} and this operation failed.
      */
-    public Rectangle getArea() throws IOException {
+    public Rectangle getRegion() throws IOException {
         if (width == 0 && height == 0) {
             final ImageReader reader = getPreparedReader(true, true);
             int value;
@@ -329,26 +340,26 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns {@code true} if calls to {@link #getArea}, {@link #intersects} and related
+     * Returns {@code true} if calls to {@link #getRegion}, {@link #intersects} and related
      * methods will be cheap. For internal usage by {@link TileCollection#getTiles} only.
      */
-    final boolean isGetAreaCheap() {
+    final boolean isGetRegionCheap() {
         return width != 0 || height != 0;
     }
 
     /**
-     * Returns {@code true} if this tile {@linkplain #getArea area} intersects the given
+     * Returns {@code true} if this tile {@linkplain #getRegion region} intersects the given
      * rectangle.
      *
      * @throws IOException if it was necessary to fetch the image dimension from the
      *         {@linkplain #getReader reader} and this operation failed.
      */
-    public boolean intersects(final Rectangle area) throws IOException {
-        if (area.x + area.width <= x || area.y + area.height <= y) {
-            // Cheap test before to invoke 'getArea()', which may be costly.
+    public boolean intersects(final Rectangle region) throws IOException {
+        if (region.x + region.width <= x || region.y + region.height <= y) {
+            // Cheap test before to invoke 'getRegion()', which may be costly.
             return false;
         }
-        return getArea().intersects(area);
+        return getRegion().intersects(region);
     }
 
     /**
@@ -387,10 +398,10 @@ public class Tile implements Comparable<Tile> {
                     Utilities.equals    (this.getReader(), that.getReader()) &&
                     Utilities.equals    (this.getOrigin(), that.getOrigin()))
             {
-                if (this.isGetAreaCheap() && that.isGetAreaCheap()) try {
-                    return Utilities.equals(this.getArea(), that.getArea());
+                if (this.isGetRegionCheap() && that.isGetRegionCheap()) try {
+                    return Utilities.equals(this.getRegion(), that.getRegion());
                 } catch (IOException e) {
-                    // Should not occurs, since we checked that 'getArea()' should be cheap.
+                    // Should not occurs, since we checked that 'getRegion()' should be cheap.
                     recoverableException(Tile.class, "equals", e);
                 }
                 return true;
@@ -425,15 +436,18 @@ public class Tile implements Comparable<Tile> {
             }
         }
         buffer.append("input=\"").append(Utilities.deepToString(getInput())).append("\", ");
-        if (!isGetAreaCheap()) {
+        if (!isGetRegionCheap()) {
             final Point origin = getOrigin();
-            buffer.append("x=").append(origin.x).append(", y=").append(origin.y);
+            buffer.append(  "x=").append(origin.x)
+                  .append(", y=").append(origin.y);
         } else try {
-            final Rectangle area = getArea();
-            buffer.append("x=").append(area.x).append(", y=").append(area.y).
-                    append(", width=").append(area.width).append(", height=").append(area.height);
+            final Rectangle region = getRegion();
+            buffer.append(  "x=")     .append(region.x)
+                  .append(", y=")     .append(region.y)
+                  .append(", width=") .append(region.width)
+                  .append(", height=").append(region.height);
         } catch (IOException e) {
-            // Should not happen since we checked that 'getArea' should be easy.
+            // Should not happen since we checked that 'getRegion' should be easy.
             // If it happen anyway, put the exception message at the place where
             // coordinates were supposed to appear, so we can debug.
             buffer.append(e);

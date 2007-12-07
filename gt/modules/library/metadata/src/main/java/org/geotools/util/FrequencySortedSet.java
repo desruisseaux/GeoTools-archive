@@ -119,9 +119,7 @@ public class FrequencySortedSet<E> extends AbstractSet<E> implements SortedSet<E
         if (n == null) {
             return true;
         }
-        if (count.put(element, n + order) != n) {
-            throw new AssertionError(element);
-        }
+        count.put(element, n + order);
         return false;
     }
 

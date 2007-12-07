@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,8 +48,8 @@ import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Component;
 import java.awt.Dimension;
+import static java.awt.GridBagConstraints.*;
 
-// JAI dependencies
 import javax.media.jai.util.Range;
 import javax.media.jai.KernelJAI;
 import javax.media.jai.LookupTableJAI;
@@ -60,11 +59,11 @@ import javax.media.jai.PerspectiveTransform;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RegistryElementDescriptor;
 
-// Geotools dependencies
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.XMath;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -101,6 +100,7 @@ import org.geotools.gui.swing.image.KernelEditor;
  *       We will allow that in a future version. This work is already
  *       partially done with the 'editable' boolean value.
  */
+@SuppressWarnings("serial")
 public class ParameterEditor extends JPanel {
     /** Key for {@link String} node.    */  private static final String STRING  = "String";
     /** Key for {@link Boolean} node.   */  private static final String BOOLEAN = "Boolean";
@@ -113,9 +113,8 @@ public class ParameterEditor extends JPanel {
 
     /**
      * The set of {@linkplain Component component} editors created up to date.
-     * Keys are {@link String} and values are {@link Component} objects.
      */
-    private final Map editors = new HashMap();
+    private final Map<String,Component> editors = new HashMap<String,Component>();
 
     /**
      * The properties panel for parameters. The content for this panel
@@ -319,7 +318,7 @@ public class ParameterEditor extends JPanel {
      * @return The editor, or {@code null}.
      */
     private Component getEditor(final String name) {
-        final Component panel = (Component) editors.get(name);
+        final Component panel = editors.get(name);
         ((CardLayout) cards.getLayout()).show(cards, name);
         return panel;
     }
@@ -357,6 +356,7 @@ public class ParameterEditor extends JPanel {
      *
      * The {@link #model} field will be set to the model used by the editor widget.
      */
+    @SuppressWarnings("fallthrough")
     private void updateEditor() {
         Object value = this.value;
         /*
@@ -602,7 +602,7 @@ public class ParameterEditor extends JPanel {
             field.setEditable(editable);
             final Vocabulary resources = Vocabulary.getResources(getLocale());
             final GridBagConstraints c = new GridBagConstraints();
-            c.gridx=0; c.gridwidth=1; c.insets.left=9; c.fill=c.HORIZONTAL;
+            c.gridx=0; c.gridwidth=1; c.insets.left=9; c.fill=HORIZONTAL;
             c.gridy=0; add(new JLabel(resources.getLabel(VocabularyKeys.TYPE   )), c);
             c.gridy++; add(new JLabel(resources.getLabel(VocabularyKeys.MINIMUM)), c);
             c.gridy++; add(new JLabel(resources.getLabel(VocabularyKeys.MAXIMUM)), c);
@@ -654,7 +654,7 @@ public class ParameterEditor extends JPanel {
                                                        : VocabularyKeys.REAL_NUMBER_$1,
                                             new Integer(XMath.getBitCount(classe)));
                 } else {
-                    type = Utilities.getShortName(classe);
+                    type = Classes.getShortName(classe);
                 }
             }
             if (range != null) {
@@ -743,6 +743,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Returns the name of the column at the specified index.
          */
+        @Override
         public String getColumnName(final int index) {
             switch (index) {
                 case 0:  return Vocabulary.format(VocabularyKeys.INDEX);
@@ -753,6 +754,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Returns the most specific superclass for all the cell values.
          */
+        @Override
         public Class getColumnClass(final int index) {
             if (index==0 || unsigned) {
                 return Integer.class;
@@ -763,6 +765,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Tells if the specified cell is editable.
          */
+        @Override
         public boolean isCellEditable(final int row, final int column) {
             return editable && column!=0;
         }
@@ -784,6 +787,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Set the value at the given index.
          */
+        @Override
         public void setValueAt(final Object value, final int row, final int column) {
             Array.set(table[column-1], row, value);
         }
@@ -850,6 +854,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Returns the name of the column at the specified index.
          */
+        @Override
         public String getColumnName(final int index) {
             return Integer.toString(index);
         }
@@ -857,6 +862,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Returns the most specific superclass for all the cell values.
          */
+        @Override
         public Class getColumnClass(final int index) {
             return XMath.primitiveToWrapper(matrix.getClass().getComponentType().getComponentType());
         }
@@ -864,6 +870,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Tells if the specified cell is editable.
          */
+        @Override
         public boolean isCellEditable(final int row, final int column) {
             return editable;
         }
@@ -879,6 +886,7 @@ public class ParameterEditor extends JPanel {
         /**
          * Set the value at the given index.
          */
+        @Override
         public void setValueAt(final Object value, final int row, final int column) {
             Array.set(matrix[row], column, value);
         }

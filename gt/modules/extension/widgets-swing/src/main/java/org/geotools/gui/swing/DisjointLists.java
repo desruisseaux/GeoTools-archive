@@ -16,7 +16,6 @@
  */
 package org.geotools.gui.swing;
 
-// Swing and AWT dependencies
 import java.awt.Font;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -25,11 +24,9 @@ import javax.swing.JScrollPane;
 import javax.swing.AbstractListModel;
 import java.awt.IllegalComponentStateException;
 
-// Events
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Layout
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -41,10 +38,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Locale;
+import static java.awt.GridBagConstraints.*;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.SwingUtilities;
 
 
@@ -58,6 +55,7 @@ import org.geotools.resources.SwingUtilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@SuppressWarnings("serial")
 public class DisjointLists extends JPanel {
     /**
      * The list model. Each {@link DisjointLists} object will use two instances
@@ -73,7 +71,7 @@ public class DisjointLists extends JPanel {
          * Note: this list is read by {@link DisjointLists#selectElements}. The content
          *       of this list should never be modified from any method outside this class.
          */
-        final List choices;
+        final List<Object> choices;
 
         /**
          * The index of valids elements in the {@link #choice} list. This array will growth
@@ -89,7 +87,7 @@ public class DisjointLists extends JPanel {
         /**
          * Constructs a model for the specified list of elements.
          */
-        public Model(final List choices) {
+        public Model(final List<Object> choices) {
             this.choices = choices;
         }
 
@@ -226,7 +224,7 @@ public class DisjointLists extends JPanel {
         /**
          * Adds all elements from the specified collection.
          */
-        public void addAll(final Collection items) {
+        public void addAll(final Collection<?> items) {
             if (!items.isEmpty()) {
                 choices.addAll(items);
                 final int length = items.size();
@@ -316,7 +314,7 @@ public class DisjointLists extends JPanel {
         /*
          * Setup lists
          */
-        final List choices = new ArrayList();
+        final List<Object> choices = new ArrayList<Object>();
         left  = new JList(new Model(choices));
         right = new JList(new Model(choices));
         final JScrollPane  leftPane = new JScrollPane( left);
@@ -339,14 +337,14 @@ public class DisjointLists extends JPanel {
          * Build UI
          */
         final GridBagConstraints c = new GridBagConstraints();
-        c.gridy=0; c.gridwidth=1; c.gridheight=4; c.weightx=c.weighty=1; c.fill=c.BOTH;
+        c.gridy=0; c.gridwidth=1; c.gridheight=4; c.weightx=c.weighty=1; c.fill=BOTH;
         c.gridx=0; add( leftPane,  c);
         c.gridx=2; add(rightPane, c);
 
         c.insets.left = c.insets.right = 9;
-        c.gridx=1; c.gridheight=1; c.weightx=0; c.fill=c.HORIZONTAL;
-        c.gridy=0; c.anchor=c.SOUTH;  add(add,       c);
-        c.gridy=3; c.anchor=c.NORTH;  add(removeAll, c);
+        c.gridx=1; c.gridheight=1; c.weightx=0; c.fill=HORIZONTAL;
+        c.gridy=0; c.anchor=SOUTH;    add(add,       c);
+        c.gridy=3; c.anchor=NORTH;    add(removeAll, c);
         c.gridy=2; c.weighty=0;       add(addAll,    c);
         c.gridy=1; c.insets.bottom=9; add(remove,    c);
     }
@@ -386,7 +384,7 @@ public class DisjointLists extends JPanel {
         if (autoSort != this.autoSort) {
             this.autoSort = autoSort;
             if (autoSort) {
-                final List elements = new ArrayList(((Model) left.getModel()).choices);
+                final List<Object> elements = new ArrayList<Object>(((Model) left.getModel()).choices);
                 clear();
                 addElements(elements);
             }
@@ -429,7 +427,7 @@ public class DisjointLists extends JPanel {
         } catch (IllegalComponentStateException e) {
             locale = getDefaultLocale();
         }
-        final List list = new ArrayList(items.length);
+        final List<Object> list = new ArrayList<Object>(items.length);
         for (int i=0; i<items.length; i++) {
             Object candidate = items[i];
             if (!(candidate instanceof String)) {
@@ -441,7 +439,7 @@ public class DisjointLists extends JPanel {
         final Model right = (Model) this.right.getModel();
         if (autoSort) {
             list.addAll(left.choices);
-            Collections.sort(list);
+            Collections.sort((List) list);
             left .clear();
             right.clear();
         }
@@ -483,6 +481,7 @@ public class DisjointLists extends JPanel {
     /**
      * Set the font for both lists on the left and right side.
      */
+    @Override
     public void setFont(final Font font) {
         // Note: 'left' and 'right' may be null during JComponent initialisation.
         if (left  != null) left .setFont(font);
@@ -513,7 +512,7 @@ public class DisjointLists extends JPanel {
     public static void main(final String[] args) {
         final DisjointLists list = new DisjointLists();
         list.addElements(Locale.getAvailableLocales());
-        list.showDialog(null, Utilities.getShortClassName(list));
+        list.showDialog(null, Classes.getShortClassName(list));
         System.out.println(list.getElements(true));
     }
 }

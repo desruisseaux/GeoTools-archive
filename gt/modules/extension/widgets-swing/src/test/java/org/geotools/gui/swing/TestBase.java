@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -75,7 +75,7 @@ public class TestBase extends TestCase {
      * @param component The component to show.
      */
     protected static void show(final Component component) {
-        show(component, Utilities.getShortClassName(component));
+        show(component, Classes.getShortClassName(component));
     }    
 
     /**
