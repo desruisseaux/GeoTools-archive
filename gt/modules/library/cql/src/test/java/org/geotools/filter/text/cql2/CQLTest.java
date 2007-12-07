@@ -17,9 +17,7 @@ package org.geotools.filter.text.cql2;
 
 import junit.framework.TestCase;
 
-import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
@@ -50,8 +48,8 @@ import org.opengis.filter.spatial.Within;
  * Test Common CQL language
  * </p>
  *
- * @author Mauricio Pazos - www.axios.es
- * @version 2.4
+ * @author Mauricio Pazos - Axios Engineering
+ * @since 2.5 
  */
 public class CQLTest extends TestCase {
 
@@ -1032,7 +1030,7 @@ public class CQLTest extends TestCase {
         // TODO not implement it
         // (Mauricio Comments) This case is not implemented because the filter
         // model has not a
-        // Routine (Like functions in ExpresiÃ³n). We could develop easily the
+        // Routine (Like functions in Expresión). We could develop easily the
         // parser
         // but we can not build a filter for CQL <Routine invocation>.
     }
@@ -1263,10 +1261,61 @@ public class CQLTest extends TestCase {
             assertFalse("error message is expected", "".equals(message));
         }
     }
+    
+    /**
+     * <pre>
+     * &lt;character string literal&gt; ::= &lt;quote&gt; [ {&lt;character representation&lt;} ]  &lt;quote&gt;
+     * &lt;character representation&gt; ::= 
+     * 			&lt;nonquote character&gt; 
+     * 		| 	&lt;quote symbol&gt;
+ 	 * &lt;quote symbol&gt; ::=  &lt;quote&gt; &lt;quote&gt;
+ 	 *  </pre>
+     */
+    public void testCharacterStringLiteral() throws Exception{
+    	
+    	PropertyIsEqualTo eqFilter; 
+    	
+        // empty string ''
+    	Filter emptyFilter = CQL.toFilter("MAJOR_WATERSHED_SYSTEM = ''");
+
+        assertNotNull(emptyFilter);
+        assertTrue(emptyFilter instanceof PropertyIsEqualTo);
+
+        eqFilter = (PropertyIsEqualTo) emptyFilter;
+        Expression emptyLiteral = eqFilter.getExpression2();
+        assertEquals("", emptyLiteral.toString());
+        
+        //character string without quote
+        final String expectedWithout = "ab";
+
+        Filter filterWithoutQuote = CQL.toFilter("MAJOR_WATERSHED_SYSTEM = '"
+                + expectedWithout + "'");
+
+        assertNotNull(filterWithoutQuote);
+        assertTrue(filterWithoutQuote instanceof PropertyIsEqualTo);
+
+        eqFilter = (PropertyIsEqualTo) filterWithoutQuote;
+        Expression actualWhithoutQuote = eqFilter.getExpression2();
+        assertEquals(expectedWithout, actualWhithoutQuote.toString());
+        
+    	// <quote symbol>
+        final String expected = "cde'' fg";
+
+        Filter filter = CQL.toFilter("MAJOR_WATERSHED_SYSTEM = '" + expected
+                + "'");
+
+        assertNotNull(filter);
+        assertTrue(filter instanceof PropertyIsEqualTo);
+
+        eqFilter = (PropertyIsEqualTo) filter;
+        Expression actual = eqFilter.getExpression2();
+        assertEquals(expected.replaceAll("''", "'"), actual.toString());
+    	
+    }
 
     /**
      * Test for expressions
-     *
+     *  
      * @throws Exception
      */
     public void testParseExpression() throws Exception {

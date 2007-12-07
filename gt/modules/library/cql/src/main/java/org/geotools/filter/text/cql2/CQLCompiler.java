@@ -62,10 +62,10 @@ import com.vividsolutions.jts.io.WKTReader;
  * each syntax rules recognized.
  * </p>
  * 
- * @author Mauricio Pazos - www.axios.es
+ * @author Mauricio Pazos - Axios Engineering
  * 
  * @version $Id$
- * @since 2.4
+ * @since 2.5
  */
 final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
     private static final String ATTRIBUTE_PATH_SEPARATOR = "/";
@@ -77,7 +77,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
     private BuildResultStack resultStack;
 
-    /** cql expresion to compile */
+    /** cql expression to compile */
     private String cqlSource = null;
 
     private FilterFactory filterFactory;
@@ -341,8 +341,10 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
             return filterFactory.literal(Double.parseDouble(getToken(0).image));
 
         case JJTSTRINGNODE:
-            return filterFactory.literal(n.getToken().image);
-
+        case JJTCHARACTERPATTERNNODE:
+        	String strLiteral = removeQuotes(n.getToken().image);
+        	return filterFactory.literal(strLiteral);
+            
             // ----------------------------------------
             // Identifier
             // ----------------------------------------
@@ -1272,6 +1274,33 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         return wktGeom;
     }
+    
+    /**
+     * Removes initial and final "'" from string. If some "''" is found
+     * it will be changed by a single quote "'".
+     * 
+     * @param source
+     * @return string without initial and final quote, and "''" replaced 
+     * by "'".
+     */
+    private String removeQuotes(final String source){
+
+    	// checks if it has initial an final quote
+    	final String quote = "'";
+    	if( !( source.startsWith(quote) && source.endsWith(quote)) ){
+    		return source;
+    	}
+    
+    	int length = source.length();
+    	
+    	// removes the first and last quote
+    	String result = source.substring(1,length -1);
+    	// removes internal quotes
+    	result = result.replaceAll("''", "'");
+    	
+    	return result;
+    }
+    
 
     /**
      * This transformation is required because some geometries like

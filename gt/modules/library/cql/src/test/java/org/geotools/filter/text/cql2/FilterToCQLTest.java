@@ -1,15 +1,12 @@
 package org.geotools.filter.text.cql2;
 
-import java.io.IOException;
-
-import org.opengis.filter.Filter;
-
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-import junit.framework.TestSuite;
+
+import org.opengis.filter.Filter;
 
 public class FilterToCQLTest extends TestCase {
 
