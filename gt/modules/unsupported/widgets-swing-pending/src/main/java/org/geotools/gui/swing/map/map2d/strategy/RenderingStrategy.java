@@ -35,6 +35,8 @@ public interface RenderingStrategy {
     
     public BufferedImage createBufferImage(MapLayer layer);
     public BufferedImage createBufferImage(MapContext context);
+    
+    public BufferedImage getBufferImage();
 
     public void setContext(MapContext context);
     public MapContext getContext();

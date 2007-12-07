@@ -199,6 +199,10 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
         }
 
     }
+    
+    public BufferedImage getBufferImage() {
+        return comp.getSnapShot();
+    }
 
     public void reset() {
        checkAspect(true);
@@ -253,6 +257,13 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             GC = this.getGraphicsConfiguration();
         }
 
+        public BufferedImage getSnapShot(){
+            if(buffer != null){
+                return buffer.getSnapshot();
+            }
+            return null;
+        }
+        
         public void refresh() {
             update = true;
             repaint();
@@ -358,6 +369,8 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
             }
         }
     }
+
+    
     
     
 }

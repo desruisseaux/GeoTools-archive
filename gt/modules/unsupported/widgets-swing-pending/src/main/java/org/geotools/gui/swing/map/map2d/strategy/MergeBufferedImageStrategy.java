@@ -207,6 +207,10 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
         }
 
     }
+    
+    public BufferedImage getBufferImage() {
+        return comp.getBuffer();
+    }
 
     public void reset() {
         checkAspect(true);
@@ -302,6 +306,10 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
             repaint();
         }
 
+        public BufferedImage getBuffer(){
+            return img;
+        }
+        
         @Override
         protected void paintComponent(Graphics g) {
             if (img != null) {

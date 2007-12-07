@@ -48,7 +48,6 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     private Rectangle oldRect = null;
     private int nbthread = 0;
 
-    
     public SingleBufferedImageStrategy() {
         this(new ShapefileRenderer());
     }
@@ -106,8 +105,8 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         }
     }
 
-    private void checkAspect(boolean changed){
-                
+    private void checkAspect(boolean changed) {
+
         Rectangle newRect = comp.getBounds();
 
         if (!newRect.equals(oldRect)) {
@@ -115,7 +114,7 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
             oldRect = newRect;
         }
 
-        if ( mapArea != null ) {
+        if (mapArea != null) {
 
             if (!(mapArea.equals(oldMapArea)) && !(Double.isNaN(mapArea.getMinX()))) {
                 changed = true;
@@ -129,8 +128,7 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
             }
         }
     }
-    
-    
+
     //-----------------------RenderingStrategy----------------------------------
     public synchronized BufferedImage createBufferImage(MapLayer layer) {
 
@@ -172,21 +170,25 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
 
     }
 
+    public BufferedImage getBufferImage() {
+        return comp.getBuffer();
+    }
+
     public void reset() {
         fit();
     }
-    
+
     public JComponent getComponent() {
         return comp;
     }
-        
+
     //------------------Abstract RenderingStrategy------------------------------
     @Override
     public void setMapArea(Envelope area) {
         super.setMapArea(area);
         checkAspect(false);
     }
-    
+
     protected void changedLayer(MapLayerListEvent event) {
         fit();
     }
@@ -226,6 +228,10 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
         public void setBuffer(BufferedImage buf) {
             img = buf;
             repaint();
+        }
+
+        public BufferedImage getBuffer() {
+            return img;
         }
 
         @Override
