@@ -282,7 +282,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Return array of Shifts. This method is useful to create Coverage2D object.
+     * Returns array of Shifts. This method is useful to create Coverage2D object.
      * @return array of Shifts
      */
     public float[][] getDxGrid() throws FactoryException {
@@ -292,6 +292,8 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             final int yNumCells = WarpParams.parameter("yNumCells").intValue();
             final int xStep = WarpParams.parameter("xStep").intValue();
             final int yStep = WarpParams.parameter("yStep").intValue();
+            final int xStart = WarpParams.parameter("xStart").intValue();
+            final int yStart = WarpParams.parameter("yStart").intValue();
 
             final float[] warpPositions;
 
@@ -302,7 +304,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
                     dxgrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j))]
-                        - (j * xStep);
+                        - (j * xStep) -xStart;
                 }
             }
         }
@@ -321,6 +323,8 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             final int yNumCells = WarpParams.parameter("yNumCells").intValue();
             final int xStep = WarpParams.parameter("xStep").intValue();
             final int yStep = WarpParams.parameter("yStep").intValue();
+            final int xStart = WarpParams.parameter("xStart").intValue();
+            final int yStart = WarpParams.parameter("yStart").intValue();
 
             final float[] warpPositions;
 
@@ -331,7 +335,7 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
             for (int i = 0; i <= WarpParams.parameter("yNumCells").intValue(); i++) {
                 for (int j = 0; j <= WarpParams.parameter("xNumCells").intValue(); j++) {
                     dygrid[i][j] = (float) warpPositions[(int) ((i * (1 + xNumCells) * 2) + (2 * j)
-                        + 1)] - (i * yStep);
+                        + 1)] - (i * yStep) - yStart;
                 }
             }
         }
@@ -566,20 +570,18 @@ public abstract class WarpGridBuilder extends MathTransformBuilder {
 
             Envelope gridEnv = CRS.transform(trans, env);
 
-            //final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
-            //WarpGridTransform2D.Provider.
-            WarpGridParameters = new ParameterGroup(WarpGridTransform2D.Provider.PARAMETERS);
-            //WarpGridParameters = factory.getDefaultParameters("Warp Grid");
-            WarpGridParameters.parameter("xStart").setValue((int) (gridEnv.getMinimum(0)));
-            WarpGridParameters.parameter("yStart").setValue((int) (gridEnv.getMinimum(1)));
-            WarpGridParameters.parameter("xStep").setValue((int) Math.ceil(dxdy.getLength(0)));
-            WarpGridParameters.parameter("yStep").setValue((int) Math.ceil(dxdy.getLength(1)));
+    
+            WarpGridParameters = new ParameterGroup(WarpGridTransform2D.Provider.PARAMETERS);        
+            WarpGridParameters.parameter("xStart").setValue((new Double(gridEnv.getMinimum(0))).intValue());
+            WarpGridParameters.parameter("yStart").setValue((new Double(gridEnv.getMinimum(1))).intValue());
+            WarpGridParameters.parameter("xStep").setValue((new Double(Math.ceil(dxdy.getLength(0))).intValue()));
+            WarpGridParameters.parameter("yStep").setValue((new Double(Math.ceil(dxdy.getLength(1))).intValue()));
             WarpGridParameters.parameter("xNumCells")
-                              .setValue((int) Math.ceil(gridEnv.getLength(0) / 
-                            		   WarpGridParameters.parameter("xStep").intValue()));
+                              .setValue(new Double( Math.ceil(gridEnv.getLength(0) / 
+                            		   WarpGridParameters.parameter("xStep").intValue())).intValue());
             WarpGridParameters.parameter("yNumCells")
-                              .setValue((int) Math.ceil(gridEnv.getLength(1) / 
-                            		  WarpGridParameters.parameter("yStep").intValue()));
+                              .setValue(new Double ( Math.ceil(gridEnv.getLength(1) / 
+                            		  WarpGridParameters.parameter("yStep").intValue())).intValue());
 
             WarpGridParameters.parameter("warpPositions")
                               .setValue(new float[2 * (WarpGridParameters.parameter("xNumCells")

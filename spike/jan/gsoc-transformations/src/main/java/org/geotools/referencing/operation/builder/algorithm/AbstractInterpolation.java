@@ -18,11 +18,14 @@ package org.geotools.referencing.operation.builder.algorithm;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 import java.util.Map;
+
 import javax.media.jai.RasterFactory;
+
+import org.geotools.geometry.DirectPosition2D;
+import org.opengis.coverage.Coverage;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.operation.TransformException;
-import org.geotools.geometry.DirectPosition2D;
 
 
 /**
@@ -127,14 +130,33 @@ public abstract class AbstractInterpolation {
 
         for (int i = 0; i <= yNumCells; i++) {
             for (int j = 0; j <= xNumCells; j++) {
+            	
+            	DirectPosition dp = new DirectPosition2D(
+            			            env.getLowerCorner().getOrdinate(0) + (j * dx),
+            			            env.getUpperCorner().getOrdinate(1) - (i * dy));
+            	int index = (i * (1 + xNumCells)) + j;
+            	float value =  getValue(dp);
+                gridValues[index] = value;
+            }
+        }
+
+        return gridValues;
+    }
+    
+    private Coverage buildCoverage() {
+        gridValues = new float[(xNumCells + 1) * (yNumCells + 1)];
+
+        for (int i = 0; i <= yNumCells; i++) {
+            for (int j = 0; j <= xNumCells; j++) {
                 gridValues[(i * (1 + xNumCells)) + j] = getValue(new DirectPosition2D(env.getLowerCorner()
                                                                                          .getOrdinate(0)
                             + (j * dx), env.getLowerCorner().getOrdinate(1) + (i * dy)));
             }
         }
 
-        return gridValues;
+        return null;
     }
+
 
     /**
      *
@@ -178,7 +200,9 @@ public abstract class AbstractInterpolation {
 
             for (int i = 0; i <= yNumCells; i++) {
                 for (int j = 0; j <= xNumCells; j++) {
-                    grid2D[i][j] = getGrid()[(int) ((i * (xNumCells + 1)) + (j))];
+                	int index = (int) ((i * (xNumCells + 1)) + (j));
+                	float value = getGrid()[index];
+                    grid2D[i][j] = value;
                 }
             }
         }

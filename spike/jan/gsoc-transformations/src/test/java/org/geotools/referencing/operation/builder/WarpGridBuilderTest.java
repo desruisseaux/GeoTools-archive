@@ -38,10 +38,10 @@ import org.opengis.referencing.operation.TransformException;
  *
  */
 public class WarpGridBuilderTest extends TestCase {
-    private double tolerance = 0.05; //cm
+    private double tolerance = 0.03; //cm
     private CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
-    private boolean show = true;//false;
-    private boolean write = true;//false;
+    private boolean show = false;
+    private boolean write = false;
  
     private String path="/home/jezekjan/tmp/";
     /**
@@ -140,10 +140,10 @@ public class WarpGridBuilderTest extends TestCase {
     public void testTPSWarpGridBuilder() {
         try {
            
-            Envelope env = new Envelope2D(crs, 0, 0, 1000, 1000);
+            Envelope env = new Envelope2D(crs, 0, 0, 400000, 200000);
 
             // Generates 15 MappedPositions of approximately 2 m differences
-            List mp = generateMappedPositions(env, 15, 1, crs);
+            List mp = generateMappedPositions(env, 100, 1, crs);
 
             GeneralMatrix M = new GeneralMatrix(3, 3);
             double[] m0 = { 1, 0, 0 };
@@ -153,8 +153,10 @@ public class WarpGridBuilderTest extends TestCase {
             M.setRow(1, m1);
             M.setRow(2, m2);
 
-            WarpGridBuilder builder = new TPSGridBuilder(mp, 3, 3, env,
+            WarpGridBuilder builder = new TPSGridBuilder(mp, 5000, 5000, env,
                     ProjectiveTransform.create(M));
+            
+            builder.getDeltaFile(0, "/home/jezekjan/gridfile.txt");
 
             GridCoverage2D dx  =  (new GridCoverageFactory()).create("tps - dx", builder.getDxGrid(), env);
             GridCoverage2D dy =  (new GridCoverageFactory()).create("tps - dy", builder.getDyGrid(), env);
@@ -202,8 +204,7 @@ public class WarpGridBuilderTest extends TestCase {
             WarpGridBuilder builder = new RSGridBuilder(mp, 3, 3, env,
                     ProjectiveTransform.create(M));
 
-          
-            
+                      
             GridCoverage2D rubberdx  =  (new GridCoverageFactory()).create("RubberSheet - dx", builder.getDxGrid(), env);
             GridCoverage2D rubberdy =  (new GridCoverageFactory()).create("RubberSheet - dy", builder.getDyGrid(), env);
                       

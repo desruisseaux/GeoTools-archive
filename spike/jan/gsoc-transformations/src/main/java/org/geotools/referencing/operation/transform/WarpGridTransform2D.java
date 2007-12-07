@@ -52,7 +52,7 @@ import org.opengis.referencing.operation.Transformation;
 
 
 /**
- * Basic implementation of JAI's GridWarp Transformation. This class just encapsulate GridWarp into the
+ * Basic implementation of JAI's WarpGrid Transformation. This class just encapsulate GridWarp into the
  * GeoTools transformations conventions.
  * @author jezekjan
  *
@@ -93,7 +93,7 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
     /**
      * Returns a URL from the string representation. If the string has no
-     * path, the default path preferece is added.
+     * path, the default path preference is added.
      *
      * @param str a string representation of a URL
      * @return a URL created from the string representation
@@ -330,27 +330,27 @@ public class WarpGridTransform2D extends WarpTransform2D {
 
         /** Descriptor for the "{@link WarpGrid#getXStart  xStart}" parameter value. */
         public static final ParameterDescriptor X_START = new DefaultParameterDescriptor("xStart",
-                int.class, null, null);
+        		Integer.class, null, null);
 
         /** Descriptor for the "{@link WarpGrid#getXStep xStep}" parameter value. */
         public static final ParameterDescriptor X_STEP = new DefaultParameterDescriptor("xStep",
-                int.class, null, null);
+        		Integer.class, null, null);
 
         /** Descriptor for the "{@link WarpGrid#getXNumCells xNumCells}" parameter value. */
         public static final ParameterDescriptor X_NUMCELLS = new DefaultParameterDescriptor("xNumCells",
-                int.class, null, null);
+                Integer.class, null, null);
 
         /** Descriptor for the "{@link WarpGrid#getYStart yStart}" parameter value. */
         public static final ParameterDescriptor Y_START = new DefaultParameterDescriptor("yStart",
-                int.class, null, null);
+        		Integer.class, null, null);
 
         /** Descriptor for the "{@link WarpGrid#getYStep yStep}" parameter value. */
         public static final ParameterDescriptor Y_STEP = new DefaultParameterDescriptor("yStep",
-                int.class, null, null);
+        		Integer.class, null, null);
 
         /** Descriptor for the "{@link WarpGrid#getYNumCells yNumCells}" parameter value. */
         public static final ParameterDescriptor Y_NUMCELLS = new DefaultParameterDescriptor("yNumCells",
-                int.class, null, null);
+        		Integer.class, null, null);
 
         /** Descriptor for the warpPositions parameter value. */
         public static final ParameterDescriptor WARP_POSITIONS = new DefaultParameterDescriptor("warpPositions",

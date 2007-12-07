@@ -1,12 +1,18 @@
 package org.geotools.referencing.operation.builder;
 
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
@@ -31,42 +37,62 @@ public class InterpolationTest extends TestCase {
 	}
     public void testInterpoaltion(){
     	
+    	 BufferedImage bimage = new BufferedImage(100, 100, BufferedImage.TYPE_USHORT_GRAY);
+    	 bimage.setRGB(4, 3, 4);
+    	 GridCoverageFactory p = new GridCoverageFactory() ;
+    	 
+    	
+    	float[][] g = new float[10][10];
+    	g[0][0]=2;
     	CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
 
     	// Define the Envelope for our work; this will be the bounds of the final interpolation
     	GeneralDirectPosition min = new GeneralDirectPosition( 0.0,   0.0 );
     	GeneralDirectPosition max = new GeneralDirectPosition( 100.0, 100.0 );
-    	Envelope env = new GeneralEnvelope(min, max);
-    
-
+    	GeneralEnvelope env = new GeneralEnvelope(min, max);    
+    	env.setCoordinateReferenceSystem(crs);
+    	
+    	Hints k;
+    	GridCoverageFactory fac = new GridCoverageFactory();
+    	 GridCoverage2D cov = fac.create("sd", g, env);
+    	 
     	
     	// Generate some known points to root the interpolation
-    	DirectPosition a = new DirectPosition2D(crs,13,85);
-    	DirectPosition b = new DirectPosition2D(crs,14,15);
-    	DirectPosition c = new DirectPosition2D(crs,45,78);
-    	DirectPosition d = new DirectPosition2D(crs,95,28);
+    	DirectPosition a = new DirectPosition2D(crs,10,10);
+    	DirectPosition b = new DirectPosition2D(crs,80,80);
+    	DirectPosition c = new DirectPosition2D(crs,10,90);
+    	DirectPosition d = new DirectPosition2D(crs,80,10);
 
     	
     	// Define at each point the values to be interpolated; we do this in a HashMap
-    	HashMap /*<DirectPosition2D, Float>*/ pointsAndValues = new HashMap();
-    	pointsAndValues.put(a,  6.5);
-    	pointsAndValues.put(b,  1.5);
-    	pointsAndValues.put(c, -9.5);
-    	pointsAndValues.put(d,  7.5);
+    	HashMap<DirectPosition, Double> pointsAndValues = new HashMap();
+    	pointsAndValues.put(a,  new Double(6.5456));
+    	pointsAndValues.put(b,  new Double(1.541906));
+    	pointsAndValues.put(c,  new Double(-9.54456));
+    	pointsAndValues.put(d,  new Double(7.2345));
 
 
     	//now we can construct the Interpolation Object
-    	TPSInterpolation interp = new TPSInterpolation(pointsAndValues, 1000, 1000, env);
+    	TPSInterpolation interp = new TPSInterpolation(pointsAndValues, 100, 100, env);
 
 
     	 // We can create and show a coverage image of the interpolation within the Envelope
     	GridCoverageFactory gcf = new GridCoverageFactory();
-    	gcf.create("Intepolated Coverage",  interp.get2DGrid(), env).show();
+    	GridCoverage2D coverage = gcf.create("Intepolated Coverage",  interp.get2DGrid(), env);//.show();
 
     	
-    	// We can also generate an interpolated value at any DirectPosition
-    	float myValue = interp.getValue(new DirectPosition2D(crs,12.34,15.123));
+    	Assert.assertEquals( Double.parseDouble((coverage.evaluate(a, (Set)(new HashSet())).iterator().next()).toString()), pointsAndValues.get(a).floatValue(), 0.01);
     	
+    	
+    	// We can also get interpolated value at any DirectPosition
+    	float myValue = interp.getValue(a);
+    	Assert.assertEquals( interp.getValue(a), pointsAndValues.get(a).floatValue(), 0.0);        
+    	Assert.assertEquals( interp.getValue(b), pointsAndValues.get(b).floatValue(), 0.0);
+    	Assert.assertEquals( interp.getValue(c), pointsAndValues.get(c).floatValue(), 0.0);
+    	Assert.assertEquals( interp.getValue(d), pointsAndValues.get(d).floatValue(), 0.0);
+        
+         
+        
     	//TODO --- test case!
     	
     }
