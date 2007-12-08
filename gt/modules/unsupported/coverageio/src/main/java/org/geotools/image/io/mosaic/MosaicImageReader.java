@@ -247,6 +247,20 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
+     * Returns {@code true} if every image reader uses the default implementation for the given
+     * method. Some methods may avoid costly file seeking when this method returns {@code true}.
+     * <p>
+     * This method always returns {@code true} if there is no tiles.
+     */
+    private boolean useDefaultImplementation(final String methodName) {
+        if (tiles == null) {
+            return true;
+        }
+        // TODO: implement that.
+        return false;
+    }
+
+    /**
      * Returns {@code true} if the storage format of the given image places no inherent impediment
      * on random access to pixels. The default implementation returns {@code true} if the input of
      * every tiles is a {@link File} and {@code isRandomAccessEasy} returned {@code true} for all
@@ -256,7 +270,7 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public boolean isRandomAccessEasy(final int imageIndex) throws IOException {
-        if (tiles == null) {
+        if (useDefaultImplementation("isRandomAccessEasy")) {
             return super.isRandomAccessEasy(imageIndex);
         }
         for (final Tile tile : tiles.getTiles(imageIndex, null)) {
@@ -269,6 +283,36 @@ public class MosaicImageReader extends ImageReader {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns the aspect ratio. If all tiles have the same aspect ratio, then that ratio is
+     * returned. Otherwise the {@linkplain ImageReader#getAspectRatio default value} is returned.
+     *
+     * @param  imageIndex The index of the image to be queried.
+     * @throws IOException If an error occurs reading the information from the input source.
+     */
+    @Override
+    public float getAspectRatio(final int imageIndex) throws IOException {
+        if (!useDefaultImplementation("getAspectRatio")) {
+            float ratio = Float.NaN;
+            for (final Tile tile : tiles.getTiles(imageIndex, null)) {
+                final float candidate = tile.getPreparedReader(true, true).getAspectRatio(imageIndex);
+                if (candidate == ratio || Float.isNaN(candidate)) {
+                    // Same ratio or unspecified ratio.
+                    continue;
+                }
+                if (!Float.isNaN(ratio)) {
+                    // The ratio is different for different tile. Fall back on default.
+                    return super.getAspectRatio(imageIndex);
+                }
+                ratio = candidate;
+            }
+            if (!Float.isNaN(ratio)) {
+                return ratio;
+            }
+        }
+        return super.getAspectRatio(imageIndex);
     }
 
     /**
@@ -399,7 +443,7 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public ImageReadParam getDefaultReadParam() {
-        if (tiles != null) {
+        if (!useDefaultImplementation("getDefaultReadParam")) {
             final ImageReader reader = tiles.getReader();
             if (reader != null) {
                 return reader.getDefaultReadParam();
@@ -493,34 +537,36 @@ public class MosaicImageReader extends ImageReader {
      * @param  param The parameters used to control the reading process, or {@code null}.
      * @return The desired portion of the image.
      * @throws IOException if an error occurs during reading.
-     *
-     * @todo Delegates directly to the underlying reader when there is only one tile in the source region.
      */
     public BufferedImage read(final int imageIndex, ImageReadParam param) throws IOException {
         clearAbortRequest();
-        BufferedImage image;
-        final int[]      sourceBands;
-        final int[] destinationBands;
-        final int sourceXSubsampling;
-        final int sourceYSubsampling;
-        if (param != null) {
-            image              = param.getDestination();
-            sourceBands        = param.getSourceBands();
-            destinationBands   = param.getDestinationBands();
-            sourceXSubsampling = param.getSourceXSubsampling();
-            sourceYSubsampling = param.getSourceYSubsampling();
-        } else {
-            image              = null;
-            sourceBands        = null;
-            destinationBands   = null;
-            sourceXSubsampling = 1;
-            sourceYSubsampling = 1;
-        }
         final int          srcWidth  = getWidth (imageIndex);
         final int          srcHeight = getHeight(imageIndex);
         final Rectangle sourceRegion = getSourceRegion(param, srcWidth, srcHeight);
-        final Rectangle   destRegion = new Rectangle(); // Will be computed later.
         final Collection<Tile> tiles = getTileManager().getTiles(imageIndex, sourceRegion);
+        if (tiles.size() == 1) {
+            /*
+             * If there is exactly one tile, delegates to the image reader
+             * directly without any other processing from ImageMosaicReader.
+             */
+            final Tile tile = tiles.iterator().next();
+            if (param != null) {
+                final Rectangle region = param.getSourceRegion();
+                if (region != null) {
+                    final Point origin = tile.getOrigin();
+                    region.translate(-origin.x, -origin.y);
+                    param.setSourceRegion(region);
+                }
+            }
+            final ImageReader reader = tile.getPreparedReader(seekForwardOnly, ignoreMetadata);
+            return reader.read(imageIndex, param);
+        }
+        /*
+         * We need to read at least two tiles (or zero).
+         * Creates the destination image here.
+         */
+        BufferedImage image = (param != null) ? param.getDestination() : null;
+        final Rectangle   destRegion = new Rectangle(); // Will be computed later.
         computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
         if (image == null) {
             /*
@@ -543,9 +589,9 @@ public class MosaicImageReader extends ImageReader {
                                                   destRegion.y + destRegion.height);
             computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
         }
-        final int numDstBands = image.getSampleModel().getNumBands();
-        final int numSrcBands = (sourceBands != null) ? sourceBands.length : numDstBands;
-        checkReadParamBandSettings(param, numSrcBands, numDstBands);
+        /*
+         * Now read every tiles...
+         */
         final int  destinationXOffset = destRegion.x - sourceRegion.x;
         final int  destinationYOffset = destRegion.y - sourceRegion.y;
         final Point destinationOffset = new Point();
@@ -553,6 +599,9 @@ public class MosaicImageReader extends ImageReader {
             param = getDefaultReadParam();
         }
         for (final Tile tile : tiles) {
+            if (abortRequested()) {
+                break;
+            }
             final Rectangle tileRegion = tile.getRegion();
             final Rectangle sourceTileRegion = tileRegion.intersection(sourceRegion);
             if (sourceTileRegion.isEmpty()) {
@@ -569,7 +618,7 @@ public class MosaicImageReader extends ImageReader {
             if (param.canSetSourceRenderSize()) {
                 param.setSourceRenderSize(null); // TODO.
             }
-            final ImageReader reader = tile.getPreparedReader(seekForwardOnly, ignoreMetadata);
+            final ImageReader reader = tile.getPreparedReader(true, true);
             final BufferedImage output = reader.read(imageIndex, param);
             if (output != image) {
                 /*
@@ -580,6 +629,27 @@ public class MosaicImageReader extends ImageReader {
             }
         }
         return image;
+    }
+
+    /**
+     * Reads the tile indicated by the {@code tileX} and {@code tileY} arguments.
+     *
+     * @param  imageIndex The index of the image to be retrieved.
+     * @param  tileX The column index (starting with 0) of the tile to be retrieved.
+     * @param  tileY The row index (starting with 0) of the tile to be retrieved.
+     * @return The desired tile.
+     * @throws IOException if an error occurs during reading.
+     */
+    @Override
+    public BufferedImage readTile(final int imageIndex, final int tileX, final int tileY)
+            throws IOException
+    {
+        final int width  = getTileWidth (imageIndex);
+        final int height = getTileHeight(imageIndex);
+        final Rectangle sourceRegion = new Rectangle(tileX*width, tileY*height, width, height);
+        final ImageReadParam param = getDefaultReadParam();
+        param.setSourceRegion(sourceRegion);
+        return read(imageIndex, param);
     }
 
     /**
