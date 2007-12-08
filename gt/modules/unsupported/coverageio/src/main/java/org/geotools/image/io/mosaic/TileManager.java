@@ -41,7 +41,7 @@ import org.geotools.resources.UnmodifiableArrayList;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-class TileCollection {
+class TileManager {
     /**
      * The tiles sorted by ({@linkplain Tile#getReader reader}, {@linkplain Tile#getInput input})
      * first, then by {@linkplain Tile#getImageIndex image index}. If an iteration must be performed
@@ -95,14 +95,14 @@ class TileCollection {
     /**
      * Creates a manager for the given tiles.
      */
-    public TileCollection(final Tile[] tiles) {
+    public TileManager(final Tile[] tiles) {
         this(Arrays.asList(tiles));
     }
 
     /**
      * Creates a manager for the given tiles.
      */
-    public TileCollection(final Collection<Tile> tiles) {
+    public TileManager(final Collection<Tile> tiles) {
         final Tile[] tilesArray = tiles.toArray(new Tile[tiles.size()]);
         Arrays.sort(tilesArray);
         /*
@@ -137,7 +137,7 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             for (final Tile tile : sameInputs) {
                 synchronized (tile) {
                     if (tile.manager != null) {
-                        // Found a tile already in use by an other TileCollection.
+                        // Found a tile already in use by an other TileManager.
                         // Stop the loop now; we will thrown an exception later.
                         break fill;
                     }
@@ -148,7 +148,7 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
         }
         /*
          * If we stopped the loop before we assigned every tiles, this is because the above
-         * loop has found a tile already in use by an other TileCollection. Release every
+         * loop has found a tile already in use by an other TileManager. Release every
          * previous tiles already assigned before to throw the exception.
          */
         if (numTiles != tilesArray.length) {

@@ -68,10 +68,10 @@ import org.geotools.resources.i18n.Errors;
  */
 public class Tile implements Comparable<Tile> {
     /**
-     * The tile collection that own this tile. Will be set by {@link TileCollection} constructor
+     * The tile manager that own this tile. Will be set by {@link TileManager} constructor
      * only, and should not be modified after that point.
      */
-    TileCollection manager;
+    TileManager manager;
 
     /**
      * The image reader to use. The same reader is typically given to every {@code Tile} objects
@@ -341,7 +341,7 @@ public class Tile implements Comparable<Tile> {
 
     /**
      * Returns {@code true} if calls to {@link #getRegion}, {@link #intersects} and related
-     * methods will be cheap. For internal usage by {@link TileCollection#getTiles} only.
+     * methods will be cheap. For internal usage by {@link TileManager#getTiles} only.
      */
     final boolean isGetRegionCheap() {
         return width != 0 || height != 0;

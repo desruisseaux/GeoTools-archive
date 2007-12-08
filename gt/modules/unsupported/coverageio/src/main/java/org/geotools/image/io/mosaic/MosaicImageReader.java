@@ -52,9 +52,9 @@ import org.geotools.util.FrequencySortedSet;
  */
 public class MosaicImageReader extends ImageReader {
     /**
-     * The tile collections.
+     * The tile manager.
      */
-    private TileCollection tiles;
+    private TileManager tiles;
 
     /**
      * Constructs an image reader with the specified provider.
@@ -99,7 +99,7 @@ public class MosaicImageReader extends ImageReader {
             throw new IllegalStateException(Errors.format(ErrorKeys.ILLEGAL_CLASS_$2,
                     Classes.getClass(input), Tile[].class));
         }
-        tiles = new TileCollection(inputTiles);
+        tiles = new TileManager(inputTiles);
         /*
          * Copies the configuration to every readers in the tile collection.
          */
@@ -118,9 +118,9 @@ public class MosaicImageReader extends ImageReader {
     }
 
     /**
-     * Returns the tiles collection, making sure that it is set.
+     * Returns the tiles manager, making sure that it is set.
      */
-    private TileCollection getTileCollection() throws IOException {
+    private TileManager getTileManager() throws IOException {
         if (tiles == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_INPUT));
         }
@@ -187,7 +187,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getNumImages(final boolean allowSearch) throws IOException {
-        return getTileCollection().getNumImages();
+        return getTileManager().getNumImages();
     }
 
     /**
@@ -208,7 +208,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getWidth(final int imageIndex) throws IOException {
-        return getTileCollection().getRegion(imageIndex).width;
+        return getTileManager().getRegion(imageIndex).width;
     }
 
     /**
@@ -219,7 +219,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public int getHeight(final int imageIndex) throws IOException {
-        return getTileCollection().getRegion(imageIndex).height;
+        return getTileManager().getRegion(imageIndex).height;
     }
 
     /**
@@ -386,7 +386,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
-        final Collection<Tile> tiles = getTileCollection().getTiles(imageIndex, null);
+        final Collection<Tile> tiles = getTileManager().getTiles(imageIndex, null);
         return getImageTypes(imageIndex, tiles, null).iterator();
     }
 
@@ -417,7 +417,7 @@ public class MosaicImageReader extends ImageReader {
      */
     public IIOMetadata getStreamMetadata() throws IOException {
         IIOMetadata metadata = null;
-        for (final Tile tile : getTileCollection().getTiles()) {
+        for (final Tile tile : getTileManager().getTiles()) {
             final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
             final IIOMetadata candidate = reader.getStreamMetadata();
             metadata = MetadataMerge.merge(candidate, metadata);
@@ -437,7 +437,7 @@ public class MosaicImageReader extends ImageReader {
             throws IOException
     {
         IIOMetadata metadata = null;
-        for (final Tile tile : getTileCollection().getTiles()) {
+        for (final Tile tile : getTileManager().getTiles()) {
             final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
             final IIOMetadata candidate = reader.getStreamMetadata(formatName, nodeNames);
             metadata = MetadataMerge.merge(candidate, metadata);
@@ -458,7 +458,7 @@ public class MosaicImageReader extends ImageReader {
      */
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         IIOMetadata metadata = null;
-        for (final Tile tile : getTileCollection().getTiles(imageIndex, null)) {
+        for (final Tile tile : getTileManager().getTiles(imageIndex, null)) {
             final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
             final IIOMetadata candidate = reader.getImageMetadata(imageIndex);
             metadata = MetadataMerge.merge(candidate, metadata);
@@ -478,7 +478,7 @@ public class MosaicImageReader extends ImageReader {
             final String formatName, final Set<String> nodeNames) throws IOException
     {
         IIOMetadata metadata = null;
-        for (final Tile tile : getTileCollection().getTiles(imageIndex, null)) {
+        for (final Tile tile : getTileManager().getTiles(imageIndex, null)) {
             final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
             final IIOMetadata candidate = reader.getImageMetadata(imageIndex, formatName, nodeNames);
             metadata = MetadataMerge.merge(candidate, metadata);
@@ -520,7 +520,7 @@ public class MosaicImageReader extends ImageReader {
         final int          srcHeight = getHeight(imageIndex);
         final Rectangle sourceRegion = getSourceRegion(param, srcWidth, srcHeight);
         final Rectangle   destRegion = new Rectangle(); // Will be computed later.
-        final Collection<Tile> tiles = getTileCollection().getTiles(imageIndex, sourceRegion);
+        final Collection<Tile> tiles = getTileManager().getTiles(imageIndex, sourceRegion);
         computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
         if (image == null) {
             /*
