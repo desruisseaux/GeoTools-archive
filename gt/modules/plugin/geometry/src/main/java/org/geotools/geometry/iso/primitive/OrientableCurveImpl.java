@@ -19,7 +19,9 @@ package org.geotools.geometry.iso.primitive;
 
 import org.opengis.geometry.complex.CompositeCurve;
 import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveBoundary;
 import org.opengis.geometry.primitive.OrientableCurve;
+import org.opengis.geometry.primitive.PrimitiveBoundary;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -38,6 +40,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public abstract class OrientableCurveImpl extends OrientablePrimitiveImpl
 		implements OrientableCurve {
 
+    public abstract CurveBoundary getBoundary();
+    
 	/**
 	 * Constructor
 	 * 
