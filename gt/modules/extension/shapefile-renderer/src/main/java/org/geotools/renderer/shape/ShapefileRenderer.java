@@ -718,32 +718,43 @@ public class ShapefileRenderer implements GTRenderer {
     }
 
     /**
-     * DOCUMENT ME!
-     * @param geom 
+     * Return provided geom; or use a default value if null.
      * 
-     * @param defaultGeometry
-     * @return
+     * @param geom Provided Geometry as read from record.shape()
+     * @param defaultGeometry GeometryDescriptor used to determine default value
+     * @return provided geom or default value if null
      */
     private Object getGeom( Object geom, GeometryDescriptor defaultGeometry ) {
         if( geom instanceof Geometry){
             return geom;
         }
-        Class binding = defaultGeometry.getType().getBinding();
-        if (defaultGeom == null) {
-            if (MultiPolygon.class.isAssignableFrom(binding)) {
-                defaultGeom = MULTI_POLYGON_GEOM;
-            } else if (MultiLineString.class.isAssignableFrom(binding)) {
-                defaultGeom = MULTI_LINE_GEOM;
-            } else if (Point.class.isAssignableFrom(binding)) {
-                defaultGeom = POINT_GEOM;
-            } else if (MultiPoint.class.isAssignableFrom(binding)) {
-                defaultGeom = MULTI_POINT_GEOM;
-            }
-        }
-
-        return defaultGeom;
+        return getGeom( defaultGeometry );
     }
 
+    /**
+     * This class keeps a couple of default geometries on hand to use
+     * when making a feature with default values.
+     * 
+     * @param defaultGeometry
+     * @return placeholder to use as a default while waiting for a real geometry.
+     */
+    private Object getGeom(GeometryDescriptor defaultGeometry) {
+        Class binding = defaultGeometry.getType().getBinding();
+        if (MultiPolygon.class.isAssignableFrom(binding)) {
+            return MULTI_POLYGON_GEOM;
+        }
+        else if (MultiLineString.class.isAssignableFrom(binding)) {
+            return MULTI_LINE_GEOM;
+        }
+        else if (Point.class.isAssignableFrom(binding)) {
+            return POINT_GEOM;
+        }
+        else if (MultiPoint.class.isAssignableFrom(binding)) {
+            return MULTI_POINT_GEOM;
+        }
+        return null; // we don't have a good default value - null will need to do
+    }
+    
     /**
      * DOCUMENT ME!
      * 
