@@ -31,6 +31,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -43,9 +45,11 @@ import java.sql.Statement;
  * @source $URL$
  */
 public class MaxIncFIDMapper extends AbstractFIDMapper {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5719859796485477701L;
 
-
+	/** A logger */
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.jdbc.fidmapper");
+    
     /**
      * Creates a new MaxIncFIDMapper object.
      *
@@ -116,9 +120,11 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
      */
     public String createID(Connection conn, SimpleFeature feature, Statement statement)
         throws IOException {
+    	Statement stmt = null;
+    	ResultSet rs =null;
         try {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("Select MAX(" + getColumnName()
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("Select MAX(" + getColumnName()
                     + ") from " + tableName);
 
             if (rs.next()) {
@@ -133,6 +139,22 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
         } catch (SQLException e) {
             throw new DataSourceException("An sql problem occurred. Are the table and the fid column there?",
                 e);
+        }
+        finally {
+        	if( stmt != null ) {
+        		try {
+					stmt.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.WARNING, "MaxIncFidMapper could not close statement:"+e, e );
+				}
+        	}
+        	if( rs != null ) {
+        		try {
+					rs.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.WARNING, "MaxIncFidMapper could not close resultset:"+e, e );
+				}
+        	}
         }
     }
 }
