@@ -210,8 +210,10 @@ public final class Decimator {
 			if (ncoords == 1) // 1 coordinate -- just xform it
 			{
 				// double[] newCoordsXformed2 = new double[2];
-				transform.transform(coords, 0, coords, 0, 1);
-				seq.setArray(coords);
+			    if(transform != null) {
+			        transform.transform(coords, 0, coords, 0, 1);
+			        seq.setArray(coords);
+			    }
 				return;
 			} else
 				return; // ncoords =0
