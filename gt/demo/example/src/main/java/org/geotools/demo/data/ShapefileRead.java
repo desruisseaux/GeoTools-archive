@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileFilter;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.demo.swing.ShapeFileDialog;
 import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.collection.AbstractFeatureVisitor;
@@ -34,29 +35,12 @@ public class ShapefileRead {
 		
 		File file;
 		if (args.length == 0){
-			JFileChooser chooser = new JFileChooser();
-			chooser.setFileFilter( new FileFilter(){
-                public boolean accept( File f ) {
-                    return f.isDirectory() || f.getPath().endsWith("shp") || f.getPath().endsWith("SHP");
-                }
-                public String getDescription() {
-                    return "Shapefiles";
-                }			    
-			});
-			int returnVal = chooser.showOpenDialog( null );
-			
-			if(returnVal != JFileChooser.APPROVE_OPTION) {
-				System.exit(0);
-			}
-			file = chooser.getSelectedFile();
-			
-			System.out.println("You chose to open this file: " +
-					file.getName());								
+		    file = ShapeFileDialog.showOpenShapefile(null);
 		}
 		else {
 			file = new File( args[0] );
 		}
-		if (!file.exists()){
+		if (file == null || !file.exists()){
 			System.exit(1);
 		}
 		
