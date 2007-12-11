@@ -83,7 +83,7 @@ public class Version implements CharSequence, Comparable<Version>, Serializable 
      * Returns the major version number. This method returns an {@link Integer} if possible,
      * or a {@link String} otherwise.
      */
-    public Comparable getMajor() {
+    public Comparable<?> getMajor() {
         return getComponent(0);
     }
 
@@ -92,7 +92,7 @@ public class Version implements CharSequence, Comparable<Version>, Serializable 
      * or a {@link String} otherwise. If there is no minor version number, then this method
      * returns {@code null}.
      */
-    public Comparable getMinor() {
+    public Comparable<?> getMinor() {
         return getComponent(1);
     }
 
@@ -101,7 +101,7 @@ public class Version implements CharSequence, Comparable<Version>, Serializable 
      * or a {@link String} otherwise. If there is no revision number, then this method
      * returns {@code null}.
      */
-    public Comparable getRevision() {
+    public Comparable<?> getRevision() {
         return getComponent(2);
     }
 
@@ -265,9 +265,9 @@ public class Version implements CharSequence, Comparable<Version>, Serializable 
     @Override
     public int hashCode() {
         if (hashCode == 0) {
-            int code = (int)serialVersionUID;
+            int code = (int) serialVersionUID;
             int index = 0;
-            Comparable component;
+            Comparable<?> component;
             while ((component = getComponent(index)) != null) {
                 code = code * 37 + component.hashCode();
                 index++;

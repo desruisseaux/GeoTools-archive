@@ -18,6 +18,8 @@ package org.geotools.util;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -28,56 +30,62 @@ import java.util.Map;
  * @source $URL$
  * @version $Id$
  * @author Simone Giannecchini
+ * @author Martin Desruisseaux
  * @since 2.3
  */
 public final class LRULinkedHashMap<K,V> extends LinkedHashMap<K,V> {
     /**
      * Serial number for cross-version compatibility.
      */
-    private static final long serialVersionUID = 2082871604196698140L;
+    private static final long serialVersionUID = -6668885347230182669L;
 
     /**
-     * Default maximum capacity.
+     * The default load factor copied from {@link HashMap} package-privated field.
      */
-    private static final int DEFAULT_MAXIMUM_CAPACITY = 100;
+    private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     /**
-     * Maximum number of entries for this LRU cache.
+     * Default maximum size (not to be confused with capacity).
      */
-    private final int maxEntries;
+    private static final int DEFAULT_MAXIMUM_SIZE = 100;
 
     /**
-     * Constructs a {@code LRULinkedHashMap} with default initial capacity, maximum capacity
+     * Maximum number of entries for this LRU map.
+     */
+    private int maximumSize;
+
+    /**
+     * Constructs a {@code LRULinkedHashMap} with default initial capacity, maximum size
      * and load factor.
      */
     public LRULinkedHashMap() {
         super();
-        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
+        maximumSize = DEFAULT_MAXIMUM_SIZE;
     }
 
     /**
-     * Constructs a {@code LRULinkedHashMap} with default maximum capacity and load factor.
+     * Constructs a {@code LRULinkedHashMap} with default maximum size and load factor.
      *
      * @param initialCapacity The initial capacity.
      */
     public LRULinkedHashMap(final int initialCapacity) {
         super(initialCapacity);
-        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
+        maximumSize = DEFAULT_MAXIMUM_SIZE;
     }
 
     /**
-     * Constructs a {@code LRULinkedHashMap} with default maximum capacity.
+     * Constructs a {@code LRULinkedHashMap} with default maximum size.
      *
      * @param initialCapacity The initial capacity.
      * @param loadFactor      The load factor.
      */
     public LRULinkedHashMap(final int initialCapacity, final float loadFactor) {
         super(initialCapacity, loadFactor);
-        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
+        maximumSize = DEFAULT_MAXIMUM_SIZE;
     }
 
     /**
-     * Constructs a {@code LRULinkedHashMap} with default maximum capacity.
+     * Constructs a {@code LRULinkedHashMap} with default maximum size.
      *
      * @param initialCapacity The initial capacity.
      * @param loadFactor      The load factor.
@@ -88,69 +96,150 @@ public final class LRULinkedHashMap<K,V> extends LinkedHashMap<K,V> {
                             final boolean accessOrder)
     {
         super(initialCapacity, loadFactor, accessOrder);
-        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
+        maximumSize = DEFAULT_MAXIMUM_SIZE;
     }
 
     /**
-     * Constructs a {@code LRULinkedHashMap} with the specified maximum capacity.
+     * Constructs a {@code LRULinkedHashMap} with the specified maximum size.
      *
      * @param initialCapacity The initial capacity.
      * @param loadFactor      The load factor.
      * @param accessOrder     The ordering mode: {@code true} for access-order,
      *                        {@code false} for insertion-order.
-     * @param maxEntries      Maximum number of entries for this LRU cache.
+     * @param maximumSize     Maximum number of entries for this LRU map.
      */
     public LRULinkedHashMap(final int initialCapacity, final float loadFactor,
-                            final boolean accessOrder, final int maxEntries)
+                            final boolean accessOrder, final int maximumSize)
     {
         super(initialCapacity, loadFactor, accessOrder);
-        this.maxEntries = maxEntries;
+        this.maximumSize = maximumSize;
+        checkMaximumSize(maximumSize);
+    }
+
+    /**
+     * For private usage by static convenience constructors only. The {@code maximumSize} must
+     * be checked before this construcor is invoked, because it is used in the calculation of
+     * the value given to {@code super} constructor call.
+     */
+    private LRULinkedHashMap(final boolean accessOrder, final int maximumSize) {
+        super((int) Math.ceil(maximumSize / DEFAULT_LOAD_FACTOR),
+              (float)DEFAULT_LOAD_FACTOR, accessOrder);
+        this.maximumSize = maximumSize;
     }
 
     /**
      * Constructs a {@code LRULinkedHashMap} with all entries from the specified map.
+     * The {@linkplain #getMaximumSize maximum size} is set to the given
+     * {@linkplain Map#size map size}.
      *
-     * @param m the map whose mappings are to be placed in this map.
+     * @param map The map whose mappings are to be placed in this map.
+     *
+     * @since 2.5
      */
-    private LRULinkedHashMap(final Map<K,V> map) {
+    public LRULinkedHashMap(final Map<K,V> map) {
         super(map);
-        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
-        removeExtraEntries();
+        maximumSize = map.size();
     }
 
     /**
      * Constructs a {@code LRULinkedHashMap} with all entries from the specified map
      * and maximum number of entries.
      *
-     * @param m the map whose mappings are to be placed in this map.
-     * @param maxEntries      Maximum number of entries for this LRU cache.
+     * @param map The map whose mappings are to be placed in this map.
+     * @param maximumSize Maximum number of entries for this LRU map.
+     *
+     * @since 2.5
      */
-    private LRULinkedHashMap(final Map<K,V> map, final int maxEntries) {
+    public LRULinkedHashMap(final Map<K,V> map, final int maximumSize) {
         super(map);
-        this.maxEntries = maxEntries;
+        this.maximumSize = maximumSize;
+        checkMaximumSize(maximumSize);
         removeExtraEntries();
+    }
+
+    /**
+     * Ensures that the given size is strictly positive.
+     */
+    private static void checkMaximumSize(final int maximumSize) throws IllegalArgumentException {
+        if (maximumSize <= 0) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.NOT_GREATER_THAN_ZERO_$1, maximumSize));
+        }
     }
 
     /**
      * If there is more entries than the maximum amount, remove extra entries.
      * <p>
      * <b>Note:</b> Invoking {@code removeExtraEntries()} after adding all entries in the
-     * {@code LRULinkedHashMap(Map)} constructor is less efficient than just iterating over
-     * the {@code maxEntries} first entries at construction time, but super-class constructor
-     * is more efficient for maps with less than {@code maxEntries}. We assume that this is the
-     * most typical case. In addition, this method would be needed anyway if we add a
-     * {@code setMaximumEntries(int)} method in some future Geotools version.
+     * {@link #LRULinkedHashMap(Map,int)} constructor is less efficient than just iterating over
+     * the {@link #maximumSize} first entries at construction time,  but super-class constructor
+     * is more efficient for maps with less than {@code maximumSize}. We assume that this is the
+     * most typical case.
      */
     private void removeExtraEntries() {
-        if (size() > maxEntries) {
+        if (size() > maximumSize) {
             final Iterator<Map.Entry<K,V>> it = entrySet().iterator();
-            for (int c=0; c<maxEntries; c++) {
+            for (int c=0; c<maximumSize; c++) {
                 it.next();
             }
             while (it.hasNext()) {
                 it.remove();
             }
         }
+    }
+
+    /**
+     * Creates a map for the most recently accessed entries. This convenience constructor
+     * uses an initial capacity big enough for holding the given maximum number of entries,
+     * so it is not appropriate if {@code maximumSize} is very large.
+     *
+     * @param  maximumSize Maximum number of entries for this LRU map.
+     * @return A map holding only the {@code maximumSize} most recently accessed entries.
+     *
+     * @since 2.5
+     */
+    public static <K,V> LRULinkedHashMap<K,V> createForRecentAccess(final int maximumSize) {
+        checkMaximumSize(maximumSize);
+        return new LRULinkedHashMap<K,V>(true, maximumSize);
+    }
+
+    /**
+     * Creates a map for the most recently inserted entries. This convenience constructor
+     * uses an initial capacity big enough for holding the given maximum number of entries,
+     * so it is not appropriate if {@code maximumSize} is very large.
+     *
+     * @param  maximumSize Maximum number of entries for this LRU map.
+     * @return A map holding only the {@code maximumSize} most recently inserted entries.
+     *
+     * @since 2.5
+     */
+    public static <K,V> LRULinkedHashMap<K,V> createForRecentInserts(final int maximumSize) {
+        checkMaximumSize(maximumSize);
+        return new LRULinkedHashMap<K,V>(false, maximumSize);
+    }
+
+    /**
+     * Returns the maximal {@linkplain #size size} allowed for this map.
+     *
+     * @since 2.5
+     */
+    public int getMaximumSize() {
+        return maximumSize;
+    }
+
+    /**
+     * Sets the maximal {@linkplain #size size} allowed for this map. If the given size
+     * is smaller than the previous one, eldest entries will be immediately removed.
+     *
+     * @param max The new maximal size.
+     * @throws IllegalArgumentException if the given size is negative.
+     *
+     * @since 2.5
+     */
+    public void setMaximumSize(final int max) {
+        checkMaximumSize(max);
+        maximumSize = max;
+        removeExtraEntries();
     }
 
     /**
@@ -166,10 +255,6 @@ public final class LRULinkedHashMap<K,V> extends LinkedHashMap<K,V> {
      */
     @Override
     protected boolean removeEldestEntry(final Map.Entry<K,V> eldest) {
-        /*
-         * Do we have to remove anything?
-         * If we still below the desired threshold, just return false.
-         */
-        return size() > maxEntries;
+        return size() > maximumSize;
     }
 }
