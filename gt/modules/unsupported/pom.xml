@@ -81,7 +81,6 @@
          <module>hsql</module>
          <module>jpox</module>
          <module>geomedia</module>
-         <module>h2</module>
        </modules>
      </profile>
   </profiles>
@@ -93,6 +92,7 @@
     <module>epsg-oracle</module>    
     <module>gml</module>
     <module>go</module>
+    <module>h2</module>
     <module>jts-wrapper</module>
     <module>mif</module>
     <module>mysql</module>
