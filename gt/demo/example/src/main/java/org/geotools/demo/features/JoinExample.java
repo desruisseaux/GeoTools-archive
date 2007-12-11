@@ -92,19 +92,23 @@ public class JoinExample {
                         continue;
                     }
                     Filter innerFilter = ff.intersects( ff.property(geomName2), ff.literal( geometry ));
+                    //Filter innerFilter = ff.dwithin(ff.property(geomName2), ff.literal( geometry ),1.0,"km");
+                    //Filter innerFilter = ff.beyond(ff.property(geomName2), ff.literal( geometry ),1.0,"km");
+                    //Filter innerFilter = ff.not( ff.disjoint(ff.property(geomName2), ff.literal( geometry )) );
+                    
                     DefaultQuery innerQuery = new DefaultQuery( typeName2, innerFilter, DefaultQuery.NO_NAMES );
                     FeatureCollection join = shapes2.getFeatures( innerQuery );
                     int size = join.size();                
                     max = Math.max( max, size );
                 }
-                catch( TopologyException skipBadData ){
+                catch( Exception skipBadData ){
                 }
             }
         }
         finally {
             iterator.close();            
         }
-        System.out.println("At most "+max+" "+typeName2+" features overlap a single "+typeName+" feature");
+        System.out.println("At most "+max+" "+typeName2+" features in a single "+typeName+" feature");
     }
 
 }
