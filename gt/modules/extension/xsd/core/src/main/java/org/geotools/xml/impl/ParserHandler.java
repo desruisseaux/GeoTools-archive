@@ -107,6 +107,7 @@ public class ParserHandler extends DefaultHandler {
     public ParserHandler(Configuration config) {
         this.config = config;
         errors = new ArrayList();
+        namespaces = new NamespaceSupport();
         validating = false;
     }
 
@@ -197,7 +198,6 @@ public class ParserHandler extends DefaultHandler {
         }
 
         //setup the namespace support
-        namespaces = new NamespaceSupport();
         context.registerComponentInstance(namespaces);
         context.registerComponentInstance(new NamespaceSupportWrapper(namespaces));
 
