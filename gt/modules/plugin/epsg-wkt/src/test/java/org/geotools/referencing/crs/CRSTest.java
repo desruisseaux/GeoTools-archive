@@ -15,24 +15,25 @@
  */
 package org.geotools.referencing.crs;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.geotools.factory.GeoTools;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.DirectPosition;
 
-import com.vividsolutions.jts.JTSVersion;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -110,6 +111,14 @@ public class CRSTest extends TestCase {
      * @throws Exception
      */
     public void testSamplePixel() throws Exception {
+        Map map = new HashMap();
+        //map.put( Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, true );
+        //map.put( Hints.FORCE_STANDARD_AXIS_DIRECTIONS, true );
+        //map.put( Hints.FORCE_STANDARD_AXIS_UNITS, true );
+
+        Hints global = new Hints(map);
+        GeoTools.init( global );
+
        // ReferencedEnvelope[-0.24291497975705742 : 0.24291497975711265, -0.5056179775280899 : -0.0]
         CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");
         ReferencedEnvelope pixelBounds = new ReferencedEnvelope( -0.24291497975705742, 0.24291497975711265, -0.5056179775280899, 0.0, EPSG4326 );
