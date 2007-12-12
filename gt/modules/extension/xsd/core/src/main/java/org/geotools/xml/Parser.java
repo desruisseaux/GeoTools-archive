@@ -20,7 +20,6 @@ import org.eclipse.xsd.XSDSchema;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.NamespaceSupport;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -240,7 +239,7 @@ public class Parser {
     /**
      * Returns the namespace mappings maintained by the parser.
      * <p>
-     * Clients may register additional namespace mappings. This is useful when 
+     * Clients may register additional namespace mappings. This is useful when
      * an application whishes to provide some "default" namespace mappings.
      * </p>
      * <p>
@@ -252,14 +251,14 @@ public class Parser {
      * ...
      * </code>
      * </p>
-     * 
+     *
      * @return The namespace support containing prefix to uri mappings.
      * @since 2.4
      */
     public NamespaceSupport getNamespaces() {
         return handler.getNamespaceSupport();
     }
-    
+
     protected SAXParser parser() throws ParserConfigurationException, SAXException {
         //JD: we use xerces directly here because jaxp does seem to allow use to 
         // override all the namespaces to validate against
