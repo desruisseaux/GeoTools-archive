@@ -62,8 +62,10 @@ public class Lock {
             return true;
         
         
-        if ( owners.size()>1 )
+        if ( owners.size()>1 ) {
+        	logger.fine("Writer operating but there are owners still around!!");
             return false;
+        }
 
         return true;
     }
@@ -94,6 +96,7 @@ public class Lock {
      * @throws IOException
      */
     public synchronized void lockRead() throws IOException {
+    	logger.fine("Read lock attempt from " + Thread.currentThread().getName());
         if (!canRead()) {
             while (writeLocks > 0 || writer != null) {
                 try {
@@ -114,7 +117,7 @@ public class Lock {
             owners.put(current, owner);
         }
 
-        logger.finer("Start Read Lock:" + owner);
+        logger.fine("Start Read Lock:" + owner);
     }
 
     private void assertTrue(String message, boolean b) {
@@ -137,6 +140,7 @@ public class Lock {
                 + "negative number of locks", owner.timesLocked > 0);
 
         owner.timesLocked--;
+        logger.fine("Read lock removed " + owner);
         if (owner.timesLocked == 0)
             owners.remove(Thread.currentThread());
 
@@ -153,6 +157,7 @@ public class Lock {
      */
     public synchronized void lockWrite() throws IOException {
         Thread currentThread = Thread.currentThread();
+        logger.fine("Getting write lock for " + currentThread.getName());
         if (writer == null)
             writer = currentThread;
         while (!canWrite()) {
@@ -175,7 +180,7 @@ public class Lock {
                 canRead());
 
         writeLocks++;
-        logger.finer(currentThread.getName() + " is getting write lock:"
+        logger.fine(currentThread.getName() + " is getting write lock:"
                 + writeLocks);
     }
 
@@ -214,7 +219,7 @@ public class Lock {
             if (writeLocks == 0)
                 writer = null;
         }
-        logger.finer("unlock write:" + Thread.currentThread().getName());
+        logger.fine("unlock write:" + Thread.currentThread().getName());
         notifyAll();
     }
     /**

@@ -71,6 +71,7 @@ public class ShapefileWriter {
   public ShapefileWriter(FileChannel shpChannel, FileChannel shxChannel, Lock lock) throws IOException {
     this.shpChannel = shpChannel;
     this.shxChannel = shxChannel;
+    lock.lockWrite();
     shpLogger.open();
     shxLogger.open();
   }
