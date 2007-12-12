@@ -890,7 +890,8 @@ public final class CRS {
             // Slight optimization in order to avoid the overhead of loading the full referencing engine.
             return IdentityTransform.create(sourceCRS.getCoordinateSystem().getDimension());
         }
-        return getCoordinateOperationFactory(lenient).createOperation(sourceCRS, targetCRS).getMathTransform();
+        CoordinateOperationFactory operationFactory = getCoordinateOperationFactory(lenient);
+        return operationFactory.createOperation(sourceCRS, targetCRS).getMathTransform();
     }
 
     /**

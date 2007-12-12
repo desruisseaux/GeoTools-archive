@@ -24,6 +24,7 @@ import org.opengis.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
@@ -503,8 +504,9 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
          * Gets a first estimation using an algorithm capable to take singularity in account
          * (North pole, South pole, 180ï¿½ longitude). We will expand this initial box later.
          */
-        final CoordinateOperation operation = CRS.getCoordinateOperationFactory(lenient)
-                                                 .createOperation(crs, targetCRS);
+        CoordinateOperationFactory coordinateOperationFactory = CRS.getCoordinateOperationFactory(lenient);
+        
+        final CoordinateOperation operation = coordinateOperationFactory.createOperation(crs, targetCRS);
         final GeneralEnvelope transformed = CRS.transform(operation, this);
         transformed.setCoordinateReferenceSystem(targetCRS);
 

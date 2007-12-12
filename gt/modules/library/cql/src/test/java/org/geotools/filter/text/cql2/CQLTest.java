@@ -729,7 +729,7 @@ public class CQLTest extends TestCase {
      *
      * </p>
      */
-    public void testAttribute() {
+    public void testAttribute() throws Exception {
         // Simple attribute name
         testAttribute("startPart");
 
@@ -742,21 +742,17 @@ public class CQLTest extends TestCase {
             "gmd:MD_Metadata.gmd:identificationInfo.gmd:MD_DataIdentification.gmd:abstract");
     }
 
-    private void testAttribute(final String attSample) {
+    private void testAttribute(final String attSample) throws Exception {
         PropertyIsLike result;
         PropertyName attResult = null;
 
-        try {
-            String expected = attSample.replace('.', '/');
+        String expected = attSample.replace('.', '/');
 
-            result = (PropertyIsLike) CQL.toFilter(attSample + " LIKE 'abc%'");
+        result = (PropertyIsLike) CQL.toFilter(attSample + " LIKE 'abc%'");
 
-            attResult = (PropertyName) result.getExpression();
+        attResult = (PropertyName) result.getExpression();
 
-            assertEquals(expected, attResult.getPropertyName());
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
+        assertEquals(expected, attResult.getPropertyName());
     }
 
     /**

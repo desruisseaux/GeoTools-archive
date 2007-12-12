@@ -20,25 +20,26 @@ import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
- * A simple event object to represent all events triggered by DataStore
- * instances (typically change events).
+ * Represents all events triggered by DataStore instances (typically change events).
  *
  * <p>
- * The "Source" FeatureEvents is taken to be a <code>FeatureSource</code>,
- * rather than <code>DataStore</code>. The is due to FeatureSource having a a
+ * The "Source" for FeatureEvents is taken to be a <code>FeatureSource</code>,
+ * rather than <code>DataStore</code>. The is due to FeatureSource having a
  * hold of Transaction information.
  * </p>
  *
  * <p>
- * DataStore implementations will actually keep the list listeners by
- * DataSource, and can report FeatureWriter modifications as required (by
- * filtering the Listener list by typeName and Transaction).
+ * DataStore implementations will actually keep the list listeners sorted
+ * by TypeName, and can report FeatureWriter modifications as required
+ * (by filtering the Listener list by typeName and Transaction).
  * </p>
  *
  * <p>
- * The commit opperation will also need to provide notification.
+ * The Transaction.commit() operation will also need to provide notification, this
+ * shows up as a CHANGE event; with a bit more detail being available in the subclass
+ * BatchFeatureEvent.
  * </p>
- *
+ * 
  * @since GeoTools 2.0
  * @source $URL$
  */
@@ -46,7 +47,7 @@ public class FeatureEvent extends EventObject {
     private static final long serialVersionUID = 3154238322369916485L;
 
     /**
-     * Event type constant denoting the adding of a feature.
+     * FeatureWriter event type denoting the adding features.
      *
      * <p>
      * This EventType is used when FeatureWriter.write() is called when
@@ -72,6 +73,7 @@ public class FeatureEvent extends EventObject {
      * FeatureEvent.getBounds() should reflect the the Bounding Box of the
      * newly created Features.
      * </p>
+     * @deprecated Please use FeatureEvent.getType() == Type.ADDED
      */
     public static final int FEATURES_ADDED = 1;
 
@@ -141,6 +143,44 @@ public class FeatureEvent extends EventObject {
 
     /** Indicates one of FEATURES_ADDED, FEATURES_REMOVED, FEATURES_CHANGED */
     private int type;
+    
+    public enum Type {
+        /**
+         * Features have been added.
+         *
+         * <p>
+         * This EventType is used when FeatureWriter.close() is called when
+         * <p>
+         * The use of FeatureStore addFeatures( FeatureCollection ) is recommended,
+         * and will issue a single FeatureEvent with getType() ADDED.
+         * <p> 
+         * For a more hands on experience FeatureWriter can be used to create
+         * new features can be added by calling
+         * <code>next()</code> and <code>write()</code>
+         * when <code>hasNext()</code> has previously returned
+         * <code>false</code>.
+         * This action represents a newly create Feature being
+         * passed to the DataStore.
+         * <p>
+         * If you are working with a Transaction you will only receive events
+         * for modifications that occur on that Transaction. If not you will need
+         * to wait for the event like everyone else.</p>
+         *
+         * <p>
+         * FeatureEvent.getBounds() should reflect the the Bounding Box of the
+         * newly created Features.
+         * </p>
+         */
+        ADDED( FEATURES_ADDED ),
+        CHANGED( FEATURES_CHANGED ),
+        REMOVED( FEATURES_REMOVED );
+        
+        final int type;
+        Type( int type ){
+            this.type = type;
+        }
+
+    }
 
     /**
      * Indicates the bounds in which the modification occured.

@@ -37,6 +37,7 @@ import org.geotools.filter.expression.PropertyAccessorFactory;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -707,6 +708,8 @@ public class FilterTest extends TestCase {
     }
 
     public void testDistanceGeometry() throws Exception {
+        //FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        
         // Test DWithin
         GeometryDistanceFilter filter = FilterFactoryFinder.createFilterFactory()
         	.createGeometryDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN);

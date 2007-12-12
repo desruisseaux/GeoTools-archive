@@ -1,6 +1,7 @@
 package org.geotools.filter.text.cql2;
 
-import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -8,8 +9,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.filter.LikeFilterImpl;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.util.Converters;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.ExcludeFilter;
@@ -75,6 +74,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 class FilterToCQL implements FilterVisitor, ExpressionVisitor {
     /** Standard java logger */
     private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.filter");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     
     /**
      * Process the possibly user supplied extraData parameter into a StringBuffer.
@@ -540,25 +540,19 @@ class FilterToCQL implements FilterVisitor, ExpressionVisitor {
         }
         return output;
     }
+    /**
+     * Uses the format <code>yyyy-MM-dd'T'HH:mm:ss'Z'</code> for
+     * output the provided date.
+     * @param date
+     * @param output
+     * @return output
+     */
     public StringBuffer date( Date date, StringBuffer output ){
-        Calendar now = Calendar.getInstance();        
-        now.setTime( date );
-        
-        output.append( now.get(Calendar.YEAR) );
-        output.append("-");
-        output.append( now.get(Calendar.MONTH) );
-        output.append("-");
-        output.append( now.get(Calendar.DAY_OF_MONTH) );
-        output.append("T");
-        output.append( now.get(Calendar.HOUR_OF_DAY) );
-        output.append(":");
-        output.append( now.get(Calendar.MINUTE) );
-        output.append(":");
-        output.append( now.get(Calendar.SECOND) );
-        output.append("Z");
-        
+        String text = DATE_FORMAT.format( date );
+        output.append( text );        
         return output;
     }
+    
     public Object visit(Multiply expression, Object extraData) {
         LOGGER.finer("exporting Expression Multiply");
 
