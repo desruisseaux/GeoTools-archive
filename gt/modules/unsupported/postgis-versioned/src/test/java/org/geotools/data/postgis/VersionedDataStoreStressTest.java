@@ -46,7 +46,7 @@ public class VersionedDataStoreStressTest extends
             VersionedPostgisDataStore ds = (VersionedPostgisDataStore) DataStoreFinder
                     .getDataStore(remote);
 
-            String[] typeNames = ds.getTypeNames();
+            String[] typeNames = new String[] {"road", "river", "lake"};
             for (int j = 0; j < typeNames.length; j++) {
                 String typeName = typeNames[j];
                 ds.getSchema(typeName);
