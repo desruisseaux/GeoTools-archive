@@ -15,6 +15,10 @@
  */
 package org.geotools.data;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -71,6 +75,38 @@ public class DataUtilitiesTest extends DataTestCase {
         super(arg0);
     }
 
+    public void testUrlToFile() throws Exception {
+        handleFile( System.getProperty("user.home"));
+        handleFile( System.getProperty("user.dir"));
+
+        String arch = System.getProperty("os.arch");
+        String os = System.getProperty("os.name");
+        
+        if( !os.toUpperCase().contains("WINDOWS")){
+            return;
+        }
+        handleFile( "C:\\" );        
+        handleFile( "C:\\one" );
+        handleFile( "C:\\one\\two" );
+        handleFile( "C:\\one\\two\\and three" );
+        handleFile( "D:\\" );
+        handleFile( "\\\\host\\share\\file" ); 
+    }
+    public void handleFile( String path ) throws Exception {
+        File file = new File( path );
+        URI uri = file.toURI();
+        URL url = file.toURL();
+        URL url2 = file.toURI().toURL();
+        URI uri2 = url2.toURI();
+        
+        assertEquals( "jdk contract", file, new File( uri ));
+
+        File toFile = DataUtilities.urlToFile( url );        
+        assertEquals( path+":url", file, toFile);
+        
+        File toFile2 = DataUtilities.urlToFile( url2 );        
+        assertEquals( path+":url2", file, toFile2 );
+    }
     /**
      * Test for {@link DataUtilities#attributeNames(FeatureType)}
      */

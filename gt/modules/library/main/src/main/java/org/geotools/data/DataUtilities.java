@@ -234,11 +234,12 @@ public class DataUtilities {
     public static File urlToFile (URL url) {
     	String auth = url.getAuthority();
     	String path = url.getPath();
+    	String path2 = path.replace("%20", " ");
 		File f = null;
 		if (auth != null && !auth.equals("")) {
-			f = new File("//"+auth+path);
+			f = new File("//"+auth+path2);
 		} else {
-			f = new File(path);
+			f = new File(path2);
 		}
 		return f;
     }

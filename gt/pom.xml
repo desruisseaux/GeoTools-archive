@@ -559,7 +559,7 @@
       <dependency>
         <groupId>com.vividsolutions</groupId>
         <artifactId>jts</artifactId>
-        <version>1.8</version>
+        <version>1.9-RC6</version>
       </dependency>
       <dependency>
         <groupId>org.wkb4j</groupId>
