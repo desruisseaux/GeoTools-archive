@@ -16,6 +16,8 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +38,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.VersioningFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -44,8 +47,10 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -62,10 +67,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         VersionedPostgisDataStore ds = getDataStore();
         List typeNames = Arrays.asList(ds.getTypeNames());
         assertTrue(typeNames.contains("road"));
+        assertFalse(typeNames.contains("road_wfc_view"));
         assertTrue(typeNames.contains("lake"));
+        assertFalse(typeNames.contains("lake_wfc_view"));
         assertTrue(typeNames.contains("river"));
+        assertFalse(typeNames.contains("rivel_wfc_view"));
         assertTrue(typeNames.contains("rail"));
+        assertFalse(typeNames.contains("rail_wfc_view"));
         assertTrue(typeNames.contains("nopk"));
+        assertFalse(typeNames.contains("nopk_wfc_view"));
         assertTrue(typeNames.contains(VersionedPostgisDataStore.TBL_CHANGESETS));
 
         assertFalse(typeNames.contains(VersionedPostgisDataStore.TBL_VERSIONEDTABLES));
@@ -95,13 +105,58 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         if (ds.getFIDMapper("road").returnFIDColumnsAsAttributes())
             assertNotNull(ds.wrapped.getSchema("road").getAttribute("revision"));
         assertNotNull(ds.wrapped.getSchema("road").getAttribute("expired"));
-
+        // check we don't see the versioned feature collection as a public type
+        assertFalse(Arrays.asList(ds.getTypeNames()).contains("road_vfc_view"));
+        
+        // check the versioned feature collection view is there
+        SimpleFeatureType view = ds.wrapped.getSchema("road_vfc_view");
+        AttributeDescriptor[] types = view.getAttributes().toArray(new AttributeDescriptor[view.getAttributes().size()]);
+        assertEquals(ft.getAttributeCount() + 7, view.getAttributeCount());
+        assertEquals("revision", types[types.length - 6].getLocalName());
+        assertEquals("expired", types[types.length - 5].getLocalName());
+        assertEquals("version", types[types.length - 4].getLocalName());
+        assertEquals("author", types[types.length - 3].getLocalName());
+        assertEquals("date", types[types.length - 2].getLocalName());
+        assertEquals("message", types[types.length - 1].getLocalName());
+        // check the versioned feature collation is not visible outside of the verioning datastore
+        try {
+            ds.getSchema("road_vfc_view");
+            fail("The versioning feature collection for road should not be visible as a standalone type");
+        } catch(IOException e) {
+            // ok
+        }
+        
+        
         // un-version
         ds.setVersioned("road", false, "gimbo", "Versioning no more needed");
         assertFalse(ds.isVersioned("road"));
         assertEquals(ft, ds.getSchema("road"));
         assertNull(ds.wrapped.getSchema("road").getAttribute("revision"));
         assertNull(ds.wrapped.getSchema("road").getAttribute("expired"));
+        try {
+            ds.wrapped.getSchema("road_vfc_view");
+            fail("The versioning view should not be there anymore");
+        } catch(IOException e) {
+            // ok
+        }
+    }
+    
+    public void testNonExistentTypes() throws IOException {
+        VersionedPostgisDataStore ds = getDataStore();
+        try {
+            ds.isVersioned("blablabla");
+            fail("Non existent type blablabla accepted anyways...");
+        } catch(IOException e) {
+            // ok, does not exist
+        }
+        
+        ds.setVersioned("road", true, "gimbo", "Initial import of roads");
+        try {
+            ds.isVersioned(ds.getVFCViewName("road"));
+            fail("Versioned feature collection view accepted as a legitimate type...");
+        } catch(IOException e) {
+            // ok, should not be accepted
+        }
     }
 
     public void testVersionEnableChangeSets() throws IOException {
@@ -1056,6 +1111,84 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertFalse(reader.hasNext());
         reader.close();
         t.close();
+    }
+    
+    public void testVersionedCollection() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        buildRiverHistory();
+        
+        VersioningFeatureSource fs = (VersioningFeatureSource) ds.getFeatureSource("river");
+        // smoke test, can we get it?
+        FeatureCollection vfc = fs.getVersionedFeatures();
+        FeatureCollection fc = fs.getFeatures();
+        assertEquals(vfc.size(), fc.size());
+        final int vfcAttributesCount = vfc.getSchema().getAttributeCount();
+        assertEquals(fc.getSchema().getAttributeCount() + 4, vfcAttributesCount);
+        assertEquals("version", vfc.getSchema().getAttribute(vfcAttributesCount - 4).getLocalName());
+        assertEquals("author", vfc.getSchema().getAttribute(vfcAttributesCount - 3).getLocalName());
+        assertEquals("date", vfc.getSchema().getAttribute(vfcAttributesCount - 2).getLocalName());
+        assertEquals("message", vfc.getSchema().getAttribute(vfcAttributesCount - 1).getLocalName());
+        final FeatureIterator vfr = vfc.features();
+        final FeatureIterator fr = fc.features();
+        final SimpleFeature vf = vfr.next();
+        final SimpleFeature f = fr.next();
+        vfr.close();
+        fr.close();
+        assertEquals(fc.getSchema().getTypeName(), vfc.getSchema().getTypeName());
+        assertEquals(f.getFeatureType().getTypeName(), vf.getFeatureType().getTypeName());
+        assertEquals(vfcAttributesCount, vfc.getSchema().getAttributeCount());
+        assertEquals(vf.getID(), f.getID());
+        for (int i = 0; i < f.getFeatureType().getAttributeCount(); i++) {
+            assertTrue(DataUtilities.attributesEqual(f.getAttribute(i), vf.getAttribute(i)));
+        }
+    }
+    
+    public void testMissingVersionedCollection() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        buildRiverHistory();
+        
+        // drop the versioning collection view to make the db in the
+        // same condition as an old db
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = pool.getConnection();
+            st = conn.createStatement();
+            st.execute("drop view river_vfc_view");
+        } catch(Exception e) {
+            
+        }
+        
+        VersioningFeatureSource fs = (VersioningFeatureSource) ds.getFeatureSource("river");
+        // now, will the datastore create the view on the fly?
+        FeatureCollection vfc = fs.getVersionedFeatures();
+        FeatureCollection fc = fs.getFeatures();
+        assertEquals(vfc.size(), fc.size());
+        assertEquals(vfc.getSchema().getDefaultGeometry(), fc.getSchema().getDefaultGeometry());
+    }
+    
+    public void testVersionedCollectionFidFilter() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        buildRiverHistory();
+        
+        // drop the versioning collection view to make the db in the
+        // same condition as an old db
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = pool.getConnection();
+            st = conn.createStatement();
+            st.execute("drop view river_vfc_view");
+        } catch(Exception e) {
+            
+        }
+        
+        VersioningFeatureSource fs = (VersioningFeatureSource) ds.getFeatureSource("river");
+        final Id fidFilter = ff.id(Collections.singleton(ff.featureId("river.rv1")));
+        FeatureCollection vfc = fs.getVersionedFeatures(fidFilter);
+        FeatureCollection fc = fs.getFeatures(fidFilter);
+        assertEquals(vfc.size(), fc.size());
+        assertEquals(1, vfc.size());
     }
 
     /**

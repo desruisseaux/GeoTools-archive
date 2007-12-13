@@ -66,6 +66,12 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         String url = "jdbc:postgresql" + "://" + f.host + ":" + f.port + "/" + f.database;
         pool = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", f.user, f.password, "select now()");
 
+        // make sure versioned metadata is not in the way
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_VERSIONEDTABLES, false);
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_CHANGESETS, true);
+        SqlTestUtils.execute(pool, "DELETE FROM geometry_columns");
+        
         setUpLakeTable();
         setUpRiverTable();
         setUpRoadTable();
@@ -74,11 +80,6 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         setUpTreeTable();
         setUpEmptyTable();
         setUpPointTable();
-
-        // make sure versioned metadata is not in the way
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_VERSIONEDTABLES, false);
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_CHANGESETS, true);
     }
 
     protected void dataSetUp() throws Exception {
@@ -144,7 +145,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".tree");
+            s.execute("DROP TABLE " + f.schema + ".tree cascade");
         } catch (Exception ignore) {
         }
 
@@ -185,7 +186,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".road");
+            s.execute("DROP TABLE " + f.schema + ".road cascade");
         } catch (Exception ignore) {
         }
 
@@ -228,7 +229,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".lake");
+            s.execute("DROP TABLE " + f.schema + ".lake cascade");
         } catch (Exception ignore) {
         }
 
@@ -269,7 +270,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".rail");
+            s.execute("DROP TABLE " + f.schema + ".rail  cascade");
         } catch (Exception ignore) {
         }
 
@@ -308,7 +309,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".nopk");
+            s.execute("DROP TABLE " + f.schema + ".nopk  cascade");
         } catch (Exception ignore) {
         }
 
@@ -407,7 +408,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".river");
+            s.execute("DROP TABLE " + f.schema + ".river cascade");
         } catch (Exception ignore) {
         }
 
@@ -449,7 +450,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".empty");
+            s.execute("DROP TABLE " + f.schema + ".empty cascade");
         } catch (Exception ignore) {
         }
 
@@ -477,7 +478,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".point");
+            s.execute("DROP TABLE " + f.schema + ".point cascade");
         } catch (Exception ignore) {
         }
 

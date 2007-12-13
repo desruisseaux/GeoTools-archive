@@ -48,7 +48,6 @@ import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.VersioningDataStore;
-import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
@@ -172,6 +171,11 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         List names = new ArrayList(Arrays.asList(wrapped.getTypeNames()));
         names.remove(TBL_TABLESCHANGED);
         names.remove(TBL_VERSIONEDTABLES);
+        for (Iterator it = names.iterator(); it.hasNext();) {
+            String name = (String) it.next();
+            if(isVersionedFeatureCollection(name))
+                it.remove();
+        }
         return (String[]) names.toArray(new String[names.size()]);
     }
 
@@ -226,8 +230,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
 
         // check what revision we have to gather, and build a modified query
         // that extracts it
-        RevisionInfo ri = new RevisionInfo(query.getVersion());
-        DefaultQuery versionedQuery = buildVersionedQuery(query, ri);
+        DefaultQuery versionedQuery = buildVersionedQuery(query);
 
         FeatureReader reader = wrapped.getFeatureReader(versionedQuery, trans);
         VersionedFIDMapper mapper = (VersionedFIDMapper) getFIDMapper(query.getTypeName());
@@ -385,6 +388,12 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
     protected boolean isVersioned(String typeName, Transaction transaction) throws IOException {
         Boolean versioned = (Boolean) versionedMap.get(typeName);
         if (versioned == null) {
+            // first check the type exists for good, this will throw an exception if the
+            // schema does not
+            wrapped.getSchema(typeName);
+            if(isVersionedFeatureCollection(typeName))
+                throw new DataSourceException("Could not find type " + typeName);
+            
             Connection conn = null;
             Statement st = null;
             PostgisSQLBuilder sqlb = wrapped.createSQLBuilder();
@@ -414,6 +423,14 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             versionedMap.put(typeName, versioned);
         }
         return versioned.booleanValue();
+    }
+
+    private boolean isVersionedFeatureCollection(String typeName) throws IOException {
+        if(!typeName.endsWith("_vfc_view"))
+            return false;
+        
+         String originalName = getVFCTableName(typeName);
+         return Arrays.asList(wrapped.getTypeNames()).contains(originalName);
     }
 
     /**
@@ -1074,6 +1091,9 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
                         + typeName + "', TRUE)");
             }
             rs.close();
+            
+            // create view to support versioned feature collection extraction
+            createVersionedFeatureCollectionView(typeName, conn);
 
             // phew... done!
             t.commit();
@@ -1097,6 +1117,79 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             JDBCUtils.close(conn, t, null);
             t.close();
         }
+    }
+    
+    void createVersionedFeatureCollectionView(String typeName) throws IOException {
+        Connection conn = null;
+        Transaction t = new DefaultTransaction();
+        try {
+            conn = wrapped.getConnection(t);
+            createVersionedFeatureCollectionView(typeName, conn);
+            t.commit();
+        } finally {
+            JDBCUtils.close(conn, t, null);
+        }
+    }
+
+    /**
+     * Creates the <TABLE>_VFC_VIEW for the specified feature type
+     * @param conn
+     * @param typeName
+     */
+    private void createVersionedFeatureCollectionView(String typeName, Connection conn) throws IOException {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+            
+            String viewName = getVFCViewName(typeName);
+            st.execute("CREATE VIEW " + viewName + "\n " 
+                    + "AS SELECT " + typeName + ".*, "
+                    + "changesets.revision as version, changesets.author, " +
+                    		"changesets.date, changesets.message\n" 
+                    + "FROM " + typeName + " inner join " + " changesets on " + typeName 
+                    + ".revision = changesets.revision");
+            
+            // make sure there is no other row for this view (one might have remained
+            // due to errors, and we would end up with a primary key violation)
+            st.execute("DELETE FROM geometry_columns " +
+            		   "WHERE f_table_schema = current_schema()" +
+            		   "AND f_table_name = '" + viewName + "'");
+            
+            st.execute("INSERT INTO geometry_columns \n" +
+                       "SELECT '', current_schema(), '" + viewName + "', " +
+                       "       gc.f_geometry_column, gc.coord_dimension, gc.srid, gc.type\n" +
+                       "FROM geometry_columns as gc\n" +
+                       "WHERE gc.f_table_name = '" + typeName + "'");
+        } catch(SQLException e) {
+            throw new DataSourceException("Issues creating versioned feature collection view for " 
+                    + typeName, e);
+        }finally {
+            JDBCUtils.close(st);
+        }
+    }
+
+    /**
+     * Given a type name returns the name of the versioned feature collection view
+     * associated to it
+     * @param typeName
+     * @return
+     */
+    public static String getVFCViewName(String typeName) {
+        return typeName + "_vfc_view";
+    }
+    
+    /**
+     * Given a versioned feature collection view name returns the base table name
+     * @param vfcTypeName
+     * @return
+     * @throws IOException
+     */
+    public static String getVFCTableName(String vfcTypeName) throws IOException {
+        if(vfcTypeName.endsWith("_vfc_view"))
+          return vfcTypeName.substring(0, vfcTypeName.lastIndexOf("_vfc_view"));
+        else
+            throw new IOException("Specified type " + vfcTypeName 
+                    + " is not a versioned feature collection view");
     }
 
     /**
@@ -1130,8 +1223,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             state.setTypeNameDirty(typeName);
 
             // the following is funny, but if I don't gather the revision now, the transactio may
-            // lock...
-            // not sure why...
+            // lock... not sure why...
             state.getRevision();
 
             // gather bbox, we need it for the first commit msg
@@ -1144,16 +1236,24 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
                 state.expandDirtyBounds(envelope);
             }
 
-            // setup for altering tables
+            // drop the versioning feature collection view
             conn = state.getConnection();
             st = conn.createStatement();
-            PkDescriptor pk = getPrimaryKeyConstraintName(conn, typeName);
-            if (pk == null)
-                throw new DataSourceException("Cannot version tables without primary keys");
-
+            try {
+                st.execute("DROP VIEW " + typeName + "_vfc_view");
+            } catch(SQLException e) {
+                // if the view wasn't there no problem
+            }
+            st.execute("DELETE FROM geometry_columns WHERE f_table_schema = current_schema() " +
+            		"   AND f_table_name = '" + typeName + "_vfc_view'");
+            
             // build a comma separated list of old pk columns, just skip the
             // first
             // which we know is "revision"
+            PkDescriptor pk = getPrimaryKeyConstraintName(conn, typeName);
+            if (pk == null)
+                throw new DataSourceException("Cannot version tables without primary keys");
+            
             String colList = "";
             for (int i = 1; i < pk.columns.length; i++) {
                 colList += "," + pk.columns[i];
@@ -1369,7 +1469,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      * @throws FactoryRegistryException
      * @throws IOException
      */
-    DefaultQuery buildVersionedQuery(Query query, RevisionInfo ri) throws IOException {
+    DefaultQuery buildVersionedQuery(Query query) throws IOException {
+        RevisionInfo ri = new RevisionInfo(query.getVersion());
         // build a filter that limits the number
         Filter newFilter = buildVersionedFilter(query.getTypeName(), query.getFilter(), ri);
         DefaultQuery versionedQuery = new DefaultQuery(query);
@@ -1389,7 +1490,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         String[] names = wrapped.propertyNames(query);
 
         Set extraColumns = new HashSet();
-        if (isVersioned(query.getTypeName())) {
+        if (isVersionedFeatureCollection(query.getTypeName()) || isVersioned(query.getTypeName(), null)) {
             extraColumns.add("revision");
             extraColumns.add("expired");
         }

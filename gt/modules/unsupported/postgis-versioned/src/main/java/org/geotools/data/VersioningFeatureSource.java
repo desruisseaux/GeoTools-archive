@@ -82,4 +82,25 @@ public interface VersioningFeatureSource extends FeatureSource {
      */
     public FeatureDiffReader getDifferences(String fromVersion, String toVersion, Filter filter,
             String[] userIds) throws IOException;
+    
+    /**
+     * Returns the same features as {@link FeatureSource#getFeatures(Query)} but providing more
+     * attributes, namely, revision, author and date of the version.
+     * @return
+     */
+    public FeatureCollection getVersionedFeatures(Query q) throws IOException;
+    
+    /**
+     * Returns the same features as {@link FeatureSource#getFeatures(Filter)} but providing more
+     * attributes, namely, revision, author and date of the version.
+     * @return
+     */
+    public FeatureCollection getVersionedFeatures(Filter f) throws IOException;
+    
+    /**
+     * Returns the same features as {@link FeatureSource#getFeatures()} but providing more
+     * attributes, namely, revision, author and date of the version.
+     * @return
+     */
+    public FeatureCollection getVersionedFeatures() throws IOException;
 }

@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
@@ -79,7 +80,20 @@ public class VersionedFIDMapperFactory extends DefaultFIDMapperFactory {
         // must remember that versioned data store uses typed fids externally
         // (only internal ones are non typed)
         if (!versionedTypes.contains(tableName)) {
+            if(tableName.endsWith("_vfc_view")) {
+                try {
+                    String otn = VersionedPostgisDataStore.getVFCTableName(tableName);
+                    // let's see if the original feature table is there and versioned
+                    VersionedFIDMapper mapper = (VersionedFIDMapper) getMapper(catalog, schema,otn, connection);
+                    return new VersionedFeatureCollectionFidMapper(mapper);
+//                    return new VersionedFeatureCollectionFidMapper(mapper);
+                } catch(Exception e ) {
+                    // ok, it wasn't a versioned feature collection view
+                }
+            }
+                
             return unversionedFactory.getMapper(catalog, schema, tableName, connection);
+            
         }
 
         ColumnInfo[] colInfos = getPkColumnInfo(catalog, schema, tableName, connection);
