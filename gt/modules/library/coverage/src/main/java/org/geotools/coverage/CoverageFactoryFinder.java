@@ -18,6 +18,7 @@ package org.geotools.coverage;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
@@ -34,14 +35,32 @@ import org.geotools.resources.LazySet;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- * @depreacted Please use CoverageFactoryFinder
  */
-public final class FactoryFinder {
+public final class CoverageFactoryFinder {
+    /**
+     * The service registry for this manager.
+     * Will be initialized only when first needed.
+     */
+    private static FactoryRegistry registry;
+
     /**
      * Do not allows any instantiation of this class.
      */
-    private FactoryFinder() {
+    private CoverageFactoryFinder() {
         // singleton
+    }
+
+    /**
+     * Returns the service registry. The registry will be created the first
+     * time this method is invoked.
+     */
+    private static FactoryRegistry getServiceRegistry() {
+        assert Thread.holdsLock(CoverageFactoryFinder.class);
+        if (registry == null) {
+            registry = new FactoryCreator(Arrays.asList(new Class<?>[] {
+                    GridCoverageFactory.class}));
+        }
+        return registry;
     }
 
     /**
@@ -57,10 +76,12 @@ public final class FactoryFinder {
      * @see Hints#DEFAULT_COORDINATE_REFERENCE_SYSTEM
      * @see Hints#TILE_ENCODING
      */
-    public static synchronized GridCoverageFactory getGridCoverageFactory(final Hints hints)
+    public static synchronized GridCoverageFactory getGridCoverageFactory(Hints hints)
             throws FactoryRegistryException
     {
-        return CoverageFactoryFinder.getGridCoverageFactory(hints);
+        hints = GeoTools.addDefaultHints(hints);
+        return (GridCoverageFactory) getServiceRegistry().getServiceProvider(
+                GridCoverageFactory.class, null, hints, null);
     }
 
     /**
@@ -71,8 +92,10 @@ public final class FactoryFinder {
      *
      * @since 2.4
      */
-    public static synchronized Set getGridCoverageFactories(final Hints hints) {
-        return CoverageFactoryFinder.getGridCoverageFactories(hints);
+    public static synchronized Set getGridCoverageFactories(Hints hints) {
+        hints = GeoTools.addDefaultHints(hints);
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                GridCoverageFactory.class, null, hints));
     }
 
     /**
@@ -86,6 +109,8 @@ public final class FactoryFinder {
      * available at runtime.
      */
     public static synchronized void scanForPlugins() {
-        CoverageFactoryFinder.scanForPlugins();
+        if (registry != null) {
+            registry.scanForPlugins();
+        }
     }
 }

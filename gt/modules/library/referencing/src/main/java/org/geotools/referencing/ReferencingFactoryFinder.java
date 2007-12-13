@@ -125,27 +125,6 @@ public class ReferencingFactoryFinder {
     }
 
     /**
-     * Add {@linkplain GeoTools#getDefaultHints defaults hints} to the specified user hints.
-     * User hints have precedence.
-     * <p>
-     * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
-     * default hints} on a case-by-case basis instead of fetching all default hints at once.
-     * But it leads to significant complication in {@link FactoryRegistry} (hints comming from
-     * two different sources, which introduced new bugs when "longitude first axis order" hint
-     * is set). In addition, it may leads to synchronization issue if many hints are modified
-     * one by one. It is safer to get all default hints in one synchronized snapshot and lets
-     * {@link FactoryRegistry} assumes that the hints map really contains every hints it need
-     * to care about.
-     */
-    private static Hints addDefaultHints(final Hints hints) {
-        final Hints completed = GeoTools.getDefaultHints();
-        if (hints != null) {
-            completed.add(hints);
-        }
-        return completed;
-    }
-
-    /**
      * Returns the names of all currently registered authorities.
      */
     public static synchronized Set<String> getAuthorityNames() {
@@ -194,7 +173,7 @@ loop:       for (int i=0; ; i++) {
     private static synchronized <T extends Factory>
             Set<T> getFactories(final Class<T> type, Hints hints)
     {
-        hints = addDefaultHints(hints);
+        hints = GeoTools.addDefaultHints(hints);
         return new LazySet<T>(getServiceRegistry().getServiceProviders(type, null, hints));
     }
 
@@ -211,7 +190,7 @@ loop:       for (int i=0; ; i++) {
     private static synchronized <T extends Factory> T getFactory(final Class<T> type,
             Hints hints, final Hints.Key key) throws FactoryRegistryException
     {
-        hints = addDefaultHints(hints);
+        hints = GeoTools.addDefaultHints(hints);
         return getServiceRegistry().getServiceProvider(type, null, hints, key);
     }
 
@@ -234,7 +213,7 @@ loop:       for (int i=0; ; i++) {
             final Class<T> type, final String authority, Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
-        hints = addDefaultHints(hints);
+        hints = GeoTools.addDefaultHints(hints);
         return getServiceRegistry().getServiceProvider(type, new AuthorityFilter(authority), hints, key);
     }
 

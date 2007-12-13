@@ -69,30 +69,13 @@ public class GeometryFactoryFinder {
         return registry;
     }
 
-    /**
-     * Add {@linkplain GeoTools#getDefaultHints defaults hints} to the specified user hints.
-     * User hints have precedence.
-     * <p>
-     * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
-     * default hints} on a case-by-case basis instead of fetching all default hints at once.
-     * But it leads to significant complication in {@link FactoryRegistry} (hints comming from
-     * two different sources, which introduced new bugs when "longitude first axis order" hint
-     * is set). In addition, it may leads to synchronization issue if many hints are modified
-     * one by one. It is safer to get all default hints in one synchronized snapshot and lets
-     * {@link FactoryRegistry} assumes that the hints map really contains every hints it need
-     * to care about.
-     *
-    private static Hints addDefaultHints(final Hints hints) {
-        final Hints completed = GeoTools.getDefaultHints();
-        completed.add(hints);
-        return completed;
-    }*/
-
     public static synchronized Precision getPrecision(Hints hints) throws FactoryRegistryException {
+        hints = GeoTools.addDefaultHints(hints);
         return (Precision) getServiceRegistry().getServiceProvider( Precision.class, null, hints, Hints.PRECISION );
     }
 
     public static synchronized PositionFactory getPositionFactory( Hints hints) throws FactoryRegistryException {
+        hints = GeoTools.addDefaultHints(hints);
         return (PositionFactory) getServiceRegistry().getServiceProvider( PositionFactory.class, null, hints, Hints.POSITION_FACTORY );
     }
     /**
@@ -104,18 +87,22 @@ public class GeometryFactoryFinder {
      *         {@link GeometryFactory} interface.
      */
     public static synchronized GeometryFactory getGeometryFactory( Hints hints) throws FactoryRegistryException {
+        hints = GeoTools.addDefaultHints(hints);
         return (GeometryFactory) getServiceRegistry().getServiceProvider( GeometryFactory.class, null, hints, Hints.GEOMETRY_FACTORY );
     }
 
     public static synchronized ComplexFactory getComplexFactory(Hints hints) throws FactoryRegistryException {
+        hints = GeoTools.addDefaultHints(hints);
         return (ComplexFactory) getServiceRegistry().getServiceProvider( ComplexFactory.class, null, hints, Hints.COMPLEX_FACTORY );
     }
 
     public static synchronized AggregateFactory getAggregateFactory(Hints hints) throws FactoryRegistryException {
+        hints = GeoTools.addDefaultHints(hints);
         return (AggregateFactory) getServiceRegistry().getServiceProvider( AggregateFactory.class, null, hints, Hints.AGGREGATE_FACTORY );
     }
 
     public static synchronized PrimitiveFactory getPrimitiveFactory(Hints hints) throws FactoryRegistryException {
+        hints = GeoTools.addDefaultHints(hints);
         return (PrimitiveFactory) getServiceRegistry().getServiceProvider( PrimitiveFactory.class, null, hints, Hints.PRIMITIVE_FACTORY );
     }
 
