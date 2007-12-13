@@ -26,7 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.processing.operation.Extrema;
@@ -112,7 +112,7 @@ public class StatisticsOperationsTest extends TestCase {
 		 */
 		final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		final Envelope envelope = new Envelope2D(crs, 0, 0, 30, 30);
-		final GridCoverageFactory factory = FactoryFinder
+		final GridCoverageFactory factory = CoverageFactoryFinder
 				.getGridCoverageFactory(null);
 		sampleFloatCoverage = factory.create("My grayscale float coverage",
 				raster, envelope);
@@ -146,7 +146,7 @@ public class StatisticsOperationsTest extends TestCase {
 		 */
 		final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 		final Envelope envelope = new Envelope2D(crs, 0, 0, 30, 30);
-		final GridCoverageFactory factory = FactoryFinder
+		final GridCoverageFactory factory = CoverageFactoryFinder
 				.getGridCoverageFactory(null);
 		sampleByteCoverage = factory.create("My grayscale byte coverage",
 				raster, envelope);

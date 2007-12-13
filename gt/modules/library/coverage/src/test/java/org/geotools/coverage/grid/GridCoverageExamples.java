@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
@@ -137,7 +137,7 @@ public final class GridCoverageExamples extends Assert {
             envelope.setRange(i, 10*i, 10*i+5);
         }
         final Hints                 hints = new Hints(Hints.TILE_ENCODING, "raw");
-        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(hints);
+        final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(hints);
         coverage = (GridCoverage2D)factory.create("Test", image, envelope,
                 new GridSampleDimension[]{band}, null, null);
         assertEquals("raw", coverage.tileEncoding);
@@ -204,7 +204,7 @@ public final class GridCoverageExamples extends Assert {
      * @throws IOException if an I/O operation was needed and failed.
      */
     public static GridCoverage2D getExample( final int number) throws IOException {
-        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         final String                   path;
         final Category[]         categories;
         final CoordinateReferenceSystem crs;

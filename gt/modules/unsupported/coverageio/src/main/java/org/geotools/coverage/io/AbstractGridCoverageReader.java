@@ -44,7 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -165,7 +165,7 @@ public abstract class AbstractGridCoverageReader implements GridCoverageReader {
      * @since 2.4
      */
     public AbstractGridCoverageReader(final Hints hints, final String formatName) {
-        this.factory = FactoryFinder.getGridCoverageFactory(hints);
+        this.factory = CoverageFactoryFinder.getGridCoverageFactory(hints);
         this.formatName = formatName;
     }
 

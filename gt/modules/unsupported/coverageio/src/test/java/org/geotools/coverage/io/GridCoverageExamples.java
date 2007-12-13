@@ -29,7 +29,7 @@ import junit.framework.Assert;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -71,7 +71,7 @@ public final class GridCoverageExamples extends Assert {
      * @throws IOException if an I/O operation was needed and failed.
      */
     public static GridCoverage2D getExample( final int number) throws IOException {
-        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         final String                   path;
         final Category[]         categories;
         final CoordinateReferenceSystem crs;

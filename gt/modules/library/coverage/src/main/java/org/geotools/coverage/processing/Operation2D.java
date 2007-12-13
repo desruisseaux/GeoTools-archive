@@ -27,7 +27,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.IdentifiedObject;
 
 import org.geotools.factory.Hints;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.ViewType;
@@ -174,6 +174,6 @@ public abstract class Operation2D extends AbstractOperation {
      * @since 2.2
      */
     protected static GridCoverageFactory getFactory(final Hints hints) {
-        return FactoryFinder.getGridCoverageFactory(hints);
+        return CoverageFactoryFinder.getGridCoverageFactory(hints);
     }
 }

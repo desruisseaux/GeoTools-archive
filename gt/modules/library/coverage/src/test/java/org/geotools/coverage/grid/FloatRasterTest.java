@@ -34,7 +34,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.geometry.Envelope2D;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -101,7 +101,7 @@ public class FloatRasterTest extends TestCase {
          */
         CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         Envelope envelope = new Envelope2D(crs, 0, 0, 30, 30);
-        GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         GridCoverage gc = factory.create("My grayscale coverage", raster, envelope);
         if (display) ((GridCoverage2D) gc).show(); // Convenience method specific to Geotools.
         /*
@@ -131,7 +131,7 @@ public class FloatRasterTest extends TestCase {
         }
         CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         Envelope envelope = new Envelope2D(crs, 0, 0, 30, 30);
-        GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         GridCoverage gc = factory.create("My grayscale matrix", matrix, envelope);
         if (display) ((GridCoverage2D) gc).show(); // Convenience method specific to Geotools.
     }

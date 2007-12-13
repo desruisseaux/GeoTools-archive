@@ -29,7 +29,7 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
 
 import org.geotools.factory.Hints;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operation2D;
@@ -131,7 +131,7 @@ abstract class IndexColorOperation extends Operation2D {
          */
         final ImageLayout layout = new ImageLayout().setColorModel(model);
         final RenderedImage newImage = new NullOpImage(image, layout, null, OpImage.OP_COMPUTE_BOUND);
-        final GridCoverage2D target = FactoryFinder.getGridCoverageFactory(null).create(
+        final GridCoverage2D target = CoverageFactoryFinder.getGridCoverageFactory(null).create(
                     visual.getName(), newImage,
                     visual.getCoordinateReferenceSystem2D(),
                     visual.getGridGeometry().getGridToCRS(),

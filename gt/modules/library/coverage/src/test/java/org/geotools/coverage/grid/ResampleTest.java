@@ -53,7 +53,7 @@ import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.factory.Hints;
 
 
@@ -382,7 +382,7 @@ public final class ResampleTest extends GridCoverageTest {
          * amount, with the opposite sign.
          */
         final AffineTransform expected = getAffineTransform(grid);
-        grid = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create("Translated",
+        grid = (GridCoverage2D) CoverageFactoryFinder.getGridCoverageFactory(null).create("Translated",
                                   image, grid.getEnvelope(), grid.getSampleDimensions(),
                                   new GridCoverage2D[]{grid}, grid.getProperties());
         expected.translate(-transX, -transY);

@@ -109,7 +109,7 @@ public class GridCoverageRendererTest extends TestCase {
 					new Category[] { values }, null).geophysics(true);
 		}
 		final String filename = new File(path).getName();
-		final GridCoverageFactory factory = org.geotools.coverage.FactoryFinder
+		final GridCoverageFactory factory = org.geotools.coverage.CoverageFactoryFinder
 				.getGridCoverageFactory(null);
 		envelope.setCoordinateReferenceSystem(crs);
 		return (GridCoverage2D) factory.create(filename, image, envelope,

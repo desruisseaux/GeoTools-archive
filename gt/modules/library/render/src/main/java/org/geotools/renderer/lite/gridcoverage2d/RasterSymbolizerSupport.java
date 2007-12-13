@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.media.jai.util.Range;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -99,7 +99,7 @@ public final class RasterSymbolizerSupport {
 					gridCoverage.getSampleDimension(band), colorMaps);
 		}
 
-		return FactoryFinder.getGridCoverageFactory(null).create(
+		return CoverageFactoryFinder.getGridCoverageFactory(null).create(
 				gridCoverage.getName(), gridCoverage.getRenderedImage(),
                 (GridGeometry2D) gridCoverage.getGridGeometry(), targetBands,
 				new GridCoverage[] { gridCoverage }, null);

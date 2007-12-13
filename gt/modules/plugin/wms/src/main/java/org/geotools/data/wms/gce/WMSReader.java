@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
@@ -265,7 +265,7 @@ public class WMSReader implements GridCoverageReader {
 
         hasNext = false;
 
-        GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         GridCoverage coverage = factory.create("wmsMap", image, envelope);
 
         return coverage;

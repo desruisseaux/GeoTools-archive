@@ -40,7 +40,7 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CategoryListTest;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -150,7 +150,7 @@ public class SampleTranscoderTest extends TestCase {
             array[i] = (byte) random.nextInt(161);
         }
         final MathTransform identity = IdentityTransform.create(2);
-        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        final GridCoverageFactory factory = CoverageFactoryFinder.getGridCoverageFactory(null);
         GridCoverage2D coverage;
         coverage = (GridCoverage2D) factory.create("Test", source, DefaultGeographicCRS.WGS84,
                                         identity, new GridSampleDimension[]{band}, null, null);

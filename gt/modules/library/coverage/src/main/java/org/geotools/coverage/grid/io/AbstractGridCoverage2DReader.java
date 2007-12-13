@@ -38,7 +38,7 @@ import javax.units.Unit;
 import javax.units.UnitFormat;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -87,7 +87,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	private final static Logger LOGGER = Logging.getLogger("org.geotools.data.coverage.grid");
 
 	/** Caches a default GridCoverageFactory for usage in plugins. */
-	protected final static GridCoverageFactory coverageFactory = FactoryFinder
+	protected final static GridCoverageFactory coverageFactory = CoverageFactoryFinder
 			.getGridCoverageFactory(null);
 
 	protected static final double EPS = 1E-6;

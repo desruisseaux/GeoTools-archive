@@ -564,7 +564,7 @@ control:    for (int p=0; p<=1; p++) {
         final MathTransform gridToCRS;
         gridToCRS = ProjectiveTransform.create((AffineTransform) image.getProperty("gridToCRS"));
         if (factory == null) {
-            factory = org.geotools.coverage.FactoryFinder.getGridCoverageFactory(HINTS);
+            factory = org.geotools.coverage.CoverageFactoryFinder.getGridCoverageFactory(HINTS);
         }
         return (GridCoverage2D) factory.create(name, image, crs, gridToCRS, bands, null, null);
     }
