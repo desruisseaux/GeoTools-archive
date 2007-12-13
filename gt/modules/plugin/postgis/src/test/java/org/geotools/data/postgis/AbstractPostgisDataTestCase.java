@@ -164,7 +164,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".road");
+            s.execute("DROP TABLE " + f.schema + ".road CASCADE");
         } catch (Exception ignore) {}
 
         try {
@@ -208,7 +208,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".lake");
+            s.execute("DROP TABLE " + f.schema + ".lake CASCADE");
         } catch (Exception ignore) {
         }
 
@@ -290,7 +290,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         try {
             Statement s = conn.createStatement();
-            s.execute("DROP TABLE " + f.schema + ".river");
+            s.execute("DROP TABLE " + f.schema + ".river CASCADE");
         } catch (Exception ignore) {
         }
 
