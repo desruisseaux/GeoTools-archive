@@ -101,11 +101,13 @@ public abstract class AbstractProcessor {
      */
     public static synchronized AbstractProcessor getInstance() {
         if (DEFAULT == null) {
-            DEFAULT = new BufferedProcessor((RenderingHints) null);
+            DEFAULT = new DefaultProcessor((RenderingHints) null);
             DEFAULT.setAsDefault();
         }
         return DEFAULT;
     }
+    
+
 
     /**
      * Notifies this processor that it is going to be used as the application-wide default
