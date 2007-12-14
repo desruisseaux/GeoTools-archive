@@ -1301,6 +1301,8 @@ public class ImageWorker {
 	 * @see BandSelectDescriptor
 	 */
 	public final ImageWorker retainBands(final int numBands) {
+		if(numBands<=0)
+			throw new IndexOutOfBoundsException("The specified number of bands to retain is invalid.");
 		if (getNumBands() > numBands) {
 			final int[] bands = new int[numBands];
 			final int length = bands.length;
@@ -1310,6 +1312,7 @@ public class ImageWorker {
 			image = BandSelectDescriptor.create(image, bands,
 					getRenderingHints());
 		}
+		
 
 		// All post conditions for this method contract.
 		assert getNumBands() <= numBands;
