@@ -489,7 +489,6 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		// Gather reader to compute tile x and y from tile size
 		//
 		// /////////////////////////////////////////////////////////////////////
-
 		AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 				.findFormat(inputLocation);
 		if (format == null) {
