@@ -1,7 +1,8 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2007, Geotools Project Managment Committee (PMC)
+ *	  (C) 2007, GeoSolutions S.A.S.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,6 +33,7 @@ import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -41,7 +43,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @author Simone Giannecchini (simboss)
  */
 public final class MrSIDFormat extends AbstractGridFormat implements Format {
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.mrsid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger("org.geotools.gce.mrsid");
 
 	/** Caching the {@link MrSIDImageReaderSpi} factory. */
 	private final MrSIDImageReaderSpi spi = new MrSIDImageReaderSpi();
@@ -64,7 +67,7 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 		info.put("name", "MrSID");
 		info.put("description", "MrSID Coverage Format");
 		info.put("vendor", "Geotools");
-		info.put("docURL", "");//TODO: set something
+		info.put("docURL", "");// TODO: set something
 		info.put("version", "1.0");
 		mInfo = info;
 
@@ -75,7 +78,7 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 		readParameters = new ParameterGroup(
 				new DefaultParameterDescriptorGroup(
 						mInfo,
-						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D}));
+						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 	}
 
 	/**
@@ -91,7 +94,8 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 	 *      destination)
 	 */
 	public GridCoverageWriter getWriter(Object destination) {
-		return null;
+		throw new UnsupportedOperationException(
+				"This plugin does not support writing at this time.");
 	}
 
 	/**
@@ -99,7 +103,8 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 	 *      destination,Hints hints)
 	 */
 	public GridCoverageWriter getWriter(Object destination, Hints hints) {
-			return null;
+		throw new UnsupportedOperationException(
+				"This plugin does not support writing at this time.");
 	}
 
 	/**
@@ -123,14 +128,20 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 	public GridCoverageReader getReader(Object source, Hints hints) {
 		try {
 			return new MrSIDReader(source, hints);
+		} catch (MismatchedDimensionException e) {
+			final RuntimeException re = new RuntimeException();
+			re.initCause(e);
+			throw re;
 		} catch (DataSourceException e) {
-			if (LOGGER.isLoggable(Level.SEVERE))
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			final RuntimeException re = new RuntimeException();
+			re.initCause(e);
+			throw re;
 		}
+
 	}
 
 	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
-		return null;
+		throw new UnsupportedOperationException(
+				"This plugin does not support writing at this time.");
 	}
 }

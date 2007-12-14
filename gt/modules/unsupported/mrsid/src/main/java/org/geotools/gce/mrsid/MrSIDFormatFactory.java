@@ -1,7 +1,8 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2007, Geotools Project Managment Committee (PMC)
+ *	  (C) 2007, GeoSolutions S.A.S.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public

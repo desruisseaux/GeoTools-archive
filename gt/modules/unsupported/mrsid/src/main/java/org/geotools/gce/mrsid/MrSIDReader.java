@@ -1,7 +1,8 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2007, Geotools Project Managment Committee (PMC)
+ *	  (C) 2007, GeoSolutions S.A.S.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,6 +18,7 @@
 package org.geotools.gce.mrsid;
 
 import it.geosolutions.imageio.gdalframework.GDALCommonIIOImageMetadata;
+import it.geosolutions.imageio.gdalframework.GDALImageReader.GDALDatasetWrapper;
 import it.geosolutions.imageio.plugins.mrsid.MrSIDIIOImageMetadata;
 import it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi;
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
@@ -87,7 +89,8 @@ import com.vividsolutions.jts.io.InStream;
 public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 	/** Logger. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.mrsid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger("org.geotools.gce.mrsid");
 
 	/** Caches an ImageReaderSpi for a MrSIDImageReader. */
 	private final static ImageReaderSpi readerSPI = new MrSIDImageReaderSpi();
@@ -131,13 +134,20 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		try {
+			// //
+			//
+			// Hints
+			//
+			// //
+			if (hints != null)
+				this.hints.add(hints);
 
 			// //
 			//
 			// Source management
 			//
 			// //
-			checkSource(input, hints);
+			checkSource(input);
 
 			// Getting a reader for this format
 			final ImageReader reader = readerSPI.createReaderInstance();
@@ -156,6 +166,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			//
 			// //
 			getResolutionInfo(reader);
+			reader.reset();
 			coverageName = (source instanceof File) ? ((File) source).getName()
 					: "MrSID_coverage";
 
@@ -200,23 +211,27 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 
 		// //
 		//
-		// If common metadata don't have sufficient information to set CRS and
-		// envelope, try other ways, such as looking for a PRJ, directly read
-		// MrSID metadata, looking for a WorldFile
+		// If common metadata don't have sufficient information to set CRS
+		// envelope, try other ways, such as looking for a PRJ
 		//
 		// //
-
 		if (crs == null)
 			getCoordinateReferenceSystemFromPrj();
+
+		if (originalEnvelope == null || crs == null)
+			getOriginalEnvelopeFromMrSIDMetadata(metadata);
 
 		if (crs == null) {
 			LOGGER.info("crs not found proceeding with EPSG:4326");
 			crs = MrSIDFormat.getDefaultCRS();
 		}
 
-		if (originalEnvelope == null)
-			getOriginalEnvelopeFromMrSIDMetadata(metadata);
-
+		// //
+		//
+		// If common metadata doesn't have sufficient information to set the
+		// envelope, try other ways, such as looking for a WorldFile
+		//
+		// //
 		if (originalEnvelope == null)
 			checkForWorldFile();
 
@@ -232,73 +247,43 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @param commonMetadata
 	 */
 	private void getPropertiesFromCommonMetadata(IIOMetadata metadata) {
-
+		// casting metadata
 		final GDALCommonIIOImageMetadata commonMetadata = (GDALCommonIIOImageMetadata) metadata;
-		final Node root = commonMetadata
-				.getAsTree(GDALCommonIIOImageMetadata.nativeMetadataFormatName);
+		final GDALDatasetWrapper dsWrapper = commonMetadata.getDsWrapper();
 
-		Node child = root.getFirstChild();
-		NamedNodeMap attributes = child.getAttributes();
-
-		// setting CRS directly from GDAL, if available
-		final String wkt = attributes.getNamedItem("projection").getNodeValue();
+		// setting CRS and Envelope directly from GDAL, if available
+		final String wkt = dsWrapper.getProjection();
 		if (wkt != null && !(wkt.equalsIgnoreCase("")))
 			try {
 				crs = CRS.parseWKT(wkt);
 
 			} catch (FactoryException fe) {
 				// unable to get CRS from WKT
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING, fe.getLocalizedMessage(), fe);
 				crs = null;
 			}
 
-		// //
-		//
-		// getting Grid Properties
-		//
-		// //
-		child = child.getNextSibling();
-		attributes = child.getAttributes();
-		final int hrWidth = Integer.parseInt(attributes.getNamedItem("width")
-				.getNodeValue());
-		final int hrHeight = Integer.parseInt(attributes.getNamedItem("height")
-				.getNodeValue());
-		// Setting Grid Range
+		final int hrWidth = dsWrapper.getWidth();
+		final int hrHeight = dsWrapper.getHeight();
 		originalGridRange = new GeneralGridRange(new Rectangle(0, 0, hrWidth,
 				hrHeight));
 
-		// //
-		//
-		// getting Transformation coefficients
-		//
-		// //
-		child = child.getNextSibling();
-		attributes = child.getAttributes();
-
-		// retrieveing coefficients
-		final String m0 = attributes.getNamedItem("m0").getNodeValue();
-		final String m1 = attributes.getNamedItem("m1").getNodeValue();
-		final String m2 = attributes.getNamedItem("m2").getNodeValue();
-		final String m3 = attributes.getNamedItem("m3").getNodeValue();
-		final String m4 = attributes.getNamedItem("m4").getNodeValue();
-		final String m5 = attributes.getNamedItem("m5").getNodeValue();
-		if (m0 != null && m1 != null && m2 != null && m3 != null && m4 != null
-				&& m5 != null && (m0.trim().length() > 0)
-				&& (m1.trim().length() > 0) && (m2.trim().length() > 0)
-				&& (m3.trim().length() > 0) && (m4.trim().length() > 0)
-				&& (m5.trim().length() > 0)) {
-
-			// Building an AffineTransformation
-			final AffineTransform tempTransform = new AffineTransform(Double
-					.parseDouble(m1), Double.parseDouble(m4), Double
-					.parseDouble(m2), Double.parseDouble(m5), Double
-					.parseDouble(m0), Double.parseDouble(m3));
-			tempTransform.translate(-0.5, -0.5);
+		// getting Grid Properties
+		final double geoTransform[] = dsWrapper.getGeoTransformation();
+		if (geoTransform != null && geoTransform.length == 6) {
+			final AffineTransform tempTransform = new AffineTransform(
+					geoTransform[1], geoTransform[4], geoTransform[2],
+					geoTransform[5], geoTransform[0], geoTransform[3]);
+			// attention gdal geotransform does not uses the pixel is centre
+			// convention like world files.
+			// tempTransform.translate(-0.5, -0.5);
+			this.raster2Model = ProjectiveTransform.create(tempTransform);
 			try {
 
 				// Setting Envelope
-				originalEnvelope = CRS.transform(ProjectiveTransform
-						.create(tempTransform), new GeneralEnvelope(
-						originalGridRange.toRectangle()));
+				originalEnvelope = CRS.transform(raster2Model,
+						new GeneralEnvelope(originalGridRange.toRectangle()));
 			} catch (IllegalStateException e) {
 				if (LOGGER.isLoggable(Level.WARNING))
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
@@ -307,6 +292,76 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			}
 		}
+
+		// final Node root = commonMetadata
+		// .getAsTree(GDALCommonIIOImageMetadata.nativeMetadataFormatName);
+		//
+		// Node child = root.getFirstChild();
+		// NamedNodeMap attributes = child.getAttributes();
+		//
+		// // setting CRS and Envelope directly from GDAL, if available
+		// final String wkt =
+		// attributes.getNamedItem("projection").getNodeValue();
+		// if (wkt != null && !(wkt.equalsIgnoreCase("")))
+		// try {
+		// crs = CRS.parseWKT(wkt);
+		//
+		// } catch (FactoryException fe) {
+		// // unable to get CRS from WKT
+		// if (LOGGER.isLoggable(Level.WARNING))
+		// LOGGER.log(Level.WARNING, fe.getLocalizedMessage(), fe);
+		// crs = null;
+		// }
+		//
+		// child = child.getNextSibling();
+		//
+		// // getting Grid Properties
+		// attributes = child.getAttributes();
+		// final int hrWidth = Integer.parseInt(attributes.getNamedItem("width")
+		// .getNodeValue());
+		// final int hrHeight =
+		// Integer.parseInt(attributes.getNamedItem("height")
+		// .getNodeValue());
+		// originalGridRange = new GeneralGridRange(new Rectangle(0, 0, hrWidth,
+		// hrHeight));
+		//
+		// child = child.getNextSibling();
+		// // getting Grid Properties
+		// attributes = child.getAttributes();
+		// final String m0 = attributes.getNamedItem("m0").getNodeValue();
+		// final String m1 = attributes.getNamedItem("m1").getNodeValue();
+		// final String m2 = attributes.getNamedItem("m2").getNodeValue();
+		// final String m3 = attributes.getNamedItem("m3").getNodeValue();
+		// final String m4 = attributes.getNamedItem("m4").getNodeValue();
+		// final String m5 = attributes.getNamedItem("m5").getNodeValue();
+		// if (m0 != null && m1 != null && m2 != null && m3 != null && m4 !=
+		// null
+		// && m5 != null && !(m0.trim().equalsIgnoreCase(""))
+		// && !(m1.trim().equalsIgnoreCase(""))
+		// && !(m2.trim().equalsIgnoreCase(""))
+		// && !(m3.trim().equalsIgnoreCase(""))
+		// && !(m4.trim().equalsIgnoreCase(""))
+		// && !(m5.trim().equalsIgnoreCase(""))) {
+		//
+		// final AffineTransform tempTransform = new AffineTransform(Double
+		// .parseDouble(m1), Double.parseDouble(m4), Double
+		// .parseDouble(m2), Double.parseDouble(m5), Double
+		// .parseDouble(m0), Double.parseDouble(m3));
+		// // tempTransform.translate(-0.5, -0.5);
+		// this.raster2Model = ProjectiveTransform.create(tempTransform);
+		// try {
+		//
+		// // Setting Envelope
+		// originalEnvelope = CRS.transform(raster2Model,
+		// new GeneralEnvelope(originalGridRange.toRectangle()));
+		// } catch (IllegalStateException e) {
+		// if (LOGGER.isLoggable(Level.WARNING))
+		// LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+		// } catch (TransformException e) {
+		// if (LOGGER.isLoggable(Level.WARNING))
+		// LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+		// }
+		// }
 	}
 
 	/**
@@ -375,7 +430,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
-	private void checkSource(Object input, final Hints hints) throws UnsupportedEncodingException,
+	private void checkSource(Object input) throws UnsupportedEncodingException,
 			DataSourceException, IOException, FileNotFoundException {
 		if (input == null) {
 			final DataSourceException ex = new DataSourceException(
@@ -385,8 +440,6 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			throw ex;
 		}
 		this.source = input;
-		if (hints != null)
-			this.hints.add(hints);
 		closeMe = true;
 
 		// //
@@ -589,13 +642,9 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		try {
 			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
 		} catch (IOException e) {
-			if (LOGGER.isLoggable(Level.SEVERE))
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			throw new DataSourceException(e);
 		} catch (TransformException e) {
-			if (LOGGER.isLoggable(Level.SEVERE))
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			return null;
+			throw new DataSourceException(e);
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -758,8 +807,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	private void getOriginalEnvelopeFromMrSIDMetadata(IIOMetadata metadata)
 			throws MismatchedDimensionException {
 
-		MrSIDIIOImageMetadata gridMetadata = (MrSIDIIOImageMetadata) metadata;
-		// TODO: Check this method
+		final GDALCommonIIOImageMetadata gridMetadata = (GDALCommonIIOImageMetadata) metadata;
 
 		// getting metadata
 		final Node root = gridMetadata
@@ -767,38 +815,38 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 
 		Node child = root.getFirstChild();
 
-		// getting Grid Properties
-		NamedNodeMap attributes;
 		// getting GeoReferencing Properties
 		child = child.getNextSibling();
-		attributes = child.getAttributes();
-		final String xResolution = attributes.getNamedItem(
-				"IMAGE__X_RESOLUTION").getNodeValue();
-		final String yResolution = attributes.getNamedItem(
-				"IMAGE__Y_RESOLUTION").getNodeValue();
-		final String xyOrigin = attributes.getNamedItem("IMAGE__XY_ORIGIN")
-				.getNodeValue();
+		final NamedNodeMap attributes = child.getAttributes();
+		if (originalEnvelope == null) {
+			final String xResolution = attributes.getNamedItem(
+					"IMAGE__X_RESOLUTION").getNodeValue();
+			final String yResolution = attributes.getNamedItem(
+					"IMAGE__Y_RESOLUTION").getNodeValue();
+			final String xyOrigin = attributes.getNamedItem("IMAGE__XY_ORIGIN")
+					.getNodeValue();
 
-		if (xResolution != null && yResolution != null && xyOrigin != null
-				&& !(xResolution.trim().equalsIgnoreCase(""))
-				&& !(yResolution.trim().equalsIgnoreCase(""))
-				&& !(xyOrigin.trim().equalsIgnoreCase(""))) {
-			double cellsizeX = Double.parseDouble(xResolution);
-			double cellsizeY = Double.parseDouble(yResolution);
-			final String[] origins = xyOrigin.split(",");
-			double xul = Double.parseDouble(origins[0]);
-			double yul = Double.parseDouble(origins[1]);
+			if (xResolution != null && yResolution != null && xyOrigin != null
+					&& !(xResolution.trim().equalsIgnoreCase(""))
+					&& !(yResolution.trim().equalsIgnoreCase(""))
+					&& !(xyOrigin.trim().equalsIgnoreCase(""))) {
+				double cellsizeX = Double.parseDouble(xResolution);
+				double cellsizeY = Double.parseDouble(yResolution);
+				final String[] origins = xyOrigin.split(",");
+				double xul = Double.parseDouble(origins[0]);
+				double yul = Double.parseDouble(origins[1]);
 
-			xul -= (cellsizeX / 2d);
-			yul -= (cellsizeY / 2d);
-			final double xll = xul;
-			final double yur = yul;
-			final int width = originalGridRange.getLength(0);
-			final int height = originalGridRange.getLength(1);
-			final double xur = xul + (cellsizeX * width);
-			final double yll = yul - (cellsizeY * height);
-			originalEnvelope = new GeneralEnvelope(new double[] { xll, yll },
-					new double[] { xur, yur });
+				xul -= (cellsizeX / 2d);
+				yul -= (cellsizeY / 2d);
+				final double xll = xul;
+				final double yur = yul;
+				final int width = originalGridRange.getLength(0);
+				final int height = originalGridRange.getLength(1);
+				final double xur = xul + (cellsizeX * width);
+				final double yll = yul - (cellsizeY * height);
+				originalEnvelope = new GeneralEnvelope(
+						new double[] { xll, yll }, new double[] { xur, yur });
+			}
 		}
 		// Retrieving projection Information
 		if (crs == null) {
@@ -814,9 +862,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					}
 			}
 		}
-		if (crs == null) {
-			crs = MrSIDFormat.getDefaultCRS();
-		}
+
 	}
 
 	/**
@@ -843,19 +889,35 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					File.separatorChar).append(this.coverageName)
 					.append(".prj").toString();
 			// read the prj info from the file
+			PrjFileReader projReader = null;
 			try {
 				final File prj = new File(prjPath);
 				if (prj.exists()) {
-					final PrjFileReader prjReader = new PrjFileReader(
-							new FileInputStream(prj).getChannel());
-					crs = prjReader.getCoodinateSystem();
+					projReader = new PrjFileReader(new FileInputStream(prj)
+							.getChannel());
+					crs = projReader.getCoodinateSystem();
 				}
 			} catch (FileNotFoundException e) {
-				crs = null;
+				// warn about the error but proceed, it is not fatal
+				// we have at least the default crs to use
+				LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 			} catch (IOException e) {
-				crs = null;
+				// warn about the error but proceed, it is not fatal
+				// we have at least the default crs to use
+				LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 			} catch (FactoryException e) {
-				crs = null;
+				// warn about the error but proceed, it is not fatal
+				// we have at least the default crs to use
+				LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+			} finally {
+				if (projReader != null)
+					try {
+						projReader.close();
+					} catch (IOException e) {
+						// warn about the error but proceed, it is not fatal
+						// we have at least the default crs to use
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					}
 			}
 		}
 	}
