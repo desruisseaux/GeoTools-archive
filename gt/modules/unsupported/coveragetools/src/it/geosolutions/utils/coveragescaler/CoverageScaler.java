@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.stream.ImageInputStream;
 
 import org.apache.commons.cli2.option.DefaultOption;
 import org.apache.commons.cli2.option.GroupImpl;
@@ -28,7 +27,6 @@ import org.apache.commons.io.filefilter.WildcardFilter;
 import org.geotools.coverage.processing.operation.FilteredSubsample;
 import org.geotools.coverage.processing.operation.Scale;
 import org.geotools.coverage.processing.operation.SubsampleAverage;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -131,8 +129,8 @@ public class CoverageScaler extends ProgressManager implements Runnable,
 	private int numFiles;
 
 	/** Default Logger * */
-	private final static Logger LOG = org.geotools.util.logging.Logging.getLogger(CoverageScaler.class
-			.toString());
+	private final static Logger LOG = org.geotools.util.logging.Logging
+			.getLogger(CoverageScaler.class.toString());
 
 	/** Program Version */
 	private final static String versionNumber = "0.2";
@@ -198,16 +196,11 @@ public class CoverageScaler extends ProgressManager implements Runnable,
 		// Creating temp vars
 		//
 		// /////////////////////////////////////////////////////////////////////
-
-		/** Fixed local variables * */
-		AbstractGridCoverage2DReader reader;
-
 		CoordinateReferenceSystem defaultCRS = null, actualCRS = null;
 
 		GeneralEnvelope globEnvelope = null;
 		GeneralEnvelope envelope;
 
-		ImageInputStream inStream;
 		ImageTypeSpecifier its;
 		Iterator it;
 		ImageReader r;
@@ -218,13 +211,13 @@ public class CoverageScaler extends ProgressManager implements Runnable,
 		final File dir = new File(locationPath);
 		final FileFilter fileFilter = new WildcardFilter(wildcardString);
 		final File[] files = dir.listFiles(fileFilter);
-		StringBuffer message;
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Cycling over the features
 		//
 		// /////////////////////////////////////////////////////////////////////
 		numFiles = files.length;
+		StringBuffer message;
 		for (int i = 0; i < numFiles; i++) {
 			// //
 			//

@@ -9,14 +9,12 @@ import it.geosolutions.utils.progress.ProcessingEventListener;
 import it.geosolutions.utils.progress.ProgressManager;
 
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.media.jai.Interpolation;
 
 import org.apache.commons.cli2.builder.DefaultOptionBuilder;
 import org.apache.commons.cli2.option.DefaultOption;
@@ -24,24 +22,23 @@ import org.apache.commons.cli2.option.GroupImpl;
 import org.apache.commons.cli2.util.HelpFormatter;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.processing.AbstractProcessor;
-import org.geotools.coverage.processing.DefaultProcessor;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.data.coverage.grid.UnknownFormat;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.GridFormatFinder;
+import org.geotools.coverage.grid.io.UnknownFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
+import org.geotools.factory.Hints;
+import org.geotools.gce.geotiff.GeoTiffFormat;
+import org.geotools.gce.geotiff.GeoTiffWriteParams;
 import org.geotools.gce.geotiff.GeoTiffWriter;
-import org.geotools.gce.imagemosaic.ImageMosaicFormat;
 import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * <p>
- * This utility splits rasters into smaller pieces. Having a raster tilized into
- * pieces, and using them on a mosaic, fo instance, means big performance
+ * This utility splits rasters into smaller pieces. Having a raster tiled into
+ * pieces, and using them on a mosaic, for instance, means big performance
  * improvements.
  * </p>
  * 
@@ -56,29 +53,29 @@ import org.opengis.parameter.ParameterValueGroup;
  * </p>
  * 
  * <pre>
- *                                                                                                  
- *     HINT: set the tile dimensions in order to obtain smaller pieces which size is between 500Kb and 2Mb
- *           The size of the pieces depends on the raster resolution and the Envelope.                    
- *           Use the CoverageScaler to change your raster resolution.                                     
- *           If you don't know these parameters, however, try first with small values like 20,20 or 40,40 
- *           and calibrate then the tile dimension in order to obtain the desired size.                   
+ *                                                                                                      
+ *         HINT: set the tile dimensions in order to obtain smaller pieces which size is between 500Kb and 2Mb
+ *               The size of the pieces depends on the raster resolution and the Envelope.                    
+ *               Use the CoverageScaler to change your raster resolution.                                     
+ *               If you don't know these parameters, however, try first with small values like 20,20 or 40,40 
+ *               and calibrate then the tile dimension in order to obtain the desired size.                   
  * </pre>
  * 
- * @author Simone Giannecchini
- * @author Alessio Fabiani
- * @version 0.2
+ * @author Simone Giannecchini, GeoSolutions
+ * @author Alessio Fabiani, GeoSolutions
+ * @version 0.3
  * 
  */
 public class CoverageTiler extends ProgressManager implements
 		ProcessingEventListener, Runnable {
 	/** Default Logger * */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(CoverageTiler.class
+	private final static Logger LOGGER = Logger.getLogger(CoverageTiler.class
 			.toString());
 
 	/** Program Version */
-	private final static String versionNumber = "0.2";
+	private final static String versionNumber = "0.3";
 
-	protected final DefaultOptionBuilder optionBuilder = new DefaultOptionBuilder();
+	private final DefaultOptionBuilder optionBuilder = new DefaultOptionBuilder();
 
 	private DefaultOption helpOpt;
 
@@ -94,9 +91,15 @@ public class CoverageTiler extends ProgressManager implements
 
 	private DefaultOption tileDimOpt;
 
-	private int numTileX;
+	private int tileWidth;
 
-	private int numTileY;
+	private int tileHeight;
+
+	private DefaultOption internalTileDimOpt;
+
+	private int internalTileWidth;
+
+	private int internalTileHeight;
 
 	/**
 	 * Default constructor
@@ -126,15 +129,17 @@ public class CoverageTiler extends ProgressManager implements
 				.withDescription(
 						"output directory, if none is provided, the \"tiled\" directory will be used")
 				.withRequired(false).create();
-		tileDimOpt = optionBuilder
-				.withShortName("t")
-				.withLongName("tiled_dimension")
-				.withArgument(
-						arguments.withName("t").withMinimum(1).withMaximum(1)
-								.create())
-				.withDescription(
-						"number or rows and columns used to split the image as a couple rows,cols")
+		tileDimOpt = optionBuilder.withShortName("t").withLongName(
+				"tile_dimension").withArgument(
+				arguments.withName("t").withMinimum(1).withMaximum(1).create())
+				.withDescription("Width and height of each tile we generate")
 				.withRequired(true).create();
+
+		internalTileDimOpt = optionBuilder.withShortName("it").withLongName(
+				"internal_tile_dimension").withArgument(
+				arguments.withName("it").withMinimum(0).withMaximum(1).create()).withDescription(
+				"Internal width and height of each tile we generate")
+				.withRequired(false).create();
 
 		priorityOpt = optionBuilder.withShortName("p").withLongName(
 				"thread_priority").withArgument(
@@ -149,6 +154,8 @@ public class CoverageTiler extends ProgressManager implements
 		cmdOpts.add(inputLocationOpt);
 		cmdOpts.add(outputLocationOpt);
 		cmdOpts.add(priorityOpt);
+		cmdOpts.add(internalTileDimOpt);
+		
 
 		optionsGroup = new GroupImpl(cmdOpts, "Options", "All the options", 1,
 				10);
@@ -182,7 +189,7 @@ public class CoverageTiler extends ProgressManager implements
 		final CoverageTiler coverageTiler = new CoverageTiler();
 		coverageTiler.addProcessingEventListener(coverageTiler);
 		if (coverageTiler.parseArgs(args)) {
-			final Thread t = new Thread(coverageTiler, "MosaicIndexBuilder");
+			final Thread t = new Thread(coverageTiler, "CoverageTiler");
 			t.setPriority(coverageTiler.priority);
 			t.start();
 			try {
@@ -221,101 +228,107 @@ public class CoverageTiler extends ProgressManager implements
 				.getException());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see it.geosolutions.utils.progress.ProgressManager#run()
+	 */
 	public void run() {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		//
-		// PARSING INPUT PARAMETERS
+		// Trying to acquire a reader for the provided source file.
 		// 
 		// 
 		// /////////////////////////////////////////////////////////////////////
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		//
-		// Opening the base mosaic
-		// 
-		// 
-		// /////////////////////////////////////////////////////////////////////
-		// mosaic reader
 		StringBuffer message = new StringBuffer(
 				"Acquiring a mosaic reader to mosaic ").append(inputLocation);
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(message.toString());
-
-		AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
+		fireEvent(message.toString(), 0);
+		// get the format of this file, if it is recognized!
+		final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 				.findFormat(inputLocation);
-		if (format == null||format instanceof UnknownFormat) {
+		if (format == null || format instanceof UnknownFormat) {
 			fireException(
 					"Unable to decide format for this coverage",
 					0,
 					new IOException("Could not find a format for this coverage"));
 			return;
 		}
-		AbstractGridCoverage2DReader inReader = (AbstractGridCoverage2DReader) format
-				.getReader(inputLocation);
+		// get a reader for this file
+		final AbstractGridCoverage2DReader inReader = (AbstractGridCoverage2DReader) format
+				.getReader(inputLocation, new Hints(
+						Hints.IGNORE_COVERAGE_OVERVIEW, Boolean.TRUE));
 		if (inReader == null) {
 			message = new StringBuffer(
 					"Unable to instantiate a reader for this coverage");
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER.fine(message.toString());
+			fireEvent(message.toString(), 0);
 			return;
 		}
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		//
-		// Preparing all the params
+		// If everything went fine, let's proceed with tiling this coverage.
 		// 
 		// 
 		// /////////////////////////////////////////////////////////////////////
 		if (!outputLocation.exists())
 			outputLocation.mkdir();
 
-		// getting envelope and other information about dimension
+		// //
+		//
+		// getting source envelope and crs
+		//
+		// //
 		final GeneralEnvelope envelope = inReader.getOriginalEnvelope();
 		message = new StringBuffer("Original envelope is ").append(envelope
 				.toString());
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(message.toString());
-		// world.200401.3x21600x21600.C1.tif
+		fireEvent(message.toString(), 0);
 
+		// //
+		//
+		// getting source gridrange and checking tile dimensions to be not
+		// bigger than the original coverage size
+		//
+		// //
 		final GeneralGridRange range = inReader.getOriginalGridRange();
-
+		final int w = range.getLength(0);
+		final int h = range.getLength(1);
+		tileWidth = tileWidth > w ? w : tileWidth;
+		tileHeight = tileHeight > h ? h : tileHeight;
 		message = new StringBuffer("Original range is ").append(range
 				.toString());
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(message.toString());
-		// world.200401.3x21600x21600.C1.tif
-
+		fireEvent(message.toString(), 0);
 		message = new StringBuffer("New matrix dimension is (cols,rows)==(")
-				.append(numTileX).append(",").append(numTileY).append(")");
+				.append(tileWidth).append(",").append(tileHeight).append(")");
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(message.toString());
-		// world.200401.3x21600x21600.C1.tif
+		fireEvent(message.toString(), 0);
 
-		final int uppers[] = range.getUppers();
-		final double newRange[] = new double[] { uppers[0] / numTileX,
-				uppers[1] / numTileY };
-		final double minx = envelope.getMinimum(0);
-		final double miny = envelope.getMinimum(1);
-		final double maxx = envelope.getMaximum(0);
-		final double maxy = envelope.getMaximum(1);
-		// getting resolution
-		final double dx = envelope.getLength(0) / numTileX;
-		final double dy = envelope.getLength(1) / numTileY;
+		// //
+		//
+		// read a coverage with the actual
+		// envelope
+		//
+		// //
+		GridCoverage2D gc;
+		try {
+			gc = (GridCoverage2D) inReader.read(null);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			fireException(e);
+			return;
 
-		double _maxx = 0.0;
-		double _maxy = 0.0;
-		double _minx = 0.0;
-		double _miny = 0.0;
-		final AbstractProcessor processor = new DefaultProcessor(null);
-		GridCoverage2D gc = null;
-		File fileOut;
-		GeoTiffWriter writerWI;
-		ParameterValue gg;
-		GeneralEnvelope cropEnvelope;
+		}
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -323,104 +336,70 @@ public class CoverageTiler extends ProgressManager implements
 		//
 		//
 		// ///////////////////////////////////////////////////////////////////
-		for (int i = 0; i < numTileY; i++)
-			for (int j = 0; j < numTileX; j++) {
+		final int numTileX = (int) (w / (tileWidth * 1.0) + 1);
+		final int numTileY = (int) (h / (tileHeight * 1.0) + 1);
+		for (int i = 0; i < numTileX; i++)
+			for (int j = 0; j < numTileY; j++) {
 
 				// //
 				//
 				// computing the bbox for this tile
 				//
 				// //
-				_maxx = minx + (j + 1) * dx;
-				_minx = minx + (j) * dx;
-				_maxy = miny + (i + 1) * dy;
-				_miny = miny + (i) * dy;
-				if (_maxx > maxx)
-					_maxx = maxx;
-				if (_maxy > maxy)
-					_maxy = maxy;
-
-				// //
-				//
-				// building gridgeometry for the read operation
-				//
-				// //
-				gg = (ParameterValue) ImageMosaicFormat.READ_GRIDGEOMETRY2D
-						.createValue();
-				cropEnvelope = new GeneralEnvelope(
-						new double[] { _minx, _miny }, new double[] { _maxx,
-								_maxy });
-				cropEnvelope.setCoordinateReferenceSystem(inReader.getCrs());
-				gg.setValue(new GridGeometry2D(new GeneralGridRange(
-						new Rectangle(0, 0, 800, 800)), cropEnvelope));
-
-				message = new StringBuffer("Reading with grid envelope ")
-						.append(cropEnvelope.toString());
+				final Rectangle sourceRegion = new Rectangle(i * tileWidth, j
+						* tileHeight, tileWidth, tileHeight);
+				message = new StringBuffer("Writing region  ")
+						.append(sourceRegion);
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine(message.toString());
+				fireEvent(message.toString(), (i + j)
+						/ (numTileX * numTileY * 1.0));
 
-				try {
-					gc = (GridCoverage2D) inReader
-							.read(new GeneralParameterValue[] { gg });
-
-				} catch (IOException e) {
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-					fireEvent(e.getLocalizedMessage(), 0);
-					return;
-				}
-
-				fileOut = new File(outputLocation, new StringBuffer("mosaic")
-						.append("_").append(Integer.toString(i * numTileX + j))
-						.append(".").append("tiff").toString());
+				// //
+				//
+				// building gridgeometry for the read operation with the actual
+				// envelope
+				//
+				// //
+				final File fileOut = new File(outputLocation, new StringBuffer(
+						"mosaic").append("_").append(
+						Integer.toString(i * tileWidth + j)).append(".")
+						.append("tiff").toString());
+				// remove an old output file if it exists
 				if (fileOut.exists())
 					fileOut.delete();
 
-				message = new StringBuffer("Preparing tile (col,row)==(")
-						.append(j).append(",").append(i).append(") to file ")
-						.append(fileOut);
+				message = new StringBuffer(
+						"Preparing to write tile (col,row)==(").append(j)
+						.append(",").append(i).append(") to file ").append(
+								fileOut);
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine(message.toString());
+				fireEvent(message.toString(), (i + j)
+						/ (numTileX * numTileY * 1.0));
 
 				// //
 				//
-				// building gridgeometry for the read operation
+				// Write this coverage out as a geotiff
 				//
 				// //
-
-				ParameterValueGroup param = processor.getOperation(
-						"CoverageCrop").getParameters();
-				param.parameter("Source").setValue(gc);
-				param.parameter("Envelope").setValue(cropEnvelope);
-
-				GridCoverage2D cropped = (GridCoverage2D) processor
-						.doOperation(param);
-
-				final GeneralGridRange newGridrange = new GeneralGridRange(
-						new Rectangle2D.Double(0.0, 0.0, newRange[0],
-								newRange[1]).getBounds());
-				final GridGeometry2D scaledGridGeometry = new GridGeometry2D(
-						newGridrange, cropEnvelope);
-				param = processor.getOperation("Resample").getParameters();
-				param.parameter("Source").setValue(cropped);
-				param.parameter("CoordinateReferenceSystem").setValue(
-						inReader.getCrs());
-				param.parameter("GridGeometry").setValue(scaledGridGeometry);
-				param
-						.parameter("InterpolationType")
-						.setValue(
-								Interpolation
-										.getInstance(Interpolation.INTERP_NEAREST));
-
-				GridCoverage2D scaled = (GridCoverage2D) processor
-						.doOperation(param);
-
-				message = new StringBuffer("Writing out...");
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine(message.toString());
-
+				final AbstractGridFormat outFormat= new GeoTiffFormat();
 				try {
-					writerWI = new GeoTiffWriter(fileOut);
-					writerWI.write(scaled, null);
+
+					final GeoTiffWriteParams wp = new GeoTiffWriteParams();
+					wp.setTilingMode(GeoToolsWriteParams.MODE_EXPLICIT);
+					wp.setTiling(internalTileWidth, internalTileHeight);
+					wp.setSourceRegion(sourceRegion);
+					final ParameterValueGroup params = outFormat
+							.getWriteParameters();
+					params.parameter(
+							AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName()
+									.toString()).setValue(wp);
+
+					final GeoTiffWriter writerWI = new GeoTiffWriter(fileOut);
+					writerWI.write(gc, (GeneralParameterValue[]) params
+							.values().toArray(new GeneralParameterValue[1]));
+					writerWI.dispose();
 				} catch (IOException e) {
 					fireException(e);
 					return;
@@ -431,6 +410,7 @@ public class CoverageTiler extends ProgressManager implements
 		message = new StringBuffer("Done...");
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(message.toString());
+		fireEvent(message.toString(), 100);
 	}
 
 	private boolean parseArgs(String[] args) {
@@ -458,12 +438,31 @@ public class CoverageTiler extends ProgressManager implements
 			else
 				outputLocation = new File(inputLocation.getParentFile(),
 						"tiled");
-
+			// //
+			//
 			// tile dim
+			//
+			// //
 			final String tileDim = (String) cmdLine.getValue(tileDimOpt);
-			final String[] pairs = tileDim.split(",");
-			numTileX = Integer.parseInt(pairs[0]);
-			numTileY = Integer.parseInt(pairs[1]);
+			String[] pairs = tileDim.split(",");
+			tileWidth = Integer.parseInt(pairs[0]);
+			tileHeight = Integer.parseInt(pairs[1]);
+
+			// //
+			//
+			// Internal Tile dim
+			//
+			// //
+			final String internalTileDim = (String) cmdLine
+					.getValue(internalTileDimOpt);
+			if (internalTileDim != null && internalTileDim.length() > 0) {
+				pairs = internalTileDim.split(",");
+				internalTileWidth = Integer.parseInt(pairs[0]);
+				internalTileHeight = Integer.parseInt(pairs[1]);
+			} else {
+				internalTileWidth=tileWidth;
+				internalTileHeight=tileHeight;
+			}
 
 			// //
 			//
@@ -489,20 +488,20 @@ public class CoverageTiler extends ProgressManager implements
 		this.inputLocation = inputLocation;
 	}
 
-	public int getNumTileX() {
-		return numTileX;
+	public int getTileWidth() {
+		return tileWidth;
 	}
 
-	public void setNumTileX(int numTileX) {
-		this.numTileX = numTileX;
+	public void setTileWidth(int numTileX) {
+		this.tileWidth = numTileX;
 	}
 
-	public int getNumTileY() {
-		return numTileY;
+	public int getTileHeight() {
+		return tileHeight;
 	}
 
-	public void setNumTileY(int numTileY) {
-		this.numTileY = numTileY;
+	public void setTileHeight(int numTileY) {
+		this.tileHeight = numTileY;
 	}
 
 	public File getOutputLocation() {

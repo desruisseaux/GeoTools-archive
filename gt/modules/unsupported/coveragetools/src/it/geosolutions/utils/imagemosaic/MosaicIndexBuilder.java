@@ -39,7 +39,6 @@ import org.apache.commons.cli2.option.GroupImpl;
 import org.apache.commons.cli2.util.HelpFormatter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.WildcardFilter;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
@@ -48,17 +47,14 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
-import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.feature.type.TextualAttributeType;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -69,31 +65,31 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-/**                                                                                                                  
- * This classis in charge for creating the index for a mosaic of images that we                                      
- * want to tie together as a sigle bg coverage.                                                                      
- *                                                                                                                   
- * <p>                                                                                                               
- * To get instructions on how to run the toll just run it without any arguments                                      
- * and nice and clean help will be printed to the command line.                                                      
- *                                                                                                                   
- *                                                                                                                   
- * <p>                                                                                                               
- * It is worth to point out that this tool comes as a command line tool but it                                       
- * has been built with in mind a GUI. It has the capapbility to register                                             
- * {@link ProcessingEventListener} object that receive notifications about what                                      
- * is going on. Moreover it delegates all the computations to an external                                            
- * thread, hence we can stop the tool in the middle of processig with no so many                                     
- * concerns (hopefully :-) ).                                                                                        
- * <p>                                                                                                               
- *                                                                                                                   
- * <p>                                                                                                               
- *                                                                                                                   
- * @author Simone Giannecchini                                                                         
- * @author Alessio Fabiani                                                                             
- * @author Blaz Repnik                                                                                               
- * @version 0.3                                                                                                      
- *                                                                                                                   
+/**
+ * This classis in charge for creating the index for a mosaic of images that we
+ * want to tie together as a sigle bg coverage.
+ * 
+ * <p>
+ * To get instructions on how to run the toll just run it without any arguments
+ * and nice and clean help will be printed to the command line.
+ * 
+ * 
+ * <p>
+ * It is worth to point out that this tool comes as a command line tool but it
+ * has been built with in mind a GUI. It has the capapbility to register
+ * {@link ProcessingEventListener} object that receive notifications about what
+ * is going on. Moreover it delegates all the computations to an external
+ * thread, hence we can stop the tool in the middle of processig with no so many
+ * concerns (hopefully :-) ).
+ * <p>
+ * 
+ * <p>
+ * 
+ * @author Simone Giannecchini
+ * @author Alessio Fabiani
+ * @author Blaz Repnik
+ * @version 0.3
+ * 
  */
 public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		ProcessingEventListener {
@@ -112,7 +108,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 	private int numFiles;
 
 	/** Default Logger * */
-	private final static Logger LOG = org.geotools.util.logging.Logging.getLogger("it.geosolutions.utils.imagemosaic");
+	private final static Logger LOG = org.geotools.util.logging.Logging
+			.getLogger("it.geosolutions.utils.imagemosaic");
 
 	/** Program Version */
 	private final static String versionNumber = "0.2";
@@ -202,19 +199,19 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			// Add to the desired logger
 			LOG.addHandler(handler);
 		} catch (SecurityException el) {
-            fireException(el);
-            return;
+			fireException(el);
+			return;
 		} catch (IOException el) {
-            fireException(el);
-            return;
+			fireException(el);
+			return;
 		}
-        
+
 		// /////////////////////////////////////////////////////////////////////
-        //
-        // Create a set of file names that have to be skipped since these are
-        // our metadata files
-        //
-        // /////////////////////////////////////////////////////////////////////
+		//
+		// Create a set of file names that have to be skipped since these are
+		// our metadata files
+		//
+		// /////////////////////////////////////////////////////////////////////
 		final Set skipFiles = new HashSet(Arrays.asList(new String[] {
 				indexName + ".shp", indexName + ".dbf", indexName + ".shx",
 				indexName + ".prj", "error.txt", "error.txt.lck",
@@ -277,14 +274,14 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			try {
 				validFileName = fileBeingProcessed.getCanonicalPath();
 			} catch (IOException e1) {
-                fireException(e1);
+				fireException(e1);
 				return;
 			}
 			validFileName = validFileName.replace('\\', '/');
 			validFileName = validFileName.substring(locationPath.length() + 1,
 					fileBeingProcessed.getAbsolutePath().length());
-            if(skipFiles.contains(validFileName))
-                continue;
+			if (skipFiles.contains(validFileName))
+				continue;
 			message = new StringBuffer("Now indexing file ")
 					.append(validFileName);
 
@@ -311,7 +308,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					r = (ImageReader) it.next();
 					r.setInput(inStream);
 				} else {
-					//release resources
+					// release resources
 					try {
 						inStream.close();
 					} catch (Exception e) {
@@ -322,8 +319,8 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					} catch (Exception e) {
 						// ignore exception
 					}
-					
-					//send a message
+
+					// send a message
 					message = new StringBuffer("Skipped file ").append(
 							files.get(i)).append(
 							":No ImageIO readeres avalaible.");
@@ -348,7 +345,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 						.findFormat(files.get(i));
 				if (format == null) {
-					//release resources
+					// release resources
 					try {
 						inStream.close();
 					} catch (Exception e) {
@@ -359,7 +356,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					} catch (Exception e) {
 						// ignore exception
 					}
-					
+
 					message = new StringBuffer("Skipped file ").append(
 							files.get(i)).append(
 							": File format is not supported.");
@@ -449,27 +446,18 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					// creating the schema
 					//
 					// /////////////////////////////////////////////////////////////////////
-					final GeometricAttributeType refGeom = new GeometricAttributeType(
-							"the_geom", Polygon.class, true, null, defaultCRS,
-							null);
-					final TextualAttributeType locationAttribute = new TextualAttributeType(
-							"location", true, 1, 1, "none", null);
-					final FeatureTypeBuilder builder = FeatureTypeBuilder
-							.newInstance("index");
-					builder.setDefaultGeometry(refGeom);
-					builder.addType(locationAttribute);
-
-					final FeatureType ftType;
-					try {
-						ftType = builder.getFeatureType();
-					} catch (SchemaException e) {
-						if (LOG.isLoggable(Level.SEVERE))
-							LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
-						fireEvent(e.getLocalizedMessage(), 0);
-						return;
-					}
+					final SimpleFeatureTypeBuilder featureBuilder = new SimpleFeatureTypeBuilder();
+					featureBuilder.setName("Flag");
+					featureBuilder.setNamespaceURI("http://localhost/");
+					featureBuilder.setCRS(this.actualCRS);
+					featureBuilder.add("location", String.class);
+					featureBuilder.add("the_geom", Polygon.class,
+							this.actualCRS);
+					featureBuilder.setDefaultGeometry("the_geom");
+					final SimpleFeatureType simpleFeatureType = featureBuilder
+							.buildFeatureType();
 					// create the schema for the new shape file
-					index.createSchema(ftType);
+					index.createSchema(simpleFeatureType);
 
 					// get a feature writer
 					fw = index.getFeatureWriter(index.getTypeNames()[0], t);
@@ -532,12 +520,14 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				// ////////////////////////////////////////////////////////
 				if (!skipFeature) {
 
-					final Feature feature = fw.next();
-					feature.setAttribute(0, geomFactory
+					// final SimpleFeature feature = SimpleFeatureBuilder.build(
+					// this.simpleFeatureType, new Object[]{ point, "Here"},
+					// "flag.1" );
+					final SimpleFeature feature = fw.next();
+					feature.setAttribute(1, geomFactory
 							.toGeometry(new ReferencedEnvelope(
 									(Envelope) envelope)));
-
-					feature.setAttribute(1, validFileName);
+					feature.setAttribute(0, validFileName);
 					fw.write();
 
 					message = new StringBuffer("Done with file ").append(files
@@ -550,7 +540,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 					doneSomething = true;
 				} else
 					skipFeature = false;
-				
+
 				// ////////////////////////////////////////////////////////
 				//
 				// STEP 5
@@ -568,19 +558,18 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				} catch (Exception e) {
 					// ignore exception
 				}
-				//release resources
+				// release resources
 				reader.dispose();
-
 
 			} catch (IOException e) {
 				fireException(e);
-                break;
+				break;
 			} catch (ArrayIndexOutOfBoundsException e) {
-                fireException(e);
-                break;
+				fireException(e);
+				break;
 			} catch (IllegalAttributeException e) {
-                fireException(e);
-                break;
+				fireException(e);
+				break;
 			}
 
 		}
@@ -976,10 +965,11 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 				"attached message is: ").append(event.getMessage()).toString());
 
 	}
-    
-    public void exceptionOccurred(ExceptionEvent event) {
-        LOG.log(Level.SEVERE, "An error occurred during processing", event.getException());
-    }
+
+	public void exceptionOccurred(ExceptionEvent event) {
+		LOG.log(Level.SEVERE, "An error occurred during processing", event
+				.getException());
+	}
 
 	/**
 	 * @param locationPath
@@ -1000,7 +990,7 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 			LOG.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			final IllegalArgumentException ex = new IllegalArgumentException();
 			ex.initCause(e);
-            throw ex;
+			throw ex;
 		}
 	}
 
@@ -1012,19 +1002,19 @@ public class MosaicIndexBuilder extends ProgressManager implements Runnable,
 		this.wildcardString = wildcardString;
 	}
 
-    public String getIndexName() {
-        return indexName;
-    }
+	public String getIndexName() {
+		return indexName;
+	}
 
-    public void setIndexName(String indexName) {
-        this.indexName = indexName;
-    }
-    
-    public double getResolutionX() {
-        return this.resolutionLevels[0][0];
-    }
-    
-    public double getResolutionY() {
-        return this.resolutionLevels[1][0];
-    }
+	public void setIndexName(String indexName) {
+		this.indexName = indexName;
+	}
+
+	public double getResolutionX() {
+		return this.resolutionLevels[0][0];
+	}
+
+	public double getResolutionY() {
+		return this.resolutionLevels[1][0];
+	}
 }
