@@ -61,7 +61,7 @@ public abstract class ProgressManager {
 	/**
 	 * Options for the command line.
 	 */
-	protected final List cmdOpts = new ArrayList(5);
+	protected final List<Option> cmdOpts = new ArrayList<Option>(5);
 
 	protected final Parser cmdParser = new Parser();
 
