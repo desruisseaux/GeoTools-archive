@@ -507,8 +507,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 
 		envelope = inReader.getOriginalEnvelope();
 		final GridRange range = inReader.getOriginalGridRange();
-		final int numTileX = (int) Math.ceil(range.getLength(0) / tileW);
-		final int numtileY = (int) Math.ceil(range.getLength(1) / tileH);
+//		final int numTileX = (int) Math.ceil(range.getLength(0) / tileW);
+//		final int numtileY = (int) Math.ceil(range.getLength(1) / tileH);
 		inReader.dispose();
 
 
@@ -548,7 +548,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 
 		// create first tiled set
 		resolutions = new double[2][numSteps+1];
-		tileInput(numTileX, numtileY, outputDir);
+//		tileInput(numTileX, numtileY, outputDir);
+		tileInput(tileW, tileH, outputDir);
 		if (exceptionOccurred)
 			return;
 		currStep++;
@@ -625,14 +626,15 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		return true;
 	}
 
-	private void tileInput(final int numTileX, final int numtileY,
+//	private void tileInput(final int numTileX, final int numTileY,
+	private void tileInput(final int tileWidth, final int tileHeight,
 			File outputDir) {
 		CoverageTiler tiler = new CoverageTiler();
 		tiler.addProcessingEventListener(slaveToolsListener);
 		tiler.setInputLocation(inputLocation);
 		tiler.setOutputLocation(outputDir);
-		tiler.setTileWidth(numTileX);
-		tiler.setTileHeight(numtileY);
+		tiler.setTileWidth(tileW);
+		tiler.setTileHeight(tileH);
 		tiler.run();
 		tiler.removeAllProcessingEventListeners();
 	}
