@@ -24,7 +24,7 @@
   <packaging>pom</packaging>
   <name>Geotools unsupported</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/</url>
-  
+
   <scm>
     <connection>
       scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/
@@ -53,9 +53,10 @@
        <id>gdal</id>
        <modules>
          <module>mrsid</module>
+         <module>ecw</module>
        </modules>
      </profile>
-     
+
      <!-- ================================================== -->
      <!--     Modules not yet included in the build          -->
      <!-- ================================================== -->
@@ -89,14 +90,14 @@
     <module>coverageio</module>
     <module>coverageio-netcdf</module>
     <module>directory</module>
-    <module>epsg-oracle</module>    
+    <module>epsg-oracle</module>
     <module>gml</module>
     <module>go</module>
     <module>h2</module>
     <module>jts-wrapper</module>
     <module>mif</module>
     <module>mysql</module>
-    <module>oracle-spatial</module>    
+    <module>oracle-spatial</module>
     <module>postgis-versioned</module>
     <module>tiger</module>
     <module>tile</module>
