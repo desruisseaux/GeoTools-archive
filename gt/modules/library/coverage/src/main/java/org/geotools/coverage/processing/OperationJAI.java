@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.processing;
 
-// J2SE dependencies and extensions
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
@@ -27,7 +26,6 @@ import java.util.Locale;
 import java.util.Collections;
 import javax.units.Unit;
 
-// JAI dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.OperationRegistry;
@@ -35,7 +33,6 @@ import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.referencing.FactoryException;
@@ -46,11 +43,9 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.ViewType;
@@ -205,7 +200,7 @@ public class OperationJAI extends Operation2D {
                 // try and register our operations
                 Registry.registerGeotoolsServices(registry);
             } catch (RuntimeException e) {
-                Logging.GEOTOOLS.unexpectedException(AbstractProcessor.LOGGER,
+                Logging.unexpectedException(AbstractProcessor.LOGGER,
                         OperationJAI.class, "getOperationDescriptor", e);
             }
 
@@ -237,7 +232,7 @@ public class OperationJAI extends Operation2D {
      * <b>Note:</b> it would be possible to use {@link ImagingParameters#parameters}
      * directly in some occasions. However, we peform an unconditional copy instead
      * because some operations (e.g. "GradientMagnitude") may change the values.
-     * 
+     *
      * @param parameters The {@link ParameterValueGroup} to be copied.
      * @return A copy of the provided {@link ParameterValueGroup} as a JAI block.
      *
@@ -304,12 +299,11 @@ public class OperationJAI extends Operation2D {
         GridCoverage2D coverage = sources[PRIMARY_SOURCE_INDEX];
         final CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem2D();
         // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        final MathTransform2D gridToCRS = ((GridGeometry2D) coverage.getGridGeometry()).getGridToCRS2D();
+        final MathTransform2D gridToCRS = coverage.getGridGeometry().getGridToCRS2D();
         for (int i=0; i<sources.length; i++) {
             final GridCoverage2D source = sources[i];
             if (!CRS.equalsIgnoreMetadata(crs, source.getCoordinateReferenceSystem2D()) ||
-                !CRS.equalsIgnoreMetadata(gridToCRS,
-                    ((GridGeometry2D) source.getGridGeometry()).getGridToCRS2D()))
+                !CRS.equalsIgnoreMetadata(gridToCRS, source.getGridGeometry().getGridToCRS2D()))
             {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_GRID_GEOMETRY));
             }
@@ -443,8 +437,7 @@ public class OperationJAI extends Operation2D {
             throw new CannotReprojectException("Unsupported CRS: "+crs2D.getName().getCode());
         }
         if (gridToCrs2D == null) {
-            // TODO: Remove cast when we will be allowed to compile for J2SE 1.5.
-            gridToCrs2D = ((GridGeometry2D) primarySource.getGridGeometry()).getGridToCRS2D();
+            gridToCrs2D = primarySource.getGridGeometry().getGridToCRS2D();
         }
         /*
          * 'crs2D' is the two dimensional part of the target CRS. Now for each source coverages,
@@ -455,7 +448,7 @@ public class OperationJAI extends Operation2D {
         final AbstractProcessor processor = getProcessor(hints);
         for (int i=0; i<sources.length; i++) {
             final GridCoverage2D            source    = sources[i];
-            final GridGeometry2D            geometry  = (GridGeometry2D) source.getGridGeometry();
+            final GridGeometry2D            geometry  = source.getGridGeometry();
             final CoordinateReferenceSystem srcCrs2D  = source.getCoordinateReferenceSystem2D();
             final CoordinateReferenceSystem sourceCRS = source.getCoordinateReferenceSystem();
             final CoordinateReferenceSystem targetCRS;
@@ -482,7 +475,7 @@ public class OperationJAI extends Operation2D {
                 if (headCRS != null) components[count++] = headCRS;
                                      components[count++] = crs2D;
                 if (tailCRS != null) components[count++] = tailCRS;
-                components = (CoordinateReferenceSystem[]) XArray.resize(components, count);
+                components = XArray.resize(components, count);
                 if (count == 1) {
                     targetCRS = components[0];
                 } else try {
@@ -654,7 +647,7 @@ public class OperationJAI extends Operation2D {
      * Prepares the properties to be given to the coverage created by the
      * {@link #deriveGridCoverage deriveGridCoverage} method. The default
      * implementation returns {@code null}.
-     * 
+     *
      * @param data
      *            The {@link RenderedImage} created by this operation.
      * @param crs
@@ -988,7 +981,7 @@ public class OperationJAI extends Operation2D {
     }
 
 //    /**
-//	 * 
+//	 *
 //	 * @param polygon
 //	 * @param worldToGridTransform
 //	 * @return
@@ -1001,9 +994,9 @@ public class OperationJAI extends Operation2D {
 //
 //		return new ROIShape(new LiteShape2(polygon, worldToGridTransform, null, false));
 //	}
-//	
+//
 //    /**
-//	 * 
+//	 *
 //	 * @param polygon
 //	 * @param transform
 //	 * @return
@@ -1016,13 +1009,14 @@ public class OperationJAI extends Operation2D {
 //
 //		return polygonToRoi(polygon, ProjectiveTransform.create(worldToGridTransform));
 //	}
-//	
+//
 
 
-	
+
     /**
-	 * Compares the specified object with this operation for equality.
-	 */
+     * Compares the specified object with this operation for equality.
+     */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimisation

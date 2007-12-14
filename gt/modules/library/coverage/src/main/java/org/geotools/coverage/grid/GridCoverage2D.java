@@ -264,7 +264,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 /*
                  * If the math transform was not explicitly specified by the user, then it will be
                  * computed from the envelope. In this case, some heuristic rules are used in order
-                 * to decide if we should reverse some axis directions or swap axis. 
+                 * to decide if we should reverse some axis directions or swap axis.
                  */
                 gridGeometry = new GridGeometry2D(r, gridGeometry.getEnvelope());
             }
@@ -338,6 +338,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * implementation returns {@code true} if {@link #image} is an
      * instance of {@link WritableRenderedImage}.
      */
+    @Override
     public boolean isDataEditable() {
         return (image instanceof WritableRenderedImage);
     }
@@ -345,10 +346,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * Returns information for the grid coverage geometry. Grid geometry
      * includes the valid range of grid coordinates and the georeferencing.
-     *
-     * @todo Use covariant return type once we are allowed to compile for J2SE 1.5.
      */
-    public GridGeometry getGridGeometry() {
+    public GridGeometry2D getGridGeometry() {
         final String error = checkConsistency(image, gridGeometry);
         if (error != null) {
             throw new IllegalStateException(error);
@@ -361,6 +360,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * The returned envelope have at least two dimensions. It may have more dimensions if the
      * coverage has some extent in other dimensions (for example a depth, or a start and end time).
      */
+    @Override
     public Envelope getEnvelope() {
         return gridGeometry.getEnvelope();
     }
@@ -406,7 +406,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * Returns all sample dimensions for this grid coverage.
      */
     public GridSampleDimension[] getSampleDimensions() {
-        return (GridSampleDimension[]) sampleDimensions.clone();
+        return sampleDimensions.clone();
     }
 
     /**
@@ -446,6 +446,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public byte[] evaluate(final DirectPosition coord, byte[] dest)
             throws CannotEvaluateException
     {
@@ -469,6 +470,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public int[] evaluate(final DirectPosition coord, final int[] dest)
             throws CannotEvaluateException
     {
@@ -485,6 +487,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public float[] evaluate(final DirectPosition coord, final float[] dest)
             throws CannotEvaluateException
     {
@@ -501,6 +504,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates.
      */
+    @Override
     public double[] evaluate(final DirectPosition coord, final double[] dest)
             throws CannotEvaluateException
     {
@@ -626,7 +630,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             final int  numBands = image.getNumBands();
             final Raster raster = image.getTile(image.XToTileX(x), image.YToTileY(y));
             final int  datatype = image.getSampleModel().getDataType();
-            final StringBuilder  buffer = new StringBuilder();
+            final StringBuilder buffer = new StringBuilder();
             buffer.append('(').append(x).append(',').append(y).append(")=[");
             for (int band=0; band<numBands; band++) {
                 if (band != 0) {
@@ -640,13 +644,10 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 }
                 final String formatted = sampleDimensions[band].getLabel(sample, null);
                 if (formatted != null) {
-                    buffer.append("\u00A0(");
-                    buffer.append(formatted);
-                    buffer.append(')');
+                    buffer.append("\u00A0(").append(formatted).append(')');
                 }
             }
-            buffer.append(']');
-            return buffer.toString();
+            return buffer.append(']').toString();
         }
         return null;
     }
@@ -679,6 +680,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * @param  yAxis Dimension to use for <var>y</var> axis.
      * @return A 2D view of this grid coverage as a renderable image.
      */
+    @Override
     public RenderableImage getRenderableImage(final int xAxis, final int yAxis) {
         ensureValid();
         if (xAxis == gridGeometry.axisDimensionX  &&  yAxis == gridGeometry.axisDimensionY) {
@@ -747,6 +749,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
          *
          * @return A rendered image containing the rendered data
          */
+        @Override
         public RenderedImage createDefaultRendering() {
             if (xAxis == gridGeometry.axisDimensionX &&
                 yAxis == gridGeometry.axisDimensionY)
@@ -878,7 +881,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         }
         final int                      numBands = image.getNumBands();
         final int                   visibleBand = CoverageUtilities.getVisibleBand(image);
-        final GridSampleDimension[] targetBands = (GridSampleDimension[]) sampleDimensions.clone();
+        final GridSampleDimension[] targetBands = sampleDimensions.clone();
         assert targetBands.length == numBands : targetBands.length;
         for (int i=0; i<targetBands.length; i++) {
             targetBands[i] = targetBands[i].geophysics(geo);
@@ -1173,7 +1176,7 @@ testLinear: for (int i=0; i<numBands; i++) {
      * used in a JAI operation chain. It doesn't prevent the disposal in every cases however.
      * When unsure about whatever a coverage is still in use or not, it is safer to not invoke
      * this method and rely on the garbage collector instead.
-     * 
+     *
      * @see PlanarImage#dispose
      *
      * @since 2.4
@@ -1190,10 +1193,10 @@ testLinear: for (int i=0; i<numBands; i++) {
          * other views of this coverage. If there is no remaining sinks, we can process.
          */
         if (!force) {
-            Collection/*<?>*/ sinks = image.getSinks();
+            Collection<?> sinks = image.getSinks();
             if (sinks != null) {
                 if (inverse != null) {
-                    sinks = new HashSet(sinks);
+                    sinks = new HashSet<Object>(sinks);
                     sinks.remove(inverse.image);
                     deepRemove(sinks, inverse.image);
                 }
@@ -1220,16 +1223,14 @@ testLinear: for (int i=0; i<numBands; i++) {
      * Removes from the specified collection the specified image and its dependencies.
      * This method invokes itself recursively in order to scan down the sources tree.
      */
-    private static void deepRemove(final Collection/*<?>*/ sinks, final RenderedImage image) {
+    private static void deepRemove(final Collection<?> sinks, final RenderedImage image) {
         /*
          * The following must be unchecked, because PlanarImage.getSources()
          * violates RenderedImage.getSources() contract on parameterized type.
          */
-        //@SuppressWarning("unchecked")
-        final List sources = image.getSources();
+        final List<?> sources = image.getSources();
         if (sources != null) {
-            for (final Iterator it=sources.iterator(); it.hasNext();) {
-                final Object dependency = it.next();
+            for (final Object dependency : sources) {
                 sinks.remove(dependency);
                 if (dependency instanceof RenderedImage) {
                     deepRemove(sinks, (RenderedImage) dependency);

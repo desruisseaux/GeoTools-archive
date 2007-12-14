@@ -19,20 +19,18 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// JAI dependencies
 import javax.media.jai.Interpolation;
 import javax.media.jai.operator.WarpDescriptor;    // For javadoc
 import javax.media.jai.operator.AffineDescriptor;  // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
+import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.Operation2D;
@@ -109,7 +107,7 @@ import org.geotools.resources.image.ImageUtilities;
  *   </tr>
  *   <tr>
  *     <td>{@code "GridGeometry"}</td>
- *     <td>{@link org.geotools.coverage.grid.GridGeometry2D}</td>
+ *     <td>{@link org.opengis.coverage.grid.GridGeometry}</td>
  *     <td>(automatic)</td>
  *     <td align="center">N/A</td>
  *     <td align="center">N/A</td>
@@ -161,7 +159,7 @@ public class Resample extends Operation2D {
      */
     public static final ParameterDescriptor GRID_GEOMETRY =
             new DefaultParameterDescriptor(Citations.OGC, "GridGeometry",
-                GridGeometry2D.class,               // Value class (mandatory)
+                GridGeometry.class,                 // Value class (mandatory)
                 null,                               // Array of valid values
                 null,                               // Default value
                 null,                               // Minimal value
@@ -191,14 +189,16 @@ public class Resample extends Operation2D {
         GridCoverage2D         source = (GridCoverage2D)               parameters.parameter("Source")                   .getValue();
         Interpolation          interp = ImageUtilities.toInterpolation(parameters.parameter("InterpolationType")        .getValue());
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem)    parameters.parameter("CoordinateReferenceSystem").getValue();
-        GridGeometry2D       gridGeom = (GridGeometry2D)               parameters.parameter("GridGeometry")             .getValue();
+        GridGeometry         gridGeom = (GridGeometry)                 parameters.parameter("GridGeometry")             .getValue();
         GridCoverage2D       coverage; // The result to be computed below.
         if (crs == null) {
             crs = source.getCoordinateReferenceSystem();
         }
+        final GridGeometry2D gridGeom2D = (gridGeom == null || gridGeom instanceof GridGeometry2D)
+                ? (GridGeometry2D) gridGeom : new GridGeometry2D(gridGeom);
         try {
-            coverage = Resampler2D.reproject(source, crs, gridGeom, interp,
-                (hints instanceof Hints) ? (Hints) hints : new Hints(hints));
+            coverage = Resampler2D.reproject(source, crs, gridGeom2D, interp,
+                (hints instanceof Hints) ? hints : new Hints(hints));
         } catch (FactoryException exception) {
             throw new CannotReprojectException(Errors.format(
                     ErrorKeys.CANT_REPROJECT_$1, source.getName()), exception);

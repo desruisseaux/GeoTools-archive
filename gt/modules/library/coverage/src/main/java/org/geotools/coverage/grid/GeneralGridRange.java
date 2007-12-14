@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
@@ -27,13 +26,11 @@ import java.awt.geom.Rectangle2D; // For javadoc
 import java.io.Serializable;
 import java.util.Arrays;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry; // For javadoc
 import org.opengis.coverage.grid.GridCoordinates;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -208,8 +205,8 @@ public class GeneralGridRange implements GridRange, Serializable {
         index = new int[dimension * 2];
         for (int i=0; i<dimension; i++) {
             // See "note about conversion of floating point values to integers" in the JavaDoc.
-            index[i            ] = (int)Math.round(envelope.getMinimum(i));
-            index[i + dimension] = (int)Math.round(envelope.getMaximum(i));
+            index[i            ] = (int) Math.round(envelope.getMinimum(i));
+            index[i + dimension] = (int) Math.round(envelope.getMaximum(i));
         }
     }
 

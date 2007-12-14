@@ -44,7 +44,7 @@ import org.geotools.resources.i18n.Errors;
 /**
  * Operation applied only on image's colors. This operation work only for source
  * image using an {@link IndexColorModel}.
- * 
+ *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -63,7 +63,7 @@ abstract class IndexColorOperation extends Operation2D {
      * Performs the color transformation. This method invokes the
      * {@link #transformColormap transformColormap(...)} method with current RGB
      * colormap, the source {@link SampleDimension} and the supplied parameters.
-     * 
+     *
      * @param parameters The parameters.
      * @param hints Rendering hints (ignored in this implementation).
      *
@@ -149,7 +149,7 @@ abstract class IndexColorOperation extends Operation2D {
      * {@link GridCoverage2D}. The {@code ARGB} array contains the ARGB values
      * from the current source and should be overridden with new ARGB values
      * for the destination image.
-     * 
+     *
      * @param ARGB
      *            Alpha, Red, Green and Blue components to transform.
      * @param band

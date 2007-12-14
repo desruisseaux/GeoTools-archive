@@ -792,7 +792,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		}
 
 		// disposing the old unused coverages
-		gc1.dispose();
+		gc1.dispose(false);
 	}
 
 	/**

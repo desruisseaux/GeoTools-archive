@@ -64,6 +64,11 @@ public class LoggedFormat<T> extends Format {
     private final Class<T> type;
 
     /**
+     * The level to use for the messages to be logged.
+     */
+    private Level level;
+
+    /**
      * The logger where to log warnings, or {@code null} if none.
      *
      * @see #setLogger
@@ -93,6 +98,7 @@ public class LoggedFormat<T> extends Format {
     protected LoggedFormat(final Format format, final Class<T> type) {
         this.format = format;
         this.type   = type;
+        this.level  = Level.WARNING;
     }
 
     /**
@@ -112,6 +118,20 @@ public class LoggedFormat<T> extends Format {
      */
     public void setLogger(final String logger) {
         this.logger = logger;
+    }
+
+    /**
+     * Sets the logger level for the warnings eventually emitted by the {@link #parse} method.
+     * The default value is {@link Level#WARNING}.
+     *
+     * @param level The new logging level.
+     *
+     * @since 2.5
+     */
+    public void setLevel(final Level level) {
+        if (level != null) {
+            this.level = level;
+        }
     }
 
     /**
@@ -148,9 +168,10 @@ public class LoggedFormat<T> extends Format {
             index = error;
         }
         if (index < text.length()) {
-            logWarning(ErrorKeys.UNPARSABLE_STRING_$2, text, text.substring(index));
+            doLogWarning(formatUnparsable(text, 0, index, getWarningLocale(), level));
         } else if (value!=null && !type.isInstance(value)) {
-            logWarning(ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), type);
+            doLogWarning(Errors.getResources(getWarningLocale()).getLogRecord(level,
+                    ErrorKeys.ILLEGAL_CLASS_$2, value.getClass(), type));
             return null;
         }
         return type.cast(value);
@@ -211,15 +232,9 @@ public class LoggedFormat<T> extends Format {
     }
 
     /**
-     * Logs a warning.
-     *
-     * @param key  The resource key.
-     * @param arg1 First value to format in the message.
-     * @param arg1 Second value to format in the message.
+     * Logs a warning. The caller is set before to invoke the user-overridable method.
      */
-    private void logWarning(final int key, final Object arg1, final Object arg2) {
-        final LogRecord warning = Errors.getResources(getWarningLocale())
-                .getLogRecord(Level.WARNING, key, arg1, arg2);
+    private void doLogWarning(final LogRecord warning) {
         if (className != null) {
             warning.setSourceClassName(className);
         }
@@ -252,11 +267,95 @@ public class LoggedFormat<T> extends Format {
     }
 
     /**
+     * Formats an error message for an unparsable string. This method performs the same work that
+     * {@link #formatUnparsable(String, int, int, Locale, Level) formatUnparsable(..., Level)},
+     * except that the result is returned as a {@link String} rather than a {@link LogRecord}.
+     * This is provided as a convenience method for creating the message to give to an
+     * {@linkplain Exception#Exception(String) exception constructor}.
+     *
+     * @param  text The unparsable string.
+     * @param  index The parse position. This is usually {@link ParsePosition#getIndex}.
+     * @param  errorIndex The index where the error occured. This is usually
+     *         {@link ParsePosition#getErrorIndex}.
+     * @param  locale The locale for the message, or {@code null} for the default one.
+     * @return A formatted error message.
+     *
+     * @since 2.5
+     */
+    public static String formatUnparsable(final String text, final int index,
+            final int errorIndex, final Locale locale)
+    {
+        return (String) doFormatUnparsable(text, index, errorIndex, locale, null);
+    }
+
+    /**
+     * Formats a log record for an unparsable string. This method is invoked by the
+     * {@link #parse parse} method for formatting the log record to be given to the
+     * {@link #logWarning} method. It is made public as a convenience for implementors
+     * who wish to manage loggings outside this {@code LoggedFormat} class.
+     *
+     * @param  text The unparsable string.
+     * @param  index The parse position. This is usually {@link ParsePosition#getIndex}.
+     * @param  errorIndex The index where the error occured. This is usually
+     *         {@link ParsePosition#getErrorIndex}.
+     * @param  locale The locale for the log message, or {@code null} for the default one.
+     * @param  level The log record level.
+     * @return A formatted log record.
+     *
+     * @since 2.5
+     */
+    public static LogRecord formatUnparsable(final String text, final int index,
+            final int errorIndex, final Locale locale, Level level)
+    {
+        if (level == null) {
+            // It is necessary to ensure that the level argument is non-null,
+            // otherwise we would get a ClassCastException in the code below.
+            level = Level.WARNING;
+        }
+        return (LogRecord) doFormatUnparsable(text, index, errorIndex, locale, level);
+    }
+
+    /**
+     * Implementation of {@code formatUnparsable} methods. Returns a {@link LogRecord}
+     * if {@code level} is non-null, or a {@link String} otherwise.
+     */
+    private static Object doFormatUnparsable(String text, final int index, int errorIndex,
+                                             final Locale locale, final Level level)
+    {
+        final Errors resources = Errors.getResources(locale);
+        final int length = text.length();
+        if (errorIndex < index) {
+            errorIndex = index;
+        }
+        if (errorIndex == length) {
+            if (level != null) {
+                return resources.getLogRecord(level, ErrorKeys.UNEXPECTED_END_OF_STRING);
+            }
+            return resources.getString(ErrorKeys.UNEXPECTED_END_OF_STRING);
+        }
+        int upper = errorIndex;
+        if (upper < length) {
+            final int type = Character.getType(text.charAt(upper));
+            while (++upper < length) {
+                if (Character.getType(text.charAt(upper)) != type) {
+                    break;
+                }
+            }
+        }
+        final String error = text.substring(errorIndex, upper);
+        text = text.substring(index);
+        if (level != null) {
+            return resources.getLogRecord(level, ErrorKeys.UNPARSABLE_STRING_$2, text, error);
+        }
+        return resources.getString(ErrorKeys.UNPARSABLE_STRING_$2, text, error);
+    }
+
+    /**
      * Returns a string representation for debugging purpose.
      */
     @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Classes.getShortClassName(this))
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this))
                 .append('[').append(Classes.getShortClassName(format));
         if (logger != null) {
             buffer.append(", logger=").append(logger);

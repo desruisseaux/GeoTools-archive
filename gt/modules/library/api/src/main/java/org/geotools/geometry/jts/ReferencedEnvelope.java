@@ -30,6 +30,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -175,24 +176,14 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         checkCoordinateReferenceSystemDimension();
     }
 
+    /**
+     * Sets this envelope to the specified bounding box.
+     */
     public void init(BoundingBox bounds) {
         super.init(bounds.getMinimum(0), bounds.getMaximum(0), bounds.getMinimum(1),
             bounds.getMaximum(1));
         this.crs = bounds.getCoordinateReferenceSystem();
     }
-
-    /**
-     * Creates a new envelope from an existing OGC envelope.
-     *
-     * @param envelope The envelope to initialize from.
-     * @param crs The coordinate reference system.
-     * @throws MismatchedDimensionException if the CRS dimension is not valid.
-     *
-     * @since 2.3
-     *
-     * @deprecated The {@code crs} argument duplicate the information already provided
-     *             in the OGC envelope.
-     */
 
     /**
      * Returns the specified bounding box as a JTS envelope.
@@ -201,7 +192,6 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         if (bbox instanceof Envelope) {
             return (Envelope) bbox;
         }
-
         return new ReferencedEnvelope(bbox);
     }
 
@@ -215,7 +205,6 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         if (crs != null) {
             final int expected = getDimension();
             final int dimension = crs.getCoordinateSystem().getDimension();
-
             if (dimension != expected) {
                 throw new MismatchedDimensionException(Errors.format(
                         ErrorKeys.MISMATCHED_DIMENSION_$3, crs.getName().getCode(),
@@ -234,7 +223,6 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         throws MismatchedReferenceSystemException {
         if (crs != null) {
             final CoordinateReferenceSystem other = bbox.getCoordinateReferenceSystem();
-
             if (other != null) {
                 if (!CRS.equalsIgnoreMetadata(crs, other)) {
                     throw new MismatchedReferenceSystemException(Errors.format(
@@ -251,6 +239,10 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         return crs;
     }
 
+    /**
+     * @deprecated Use {@link #getCoordinateReferenceSystem}, since it is the
+     * method inherited from the interface.
+     */
     public CoordinateReferenceSystem crs() {
         return getCoordinateReferenceSystem();
     }
@@ -278,10 +270,16 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         }
     }
 
+    /**
+     * @deprecated Use {@link #getMinX}.
+     */
     public double minX() {
         return getMinX();
     }
 
+    /**
+     * @deprecated Use {@link #getMinY}.
+     */
     public double minY() {
         return getMinY();
     }
@@ -302,10 +300,16 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
         }
     }
 
+    /**
+     * @deprecated Use {@link #getMaxX}.
+     */
     public double maxX() {
         return getMaxX();
     }
 
+    /**
+     * @deprecated Use {@link #getMaxY}.
+     */
     public double maxY() {
         return getMaxY();
     }
@@ -499,13 +503,13 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
                 throw new NullPointerException("Unable to transform referenced envelope, crs has not yet been provided.");
             }
         }
-        
+
         /*
          * Gets a first estimation using an algorithm capable to take singularity in account
          * (North pole, South pole, 180ï¿½ longitude). We will expand this initial box later.
          */
         CoordinateOperationFactory coordinateOperationFactory = CRS.getCoordinateOperationFactory(lenient);
-        
+
         final CoordinateOperation operation = coordinateOperationFactory.createOperation(crs, targetCRS);
         final GeneralEnvelope transformed = CRS.transform(operation, this);
         transformed.setCoordinateReferenceSystem(targetCRS);
@@ -524,19 +528,19 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * Returns a hash value for this envelope. This value need not remain
      * consistent between different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         int code = super.hashCode() ^ (int) serialVersionUID;
-
         if (crs != null) {
             code ^= crs.hashCode();
         }
-
         return code;
     }
 
     /**
      * Compares the specified object with this envelope for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final CoordinateReferenceSystem otherCRS = (object instanceof ReferencedEnvelope)
@@ -544,7 +548,6 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
 
             return Utilities.equals(crs, otherCRS);
         }
-
         return false;
     }
 
@@ -552,8 +555,9 @@ public class ReferencedEnvelope extends Envelope implements org.opengis.geometry
      * Returns a string representation of this envelope. The default implementation
      * is okay for occasional formatting (for example for debugging purpose).
      */
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this)).append('[');
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this)).append('[');
         final int dimension = getDimension();
 
         for (int i = 0; i < dimension; i++) {

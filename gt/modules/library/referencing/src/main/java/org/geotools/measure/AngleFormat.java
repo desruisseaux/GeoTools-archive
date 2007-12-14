@@ -32,6 +32,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.logging.LoggedFormat;
 
 
 /**
@@ -1192,7 +1193,7 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
     }
 
     /**
-     * Parse a string as an angle.
+     * Parses a string as an angle.
      *
      * @param  source The string to parse.
      * @return The parsed string as an {@link Angle}, {@link Latitude}
@@ -1201,13 +1202,20 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
      */
     public Angle parse(final String source) throws ParseException {
         final ParsePosition pos = new ParsePosition(0);
-        final Angle         ang = parse(source, pos, true);
-        checkComplete(source, pos, false);
-        return ang;
+        final Angle angle = parse(source, pos, true);
+        final int  length = source.length();
+        final int  origin = pos.getIndex();
+        for (int index=origin; index<length; index++) {
+            if (!Character.isWhitespace(source.charAt(index))) {
+                index = Math.max(origin, pos.getErrorIndex());
+                throw new ParseException(LoggedFormat.formatUnparsable(source, 0, index, null), index);
+            }
+        }
+        return angle;
     }
 
     /**
-     * Parse a substring as an angle. Default implementation invokes
+     * Parses a substring as an angle. Default implementation invokes
      * {@link #parse(String, ParsePosition)}.
      *
      * @param source A String whose beginning should be parsed.
@@ -1220,7 +1228,7 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
     }
 
     /**
-     * Parse a string as an object. Default implementation invokes
+     * Parses a string as an object. Default implementation invokes
      * {@link #parse(String)}.
      *
      * @param  source The string to parse.
@@ -1244,43 +1252,6 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
      */
     final Number parseNumber(final String source, final ParsePosition pos) {
         return numberFormat.parse(source, pos);
-    }
-
-    /**
-     * Vérifie si l'interprétation d'une chaîne de caractères a été complète.
-     * Si ce n'était pas le cas, lance une exception avec un message d'erreur
-     * soulignant les caractères problématiques.
-     *
-     * @param  source Chaîne de caractères qui était à interpréter.
-     * @param  pos Position à laquelle s'est terminée l'interprétation de la
-     *         chaîne {@code source}.
-     * @param  isCoordinate {@code false} si on interprétait un angle,
-     *         ou {@code true} si on interprétait une coordonnée.
-     * @throws ParseException Si la chaîne {@code source} n'a pas été
-     *         interprétée dans sa totalité.
-     */
-    static void checkComplete(final String source,
-                              final ParsePosition pos,
-                              final boolean isCoordinate)
-        throws ParseException
-    {
-        final int length=source.length();
-        final int origin=pos.getIndex();
-        for (int index=origin; index<length; index++) {
-            if (!Character.isWhitespace(source.charAt(index))) {
-                index=pos.getErrorIndex(); if (index<0) index=origin;
-                int lower=index;
-                while (lower<length && Character.isWhitespace(source.charAt(lower))) {
-                    lower++;
-                }
-                int upper=lower;
-                while (upper<length && !Character.isWhitespace(source.charAt(upper))) {
-                    upper++;
-                }
-                throw new ParseException(Errors.format(ErrorKeys.UNPARSABLE_STRING_$2, source,
-                            source.substring(lower, Math.min(lower+10, upper))), index);
-            }
-        }
     }
 
     /**

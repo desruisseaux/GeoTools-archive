@@ -370,6 +370,29 @@ public final class GeoTools {
     }
 
     /**
+     * Returns new hints that combine user supplied hints with the
+     * {@linkplain #getDefaultHints defaults hints}. If a hint is specified in both user
+     * and default hints, then user hints have precedence.
+     * <p>
+     * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
+     * default hints} on a case-by-case basis instead of fetching all default hints at once.
+     * But it leads to significant complication in {@link FactoryRegistry} and synchronization
+     * issues.
+     *
+     * @param hints The user hints, or {@code null} if none.
+     * @return New hints (never {@code null}).
+     *
+     * @since 2.5
+     */
+    public static Hints addDefaultHints(final Hints hints) {
+        final Hints completed = getDefaultHints();
+        if (hints != null) {
+            completed.add(hints);
+        }
+        return completed;
+    }
+
+    /**
      * Returns the default initial context.
      *
      * @param  hints An optional set of hints, or {@code null} if none.
@@ -513,25 +536,5 @@ public final class GeoTools {
         if (hints!=null && !hints.isEmpty()) {
             arguments.out.println(hints);
         }
-    }
-    /**
-     * Add {@linkplain GeoTools#getDefaultHints defaults hints} to the specified user hints.
-     * User hints have precedence.
-     * <p>
-     * <b>Note:</b> In a previous version, we fetched the {@linkplain Hints#getSystemDefault
-     * default hints} on a case-by-case basis instead of fetching all default hints at once.
-     * But it leads to significant complication in {@link FactoryRegistry} (hints comming from
-     * two different sources, which introduced new bugs when "longitude first axis order" hint
-     * is set). In addition, it may leads to synchronization issue if many hints are modified
-     * one by one. It is safer to get all default hints in one synchronized snapshot and lets
-     * {@link FactoryRegistry} assumes that the hints map really contains every hints it need
-     * to care about.
-     */
-    public static Hints addDefaultHints(final Hints hints) {
-        final Hints completed = GeoTools.getDefaultHints();
-        if (hints != null) {
-            completed.add(hints);
-        }
-        return completed;
     }
 }

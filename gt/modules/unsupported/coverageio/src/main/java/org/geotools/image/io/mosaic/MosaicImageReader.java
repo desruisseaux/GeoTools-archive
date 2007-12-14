@@ -40,6 +40,7 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.util.FrequencySortedSet;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -51,6 +52,13 @@ import org.geotools.util.FrequencySortedSet;
  * @author Martin Desruisseaux
  */
 public class MosaicImageReader extends ImageReader {
+    /**
+     * Type arguments made of a single {@code int} value.
+     */
+    private static final Class<?>[] INTEGER_ARGUMENTS = {
+        int.class
+    };
+
     /**
      * The tile manager.
      */
@@ -252,12 +260,23 @@ public class MosaicImageReader extends ImageReader {
      * <p>
      * This method always returns {@code true} if there is no tiles.
      */
-    private boolean useDefaultImplementation(final String methodName) {
-        if (tiles == null) {
-            return true;
+    private boolean useDefaultImplementation(final String methodName, final Class<?>[] parameterTypes) {
+        if (tiles != null) {
+            for (final ImageReader reader : tiles.getReaders()) {
+                Class<?> type = reader.getClass();
+                try {
+                    type = type.getMethod(methodName, parameterTypes).getDeclaringClass();
+                } catch (NoSuchMethodException e) {
+                    Logging.unexpectedException("org.geotools.image.io.mosaic",
+                            MosaicImageReader.class, "useDefaultImplementation", e);
+                    return false; // Conservative value.
+                }
+                if (!type.equals(ImageReader.class)) {
+                    return false;
+                }
+            }
         }
-        // TODO: implement that.
-        return false;
+        return true;
     }
 
     /**
@@ -270,7 +289,7 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public boolean isRandomAccessEasy(final int imageIndex) throws IOException {
-        if (useDefaultImplementation("isRandomAccessEasy")) {
+        if (useDefaultImplementation("isRandomAccessEasy", INTEGER_ARGUMENTS)) {
             return super.isRandomAccessEasy(imageIndex);
         }
         for (final Tile tile : tiles.getTiles(imageIndex, null)) {
@@ -294,7 +313,7 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public float getAspectRatio(final int imageIndex) throws IOException {
-        if (!useDefaultImplementation("getAspectRatio")) {
+        if (!useDefaultImplementation("getAspectRatio", INTEGER_ARGUMENTS)) {
             float ratio = Float.NaN;
             for (final Tile tile : tiles.getTiles(imageIndex, null)) {
                 final float candidate = tile.getPreparedReader(true, true).getAspectRatio(imageIndex);
@@ -443,7 +462,7 @@ public class MosaicImageReader extends ImageReader {
      */
     @Override
     public ImageReadParam getDefaultReadParam() {
-        if (!useDefaultImplementation("getDefaultReadParam")) {
+        if (!useDefaultImplementation("getDefaultReadParam", null)) {
             final ImageReader reader = tiles.getReader();
             if (reader != null) {
                 return reader.getDefaultReadParam();

@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// Collections
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -25,11 +24,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.logging.LoggedFormat;
 
 
 /**
@@ -66,7 +65,7 @@ public final class Element {
      * May be {@code null} if the keyword was not followed by a pair of brackets
      * (e.g. "NORTH").
      */
-    private final List list;
+    private final List<Object> list;
 
     /**
      * Constructs a root element.
@@ -76,7 +75,7 @@ public final class Element {
     Element(final Element singleton) {
         offset  = 0;
         keyword = null;
-        list    = new LinkedList();
+        list    = new LinkedList<Object>();
         list.add(singleton);
     }
 
@@ -86,7 +85,7 @@ public final class Element {
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.
      *                    In output, the first character after the separator.
-     */ 
+     */
     Element(final AbstractParser parser, final String text, final ParsePosition position)
             throws ParseException
     {
@@ -123,9 +122,8 @@ public final class Element {
                 return;
             }
         }
-        while (!parseOptionalSeparator(text, position,
-                parser.symbols.openingBrackets[bracketIndex]));
-        list = new LinkedList();
+        while (!parseOptionalSeparator(text, position, parser.symbols.openingBrackets[bracketIndex]));
+        list = new LinkedList<Object>();
         /*
          * Parse all elements inside the bracket. Elements are parsed sequentially
          * and their type are selected according their first character:
@@ -144,7 +142,7 @@ public final class Element {
             // it as a string if the first non-blank character is a quote.
             //
             if (parseOptionalSeparator(text, position, parser.symbols.quote)) {
-                lower = position.getIndex();        
+                lower = position.getIndex();
                 upper = text.indexOf(parser.symbols.quote, lower);
                 if (upper < lower) {
                     position.setErrorIndex(++lower);
@@ -158,7 +156,7 @@ public final class Element {
             // Try to parse the next element as a number. We will take it as a number if
             // the first non-blank character is not the begining of an unicode identifier.
             //
-            lower = position.getIndex();        
+            lower = position.getIndex();
             if (!Character.isUnicodeIdentifierStart(text.charAt(lower))) {
                 final Number number = parser.parseNumber(text, position);
                 if (number == null) {
@@ -270,26 +268,10 @@ public final class Element {
      * @return An exception with a formatted error message.
      */
     private ParseException unparsableString(final String text, final ParsePosition position) {
-        final int lower = position.getErrorIndex();
-        int upper = lower;
-        final int length = text.length();
-        if (upper < length) {
-            final int type = Character.getType(text.charAt(upper));
-            while (++upper < length) {
-                if (Character.getType(text.charAt(upper)) != type) {
-                    break;
-                }
-            }
-        }
-        final String message;
-        if (lower == length) {
-            message = Errors.format(ErrorKeys.UNEXPECTED_END_OF_STRING);
-        } else {
-            message = Errors.format(ErrorKeys.UNPARSABLE_STRING_$2,
-                      text.substring(position.getIndex()),
-                      text.substring(lower, upper));
-        }
-        return trim("unparsableString", new ParseException(complete(message), lower));
+        final int errorIndex = position.getErrorIndex();
+        String message = LoggedFormat.formatUnparsable(text, position.getIndex(), errorIndex, null);
+        message = complete(message);
+        return trim("unparsableString", new ParseException(message, errorIndex));
     }
 
     /**
@@ -343,7 +325,7 @@ public final class Element {
         StackTraceElement[] trace = exception.getStackTrace();
         if (trace!=null && trace.length!=0) {
             if (factory.equals(trace[0].getMethodName())) {
-                trace = (StackTraceElement[]) XArray.remove(trace, 0, 1);
+                trace = XArray.remove(trace, 0, 1);
                 exception.setStackTrace(trace);
             }
         }
@@ -429,7 +411,7 @@ public final class Element {
         while (iterator.hasNext()) {
             final Object object = iterator.next();
             if (object instanceof String) {
-                iterator.remove();                
+                iterator.remove();
                 return (String)object;
             }
         }
@@ -449,7 +431,7 @@ public final class Element {
             return element;
         }
         throw missingParameter(key);
-    }        
+    }
 
     /**
      * Removes the next {@link Element} from the list and returns it.
@@ -521,6 +503,7 @@ public final class Element {
      * Returns the keyword. This overriding is needed for correct
      * formatting of the error message in {@link #close}.
      */
+    @Override
     public String toString() {
         return keyword;
     }

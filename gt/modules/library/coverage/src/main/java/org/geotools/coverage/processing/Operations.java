@@ -16,15 +16,14 @@
  */
 package org.geotools.coverage.processing;
 
-// J2SE and JAI dependencies
 import java.awt.RenderingHints;
 import java.util.Map;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
 import javax.media.jai.KernelJAI;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.processing.Operation;
@@ -32,12 +31,17 @@ import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
+import org.geotools.referencing.CRS;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.GridGeometry2D;
 
 
 /**
@@ -245,7 +249,7 @@ public class Operations {
 
     /**
      * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
-     * 
+     *
      * @param source  The source coverage.
      * @param padding The number of pixels above, below, to the left and to the right of central
      *        {@code NaN} pixel to use for computing the average. The default value is 1.
@@ -321,7 +325,7 @@ public class Operations {
 
     /**
      * Recolors a coverage to the specified colormaps.
-     * 
+     *
      * @param source    The source coverage.
      * @param colorMaps The color maps to apply.
      * @throws CoverageProcessingException if the operation can't be applied.
@@ -341,7 +345,7 @@ public class Operations {
 
     /**
      * Recolors a coverage to the specified color maps.
-     * 
+     *
      * @param source    The source coverage.
      * @param colorMaps The color maps to apply.
      * @throws CoverageProcessingException if the operation can't be applied.
@@ -395,6 +399,61 @@ public class Operations {
             throws CoverageProcessingException
     {
         return doOperation("Resample", source, "CoordinateReferenceSystem", crs);
+    }
+
+    /**
+     * Resamples a grid coverage to the specified envelope.
+     *
+     * @param source The source coverage.
+     * @param crs The target envelope, including a possibly different coordinate reference system.
+     * @param interpolationType The interpolation type, or {@code null} for the default one.
+     * @throws CoverageProcessingException if the operation can't be applied.
+     *
+     * @see org.geotools.coverage.processing.operation.Resample
+     * @since 2.5
+     */
+    public Coverage resample(final GridCoverage  source,
+                             final Envelope      envelope,
+                             final Interpolation interpolationType)
+            throws CoverageProcessingException
+    {
+        GridGeometry gridGeometry = source.getGridGeometry();
+        final CoordinateReferenceSystem sourceCRS =   source.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem targetCRS = envelope.getCoordinateReferenceSystem();
+        if (targetCRS == null || CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+            /*
+             * Same CRS (or unknown target CRS, which we treat as same), so we will keep the same
+             * "gridToCRS" transform. Basically the result will be the same as if we did a crop.
+             */
+            gridGeometry = new GridGeometry2D(gridGeometry.getGridToCRS(), envelope);
+        } else {
+            /*
+             * Different CRS. We need to infer an image size, which may be the same than the
+             * original size or something smaller if the envelope is a subarea. We process by
+             * transforming the target envelope to the source CRS and compute a new grid geometry
+             * with that envelope. The grid range of that grid geometry is the new image size.
+             * Note that failure to transform the envelope is non-fatal (we will assume that the
+             * target image should have the same size). Then create again a new grid geometry,
+             * this time with the target envelope.
+             */
+            GridRange gridRange;
+            try {
+                final GeneralEnvelope transformed;
+                transformed = CRS.transform(CRS.getCoordinateOperationFactory(true)
+                        .createOperation(targetCRS, sourceCRS), envelope);
+                transformed.intersect(source.getEnvelope());
+                gridGeometry = new GridGeometry2D(gridGeometry.getGridToCRS(), envelope);
+            } catch (FactoryException exception) {
+                recoverableException("resample", exception);
+            } catch (TransformException exception) {
+                recoverableException("resample", exception);
+                // Will use the grid range from the original geometry,
+                // which will result in keeping the same image size.
+            }
+            gridRange = gridGeometry.getGridRange();
+            gridGeometry = new GridGeometry2D(gridRange, envelope);
+        }
+        return resample(source, targetCRS, gridGeometry, interpolationType);
     }
 
     /**
@@ -753,7 +812,7 @@ public class Operations {
     /**
      * Applies a process operation with one parameter.
      * This is a helper method for implementation of various convenience methods in this class.
-     * 
+     *
      * @param operationName  Name of the operation to be applied to the coverage.
      * @param source         The source coverage.
      * @param argumentName1  The name of the first parameter to setParameterValue.
@@ -779,7 +838,7 @@ public class Operations {
     /**
      * Applies process operation with two parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     * 
+     *
      * @param operationName  Name of the operation to be applied to the coverage.
      * @param source         The source coverage.
      * @param argumentName1  The name of the first parameter to setParameterValue.
@@ -809,7 +868,7 @@ public class Operations {
     /**
      * Applies a process operation with three parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     * 
+     *
      * @param operationName  Name of the operation to be applied to the coverage.
      * @param source         The source coverage.
      * @param argumentName1  The name of the first parameter to setParameterValue.
@@ -843,7 +902,7 @@ public class Operations {
     /**
      * Applies a process operation with four parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     * 
+     *
      * @param  operationName  Name of the operation to be applied to the coverage.
      * @param  source         The source coverage.
      * @return The result as a coverage.
@@ -875,7 +934,7 @@ public class Operations {
     /**
      * Applies a process operation with five parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     * 
+     *
      * @param  operationName  Name of the operation to be applied to the coverage.
      * @param  source         The source coverage.
      * @return The result as a coverage.
@@ -909,7 +968,7 @@ public class Operations {
     /**
      * Applies a process operation with six parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     * 
+     *
      * @param  operationName  Name of the operation to be applied to the coverage.
      * @param  source         The source coverage.
      * @return The result as a coverage.
@@ -956,5 +1015,16 @@ public class Operations {
             exception.initCause(cause);
             throw exception;
         }
+    }
+
+    /**
+     * Invoked when an error occured but the application can fallback on a reasonable default.
+     *
+     * @param method The method where the error occured.
+     * @param exception The error.
+     */
+    private static void recoverableException(final String method, final Exception exception) {
+        Utilities.recoverableException("org.geotools.coverage.processing", Operations.class,
+                method, exception);
     }
 }

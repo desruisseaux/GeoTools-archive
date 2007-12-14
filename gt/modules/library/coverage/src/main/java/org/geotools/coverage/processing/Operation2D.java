@@ -73,7 +73,7 @@ public abstract class Operation2D extends AbstractOperation {
      */
     public static final ParameterDescriptor SOURCE_0;
     static {
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(IdentifiedObject.NAME_KEY,  new NamedIdentifier(Citations.OGC, "Source"));
         properties.put(IdentifiedObject.ALIAS_KEY, new NamedIdentifier(Citations.JAI, "source0"));
         SOURCE_0 = new DefaultParameterDescriptor(properties, GridCoverage2D.class,
@@ -117,7 +117,7 @@ public abstract class Operation2D extends AbstractOperation {
      * <p>
      * This method fills the {@code sources} array with needed sources, changing to their
      * geophysics view if needed.
-     * 
+     *
      * @param parameters  Parameters that will control this operation.
      * @param sourceNames Names of the sources to extract from {@link ParameterValueGroup}.
      * @param sources     On input, an array with the same length than {@code sourceNames}.

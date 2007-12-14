@@ -87,7 +87,7 @@ public class GT30ZipWriterTest extends GT30TestBase {
 			writer.write(gc, (GeneralParameterValue[]) params.values().toArray(
 					new GeneralParameterValue[1]));
 		
-			gc.dispose();
+			gc.dispose(false);
 		}
 	}
 

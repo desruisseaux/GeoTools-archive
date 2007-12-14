@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.processing;
 
-// Collections
 import java.util.List;
 import java.util.Locale;
 import java.util.Iterator;
@@ -29,14 +28,12 @@ import java.awt.RenderingHints;
 import java.io.IOException;
 import java.io.Writer;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
-// Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.resources.image.ImageUtilities;
@@ -77,7 +74,7 @@ public abstract class AbstractProcessor {
             super(name, level);
         }
     }
-    
+
     /**
      * The default coverage processor. Will be constructed only when first requested.
      *
@@ -106,8 +103,6 @@ public abstract class AbstractProcessor {
         }
         return DEFAULT;
     }
-    
-
 
     /**
      * Notifies this processor that it is going to be used as the application-wide default
@@ -120,7 +115,7 @@ public abstract class AbstractProcessor {
      * Retrieves grid processing operations information. Each operation information contains
      * the name of the operation as well as a list of its parameters.
      */
-    public abstract Collection/*<Operation>*/ getOperations();
+    public abstract Collection<Operation> getOperations();
 
     /**
      * Returns the operation for the specified name.
@@ -280,7 +275,7 @@ public abstract class AbstractProcessor {
                     out.write(lineSeparator);
                     writer.format(((AbstractOperation) operation).descriptor);
                 }
-            }            
+            }
         }
     }
 

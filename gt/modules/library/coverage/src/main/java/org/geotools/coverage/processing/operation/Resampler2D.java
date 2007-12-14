@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage.processing.operation;
 
-// J2SE dependencies
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.renderable.ParameterBlock;
@@ -150,7 +149,7 @@ final class Resampler2D extends GridCoverage2D {
         GridGeometry2D sourceGG;
         CoordinateReferenceSystem sourceCRS;
         while (true) {
-            sourceGG  = (GridGeometry2D) sourceCoverage.getGridGeometry(); // TODO: remove cast with J2SE 1.5.
+            sourceGG  = sourceCoverage.getGridGeometry();
             sourceCRS = sourceCoverage.getCoordinateReferenceSystem();
             if (targetCRS == null) {
                 targetCRS = sourceCRS;
@@ -205,7 +204,7 @@ final class Resampler2D extends GridCoverage2D {
         if (targetHints == null) {
             targetHints = new RenderingHints(null);
             if (hints != null) {
-            	targetHints.add(hints);	
+            	targetHints.add(hints);
             }
         } else if (hints != null) {
             targetHints.add(hints);
@@ -344,7 +343,6 @@ final class Resampler2D extends GridCoverage2D {
          * rendering hints, which contains mostly indications about tiles layout.
          * The xmin, xmax, ymin and ymax bounds are relative to the target image.
          */
-//      final PlanarImage sourceImage =
         final GridRange   targetGR    = targetGG.getGridRange();
         final int         xAxis       = targetGG.gridDimensionX;
         final int         yAxis       = targetGG.gridDimensionY;
@@ -531,8 +529,7 @@ final class Resampler2D extends GridCoverage2D {
             case 2: targetCoverage = targetCoverage.geophysics(false); break;
         }
         assert CRS.equalsIgnoreMetadata(targetCoverage.getCoordinateReferenceSystem(), targetCRS) : targetGG;
-        assert ((GridGeometry2D) targetCoverage.getGridGeometry()).getGridRange2D()
-                             .equals(targetImage.getBounds()) : targetGG;
+        assert targetCoverage.getGridGeometry().getGridRange2D().equals(targetImage.getBounds())  : targetGG;
         if (AbstractProcessor.LOGGER.isLoggable(LOGGING_LEVEL)) {
             log(Logging.getResources(locale).getLogRecord(LOGGING_LEVEL,
                 LoggingKeys.APPLIED_RESAMPLE_$11, new Object[] {

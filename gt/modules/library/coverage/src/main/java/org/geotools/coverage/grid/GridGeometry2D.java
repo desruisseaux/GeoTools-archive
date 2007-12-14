@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -82,7 +83,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
      *
      * @todo Uncomment the additional enums if we add those code lists to GeoAPI.
      */
-    private static Map/*<PixelOrientation, Point2D.Double>*/ ORIENTATIONS = new HashMap(8);
+    private static Map<PixelOrientation, Point2D.Double> ORIENTATIONS =
+            new HashMap<PixelOrientation, Point2D.Double>(8);
     static {
         ORIENTATIONS.put(PixelOrientation.CENTER,      new Point2D.Double( 0.0,  0.0));
         ORIENTATIONS.put(PixelOrientation.UPPER_LEFT,  new Point2D.Double(-0.5, -0.5));
@@ -145,6 +147,39 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
+     * Creates a new grid geometry with the same values than the given grid geometry. This
+     * is a copy constructor useful when the instance must be a {@code GridGeometry2D}.
+     *
+     * @param other The other grid geometry to copy.
+     *
+     * @since 2.5
+     */
+    public GridGeometry2D(final GridGeometry other) {
+        super(other);
+        if (other instanceof GridGeometry2D) {
+            final GridGeometry2D gg = (GridGeometry2D) other;
+            gridToCRS2D    = gg.gridToCRS2D;
+            gridFromCRS2D  = gg.gridFromCRS2D;
+            gridDimensionX = gg.gridDimensionX;
+            gridDimensionY = gg.gridDimensionY;
+            axisDimensionX = gg.axisDimensionX;
+            axisDimensionY = gg.axisDimensionY;
+            crs2D          = gg.crs2D;
+
+        } else {
+            final int[] dimensions;
+            dimensions     = new int[4];
+            gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
+            gridFromCRS2D  = inverse(gridToCRS2D);
+            gridDimensionX = dimensions[0];
+            gridDimensionY = dimensions[1];
+            axisDimensionX = dimensions[2];
+            axisDimensionY = dimensions[3];
+            crs2D          = createCRS2D();
+        }
+    }
+
+    /**
      * Constructs a new grid geometry from a math transform. The arguments are passed unchanged
      * to the {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange, MathTransform,
      * CoordinateReferenceSystem) super-class constructor}. However, they must obey to one
@@ -187,7 +222,38 @@ public class GridGeometry2D extends GeneralGridGeometry {
         gridDimensionY = dimensions[1];
         axisDimensionX = dimensions[2];
         axisDimensionY = dimensions[3];
-        crs2D = createCRS2D();
+        crs2D          = createCRS2D();
+    }
+
+    /**
+     * Constructs a new grid geometry from an envelope and a {@linkplain MathTransform math transform}
+     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}.
+     *
+     * @param gridToCRS The math transform which allows for the transformations from grid
+     *                  coordinates (pixel's <em>center</em>) to real world earth coordinates.
+     *                  May be {@code null}, but this is not recommanded.
+     * @param envelope  The envelope (including CRS) of a grid coverage, or {@code null} if none.
+     *
+     * @throws MismatchedDimensionException if the math transform and the envelope doesn't have
+     *         consistent dimensions.
+     * @throws IllegalArgumentException if the math transform can't transform coordinates
+     *         in the domain of the grid range.
+     *
+     * @since 2.5
+     */
+    public GridGeometry2D(final MathTransform gridToCRS, final Envelope envelope)
+            throws MismatchedDimensionException, IllegalArgumentException
+    {
+        super(gridToCRS, envelope);
+        final int[] dimensions;
+        dimensions     = new int[4];
+        gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
+        gridFromCRS2D  = inverse(gridToCRS2D);
+        gridDimensionX = dimensions[0];
+        gridDimensionY = dimensions[1];
+        axisDimensionX = dimensions[2];
+        axisDimensionY = dimensions[3];
+        crs2D          = createCRS2D();
     }
 
     /**
@@ -261,7 +327,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
         gridDimensionY = dimensions[1];
         axisDimensionX = dimensions[2];
         axisDimensionY = dimensions[3];
-        crs2D = createCRS2D();
+        crs2D          = createCRS2D();
     }
 
     /**
@@ -586,7 +652,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
     private static Point2D.Double getDirectPixelTranslation(final PixelOrientation orientation)
             throws IllegalArgumentException
     {
-        final Point2D.Double offset = (Point2D.Double) ORIENTATIONS.get(orientation);
+        final Point2D.Double offset = ORIENTATIONS.get(orientation);
         if (offset == null) {
             throw new IllegalArgumentException(Errors.format(
                     ErrorKeys.ILLEGAL_ARGUMENT_$2, "orientation", orientation));
@@ -664,6 +730,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
     /**
      * Compares the specified object with this grid geometry for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final GridGeometry2D that = (GridGeometry2D) object;

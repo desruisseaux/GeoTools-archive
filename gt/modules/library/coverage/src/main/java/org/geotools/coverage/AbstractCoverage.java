@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Frame;
@@ -43,14 +42,12 @@ import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-// JAI dependencies
 import javax.media.jai.ImageFunction;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;  // For Javadoc
@@ -65,12 +62,13 @@ import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
 import javax.media.jai.util.CaselessStringKey;           // For Javadoc
 import javax.media.jai.widget.ScrollingImagePanel;
 
-// OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.CommonPointRule;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.GeometryValuePair;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.AttributeValues;
+import org.opengis.coverage.DomainObject;
 import org.opengis.coverage.grid.GridCoverage;                // For javadoc
 import org.opengis.coverage.grid.GridGeometry;                // For javadoc
 import org.opengis.coverage.processing.GridCoverageProcessor; // For javadoc
@@ -81,11 +79,11 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.Geometry;
 import org.opengis.temporal.Period;
+import org.opengis.metadata.extent.Extent;
 import org.opengis.util.InternationalString;
 import org.opengis.util.Record;
 import org.opengis.util.RecordType;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
@@ -94,7 +92,6 @@ import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.util.logging.Logging;
 import org.geotools.util.SimpleInternationalString;
 
-// Resources
 import org.geotools.io.LineWriter;
 import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
@@ -169,7 +166,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Constructs a coverage using the specified coordinate reference system. If the coordinate
      * reference system is {@code null}, then the subclasses must override {@link #getDimension()}.
-     * 
+     *
      * @param name   The coverage name.
      * @param crs    The coordinate reference system. This specifies the CRS used when accessing
      *               a coverage or grid coverage with the {@code evaluate(...)} methods.
@@ -184,7 +181,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     protected AbstractCoverage(final CharSequence             name,
                                final CoordinateReferenceSystem crs,
                                final PropertySource         source,
-                               final Map                properties)
+                               final Map<?,?>           properties)
     {
         super(properties, source);
         this.name = SimpleInternationalString.wrap(name);
@@ -197,7 +194,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * <strong>Note:</strong> This constructor keeps a strong reference to the source
      * coverage (through {@link PropertySourceImpl}). In many cases, it is not a problem
      * since {@link GridCoverage} will retains a strong reference to its source anyway.
-     * 
+     *
      * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
      * @param coverage The source coverage.
      */
@@ -243,7 +240,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *
      * @return The coordinate reference system used when accessing a coverage or
      *         grid coverage with the {@code evaluate(...)} methods.
-     * 
+     *
      * @see org.geotools.coverage.grid.GeneralGridGeometry#getGridToCRS
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
@@ -263,7 +260,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * The default implementation ask for
      * {@linkplain CoordinateSystem coordinate system} axis names, or returns
      * "x", "y"... if this coverage has no CRS.
-     * 
+     *
      * @return The names of each dimension. The array's length is equals to
      *         {@link #getDimension}.
      *
@@ -287,33 +284,19 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     }
 
     /**
-     * Returns the names of each dimension in this coverage.
-     * 
-     * @deprecated Replaced by {@link #getDimensionNames()}.
-     */
-    public final String[] getDimensionNames(final Locale locale) {
-        final InternationalString[] inter = getDimensionNames();
-        final String[] names = new String[inter.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = inter[i].toString(locale);
-        }
-        return names;
-    }
-
-    /**
      * Returns the bounding box for the coverage domain in
      * {@linkplain #getCoordinateReferenceSystem coordinate reference system} coordinates. May
      * be {@code null} if this coverage has no associated coordinate reference system. For grid
      * coverages, the grid cells are centered on each grid coordinate. The envelope for a 2-D
      * grid coverage includes the following corner positions.
-     * 
+     *
      * <blockquote><pre>
      *  (Minimum row - 0.5, Minimum column - 0.5) for the minimum coordinates
      *  (Maximum row - 0.5, Maximum column - 0.5) for the maximum coordinates
      * </pre></blockquote>
-     * 
+     *
      * The default implementation returns the domain of validity of the CRS, if there is one.
-     * 
+     *
      * @return The bounding box for the coverage domain in coordinate system coordinates.
      */
     public Envelope getEnvelope() {
@@ -331,7 +314,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @todo Proposed default implementation: invokes {@link #getEnvelope}, extract
      *       the spatial and temporal parts and put them in a {@link Extent} object.
      */
-    public Set/*<Extent>*/ getDomainExtents() {
+    public Set<Extent> getDomainExtents() {
         throw unsupported();
     }
 
@@ -347,7 +330,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *       spatial and temporal parts, get the grid geometry and create on-the-fly a
      *       {@link DomainObject} for each cell.
      */
-    public Set/*<? extends DomainObject>*/ getDomainElements() {
+    public Set<? extends DomainObject> getDomainElements() {
         throw unsupported();
     }
 
@@ -377,7 +360,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *
      * @since 2.3
      */
-    public Set/*<AttributeValues>*/ getRangeElements() {
+    public Set<AttributeValues> getRangeElements() {
         throw unsupported();
     }
 
@@ -419,7 +402,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *
      * @since 2.3
      */
-    public Set list() {
+    public Set<? extends GeometryValuePair> list() {
         throw unsupported();
     }
 
@@ -436,7 +419,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *
      * @since 2.3
      */
-    public Set select(Geometry arg0, Period arg1) {
+    public Set<? extends GeometryValuePair> select(Geometry s, Period t) {
         throw unsupported();
     }
 
@@ -463,7 +446,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *
      * @since 2.3
      */
-    public List find(DirectPosition p, int limit) {
+    public List<? extends GeometryValuePair> find(DirectPosition p, int limit) {
         throw unsupported();
     }
 
@@ -513,23 +496,13 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * according to the {@linkplain #getCommonPointRule common point rule}.
      * <P>
      * <B>NOTE:</B> Normally, the operation will return a single record of feature attribute values.
+     * <p>
+     * <strong>This method is not yet implemented.</strong>
      *
      * @since 2.3
-     *
-     * @deprecated Current implementation is incorrect, since it ignores the {@link #list} argument.
      */
-    public Set/*<Record>*/ evaluate(final DirectPosition coord, final Set/*<String>*/ list) {
-        final Set set = new HashSet();
-        final Object array = evaluate(coord);
-        try {
-            final int length = Array.getLength(array);
-            for (int index=0; index<length; index++) {
-                set.add(Array.get(array, index));
-            }
-        } catch (IllegalArgumentException exception) {
-            throw new CannotEvaluateException(formatErrorMessage(set), exception);
-        }
-        return set;
+    public Set<Record> evaluate(final DirectPosition coord, final Set<String> list) {
+        throw unsupported();
     }
 
     /**
@@ -540,7 +513,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
-     * 
+     *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest An array in which to store values, or {@code null} to create a new array.
      * @return The {@code dest} array, or a newly created array if {@code dest} was null.
@@ -575,7 +548,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
-     * 
+     *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest An array in which to store values, or {@code null} to create a new array.
      * @return The {@code dest} array, or a newly created array if {@code dest} was null.
@@ -612,7 +585,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
-     * 
+     *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest An array in which to store values, or {@code null} to create a new array.
      * @return The {@code dest} array, or a newly created array if {@code dest} was null.
@@ -647,7 +620,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
-     * 
+     *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest An array in which to store values, or {@code null} to create a new array.
      * @return The {@code dest} array, or a newly created array if {@code dest} was null.
@@ -682,7 +655,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * some {@linkplain org.geotools.coverage.grid.Interpolator2D subclasses}. The CRS of the
      * point is the same as the grid coverage {@linkplain #getCoordinateReferenceSystem coordinate
      * reference system}.
-     * 
+     *
      * @param  coord The coordinate point where to evaluate.
      * @param  dest An array in which to store values, or {@code null} to create a new array.
      * @return The {@code dest} array, or a newly created array if {@code dest} was null.
@@ -724,14 +697,14 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      *
      * @since 2.3
      */
-    public Set evaluateInverse(Record v) {
+    public Set<? extends DomainObject> evaluateInverse(Record v) {
         throw unsupported();
     }
 
     /**
      * Returns 2D view of this grid coverage as a renderable image. This method
      * allows interoperability with Java2D.
-     * 
+     *
      * @param xAxis Dimension to use for the <var>x</var> display axis.
      * @param yAxis Dimension to use for the <var>y</var> display axis.
      * @return A 2D view of this grid coverage as a renderable image.
@@ -754,10 +727,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * allow interoperability with <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>
      * for a two-dimensional slice of a coverage (which may or may not be a
      * {@linkplain org.geotools.coverage.grid.GridCoverage2D grid coverage}).
-     * 
+     *
      * @version $Id$
      * @author Martin Desruisseaux
-     * 
+     *
      * @see AbstractCoverage#getRenderableImage
      */
     protected class Renderable extends PropertySourceImpl implements RenderableImage, ImageFunction {
@@ -790,7 +763,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
 
         /**
          * Constructs a renderable image.
-         * 
+         *
          * @param xAxis Dimension to use for <var>x</var> axis.
          * @param yAxis Dimension to use for <var>y</var> axis.
          */
@@ -806,14 +779,14 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         /**
          * Returns {@code null} to indicate that no source information is available.
          */
-        public Vector getSources() {
+        public Vector<RenderableImage> getSources() {
             return null;
         }
 
         /**
          * Returns {@code true} if successive renderings with the same arguments
          * may produce different results. The default implementation returns {@code false}.
-         * 
+         *
          * @see org.geotools.coverage.grid.GridCoverage2D#isDataEditable
          */
         public boolean isDynamic() {
@@ -829,7 +802,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
 
         /**
          * Gets the width in coverage coordinate space.
-         * 
+         *
          * @see AbstractCoverage#getEnvelope
          * @see AbstractCoverage#getCoordinateReferenceSystem
          */
@@ -839,7 +812,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
 
         /**
          * Gets the height in coverage coordinate space.
-         * 
+         *
          * @see AbstractCoverage#getEnvelope
          * @see AbstractCoverage#getCoordinateReferenceSystem
          */
@@ -851,7 +824,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * Gets the minimum <var>X</var> coordinate of the rendering-independent image
          * data. This is the {@linkplain AbstractCoverage#getEnvelope coverage's envelope}
          * minimal value for the {@linkplain #xAxis x axis}.
-         * 
+         *
          * @see AbstractCoverage#getEnvelope
          * @see AbstractCoverage#getCoordinateReferenceSystem
          */
@@ -863,7 +836,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * Gets the minimum <var>Y</var> coordinate of the rendering-independent image
          * data. This is the {@linkplain AbstractCoverage#getEnvelope coverage's envelope}
          * minimal value for the {@linkplain #yAxis y axis}.
-         * 
+         *
          * @see AbstractCoverage#getEnvelope
          * @see AbstractCoverage#getCoordinateReferenceSystem
          */
@@ -873,7 +846,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
 
         /**
          * Returns a rendered image with a default width and height in pixels.
-         * 
+         *
          * @return A rendered image containing the rendered data
          */
         public RenderedImage createDefaultRendering() {
@@ -887,7 +860,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * <p>
          * The default implementation creates a render context with {@link #createRenderContext}
          * and invokes {@link #createRendering(RenderContext)}.
-         * 
+         *
          * @param width  The width of rendered image in pixels, or 0.
          * @param height The height of rendered image in pixels, or 0.
          * @param hints  Rendering hints, or {@code null}.
@@ -913,7 +886,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * "{@link ImageFunctionDescriptor ImageFunction}" operation if possible (i.e. if
          * the area of interect is rectangular and the affine transform contains only
          * translation and scale coefficients).
-         * 
+         *
          * @param context The render context to use to produce the rendering.
          * @return A rendered image containing the rendered data
          */
@@ -1034,13 +1007,13 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * to the specified destination rectangle. The affine transform mays swap axis in order to
          * normalize their order (i.e. make them appear in the (<var>x</var>,<var>y</var>) order),
          * so that the image appears properly oriented when rendered.
-         * 
+         *
          * @param gridBounds The two-dimensional destination rectangle.
          * @param hints      The rendering hints, or {@code null} if none.
          * @return A render context initialized with an affine transform from the coverage
          *         to the grid coordinate system. This transform is the inverse of
          *         {@link org.geotools.coverage.grid.GridGeometry2D#getGridToCRS2D}.
-         * 
+         *
          * @see org.geotools.coverage.grid.GridGeometry2D#getGridToCRS2D
          */
         protected RenderContext createRenderContext(final Rectangle2D gridBounds,
@@ -1055,7 +1028,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                         cs.getAxis(xAxis).getDirection(),
                         cs.getAxis(yAxis).getDirection()
                 };
-                final AxisDirection[] normalized = (AxisDirection[]) axis.clone();
+                final AxisDirection[] normalized = axis.clone();
                 if (false) {
                     // Normalize axis: Is it really a good idea?
                     // We should provide a rendering hint for configuring that.
@@ -1145,19 +1118,6 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * Display this coverage in a windows. This convenience method is used for debugging purpose.
      * The exact appareance of the windows and the tools provided may changes in future versions.
      *
-     * @param  xAxis Dimension to use for the <var>x</var> display axis.
-     * @param  yAxis Dimension to use for the <var>y</var> display axis.
-     *
-     * @deprecated Use {@link #show(String, int, int)}.
-     */
-    public void show(final int xAxis, final int yAxis) {
-        show(null, xAxis, yAxis);
-    }
-
-    /**
-     * Display this coverage in a windows. This convenience method is used for debugging purpose.
-     * The exact appareance of the windows and the tools provided may changes in future versions.
-     *
      * @param  title The window title, or {@code null} for default value.
      * @param  xAxis Dimension to use for the <var>x</var> display axis.
      * @param  yAxis Dimension to use for the <var>y</var> display axis.
@@ -1191,6 +1151,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         /**
          * Displays the specified image in a window with the specified title.
          */
+        @SuppressWarnings("deprecated")
         public Viewer(final String title, final RenderedImage image) {
             final int width  = Math.max(Math.min(image.getWidth(),  800), 24);
             final int height = Math.max(Math.min(image.getHeight(), 600), 24);
@@ -1212,6 +1173,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         /**
          * Invoked when the user dispose the window.
          */
+        @Override
         public void windowClosing(WindowEvent e) {
             frame.dispose();
         }
@@ -1241,15 +1203,15 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns the source data for a coverage. The default implementation returns an empty list.
      */
-    public List getSources() {
-        return Collections.EMPTY_LIST;
+    public List<? extends Coverage> getSources() {
+        return Collections.emptyList();
     }
 
     /**
      * List of metadata keywords for a coverage. If no metadata is available,
      * the sequence will be empty. The default implementation gets the list of
      * metadata names from the {@link #getPropertyNames()} method.
-     * 
+     *
      * @return the list of metadata keywords for a coverage.
      *
      * @deprecated Use {@link #getPropertyNames()} instead.
@@ -1262,7 +1224,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Retrieve the metadata value for a given metadata name. The default
      * implementation query the {@link #getProperty(String)} method.
-     * 
+     *
      * @param name Metadata keyword for which to retrieve data.
      * @return the metadata value for a given metadata name.
      * @throws MetadataNameNotFoundException
@@ -1363,12 +1325,5 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      */
     public boolean dispose(boolean force) {
         return true;
-    }
-
-    /**
-     * @deprecated Use {@link #dispose(boolean)} instead.
-     */
-    public void dispose() {
-        dispose(false);
     }
 }

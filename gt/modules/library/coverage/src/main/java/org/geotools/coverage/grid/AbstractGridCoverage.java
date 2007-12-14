@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
@@ -30,12 +29,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
-// JAI dependencies
-import javax.media.jai.PlanarImage;
+import javax.media.jai.PlanarImage;  // For javadoc
 import javax.media.jai.PropertySource;
 import javax.media.jai.util.CaselessStringKey;  // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridPacking;
@@ -45,7 +42,6 @@ import org.opengis.coverage.grid.InvalidRangeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.util.logging.Logging;
@@ -76,7 +72,7 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      * Sources grid coverage, or {@code null} if none. This information is lost during
      * serialization, in order to avoid sending a too large amount of data over the network.
      */
-    private final transient List sources;
+    private final transient List<GridCoverage> sources;
 
     /**
      * Constructs a grid coverage using the specified coordinate reference system. If the
@@ -128,8 +124,7 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
             switch (sources.length) {
                 case 0:  this.sources = null; break;
                 case 1:  this.sources = Collections.singletonList(sources[0]); break;
-                default: this.sources = Collections.unmodifiableList(
-                                        Arrays.asList((GridCoverage[]) sources.clone()));
+                default: this.sources = Collections.unmodifiableList(Arrays.asList(sources.clone()));
             }
         } else {
             this.sources = null;
@@ -159,8 +154,13 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      * to establish what {@code GridCoverage}s will be affected when others are updated,
      * as well as to trace back to the "raw data".
      */
-    public List getSources() {
-        return (sources!=null) ? sources : Collections.EMPTY_LIST;
+    @Override
+    public List<GridCoverage> getSources() {
+        if (sources != null) {
+            return sources;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -213,7 +213,7 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
     }
 
     /**
-     * Returns a block of grid coverage data for all sample dimensions. 
+     * Returns a block of grid coverage data for all sample dimensions.
      * The default implementation throws an {@link UnsupportedOperationException}.
      * We don't know at this time if and when this method will be implemented, since
      * the API is going to change when we will shift to ISO 19123.

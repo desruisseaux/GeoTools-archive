@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
@@ -24,11 +23,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.util.Date;
-
-// JAI dependencies
 import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
@@ -39,7 +35,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
@@ -47,7 +42,6 @@ import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -100,7 +94,7 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
      * found at an odd index.
      */
     private static final AxisDirection[] DIRECTIONS = {
-        AxisDirection.EAST,             AxisDirection.NORTH, 
+        AxisDirection.EAST,             AxisDirection.NORTH,
         AxisDirection.DISPLAY_RIGHT,    AxisDirection.DISPLAY_UP,
         AxisDirection.COLUMN_POSITIVE,  AxisDirection.ROW_POSITIVE
     };
@@ -491,28 +485,31 @@ control:    for (int p=0; p<=1; p++) {
     {
         return coverage.evaluate(coord);
     }
-    
+
     /**
      * Returns a sequence of boolean values for a given point in the coverage.
      */
+    @Override
     public final boolean[] evaluate(final DirectPosition coord, boolean[] dest)
             throws CannotEvaluateException
     {
         return coverage.evaluate(coord, dest);
     }
-    
+
     /**
      * Returns a sequence of byte values for a given point in the coverage.
      */
+    @Override
     public final byte[] evaluate(final DirectPosition coord, byte[] dest)
             throws CannotEvaluateException
     {
         return coverage.evaluate(coord, dest);
     }
-    
+
     /**
      * Returns a sequence of integer values for a given point in the coverage.
      */
+    @Override
     public final int[] evaluate(final DirectPosition coord, int[] dest)
             throws CannotEvaluateException
     {
@@ -522,6 +519,7 @@ control:    for (int p=0; p<=1; p++) {
     /**
      * Returns a sequence of float values for a given point in the coverage.
      */
+    @Override
     public final float[] evaluate(final DirectPosition coord, float[] dest)
             throws CannotEvaluateException
     {
@@ -531,6 +529,7 @@ control:    for (int p=0; p<=1; p++) {
     /**
      * Returns a sequence of double values for a given point in the coverage.
      */
+    @Override
     public final double[] evaluate(final DirectPosition coord, final double[] dest)
             throws CannotEvaluateException
     {
@@ -564,9 +563,9 @@ control:    for (int p=0; p<=1; p++) {
         final MathTransform gridToCRS;
         gridToCRS = ProjectiveTransform.create((AffineTransform) image.getProperty("gridToCRS"));
         if (factory == null) {
-            factory = org.geotools.coverage.CoverageFactoryFinder.getGridCoverageFactory(HINTS);
+            factory = CoverageFactoryFinder.getGridCoverageFactory(HINTS);
         }
-        return (GridCoverage2D) factory.create(name, image, crs, gridToCRS, bands, null, null);
+        return factory.create(name, image, crs, gridToCRS, bands, null, null);
     }
 
     /**
@@ -596,11 +595,12 @@ control:    for (int p=0; p<=1; p++) {
             super(xDimension, yDimension);
             coordinate.ordinates[temporalDimension] = temporalCRS.toValue(date);
         }
-        
+
         /**
          * Returns a rendered image with width and height computed from
          * {@link Coverage3D#getDefaultPixelSize()}.
          */
+        @Override
         public RenderedImage createDefaultRendering() {
             final Dimension2D pixelSize = getDefaultPixelSize();
             if (pixelSize == null) {

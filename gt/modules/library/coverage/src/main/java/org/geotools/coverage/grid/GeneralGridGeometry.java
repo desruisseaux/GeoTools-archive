@@ -16,26 +16,24 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.geom.AffineTransform;  // For javadoc
 import java.awt.image.BufferedImage;   // For javadoc
 import java.awt.image.RenderedImage;   // For javadoc
 import java.io.Serializable;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
-import org.geotools.referencing.operation.transform.ConcatenatedTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -167,9 +165,30 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Constructs a new grid geometry from a {@linkplain MathTransform math transform}
-     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}. This is the most general
-     * constructor, the one that gives the maximal control over the grid geometry to be created.
+     * Creates a new grid geometry with the same values than the given grid geometry. This
+     * is a copy constructor useful when the instance must be a {@code GeneralGridGeometry}.
+     *
+     * @param other The other grid geometry to copy.
+     *
+     * @since 2.5
+     */
+    public GeneralGridGeometry(final GridGeometry other) {
+        gridRange = other.getGridRange();
+        gridToCRS = other.getGridToCRS();
+        if (other instanceof GeneralGridGeometry) {
+            final GeneralGridGeometry gg = (GeneralGridGeometry) other;
+            envelope = gg.envelope;
+        } else if (gridRange!=null && gridToCRS!=null) {
+            envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CENTER, gridToCRS, null);
+        } else {
+            envelope = null;
+        }
+    }
+
+    /**
+     * Constructs a new grid geometry from a grid range and a {@linkplain MathTransform math transform}
+     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}. This is the most general constructor,
+     * the one that gives the maximal control over the grid geometry to be created.
      *
      * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
      * @param gridToCRS The math transform which allows for the transformations from grid
@@ -179,7 +198,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  {@code null} if unknown. This CRS is given to the
      *                  {@linkplain #getEnvelope envelope}.
      *
-     * @throws MismatchedDimensionException if the math transform or the CRS doesn't have
+     * @throws MismatchedDimensionException if the math transform and the CRS doesn't have
      *         consistent dimensions.
      * @throws IllegalArgumentException if the math transform can't transform coordinates
      *         in the domain of the specified grid range.
@@ -201,6 +220,52 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         } else {
             envelope = null;
         }
+    }
+
+    /**
+     * Constructs a new grid geometry from an envelope and a {@linkplain MathTransform math transform}
+     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}.
+     *
+     * @param gridToCRS The math transform which allows for the transformations from grid
+     *                  coordinates (pixel's <em>center</em>) to real world earth coordinates.
+     *                  May be {@code null}, but this is not recommanded.
+     * @param envelope  The envelope (including CRS) of a grid coverage, or {@code null} if none.
+     *
+     * @throws MismatchedDimensionException if the math transform and the envelope doesn't have
+     *         consistent dimensions.
+     * @throws IllegalArgumentException if the math transform can't transform coordinates
+     *         in the domain of the grid range.
+     *
+     * @since 2.5
+     */
+    public GeneralGridGeometry(final MathTransform gridToCRS, final Envelope envelope)
+            throws MismatchedDimensionException, IllegalArgumentException
+    {
+        this.gridToCRS = gridToCRS;
+        if (envelope == null) {
+            this.envelope  = null;
+            this.gridRange = null;
+            return;
+        }
+        this.envelope = new GeneralEnvelope(envelope);
+        if (gridToCRS == null) {
+            this.gridRange = null;
+            return;
+        }
+        final GeneralEnvelope transformed;
+        try {
+            transformed = org.geotools.referencing.CRS.transform(gridToCRS.inverse(), envelope);
+        } catch (TransformException exception) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
+                    Classes.getClass(gridToCRS)), exception);
+        }
+        for (int i=transformed.getDimension(); --i>=0;) {
+            // According OpenGIS specification, GridGeometry maps pixel's center. We must
+            // be consistent with the GeneralEnvelope(GridRange, ...) constructor here.
+            transformed.setRange(i, transformed.getMinimum(i) + 0.5,
+                                    transformed.getMaximum(i) + 0.5);
+        }
+        gridRange = new GeneralGridRange(transformed);
     }
 
     /**
