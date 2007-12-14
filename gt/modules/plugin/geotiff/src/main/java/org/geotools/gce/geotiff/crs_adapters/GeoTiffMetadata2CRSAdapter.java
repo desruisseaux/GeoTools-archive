@@ -665,9 +665,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 			projection = (Conversion) this.allAuthoritiesFactory
 					.createCoordinateOperation(new StringBuffer("EPSG:")
 							.append(projCode).toString());
-			// projection = (Conversion) this.factory
-			// .createCoordinateOperation(new StringBuffer("EPSG:")
-			// .append(projCode).toString());
+
 		}
 
 		// /////////////////////////////////////////////////////////////////////
