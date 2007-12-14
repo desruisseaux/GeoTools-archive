@@ -348,7 +348,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 										final int size = args.size();
 										if (size > 1)
 											throw new InvalidArgumentException(
-													"Only one scaling algorithm at a time can be chosen");
+													"Only one scale factor at a time can be chosen");
 										int factor = Integer
 												.parseInt((String) args.get(0));
 										if (factor <= 0)
@@ -385,13 +385,13 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 										final int size = args.size();
 										if (size > 1)
 											throw new InvalidArgumentException(
-													"Only one scaling algorithm at a time can be chosen");
+													"Only one  number of step at a time can be chosen");
 										int steps = Integer
 												.parseInt((String) args.get(0));
 										if (steps <= 0)
 											throw new InvalidArgumentException(
 													new StringBuffer(
-															"The provided scale factor is negative! ")
+															"The provided number of step is negative! ")
 
 													.toString());
 
@@ -417,7 +417,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 												.get(0)))
 											throw new InvalidArgumentException(
 													new StringBuffer(
-															"The output format ")
+															"The scaling algorithm ")
 															.append(args.get(0))
 															.append(
 																	" is not permitted")
@@ -757,14 +757,6 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 			// Cycling over the features
 			//
 			// /////////////////////////////////////////////////////////////////////
-			RenderedOp currentImage;
-			ImageReader reader;
-			ImageInputStream stream;
-			Iterator it;
-			ImageLayout layout;
-			ImageOutputStream streamOut;
-			RenderingHints newHints;
-			ParameterBlock pbjRead;
 			for (fileBeingProcessed = 0; fileBeingProcessed < numFiles; fileBeingProcessed++) {
 
 				message = new StringBuffer("Managing file  ").append(
@@ -794,7 +786,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				//
 				//
 				// //
-				stream = ImageIO
+				ImageInputStream stream = ImageIO
 						.createImageInputStream(files[fileBeingProcessed]);
 				stream.mark();
 
@@ -804,12 +796,12 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				//
 				//
 				// //
-				it = ImageIO.getImageReaders(stream);
+				final Iterator<ImageReader> it = ImageIO.getImageReaders(stream);
 				if (!it.hasNext()) {
 
 					return;
 				}
-				reader = (ImageReader) it.next();
+				final ImageReader reader = (ImageReader) it.next();
 				stream.reset();
 				stream.mark();
 
@@ -819,7 +811,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				//
 				// //
 				reader.setInput(stream);
-				layout = null;
+				ImageLayout layout = null;
 				// tiling the image if needed
 				int actualTileW = reader.getTileWidth(0);
 				int actualTileH = reader.getTileHeight(0);
@@ -843,7 +835,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				// output image stream
 				//
 				// //
-				streamOut = ImageIO
+				ImageOutputStream streamOut = ImageIO
 						.createImageOutputStream(files[fileBeingProcessed]);
 				if (streamOut == null) {
 					message = new StringBuffer(
@@ -916,8 +908,8 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				//
 				// //
 
-				newHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-				pbjRead = new ParameterBlock();
+				final RenderingHints newHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+				ParameterBlock pbjRead = new ParameterBlock();
 				pbjRead.add(ImageIO
 						.createImageInputStream(files[fileBeingProcessed]));
 				pbjRead.add(new Integer(0));
@@ -928,7 +920,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				pbjRead.add(null);
 				pbjRead.add(null);
 				pbjRead.add(null);
-				currentImage = JAI.create("ImageRead", pbjRead, newHints);
+				RenderedOp currentImage = JAI.create("ImageRead", pbjRead, newHints);
 				message = new StringBuffer("Reaad original image  ")
 						.append(fileBeingProcessed);
 				if (LOGGER.isLoggable(Level.FINE)) {
