@@ -224,9 +224,7 @@ public abstract class AbstractGridFormat implements Format {
 	 *            The input object to test for suitablilty.
 	 * @return True if this format can read this object, False otherwise.
 	 */
-	public abstract boolean accepts(Object input) ;
-
-
+	public abstract boolean accepts(Object input);
 
 	/**
 	 * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
@@ -244,6 +242,9 @@ public abstract class AbstractGridFormat implements Format {
 	 * @see org.opengis.coverage.grid.Format#getReadParameters()
 	 */
 	public ParameterValueGroup getReadParameters() {
+		if (this.readParameters == null)
+			throw new UnsupportedOperationException(
+					"This format does not support usage of read parameters.");
 		return (ParameterValueGroup) this.readParameters.clone();
 	}
 
@@ -253,6 +254,9 @@ public abstract class AbstractGridFormat implements Format {
 	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
 	 */
 	public ParameterValueGroup getWriteParameters() {
+		if (this.writeParameters == null)
+			throw new UnsupportedOperationException(
+					"This format does not support usage of write parameters.");
 		return (ParameterValueGroup) this.writeParameters.clone();
 	}
 
