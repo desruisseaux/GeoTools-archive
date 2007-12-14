@@ -41,17 +41,28 @@ public class ReprojectingFeatureCollectionTest extends
 			SimpleFeature reprojected = (SimpleFeature) reproject.next();
 			
 			Point p1 = (Point) normal.getAttribute( "defaultGeom" );
-			p1 = (Point) transformer.transform( p1 );
-			
 			Point p2 = (Point) reprojected.getAttribute( "defaultGeom" );
-			assertTrue( p1.equals( p2 ) );
+			if(p1 != null) {
+			    p1 = (Point) transformer.transform( p1 );
+    			assertTrue( p1.equals( p2 ) );
+			} else {
+			    assertNull(p2);
+			}
 			
 			LineString l1 = (LineString) normal.getAttribute( "otherGeom" );
-			l1 = (LineString) transformer.transform( l1 );
-			
 			LineString l2 = (LineString) reprojected.getAttribute( "otherGeom" );
-			assertTrue( l1.equals( l2 ) );
+			if(l1 != null) {
+			    l1 = (LineString) transformer.transform( l1 );
+			    assertTrue( l1.equals( l2 ) );
+			} else {
+			    assertNull(l2);
+			}
 		}
 		
+	}
+	
+	public void testBounds() throws Exception {
+	    ReprojectingFeatureCollection rfc = new ReprojectingFeatureCollection( delegate, target );
+	    rfc.getBounds();
 	}
 }

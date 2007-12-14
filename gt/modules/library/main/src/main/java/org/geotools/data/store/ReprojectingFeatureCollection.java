@@ -220,8 +220,11 @@ public class ReprojectingFeatureCollection extends DecoratingFeatureCollection
 
             while (r.hasNext()) {
                 feature = r.next();
-                internal = ((Geometry)feature.getDefaultGeometry()).getEnvelopeInternal();
-                newBBox.expandToInclude(internal);
+                final Geometry geom = ((Geometry)feature.getDefaultGeometry());
+                if(geom != null) {
+                    internal = geom.getEnvelopeInternal();
+                    newBBox.expandToInclude(internal);
+                }
             }
             return ReferencedEnvelope.reference(newBBox);
         } catch (Exception e) {

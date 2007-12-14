@@ -43,7 +43,8 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 		
 		double x = -140;
 		double y = 45;
-		for ( int i = 0; i < 5; i++ ) {
+		final int features = 5;
+		for ( int i = 0; i < features; i++ ) {
 			Point point = gf.createPoint( new Coordinate( x+i, y+i ) );
 			point.setUserData( crs );
 			
@@ -56,5 +57,12 @@ public class FeatureCollectionWrapperTestSupport extends TestCase {
 			
 			delegate.add( builder.buildFeature( i + "" ) );
 		}
+		
+		// add a feature with a null geometry
+		builder.add( null );
+        builder.add( new Integer( -1 ) );
+        builder.add( null );
+        
+        delegate.add( builder.buildFeature( (features + 1) + "" ) );
 	}
 }
