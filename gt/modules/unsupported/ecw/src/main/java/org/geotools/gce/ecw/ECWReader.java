@@ -241,11 +241,17 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	private void checkForWorldFile() throws IllegalStateException,
 			TransformException, IOException {
 
-		String worldFilePath = new StringBuffer(this.parentPath).append(
-				File.separatorChar).append(this.coverageName).append(".sdw")
-				.toString();
-		File file2Parse = new File(worldFilePath);
-		if (file2Parse.exists()) {
+		final String worldFilePath = new StringBuffer(this.parentPath).append(
+				File.separatorChar).append(this.coverageName).toString();
+
+		// TODO: Check if "ers" is the right extension of ecw world files.
+		File file2Parse = new File(worldFilePath + ".ers");
+		boolean worldFileExists = file2Parse.exists();
+		if (!worldFileExists){
+			file2Parse=new File(worldFilePath + ".wld");
+			worldFileExists = file2Parse.exists();
+		}
+		if (worldFileExists) {
 			final WorldFileReader reader = new WorldFileReader(file2Parse);
 			raster2Model = reader.getTransform();
 
@@ -267,6 +273,8 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
+	 * Given a <code>IIOMetadata</code> metadata object, retrieves several
+	 * properties to properly set envelope, gridrange and crs.
 	 * 
 	 * @param commonMetadata
 	 */
@@ -775,21 +783,15 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 				// I need to calculate a new transformation (raster2Model)
 				// between the cropped image and the required
 				// intersectionEnvelope
-				// final GridToEnvelopeMapper gem = new GridToEnvelopeMapper();
-				// gem.setEnvelope(intersectionEnvelope);
-				// final int ssWidth = ecwCoverage.getWidth();
-				// final int ssHeight = ecwCoverage.getHeight();
-				// gem.setGridRange(new GeneralGridRange(new Rectangle(0, 0,
-				// ssWidth, ssHeight)));
-				// gem.setGridType(PixelInCell.CELL_CENTER);
-				final AffineTransform scaleTransform = AffineTransform
-						.getScaleInstance(readP.getSourceXSubsampling(), readP
-								.getSourceYSubsampling());
-				final AffineTransform temp = (AffineTransform) ((AffineTransform) this.raster2Model)
-						.clone();
-				final AffineTransform translateCorner= new Aff
-
-				return super.createImageCoverage(ecwCoverage, ProjectiveTransform.create(scaleTransform));
+				final GridToEnvelopeMapper gem = new GridToEnvelopeMapper();
+				gem.setEnvelope(intersectionEnvelope);
+				final int ssWidth = ecwCoverage.getWidth();
+				final int ssHeight = ecwCoverage.getHeight();
+				gem.setGridRange(new GeneralGridRange(new Rectangle(0, 0,
+						ssWidth, ssHeight)));
+				gem.setGridType(PixelInCell.CELL_CENTER);
+				return super.createImageCoverage(ecwCoverage, gem
+						.createTransform());
 			} else {
 				// In case of not intersectionEnvelope (As an instance, when
 				// reading the whole image), I can use the originalEnvelope. So,
@@ -854,7 +856,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 					} catch (IOException e) {
 						// warn about the error but proceed, it is not fatal
 						// we have at least the default crs to use
-						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+						LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 					}
 			}
 		}
