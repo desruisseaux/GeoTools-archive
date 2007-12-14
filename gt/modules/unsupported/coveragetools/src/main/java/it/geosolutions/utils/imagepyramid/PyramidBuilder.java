@@ -631,8 +631,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		tiler.addProcessingEventListener(slaveToolsListener);
 		tiler.setInputLocation(inputLocation);
 		tiler.setOutputLocation(outputDir);
-		tiler.setNumTileX(numTileX);
-		tiler.setNumTileY(numtileY);
+		tiler.setTileWidth(numTileX);
+		tiler.setTileHeight(numtileY);
 		tiler.run();
 		tiler.removeAllProcessingEventListeners();
 	}
