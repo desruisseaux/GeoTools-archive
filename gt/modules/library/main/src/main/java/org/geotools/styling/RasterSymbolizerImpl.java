@@ -334,7 +334,10 @@ public class RasterSymbolizerImpl extends AbstractGTComponent
      * @throws IllegalArgumentException DOCUMENT ME!
      */
     public void setImageOutline(Symbolizer symbolizer) {
-        if (symbolizer instanceof LineSymbolizer
+        if( symbolizer == null ){
+            this.symbolizer = null;
+        }
+        else if (symbolizer instanceof LineSymbolizer
                 || symbolizer instanceof PolygonSymbolizer) {
             if (this.symbolizer == symbolizer) {
                 return;
