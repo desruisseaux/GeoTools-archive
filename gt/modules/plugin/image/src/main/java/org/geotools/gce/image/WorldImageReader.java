@@ -577,23 +577,22 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				// it exists then we have top read it
 				PrjFileReader projReader=null;
 				try {
-					FileChannel channel = new FileInputStream(prjFile)
+					final FileChannel channel = new FileInputStream(prjFile)
 							.getChannel();
 					projReader = new PrjFileReader(channel);
 					crs = projReader.getCoodinateSystem();
-                    projReader.close();
 				} catch (FileNotFoundException e) {
 					// warn about the error but proceed, it is not fatal
 					// we have at least the default crs to use
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 				} catch (IOException e) {
 					// warn about the error but proceed, it is not fatal
 					// we have at least the default crs to use
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 				} catch (FactoryException e) {
 					// warn about the error but proceed, it is not fatal
 					// we have at least the default crs to use
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 				}
 				finally{
 					if(projReader!=null)
