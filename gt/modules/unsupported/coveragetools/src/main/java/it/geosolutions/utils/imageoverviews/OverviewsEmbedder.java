@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,13 +61,11 @@ import org.apache.commons.cli2.validation.Validator;
 import org.apache.commons.io.filefilter.WildcardFilter;
 import org.geotools.resources.image.ImageUtilities;
 
-import com.sun.media.imageio.plugins.tiff.TIFFImageWriteParam;
-
 /**
  * <pre>
  *  Example of usage:
  * <code>
- * OverviewsEmbedder -s &quot;/usr/home/tmp&quot; -w *.tiff -t "512,512" -f 32 -n 8 -a nn -c 512
+ * OverviewsEmbedder -s &quot;/usr/home/tmp&quot; -w *.tiff -t &quot;512,512&quot; -f 32 -n 8 -a nn -c 512
  * </code>
  *  &lt;pre&gt;
  *  
@@ -240,7 +237,8 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 	private String scaleAlgorithm;
 
 	/** Logger for this class. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(OverviewsEmbedder.class.toString());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger(OverviewsEmbedder.class.toString());
 
 	/** Default number of resolution steps.. */
 	public final int DEFAULT_RESOLUTION_STEPS = 5;
@@ -600,9 +598,12 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 		pb.setParameter("scaleY", new Integer(downsampleStep));
 		pb.setParameter("qsFilterArray", new float[] { 1.0f });
 		pb.setParameter("Interpolation", interp);
-		//remember to add the hint to avoid replacement of the original IndexColorModel
-		//in future versions we might want to make this parametrix XXX TODO @task
-		return JAI.create("filteredsubsample", pb,ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
+		// remember to add the hint to avoid replacement of the original
+		// IndexColorModel
+		// in future versions we might want to make this parametrix XXX TODO
+		// @task
+		return JAI.create("filteredsubsample", pb,
+				ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
 	}
 
 	public int getDownsampleStep() {
@@ -796,7 +797,8 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				//
 				//
 				// //
-				final Iterator<ImageReader> it = ImageIO.getImageReaders(stream);
+				final Iterator<ImageReader> it = ImageIO
+						.getImageReaders(stream);
 				if (!it.hasNext()) {
 
 					return;
@@ -900,7 +902,6 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 					param.setTiling(actualTileW, actualTileH, 0, 0);
 				}
 
-
 				// //
 				//
 				// creating the image to use for the successive
@@ -908,7 +909,8 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				//
 				// //
 
-				final RenderingHints newHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+				final RenderingHints newHints = new RenderingHints(
+						JAI.KEY_IMAGE_LAYOUT, layout);
 				ParameterBlock pbjRead = new ParameterBlock();
 				pbjRead.add(ImageIO
 						.createImageInputStream(files[fileBeingProcessed]));
@@ -920,7 +922,8 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				pbjRead.add(null);
 				pbjRead.add(null);
 				pbjRead.add(null);
-				RenderedOp currentImage = JAI.create("ImageRead", pbjRead, newHints);
+				RenderedOp currentImage = JAI.create("ImageRead", pbjRead,
+						newHints);
 				message = new StringBuffer("Reaad original image  ")
 						.append(fileBeingProcessed);
 				if (LOGGER.isLoggable(Level.FINE)) {
@@ -930,47 +933,44 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 						((fileBeingProcessed * 100.0) / numFiles));
 				for (overviewInProcess = 0; overviewInProcess < numSteps; overviewInProcess++) {
 
-					if (overviewInProcess > 0) {
-
-						// re-instantiate the current image from disk
-						stream = ImageIO
-								.createImageInputStream(files[fileBeingProcessed]);
-						pbjRead = new ParameterBlock();
-						pbjRead.add(stream);
-						pbjRead.add(new Integer(overviewInProcess));
-						pbjRead.add(Boolean.FALSE);
-						pbjRead.add(Boolean.FALSE);
-						pbjRead.add(Boolean.FALSE);
-						pbjRead.add(null);
-						pbjRead.add(null);
-						pbjRead.add(null);
-						pbjRead.add(null);
-						currentImage = JAI.create("ImageRead", pbjRead,
-								newHints);
-
-						// //
-						//
-						// output image stream
-						//
-						// //
-						streamOut = ImageIO
-								.createImageOutputStream(files[fileBeingProcessed]);
-
-						// //
-						//
-						// Preparing to write the set of images. First of all I
-						// write
-						// the first image `
-						//
-						// //
-						// getting a writer for this reader
-						writer = ImageIO.getImageWriter(reader);
-						writer.setOutput(streamOut);
-						writer
-								.addIIOWriteProgressListener(writeProgressListener);
-						param = writer.getDefaultWriteParam();
-
-					}
+//					if (overviewInProcess > 0) {
+//
+//						// re-instantiate the current image from disk
+//						stream = ImageIO
+//								.createImageInputStream(files[fileBeingProcessed]);
+//						pbjRead = new ParameterBlock();
+//						pbjRead.add(stream);
+//						pbjRead.add(new Integer(overviewInProcess));
+//						pbjRead.add(Boolean.FALSE);
+//						pbjRead.add(Boolean.FALSE);
+//						pbjRead.add(Boolean.FALSE);
+//						pbjRead.add(null);
+//						pbjRead.add(null);
+//						pbjRead.add(null);
+//						pbjRead.add(null);
+//						currentImage = JAI.create("ImageRead", pbjRead,
+//								newHints);
+//
+//						// //
+//						//
+//						// output image stream
+//						//
+//						// //
+//						streamOut = ImageIO
+//								.createImageOutputStream(files[fileBeingProcessed]);
+//
+//						// //
+//						//
+//						// Preparing to write the set of images. First of all I
+//						// write the first image `
+//						//
+//						// //
+//						// getting a writer for this reader
+//						writer.setOutput(streamOut);
+//						writer
+//								.addIIOWriteProgressListener(writeProgressListener);
+//
+//					}
 
 					message = new StringBuffer("Subsampling step ").append(
 							overviewInProcess).append(" of image  ").append(
@@ -986,21 +986,24 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 							|| currentImage.getHeight() / downsampleStep <= 0)
 						break;
 
+					RenderedOp newImage;
 					// subsampling the input image using the chosen algorithm
 					if (scaleAlgorithm.equalsIgnoreCase("avg"))
-						currentImage = scaleAverage(currentImage);
+						newImage = scaleAverage(currentImage);
 					else if (scaleAlgorithm.equalsIgnoreCase("filt"))
-						currentImage = filteredSubsample(currentImage);
-					if (scaleAlgorithm.equalsIgnoreCase("bil"))
-						currentImage = bilinear(currentImage);
-					if (scaleAlgorithm.equalsIgnoreCase("nn"))
-						currentImage = subsample(currentImage);
-					if (scaleAlgorithm.equalsIgnoreCase("bic"))
-						currentImage = bicubic(currentImage);
+						newImage = filteredSubsample(currentImage);
+					else if (scaleAlgorithm.equalsIgnoreCase("bil"))
+						newImage = bilinear(currentImage);
+					else if (scaleAlgorithm.equalsIgnoreCase("nn"))
+						newImage = subsample(currentImage);
+					else if (scaleAlgorithm.equalsIgnoreCase("bic"))
+						newImage = bicubic(currentImage);
+					else
+						throw new IllegalStateException();
 
 					// write out
-					writer.writeInsert(overviewInProcess + 1, new IIOImage(
-							currentImage, null, null), param);
+					writer.writeInsert(-1, new IIOImage(newImage, null,
+							null), param);
 
 					message = new StringBuffer("Step ").append(
 							overviewInProcess).append(" of image  ").append(
@@ -1012,14 +1015,15 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 							((fileBeingProcessed * 100.0) / numFiles));
 
 					// flushing cache
-					JAI.getDefaultInstance().getTileCache().flush();
-
-					// free everything
-					streamOut.flush();
-					streamOut.close();
-					writer.dispose();
-					currentImage.dispose();
-					stream.close();
+					JAI.getDefaultInstance().getTileCache().removeTiles(currentImage);
+					currentImage=newImage;
+//
+//					// free everything
+//					streamOut.flush();
+//					streamOut.close();
+//					writer.reset();
+//					currentImage.dispose();
+//					stream.close();
 
 				}
 				message = new StringBuffer("Done with  image  ")
@@ -1033,7 +1037,7 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 			}
 
 		} catch (IOException e) {
-            fireException(e);
+			fireException(e);
 		}
 
 		if (LOGGER.isLoggable(Level.FINE))
@@ -1088,10 +1092,11 @@ public class OverviewsEmbedder extends ProgressManager implements Runnable,
 				"attached message is: ").append(event.getMessage()).toString());
 
 	}
-    
-    public void exceptionOccurred(ExceptionEvent event) {
-        LOGGER.log(Level.SEVERE, "An error occurred during processing", event.getException());
-    }
+
+	public void exceptionOccurred(ExceptionEvent event) {
+		LOGGER.log(Level.SEVERE, "An error occurred during processing", event
+				.getException());
+	}
 
 	private boolean parseArgs(String[] args) {
 		cmdLine = cmdParser.parseAndHelp(args);
