@@ -549,7 +549,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		// create first tiled set
 		resolutions = new double[2][numSteps+1];
 //		tileInput(numTileX, numtileY, outputDir);
-		tileInput(tileW, tileH, outputDir);
+		tileInput(outputDir);
 		if (exceptionOccurred)
 			return;
 		currStep++;
@@ -627,8 +627,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	}
 
 //	private void tileInput(final int numTileX, final int numTileY,
-	private void tileInput(final int tileWidth, final int tileHeight,
-			File outputDir) {
+	private void tileInput(File outputDir) {
 		CoverageTiler tiler = new CoverageTiler();
 		tiler.addProcessingEventListener(slaveToolsListener);
 		tiler.setInputLocation(inputLocation);
