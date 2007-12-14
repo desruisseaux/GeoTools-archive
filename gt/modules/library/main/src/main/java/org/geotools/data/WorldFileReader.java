@@ -188,7 +188,7 @@ public final class WorldFileReader {
 		return yULC;
 	}
 
-	public MathTransform getTransform() {
+	public synchronized MathTransform getTransform() {
 		if (transform == null) {
 			// building the transform
 			final GeneralMatrix gm = new GeneralMatrix(3); // identity
