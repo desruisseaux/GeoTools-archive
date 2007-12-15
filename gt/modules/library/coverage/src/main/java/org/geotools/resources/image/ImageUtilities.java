@@ -218,7 +218,7 @@ public final class ImageUtilities {
      */
     public static RenderingHints getRenderingHints(final RenderedImage image) {
         final ImageLayout layout = getImageLayout(image, false);
-        return (layout!=null) ? new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout) : null;
+        return (layout != null) ? new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout) : null;
     }
 
     /**
@@ -451,19 +451,18 @@ public final class ImageUtilities {
      * future versions. If this method doesn't recognize the class name, it does nothing.
      *
      * @param format The format name (e.g. "png").
-     * @param writer {@code false} to set the reader, or {@code true} to set the writer.
+     * @param category {@code ImageReaderSpi.class} to set the reader, or
+     *        {@code ImageWriterSpi.class} to set the writer.
      * @param allowed {@code false} to disallow native acceleration.
      */
-    public static synchronized void allowNativeCodec(final String  format,
-                                                     final boolean writer,
-                                                     final boolean allowed)
+    public static synchronized <T extends ImageReaderWriterSpi> void allowNativeCodec(
+            final String format, final Class<T> category, final boolean allowed)
     {
-        ImageReaderWriterSpi standard = null;
-        ImageReaderWriterSpi codeclib = null;
+        T standard = null;
+        T codeclib = null;
         final IIORegistry registry = IIORegistry.getDefaultInstance();
-        final Class category = writer ? ImageWriterSpi.class : ImageReaderSpi.class;
-        for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
-            final ImageReaderWriterSpi provider = (ImageReaderWriterSpi) it.next();
+        for (final Iterator<T> it = registry.getServiceProviders(category, false); it.hasNext();) {
+            final T provider = it.next();
             final String[] formats = provider.getFormatNames();
             for (int i=0; i<formats.length; i++) {
                 if (formats[i].equalsIgnoreCase(format)) {
@@ -482,6 +481,20 @@ public final class ImageUtilities {
             } else {
                 registry.setOrdering(category, standard, codeclib);
             }
+        }
+    }
+
+    /**
+     * @deprecated Replaced by {@link #allowNativeCodec(String,Class,boolean)}.
+     */
+    public static void allowNativeCodec(final String  format,
+                                        final boolean writer,
+                                        final boolean allowed)
+    {
+        if (writer) {
+            allowNativeCodec(format, ImageWriterSpi.class, allowed);
+        } else {
+            allowNativeCodec(format, ImageReaderSpi.class, allowed);
         }
     }
 

@@ -55,7 +55,7 @@ import org.geotools.axis.LogarithmicNumberGraduation;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;

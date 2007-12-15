@@ -636,13 +636,13 @@ public final class Hints extends RenderingHints {
 
     /**
      * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to read
-     * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model, 
+     * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model,
      * Tile Caching,...) or the direct {@code ImageReader}'s read methods.
      *
      * @since 2.4
      */
     public static final Key USE_JAI_IMAGEREAD = new Key(Boolean.class);
-    
+
     /**
      * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
      * processor} to perform operations on the non-geophysics view.
@@ -1035,6 +1035,66 @@ public final class Hints extends RenderingHints {
     }
 
     /**
+     * Tries to find the name of the given key, using reflection.
+     */
+    static String nameOf(final RenderingHints.Key key) {
+        if (key instanceof Key) {
+            return key.toString();
+        }
+        int t = 0;
+        while (true) {
+            final Class<?> type;
+            switch (t++) {
+                case 0: {
+                    type = RenderingHints.class;
+                    break;
+                }
+                case 1: {
+                    try {
+                        type = Class.forName("javax.media.jai.JAI");
+                        break;
+                    } catch (ClassNotFoundException e) {
+                        continue;
+                    } catch (NoClassDefFoundError e) {
+                        // May occurs because of indirect JAI dependencies.
+                        continue;
+                    }
+                }
+                default: {
+                    return key.toString();
+                }
+            }
+            final String name = nameOf(type, key);
+            if (name != null) {
+                return name;
+            }
+        }
+    }
+
+    /**
+     * If the given key is declared in the given class, returns its name.
+     * Otherwise returns {@code null}.
+     */
+    private static String nameOf(final Class<?> type, final RenderingHints.Key key) {
+        final Field[] fields = type.getFields();
+        for (int i=0; i<fields.length; i++) {
+            final Field f = fields[i];
+            if (Modifier.isStatic(f.getModifiers())) {
+                final Object v;
+                try {
+                    v = f.get(null);
+                } catch (IllegalAccessException e) {
+                    continue;
+                }
+                if (v == key) {
+                    return f.getName();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * The type for keys used to control various aspects of the factory
      * creation. Factory creation impacts rendering (which is why extending
      * {@linkplain java.awt.RenderingHints.Key rendering key} is not a complete
@@ -1149,20 +1209,9 @@ public final class Hints extends RenderingHints {
                     case 1:  type = getValueClass();  break;
                     default: return super.toString();
                 }
-                final Field[] fields = type.getFields();
-                for (int i=0; i<fields.length; i++) {
-                    final Field f = fields[i];
-                    if (Modifier.isStatic(f.getModifiers())) {
-                        final Object v;
-                        try {
-                            v = f.get(null);
-                        } catch (IllegalAccessException e) {
-                            continue;
-                        }
-                        if (v == this) {
-                            return f.getName();
-                        }
-                    }
+                final String name = nameOf(type, this);
+                if (name != null) {
+                    return name;
                 }
             }
         }

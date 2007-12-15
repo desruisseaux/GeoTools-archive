@@ -31,7 +31,6 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -153,6 +152,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @param other The other grid geometry to copy.
      *
      * @since 2.5
+     *
+     * @see #wrap
      */
     public GridGeometry2D(final GridGeometry other) {
         super(other);
@@ -353,6 +354,23 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
 
     /**
+     * Returns the given grid geometry as a {@code GridGeometry2D}. If the given
+     * object is already an instance of {@code GridGeometry2D}, then it is returned
+     * unchanged. Otherwise a new {@code GridGeometry2D} instance is created using the
+     * {@linkplain #GridGeometry2D(GridGeometry) copy constructor}.
+     *
+     * @param other The grid geometry to wrap.
+     *
+     * @since 2.5
+     */
+    public static GridGeometry2D wrap(final GridGeometry other) {
+        if (other instanceof GridGeometry2D) {
+            return (GridGeometry2D) other;
+        }
+        return new GridGeometry2D(other);
+    }
+
+    /**
      * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
      * call in constructors").
      */
@@ -464,24 +482,73 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * 2D CRS with only those axis.
      *
      * @return The coordinate reference system, or {@code null} if none.
+     * @throws InvalidGridGeometryException if the CRS can't be reduced.
      */
-    private CoordinateReferenceSystem createCRS2D() {
+    private CoordinateReferenceSystem createCRS2D() throws InvalidGridGeometryException {
         if (!super.isDefined(CRS)) {
             return null;
         }
-        final CoordinateReferenceSystem crs = super.getCoordinateReferenceSystem();
+        CoordinateReferenceSystem crs = super.getCoordinateReferenceSystem();
+        try {
+            crs = reduce(crs);
+        } catch (FactoryException exception) {
+            throw new InvalidGridGeometryException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()), exception);
+        }
+        return crs;
+    }
+
+    /**
+     * Reduces the specified envelope to a two-dimensional one. If the given envelope has
+     * more than two dimensions, then a new one is created using only the coordinates at
+     * ({@link #axisDimensionX}, {@link #axisDimensionY}) index.
+     * <p>
+     * The {@link Envelope#getCoordinateReferenceSystem coordinate reference system} of the
+     * source envelope is ignored. The coordinate reference system of the target envelope
+     * will be {@link #getCoordinateReferenceSystem2D} or {@code null}.
+     *
+     * @param  envelope The envelope to reduce, or {@code null}. This envelope will not be modified.
+     * @return An envelope with excatly 2 dimensions, or {@code null} if {@code envelope} was null.
+     *         The returned envelope is always a new instance, so it can be modified safely.
+     *
+     * @since 2.5
+     */
+    public Envelope2D reduce(final Envelope envelope) {
+        if (envelope == null) {
+            return null;
+        }
+        return new Envelope2D(crs2D,
+                envelope.getMinimum(axisDimensionX),
+                envelope.getMinimum(axisDimensionY),
+                envelope.getLength (axisDimensionX),
+                envelope.getLength (axisDimensionY));
+    }
+
+    /**
+     * Reduces the specified CRS to a two-dimensional one. If the given CRS has more than two
+     * dimensions, then a new one is created using only the axis at ({@link #axisDimensionX},
+     * {@link #axisDimensionY}) index.
+     *
+     * @param  crs The coordinate reference system to reduce, or {@code null}.
+     * @return A coordinate reference system with no more than 2 dimensions,
+     *         or {@code null} if {@code crs} was null.
+     * @throws FactoryException if the given CRS can't be reduced to two dimensions.
+     *
+     * @since 2.5
+     */
+    public CoordinateReferenceSystem reduce(final CoordinateReferenceSystem crs)
+            throws FactoryException
+    {
+        if (crs == null || crs.getCoordinateSystem().getDimension() <= 2) {
+            return crs;
+        }
         if (FACTORIES == null) {
             FACTORIES = ReferencingFactoryContainer.instance(null);
             // No need to synchronize: this is not a big deal if
             // two ReferencingFactoryContainer instances are created.
         }
         final CoordinateReferenceSystem crs2D;
-        try {
-            crs2D = FACTORIES.separate(crs, new int[] {axisDimensionX, axisDimensionY});
-        } catch (FactoryException exception) {
-            throw new InvalidGridGeometryException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "crs", crs.getName()), exception);
-        }
+        crs2D = FACTORIES.separate(crs, new int[] {axisDimensionX, axisDimensionY});
         assert crs2D.getCoordinateSystem().getDimension() == 2 : crs2D;
         return crs2D;
     }
@@ -530,6 +597,8 @@ public class GridGeometry2D extends GeneralGridGeometry {
                     envelope.getMinimum(axisDimensionY),
                     envelope.getLength (axisDimensionX),
                     envelope.getLength (axisDimensionY));
+            // Note: we didn't invoked reduce(Envelope) in order to make sure that
+            //       our privated 'envelope' field is not exposed to subclasses.
         }
         assert !isDefined(ENVELOPE);
         throw new InvalidGridGeometryException(Errors.format(gridToCRS == null ?
@@ -561,13 +630,6 @@ public class GridGeometry2D extends GeneralGridGeometry {
         }
         assert !isDefined(GRID_RANGE);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));
-    }
-
-    /**
-     * @deprecated Renamed as {@link #getGridToCRS2D()}.
-     */
-    public MathTransform2D getGridToCoordinateSystem2D() throws InvalidGridGeometryException {
-        return getGridToCRS2D();
     }
 
     /**

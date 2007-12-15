@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -20,17 +20,16 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import javax.vecmath.MismatchedSizeException;
 import javax.vecmath.SingularMatrixException;
 import javax.units.NonSI;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -39,10 +38,8 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.geometry.DirectPosition;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameters;
@@ -99,17 +96,17 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -2104496465933824935L;
-    
+
     /**
      * The number of rows.
      */
     private final int numRow;
-    
+
     /**
      * The number of columns.
      */
     private final int numCol;
-    
+
     /**
      * Elements of the matrix. Column indice vary fastest.
      */
@@ -119,14 +116,14 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * The inverse transform. Will be created only when first needed.
      */
     private transient ProjectiveTransform inverse;
-    
+
     /**
      * Constructs a transform from the specified matrix.
      * The matrix should be affine, but it will not be verified.
      *
      * @param matrix The matrix.
      */
-    protected ProjectiveTransform(final Matrix matrix) {        
+    protected ProjectiveTransform(final Matrix matrix) {
         numRow = matrix.getNumRow();
         numCol = matrix.getNumCol();
         elt = new double[numRow*numCol];
@@ -240,6 +237,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         return ProviderAffine.PARAMETERS;
     }
@@ -254,7 +252,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      */
     static ParameterValueGroup getParameterValues(final Matrix matrix) {
         final MatrixParameters values;
-        values = (MatrixParameters) ProviderAffine.PARAMETERS.createValue();        
+        values = (MatrixParameters) ProviderAffine.PARAMETERS.createValue();
         values.setMatrix(matrix);
         return values;
     }
@@ -266,10 +264,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      *
      * @return A copy of the parameter values for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         return getParameterValues(getMatrix());
     }
-    
+
     /**
      * Transforms an array of floating point coordinates by this matrix. Point coordinates
      * must have a dimension equals to <code>{@link Matrix#getNumCol}-1</code>. For example,
@@ -287,6 +286,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      *               be overlaps.
      * @param numPts The number of points to be transformed
      */
+    @Override
     public void transform(float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
@@ -326,7 +326,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             srcOff += inputDimension;
         }
     }
-    
+
     /**
      * Transforms an array of floating point coordinates by this matrix. Point coordinates
      * must have a dimension equals to <code>{@link Matrix#getNumCol}-1</code>. For example,
@@ -383,58 +383,61 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             srcOff += inputDimension;
         }
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.
      * For a matrix transform, the derivative is the
      * same everywhere.
      */
+    @Override
     public Matrix derivative(final Point2D point) {
         return derivative((DirectPosition)null);
     }
-    
+
     /**
      * Gets the derivative of this transform at a point.
      * For a matrix transform, the derivative is the
      * same everywhere.
      */
+    @Override
     public Matrix derivative(final DirectPosition point) {
         final GeneralMatrix matrix = getGeneralMatrix();
         matrix.setSize(numRow-1, numCol-1);
         return matrix;
     }
-    
+
     /**
      * Returns a copy of the matrix.
      */
     public Matrix getMatrix() {
         return getGeneralMatrix();
     }
-    
+
     /**
      * Returns a copy of the matrix.
      */
     private GeneralMatrix getGeneralMatrix() {
         return new GeneralMatrix(numRow, numCol, elt);
     }
-    
+
     /**
      * Gets the dimension of input points.
      */
     public int getSourceDimensions() {
-        return numCol-1;
+        return numCol - 1;
     }
-    
+
     /**
      * Gets the dimension of output points.
      */
     public int getTargetDimensions() {
-        return numRow-1;
+        return numRow - 1;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      */
+    @Override
     public boolean isIdentity() {
         if (numRow != numCol) {
             return false;
@@ -482,6 +485,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     /**
      * Creates the inverse transform of this object.
      */
+    @Override
     public MathTransform inverse() throws NoninvertibleTransformException {
         // No need to synchronize. This is not a big deal if the same object is created twice.
         if (inverse == null) {
@@ -492,6 +496,9 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 try {
                     matrix.invert();
                 } catch (SingularMatrixException exception) {
+                    throw new NoninvertibleTransformException(Errors.format(
+                              ErrorKeys.NONINVERTIBLE_TRANSFORM), exception);
+                } catch (MismatchedSizeException exception) {
                     throw new NoninvertibleTransformException(Errors.format(
                               ErrorKeys.NONINVERTIBLE_TRANSFORM), exception);
                 }
@@ -515,6 +522,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         long code = serialVersionUID;
         for (int i=elt.length; --i>=0;) {
@@ -522,11 +530,12 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         }
         return (int)(code >>> 32) ^ (int)code;
     }
-    
+
     /**
      * Compares the specified object with
      * this math transform for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -571,7 +580,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         static final ParameterDescriptorGroup PARAMETERS;
         static {
             final NamedIdentifier name = new NamedIdentifier(Citations.OGC, "Affine");
-            final Map  properties = new HashMap(4, 0.8f);
+            final Map<String,Object> properties = new HashMap<String,Object>(4, 0.8f);
             properties.put(NAME_KEY,        name);
             properties.put(IDENTIFIERS_KEY, name);
             properties.put(ALIAS_KEY, new NamedIdentifier[] {name,
@@ -602,7 +611,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Conversion> getOperationType() {
             return Conversion.class;
         }
 
@@ -684,10 +694,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Conversion> getOperationType() {
             return Conversion.class;
         }
-        
+
         /**
          * Creates a transform from the specified group of parameter values.
          *

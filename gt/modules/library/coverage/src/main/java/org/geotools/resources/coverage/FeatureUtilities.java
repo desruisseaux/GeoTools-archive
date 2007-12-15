@@ -93,8 +93,7 @@ public final class FeatureUtilities {
             throws TransformException, SchemaException, IllegalAttributeException
     {
         final Polygon bounds = getPolygon(coverage.getEnvelope2D());
-        final CoordinateReferenceSystem sourceCRS =
-                CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
+        final CoordinateReferenceSystem sourceCRS = coverage.getCoordinateReferenceSystem2D();
 
         SimpleFeatureTypeBuilder ftb = new SimpleFeatureTypeBuilder();
         ftb.setName("GridCoverage");

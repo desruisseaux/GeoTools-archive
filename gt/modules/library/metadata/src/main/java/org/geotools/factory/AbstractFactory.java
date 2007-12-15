@@ -431,7 +431,9 @@ public class AbstractFactory implements Factory, RegisterableService {
             throws IOException
     {
         for (final Map.Entry<?,?> entry : hints.entrySet()) {
-            String key   = String.valueOf(entry.getKey());
+            final Object k = entry.getKey();
+            String key = (k instanceof RenderingHints.Key) ?
+                    Hints.nameOf((RenderingHints.Key) k) : String.valueOf(k);
             Object value = entry.getValue();
             table.write(indent);
             table.write(key);

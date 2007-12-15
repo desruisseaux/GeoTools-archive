@@ -56,7 +56,7 @@ import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.SLD;
@@ -76,13 +76,10 @@ import com.vividsolutions.jts.geom.Envelope;
  * coverage SLD stylers is still limited.
  * 
  * @author Simone Giannecchini
- * @author Martin Desruisseaux
  * @author Andrea Aime
  * @author Alessio Fabiani
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/GridCoverageRenderer.java $
- * @version $Id: GridCoverageRenderer.java 18352 2006-03-01 06:13:42Z
- *          desruisseaux $
+ * @source $URL$
+ * @version $Id$
  * 
  * @task Add support for SLD styles
  */
@@ -131,7 +128,7 @@ public final class GridCoverageRenderer {
 		//	
 		// ///////////////////////////////////////////////////////////////////
 		final DefaultProcessor processor = new DefaultProcessor(
-				CoverageUtilities.LENIENT_HINT);
+				new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 		resampleParams = processor.getOperation("Resample").getParameters();
 		scaleParams = processor.getOperation("Scale").getParameters();
 		cropParams = processor.getOperation("CoverageCrop").getParameters();
@@ -255,7 +252,7 @@ public final class GridCoverageRenderer {
 		if (java2dHints != null)
 			this.hints.add(java2dHints);
 		// this prevents users from overriding leninet hint
-		this.hints.add(CoverageUtilities.LENIENT_HINT);
+		this.hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 		this.hints.add(ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
 
 	}

@@ -20,6 +20,7 @@ package org.geotools.map;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -34,7 +35,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapLayerEvent;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -182,7 +183,7 @@ public class DefaultMapLayer implements MapLayer {
 	 */
 	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 
-		this(CoverageUtilities.wrapGc(coverage), style, "");
+		this(FeatureUtilities.wrapGridCoverage((GridCoverage2D) coverage), style, "");
 
 	}
 
@@ -202,7 +203,7 @@ public class DefaultMapLayer implements MapLayer {
 	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style, String title)
 			throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 
-		this(CoverageUtilities.wrapGcReader(reader), style, title);
+		this(FeatureUtilities.wrapGridCoverageReader(reader), style, title);
 
 	}
 
@@ -225,7 +226,7 @@ public class DefaultMapLayer implements MapLayer {
 	         SchemaException, 
 	         IllegalAttributeException {
 
-		this(CoverageUtilities.wrapGcReader(reader), style, "");
+		this(FeatureUtilities.wrapGridCoverageReader(reader), style, "");
 
 	}
 
@@ -244,7 +245,7 @@ public class DefaultMapLayer implements MapLayer {
 	public DefaultMapLayer(GridCoverage coverage, Style style, String title)
 			throws TransformException, FactoryRegistryException, SchemaException, IllegalAttributeException {
 
-		this(CoverageUtilities.wrapGc(coverage), style, title);
+		this(FeatureUtilities.wrapGridCoverage((GridCoverage2D) coverage), style, title);
 
 	}
 	/**

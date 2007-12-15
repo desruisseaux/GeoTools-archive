@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
@@ -41,7 +42,7 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.FeatureUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
@@ -292,7 +293,7 @@ public class DefaultMapContext implements MapContext {
 	 */
 	public void addLayer(GridCoverage gc, Style style) {
 		try {
-			this.addLayer(CoverageUtilities.wrapGc(gc), style);
+			this.addLayer(FeatureUtilities.wrapGridCoverage((GridCoverage2D) gc), style);
 		} catch (TransformException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
 		} catch (FactoryRegistryException e) {
@@ -315,7 +316,7 @@ public class DefaultMapContext implements MapContext {
 	 */
 	public void addLayer(AbstractGridCoverage2DReader reader, Style style) {
 		try {
-			this.addLayer(CoverageUtilities.wrapGcReader(reader), style);
+			this.addLayer(FeatureUtilities.wrapGridCoverageReader(reader), style);
 		} catch (TransformException e) {
 			DefaultMapContext.LOGGER.log(Level.WARNING, "Could not use gc", e);
 		} catch (FactoryRegistryException e) {

@@ -29,20 +29,23 @@ import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.PropertySource;
 
+import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.RenderedCoverage;
-import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
 
 
@@ -56,27 +59,74 @@ import org.geotools.util.NumberRange;
  * @author Martin Desruisseaux
  * @author Simone Giannecchini
  */
-public class CoverageUtilities {
-    /**
-     * Controlling datum shift process.
-     *
-     * @deprecated Will be deleted.
-     */
-    public final static Hints LENIENT_HINT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-
+public final class CoverageUtilities {
     /**
      * Do not allows instantiation of this class.
-     *
-     * @deprecated We will make this constructor private after we deleted
-     *             the deprecated subclass, and make this class final.
      */
-    protected CoverageUtilities() {
+    private CoverageUtilities() {
+    }
+
+    /**
+     * Returns a two-dimensional CRS for the given coverage. This method performs a
+     * <cite>best effort</cite>; the returned CRS is not garanteed to be the most
+     * appropriate one.
+     *
+     * @param  coverage The coverage for which to obtains a two-dimensional CRS.
+     * @return The two-dimensional CRS.
+     * @throws TransformException if the CRS can't be reduced to two dimensions.
+     */
+    public static CoordinateReferenceSystem getCRS2D(final Coverage coverage)
+            throws TransformException
+    {
+        if (coverage instanceof GridCoverage2D) {
+            return ((GridCoverage2D) coverage).getCoordinateReferenceSystem2D();
+        }
+        if (coverage instanceof GridCoverage) {
+            final GridGeometry2D geometry =
+                    GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
+            if (geometry.isDefined(GridGeometry2D.CRS)) {
+                return geometry.getCoordinateReferenceSystem2D();
+            } else try {
+                return geometry.reduce(coverage.getCoordinateReferenceSystem());
+            } catch (FactoryException exception) {
+                // Ignore; we will fallback on the code below.
+            }
+        }
+        return CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * Returns a two-dimensional envelope for the given coverage. This method performs a
+     * <cite>best effort</cite>; the returned envelope is not garanteed to be the most
+     * appropriate one.
+     *
+     * @param  coverage The coverage for which to obtains a two-dimensional envelope.
+     * @return The two-dimensional envelope.
+     * @throws MismatchedDimensionException if the envelope can't be reduced to two dimensions.
+     */
+    public static Envelope2D getEnvelope2D(final Coverage coverage)
+            throws MismatchedDimensionException
+    {
+        if (coverage instanceof GridCoverage2D) {
+            return ((GridCoverage2D) coverage).getEnvelope2D();
+        }
+        if (coverage instanceof GridCoverage) {
+            final GridGeometry2D geometry =
+                    GridGeometry2D.wrap(((GridCoverage) coverage).getGridGeometry());
+            if (geometry.isDefined(GridGeometry2D.ENVELOPE)) {
+                return geometry.getEnvelope2D();
+            } else {
+                return geometry.reduce(coverage.getEnvelope());
+            }
+        }
+        // Following may thrown MismatchedDimensionException.
+        return new Envelope2D(coverage.getEnvelope());
     }
 
     /**
      * Retrieves a best guess for the sample value to use for background,
      * inspecting the categories of the provided {@link GridCoverage2D}.
-     * 
+     *
      * @param coverage to use for guessing background values.
      * @return an array of double values to use as a background.
      */
@@ -165,6 +215,19 @@ public class CoverageUtilities {
     }
 
     /**
+     * @deprecated Use {@link #prepareSourceForOperation} instead.
+     *
+     * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to be
+     *         provided, 2 if we need to employ the geophysics vew of the provided coverage,
+     *         3 if we suggest to  employ the non-geophysics vew of the provided coverage.
+     */
+    public static int prepareSourcesForGCOperation(final GridCoverage2D coverage,
+            final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
+    {
+        return prepareSourceForOperation(coverage, interpolation, hasFilter, hints).ordinal();
+    }
+
+    /**
      * General purpose method used in various operations for {@link GridCoverage2D} to help
      * with taking decisions on how to treat coverages with respect to their {@link ColorModel}.
      *
@@ -188,7 +251,7 @@ public class CoverageUtilities {
      * <ul>
      *  <li>if the interpolation is {@link InterpolationNearest} and there is no filter involved
      *      we can apply the operation on the {@link IndexColorModel}-backed coverage with nor
-     *      probs.</li>
+     *      problems.</li>
      *  <li>If the interpolations in of higher order or there is a filter to apply we have to
      *      options:
      *      <ul>
@@ -202,111 +265,93 @@ public class CoverageUtilities {
      * </ul>
      *
      * <p>
-     * A special case is when we want to apply an operation on the geophysics view of a coverage that
-     * does not involve high order interpolation of filters. In this case we suggest to apply the
-     * operation on the non-geophysics view, which is usually much faster. Users may ignore this
-     * advice.
+     * A special case is when we want to apply an operation on the geophysics view of a coverage
+     * that does not involve high order interpolation of filters. In this case we suggest to apply
+     * the operation on the non-geophysics view, which is usually much faster. Users may ignore
+     * this advice.
      *
      * @param coverage to check for the action to take.
      * @param interpolation to use for the action to take.
      * @param hasFilter if the operation we will apply is going to use a filter.
      * @param hints to use when applying a certain operation.
-     * @return 0 if nothing has to be done on the provided coverage, 1 if a color expansion has to be
-     *         provided, 2 if we need to employ the geophysics vew of the provided coverage,
-     *         3 if we suggest to  employ the non-geophysics vew of the provided coverage.
+     * @return {@link OperationStrategy#USE_AS_IS USE_AS_IS}
+     *         if nothing has to be done on the provided coverage,
+     *         {@link OperationStrategy#APPLY_COLOR_EXPANSION APPLY_COLOR_EXPANSION}
+     *         if a color expansion has to be provided,
+     *         {@link OperationStrategy#USE_GEOPHYSICS_VIEW USE_GEOPHYSICS_VIEW}
+     *         if we need to employ the geophysics vew of the provided coverage,
+     *         {@link OperationStrategy#USE_NATIVE_VIEW USE_NATIVE_VIEW}
+     *         if we suggest to  employ the non-geophysics vew of the provided coverage.
      *
      * @since 2.3.1
      *
      * @todo Consider refactoring this method into {@link org.geotools.coverage.grid.ViewType},
      *       or in some utility class related to it.
      */
-    public static int prepareSourcesForGCOperation(final GridCoverage2D coverage,
+    public static OperationStrategy prepareSourceForOperation(final GridCoverage2D coverage,
             final Interpolation interpolation, final boolean hasFilter, final RenderingHints hints)
     {
         final RenderedImage sourceImage = coverage.getRenderedImage();
-        boolean useNonGeoView = false;
-        if (hints != null) {
-            // REPLACE_NON_GEOPHYSICS_VIEW default value is 'true'.
-            // useNonGeoView value is the opposite of REPLACE_NON_GEOPHYSICS_VIEW.
-            useNonGeoView = Boolean.FALSE.equals(hints.get(Hints.REPLACE_NON_GEOPHYSICS_VIEW));
+        if (!(sourceImage.getColorModel() instanceof IndexColorModel)) {
+            return OperationStrategy.USE_AS_IS; // optimization
         }
-        // the color model is indexed?
-        final boolean isIndexColorModel = sourceImage.getColorModel() instanceof IndexColorModel;
-        if (!isIndexColorModel) {
-            return 0;// optimization
-        }
-        final boolean isNearestNeigborInterpolation = interpolation instanceof InterpolationNearest;
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // The projection are usually applied on floating-point values, in order
-        // to gets maximal precision and to handle correctly the special case of
-        // NaN values. However, we can apply the projection on integer values if
-        // the interpolation type is "nearest neighbor", since this is not
-        // really an interpolation.
-        //
-        // If this condition is met, then we verify if an "integer version" of
-        // the image is available as a source of the source coverage (i.e. the
-        // floating-point image is derived from the integer image, not the
-        // converse).
-        //
-        // /////////////////////////////////////////////////////////////////////
-        if (isNearestNeigborInterpolation && !hasFilter) {
+        /*
+         * The operations are usually applied on floating-point values, in order
+         * to gets maximal precision and to handle correctly the special case of
+         * NaN values. However, we can apply some operation on integer values if
+         * the interpolation type is "nearest neighbor", since this is not
+         * really an interpolation.
+         *
+         * If this condition is met, then we verify if an "integer version" of
+         * the image is available as a source of the source coverage (i.e. the
+         * floating-point image is derived from the integer image, not the
+         * converse).
+         */
+        if (!hasFilter && (interpolation instanceof InterpolationNearest)) {
             final GridCoverage2D candidate = coverage.geophysics(false);
             if (candidate != coverage) {
-                final List sources = coverage.getRenderedImage().getSources();
+                final List<RenderedImage> sources = coverage.getRenderedImage().getSources();
                 if (sources != null) {
                     if (sources.contains(candidate.getRenderedImage())) {
-                        return 3;
+                        return OperationStrategy.USE_NATIVE_VIEW;
                     }
                 }
             }
-        }
-
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Do we need to explode the Palette to RGB(A)? This is needed only when
-        // we have a coverage that has a geoophysiscs view which has itself
-        // an IndexColorModel and we want to perform an operation that involves
-        // an higher order interpolation or a filter (like with
-        // SubsampleAverage).
-        //
-        // /////////////////////////////////////////////////////////////////////
-        // do we have transforms?
-        final boolean hasRenderingCategories = hasRenderingCategories(coverage);
-        final boolean preprocessIndexed = isIndexColorModel
-                && (!isNearestNeigborInterpolation || hasFilter);
-        final boolean getGeophysics = !useNonGeoView
-                && (hasRenderingCategories && preprocessIndexed);
-        // this coverage is a real image with index color model, hence we need
-        // to apply this operation on the expanded model.
-        if (preprocessIndexed) {
-            if (!getGeophysics) {
-                return 1;
-            } else if (getGeophysics) {
-                // in this case we need to go back the geophysics view of the
-                // source coverage
-                return 2;
+            return OperationStrategy.USE_AS_IS;
+        } else if (hasRenderingCategories(coverage)) {
+            /*
+             * Do we need to explode the Palette to RGB(A)? This is needed only when we have
+             * a coverage that has a geophysics view which has itself an IndexColorModel and
+             * we want to perform an operation that involves an higher order interpolation or
+             * a filter (like with SubsampleAverage).
+             */
+            boolean useNonGeoView = false;
+            if (hints != null) {
+                // REPLACE_NON_GEOPHYSICS_VIEW default value is 'true'.
+                // useNonGeoView value is the opposite of REPLACE_NON_GEOPHYSICS_VIEW.
+                useNonGeoView = Boolean.FALSE.equals(hints.get(Hints.REPLACE_NON_GEOPHYSICS_VIEW));
+            }
+            if (!useNonGeoView) {
+                // in this case we need to go back the geophysics view of the source coverage.
+                return OperationStrategy.USE_GEOPHYSICS_VIEW;
             }
         }
-        return 0;
+        return OperationStrategy.APPLY_COLOR_EXPANSION;
     }
 
     /**
      * Returns {@code true} if the provided {@link GridCoverage}
-     * has {@link Category} objects twith a real transformation.
-     *
+     * has {@link Category} objects with a real transformation.
      * <p>
-     * Common use case for this method is understanding if a
-     * {@link GridCoverage} has an accompanying Gephysiscs or non-Geophysics
-     * view, which means a dicotomy between the coverage with the "real" data
-     * and the coverage with the rendered version of the original data exists.
-     * An example is when you have raw data whose data type is float and you
-     * want to render them using a palette. You usually do this by specifying a
-     * set of {@link Category} object which will map some intervals of the raw
-     * data to some specific colors. The rendered version that we will create
-     * using the method {@link GridCoverage2D#geophysics(false)} will be backed
-     * by a RenderedImage with an IndexColorModel representing the colors
-     * provided in the Categories.
+     * Common use case for this method is understanding if a {@link GridCoverage} has an
+     * accompanying Geophysiscs or non-Geophysics view, which means a dicotomy between the
+     * coverage with the "real" data and the coverage with the rendered version of the original
+     * data exists. An example is when you have raw data whose data type is float and you want
+     * to render them using a palette. You usually do this by specifying a set of {@link Category}
+     * object which will map some intervals of the raw data to some specific colors. The rendered
+     * version that we will create using the method {@link GridCoverage2D#geophysics(false)} will
+     * be backed by a RenderedImage with an IndexColorModel representing the colors provided in
+     * the Categories.
      *
      * @param gridCoverage
      *            to check for the existence of categories with tranformations
@@ -326,33 +371,5 @@ public class CoverageUtilities {
         }
         // do they have any transformation that is not the identity?
         return hasTransform(sampleDimensions);
-    }
-
-    /**
-     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-     * (temporary).
-     *
-     * @deprecated Moved to {@link FeatureUtilities#wrapGridCoverage}.
-     */
-    public static FeatureCollection wrapGc(final GridCoverage coverage)
-            throws TransformException, SchemaException, IllegalAttributeException
-    {
-         return FeatureUtilities.wrapGridCoverage((GridCoverage2D) coverage);
-    }
-
-    /**
-     * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-     * (temporary).
-     * 
-     * @param gridCoverageReader the grid coverage 
-     * @return a feature with the grid coverage envelope as the geometry and the
-     *         grid coverage itself in the "grid" attribute
-     *
-     * @deprecated Moved to {@link FeatureUtilities#wrapGridCoverageReader}.
-     */
-    public static FeatureCollection wrapGcReader(AbstractGridCoverage2DReader reader)
-            throws TransformException, SchemaException, IllegalAttributeException
-    {
-        return FeatureUtilities.wrapGridCoverageReader(reader);
     }
 }

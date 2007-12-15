@@ -23,7 +23,6 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.KernelJAI;
 
 import org.opengis.coverage.Coverage;
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.processing.Operation;
@@ -31,17 +30,13 @@ import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.Envelope;
 
-import org.geotools.referencing.CRS;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.processing.operation.Resample;
 
 
 /**
@@ -405,11 +400,13 @@ public class Operations {
      * Resamples a grid coverage to the specified envelope.
      *
      * @param source The source coverage.
-     * @param crs The target envelope, including a possibly different coordinate reference system.
+     * @param envelope The target envelope, including a possibly different coordinate reference system.
      * @param interpolationType The interpolation type, or {@code null} for the default one.
      * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Resample
+     * @see org.geotools.coverage.processing.operation.Resample#computeGridGeometry
+     *
      * @since 2.5
      */
     public Coverage resample(final GridCoverage  source,
@@ -417,43 +414,16 @@ public class Operations {
                              final Interpolation interpolationType)
             throws CoverageProcessingException
     {
-        GridGeometry gridGeometry = source.getGridGeometry();
-        final CoordinateReferenceSystem sourceCRS =   source.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem targetCRS = envelope.getCoordinateReferenceSystem();
-        if (targetCRS == null || CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-            /*
-             * Same CRS (or unknown target CRS, which we treat as same), so we will keep the same
-             * "gridToCRS" transform. Basically the result will be the same as if we did a crop.
-             */
-            gridGeometry = new GridGeometry2D(gridGeometry.getGridToCRS(), envelope);
-        } else {
-            /*
-             * Different CRS. We need to infer an image size, which may be the same than the
-             * original size or something smaller if the envelope is a subarea. We process by
-             * transforming the target envelope to the source CRS and compute a new grid geometry
-             * with that envelope. The grid range of that grid geometry is the new image size.
-             * Note that failure to transform the envelope is non-fatal (we will assume that the
-             * target image should have the same size). Then create again a new grid geometry,
-             * this time with the target envelope.
-             */
-            GridRange gridRange;
-            try {
-                final GeneralEnvelope transformed;
-                transformed = CRS.transform(CRS.getCoordinateOperationFactory(true)
-                        .createOperation(targetCRS, sourceCRS), envelope);
-                transformed.intersect(source.getEnvelope());
-                gridGeometry = new GridGeometry2D(gridGeometry.getGridToCRS(), envelope);
-            } catch (FactoryException exception) {
-                recoverableException("resample", exception);
-            } catch (TransformException exception) {
-                recoverableException("resample", exception);
-                // Will use the grid range from the original geometry,
-                // which will result in keeping the same image size.
-            }
-            gridRange = gridGeometry.getGridRange();
-            gridGeometry = new GridGeometry2D(gridRange, envelope);
+        final GridGeometry gridGeometry;
+        try {
+            gridGeometry = Resample.computeGridGeometry(source, envelope);
+        } catch (TransformException exception) {
+            throw new CoverageProcessingException(exception);
         }
-        return resample(source, targetCRS, gridGeometry, interpolationType);
+        return doOperation("Resample",                  source,
+                           "CoordinateReferenceSystem", envelope.getCoordinateReferenceSystem(),
+                           "GridGeometry",              gridGeometry,
+                           "InterpolationType",         interpolationType);
     }
 
     /**
@@ -1015,16 +985,5 @@ public class Operations {
             exception.initCause(cause);
             throw exception;
         }
-    }
-
-    /**
-     * Invoked when an error occured but the application can fallback on a reasonable default.
-     *
-     * @param method The method where the error occured.
-     * @param exception The error.
-     */
-    private static void recoverableException(final String method, final Exception exception) {
-        Utilities.recoverableException("org.geotools.coverage.processing", Operations.class,
-                method, exception);
     }
 }

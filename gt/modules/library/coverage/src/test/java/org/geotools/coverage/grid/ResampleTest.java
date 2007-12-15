@@ -16,23 +16,18 @@
  */
 package org.geotools.coverage.grid;
 
-// J2SE dependencies
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
@@ -42,7 +37,6 @@ import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
@@ -116,6 +110,7 @@ public final class ResampleTest extends GridCoverageTest {
     /**
      * Set up common objects used for all tests.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         coverage                        = GridCoverageExamples.getExample(0);
@@ -150,7 +145,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     private static AffineTransform getAffineTransform(final GridCoverage2D coverage) {
         AffineTransform tr;
-        tr = (AffineTransform)((GridGeometry2D)coverage.getGridGeometry()).getGridToCRS2D();
+        tr = (AffineTransform) coverage.getGridGeometry().getGridToCRS2D();
         tr = new AffineTransform(tr); // Change the type to the default Java2D implementation.
         return tr;
     }
@@ -161,7 +156,7 @@ public final class ResampleTest extends GridCoverageTest {
     private static CoordinateReferenceSystem getProjectedCRS(final GridCoverage2D coverage) {
         try {
             final GeographicCRS  base = (GeographicCRS) coverage.getCoordinateReferenceSystem();
-            final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum()).getEllipsoid();
+            final Ellipsoid ellipsoid = base.getDatum().getEllipsoid();
             final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
             final ParameterValueGroup parameters = factory.getDefaultParameters("Oblique_Stereographic");
             parameters.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis());
@@ -281,7 +276,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public void testStereographic() {
         assertEquals("Warp", projectTo(coverage,getProjectedCRS(coverage), null));
-    }	
+    }
 
     /**
      * Tests the "Resample" operation with a stereographic coordinate system.
@@ -301,7 +296,7 @@ public final class ResampleTest extends GridCoverageTest {
         assertEquals("Warp", projectTo(indexedCoverageWithTransparency,crs, null));
         assertEquals("Warp", projectTo(floatCoverage,crs, null,
                              new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE), false));
-    }	
+    }
 
     /**
      * Tests the "Resample" operation with an "Affine" transform.
@@ -315,7 +310,7 @@ public final class ResampleTest extends GridCoverageTest {
     }
 
     /**
-     * Performs an Affine transformation on the provided {@link GridCoverage2D} using the 
+     * Performs an Affine transformation on the provided {@link GridCoverage2D} using the
      * Resample operation.
      *
      * @param coverage the {@link GridCoverage2D} to apply the operation on.
@@ -382,9 +377,9 @@ public final class ResampleTest extends GridCoverageTest {
          * amount, with the opposite sign.
          */
         final AffineTransform expected = getAffineTransform(grid);
-        grid = (GridCoverage2D) CoverageFactoryFinder.getGridCoverageFactory(null).create("Translated",
-                                  image, grid.getEnvelope(), grid.getSampleDimensions(),
-                                  new GridCoverage2D[]{grid}, grid.getProperties());
+        grid = CoverageFactoryFinder.getGridCoverageFactory(null).create("Translated",
+                image, grid.getEnvelope(), grid.getSampleDimensions(),
+                new GridCoverage2D[]{grid}, grid.getProperties());
         expected.translate(-transX, -transY);
         assertEquals(expected, getAffineTransform(grid));
         /*
@@ -411,6 +406,7 @@ public final class ResampleTest extends GridCoverageTest {
      *
      * @todo Investigate why this test fails.
      */
+    @Override
     public void testSerialization() {
     }
 
