@@ -45,13 +45,16 @@ import org.geotools.resources.i18n.LoggingKeys;
  * <p>
  * Example use:
  * <blockquote><code>
- * Set categories = Collections.singleton(new Class[] {MathTransformProvider.class});<br>
+ * Set&lt;Class&lt;?&gt;&gt; categories =
+ *     Collections.singleton(new Class&lt;?&gt;[] {<br>
+ * &npsp;&npsp;&npsp;&npsp;MathTransformProvider.class<br>
+ * });<br>
  * FactoryRegistry registry = new FactoryRegistry(categories);<br>
  * <br>
  * // get the providers<br>
  * Filter filter = null;<br>
  * Hints hints = null;<br>
- * Iterator<MathTransform> providers =
+ * Iterator&lt;MathTransform&gt; providers =
  *     registry.getServiceProviders(MathTransformProvider.class, filter, hints);<br>
  * </code></blockquote>
  * <p>
@@ -91,6 +94,13 @@ public class FactoryRegistry extends ServiceRegistry {
     private final FactoryIteratorProviders globalConfiguration = new FactoryIteratorProviders();
 
     /**
+     * The set of category that need to be scanned for plugins, or {@code null} if none.
+     * On initialization, all categories need to be scanned for plugins. After a category
+     * has been first used, it is removed from this set so we don't scan for plugins again.
+     */
+    private Set<Class<?>> needScanForPlugins;
+
+    /**
      * Categories under scanning. This is used by {@link #scanForPlugins(Collection,Class)}
      * as a guard against infinite recursivity (i.e. when a factory to be scanned request
      * an other dependency of the same category).
@@ -117,6 +127,12 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     public FactoryRegistry(final Collection<Class<?>> categories) {
         super(categories.iterator());
+        for (final Iterator<Class<?>> it=getCategories(); it.hasNext();) {
+            if (needScanForPlugins == null) {
+                needScanForPlugins = new HashSet<Class<?>>();
+            }
+            needScanForPlugins.add(it.next());
+        }
     }
 
     /**
@@ -150,12 +166,8 @@ public class FactoryRegistry extends ServiceRegistry {
             }
         };
         synchronizeIteratorProviders();
-        Iterator<T> iterator = getServiceProviders(category, hintsFilter, true);
-        if (!iterator.hasNext()) {
-            scanForPlugins(getClassLoaders(), category);
-            iterator = getServiceProviders(category, hintsFilter, true);
-        }
-        return iterator;
+        scanForPluginsIfNeeded(category);
+        return getServiceProviders(category, hintsFilter, true);
     }
 
     /**
@@ -176,32 +188,20 @@ public class FactoryRegistry extends ServiceRegistry {
      * @todo Use Hints to match Constructor.
      */
     final <T> Iterator<T> getUnfilteredProviders(final Class<T> category) {
-        if (!scanningCategories.isEmpty()) {
-            /*
-             * The 'scanningCategories' map is almost always empty, so we use the above 'isEmpty()'
-             * check because it is fast. If the map is not empty, then this mean that a scanning is
-             * under progress, i.e. 'scanForPlugins' is currently being executed. This is okay as
-             * long as the user is not asking for one of the categories under scanning. Otherwise,
-             * the answer returned by 'getServiceProviders' would be incomplete because not all
-             * plugins have been found yet. This can lead to some bugs hard to spot because this
-             * methoud could complete normally but return the wrong plugin. It is safer to thrown
-             * an exception so the user is advised that something is wrong.
-             */
-            if (scanningCategories.contains(category)) {
-                throw new RecursiveSearchException(category);
-            }
+        /*
+         * If the map is not empty, then this mean that a scanning is under progress, i.e.
+         * 'scanForPlugins' is currently being executed. This is okay as long as the user
+         * is not asking for one of the categories under scanning. Otherwise, the answer
+         * returned by 'getServiceProviders' would be incomplete because not all plugins
+         * have been found yet. This can lead to some bugs hard to spot because this methoud
+         * could complete normally but return the wrong plugin. It is safer to thrown an
+         * exception so the user is advised that something is wrong.
+         */
+        if (scanningCategories.contains(category)) {
+            throw new RecursiveSearchException(category);
         }
-        Iterator<T> iterator = getServiceProviders(category, true);
-        if (!iterator.hasNext()) {
-            /*
-             * No plugin. This method is probably invoked the first time for the specified
-             * category, otherwise we should have found at least the Geotools implementation.
-             * Scans the plugin now, but for this category only.
-             */
-            scanForPlugins(getClassLoaders(), category);
-            iterator = getServiceProviders(category, true);
-        }
-        return iterator;
+        scanForPluginsIfNeeded(category);
+        return getServiceProviders(category, true);
     }
 
     /**
@@ -766,6 +766,19 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
+     * Scans the given category for plugins only if needed. After this method has been
+     * invoked once for a given category, it will no longer scan for that category.
+     */
+    private <T> void scanForPluginsIfNeeded(final Class<?> category) {
+        if (needScanForPlugins != null && needScanForPlugins.remove(category)) {
+            if (needScanForPlugins.isEmpty()) {
+                needScanForPlugins = null;
+            }
+            scanForPlugins(getClassLoaders(), category);
+        }
+    }
+
+    /**
      * {@linkplain #registerServiceProvider Registers} all factories given by the
      * supplied iterator.
      *
@@ -963,7 +976,7 @@ public class FactoryRegistry extends ServiceRegistry {
         }
         for (final Iterator<Class<?>> categories=getCategories(); categories.hasNext();) {
             final Class<?> category = categories.next();
-            if (getServiceProviders(category, false).hasNext()) {
+            if (needScanForPlugins == null || !needScanForPlugins.contains(category)) {
                 /*
                  * Register immediately the factories only if some other factories were already
                  * registered for this category,  because in such case scanForPlugin() will not

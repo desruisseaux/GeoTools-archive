@@ -45,7 +45,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.Utilities;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
@@ -301,7 +301,6 @@ public class Resample extends Operation2D {
      * @param exception The error.
      */
     private static void recoverableException(final String method, final Exception exception) {
-        Utilities.recoverableException("org.geotools.coverage.processing", Resample.class,
-                method, exception);
+        Logging.recoverableException(Resample.class, method, exception);
     }
 }

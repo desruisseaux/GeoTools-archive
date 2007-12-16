@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,30 +16,25 @@
  */
 package org.geotools.referencing.operation;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.PassThroughOperation;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.Transformation;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.GeoTools;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -74,7 +69,7 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
     }
 
     /**
-     * Uses reflection to dynamically create a test suite containing all 
+     * Uses reflection to dynamically create a test suite containing all
      * the <code>testXXX()</code> methods - from the JUnit FAQ.
      */
     public static Test suite() {
@@ -92,22 +87,11 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
      * Ensures that positional accuracy dependencies are properly loaded. This is not needed for
      * normal execution, but JUnit behavior with class loaders is sometime surprising.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         assertNotNull(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED);
         assertNotNull(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED);
-    }
-
-    /**
-     * Quick self test, in part to give this test suite a test
-     * and also to test the internal method.
-     */
-    public void testAssertPointsEqual(){
-        String name = "self test";
-        double a[]     = {10,   10  };
-        double b[]     = {10.1, 10.1};
-        double delta[] = { 0.2,  0.2};
-        assertPointsEqual(name, a, b, delta);
     }
 
     /**
@@ -279,8 +263,8 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
         if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
             assertSame (sourceCRS, operation.getSourceCRS());
             assertSame (targetCRS, operation.getTargetCRS());
-            assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-            assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+            assertTrue (operation.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+            assertFalse(operation.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
         }
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
@@ -323,8 +307,8 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
         final CoordinateOperation lenient = lenientFactory.createOperation(amputedCRS, targetCRS);
         assertSame(amputedCRS, lenient.getSourceCRS());
         assertSame( targetCRS, lenient.getTargetCRS());
-        assertFalse(lenient.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-        assertTrue (lenient.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+        assertFalse(lenient.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+        assertTrue (lenient.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
 
         final MathTransform lenientTr = lenient.getMathTransform();
         assertInterfaced(lenientTr);
@@ -368,8 +352,8 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
         if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
             assertSame(sourceCRS, operation.getSourceCRS());
             assertSame(targetCRS, operation.getTargetCRS());
-            assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-            assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+            assertTrue (operation.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+            assertFalse(operation.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
         }
         MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
@@ -388,8 +372,8 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
         if (!(opFactory instanceof AuthorityBackedFactory)) { // See comment in class javadoc
             assertSame(sourceCRS, operation.getSourceCRS());
             assertSame(targetCRS, operation.getTargetCRS());
-            assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-            assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+            assertTrue (operation.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+            assertFalse(operation.getCoordinateOperationAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
         }
         transform = operation.getMathTransform();
         assertInterfaced(transform);
@@ -663,5 +647,21 @@ public final class CoordinateOperationFactoryTest extends TestTransform {
             assertTransformEquals3_1(mt,  5,  8, 20, 20);
             assertTransformEquals3_1(mt, -5, -8, 20, 20);
         }
+    }
+
+    /**
+     * Make sure that a factory can be find in the presence of some global hints.
+     *
+     * @see http://jira.codehaus.org/browse/GEOT-1618
+     */
+    public void testFactoryWithHints() {
+        final Hints hints = new Hints();
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.TRUE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.TRUE);
+
+        final CoordinateOperationFactory factory =
+                ReferencingFactoryFinder.getCoordinateOperationFactory(hints);
+        assertSame(opFactory, factory);
     }
 }

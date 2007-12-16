@@ -177,7 +177,7 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
         try {
             close();
         } catch (IOException exception) {
-            Logging.unexpectedException(LOGGER.getName(), getClass(), "close", exception);
+            Logging.unexpectedException(LOGGER, getClass(), "close", exception);
         }
     }
 

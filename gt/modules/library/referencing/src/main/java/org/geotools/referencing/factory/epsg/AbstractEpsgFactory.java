@@ -379,7 +379,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
             result.close();
             statement.close();
         } catch (SQLException exception) {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER.getName(),
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER,
                     AbstractEpsgFactory.class, "getAuthority", exception);
             return Citations.EPSG;
         }
@@ -1331,7 +1331,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                     properties.put(Datum.REALIZATION_EPOCH_KEY, calendar.getTime());
                 } catch (NumberFormatException exception) {
                     // Not a fatal error...
-                    org.geotools.util.logging.Logging.unexpectedException(LOGGER.getName(),
+                    org.geotools.util.logging.Logging.unexpectedException(LOGGER,
                             AbstractEpsgFactory.class, "createDatum", exception);
                 }
                 final DatumFactory factory = factories.getDatumFactory();
@@ -3273,7 +3273,7 @@ public abstract class AbstractEpsgFactory extends AbstractCachedAuthorityFactory
                                         final String       method,
                                         final SQLException exception)
         {
-            org.geotools.util.logging.Logging.unexpectedException(LOGGER.getName(), classe, method, exception);
+            org.geotools.util.logging.Logging.unexpectedException(LOGGER, classe, method, exception);
         }
 
         /**

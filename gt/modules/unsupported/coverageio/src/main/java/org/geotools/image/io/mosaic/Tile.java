@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -264,7 +265,7 @@ public class Tile implements Comparable<Tile> {
                     } catch (IndexOutOfBoundsException e) {
                         // We tried to reuse the same stream in order to preserve cached data, but it was
                         // not possible to seek to the begining. Closes it; we will open a new one later.
-                        recoverableException(Tile.class, "getPreparedReader", e);
+                        Logging.recoverableException(Tile.class, "getPreparedReader", e);
                         stream.close();
                         stream = null;
                     } else {
@@ -402,7 +403,7 @@ public class Tile implements Comparable<Tile> {
                     return Utilities.equals(this.getRegion(), that.getRegion());
                 } catch (IOException e) {
                     // Should not occurs, since we checked that 'getRegion()' should be cheap.
-                    recoverableException(Tile.class, "equals", e);
+                    Logging.recoverableException(Tile.class, "equals", e);
                 }
                 return true;
             }
@@ -453,14 +454,5 @@ public class Tile implements Comparable<Tile> {
             buffer.append(e);
         }
         return buffer.append(']').toString();
-    }
-
-    /**
-     * Invoked when an exception occured that can be safely ignored.
-     */
-    static void recoverableException(final Class<?> classe, final String method,
-                                     final Exception exception)
-    {
-        Utilities.recoverableException("org.geotools.image.io.mosaic", classe, method, exception);
     }
 }

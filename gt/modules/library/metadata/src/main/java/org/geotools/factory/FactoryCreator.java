@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -178,6 +179,11 @@ public class FactoryCreator extends FactoryRegistry {
             final T candidate;
             try {
                 candidate = createSafe(category, implementation, hints);
+            } catch (FactoryNotFoundException exception) {
+                // The factory has a dependency which has not been found.
+                // Be tolerant to that kind of error.
+                Logging.recoverableException(LOGGER, FactoryCreator.class, "getServiceProvider", exception);
+                continue;
             } catch (FactoryRegistryException exception) {
                 if (exception.getCause() instanceof NoSuchMethodException) {
                     // No public constructor with the expected argument.
@@ -259,14 +265,14 @@ public class FactoryCreator extends FactoryRegistry {
         try {
             try {
                 return category.cast(implementation.getConstructor(HINTS_ARGUMENT)
-                                                   .newInstance(new Object[] {hints}));
+                        .newInstance(new Object[] {hints}));
             } catch (NoSuchMethodException exception) {
                 // Constructor do not exists or is not public. We will fallback on the no-arg one.
                 cause = exception;
             }
             try {
                 return category.cast(implementation.getConstructor((Class[]) null)
-                                                   .newInstance((Object[]) null));
+                        .newInstance((Object[]) null));
             } catch (NoSuchMethodException exception) {
                 // No constructor accessible. Do not store the cause (we keep the one above).
             }

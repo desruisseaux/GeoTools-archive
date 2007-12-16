@@ -106,8 +106,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
                 streamOrigin = ((ImageInputStream) input).getStreamPosition();
             } catch (IOException exception) {
                 streamOrigin = 0;
-                Logging.unexpectedException(LOGGER.getName(),
-                        StreamImageReader.class, "setInput", exception);
+                Logging.unexpectedException(LOGGER, StreamImageReader.class, "setInput", exception);
             }
         }
     }
@@ -231,7 +230,7 @@ public abstract class StreamImageReader extends GeographicImageReader {
         try {
             close();
         } catch (IOException exception) {
-            Logging.unexpectedException(LOGGER.getName(), getClass(), "close", exception);
+            Logging.unexpectedException(LOGGER, getClass(), "close", exception);
         }
     }
 

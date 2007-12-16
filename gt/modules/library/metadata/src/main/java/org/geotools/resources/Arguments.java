@@ -396,8 +396,7 @@ public class Arguments {
             return new InputStreamReader(in, encoding);
         } catch (UnsupportedEncodingException exception) {
             // Should not occurs, since the character encoding was supported in some previous run...
-            Logging.unexpectedException("org.geotools.resources", Arguments.class, "getReader",
-                                        exception);
+            Logging.unexpectedException(Arguments.class, "getReader", exception);
         }
         return new InputStreamReader(in);
     }
@@ -417,8 +416,7 @@ public class Arguments {
             return new OutputStreamWriter(out, encoding);
         } catch (UnsupportedEncodingException exception) {
             // Should not occurs, since the character encoding was supported in some previous run...
-            Logging.unexpectedException("org.geotools.resources", Arguments.class, "getWriter",
-                                        exception);
+            Logging.unexpectedException(Arguments.class, "getWriter", exception);
         }
         return new OutputStreamWriter(out);
     }

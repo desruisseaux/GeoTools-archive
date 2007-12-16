@@ -519,7 +519,7 @@ final class Resampler2D extends GridCoverage2D {
          */
         double[] background = null;
         if (operation == null) {
-            if (allSteps instanceof AffineTransform && (automaticGG || automaticGR)) {
+            if (allSteps instanceof AffineTransform && automaticGR) {
                 if (automaticGG) {
                     background = null;// we won't use it
                     // Cheapest approach: just update 'gridToCRS'.

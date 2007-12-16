@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2002, Institut de Recherche pour le Développement
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
@@ -16,14 +16,9 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
 import java.util.Random;
 import junit.framework.TestCase;
 
-// Geotools dependencies
-import org.geotools.referencing.ReferencingFactoryFinder;
-
-// OpenGIS dependencis
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -33,10 +28,10 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 
 /**
@@ -88,6 +83,7 @@ public abstract class TestTransform extends TestCase {
     /**
      * Setup the factories using the hints provided by {@link #getHintsForTesting}.
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         Hints hints  = getHintsForTesting();
@@ -226,7 +222,7 @@ public abstract class TestTransform extends TestCase {
               "transformed=("+target.ordinates[0]+", "+target.ordinates[1]+")";
         assertEquals(message, ex, target.ordinates[0], EPS);
         assertEquals(message, ey, target.ordinates[1], EPS);
-    }    
+    }
 
     /**
      * Transforms a three-dimensional point and compare the result with the expected
@@ -249,7 +245,7 @@ public abstract class TestTransform extends TestCase {
         final String message = "Expected ("+ez+"), "+
               "transformed=("+target.ordinates[0]+")";
         assertEquals(message, ez, target.ordinates[0], 1E-2); // Greater tolerance level for Z.
-    }    
+    }
 
     /**
      * Compare two arrays of points.
@@ -284,5 +280,17 @@ public abstract class TestTransform extends TestCase {
                 assertEquals(buffer.toString(), expected[i], actual[i], delta[i % dimension]);
             }
         }
+    }
+
+    /**
+     * Quick self test, in part to give this test suite a test
+     * and also to test the internal method.
+     */
+    public void testAssertPointsEqual(){
+        String name = "self test";
+        double a[]     = {10,   10  };
+        double b[]     = {10.1, 10.1};
+        double delta[] = { 0.2,  0.2};
+        assertPointsEqual(name, a, b, delta);
     }
 }

@@ -317,6 +317,8 @@ public final class Utilities {
      * @param classe  The class where the error occurred.
      * @param method  The method name where the error occurred.
      * @param error   The error.
+     *
+     * @deprecated Moved to {@link Logging#recoverableException}.
      */
     public static void recoverableException(final String   paquet,
                                             final Class<?> classe,
@@ -332,6 +334,9 @@ public final class Utilities {
 
     /**
      * Returns a log record for the specified exception.
+     *
+     * @deprecated Will be deleted after we removed the {@link #recoverableException}
+     *             deprecated method.
      */
     public static LogRecord getLogRecord(final Throwable error) {
         final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(error));

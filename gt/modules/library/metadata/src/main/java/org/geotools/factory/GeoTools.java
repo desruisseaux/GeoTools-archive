@@ -339,8 +339,7 @@ public final class GeoTools {
      * since it is the public API that may invokes this method.
      */
     private static void unexpectedException(final Exception exception) {
-        Logging.unexpectedException("org.geotools.factory",
-                Hints.class, "scanSystemProperties", exception);
+        Logging.unexpectedException(Hints.class, "scanSystemProperties", exception);
     }
 
     /**
@@ -464,7 +463,7 @@ public final class GeoTools {
                     }
                     fixed = context.composeName(fixed, part);
                 } catch (NamingException e) {
-                    Logging.unexpectedException("org.geotools.factory", GeoTools.class, "fixName", e);
+                    Logging.unexpectedException(GeoTools.class, "fixName", e);
                     return name;
                 }
             }

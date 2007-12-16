@@ -87,7 +87,7 @@ public class MosaicImageReader extends ImageReader {
         try {
             close();
         } catch (IOException exception) {
-            Tile.recoverableException(MosaicImageReader.class, "setInput", exception);
+            Logging.recoverableException(MosaicImageReader.class, "setInput", exception);
         }
         /*
          * Gets the new collection of tiles.
@@ -119,7 +119,7 @@ public class MosaicImageReader extends ImageReader {
                     // Invalid locale. Ignore this exception since it will not prevent the image
                     // reader to work mostly as expected (warning messages may be in a different
                     // locale, which is not a big deal).
-                    Tile.recoverableException(MosaicImageReader.class, "setInput", e);
+                    Logging.recoverableException(MosaicImageReader.class, "setInput", e);
                 }
             }
         }
@@ -182,7 +182,7 @@ public class MosaicImageReader extends ImageReader {
                 } catch (IllegalArgumentException e) {
                     // Locale not supported by the reader. It may occurs
                     // if not all readers support the same set of locales.
-                    Tile.recoverableException(MosaicImageReader.class, "setLocale", e);
+                    Logging.recoverableException(MosaicImageReader.class, "setLocale", e);
                 }
             }
         }
@@ -267,8 +267,7 @@ public class MosaicImageReader extends ImageReader {
                 try {
                     type = type.getMethod(methodName, parameterTypes).getDeclaringClass();
                 } catch (NoSuchMethodException e) {
-                    Logging.unexpectedException("org.geotools.image.io.mosaic",
-                            MosaicImageReader.class, "useDefaultImplementation", e);
+                    Logging.unexpectedException(MosaicImageReader.class, "useDefaultImplementation", e);
                     return false; // Conservative value.
                 }
                 if (!type.equals(ImageReader.class)) {
@@ -693,7 +692,7 @@ public class MosaicImageReader extends ImageReader {
         if (tiles != null) try {
             tiles.close(true);
         } catch (IOException e) {
-            Tile.recoverableException(MosaicImageReader.class, "dispose", e);
+            Logging.recoverableException(MosaicImageReader.class, "dispose", e);
         }
         tiles = null;
         super.dispose();

@@ -117,6 +117,9 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
          */
         userHints = new Hints(userHints);
         userHints.keySet().removeAll(hints.keySet());
+        userHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+        userHints.remove(Hints.FORCE_STANDARD_AXIS_DIRECTIONS);
+        userHints.remove(Hints.FORCE_STANDARD_AXIS_UNITS);
         if (!userHints.isEmpty()) {
             noForce(userHints);
             authorityFactory = ReferencingFactoryFinder.getCoordinateOperationAuthorityFactory(
@@ -156,7 +159,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
             /*
              * Factory creation at this stage will happen only if null hints were specified at
              * construction time, which explain why it is correct to use {@link FactoryFinder}
-             * with null hints here.
+             * with empty hints here.
              */
             final Hints hints = new Hints();
             noForce(hints);
@@ -362,7 +365,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         if ((prepend == null || prepend.isIdentity()) && (append == null || append.isIdentity())) {
             return operation;
         }
-        final Map properties = AbstractIdentifiedObject.getProperties(operation);
+        final Map<String,?> properties = AbstractIdentifiedObject.getProperties(operation);
         /*
          * In the particular case of concatenated operations, we can not prepend or append a math
          * transform to the operation as a whole (the math transform for a concatenated operation
@@ -397,7 +400,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
             transform = mtFactory.createConcatenatedTransform(transform, append);
         }
         assert !transform.equals(operation.getMathTransform()) : transform;
-        final Class type = AbstractCoordinateOperation.getType(operation);
+        final Class<? extends CoordinateOperation> type = AbstractCoordinateOperation.getType(operation);
         final OperationMethod method = (operation instanceof Operation) ?
                                        ((Operation) operation).getMethod() : null;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform, method, type);

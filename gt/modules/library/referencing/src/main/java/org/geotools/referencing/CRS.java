@@ -18,7 +18,6 @@ package org.geotools.referencing;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
@@ -91,11 +90,6 @@ import org.geotools.util.UnsupportedImplementationException;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public final class CRS {
-    /**
-     * The logger name to use for logging messages in this class.
-     */
-    private static final String LOGGER = "org.geotools.referencing";
-
     /**
      * A map with {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} set to {@link Boolean#TRUE}.
      */
@@ -495,10 +489,9 @@ public final class CRS {
     private static Envelope getGeographicEnvelope(final CoordinateReferenceSystem crs) {
         GeneralEnvelope envelope = null;
         if (crs != null) {
-            final Extent validArea = crs.getValidArea();
-            if (validArea != null) {
-                for (final Iterator it=validArea.getGeographicElements().iterator(); it.hasNext();) {
-                    final GeographicExtent geo = (GeographicExtent) it.next();
+            final Extent domainOfValidity = crs.getDomainOfValidity();
+            if (domainOfValidity != null) {
+                for (final GeographicExtent geo : domainOfValidity.getGeographicElements()) {
                     final GeneralEnvelope candidate;
                     if (geo instanceof GeographicBoundingBox) {
                         final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
@@ -1340,7 +1333,7 @@ public final class CRS {
      * should propagate the exception).
      */
     static void unexpectedException(final String methodName, final Exception exception) {
-        Logging.unexpectedException(LOGGER, CRS.class, methodName, exception);
+        Logging.unexpectedException(CRS.class, methodName, exception);
     }
 
     /**

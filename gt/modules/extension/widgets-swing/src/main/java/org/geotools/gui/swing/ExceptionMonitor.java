@@ -110,7 +110,7 @@ public final class ExceptionMonitor {
                 final Throwable e = error.getTargetException();
                 if (e instanceof RuntimeException) throw (RuntimeException) e;
                 if (e instanceof Error)            throw (Error)            e;
-                Logging.unexpectedException("org.geotools.gui", ExceptionMonitor.class, "show", e);
+                Logging.unexpectedException(ExceptionMonitor.class, "show", e);
             }
         }
     }

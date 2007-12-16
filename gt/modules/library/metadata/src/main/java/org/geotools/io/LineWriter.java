@@ -19,7 +19,6 @@ package org.geotools.io;
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
-
 import org.geotools.resources.XArray;
 
 
@@ -28,7 +27,7 @@ import org.geotools.resources.XArray;
  * catches all occurrences of {@code "\r"}, {@code "\n"} and {@code "\r\n"}, and replaces them
  * by the platform depend EOL string ({@code "\r\n"} on Windows, {@code "\n"} on Unix), or any
  * other EOL explicitly set at construction time. This writer also remove trailing blanks before
- * end of lines.
+ * end of lines, but this behavior can be changed by overriding {@link #isWhitespace}.
  *
  * @source $URL$
  * @version $Id$
@@ -128,9 +127,9 @@ public class LineWriter extends FilterWriter {
      * Returns {@code true} if {@link #buffer} contains only white spaces. It should
      * always be the case. This method is used for assertions only.
      */
-    private boolean bufferBlank() {
+    private boolean bufferBlank() throws IOException {
         for (int i=count; --i>=0;) {
-            if (!Character.isSpaceChar(buffer[i])) {
+            if (!isWhitespace(buffer[i])) {
                 return false;
             }
         }
@@ -158,13 +157,13 @@ public class LineWriter extends FilterWriter {
         while (upper != lower) {
             final char c = cbuf[upper-1];
             assert (c!='\r' && c!='\n');
-            if (Character.isSpaceChar(c)) {
+            if (isWhitespace(c)) {
                 upper--;
                 continue;
             }
             flushBuffer();
             out.write(cbuf, lower, upper-lower);
-            break;
+            return;
         }
         assert bufferBlank();
         count = 0;
@@ -178,13 +177,13 @@ public class LineWriter extends FilterWriter {
         while (upper != lower) {
             final char c = str.charAt(upper-1);
             assert (c!='\r' && c!='\n');
-            if (Character.isSpaceChar(c)) {
+            if (isWhitespace(c)) {
                 upper--;
                 continue;
             }
             flushBuffer();
             out.write(str, lower, upper-lower);
-            break;
+            return;
         }
         assert bufferBlank();
         count = 0;
@@ -216,10 +215,7 @@ public class LineWriter extends FilterWriter {
                     break;
                 }
                 default: {
-                    if (c >= Character.MIN_VALUE &&
-                        c <= Character.MAX_VALUE &&
-                        Character.isSpaceChar((char)c))
-                    {
+                    if (c>=Character.MIN_VALUE && c<=Character.MAX_VALUE && isWhitespace((char)c)) {
                         if (count >= buffer.length) {
                             buffer = XArray.resize(buffer, count + Math.min(8192, count));
                         }
@@ -283,7 +279,7 @@ public class LineWriter extends FilterWriter {
              * put trailing blanks into the buffer.
              */
             for (int i=upper; --i>=offset;) {
-                if (!Character.isSpaceChar(cbuf[i])) {
+                if (!isWhitespace(cbuf[i])) {
                     writeLine(cbuf, offset, offset=i+1);
                     break;
                 }
@@ -346,7 +342,7 @@ public class LineWriter extends FilterWriter {
              * put trailing blanks into the buffer.
              */
             for (int i=upper; --i>=offset;) {
-                if (!Character.isSpaceChar(string.charAt(i))) {
+                if (!isWhitespace(string.charAt(i))) {
                     writeLine(string, offset, offset=i+1);
                     break;
                 }
@@ -376,5 +372,20 @@ public class LineWriter extends FilterWriter {
             flushBuffer();
             super.flush();
         }
+    }
+
+    /**
+     * Returns {@code true} if the specified character is a white space that can be ignored
+     * on end of line. The default implementation returns {@link Character#isSpaceChar(char)}.
+     * Subclasses can override this method in order to change the criterion.
+     *
+     * @param  c The character to test.
+     * @return {@code true} if {@code c} is a character that can be ignored on end of line.
+     * @throws IOException if this method can not determine if the character is ignoreable.
+     *
+     * @since 2.5
+     */
+    protected boolean isWhitespace(final char c) throws IOException {
+        return Character.isSpaceChar(c);
     }
 }

@@ -69,7 +69,7 @@ public final class JDBC {
                                              driver, d.getMajorVersion(), d.getMinorVersion());
                         DRIVERS.add(driver);
                     } catch (Exception exception) {
-                        log = Utilities.getLogRecord(exception);
+                        log = new LogRecord(Level.WARNING, exception.toString());
                     }
                 }
             }

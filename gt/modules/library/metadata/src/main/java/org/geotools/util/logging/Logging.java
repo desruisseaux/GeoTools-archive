@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -373,11 +373,7 @@ public final class Logging {
      *         doesn't log anything at the {@link Level#WARNING WARNING} level.
      */
     public static boolean unexpectedException(final Logger logger, final Throwable error) {
-        if (logger.isLoggable(Level.WARNING)) {
-            unexpectedException(logger.getName(), (String) null, null, error);
-            return true;
-        }
-        return false;
+        return unexpectedException(logger, null, null, error, Level.WARNING);
     }
 
     /**
@@ -404,12 +400,14 @@ public final class Logging {
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the {@link Level#WARNING WARNING} level.
      */
-    public static void unexpectedException(final Logger logger, final Class classe,
-                                           final String method, final Throwable error)
+    public static boolean unexpectedException(final Logger logger, final Class<?> classe,
+                                              final String method, final Throwable error)
     {
-        // TODO: Refactor in order to use directly the logger after we removed the deprecated method.
-        unexpectedException(logger.getName(), classe, method, error);
+        final String classname = (classe != null) ? classe.getName() : null;
+        return unexpectedException(logger, classname, method, error, Level.WARNING);
     }
 
     /**
@@ -425,74 +423,194 @@ public final class Logging {
      * @param classe  The class where the error occurred, or {@code null}.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the {@link Level#WARNING WARNING} level.
+     *
+     * @deprecated Use one of the other {@code unexpectedException} methods instead.
      */
-    public static void unexpectedException(final String paquet, final Class classe,
-                                           final String method, final Throwable error)
+    public static boolean unexpectedException(final String paquet, final Class<?> classe,
+                                              final String method, final Throwable error)
     {
-        unexpectedException(paquet, (classe != null) ? classe.getName() : (String) null, method, error);
+        final Logger logger = (paquet != null) ? getLogger(paquet) : null;
+        return unexpectedException(logger, classe, method, error);
     }
 
     /**
-     * Same as {@link #unexpectedException(String, Class, String, Throwable)
-     * unexpectedException(..., Class, ...)} except that the class name is
-     * specified as a string.
+     * Invoked when an unexpected error occurs. This method logs a message at the
+     * {@link Level#WARNING WARNING} level to a logger inferred from the given class.
      *
-     * @param paquet  The package where the error occurred, or {@code null}. This
-     *                information is used for fetching an appropriate {@link Logger}
-     *                for logging the error.
-     * @param classe  The class where the error occurred, or {@code null}.
+     * @param classe  The class where the error occurred.
      * @param method  The method where the error occurred, or {@code null}.
      * @param error   The error.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the {@link Level#WARNING WARNING} level.
+     *
+     * @since 2.5
      */
-    private static void unexpectedException(String paquet, String classe, String method,
-                                            final Throwable error)
+    public static boolean unexpectedException(Class<?> classe, String method, Throwable error) {
+        return unexpectedException((Logger) null, classe, method, error);
+    }
+
+    /**
+     * Implementation of {@link #unexpectedException(Logger, Class, String, Throwable)}.
+     *
+     * @param logger  Where to log the error, or {@code null}.
+     * @param classe  The fully qualified class name where the error occurred, or {@code null}.
+     * @param method  The method where the error occurred, or {@code null}.
+     * @param error   The error.
+     * @param level   The logging level.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the specified level.
+     */
+    private static boolean unexpectedException(Logger logger, String classe, String method,
+                                               final Throwable error, final Level level)
     {
-        final LogRecord record = Utilities.getLogRecord(error);
-        if (paquet==null || classe==null || method==null) {
+        /*
+         * Checks if loggable, inferring the logger from the classe name if needed.
+         */
+        if (error == null) {
+            return false;
+        }
+        if (logger == null && classe != null) {
+            final int separator = classe.lastIndexOf('.');
+            final String paquet = (separator >= 1) ? classe.substring(0, separator-1) : "";
+            logger = getLogger(paquet);
+        }
+        if (logger != null && !logger.isLoggable(level)) {
+            return false;
+        }
+        /*
+         * Loggeable, so complete the null argument from the stack trace if we can.
+         */
+        if (logger==null || classe==null || method==null) {
+            String paquet = (logger != null) ? logger.getName() : null;
             final StackTraceElement[] elements = error.getStackTrace();
             for (int i=0; i<elements.length; i++) {
-                final StackTraceElement e = elements[i];
-                final String c = e.getClassName();
-                if (paquet != null) {
-                    if (!c.startsWith(paquet)) {
-                        continue;
-                    }
-                    final int lg = paquet.length();
-                    if (c.length()>lg && Character.isJavaIdentifierPart(c.charAt(lg))) {
-                        continue;
-                    }
-                }
+                /*
+                 * Searchs for the first stack trace element with a classname matching the
+                 * expected one. We compare preferably against the name of the class given
+                 * in argument, or against the logger name (taken as the package name) otherwise.
+                 */
+                final StackTraceElement element = elements[i];
+                final String classname = element.getClassName();
                 if (classe != null) {
-                    if (!c.endsWith(classe)) {
+                    if (!classname.equals(classe)) {
                         continue;
                     }
-                    final int lg = c.length() - classe.length() - 1;
-                    if (c.length()>=0 && Character.isJavaIdentifierPart(c.charAt(lg))) {
+                } else if (paquet != null) {
+                    if (!classname.startsWith(paquet)) {
                         continue;
+                    }
+                    final int length = paquet.length();
+                    if (classname.length() > length) {
+                        // We expect '.' but we accept also '$' or end of string.
+                        final char separator = classname.charAt(length);
+                        if (Character.isJavaIdentifierPart(separator)) {
+                            continue;
+                        }
                     }
                 }
-                final String m = e.getMethodName();
-                if (method != null) {
-                    if (!m.equals(method)) {
-                        continue;
-                    }
+                /*
+                 * Now that we have a stack trace element from the expected class (or any
+                 * element if we don't know the class), make sure that we have the right method.
+                 */
+                final String methodName = element.getMethodName();
+                if (method != null && !methodName.equals(method)) {
+                    continue;
                 }
-                final int separator = c.lastIndexOf('.');
+                /*
+                 * Now computes every values that are null, and stop the loop.
+                 */
                 if (paquet == null) {
-                    paquet = (separator >= 1) ? c.substring(0, separator-1) : "";
+                    final int separator = classname.lastIndexOf('.');
+                    paquet = (separator >= 1) ? classname.substring(0, separator-1) : "";
+                    logger = getLogger(paquet);
+                    if (!logger.isLoggable(level)) {
+                        return false;
+                    }
                 }
                 if (classe == null) {
-                    classe = c.substring(separator + 1);
+                    classe = classname;
                 }
                 if (method == null) {
-                    method = m;
+                    method = methodName;
                 }
                 break;
             }
+            /*
+             * The logger may stay null if we have been unable to find a suitable
+             * stack trace. Fallback on the global logger.
+             *
+             * TODO: Use GLOBAL_LOGGER_NAME constant when we will be allowed to target Java 6.
+             */
+            if (logger == null) {
+                logger = getLogger("global");
+                if (!logger.isLoggable(level)) {
+                    return false;
+                }
+            }
         }
-        record.setSourceClassName (classe);
-        record.setSourceMethodName(method);
-        record.setThrown          (error );
-        Logger.getLogger(paquet).log(record);
+        /*
+         * Now prepare the log message. If we have been unable to figure out a source class and
+         * method name, we will fallback on Java logging default mechanism, which may returns a
+         * less relevant name than our attempt to use the logger name as the package name.
+         */
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(error));
+        final String message = error.getLocalizedMessage();
+        if (message != null) {
+            buffer.append(": ").append(message);
+        }
+        final LogRecord record = new LogRecord(level, buffer.toString());
+        if (classe != null) {
+            record.setSourceClassName(classe);
+        }
+        if (method != null) {
+            record.setSourceMethodName(method);
+        }
+        if (level.intValue() > 500) {
+            record.setThrown(error);
+        }
+        logger.log(record);
+        return true;
+    }
+
+    /**
+     * Invoked when a recoverable error occurs. This method is similar to
+     * {@link #unexpectedException(Logger,Class,String,Throwable) unexpectedException}
+     * except that it doesn't log the stack trace and uses a lower logging level.
+     *
+     * @param logger  Where to log the error.
+     * @param classe  The class where the error occurred.
+     * @param method  The method name where the error occurred.
+     * @param error   The error.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the specified level.
+     *
+     * @since 2.5
+     */
+    public static boolean recoverableException(final Logger logger, final Class<?> classe,
+                                               final String method, final Throwable error)
+    {
+        final String classname = (classe != null) ? classe.getName() : null;
+        return unexpectedException(logger, classname, method, error, Level.FINER);
+    }
+
+    /**
+     * Invoked when a recoverable error occurs. This method is similar to
+     * {@link #unexpectedException(Class,String,Throwable) unexpectedException}
+     * except that it doesn't log the stack trace and uses a lower logging level.
+     *
+     * @param classe  The class where the error occurred.
+     * @param method  The method name where the error occurred.
+     * @param error   The error.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the specified level.
+     *
+     * @since 2.5
+     */
+    public static boolean recoverableException(final Class<?> classe, final String method,
+                                               final Throwable error)
+    {
+        return recoverableException(null, classe, method, error);
     }
 }

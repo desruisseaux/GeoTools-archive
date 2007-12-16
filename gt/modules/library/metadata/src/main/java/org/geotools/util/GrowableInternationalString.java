@@ -220,8 +220,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
              * Not a big deal if this operation fails (this is actually just an
              * optimization for reducing memory usage). Log a warning and continue.
              */
-            Logging.unexpectedException("org.geotools.util", GrowableInternationalString.class,
-                                        "unique", exception);
+            Logging.unexpectedException(GrowableInternationalString.class, "unique", exception);
         }
         /*
          * Now canonicalize the locale.

@@ -32,7 +32,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.IndexedResourceBundle;
-import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.logging.Logging;
 import org.geotools.util.CanonicalSet;
 
@@ -410,8 +409,7 @@ public class PaletteFactory {
              * will be incomplete. We log the message as if came from getAvailableNames(),
              * which is the public method that invoked this one.
              */
-            Logging.unexpectedException("org.geotools.image.io",
-                    PaletteFactory.class, "getAvailableNames", e);
+            Logging.unexpectedException(PaletteFactory.class, "getAvailableNames", e);
         }
         /*
          * After the "list.txt" files, check if the resources can be read as a directory.
@@ -511,14 +509,14 @@ public class PaletteFactory {
                      * error however, since this method is allowed to returns null if the resource
                      * is not available.
                      */
-                    Logging.unexpectedException("org.geotools.image.io", PaletteFactory.class, caller, e);
+                    Logging.unexpectedException(PaletteFactory.class, caller, e);
                     return null;
                 } else {
                     return null;
                 }
             }
         } catch (SecurityException e) {
-            Utilities.recoverableException("org.geotools.image.io", PaletteFactory.class, caller, e);
+            Logging.recoverableException(PaletteFactory.class, caller, e);
             return null;
         }
         return getReader(stream);

@@ -323,8 +323,7 @@ public abstract class AbstractConsole implements Runnable {
         try {
             out.flush();
         } catch (IOException ignore) {
-            Logging.unexpectedException("org.geotools.referencing.wkt",
-                                        AbstractConsole.class, "reportError", ignore);
+            Logging.unexpectedException(AbstractConsole.class, "reportError", ignore);
         }
         err.print(Classes.getShortClassName(exception));
         err.print(" at line ");
