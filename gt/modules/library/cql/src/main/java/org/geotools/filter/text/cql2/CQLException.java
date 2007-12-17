@@ -111,7 +111,7 @@ public class CQLException extends ParseException {
         msg.append('\n');
 
         // Second Line
-        // searchs the last token recognized 
+        // searches the last token recognized 
         Token curToken = this.currentToken;
 
         while (curToken.next != null)

@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.filter.BinaryComparisonOperator;
@@ -61,6 +60,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * The "build..." methods implement that semantic actions making a filter for
  * each syntax rules recognized.
  * </p>
+ * TODO This module should use the new geometry API, more info in http://docs.codehaus.org/display/GEOTOOLS/GeomeryFactoryFinder+Proposal
+ * 
  * 
  * @author Mauricio Pazos - Axios Engineering
  * 
@@ -113,13 +114,13 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
      *             if a ClassCastException occurs while casting a built item to
      *             a Filter.
      */
-    public final List getResults() throws CQLException {
+    public final List<Filter> getResults() throws CQLException {
         int size = resultStack.size();
-        List results = new ArrayList(size);
+        List<Filter> results = new ArrayList<Filter>(size);
 
         for (int i = 0; i < size; i++) {
             Result item = resultStack.popResult();
-            Object result = item.getBuilt();
+            Filter result = (Filter)item.getBuilt();
             results.add(0, result);
         }
 
@@ -661,7 +662,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
      * 
      * @param tipeNode
      * 
-     * @return Filter (must be BinarySpatialOperator) // FIXME see equals
+     * @return BinarySpatialOperator 
      * @throws CQLException
      */
     private BinarySpatialOperator buildBinarySpatialOperator(final int nodeType)
@@ -671,9 +672,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
         org.opengis.filter.expression.Expression property = resultStack
                 .popExpression();
 
-        FilterFactory2 ff = (FilterFactory2) filterFactory; // TODO expecting
-        // implementation of
-        // new geoapi
+        FilterFactory2 ff = (FilterFactory2) filterFactory; // TODO this cast must be removed. It depends of Geometry implementation 
 
         BinarySpatialOperator filter = null;
 
@@ -705,11 +704,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         case JJTROUTINEINVOCATION_GEOOP_WITHIN_NODE:
 
-            // TODO: remove cast once http://jira.codehaus.org/browse/GEO-92
-            // and
-            // http://jira.codehaus.org/browse/GEOT-1028 are fixed.
-            FilterFactoryImpl ffi = (FilterFactoryImpl) ff;
-            filter = ffi.within(property, geom);
+            filter = ff.within(property, geom);
 
             break;
 
@@ -733,10 +728,9 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
     private org.opengis.filter.spatial.BBOX buildBBox(int nodeType)
             throws CQLException {
         try {
-            String srs = "EPSG:4326"; // default
-
+            String crs = null ; 
             if (nodeType == JJTROUTINEINVOCATION_GEOOP_BBOX_SRS_NODE) {
-                srs = resultStack.popStringValue();
+                crs = resultStack.popStringValue();
             }
 
             double maxY = resultStack.popDoubleValue();
@@ -747,9 +741,8 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
             PropertyName property = resultStack.popPropertyName();
             String strProperty = property.getPropertyName();
 
-            // CRS.decode(srs); FIXME bug in geotools
             org.opengis.filter.spatial.BBOX bbox = filterFactory.bbox(
-                    strProperty, minX, minY, maxX, maxY, srs);
+                    strProperty, minX, minY, maxX, maxY, crs);
 
             return bbox;
         } catch (Exception e) {
@@ -771,28 +764,22 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         double tolerance = resultStack.popDoubleValue();
 
-        org.opengis.filter.expression.Expression geom = resultStack
-                .popExpression();
+        Expression geom = resultStack.popExpression();
 
-        org.opengis.filter.expression.Expression property = resultStack
-                .popExpression();
-
-        FilterFactory2 ff = (FilterFactory2) filterFactory; // TODO expecting
-        // implementation of
-        // new geoapi
+        Expression property = resultStack.popExpression();
+        
+        FilterFactory2  ff = (FilterFactory2) filterFactory; // TODO this cast must be removed. It depends of Geometry implementation 
 
         DistanceBufferOperator filter = null;
 
         switch (nodeType) {
         case JJTROUTINEINVOCATION_RELOP_DWITHIN_NODE:
             filter = ff.dwithin(property, geom, tolerance, unit);
-
             break;
 
         case JJTROUTINEINVOCATION_RELOP_BEYOND_NODE:
 
-            // filter = ff.beyond(property, geom, tolerance, unit);
-            // FIXME problem with Geometry param (Expresion is Needed)
+            filter = ff.beyond(property, geom, tolerance, unit);
             break;
 
         default:
@@ -1421,14 +1408,13 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
      * @throws CQLException
      */
     private Function buildFunction(Node n) throws CQLException {
-        // FIXME FilterFactoryImpl cast must be precluded
-        FilterFactoryImpl ff = (FilterFactoryImpl) filterFactory;
-
+        FilterFactory ff = filterFactory;
+        
         String functionName = null; // token.image;
 
         // extracts the arguments from stack. Each argument in the stack
         // is preceded by an argument node. Finally extracts the function name
-        List argList = new LinkedList();
+        List<Expression> argList = new LinkedList<Expression>();
 
         while (!resultStack.empty()) {
             Result node = resultStack.peek();

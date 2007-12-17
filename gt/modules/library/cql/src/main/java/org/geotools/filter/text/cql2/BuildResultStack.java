@@ -32,7 +32,7 @@ import org.opengis.filter.expression.PropertyName;
  */
 final class BuildResultStack {
 
-    private Stack stack = new Stack();
+    private Stack<Result> stack = new Stack<Result>();
 
     private String cqlSource;
 
@@ -44,7 +44,7 @@ final class BuildResultStack {
 
 
     public Result peek() {
-        return (Result) stack.peek();
+        return stack.peek();
     }
 
     public boolean empty() {
@@ -52,16 +52,7 @@ final class BuildResultStack {
     }
 
     public Result popResult() throws CQLException {
-        Result item = null;
-
-        try {
-            return (Result) stack.pop();
-        } catch (ClassCastException cce) {
-            throw new CQLException("Expecting Expression, but found Filter",
-                item.getToken(),cce, this.cqlSource );
-        } catch (EmptyStackException ese) {
-            throw new CQLException("No items on stack");
-        }
+        return stack.pop();
     }
 
     public org.opengis.filter.expression.Expression popExpression()
@@ -69,26 +60,25 @@ final class BuildResultStack {
         Result item = null;
 
         try {
-            item = (Result) stack.pop();
+            item = stack.pop();
 
             return (org.opengis.filter.expression.Expression) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new CQLException("Expecting Expression, but found Filter",
+            throw new CQLException("Expecting Expression",
                 item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
             throw new CQLException("No items on stack");
         }
     }
-
     public Literal popLiteral() throws CQLException {
         Result item = null;
 
         try {
-            item = (Result) stack.pop();
+            item =  stack.pop();
 
             return (Literal) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new CQLException("Expecting Expression, but found Filter",
+            throw new CQLException("Expecting Literal",
                 item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
             throw new CQLException("No items on stack");
@@ -99,11 +89,11 @@ final class BuildResultStack {
         Result item = null;
 
         try {
-            item = (Result) stack.pop();
+            item = stack.pop();
 
             return (PropertyName) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new CQLException("Expecting Expression, but found Filter",
+            throw new CQLException("Expecting Property",
                 item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
             throw new CQLException("No items on stack");
@@ -114,11 +104,11 @@ final class BuildResultStack {
         Result item = null;
 
         try {
-            item = (Result) stack.pop();
+            item = stack.pop();
 
             return (org.opengis.filter.Filter) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new CQLException("Expecting Filter, but found Expression",
+            throw new CQLException("Expecting Filter",
                 item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
             throw new CQLException("No items on stack");
@@ -129,11 +119,11 @@ final class BuildResultStack {
         Result item = null;
 
         try {
-            item = (Result) stack.pop();
+            item = stack.pop();
 
             return (PeriodNode) item.getBuilt();
         } catch (ClassCastException cce) {
-            throw new CQLException("Expecting Filter, but found Expression",
+            throw new CQLException("Expecting Period",
                 item.getToken(), cce, this.cqlSource);
         } catch (EmptyStackException ese) {
             throw new CQLException("No items on stack");
@@ -170,7 +160,7 @@ final class BuildResultStack {
 
     public String popIdentifierPart() throws CQLException {
         try {
-            Result resultPart = (Result) stack.pop();
+            Result resultPart = stack.pop();
             Token token = resultPart.getToken();
 
             return token.image;

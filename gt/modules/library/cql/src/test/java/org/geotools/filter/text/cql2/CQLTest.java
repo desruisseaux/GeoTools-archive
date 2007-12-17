@@ -28,9 +28,11 @@ import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Disjoint;
 import org.opengis.filter.spatial.DistanceBufferOperator;
 import org.opengis.filter.spatial.Equals;
@@ -38,6 +40,8 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -48,7 +52,7 @@ import org.opengis.filter.spatial.Within;
  * Test Common CQL language
  * </p>
  *
- * @author Mauricio Pazos - Axios Engineering
+ * @author Mauricio Pazos (Axios Engineering)
  * @since 2.5 
  */
 public class CQLTest extends TestCase {
@@ -64,7 +68,7 @@ public class CQLTest extends TestCase {
     }
 
     /**
-     * Test Comparation Predicate
+     * Test Comparison Predicate
      * <p>
      *
      * <pre>
@@ -946,20 +950,26 @@ public class CQLTest extends TestCase {
         assertTrue("Overlaps was expected", resultFilter instanceof Overlaps);
 
         // BBOX
-        resultFilter = CQL.toFilter("BBOX(ATTR1, 10,20,30,40)");
-
+        resultFilter = CQL.toFilter("BBOX(ATTR1, 10.0,20.0,30.0,40.0)");
         assertTrue("BBox was expected", resultFilter instanceof BBOX);
+        BBOX bboxFilter = (BBOX) resultFilter;
+        assertEquals(bboxFilter.getMinX(), 10.0);
+        assertEquals(bboxFilter.getMinY(), 20.0);
+        assertEquals(bboxFilter.getMaxX(), 30.0);
+        assertEquals(bboxFilter.getMaxY(), 40.0);
+        assertEquals(null, bboxFilter.getSRS());
 
-        resultFilter = CQL.toFilter("BBOX(ATTR1, 10,20,30,40, 'EPSG:4326')");
-
+        resultFilter = CQL.toFilter("BBOX(ATTR1, 10.0,20.0,30.0,40.0, 'EPSG:4326')");
         assertTrue("BBox was expected", resultFilter instanceof BBOX);
-
+        bboxFilter = (BBOX) resultFilter;
+        assertEquals("EPSG:4326", bboxFilter.getSRS());
+        
         // EQUALS
         resultFilter = CQL.toFilter("EQUAL(ATTR1, POINT(1 2))");
 
         assertTrue("not an instance of Equals", resultFilter instanceof Equals);
 
-        resultFilter = CQL.toFilter("WITHIN(ATTR1, POINT(1 2))");
+        resultFilter = CQL.toFilter("WITHIN(ATTR1, POLYGON((1 2, 1 10, 5 10, 1 2)) )");
 
         assertTrue("Within was expected", resultFilter instanceof Within);
     }
@@ -974,7 +984,7 @@ public class CQLTest extends TestCase {
      *   |   &lt;relgeoop name &gt; &lt;relgeoop argument list &gt; [*]
      *   |  &lt;routine name &gt; &lt;argument list &gt;
      *   &lt;relgeoop name &gt; ::=
-     *       DWITHIN | BEYON [*]
+     *       DWITHIN | BEYOND [*]
      * </pre>
      *
      * </p>
@@ -982,6 +992,7 @@ public class CQLTest extends TestCase {
     public void testRoutineInvocationRelGeoOp() throws Exception {
         Filter resultFilter;
 
+        // DWITHIN
         resultFilter = CQL.toFilter("DWITHIN(ATTR1, POINT(1 2), 10, kilometers)");
 
         assertTrue(resultFilter instanceof DistanceBufferOperator);
@@ -992,12 +1003,41 @@ public class CQLTest extends TestCase {
         resultFilter = CQL.toFilter("DWITHIN(" + prop + ", POINT(1 2), 10, kilometers) ");
 
         assertTrue("DistanceBufferOperator filter was expected",
-            resultFilter instanceof DistanceBufferOperator);
+            resultFilter instanceof DWithin);
 
-        DistanceBufferOperator filter = (DistanceBufferOperator) resultFilter;
+        DistanceBufferOperator filter = (DWithin) resultFilter;
         Expression property = filter.getExpression1();
 
         assertEquals(propExpected, property.toString());
+        
+        // Beyond
+        resultFilter = CQL.toFilter("BEYOND(ATTR1, POINT(1.0 2.0), 10.0, kilometers)");
+        assertTrue(resultFilter instanceof Beyond);
+        Beyond beyondFilter  = (Beyond) resultFilter;
+        
+        assertEquals(beyondFilter.getDistance(), 10.0);
+        assertEquals(beyondFilter.getDistanceUnits(), "kilometers");
+        assertEquals(beyondFilter.getExpression1().toString(), "ATTR1");
+        
+        Expression geomExpression = beyondFilter.getExpression2();
+        assertTrue(geomExpression instanceof Literal);
+        Literal literalPoint = (Literal) geomExpression;
+        
+        Object pointValue = literalPoint.getValue();
+        assertTrue(pointValue instanceof Point);
+        Point point = (Point) pointValue;
+        assertEquals(point.getX(),1.0);
+        assertEquals(point.getY(),2.0);
+
+        // syntax error test (POINTS must be POINT)
+        try{
+            resultFilter = CQL.toFilter("BEYOND(ATTR1, POINTS(1.0 2.0), 10.0, kilometers)");
+            fail("CQLException was expected");
+        } catch(CQLException e){
+            
+            assertNotNull("Syntax error was expected (should be POINT)", e.getMessage());
+        }
+    
     }
 
     /**
