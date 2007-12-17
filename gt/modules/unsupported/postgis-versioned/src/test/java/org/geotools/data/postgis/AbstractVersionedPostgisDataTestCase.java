@@ -86,7 +86,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         super.dataSetUp();
 
         railType = DataUtilities.createType(getName() + ".rail",
-                "geom:LineString:nillable");
+                "geom:LineString:nillable;srid=4326");
         railFeatures = new SimpleFeature[1];
         // 0,0 +-----------+ 10,10
         railFeatures[0] = SimpleFeatureBuilder.build(railType, new Object[] { line(new int[] { 0,0, 10, 10}) },
@@ -280,7 +280,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             // postgis = new PostgisDataSource(connection, FEATURE_TABLE);
             s.execute("CREATE TABLE " + f.schema + ".rail ( id serial primary key ) WITH OIDS");
             s.execute("SELECT AddGeometryColumn('" + f.schema
-                    + "', 'rail', 'geom', 0, 'LINESTRING', 2);");
+                    + "', 'rail', 'geom', 4326, 'LINESTRING', 2);");
 
             for (int i = 0; i < railFeatures.length; i++) {
                 SimpleFeature feature = railFeatures[i];
@@ -288,7 +288,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
                 // strip out the lake.
                 String ql = "INSERT INTO " + f.schema + ".rail (geom) VALUES ("
                         + "GeometryFromText('"
-                        + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 ))";
+                        + ((Geometry) feature.getAttribute("geom")).toText() + "', 4326 ))";
 
                 s.execute(ql);
             }

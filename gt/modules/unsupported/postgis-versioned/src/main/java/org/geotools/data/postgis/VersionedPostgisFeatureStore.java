@@ -207,11 +207,13 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         
         vq = store.buildVersionedQuery(vq);
         FeatureCollection fc = store.wrapped.getFeatureSource(VersionedPostgisDataStore.getVFCViewName(typeName)).getFeatures(vq);
+        final SimpleFeatureType fcSchema = fc.getSchema();
         // build a renamed feature type with the same attributes as the feature collection
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.init(ft);
         builder.setAttributes(fc.getSchema().getAttributes());
-        return new ReTypingFeatureCollection(fc, builder.buildFeatureType());
+        SimpleFeatureType renamedFt = builder.buildFeatureType();
+        return new ReTypingFeatureCollection(fc, renamedFt);
     }
 
     public FeatureCollection getVersionedFeatures(Filter filter) throws IOException {

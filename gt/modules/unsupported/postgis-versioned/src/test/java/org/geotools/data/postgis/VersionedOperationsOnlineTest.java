@@ -45,6 +45,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -52,6 +53,7 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -1141,6 +1143,18 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         for (int i = 0; i < f.getFeatureType().getAttributeCount(); i++) {
             assertTrue(DataUtilities.attributesEqual(f.getAttribute(i), vf.getAttribute(i)));
         }
+    }
+    
+    public void testReprojectedVersionedCollection() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        ds.setVersioned("rail", true, "mambo", "version enabling stuff");
+        
+        VersioningFeatureSource fs = (VersioningFeatureSource) ds.getFeatureSource("rail");
+        DefaultQuery dq = new DefaultQuery();
+        final CoordinateReferenceSystem epsg3003 = CRS.decode("EPSG:3003");
+        dq.setCoordinateSystemReproject(epsg3003);
+        FeatureCollection fc = fs.getVersionedFeatures(dq);
+        assertEquals(epsg3003, fc.getSchema().getDefaultGeometry().getCRS());
     }
     
     public void testMissingVersionedCollection() throws Exception {
