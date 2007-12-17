@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,7 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Map;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.UserDefinedCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
@@ -99,7 +96,7 @@ public class DefaultUserDefinedCS extends AbstractCS implements UserDefinedCS {
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public DefaultUserDefinedCS(final Map             properties,
+    public DefaultUserDefinedCS(final Map<String,?>   properties,
                                 final CoordinateSystemAxis axis0,
                                 final CoordinateSystemAxis axis1)
     {
@@ -116,7 +113,7 @@ public class DefaultUserDefinedCS extends AbstractCS implements UserDefinedCS {
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public DefaultUserDefinedCS(final Map             properties,
+    public DefaultUserDefinedCS(final Map<String,?>   properties,
                                 final CoordinateSystemAxis axis0,
                                 final CoordinateSystemAxis axis1,
                                 final CoordinateSystemAxis axis2)

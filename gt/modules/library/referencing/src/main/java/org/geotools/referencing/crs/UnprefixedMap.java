@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.crs;
 
-import java.util.Iterator;
 import java.util.Map;
 import org.opengis.referencing.IdentifiedObject;
 import org.geotools.util.DerivedMap;
@@ -33,11 +32,7 @@ import org.geotools.util.DerivedMap;
  * @author Martin Desruisseaux
  *
  * @since 2.0
- *
- * @deprecated Remove after we deleted the deprecated constructors from {@link DefaultDerivedCRS}
- *             and {@code DefaultProjectedCRS}.
  */
-@SuppressWarnings("serial")
 final class UnprefixedMap extends DerivedMap<String,String,Object> {
     /**
      * The prefix to remove for this map.
@@ -57,15 +52,15 @@ final class UnprefixedMap extends DerivedMap<String,String,Object> {
      * @param base   The base map.
      * @param prefix The prefix to remove from the keys in the base map.
      */
-    public UnprefixedMap(final Map base, final String prefix) {
-        super(base, String.class);
+    public UnprefixedMap(final Map<String,?> base, final String prefix) {
+        super((Map) base, String.class);
         this.prefix = prefix.trim();
         final String  nameKey = this.prefix + IdentifiedObject. NAME_KEY;
         final String aliasKey = this.prefix + IdentifiedObject.ALIAS_KEY;
         boolean hasName  = false;
         boolean hasAlias = false;
-        for (final Iterator it=base.keySet().iterator(); it.hasNext();) {
-            final String candidate = it.next().toString().trim();
+        for (final Object value : base.keySet()) {
+            final String candidate = value.toString().trim();
             if (keyMatches(nameKey, candidate)) {
                 hasName = true;
                 if (hasAlias) break;

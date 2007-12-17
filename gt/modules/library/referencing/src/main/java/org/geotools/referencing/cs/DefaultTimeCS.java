@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,15 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -98,7 +95,7 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The axis.
      */
-    public DefaultTimeCS(final Map properties, final CoordinateSystemAxis axis) {
+    public DefaultTimeCS(final Map<String,?> properties, final CoordinateSystemAxis axis) {
         super(properties, new CoordinateSystemAxis[] {axis});
         ensureTimeUnit(getAxis(0).getUnit());
     }
@@ -108,6 +105,7 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * system. The default implementation accepts only temporal directions (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */
+    @Override
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return AxisDirection.FUTURE.equals(direction.absolute());
     }
@@ -118,6 +116,7 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      *
      * @since 2.2
      */
+    @Override
     protected boolean isCompatibleUnit(final AxisDirection direction, final Unit unit) {
         return SI.SECOND.isCompatible(unit);
     }
@@ -130,6 +129,7 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      * @return The time difference between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
+    @Override
     public Measure distance(final double[] coord1, final double[] coord2)
             throws MismatchedDimensionException
     {

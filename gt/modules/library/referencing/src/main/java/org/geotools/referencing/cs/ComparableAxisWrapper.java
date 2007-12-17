@@ -16,10 +16,7 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Arrays;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
@@ -44,7 +41,7 @@ final class ComparableAxisWrapper implements Comparable {
      * The direction along meridian, or {@code null} if none.
      */
     private final DirectionAlongMeridian meridian;
-    
+
     /**
      * Creates a new wrapper for the given axis.
      */

@@ -170,7 +170,13 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     }
 
     /**
-     * Constructs a derived CRS from a set of properties. The properties are given unchanged to the
+     * Constructs a derived CRS from a set of properties. A {@linkplain DefaultOperationMethod
+     * default operation method} is inferred from the {@linkplain MathTransform math transform}.
+     * This is a convenience constructor that is not garanteed to work reliably for non-GeoTools
+     * implementations. Use the constructor expecting a {@linkplain DefiningConversion defining
+     * conversion} for more determinist result.
+     * <p>
+     * The properties are given unchanged to the
      * {@linkplain org.geotools.referencing.AbstractReferenceSystem#AbstractReferenceSystem(Map)
      * super-class constructor}. The following optional properties are also understood:
      * <p>
@@ -186,13 +192,11 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      *     <td nowrap>&nbsp;<code>{@linkplain #getConversionFromBase}.getName()</code></td>
      *   </tr>
      * </table>
-     *
-     * <P>
+     * <p>
      * Additional properties for the {@link DefaultConversion} object to be created can be
      * specified with the <code>"conversion."</code> prefix added in front of property names
      * (example: <code>"conversion.remarks"</code>). The same applies for operation method,
      * using the <code>"method."</code> prefix.
-     * </P>
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@linkplain DefaultConversion conversion}.
@@ -207,7 +211,22 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      *         {@code baseToDerived} don't match the dimension of {@code base}
      *         and {@code derivedCS} respectively.
      *
+     * @since 2.5
+     */
+    protected AbstractDerivedCRS(final Map<String,?>       properties,
+                                 final CoordinateReferenceSystem base,
+                                 final MathTransform    baseToDerived,
+                                 final CoordinateSystem     derivedCS)
+            throws MismatchedDimensionException
+    {
+        this(properties, new DefaultOperationMethod(baseToDerived), base, baseToDerived, derivedCS);
+    }
+
+    /**
      * @deprecated Create explicitly a {@link DefiningConversion} instead.
+     *
+     * @todo Move the implementation in the previous constructor after we removed the deprecated
+     *       signature.
      */
     protected AbstractDerivedCRS(final Map<String,?>       properties,
                                  final OperationMethod         method,

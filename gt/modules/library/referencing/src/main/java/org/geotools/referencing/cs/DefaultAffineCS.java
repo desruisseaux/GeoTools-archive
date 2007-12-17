@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,12 +19,10 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AffineCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -106,7 +104,7 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public DefaultAffineCS(final Map             properties,
+    public DefaultAffineCS(final Map<String,?>   properties,
                            final CoordinateSystemAxis axis0,
                            final CoordinateSystemAxis axis1)
     {
@@ -122,7 +120,7 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public DefaultAffineCS(final Map             properties,
+    public DefaultAffineCS(final Map<String,?>   properties,
                            final CoordinateSystemAxis axis0,
                            final CoordinateSystemAxis axis1,
                            final CoordinateSystemAxis axis2)
@@ -133,7 +131,7 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
     /**
      * For {@link #usingUnit} and {@link PredefinedCS#rightHanded} usage only.
      */
-    DefaultAffineCS(final Map properties, final CoordinateSystemAxis[] axis) {
+    DefaultAffineCS(final Map<String,?> properties, final CoordinateSystemAxis[] axis) {
         super(properties, axis);
     }
 
@@ -142,6 +140,7 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */
+    @Override
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return !AxisDirection.FUTURE.equals(direction.absolute());
     }
@@ -153,6 +152,7 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
      *
      * @since 2.2
      */
+    @Override
     protected boolean isCompatibleUnit(final AxisDirection direction, final Unit unit) {
         return SI.METER.isCompatible(unit) || Unit.ONE.equals(unit);
         // Note: this condition is also coded in PredefinedCS.rightHanded(AffineCS).

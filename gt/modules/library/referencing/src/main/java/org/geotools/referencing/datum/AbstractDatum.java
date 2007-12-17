@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,14 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -66,7 +63,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -4894180465652474930L;
-    
+
     /**
      * List of localizable properties. To be given to
      * {@link AbstractIdentifiedObject} constructor.
@@ -149,15 +146,15 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      *   </tr>
      * </table>
      */
-    public AbstractDatum(final Map properties) {
-        this(properties, new HashMap());
+    public AbstractDatum(final Map<String,?> properties) {
+        this(properties, new HashMap<String,Object>());
     }
 
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private AbstractDatum(final Map properties, final Map subProperties) {
+    private AbstractDatum(final Map<String,?> properties, final Map<String,Object> subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         final Date realizationEpoch;
         anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_KEY      );
@@ -231,7 +228,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     public InternationalString getScope() {
         return scope;
     }
-    
+
     /**
      * Gets the type of the datum as an enumerated code. Datum type was provided
      * for all kind of datum in the legacy OGC 01-009 specification. In the new
@@ -243,7 +240,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     int getLegacyDatumType() {
         return 0;
     }
-    
+
     /**
      * Compares the specified object with this datum for equality.
      *
@@ -252,6 +249,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {
@@ -272,7 +270,7 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
         }
         return false;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well

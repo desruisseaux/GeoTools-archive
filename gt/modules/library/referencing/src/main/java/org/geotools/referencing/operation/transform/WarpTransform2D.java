@@ -16,13 +16,10 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
-import javax.units.Unit;
 
-// JAI dependencies
 import javax.media.jai.Warp;
 import javax.media.jai.WarpAffine;
 import javax.media.jai.WarpQuadratic;
@@ -30,8 +27,6 @@ import javax.media.jai.WarpCubic;
 import javax.media.jai.WarpPolynomial;
 import javax.media.jai.WarpGeneralPolynomial;
 
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
@@ -42,7 +37,6 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.Transformation;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -325,6 +319,10 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * and merge the scale factors with {@link WarpPolynomial} preScaleX, preScaleY, postScaleX and
      * postScaleY. Additionnaly, the translation term for the post-AffineTransform may also be
      * merged with the first coefficients of WarpPolynomial.xCoeffs and yCoeffs. See GEOT-521.
+     *
+     * @todo Move this method in some other factory class. Use the optimization applied by
+     *       Resampler2D in the case of AffineTransform, and remove that optimization from
+     *       Resampler2D.
      */
     public static Warp getWarp(CharSequence name, final MathTransform2D transform) {
         if (transform instanceof WarpTransform2D) {
@@ -352,6 +350,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     /**
      * Returns the parameter descriptors for this math transform.
      */
+    @Override
     public ParameterDescriptorGroup getParameterDescriptors() {
         if (warp instanceof WarpPolynomial) {
             return Provider.PARAMETERS;
@@ -363,6 +362,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     /**
      * Returns the parameter values for this math transform.
      */
+    @Override
     public ParameterValueGroup getParameterValues() {
         if (warp instanceof WarpPolynomial) {
             final WarpPolynomial poly = (WarpPolynomial) warp;
@@ -376,7 +376,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
             if ((s=poly.getPreScaleY ()) != 1) p[c++] = new Parameter(Provider. PRE_SCALE_Y, s);
             if ((s=poly.getPostScaleX()) != 1) p[c++] = new Parameter(Provider.POST_SCALE_X, s);
             if ((s=poly.getPostScaleY()) != 1) p[c++] = new Parameter(Provider.POST_SCALE_Y, s);
-            return new ParameterGroup(getParameterDescriptors(), (ParameterValue[]) XArray.resize(p, c));
+            return new ParameterGroup(getParameterDescriptors(), XArray.resize(p, c));
         } else {
             return super.getParameterValues();
         }
@@ -399,6 +399,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     /**
      * Tests if this transform is the identity transform.
      */
+    @Override
     public boolean isIdentity() {
         return false;
     }
@@ -413,6 +414,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * @return the coordinate point after transforming {@code ptSrc} and storing the result in
      *         {@code ptDst}.
      */
+    @Override
     public Point2D transform(Point2D ptSrc, Point2D ptDst) {
         /*
          * We have to copy the coordinate in a temporary point object because we don't know
@@ -441,6 +443,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * Transforms source coordinates (usually pixel indices) into destination coordinates
      * (usually "real world" coordinates).
      */
+    @Override
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
@@ -496,6 +499,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      *
      * @throws NoninvertibleTransformException if no inverse warp were specified at construction time.
      */
+    @Override
     public MathTransform inverse() throws NoninvertibleTransformException {
         if (inverse != null) {
             return inverse;
@@ -507,6 +511,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     /**
      * Returns a hash value for this transform.
      */
+    @Override
     public int hashCode() {
         return (int)serialVersionUID ^ super.hashCode() ^ warp.hashCode();
     }
@@ -514,6 +519,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     /**
      * Compares this transform with the specified object for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final WarpTransform2D that = (WarpTransform2D) object;
@@ -616,7 +622,8 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         /**
          * Returns the operation type.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<Transformation> getOperationType() {
             return Transformation.class;
         }
 

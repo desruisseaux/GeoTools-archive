@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// Formatting
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,14 +28,12 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -151,6 +148,7 @@ public abstract class AbstractParser extends Format {
      * @return The object.
      * @throws ParseException if the string can't be parsed.
      */
+    @Override
     public final Object parseObject(final String text) throws ParseException {
         final Element element = getTree(text, new ParsePosition(0));
         final Object object = parse(element);

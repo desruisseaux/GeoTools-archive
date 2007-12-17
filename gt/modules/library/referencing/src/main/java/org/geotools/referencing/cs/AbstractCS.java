@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import javax.units.Unit;
 import javax.units.Converter;
 import javax.units.ConversionException;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -37,7 +35,6 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -47,7 +44,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
-
 
 
 /**
@@ -142,10 +138,10 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The set of axis.
      */
-    public AbstractCS(final Map properties, final CoordinateSystemAxis[] axis) {
+    public AbstractCS(final Map<String,?> properties, final CoordinateSystemAxis[] axis) {
         super(properties);
         ensureNonNull("axis", axis);
-        this.axis = (CoordinateSystemAxis[]) axis.clone();
+        this.axis = axis.clone();
         for (int i=0; i<axis.length; i++) {
             ensureNonNull("axis", axis, i);
             final AxisDirection direction = axis[i].getDirection();
@@ -224,8 +220,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * the alias, it still possible to consider two objects are equivalent even if their names
      * were formatted in different locales.
      */
-    static Map name(final int key) {
-        final Map properties = new HashMap(4);
+    static Map<String,Object> name(final int key) {
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         final InternationalString name = Vocabulary.formatInternational(key);
         properties.put(NAME_KEY,  name.toString());
         properties.put(ALIAS_KEY, name);
@@ -615,6 +611,7 @@ next:   for (int i=0; i<axis.length; i++) {
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -632,6 +629,7 @@ next:   for (int i=0; i<axis.length; i++) {
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         for (int i=0; i<axis.length; i++) {
@@ -649,6 +647,7 @@ next:   for (int i=0; i<axis.length; i++) {
      * @param  formatter The formatter to use.
      * @return The WKT element name. Current implementation default to the class name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         for (int i=0; i<axis.length; i++) {
             formatter.append(axis[i]);

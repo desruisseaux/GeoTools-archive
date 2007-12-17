@@ -16,12 +16,9 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-// Geotools dependencies
 import org.opengis.referencing.cs.AxisDirection;
 
 
@@ -68,7 +65,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
 
     /**
      * The direction. Will be created only when first needed.
-     * 
+     *
      * @see #getDirection
      */
     private transient AxisDirection direction;

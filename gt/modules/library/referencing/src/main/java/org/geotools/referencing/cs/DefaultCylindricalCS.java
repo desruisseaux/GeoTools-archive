@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,7 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Map;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CylindricalCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -92,7 +89,7 @@ public class DefaultCylindricalCS extends AbstractCS implements CylindricalCS {
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public DefaultCylindricalCS(final Map             properties,
+    public DefaultCylindricalCS(final Map<String,?>   properties,
                                 final CoordinateSystemAxis axis0,
                                 final CoordinateSystemAxis axis1,
                                 final CoordinateSystemAxis axis2)
@@ -105,6 +102,7 @@ public class DefaultCylindricalCS extends AbstractCS implements CylindricalCS {
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */
+    @Override
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return !AxisDirection.FUTURE.equals(direction.absolute());
     }

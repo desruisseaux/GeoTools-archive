@@ -28,9 +28,18 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.operation.MathTransform;
+
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.TestScript;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.test.TestData;
 
 
@@ -101,6 +110,8 @@ public final class ParserTest extends TestCase {
         assertEquals(crs1, crs2);
         assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
         assertTrue(crs1.getConversionFromBase().getMathTransform().toWKT().startsWith("PARAM_MT[\"Mercator_1SP\""));
+        assertFalse (wkt2.contains("semi_major"));
+        assertFalse (wkt2.contains("semi_minor"));
         assertEquals("semi_major",   6378137.0, param.parameter("semi_major"      ).doubleValue(), 1E-4);
         assertEquals("semi_minor",   6356752.3, param.parameter("semi_minor"      ).doubleValue(), 1E-1);
         assertEquals("central_meridian", -20.0, param.parameter("central_meridian").doubleValue(), 1E-8);
@@ -135,6 +146,8 @@ public final class ParserTest extends TestCase {
         assertEquals(crs1, crs2);
         assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
         assertTrue(crs1.getConversionFromBase().getMathTransform().toWKT().startsWith("CONCAT_MT[PARAM_MT["));
+        assertFalse (wkt2.contains("semi_major"));
+        assertFalse (wkt2.contains("semi_minor"));
         assertEquals("semi_major",   6378137.0, param.parameter("semi_major"      ).doubleValue(), 1E-4);
         assertEquals("semi_minor",   6356752.3, param.parameter("semi_minor"      ).doubleValue(), 1E-1);
         assertEquals("central_meridian", -20.0, param.parameter("central_meridian").doubleValue(), 1E-8);
@@ -169,6 +182,8 @@ public final class ParserTest extends TestCase {
         crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
         param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
+        assertFalse (wkt2.contains("semi_major"));
+        assertFalse (wkt2.contains("semi_minor"));
         assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());
         assertEquals("semi_major",   6377563.396, param.parameter("semi_major"        ).doubleValue(), 1E-4);
         assertEquals("semi_minor",   6356256.909, param.parameter("semi_minor"        ).doubleValue(), 1E-3);
@@ -205,6 +220,8 @@ public final class ParserTest extends TestCase {
         crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
         param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
+        assertFalse (wkt2.contains("semi_major"));
+        assertFalse (wkt2.contains("semi_minor"));
         assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());
         assertEquals("semi_major",     6370997.0, param.parameter("semi_major"        ).doubleValue(), 1E-5);
         assertEquals("semi_minor",     6370997.0, param.parameter("semi_minor"        ).doubleValue(), 1E-5);
@@ -222,7 +239,9 @@ public final class ParserTest extends TestCase {
                "  UNIT[\"Decimal_Second\", 4.84813681109536e-06],\n"                    +
                "  AUTHORITY[\"EPSG\", \"100001\"]]";
         assertFalse(Symbols.DEFAULT.containsAxis(wkt1));
-        parser.parseObject(wkt1);
+        wkt2 = parser.format(parser.parseObject(wkt1));
+        assertFalse(wkt2.contains("semi_major"));
+        assertFalse(wkt2.contains("semi_minor"));
     }
 
     /**
@@ -255,24 +274,58 @@ public final class ParserTest extends TestCase {
         assertTrue(check.indexOf("TOWGS84[-231") >= 0);
         CoordinateReferenceSystem crs2 = parser.parseCoordinateReferenceSystem(check);
         assertEquals(crs1, crs2);
+        assertFalse(check.contains("semi_major"));
+        assertFalse(check.contains("semi_minor"));
     }
 
     /**
-     * Parse parsing of math transforms.
+     * Tests parsing with custom axis length. At the difference of the previous test,
+     * the WKT formatting in this test should include the axis length as parameter values.
+     */
+    public void testCustomAxisLength() throws FactoryException, ParseException {
+        DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
+        ParameterValueGroup parameters = factory.getDefaultParameters("Lambert_Conformal_Conic_2SP");
+
+        final double majorAxis = 6.3712e+6;
+        final double minorAxis = 6.3712e+6;
+        parameters.parameter("semi_major").setValue(majorAxis);
+        parameters.parameter("semi_minor").setValue(minorAxis);
+        parameters.parameter("latitude_of_origin").setValue(25.0);
+        parameters.parameter("standard_parallel_1").setValue(25.0);
+        parameters.parameter("standard_parallel_2").setValue(25.0);
+        parameters.parameter("longitude_of_origin").setValue(-95.0);
+        parameters.parameter("false_easting").setValue(0.0);
+        parameters.parameter("false_northing").setValue(0.0);
+
+        GeographicCRS base = DefaultGeographicCRS.WGS84;
+        MathTransform mt   = factory.createParameterizedTransform(parameters);
+        CartesianCS cs = DefaultCartesianCS.PROJECTED;
+        CoordinateReferenceSystem crs = new DefaultProjectedCRS("Lambert", base, mt, cs);
+
+        final String wkt = crs.toWKT();
+        assertTrue(wkt.contains("semi_major"));
+        assertTrue(wkt.contains("semi_minor"));
+        final Parser parser = new Parser();
+        CoordinateReferenceSystem check = parser.parseCoordinateReferenceSystem(wkt);
+        assertEquals(wkt, check.toWKT());
+    }
+
+    /**
+     * Tests parsing of math transforms.
      */
     public void testMathTransform() throws IOException, ParseException {
         testParsing(new MathTransformParser(), "wkt/MathTransform.txt");
     }
 
     /**
-     * Parse parsing of coordinate reference systems.
+     * Tests parsing of coordinate reference systems.
      */
     public void testCoordinateReferenceSystem() throws IOException, ParseException {
         testParsing(new Parser(), "wkt/CoordinateReferenceSystem.txt");
     }
 
     /**
-     * Parse all elements from the specified file. Parsing creates a set of
+     * Parses all elements from the specified file. Parsing creates a set of
      * geographic objects. No special processing are done with them; we just
      * check if the parsing work without error and produces distincts objects.
      */
@@ -291,8 +344,7 @@ public final class ParserTest extends TestCase {
                 continue;
             }
             /*
-             * Parse a line. If the parse fails, then dump the WKT
-             * and rethrow the exception.
+             * Parses a line. If the parse fails, then dump the WKT and rethrow the exception.
              */
             final Object parsed;
             try {
@@ -312,8 +364,8 @@ public final class ParserTest extends TestCase {
             assertTrue("An identical object already exists.",      pool.add(parsed));
             assertTrue("Inconsistent hashCode or equals method.",  pool.contains(parsed));
             /*
-             * Format the object and parse it again.
-             * Ensure that the result is consistent.
+             * Formats the object and parse it again.
+             * Ensures that the result is consistent.
              */
             String formatted = parser.format(parsed);
             final Object again;

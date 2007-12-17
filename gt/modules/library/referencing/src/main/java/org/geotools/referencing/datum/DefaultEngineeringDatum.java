@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,11 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.EngineeringDatum;
-
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.i18n.Vocabulary;
@@ -61,10 +57,9 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
      */
     public static final DefaultEngineeringDatum UNKNOW;
     static {
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put( NAME_KEY, "Unknow");
-        properties.put(ALIAS_KEY,
-                       new LocalName(Vocabulary.formatInternational(VocabularyKeys.UNKNOW)));
+        properties.put(ALIAS_KEY, new LocalName(Vocabulary.formatInternational(VocabularyKeys.UNKNOW)));
         UNKNOW = new DefaultEngineeringDatum(properties);
     }
 
@@ -96,10 +91,10 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      */
-    public DefaultEngineeringDatum(final Map properties) {
+    public DefaultEngineeringDatum(final Map<String,?> properties) {
         super(properties);
     }
-    
+
     /**
      * Compare this datum with the specified object for equality.
      *
@@ -108,13 +103,14 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
         return super.equals(object, compareMetadata);
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -123,6 +119,7 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "LOCAL_DATUM"
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         super.formatWKT(formatter);
         return "LOCAL_DATUM";

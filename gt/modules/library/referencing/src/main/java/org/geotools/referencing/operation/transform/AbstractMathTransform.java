@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -20,7 +20,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE and vecmath dependencies
 import java.io.Serializable;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
@@ -32,7 +31,6 @@ import javax.vecmath.SingularMatrixException;
 import javax.units.NonSI;
 import javax.units.SI;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -47,7 +45,6 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-// Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.operation.matrix.XMatrix;
@@ -89,7 +86,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Gets the dimension of input points.
      */
     public abstract int getSourceDimensions();
-    
+
     /**
      * Gets the dimension of output points.
      */
@@ -124,7 +121,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public ParameterValueGroup getParameterValues() {
         return null;
     }
-    
+
     /**
      * Tests whether this transform does not move any points.
      * The default implementation always returns {@code false}.
@@ -146,7 +143,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     {
         return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3, argument, dimension, expected);
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      * The default implementation invokes {@link #transform(double[],int,double[],int,int)}
@@ -180,7 +177,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             return new Point2D.Double(ord[0], ord[1]);
         }
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result
      * in {@code ptDst}. The default implementation invokes
@@ -238,7 +235,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         return ptDst;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values. The default implementation
      * invokes {@link #transform(double[],int,double[],int,int)} using a temporary array
@@ -259,7 +256,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             dstPts[dstOff+i] = (float)tmpPts[i];
         }
     }
-    
+
     /**
      * Transform the specified shape. The default implementation computes
      * quadratic curves using three points for each shape segments.
@@ -306,7 +303,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         final GeneralPath   path = new GeneralPath(it.getWindingRule());
         final Point2D.Float ctrl = new Point2D.Float();
         final double[]    buffer = new double[6];
-        
+
         double ax=0, ay=0;  // Coordinate of the last point before transform.
         double px=0, py=0;  // Coordinate of the last point after  transform.
         for (; !it.isDone(); it.next()) {
@@ -431,7 +428,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         return ShapeUtilities.toPrimitive(path);
     }
-    
+
     /**
      * Gets the derivative of this transform at a point. The default implementation always
      * throw an exception. Subclasses that implement the {@link MathTransform2D} interface
@@ -452,7 +449,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         throw new TransformException(Errors.format(ErrorKeys.CANT_COMPUTE_DERIVATIVE));
     }
-    
+
     /**
      * Gets the derivative of this transform at a point. The default implementation
      * ensure that {@code point} has a valid dimension. Next, it try to delegate
@@ -500,7 +497,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         throw new TransformException(Errors.format(ErrorKeys.CANT_COMPUTE_DERIVATIVE));
     }
-    
+
     /**
      * Creates the inverse transform of this object.
      * The default implementation returns {@code this} if this transform is an identity
@@ -549,20 +546,22 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     MathTransform concatenate(final MathTransform other, final boolean applyOtherFirst) {
         return null;
     }
-    
+
     /**
      * Returns a hash value for this transform.
      */
+    @Override
     public int hashCode() {
         return getSourceDimensions() + 37*getTargetDimensions();
     }
-    
+
     /**
      * Compares the specified object with this math transform for equality.
      * The default implementation checks if {@code object} is an instance
      * of the same class than {@code this} and use the same parameter descriptor.
      * Subclasses should override this method in order to compare internal fields.
      */
+    @Override
     public boolean equals(final Object object) {
         // Do not check 'object==this' here, since this
         // optimization is usually done in subclasses.
@@ -573,7 +572,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         return false;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -584,6 +583,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is {@code "PARAM_MT"} in the default implementation.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         final ParameterValueGroup parameters = getParameterValues();
         if (parameters != null) {
@@ -592,7 +592,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         }
         return "PARAM_MT";
     }
-    
+
     /**
      * Makes sure that an argument is non-null. This is a
      * convenience method for subclass constructors.
@@ -653,7 +653,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         return srcOff  <  dstOff + numPts*dimTarget &&
                dstOff  <  srcOff + numPts*dimSource;
     }
-    
+
     /**
      * Ensures that the specified longitude stay within &plusmn;&pi; radians. This method
      * is typically invoked after geographic coordinates are transformed. This method may add
@@ -711,7 +711,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             throw e;
         }
     }
-    
+
     /**
      * Default implementation for inverse math transform. This inner class is the inverse
      * of the enclosing {@link MathTransform}. It is serializable only if the enclosing
@@ -738,7 +738,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          */
         protected Inverse() {
         }
-        
+
         /**
          * Gets the dimension of input points. The default
          * implementation returns the dimension of output
@@ -747,7 +747,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         public int getSourceDimensions() {
             return AbstractMathTransform.this.getTargetDimensions();
         }
-        
+
         /**
          * Gets the dimension of output points. The default
          * implementation returns the dimension of input
@@ -756,55 +756,61 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         public int getTargetDimensions() {
             return AbstractMathTransform.this.getSourceDimensions();
         }
-        
+
         /**
          * Gets the derivative of this transform at a point. The default
          * implementation compute the inverse of the matrix returned by
          * the enclosing math transform.
          */
+        @Override
         public Matrix derivative(final Point2D point) throws TransformException {
             return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
         }
-        
+
         /**
          * Gets the derivative of this transform at a point. The default
          * implementation compute the inverse of the matrix returned by
          * the enclosing math transform.
          */
+        @Override
         public Matrix derivative(final DirectPosition point) throws TransformException {
             return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
         }
-        
+
         /**
          * Returns the inverse of this math transform, which is the enclosing math transform.
          * This method is declared final because some implementation assume that the inverse
          * of {@code this} is always {@code AbstractMathTransform.this}.
          */
+        @Override
         public final MathTransform inverse() {
             return AbstractMathTransform.this;
         }
-        
+
         /**
          * Tests whether this transform does not move any points.
          * The default implementation delegate this tests to the
          * enclosing math transform.
          */
+        @Override
         public boolean isIdentity() {
             return AbstractMathTransform.this.isIdentity();
         }
-        
+
         /**
          * Returns a hash code value for this math transform.
          */
+        @Override
         public int hashCode() {
             return ~AbstractMathTransform.this.hashCode();
         }
-        
+
         /**
          * Compares the specified object with this inverse math transform for equality.
          * The default implementation tests if {@code object} in an instance of the same
          * class than {@code this}, and then test their enclosing math transforms.
          */
+        @Override
         public boolean equals(final Object object) {
             if (object == this) {
                 // Slight optimization
@@ -817,7 +823,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                 return false;
             }
         }
-    
+
         /**
          * Format the inner part of a
          * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -830,6 +836,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * @return The WKT element name, which is <code>"PARAM_MT"</code> or
          *         <code>"INVERSE_MT"</code> in the default implementation.
          */
+        @Override
         protected String formatWKT(final Formatter formatter) {
             final ParameterValueGroup parameters = getParameterValues();
             if (parameters != null) {

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2005, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.List;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,13 +23,9 @@ import java.util.Map;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.*;
-
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 
 
 /**
@@ -45,16 +40,17 @@ import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class PredefinedCS implements Comparator {
+final class PredefinedCS implements Comparator<CoordinateSystem> {
     /**
      * An instance of {@link PredefinedCS}. Will be created only when first needed.
      */
-    private static Comparator csComparator;
+    private static Comparator<CoordinateSystem> csComparator;
 
     /**
      * Our ordering for coordinate system objects.
      */
-    private final Class[] types = {
+    @SuppressWarnings("unchecked")
+    private final Class<? extends CoordinateSystem>[] types = new Class[] {
         CartesianCS  .class,
         AffineCS     .class,
         EllipsoidalCS.class,
@@ -77,11 +73,11 @@ final class PredefinedCS implements Comparator {
      * Compares the ordering between two coordinate systems. This comparator is used for sorting
      * the axis in an user-supplied compound CS in an order closes to some "standard" order.
      */
-    public int compare(final Object object1, final Object object2) {
-        final Class type1 = object1.getClass();
-        final Class type2 = object2.getClass();
+    public int compare(final CoordinateSystem object1, final CoordinateSystem object2) {
+        final Class<? extends CoordinateSystem> type1 = object1.getClass();
+        final Class<? extends CoordinateSystem> type2 = object2.getClass();
         for (int i=0; i<types.length; i++) {
-            final Class type = types[i];
+            final Class<?> type = types[i];
             final boolean a1 = type.isAssignableFrom(type1);
             final boolean a2 = type.isAssignableFrom(type2);
             if (a1) return a2 ? 0 : -1;
@@ -147,11 +143,11 @@ final class PredefinedCS implements Comparator {
             }
         }
         if (cs instanceof DefaultCompoundCS) {
-            final List components = ((DefaultCompoundCS) cs).getCoordinateSystems();
+            final List<CoordinateSystem> components = ((DefaultCompoundCS) cs).getCoordinateSystems();
             final CoordinateSystem[] user = new CoordinateSystem[components.size()];
             final CoordinateSystem[] std  = new CoordinateSystem[user.length];
             for (int i=0; i<std.length; i++) {
-                std[i] = standard(user[i] = (CoordinateSystem) components.get(i));
+                std[i] = standard(user[i] = components.get(i));
             }
             if (csComparator == null) {
                 csComparator = new PredefinedCS();
@@ -208,7 +204,7 @@ final class PredefinedCS implements Comparator {
         if (!changed) {
             return cs;
         }
-        final Map properties = DefaultAffineCS.getProperties(cs, null);
+        final Map<String,?> properties = DefaultAffineCS.getProperties(cs, null);
         if (cs instanceof CartesianCS) {
             return new DefaultCartesianCS(properties, axis);
         }

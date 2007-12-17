@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,12 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE direct dependencies
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.datum.TemporalDatum;
-
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 
 
@@ -46,7 +42,7 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 3357241732140076884L;
-    
+
     /**
      * Default datum for time measured since January 1st, 1970 at 00:00 UTC.
      */
@@ -88,7 +84,7 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param origin The date and time origin of this temporal datum.
      */
-    public DefaultTemporalDatum(final Map properties, final Date origin) {
+    public DefaultTemporalDatum(final Map<String,?> properties, final Date origin) {
         super(properties);
         ensureNonNull("origin", origin);
         this.origin = origin.getTime();
@@ -106,6 +102,7 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
     /**
      * Description of the point or points used to anchor the datum to the Earth.
      */
+    @Override
     public InternationalString getAnchorPoint() {
         return super.getAnchorPoint();
     }
@@ -113,10 +110,11 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
     /**
      * The time after which this datum definition is valid.
      */
+    @Override
     public Date getRealizationEpoch() {
         return super.getRealizationEpoch();
     }
-    
+
     /**
      * Compare this temporal datum with the specified object for equality.
      *
@@ -125,6 +123,7 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -146,6 +145,7 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return super.hashCode() ^ (int)origin ^ (int)(origin >>> 32);
     }

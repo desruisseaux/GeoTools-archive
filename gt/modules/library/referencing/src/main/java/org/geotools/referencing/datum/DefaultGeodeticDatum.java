@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +27,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-// OpenGIS dependencies
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
@@ -36,7 +34,6 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.Matrix;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -62,7 +59,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 8832100095648302943L;
-    
+
     /**
      * The default WGS 1984 datum.
      */
@@ -77,7 +74,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
             new NamedIdentifier(Citations.ESRI,   "D_WGS_1984"),
             new NamedIdentifier(Citations.EPSG,   "World Geodetic System 1984")
         };
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(NAME_KEY,  identifiers[0]);
         properties.put(ALIAS_KEY, identifiers);
         WGS84 = new DefaultGeodeticDatum(properties, DefaultEllipsoid.WGS84,
@@ -99,7 +96,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * The prime meridian.
      */
     private final PrimeMeridian primeMeridian;
-    
+
     /**
      * Bursa Wolf parameters for datum shifts, or {@code null} if none.
      */
@@ -158,7 +155,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * @param ellipsoid     The ellipsoid.
      * @param primeMeridian The prime meridian.
      */
-    public DefaultGeodeticDatum(final Map           properties,
+    public DefaultGeodeticDatum(final Map<String,?> properties,
                                 final Ellipsoid     ellipsoid,
                                 final PrimeMeridian primeMeridian)
     {
@@ -171,7 +168,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
         final Object object = properties.get(BURSA_WOLF_KEY);
         if (object instanceof BursaWolfParameters) {
             bursaWolf = new BursaWolfParameters[] {
-                (BursaWolfParameters) ((BursaWolfParameters) object).clone()
+                ((BursaWolfParameters) object).clone()
             };
         } else {
             bursaWolf = (BursaWolfParameters[]) object;
@@ -179,12 +176,11 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
                 if (bursaWolf.length == 0) {
                     bursaWolf = null;
                 } else {
-                    final Set s = new LinkedHashSet();
+                    final Set<BursaWolfParameters> s = new LinkedHashSet<BursaWolfParameters>();
                     for (int i=0; i<bursaWolf.length; i++) {
-                        s.add((BursaWolfParameters) bursaWolf[i].clone());
+                        s.add(bursaWolf[i].clone());
                     }
-                    bursaWolf = (BursaWolfParameters[])
-                            s.toArray(new BursaWolfParameters[s.size()]);
+                    bursaWolf = s.toArray(new BursaWolfParameters[s.size()]);
                 }
             }
         }
@@ -213,7 +209,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      */
     public BursaWolfParameters[] getBursaWolfParameters() {
         if (bursaWolf != null) {
-            return (BursaWolfParameters[]) bursaWolf.clone();
+            return bursaWolf.clone();
         }
         return new BursaWolfParameters[0];
     }
@@ -231,7 +227,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
             for (int i=0; i<bursaWolf.length; i++) {
                 final BursaWolfParameters candidate = bursaWolf[i];
                 if (equals(target, candidate.targetDatum, false)) {
-                    return (BursaWolfParameters) candidate.clone();
+                    return candidate.clone();
                 }
             }
         }
@@ -268,7 +264,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      */
     private static XMatrix getAffineTransform(final GeodeticDatum source,
                                               final GeodeticDatum target,
-                                              Set exclusion)
+                                              Set<GeodeticDatum> exclusion)
     {
         ensureNonNull("source", source);
         ensureNonNull("target", target);
@@ -321,7 +317,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
                         if (equals(sourceStep, targetStep, false)) {
                             final XMatrix step1, step2;
                             if (exclusion == null) {
-                                exclusion = new HashSet();
+                                exclusion = new HashSet<GeodeticDatum>();
                             }
                             if (exclusion.add(source)) {
                                 if (exclusion.add(target)) {
@@ -351,7 +347,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
         }
         return null;
     }
-    
+
     /**
      * Returns {@code true} if the specified object is equals (at least on
      * computation purpose) to the {@link #WGS84} datum. This method may conservatively
@@ -365,7 +361,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
         // Maybe the specified object has its own test...
         return datum!=null && datum.equals(WGS84);
     }
-    
+
     /**
      * Compare this datum with the specified object for equality.
      *
@@ -374,6 +370,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -409,6 +406,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID ^
             37*(super        .hashCode() ^
@@ -416,7 +414,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
             37*(primeMeridian.hashCode())));
         return code;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -425,6 +423,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "DATUM"
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         // Do NOT invokes the super-class method, because
         // horizontal datum do not write the datum type.

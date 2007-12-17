@@ -36,7 +36,6 @@ import org.geotools.coverage.grid.Viewer;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
-import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
@@ -212,8 +211,7 @@ public class CropTest extends GridCoverageTest {
 		atr.preConcatenate(AffineTransform.getRotateInstance(Math.PI / 4.0));
 		final MathTransform tr = ProjectiveTransform.create(atr);
 		CoordinateReferenceSystem crs = source.getCoordinateReferenceSystem();
-		crs = new DefaultDerivedCRS("F2", new DefaultOperationMethod(tr), crs,
-				tr, crs.getCoordinateSystem());
+		crs = new DefaultDerivedCRS("F2", crs, tr, crs.getCoordinateSystem());
 		final GridCoverage2D rotated = projectTo(source, crs, null, null, true);
 
 		// //

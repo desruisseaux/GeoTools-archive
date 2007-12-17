@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,18 +19,15 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import javax.units.Converter;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -202,7 +199,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public DefaultCartesianCS(final Map             properties,
+    public DefaultCartesianCS(final Map<String,?>   properties,
                               final CoordinateSystemAxis axis0,
                               final CoordinateSystemAxis axis1)
     {
@@ -220,7 +217,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public DefaultCartesianCS(final Map             properties,
+    public DefaultCartesianCS(final Map<String,?>   properties,
                               final CoordinateSystemAxis axis0,
                               final CoordinateSystemAxis axis1,
                               final CoordinateSystemAxis axis2)
@@ -232,7 +229,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
     /**
      * For {@link #usingUnit} and {@link PredefinedCS#rightHanded} usage only.
      */
-    DefaultCartesianCS(final Map properties, final CoordinateSystemAxis[] axis) {
+    DefaultCartesianCS(final Map<String,?> properties, final CoordinateSystemAxis[] axis) {
         super(properties, axis);
         ensurePerpendicularAxis();
     }
@@ -263,6 +260,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      * @return The distance between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
+    @Override
     public Measure distance(final double[] coord1, final double[] coord2)
             throws MismatchedDimensionException
     {

@@ -162,7 +162,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @see #createEllipsoid
      * @see #createFlattenedSphere
      */
-    protected DefaultEllipsoid(final Map     properties,
+    protected DefaultEllipsoid(final Map<String,?> properties,
                                final double  semiMajorAxis,
                                final double  semiMinorAxis,
                                final double  inverseFlattening,
@@ -206,7 +206,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @param semiMinorAxis The polar radius.
      * @param unit          The units of the semi-major and semi-minor axis values.
      */
-    public static DefaultEllipsoid createEllipsoid(final Map    properties,
+    public static DefaultEllipsoid createEllipsoid(final Map<String,?> properties,
                                                    final double semiMajorAxis,
                                                    final double semiMinorAxis,
                                                    final Unit   unit)
@@ -248,7 +248,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @param unit              The units of the semi-major and semi-minor axis
      *                          values.
      */
-    public static DefaultEllipsoid createFlattenedSphere(final Map    properties,
+    public static DefaultEllipsoid createFlattenedSphere(final Map<String,?> properties,
                                                          final double semiMajorAxis,
                                                          final double inverseFlattening,
                                                          final Unit   unit)

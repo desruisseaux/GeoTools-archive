@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,20 +19,17 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.EllipsoidalCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -149,7 +146,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public DefaultEllipsoidalCS(final Map             properties,
+    public DefaultEllipsoidalCS(final Map<String,?>   properties,
                                 final CoordinateSystemAxis axis0,
                                 final CoordinateSystemAxis axis1)
     {
@@ -166,7 +163,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * @param axis1 The second axis.
      * @param axis2 The third axis.
      */
-    public DefaultEllipsoidalCS(final Map             properties,
+    public DefaultEllipsoidalCS(final Map<String,?>   properties,
                                 final CoordinateSystemAxis axis0,
                                 final CoordinateSystemAxis axis1,
                                 final CoordinateSystemAxis axis2)
@@ -177,7 +174,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
     /**
      * For {@link #usingUnit} usage only.
      */
-    private DefaultEllipsoidalCS(final Map properties, final CoordinateSystemAxis[] axis) {
+    private DefaultEllipsoidalCS(final Map<String,?> properties, final CoordinateSystemAxis[] axis) {
         super(properties, axis);
     }
 
@@ -188,6 +185,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * {@link AxisDirection#EAST  EAST},  {@link AxisDirection#WEST  WEST},
      * {@link AxisDirection#UP    UP} and {@link AxisDirection#DOWN  DOWN}.
      */
+    @Override
     protected boolean isCompatibleDirection(AxisDirection direction) {
         direction = direction.absolute();
         return AxisDirection.NORTH.equals(direction) ||
@@ -203,6 +201,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      *
      * @since 2.2
      */
+    @Override
     protected boolean isCompatibleUnit(AxisDirection direction, final Unit unit) {
         direction = direction.absolute();
         final Unit expected = AxisDirection.UP.equals(direction) ? SI.METER : NonSI.DEGREE_ANGLE;

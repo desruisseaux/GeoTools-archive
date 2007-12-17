@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,10 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Map;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.LinearCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
 import org.geotools.measure.Measure;
 
 
@@ -86,7 +81,7 @@ public class DefaultLinearCS extends AbstractCS implements LinearCS {
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The axis.
      */
-    public DefaultLinearCS(final Map properties, final CoordinateSystemAxis axis) {
+    public DefaultLinearCS(final Map<String,?> properties, final CoordinateSystemAxis axis) {
         super(properties, new CoordinateSystemAxis[] {axis});
     }
 
@@ -98,6 +93,7 @@ public class DefaultLinearCS extends AbstractCS implements LinearCS {
      * @return The distance between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
+    @Override
     public Measure distance(final double[] coord1, final double[] coord2)
             throws MismatchedDimensionException
     {

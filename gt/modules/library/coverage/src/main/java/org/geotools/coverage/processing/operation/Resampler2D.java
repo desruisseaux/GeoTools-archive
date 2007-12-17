@@ -32,6 +32,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.Warp;
+import javax.media.jai.WarpAffine;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -548,7 +549,12 @@ final class Resampler2D extends GridCoverage2D {
                  * General case: construct the warp transform.
                  */
                 operation = "Warp";
-                final Warp warp = WarpTransform2D.getWarp(sourceCoverage.getName(), (MathTransform2D) allSteps2D);
+                final Warp warp;
+                if (allSteps2D instanceof AffineTransform) {
+                    warp = new WarpAffine((AffineTransform) allSteps2D);
+                } else {
+                    warp = WarpTransform2D.getWarp(sourceCoverage.getName(), (MathTransform2D) allSteps2D);
+                }
                 background = CoverageUtilities.getBackgroundValues(sourceCoverage);
                 paramBlk = paramBlk.add(warp).add(interpolation).add(background);
             }

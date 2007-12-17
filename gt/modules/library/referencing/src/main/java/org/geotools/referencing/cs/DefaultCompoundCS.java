@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,12 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 
 
@@ -60,7 +56,7 @@ public class DefaultCompoundCS extends AbstractCS {
     /**
      * An immutable view of {@link #cs} as a list. Will be created only when first needed.
      */
-    private transient List/*<CoordinateSystem>*/ asList;
+    private transient List<CoordinateSystem> asList;
 
     /**
      * Constructs a compound coordinate system. A name for this CS will
@@ -79,7 +75,7 @@ public class DefaultCompoundCS extends AbstractCS {
      */
     private static CoordinateSystem[] clone(CoordinateSystem[] cs) {
         ensureNonNull("cs", cs);
-        cs = (CoordinateSystem[]) cs.clone();
+        cs = cs.clone();
         for (int i=0; i<cs.length; i++) {
             ensureNonNull("cs", cs, i);
         }
@@ -127,7 +123,7 @@ public class DefaultCompoundCS extends AbstractCS {
     /**
      * Returns all coordinate systems in this compound CS.
      */
-    public List/*<CoordinateSystem>*/ getCoordinateSystems() {
+    public List<CoordinateSystem> getCoordinateSystems() {
         if (asList == null) {
             // No need to synchronize; this is not a big deal if two lists are created.
             asList = Collections.unmodifiableList(Arrays.asList(cs));
@@ -143,6 +139,7 @@ public class DefaultCompoundCS extends AbstractCS {
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.

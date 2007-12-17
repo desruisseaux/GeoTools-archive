@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies and extensions
 import java.util.Map;
 import javax.units.Unit;
 
@@ -39,7 +38,7 @@ final class Spheroid extends DefaultEllipsoid {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 7867565381280669821L;
-    
+
     /**
      * Constructs a new sphere using the specified radius.
      *
@@ -48,10 +47,10 @@ final class Spheroid extends DefaultEllipsoid {
      * @param ivfDefinitive {@code true} if the inverse flattening is definitive.
      * @param unit          The units of the radius value.
      */
-    protected Spheroid(Map properties, double radius, boolean ivfDefinitive, Unit unit) {
+    protected Spheroid(Map<String,?> properties, double radius, boolean ivfDefinitive, Unit unit) {
         super(properties, check("radius", radius), radius, Double.POSITIVE_INFINITY, ivfDefinitive, unit);
     }
-    
+
     /**
      * Returns the orthodromic distance between two geographic coordinates.
      * The orthodromic distance is the shortest distance between two points
@@ -63,6 +62,7 @@ final class Spheroid extends DefaultEllipsoid {
      * @param  y2 Latitude of second point (in decimal degrees).
      * @return The orthodromic distance (in the units of this ellipsoid's axis).
      */
+    @Override
     public double orthodromicDistance(double x1, double y1, double x2, double y2) {
         /*
          * The calculation of orthodromic distance on an ellipsoidal surface is complex,
@@ -87,7 +87,7 @@ final class Spheroid extends DefaultEllipsoid {
          */
         try {
             double delta;
-            assert (delta = Math.abs(super.orthodromicDistance(x1, Math.toDegrees(y1), 
+            assert (delta = Math.abs(super.orthodromicDistance(x1, Math.toDegrees(y1),
                                                                x2, Math.toDegrees(y2))-distance))
                                                                < getSemiMajorAxis()/1E+9 : delta;
         } catch (ArithmeticException exception) {

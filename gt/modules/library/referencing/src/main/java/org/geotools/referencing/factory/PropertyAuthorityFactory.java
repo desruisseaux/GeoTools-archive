@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -81,10 +81,10 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * cases.
      */
     private final Citation[] authorities;
-    
+
     /**
      * The properties object for our properties file. Keys are the authority
-     * code for a coordinate reference system and the associated value is a 
+     * code for a coordinate reference system and the associated value is a
      * WKT string for the CRS.
      * <p>
      * It is technically possible to add or remove elements after they have been
@@ -112,7 +112,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * A WKT parser.
      */
     private transient Parser parser;
-    
+
     /**
      * Creates a factory for the specified authority from the specified file.
      *
@@ -129,7 +129,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
     {
         this(factories, new Citation[] {authority}, definitions);
     }
-    
+
     /**
      * Creates a factory for the specified authorities from the specified file. More than
      * one authority may be specified when the CRS to create should have more than one
@@ -164,7 +164,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         if (authorities.length == 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));
         }
-        this.authorities = (Citation[]) authorities.clone();
+        this.authorities = authorities.clone();
         authority = authorities[0];
         ensureNonNull("authority", authority);
         final InputStream in = definitions.openStream();
@@ -195,10 +195,10 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
     public Citation getAuthority() {
         return authority;
     }
-    
-    /**  
-     * Returns the set of authority codes of the given type. The type  
-     * argument specify the base class. For example if this factory is 
+
+    /**
+     * Returns the set of authority codes of the given type. The type
+     * argument specify the base class. For example if this factory is
      * an instance of CRSAuthorityFactory, then:
      * <p>
      * <ul>
@@ -221,7 +221,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      *         returns an empty set.
      * @throws FactoryException if access to the underlying database failed.
      */
-    public Set getAuthorityCodes(final Class type) throws FactoryException {
+    public Set<String> getAuthorityCodes(final Class type) throws FactoryException {
         if (type==null || type.isAssignableFrom(IdentifiedObject.class)) {
             return codes;
         }
@@ -231,7 +231,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         synchronized (filteredCodes) {
             Set filtered = (Set) filteredCodes.get(type);
             if (filtered == null) {
-                filtered = new Codes(definitions, type);
+                filtered = new Codes((Map) definitions, type);
                 filteredCodes.put(type, filtered);
             }
             return filtered;
@@ -244,24 +244,24 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * specified type. Filtering is performed on the fly. Consequently, this set is cheap
      * if the user just want to check for the existence of a particular code.
      */
-    private static final class Codes extends DerivedSet/*<String, String>*/ {
+    private static final class Codes extends DerivedSet<String, String> {
         /**
-         * The spatial reference objects type (may be {@code Object.class}).
+         * The spatial reference objects type.
          */
-        private final Class/*<? extends IdentifiedType>*/ type;
+        private final Class<? extends IdentifiedObject> type;
 
         /**
          * The reference to {@link PropertyAuthorityFactory#definitions}.
          */
-        private final Map/*<String,String>*/ definitions;
+        private final Map<String,String> definitions;
 
         /**
          * Constructs a set of codes for the specified type.
          */
-        public Codes(final Map/*<String,String>*/ definitions,
-                     final Class/*<? extends IdentifiedType>*/ type)
+        public Codes(final Map<String,String> definitions,
+                     final Class<? extends IdentifiedObject> type)
         {
-            super(definitions.keySet());
+            super(definitions.keySet(), String.class);
             this.definitions = definitions;
             this.type = type;
         }
@@ -270,9 +270,8 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
          * Returns the code if the associated key is of the expected type, or {@code null}
          * otherwise.
          */
-        protected /*String*/ Object baseToDerived(final /*String*/ Object element) {
-            final String key = (String) element;
-            final String wkt = (String) definitions.get(key);
+        protected String baseToDerived(final String key) {
+            final String wkt = definitions.get(key);
             final int length = wkt.length();
             int i=0; while (i<length && Character.isJavaIdentifierPart(wkt.charAt(i))) i++;
             Class candidate = Parser.getClassOf(wkt.substring(0,i));
@@ -285,7 +284,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         /**
          * Transforms a value in this set to a value in the base set.
          */
-        protected /*String*/ Object derivedToBase(final /*String*/ Object element) {
+        protected String derivedToBase(final String element) {
             return element;
         }
     }
@@ -347,6 +346,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
+    @Override
     public IdentifiedObject createObject(final String code)
             throws NoSuchAuthorityCodeException, FactoryException
     {
@@ -370,6 +370,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
+    @Override
     public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws NoSuchAuthorityCodeException, FactoryException
     {
@@ -379,7 +380,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             synchronized (parser) {
                 parser.code = code;
                 // parseCoordinateReferenceSystem provides a slightly faster path than parseObject.
-                return (CoordinateReferenceSystem) parser.parseCoordinateReferenceSystem(wkt);
+                return parser.parseCoordinateReferenceSystem(wkt);
             }
         } catch (ParseException exception) {
             throw new FactoryException(exception);
@@ -431,11 +432,11 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         /**
          * Add the authority code to the specified properties, if not already present.
          */
-        // @Override
-        protected Map alterProperties(Map properties) {
+        @Override
+        protected Map<String,Object> alterProperties(Map<String,Object> properties) {
             Object candidate = properties.get(IdentifiedObject.IDENTIFIERS_KEY);
             if (candidate == null && code != null) {
-                properties = new HashMap(properties);
+                properties = new HashMap<String,Object>(properties);
                 code = trimAuthority(code);
                 final Object identifiers;
                 if (authorities.length <= 1) {

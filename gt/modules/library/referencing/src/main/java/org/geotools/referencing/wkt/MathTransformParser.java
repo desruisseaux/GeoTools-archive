@@ -17,13 +17,10 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Iterator;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -34,7 +31,6 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
-// Geotools dependencies
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
@@ -184,7 +180,7 @@ public class MathTransformParser extends AbstractParser {
         while ((param=element.pullOptionalElement("PARAMETER")) != null) {
             final String name = param.pullString("name");
             final ParameterValue parameter = parameters.parameter(name);
-            final Class type = ((ParameterDescriptor)parameter.getDescriptor()).getValueClass();
+            final Class type = parameter.getDescriptor().getValueClass();
             if (Integer.class.equals(type)) {
                 parameter.setValue(param.pullInteger("value"));
             } else if (Double.class.equals(type)) {
@@ -228,7 +224,7 @@ public class MathTransformParser extends AbstractParser {
         final Element element = parent.pullElement("INVERSE_MT");
         try {
             final MathTransform transform;
-            transform = ((MathTransform)parseMathTransform(element, true)).inverse();
+            transform = parseMathTransform(element, true).inverse();
             element.close();
             return transform;
         }

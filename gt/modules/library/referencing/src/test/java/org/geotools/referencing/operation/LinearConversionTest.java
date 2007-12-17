@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE and JUnit dependencies
 import java.util.Random;
 import javax.units.SI;
 import javax.units.Unit;
@@ -24,7 +23,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
@@ -32,8 +30,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
 
-// Geotools dependencies
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -42,6 +38,8 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.operation.matrix.Matrix2;
 import org.geotools.referencing.operation.matrix.Matrix3;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
+import static org.geotools.referencing.cs.DefaultCartesianCS.PROJECTED;
 
 
 /**
@@ -87,7 +85,7 @@ public final class LinearConversionTest extends TestCase {
             m.setElement(0,1, 100*random.nextDouble());
             m.setElement(1,0, 100*random.nextDouble());
             m.setElement(1,1, 100*random.nextDouble());
-            final Matrix2 original = (Matrix2) m.clone();
+            final Matrix2 original = m.clone();
             final GeneralMatrix check = new GeneralMatrix(m);
             m.invert();
             check.invert();
@@ -189,14 +187,12 @@ public final class LinearConversionTest extends TestCase {
         parameters.parameter("semi_major").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMinorAxis());
         transform = factory.createParameterizedTransform(parameters);
-        sourceCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
-                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        sourceCRS = new DefaultProjectedCRS("source", WGS84, transform, PROJECTED);
 
         parameters.parameter("false_easting" ).setValue(1000);
         parameters.parameter("false_northing").setValue(2000);
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
-                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        targetCRS = new DefaultProjectedCRS("source", WGS84, transform, PROJECTED);
 
         conversion = ProjectionAnalyzer.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertEquals(new Matrix3(
@@ -207,8 +203,7 @@ public final class LinearConversionTest extends TestCase {
 
         parameters.parameter("scale_factor").setValue(2);
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
-                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        targetCRS = new DefaultProjectedCRS("source", WGS84, transform, PROJECTED);
 
         conversion = ProjectionAnalyzer.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertEquals(new Matrix3(
@@ -219,8 +214,7 @@ public final class LinearConversionTest extends TestCase {
 
         parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
-                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        targetCRS = new DefaultProjectedCRS("source", WGS84, transform, PROJECTED);
         conversion = ProjectionAnalyzer.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertNull(conversion);
     }

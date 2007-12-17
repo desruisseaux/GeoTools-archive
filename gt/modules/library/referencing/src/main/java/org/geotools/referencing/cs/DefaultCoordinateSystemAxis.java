@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,6 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,13 +29,11 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.RangeMeaning;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -104,7 +101,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>geodetic longitude</cite>" and the abbreviation is "&lambda;"
      * (lambda).
-     * 
+     *
      * This axis is usually part of a {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE},
      * {@link #ELLIPSOIDAL_HEIGHT} set.
      *
@@ -123,7 +120,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The ISO 19111 name is "<cite>geodetic latitude</cite>" and the abbreviation is "&phi;" (phi).
-     * 
+     *
      * This axis is usually part of a {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE},
      * {@link #ELLIPSOIDAL_HEIGHT} set.
      *
@@ -158,7 +155,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The abbreviation is "&phi;" (phi).
-     * 
+     *
      * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
      * @see #GEODETIC_LATITUDE
@@ -177,7 +174,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>ellipsoidal heigt</cite>" and the abbreviation is lower case
      * "<var>h</var>".
-     * 
+     *
      * This axis is usually part of a {@link #GEODETIC_LONGITUDE}, {@link #GEODETIC_LATITUDE},
      * {@link #ELLIPSOIDAL_HEIGHT} set.
      *
@@ -213,7 +210,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * and units are {@linkplain SI#METER metres}.
      *
      * The abbreviation is lower case "<var>h</var>".
-     * 
+     *
      * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
      *
      * @see #ELLIPSOIDAL_HEIGHT
@@ -254,7 +251,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>geocentric radius</cite>" and the abbreviation is lower case
      * "<var>r</var>".
-     * 
+     *
      * This axis is usually part of a {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE},
      * {@link #GEOCENTRIC_RADIUS} set.
      *
@@ -297,7 +294,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>spherical latitude</cite>" and the abbreviation is "&Theta;"
      * (theta).
-     * 
+     *
      * This axis is usually part of a {@link #SPHERICAL_LONGITUDE}, {@link #SPHERICAL_LATITUDE},
      * {@link #GEOCENTRIC_RADIUS} set.
      *
@@ -316,7 +313,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * and units are {@linkplain SI#METER metres}.
      *
      * The abbreviation is lower case "<var>x</var>".
-     * 
+     *
      * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      *
      * @see #EASTING
@@ -336,7 +333,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * and units are {@linkplain SI#METER metres}.
      *
      * The abbreviation is lower case "<var>y</var>".
-     * 
+     *
      * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      *
      * @see #NORTHING
@@ -356,7 +353,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * and units are {@linkplain SI#METER metres}.
      *
      * The abbreviation is lower case "<var>z</var>".
-     * 
+     *
      * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      */
     public static final DefaultCoordinateSystemAxis Z = new DefaultCoordinateSystemAxis(
@@ -372,7 +369,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>geocentric X</cite>" and the abbreviation is upper case
      * "<var>X</var>".
-     * 
+     *
      * This axis is usually part of a {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y},
      * {@link #GEOCENTRIC_Z} set.
      */
@@ -389,7 +386,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>geocentric Y</cite>" and the abbreviation is upper case
      * "<var>Y</var>".
-     * 
+     *
      * This axis is usually part of a {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y},
      * {@link #GEOCENTRIC_Z} set.
      */
@@ -406,7 +403,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>geocentric Z</cite>" and the abbreviation is upper case
      * "<var>Z</var>".
-     * 
+     *
      * This axis is usually part of a {@link #GEOCENTRIC_X}, {@link #GEOCENTRIC_Y},
      * {@link #GEOCENTRIC_Z} set.
      */
@@ -422,7 +419,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>easting</cite>" and the abbreviation is upper case
      * "<var>E</var>".
-     * 
+     *
      * This axis is usually part of a {@link #EASTING}, {@link #NORTHING} set.
      *
      * @see #X
@@ -462,7 +459,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * The ISO 19111 name is "<cite>northing</cite>" and the abbreviation is upper case
      * "<var>N</var>".
-     * 
+     *
      * This axis is usually part of a {@link #EASTING}, {@link #NORTHING} set.
      *
      * @see #Y
@@ -508,7 +505,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * A default axis for column indices in a {@linkplain org.opengis.coverage.grid.GridCoverage
      * grid coverage}. Increasing values go toward {@linkplain AxisDirection#COLUMN_POSITIVE
      * positive column number}.
-     * 
+     *
      * The abbreviation is lower case "<var>i</var>".
      */
     public static final DefaultCoordinateSystemAxis COLUMN = new DefaultCoordinateSystemAxis(
@@ -518,7 +515,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * A default axis for row indices in a {@linkplain org.opengis.coverage.grid.GridCoverage grid
      * coverage}. Increasing values go toward {@linkplain AxisDirection#ROW_POSITIVE positive row
      * number}.
-     * 
+     *
      * The abbreviation is lower case "<var>j</var>".
      */
     public static final DefaultCoordinateSystemAxis ROW = new DefaultCoordinateSystemAxis(
@@ -527,7 +524,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
     /**
      * A default axis for <var>x</var> values in a display device. Increasing values go toward
      * {@linkplain AxisDirection#DISPLAY_RIGHT display right}.
-     * 
+     *
      * The abbreviation is lower case "<var>x</var>".
      *
      * @since 2.2
@@ -538,7 +535,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
     /**
      * A default axis for <var>y</var> values in a display device. Increasing values go toward
      * {@linkplain AxisDirection#DISPLAY_DOWN display down}.
-     * 
+     *
      * The abbreviation is lower case "<var>y</var>".
      *
      * @since 2.2
@@ -557,7 +554,8 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * name is for. The actual axis instance doesn't matter (the algorithm using this map should
      * work for any axis instance); it is just a way to differentiate latitude and longitude.
      */
-    private static final Map/*<String,CoordinateSystemAxis>*/ ALIASES = new HashMap(8);
+    private static final Map<String,CoordinateSystemAxis> ALIASES =
+            new HashMap<String,CoordinateSystemAxis>(8);
     static {
         ALIASES.put("lat",                GEODETIC_LATITUDE);
         ALIASES.put("latitude",           GEODETIC_LATITUDE);
@@ -671,7 +669,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *
      * @since 2.3
      */
-    public DefaultCoordinateSystemAxis(final Map           properties,
+    public DefaultCoordinateSystemAxis(final Map<String,?> properties,
                                        final String        abbreviation,
                                        final AxisDirection direction,
                                        final Unit          unit,
@@ -709,7 +707,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
      *                     system axis.
      */
-    public DefaultCoordinateSystemAxis(final Map           properties,
+    public DefaultCoordinateSystemAxis(final Map<String,?> properties,
                                        final String        abbreviation,
                                        final AxisDirection direction,
                                        final Unit          unit)
@@ -776,7 +774,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
      * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
      *                     system axis.
-     */    
+     */
     public DefaultCoordinateSystemAxis(final InternationalString name,
                                        final String        abbreviation,
                                        final AxisDirection direction,
@@ -789,8 +787,8 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static Map toMap(final InternationalString name) {
-        final Map properties = new HashMap(4);
+    private static Map<String,Object> toMap(final InternationalString name) {
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         if (name != null) {
             properties.put(NAME_KEY,  name.toString(Locale.US));
             properties.put(ALIAS_KEY, NameFactory.create(new InternationalString[] {name}));
@@ -808,7 +806,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
      * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
      *                     system axis.
-     */    
+     */
     private DefaultCoordinateSystemAxis(final int           name,
                                         final String        abbreviation,
                                         final AxisDirection direction,
@@ -891,7 +889,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * Currently used for testing purpose only.
      */
     static DefaultCoordinateSystemAxis[] values() {
-        return (DefaultCoordinateSystemAxis[]) PREDEFINED.clone();
+        return PREDEFINED.clone();
     }
 
     /**
@@ -1107,7 +1105,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
 
     /**
      * Returns a new axis with the same properties than current axis except for the units.
-     * 
+     *
      * @param newUnit The unit for the new axis.
      * @return An axis using the specified unit.
      * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
@@ -1171,6 +1169,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -1243,6 +1242,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * Returns a hash value for this axis. This value doesn't need to be the same
      * in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         int code = (int)serialVersionUID;
         code = code*37 + abbreviation.hashCode();
@@ -1260,6 +1260,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "AXIS".
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         formatter.append(direction);
         return "AXIS";

@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,17 +19,14 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE direct dependencies
 import java.util.Collections;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -78,13 +75,13 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * The type of this vertical datum. Default is geoidal.
      */
     private final VerticalDatumType type;
-    
+
     /**
      * Default vertical datum for {@linkplain VerticalDatumType#GEOIDAL geoidal heights}.
      */
     public static final DefaultVerticalDatum GEOIDAL =
                     new DefaultVerticalDatum("Geoidal", VerticalDatumType.GEOIDAL);
-    
+
     /**
      * Default vertical datum for ellipsoidal heights. Ellipsoidal heights
      * are measured along the normal to the ellipsoid used in the definition
@@ -124,12 +121,12 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param type       The type of this vertical datum.
      */
-    public DefaultVerticalDatum(final Map properties, final VerticalDatumType type) {
+    public DefaultVerticalDatum(final Map<String,?> properties, final VerticalDatumType type) {
         super(properties);
         this.type = type;
         ensureNonNull("type", type);
     }
-    
+
     /**
      * The type of this vertical datum. Default is geoidal.
      *
@@ -142,6 +139,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
     /**
      * Returns the legacy code for the datum type.
      */
+    @Override
     final int getLegacyDatumType() {
         final int ordinal = type.ordinal();
         if (ordinal>=0 && ordinal<LEGACY_CODES.length) {
@@ -169,7 +167,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
         }
         return null;
     }
-    
+
     /**
      * Compare this vertical datum with the specified object for equality.
      *
@@ -178,6 +176,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -199,10 +198,11 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return super.hashCode() ^ type.hashCode();
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -211,6 +211,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "VERT_DATUM"
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         super.formatWKT(formatter);
         return "VERT_DATUM";

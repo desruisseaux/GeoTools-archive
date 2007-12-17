@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
 import java.io.BufferedReader;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -32,9 +31,7 @@ import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -67,7 +64,6 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.ReferencingFactoryFinder;
@@ -112,7 +108,7 @@ public class Parser extends MathTransformParser {
      * Will be created by {@link #getTypeMap} only when first needed. Keys must
      * be upper case.
      */
-    private static Map/*<String,Class<?>>*/ TYPES;
+    private static Map<String,Class<?>> TYPES;
 
     /**
      * The factory to use for creating {@linkplain Datum datum}.
@@ -142,7 +138,7 @@ public class Parser extends MathTransformParser {
     /**
      * The list of {@linkplain AxisDirection axis directions} from their name.
      */
-    private final Map directions;
+    private final Map<String,AxisDirection> directions;
 
     /**
      * Constructs a parser using the default set of symbols and factories.
@@ -204,7 +200,8 @@ public class Parser extends MathTransformParser {
         this. csFactory   =    csFactory;
         this.crsFactory   =   crsFactory;
         final AxisDirection[] values = AxisDirection.values();
-        directions = new HashMap((int)Math.ceil((values.length+1)/0.75f), 0.75f);
+        directions = new HashMap<String,AxisDirection>(
+                (int) Math.ceil((values.length + 1) / 0.75f), 0.75f);
         for (int i=0; i<values.length; i++) {
             directions.put(values[i].name().trim().toUpperCase(), values[i]);
         }
@@ -267,6 +264,7 @@ public class Parser extends MathTransformParser {
      *       and other methods of this class and subclasses, could be optimized with
      *       a {@code switch} statement.
      */
+    @Override
     protected Object parse(final Element element) throws ParseException {
         final Object key = element.peek();
         if (key instanceof Element) {
@@ -325,7 +323,7 @@ public class Parser extends MathTransformParser {
      *
      * @since 2.3
      */
-    protected Map alterProperties(final Map properties) {
+    protected Map<String,Object> alterProperties(final Map<String,Object> properties) {
         return properties;
     }
 
@@ -342,23 +340,25 @@ public class Parser extends MathTransformParser {
      * @return A properties map with the parent name and the optional autority code.
      * @throws ParseException if the "AUTHORITY" can't be parsed.
      */
-    private Map parseAuthority(final Element parent, final String name) throws ParseException {
+    private Map<String,Object> parseAuthority(final Element parent, final String name)
+            throws ParseException
+    {
         final boolean  isRoot = parent.isRoot();
         final Element element = parent.pullOptionalElement("AUTHORITY");
-        Map properties;
+        Map<String,Object> properties;
         if (element == null) {
             if (isRoot) {
-                properties = new HashMap(4);
+                properties = new HashMap<String,Object>(4);
                 properties.put(IdentifiedObject.NAME_KEY, name);
             } else {
-                properties = Collections.singletonMap(IdentifiedObject.NAME_KEY, name);
+                properties = Collections.singletonMap(IdentifiedObject.NAME_KEY, (Object) name);
             }
         } else {
             final String auth = element.pullString("name");
             final String code = element.pullString("code");
             element.close();
             final Citation authority = Citations.fromName(auth);
-            properties = new HashMap(4);
+            properties = new HashMap<String,Object>(4);
             properties.put(IdentifiedObject.       NAME_KEY, new NamedIdentifier(authority, name));
             properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier(authority, code));
         }
@@ -390,7 +390,7 @@ public class Parser extends MathTransformParser {
         final double   factor = element.pullDouble("factor");
         final Map  properties = parseAuthority(element, name);
         element.close();
-        return (factor!=1) ? unit.multiply(factor) : unit;
+        return (factor != 1) ? unit.multiply(factor) : unit;
     }
 
     /**
@@ -428,12 +428,11 @@ public class Parser extends MathTransformParser {
                 return null;
             }
         }
-        final String         name = element.pullString     ("name");
+        final String  name        = element.pullString     ("name");
         final Element orientation = element.pullVoidElement("orientation");
-        final Map      properties = parseAuthority(element, name); // See javadoc
+        final Map<String,?> properties = parseAuthority(element, name); // See javadoc
         element.close();
-        final AxisDirection direction = (AxisDirection) directions.get(
-                                        orientation.keyword.trim().toUpperCase());
+        final AxisDirection direction = directions.get(orientation.keyword.trim().toUpperCase());
         if (direction == null) {
             throw element.parseFailed(null, Errors.format(ErrorKeys.UNKNOW_TYPE_$1, orientation));
         }
@@ -456,7 +455,7 @@ public class Parser extends MathTransformParser {
      * @param  unit The coordinate axis unit.
      * @throws FactoryException if the axis can't be created.
      */
-    private CoordinateSystemAxis createAxis(Map           properties,
+    private CoordinateSystemAxis createAxis(Map<String,?> properties,
                                       final String        abbreviation,
                                       final AxisDirection direction,
                                       final Unit          unit)
@@ -491,7 +490,7 @@ public class Parser extends MathTransformParser {
         final Element   element = parent.pullElement("PRIMEM");
         final String       name = element.pullString("name");
         final double  longitude = element.pullDouble("longitude");
-        final Map    properties = parseAuthority(element, name);
+        final Map<String,?> properties = parseAuthority(element, name);
         element.close();
         try {
             return datumFactory.createPrimeMeridian(properties, longitude, angularUnit);
@@ -550,7 +549,7 @@ public class Parser extends MathTransformParser {
         String              name = element.pullString("name");
         double     semiMajorAxis = element.pullDouble("semiMajorAxis");
         double inverseFlattening = element.pullDouble("inverseFlattening");
-        Map           properties = parseAuthority(element, name);
+        Map<String,?> properties = parseAuthority(element, name);
         element.close();
         if (inverseFlattening == 0) {
             // Inverse flattening null is an OGC convention for a sphere.
@@ -615,7 +614,7 @@ public class Parser extends MathTransformParser {
                 final String         paramName  = param.pullString("name");
                 final double         paramValue = param.pullDouble("value");
                 final ParameterValue parameter  = parameters.parameter(paramName);
-                final Unit expected = ((ParameterDescriptor)parameter.getDescriptor()).getUnit();
+                final Unit expected = parameter.getDescriptor().getUnit();
                 if (expected!=null && !Unit.ONE.equals(expected)) {
                     if (linearUnit!=null && SI.METER.isCompatible(expected)) {
                         parameter.setValue(paramValue, linearUnit);
@@ -651,11 +650,11 @@ public class Parser extends MathTransformParser {
                                      final PrimeMeridian meridian)
             throws ParseException
     {
-        Element             element = parent.pullElement("DATUM");
-        String                 name = element.pullString("name");
-        Ellipsoid         ellipsoid = parseSpheroid(element);
-        BursaWolfParameters toWGS84 = parseToWGS84(element); // Optional; may be null.
-        Map              properties = parseAuthority(element, name);
+        Element             element    = parent.pullElement("DATUM");
+        String              name       = element.pullString("name");
+        Ellipsoid           ellipsoid  = parseSpheroid(element);
+        BursaWolfParameters toWGS84    = parseToWGS84(element); // Optional; may be null.
+        Map<String,Object>  properties = parseAuthority(element, name);
         if (ALLOW_ORACLE_SYNTAX && (toWGS84 == null) && (element.peek() instanceof Number)) {
             toWGS84     = new BursaWolfParameters(DefaultGeodeticDatum.WGS84);
             toWGS84.dx  = element.pullDouble("dx");
@@ -669,7 +668,7 @@ public class Parser extends MathTransformParser {
         element.close();
         if (toWGS84 != null) {
             if (!(properties instanceof HashMap)) {
-                properties = new HashMap(properties);
+                properties = new HashMap<String,Object>(properties);
             }
             properties.put(DefaultGeodeticDatum.BURSA_WOLF_KEY, toWGS84);
         }
@@ -695,7 +694,7 @@ public class Parser extends MathTransformParser {
         final Element element = parent.pullElement("VERT_DATUM");
         final String     name = element.pullString ("name");
         final int       datum = element.pullInteger("datum");
-        final Map  properties = parseAuthority(element, name);
+        final Map<String,?> properties = parseAuthority(element, name);
         element.close();
         final VerticalDatumType type = DefaultVerticalDatum.getVerticalDatumTypeFromLegacyCode(datum);
         if (type == null) {
@@ -725,7 +724,7 @@ public class Parser extends MathTransformParser {
         final Element element = parent.pullElement("LOCAL_DATUM");
         final String     name = element.pullString ("name");
         final int       datum = element.pullInteger("datum");
-        final Map  properties = parseAuthority(element, name);
+        final Map<String,?> properties = parseAuthority(element, name);
         element.close();
         try {
             return datumFactory.createEngineeringDatum(properties);
@@ -756,16 +755,16 @@ public class Parser extends MathTransformParser {
         EngineeringDatum    datum = parseLocalDatum(element);
         Unit           linearUnit = parseUnit(element, SI.METER);
         CoordinateSystemAxis axis = parseAxis(element, linearUnit, true);
-        List                 list = new ArrayList();
+        List<CoordinateSystemAxis> list = new ArrayList<CoordinateSystemAxis>();
         do {
             list.add(axis);
             axis = parseAxis(element, linearUnit, false);
         } while (axis != null);
-        final Map properties = parseAuthority(element, name);
+        final Map<String,?> properties = parseAuthority(element, name);
         element.close();
         final CoordinateSystem cs;
         cs = new AbstractCS(Collections.singletonMap("name", name),
-                 (CoordinateSystemAxis[]) list.toArray(new CoordinateSystemAxis[list.size()]));
+                list.toArray(new CoordinateSystemAxis[list.size()]));
         try {
             return crsFactory.createEngineeringCRS(properties, datum, cs);
         } catch (FactoryException exception) {
@@ -787,12 +786,12 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "GEOCCS" element can't be parsed.
      */
     private GeocentricCRS parseGeoCCS(final Element parent) throws ParseException {
-        final Element        element = parent.pullElement("GEOCCS");
-        final String            name = element.pullString("name");
-        final Map         properties = parseAuthority(element, name);
-        final PrimeMeridian meridian = parsePrimem   (element, NonSI.DEGREE_ANGLE);
-        final GeodeticDatum    datum = parseDatum    (element, meridian);
-        final Unit        linearUnit = parseUnit     (element, SI.METER);
+        final Element          element = parent.pullElement("GEOCCS");
+        final String              name = element.pullString("name");
+        final Map<String,?> properties = parseAuthority(element, name);
+        final PrimeMeridian   meridian = parsePrimem   (element, NonSI.DEGREE_ANGLE);
+        final GeodeticDatum      datum = parseDatum    (element, meridian);
+        final Unit          linearUnit = parseUnit     (element, SI.METER);
         CoordinateSystemAxis axis0, axis1, axis2;
         axis0 = parseAxis(element, linearUnit, false);
         try {
@@ -834,7 +833,7 @@ public class Parser extends MathTransformParser {
         VerticalDatum       datum = parseVertDatum(element);
         Unit           linearUnit = parseUnit(element, SI.METER);
         CoordinateSystemAxis axis = parseAxis(element, linearUnit, false);
-        Map            properties = parseAuthority(element, name);
+        Map<String,?>  properties = parseAuthority(element, name);
         element.close();
         try {
             if (axis == null) {
@@ -861,7 +860,7 @@ public class Parser extends MathTransformParser {
     private GeographicCRS parseGeoGCS(final Element parent) throws ParseException {
         Element            element = parent.pullElement("GEOGCS");
         String                name = element.pullString("name");
-        Map             properties = parseAuthority(element, name);
+        Map<String,?>   properties = parseAuthority(element, name);
         Unit           angularUnit = parseUnit     (element, SI.RADIAN);
         PrimeMeridian     meridian = parsePrimem   (element, angularUnit);
         GeodeticDatum        datum = parseDatum    (element, meridian);
@@ -899,9 +898,9 @@ public class Parser extends MathTransformParser {
     private ProjectedCRS parseProjCS(final Element parent) throws ParseException {
         Element                element = parent.pullElement("PROJCS");
         String                    name = element.pullString("name");
-        Map                 properties = parseAuthority(element, name);
+        Map<String,?>       properties = parseAuthority(element, name);
         GeographicCRS           geoCRS = parseGeoGCS(element);
-        Ellipsoid            ellipsoid = ((GeodeticDatum) geoCRS.getDatum()).getEllipsoid();
+        Ellipsoid            ellipsoid = geoCRS.getDatum().getEllipsoid();
         Unit                linearUnit = parseUnit(element, SI.METER);
         Unit               angularUnit = geoCRS.getCoordinateSystem().getAxis(0).getUnit();
         ParameterValueGroup projection = parseProjection(element, ellipsoid, linearUnit, angularUnit);
@@ -917,7 +916,7 @@ public class Parser extends MathTransformParser {
             }
             element.close();
             if (factories == null) {
-                final Hints hints = new Hints( Collections.EMPTY_MAP );
+                final Hints hints = new Hints();
                 hints.put(Hints.DATUM_FACTORY,          datumFactory);
                 hints.put(Hints.CS_FACTORY,             csFactory);
                 hints.put(Hints.CRS_FACTORY,            crsFactory);
@@ -945,9 +944,9 @@ public class Parser extends MathTransformParser {
      */
     private CompoundCRS parseCompdCS(final Element parent) throws ParseException {
         final CoordinateReferenceSystem[] CRS = new CoordinateReferenceSystem[2];
-        Element element = parent.pullElement("COMPD_CS");
-        String     name = element.pullString("name");
-        Map  properties = parseAuthority(element, name);
+        Element       element    = parent.pullElement("COMPD_CS");
+        String        name       = element.pullString("name");
+        Map<String,?> properties = parseAuthority(element, name);
         CRS[0] = parseCoordinateReferenceSystem(element);
         CRS[1] = parseCoordinateReferenceSystem(element);
         element.close();
@@ -971,9 +970,9 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "COMPD_CS" element can't be parsed.
      */
     private DerivedCRS parseFittedCS(final Element parent) throws ParseException {
-        Element element = parent.pullElement("FITTED_CS");
-        String     name = element.pullString("name");
-        Map  properties = parseAuthority(element, name);
+        Element       element    = parent.pullElement("FITTED_CS");
+        String        name       = element.pullString("name");
+        Map<String,?> properties = parseAuthority(element, name);
         final MathTransform toBase = parseMathTransform(element, true);
         final CoordinateReferenceSystem base = parseCoordinateReferenceSystem(element);
         final OperationMethod method = getOperationMethod();
@@ -1033,13 +1032,12 @@ public class Parser extends MathTransformParser {
      *
      * @since 2.4
      */
-    public static String getNameOf(final Class/*<?>*/ type) {
+    public static String getNameOf(final Class<?> type) {
         if (type != null) {
-            for (final java.util.Iterator it=getTypeMap().entrySet().iterator(); it.hasNext();) {
-                final Map.Entry/*<String,Class<?>>*/ entry = (Map.Entry) it.next();
-                final Class candidate = (Class) entry.getValue();
+            for (final Map.Entry<String,Class<?>> entry : getTypeMap().entrySet()) {
+                final Class<?> candidate = entry.getValue();
                 if (candidate.isAssignableFrom(type)) {
-                    return (String) entry.getKey();
+                    return entry.getKey();
                 }
             }
         }
@@ -1049,9 +1047,9 @@ public class Parser extends MathTransformParser {
     /**
      * Returns the type map.
      */
-    private static Map getTypeMap() {
+    private static Map<String,Class<?>> getTypeMap() {
         if (TYPES == null) {
-            final Map map = new LinkedHashMap/*<String,Class<?>>*/(25);
+            final Map<String,Class<?>> map = new LinkedHashMap<String,Class<?>>(25);
             map.put(        "GEOGCS",        GeographicCRS.class);
             map.put(        "PROJCS",         ProjectedCRS.class);
             map.put(        "GEOCCS",        GeocentricCRS.class);

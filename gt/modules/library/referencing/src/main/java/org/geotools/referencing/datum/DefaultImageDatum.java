@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,15 +19,12 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.ImageDatum;
 import org.opengis.referencing.datum.PixelInCell;
 
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -86,7 +83,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      * @param properties  Set of properties. Should contains at least <code>"name"</code>.
      * @param pixelInCell the way the image grid is associated with the image data attributes.
      */
-    public DefaultImageDatum(final Map properties, final PixelInCell pixelInCell) {
+    public DefaultImageDatum(final Map<String,?> properties, final PixelInCell pixelInCell) {
         super(properties);
         this.pixelInCell = pixelInCell;
         ensureNonNull("pixelInCell", pixelInCell);
@@ -100,7 +97,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
     public PixelInCell getPixelInCell() {
         return pixelInCell;
     }
-    
+
     /**
      * Compare this datum with the specified object for equality.
      *
@@ -109,6 +106,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -130,10 +128,11 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         return super.hashCode() ^ pixelInCell.hashCode();
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -144,6 +143,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         super.formatWKT(formatter);
         formatter.append(pixelInCell);

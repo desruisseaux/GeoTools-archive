@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,10 +19,7 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Map;
-
-// OpenGIS dependencies
 import org.opengis.referencing.cs.PolarCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -88,7 +85,7 @@ public class DefaultPolarCS extends AbstractCS implements PolarCS {
      * @param axis0 The first axis.
      * @param axis1 The second axis.
      */
-    public DefaultPolarCS(final Map             properties,
+    public DefaultPolarCS(final Map<String,?>   properties,
                           final CoordinateSystemAxis axis0,
                           final CoordinateSystemAxis axis1)
     {
@@ -100,6 +97,7 @@ public class DefaultPolarCS extends AbstractCS implements PolarCS {
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */
+    @Override
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return !AxisDirection.FUTURE.equals(direction.absolute());
     }

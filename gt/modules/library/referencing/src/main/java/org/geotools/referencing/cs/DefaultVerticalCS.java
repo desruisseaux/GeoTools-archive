@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,13 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -115,7 +112,7 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The axis.
      */
-    public DefaultVerticalCS(final Map properties, final CoordinateSystemAxis axis) {
+    public DefaultVerticalCS(final Map<String,?> properties, final CoordinateSystemAxis axis) {
         super(properties, new CoordinateSystemAxis[] {axis});
     }
 
@@ -124,6 +121,7 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      * system. The default implementation accepts only vertical directions (i.e.
      * {@link AxisDirection#UP UP} and {@link AxisDirection#DOWN DOWN}).
      */
+    @Override
     protected boolean isCompatibleDirection(final AxisDirection direction) {
         return AxisDirection.UP.equals(direction.absolute());
     }
@@ -136,6 +134,7 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      * @return The distance between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
+    @Override
     public Measure distance(final double[] coord1, final double[] coord2)
             throws MismatchedDimensionException
     {

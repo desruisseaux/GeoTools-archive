@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2001, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,16 +19,12 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Map;
 import javax.units.NonSI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
 import org.opengis.referencing.datum.PrimeMeridian;
-
-// Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -51,13 +47,13 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 541978454643213305L;;
-    
+
     /**
      * The Greenwich meridian, with angular measurements in decimal degrees.
      */
-    public static final DefaultPrimeMeridian GREENWICH = 
+    public static final DefaultPrimeMeridian GREENWICH =
                     new DefaultPrimeMeridian("Greenwich", 0, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * Longitude of the prime meridian measured from the Greenwich meridian, positive eastward.
      */
@@ -101,7 +97,9 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
      * @param angularUnit         The angular unit of the longitude.
      */
-    public DefaultPrimeMeridian(final String name, final double greenwichLongitude, final Unit angularUnit) {
+    public DefaultPrimeMeridian(final String name, final double greenwichLongitude,
+                                final Unit angularUnit)
+    {
         this(Collections.singletonMap(NAME_KEY, name), greenwichLongitude, angularUnit);
     }
 
@@ -114,7 +112,9 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
      * @param angularUnit         The angular unit of the longitude.
      */
-    public DefaultPrimeMeridian(final Map properties, final double greenwichLongitude, final Unit angularUnit) {
+    public DefaultPrimeMeridian(final Map<String,?> properties, final double greenwichLongitude,
+                                final Unit angularUnit)
+    {
         super(properties);
         this.greenwichLongitude = greenwichLongitude;
         this.angularUnit        = angularUnit;
@@ -131,7 +131,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     public double getGreenwichLongitude() {
         return greenwichLongitude;
     }
-    
+
     /**
      * Returns the longitude value relative to the Greenwich Meridian, expressed in the specified
      * units. This convenience method makes it easier to obtain longitude in decimal degrees
@@ -150,7 +150,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     public Unit getAngularUnit() {
         return angularUnit;
     }
-    
+
     /**
      * Compare this prime meridian with the specified object for equality.
      *
@@ -159,6 +159,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
+    @Override
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
@@ -181,7 +182,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this prime meridian. {@linkplain #getName Name},
      * {@linkplain #getRemarks remarks} and the like are not taken in account.
@@ -192,11 +193,12 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
      */
+    @Override
     public int hashCode() {
         final long code = Double.doubleToLongBits(greenwichLongitude);
         return ((int)(code >>> 32) ^ (int)code) ^ (int)serialVersionUID;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -205,6 +207,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      * @param  formatter The formatter to use.
      * @return The WKT element name, which is "PRIMEM"
      */
+    @Override
     protected String formatWKT(final Formatter formatter) {
         Unit context = formatter.getAngularUnit();
         if (context == null) {

@@ -34,14 +34,12 @@ import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
-import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.coverage.processing.AbstractProcessor;
@@ -170,8 +168,7 @@ public final class ResampleTest extends GridCoverageTest {
                 fail(exception.getLocalizedMessage());
                 return null;
             }
-            return new DefaultProjectedCRS("Stereographic", new DefaultOperationMethod(mt),
-                                           base, mt, DefaultCartesianCS.PROJECTED);
+            return new DefaultProjectedCRS("Stereographic", base, mt, DefaultCartesianCS.PROJECTED);
         } catch (NoSuchIdentifierException exception) {
             fail(exception.getLocalizedMessage());
             return null;
@@ -325,7 +322,7 @@ public final class ResampleTest extends GridCoverageTest {
         atr.preConcatenate(AffineTransform.getTranslateInstance(5, 5));
         final MathTransform tr = ProjectiveTransform.create(atr);
         CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
-        crs = new DefaultDerivedCRS("F2", new DefaultOperationMethod(tr), crs, tr, crs.getCoordinateSystem());
+        crs = new DefaultDerivedCRS("F2", crs, tr, crs.getCoordinateSystem());
         /*
          * Note: In current Resampler implementation, the affine transform effect tested
          *       on the first line below will not be visible with the simple viewer used
@@ -334,13 +331,13 @@ public final class ResampleTest extends GridCoverageTest {
          */
         String operation = projectTo(coverage, crs, null);
         if (operation != null) {
-            // TODO
-            // assertEquals(testString1, operation);
+            if (false) // TODO
+                assertEquals(testString1, operation);
         }
         operation = projectTo(coverage, null, new GridGeometry2D(null, tr, null), hints, useGeophysics);
         if (operation != null) {
-            // TODO
-            // assertEquals(testString2, operation);
+            if (false) // TODO
+                assertEquals(testString2, operation);
         }
     }
 

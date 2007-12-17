@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,20 +17,13 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.RasterFormatException;
-
-// JAI dependencies
 import javax.media.jai.Warp;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -56,7 +49,7 @@ final class WarpAdapter extends Warp {
      * This transform maps destination pixels to source pixels.
      */
     private final MathTransform2D inverse;
-    
+
     /**
      * Constructs a new {@code WarpAdapter} using the given transform.
      *
@@ -67,7 +60,7 @@ final class WarpAdapter extends Warp {
     public WarpAdapter(final CharSequence name, final MathTransform2D inverse) {
         this.name    = name;
         this.inverse = inverse;
-    }    
+    }
 
     /**
      * Returns the transform from image's destination pixels to source pixels.
@@ -122,6 +115,7 @@ final class WarpAdapter extends Warp {
      * @param destPt The position in destination image coordinates
      *               to map to source image coordinates.
      */
+    @Override
     public Point2D mapDestPoint(final Point2D destPt) {
         Point2D result = new Point2D.Double(destPt.getX()+0.5, destPt.getY()+0.5);
         try {
@@ -140,6 +134,7 @@ final class WarpAdapter extends Warp {
      * @param sourcePt The position in source image coordinates
      *                 to map to destination image coordinates.
      */
+    @Override
     public Point2D mapSourcePoint(final Point2D sourcePt) {
         Point2D result = new Point2D.Double(sourcePt.getX()+0.5, sourcePt.getY()+0.5);
         try {
