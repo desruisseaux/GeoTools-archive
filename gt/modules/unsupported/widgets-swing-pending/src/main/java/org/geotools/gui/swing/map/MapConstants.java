@@ -17,13 +17,15 @@
 package org.geotools.gui.swing.map;
 
 /**
- *
+ * Class for all map constants and enums
+ * 
  * @author johann sorel
  */
-
-
 public class MapConstants {
 
+    /**
+     * Possible actions states available for a map
+     */
     public static enum ACTION_STATE{
         ZOOM_IN,
         ZOOM_OUT,
@@ -33,6 +35,9 @@ public class MapConstants {
         NONE
     };
     
+    /**
+     * Possible edition states available for an EditableMap2D
+     */
     public static enum EDIT_STATE{
         EDIT,
         POINT,
@@ -44,10 +49,5 @@ public class MapConstants {
         NONE
     };
     
-    public static enum MAP_GEOMETRIE{
-        POLYGON,
-        LINE,
-        POINT
-    };
      
 }

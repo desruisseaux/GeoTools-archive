@@ -25,7 +25,7 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author Johann Sorel
  */
-public class EditionOverLayer extends JComponent implements OverLayer{
+public class EditionDecoration extends JComponent implements MapDecoration{
 
     private final Color borderColor = new Color(0,255,0);
     private final Color fillColor = new Color(0,255,0,30);
@@ -37,7 +37,7 @@ public class EditionOverLayer extends JComponent implements OverLayer{
     private boolean draw = false;
     private boolean fill = false;
     
-    public EditionOverLayer(){}
+    public EditionDecoration(){}
     
     public void setFill(boolean fill){
         this.fill = fill;

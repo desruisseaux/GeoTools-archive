@@ -25,10 +25,10 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author Johann Sorel
  */
-public class SelectionOverLayer extends JComponent implements OverLayer{
+public class ZoomPanDecoration extends JComponent implements MapDecoration{
 
-    private final Color borderColor = new Color(0,255,0);
-    private final Color fillColor = new Color(0,255,0,30);
+    private final Color borderColor = new Color(0,0,255);
+    private final Color fillColor = new Color(0,0,255,60);
     
     private int startx =0;
     private int starty =0;
@@ -37,7 +37,7 @@ public class SelectionOverLayer extends JComponent implements OverLayer{
     private boolean draw = false;
     private boolean fill = false;
     
-    public SelectionOverLayer(){}
+    public ZoomPanDecoration(){}
     
     public void setFill(boolean fill){
         this.fill = fill;
@@ -74,7 +74,7 @@ public class SelectionOverLayer extends JComponent implements OverLayer{
     public JComponent geComponent() {
         return this;
     }
-    
+
     public void setMap2D(Map2D map) {
         
     }

@@ -16,22 +16,18 @@
 
 package org.geotools.gui.swing.map.map2d.overLayer;
 
-import java.awt.Color;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import org.geotools.gui.swing.map.map2d.Map2D;
+import org.jdesktop.swingx.JXImagePanel;
 
 /**
  *
  * @author Johann Sorel
  */
-public class ColorOverLayer extends JPanel implements OverLayer{
+public class ImageDecoration extends JXImagePanel implements MapDecoration{
 
-    public ColorOverLayer(){
-        super();
-        setOpaque(true);
-        setBackground(Color.WHITE);
-    }
+    
+    public ImageDecoration(){}
     
     public void refresh() {
         revalidate();
@@ -41,7 +37,7 @@ public class ColorOverLayer extends JPanel implements OverLayer{
     public JComponent geComponent() {
         return this;
     }
-
+    
     public void setMap2D(Map2D map) {
         
     }
@@ -49,5 +45,4 @@ public class ColorOverLayer extends JPanel implements OverLayer{
     public Map2D getMap2D() {
         return null;
     }
-
 }

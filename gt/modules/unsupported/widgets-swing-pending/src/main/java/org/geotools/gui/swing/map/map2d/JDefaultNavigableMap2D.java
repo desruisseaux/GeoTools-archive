@@ -25,7 +25,7 @@ import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.MapConstants.ACTION_STATE;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
-import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanOverLayer;
+import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanDecoration;
 
 /**
  * @author Johann Sorel
@@ -33,7 +33,7 @@ import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanOverLayer;
 public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMap2D {
 
     private final MouseInputListener mouseInputListener;
-    private final ZoomPanOverLayer zoompanPanel = new ZoomPanOverLayer();
+    private final ZoomPanDecoration zoompanPanel = new ZoomPanDecoration();
     private double zoomFactor = 2;
     protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
 
@@ -42,7 +42,7 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         mouseInputListener = new MouseListen();
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);        
-        addMapOverLayer(zoompanPanel);
+        addMapDecoration(zoompanPanel);
     }
 
     private void fireActionStateChanged(MapConstants.ACTION_STATE oldone, MapConstants.ACTION_STATE newone) {

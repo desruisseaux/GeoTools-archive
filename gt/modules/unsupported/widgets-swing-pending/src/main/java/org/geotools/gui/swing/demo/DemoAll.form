@@ -204,7 +204,7 @@
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItem5">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="BackLayer------------------"/>
+                    <Property name="text" type="java.lang.String" value="BackDecoration-----"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                 </MenuItem>
@@ -225,7 +225,7 @@
                       <ComponentRef name="bg_backlayer"/>
                     </Property>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Color layer"/>
+                    <Property name="text" type="java.lang.String" value="Color"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonMenuItem1ActionPerformed"/>
@@ -236,7 +236,7 @@
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="bg_backlayer"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Image layer"/>
+                    <Property name="text" type="java.lang.String" value="Image"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButtonMenuItem2ActionPerformed"/>
@@ -246,17 +246,25 @@
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="OverLayer------------------"/>
+                    <Property name="text" type="java.lang.String" value="Decorations-----"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                 </MenuItem>
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="gui_Chknavigationlayer">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
-                    <Property name="text" type="java.lang.String" value="Navigation layer"/>
+                    <Property name="text" type="java.lang.String" value="Navigation"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gui_ChknavigationlayerActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="gui_Chkminimaplayer">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Minimap"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gui_ChkminimaplayerActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>

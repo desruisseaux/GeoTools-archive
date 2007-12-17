@@ -20,17 +20,36 @@ import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
+ * MapDecoration are used to enrich a Map2D component. Thoses are added over
+ * the map or there can be one under the map.
+ * Decoration exemples : minimap, scalebar, navigation buttons, image in background ...
  *
  * @author Johann Sorel
  */
-public interface OverLayer {
+public interface MapDecoration {
 
+    /**
+     * called by the jdefaultmap2d when the decoration should
+     * reset completely
+     */
     public void refresh();
     
+    /**
+     * set the related map2d
+     * @param map the map2D
+     */
     public void setMap2D(Map2D map);
     
+    /**
+     * 
+     * @return Map2D, the related map2d of this decoration
+     */
     public Map2D getMap2D();
     
+    /**
+     * 
+     * @return JComponent, the component which will be added at the map2D 
+     */
     public JComponent geComponent();
     
 }

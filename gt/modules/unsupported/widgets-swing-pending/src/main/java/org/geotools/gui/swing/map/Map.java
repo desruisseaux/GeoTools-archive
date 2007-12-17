@@ -17,6 +17,8 @@
 package org.geotools.gui.swing.map;
 
 /**
+ * Map interface, not defined yet
+ * 
  * @author johann sorel
  */
 public interface Map {

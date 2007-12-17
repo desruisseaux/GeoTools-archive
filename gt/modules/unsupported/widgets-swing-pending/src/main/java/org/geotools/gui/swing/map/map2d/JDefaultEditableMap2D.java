@@ -58,7 +58,7 @@ import org.geotools.gui.swing.map.MapConstants.EDIT_STATE;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
 import org.geotools.gui.swing.map.map2d.listener.EditableMap2DListener;
-import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
+import org.geotools.gui.swing.map.map2d.overLayer.MapDecoration;
 import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -106,7 +106,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
 
-        addMapOverLayer(editedPane);
+        addMapDecoration(editedPane);
 
         editionStyle = buildEditionStyle();
         memoryLayer = createMemoryLayer();
@@ -913,7 +913,7 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
         }
     }
 
-    private class BufferComponent extends JComponent implements OverLayer {
+    private class BufferComponent extends JComponent implements MapDecoration {
 
         private BufferedImage img;
         private Rectangle oldone = null;

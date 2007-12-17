@@ -23,7 +23,7 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author Johann sorel
  */
-public class NorthArrowOverLayer implements OverLayer{
+public class NorthArrowDecoration implements MapDecoration{
 
     public void refresh() {
         throw new UnsupportedOperationException("Not supported yet.");

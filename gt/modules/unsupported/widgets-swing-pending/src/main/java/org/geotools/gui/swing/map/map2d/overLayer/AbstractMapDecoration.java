@@ -13,32 +13,28 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.gui.swing.map.map2d.overLayer;
 
-import javax.swing.JComponent;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
- *
- * @author johann Sorel
+ * Abstract implementation of MapDecoration, handle the 
+ * getMap2D and setMap2D methods.
+ * 
+ * @author Johann Sorel
  */
-public class ZoomOverLayer implements OverLayer{
+public abstract class AbstractMapDecoration implements MapDecoration{
 
-    public void refresh() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public JComponent geComponent() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    protected Map2D map = null;
     
     public void setMap2D(Map2D map) {
-        
+        this.map = map;
     }
 
     public Map2D getMap2D() {
-        return null;
+        return map;
     }
+
+    
 
 }

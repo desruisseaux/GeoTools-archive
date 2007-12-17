@@ -33,12 +33,12 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author Johann Sorel
  */
-public class InformationOverLayer extends JComponent implements OverLayer{
+public class InformationDecoration extends JComponent implements MapDecoration{
 
     private final BufferedImage buffer;
     private boolean drawing = false;
     
-    public InformationOverLayer(){
+    public InformationDecoration(){
         ImageIcon anim = IconBundle.getResource().getIcon("JS_GT");
         String msg = TextBundle.getResource().getString("drawing_wait");
         

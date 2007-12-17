@@ -35,7 +35,7 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author Johann Sorel
  */
-public class NavigationOverLayer extends JPanel implements OverLayer{
+public class NavigationDecoration extends JPanel implements MapDecoration{
 
     private Map2D map = null;
     private int ratio = 10;
@@ -50,7 +50,7 @@ public class NavigationOverLayer extends JPanel implements OverLayer{
 //    public JButton gui_se = new JButton(IconBundle.getResource().getIcon("CP32_actions_1searrow"));
 //    public JButton gui_sw = new JButton(IconBundle.getResource().getIcon("CP32_actions_1swarrow"));
     
-    public NavigationOverLayer(){
+    public NavigationDecoration(){
         setLayout(new BorderLayout());
         setOpaque(false);
         

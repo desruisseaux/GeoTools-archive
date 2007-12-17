@@ -21,9 +21,9 @@ import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
  *
- * @author Johann Sorel
+ * @author johann Sorel
  */
-public class SmallMapOverLayer implements OverLayer {
+public class ZoomDecoration implements MapDecoration{
 
     public void refresh() {
         throw new UnsupportedOperationException("Not supported yet.");

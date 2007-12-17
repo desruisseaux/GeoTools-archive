@@ -42,8 +42,8 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeometryBuilder;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
-import org.geotools.gui.swing.map.map2d.overLayer.OverLayer;
-import org.geotools.gui.swing.map.map2d.overLayer.SelectionOverLayer;
+import org.geotools.gui.swing.map.map2d.overLayer.MapDecoration;
+import org.geotools.gui.swing.map.map2d.overLayer.SelectionDecoration;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
 import org.geotools.gui.swing.misc.GeometryClassFilter;
 import org.geotools.map.DefaultMapContext;
@@ -80,7 +80,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MouseInputListener mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;
-    private final SelectionOverLayer selectionPane = new SelectionOverLayer();
+    private final SelectionDecoration selectionPane = new SelectionDecoration();
     private final BufferComponent selectedPane = new BufferComponent();
     private final FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
@@ -93,8 +93,8 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         addMouseListener(mouseInputListener);
         addMouseMotionListener(mouseInputListener);
 
-        addMapOverLayer(selectedPane);
-        addMapOverLayer(selectionPane);
+        addMapDecoration(selectedPane);
+        addMapDecoration(selectionPane);
 
         buildSelectionStyle();
     }
@@ -499,7 +499,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         }
     }
 
-    private class BufferComponent extends JComponent implements OverLayer {
+    private class BufferComponent extends JComponent implements MapDecoration {
 
         private BufferedImage img;
         private Rectangle oldone = null;
