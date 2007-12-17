@@ -214,7 +214,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         Geometry geometry = mousePositionToGeometry(mx, my);
         if (geometry != null) {
-            findFeature(geometry);
+            doSelection(geometry);
         }
     }
 
@@ -234,7 +234,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
             Geometry geometry = GEOMETRY_FACTORY.createPolygon(lr1, null);
 
-            findFeature(geometry);
+            doSelection(geometry);
         }
     }
     
@@ -317,7 +317,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
 
         Geometry geometry = GEOMETRY_FACTORY.createPoint(new Coordinate(x, y));
         // org.opengis.geometry.Geometry geometry = new Point();
-        findFeature(geometry);
+        doSelection(geometry);
     }
 
     protected SimpleFeature findFeature(Geometry geom, MapLayer layer) {
@@ -363,7 +363,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return null;
     }
 
-    protected void findFeature(Geometry geometry) {
+    public void doSelection(Geometry geometry) {
         Filter f = null;
 
         if ((context == null) || (selectionMapContext.getLayerCount() == 0)) {
