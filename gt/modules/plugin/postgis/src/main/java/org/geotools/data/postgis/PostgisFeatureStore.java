@@ -50,6 +50,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SQLEncoderException;
@@ -57,7 +60,6 @@ import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.filter.SQLUnpacker;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
@@ -944,12 +946,19 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             }
 
             LOGGER.finer("returning bounds " + retEnv);
-
-            if ( (schemaNew!=null) && (schemaNew.getDefaultGeometry() != null) )
-                return new ReferencedEnvelope(retEnv,schemaNew.getDefaultGeometry().getCRS());
-            if(query.getCoordinateSystem()!=null)
-                return new ReferencedEnvelope(retEnv,query.getCoordinateSystem());
-            return new ReferencedEnvelope(retEnv,null);
+            
+            // handle reprojection and crs forcing
+            CoordinateReferenceSystem base = null;
+            if(query.getCoordinateSystem() != null)
+                base = query.getCoordinateSystem();
+            else if(schemaNew.getDefaultGeometry() != null)
+                base = schemaNew.getDefaultGeometry().getCRS();
+            CoordinateReferenceSystem dest = query.getCoordinateSystemReproject();
+            
+            ReferencedEnvelope result = new ReferencedEnvelope(retEnv, base);
+            if(base != null && dest != null)
+                result = result.transform(dest, true);
+            return result;
         } catch (SQLException sqlException) {
             JDBCUtils.close(conn, transaction, sqlException);
             conn = null;
@@ -962,6 +971,10 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             String message = "Could not read geometry: " + parseE.getMessage();
 
             return null;
+        } catch (FactoryException e) {
+            throw new DataSourceException("Could not reproject", e);
+        }  catch (TransformException e) {
+            throw new DataSourceException("Could not reproject", e);
         } finally {
             JDBCUtils.close(conn, transaction, null);
         }

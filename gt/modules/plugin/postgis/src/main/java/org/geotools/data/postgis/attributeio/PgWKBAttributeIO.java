@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import com.vividsolutions.jts.io.InStream;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKBWriter;
 
@@ -45,16 +46,19 @@ import com.vividsolutions.jts.io.WKBWriter;
  */
 public class PgWKBAttributeIO implements AttributeIO {
     private boolean useByteArray;
-    private GeometryFactory gf;
+//    private GeometryFactory gf;
+    WKBReader wkbr;
+    ByteArrayInStream inStream = new ByteArrayInStream();
 
     public PgWKBAttributeIO(boolean useByteArray) {
         this.useByteArray = useByteArray;
+        wkbr = new WKBReader();
     }
     
     public PgWKBAttributeIO(boolean useByteArray, Hints hints) {
         this.useByteArray = useByteArray;
         // setup the geometry factory according to the hints
-        gf = (GeometryFactory) hints.get(Hints.JTS_GEOMETRY_FACTORY);
+        GeometryFactory gf = (GeometryFactory) hints.get(Hints.JTS_GEOMETRY_FACTORY);
         if(gf == null) {
             PrecisionModel pm =  (PrecisionModel) hints.get(Hints.JTS_PRECISION_MODEL);
             if(pm == null)
@@ -66,6 +70,7 @@ public class PgWKBAttributeIO implements AttributeIO {
                 csFactory = CoordinateArraySequenceFactory.instance();
             gf = new GeometryFactory(pm, srid, csFactory);
         }
+        wkbr = new WKBReader(gf);
     }
 
     /**
@@ -107,8 +112,8 @@ public class PgWKBAttributeIO implements AttributeIO {
     	if (wkbBytes == null)  //DJB: null value from database --> null geometry (the same behavior as WKT).  NOTE: sending back a GEOMETRYCOLLECTION(EMPTY) is also a possibility, but this is not the same as NULL
     		return null;
     	try {
-    		WKBReader wkbr = new WKBReader(gf);
-    		return wkbr.read(wkbBytes);
+    	    inStream.setBytes(wkbBytes);
+    		return wkbr.read(inStream);
     	} catch (Exception e) {
     		throw new DataSourceException("An exception occurred while parsing WKB data", e);
     	}
@@ -236,5 +241,24 @@ public class PgWKBAttributeIO implements AttributeIO {
             throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
         }
 
+    }
+    
+    private static class ByteArrayInStream implements InStream {
+        
+        byte[] buffer;
+        int position;
+        
+        public void setBytes(final byte[] buffer) {
+            this.buffer = buffer;
+            this.position = 0;
+        }
+        
+
+        public void read(final byte[] buf) throws IOException {
+            final int size = buf.length;
+            System.arraycopy(buffer, position, buf, 0, size);
+            position += size;
+        }
+        
     }
 }

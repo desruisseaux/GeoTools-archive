@@ -1469,6 +1469,20 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         ReferencedEnvelope expectedBounds = isEnvelopeComputingEnabled() ? roadBounds : new ReferencedEnvelope();
         assertEquals(expectedBounds, b); 
     }
+    
+    public void testBoundsReproject() throws Exception {
+        FeatureSource road = data.getFeatureSource("road");
+        assertEquals(roadBounds, road.getBounds());
+        
+        CoordinateReferenceSystem epsg4326 = CRS.decode("EPSG:4326");
+        CoordinateReferenceSystem epsg3003 = CRS.decode("EPSG:3003");
+        ReferencedEnvelope rbOriginal = new ReferencedEnvelope(roadBounds, epsg4326);
+        ReferencedEnvelope rbReprojected = rbOriginal.transform(epsg3003, true);
+        DefaultQuery q = new DefaultQuery("road");
+        q.setCoordinateSystem(epsg4326);
+        q.setCoordinateSystemReproject(epsg3003);
+        assertEquals(rbReprojected, road.getBounds(q));
+    }
 
     /**
      * Return true if the datastore is capable of computing the road bounds given a query
