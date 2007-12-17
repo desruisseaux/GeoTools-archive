@@ -81,6 +81,8 @@ public class Layer implements Comparable {
     
     private double scaleHintMin = Double.NaN;
     private double scaleHintMax = Double.NaN;
+    private double scaleDenominatorMin = Double.NaN;
+    private double scaleDenominatorMax = Double.NaN;
     
     private Layer parent;
     private Layer[] children;
@@ -360,19 +362,105 @@ public class Layer implements Comparable {
     public void setKeywords( String[] keywords ) {
         this.keywords = keywords;
     }
-
-	public double getScaleHintMax() {
+    /**
+     * Max scale denominator for which it is appropriate to draw this layer.
+     * <p>
+     * Scale denominator is calculated based on the bounding box of the central
+     * pixel in a request (ie not a scale based on real world size of the entire
+     * layer).
+     * @param Max scale denominator for which it is approprirate to draw this layer
+     */
+    public void setScaleDenominatorMax( double scaleDenominatorMax ) {
+        this.scaleDenominatorMax = scaleDenominatorMax;
+    }
+    /**
+     * Max scale denominator for which it is appropriate to draw this layer.
+     * <p>
+     * Scale denominator is calculated based on the bounding box of the central
+     * pixel in a request (ie not a scale based on real world size of the entire
+     * layer).
+     * <p>
+     * Some web map servers will refuse to render images at a scale greater than
+     * the value provided here.
+     * <p>
+     * return Max scale denominator for which it is appropriate to draw this layer.
+     */
+    public double getScaleDenominatorMax() {
+        return scaleDenominatorMax;
+    }
+    /**
+     * Min scale denominator for which it is appropriate to draw this layer.
+     * <p>
+     * Scale denominator is calculated based on the bounding box of the central
+     * pixel in a request (ie not a scale based on real world size of the entire
+     * layer).
+     * @param  Min scale denominator for which it is appropriate to draw this layer
+     */
+    public void setScaleDenominatorMin( double scaleDenominatorMin ) {
+        this.scaleDenominatorMin = scaleDenominatorMin;
+    }
+    /**
+     * Min scale denominator for which it is appropriate to draw this layer.
+     * <p>
+     * Scale denominator is calculated based on the bounding box of the central
+     * pixel in a request (ie not a scale based on real world size of the entire
+     * layer).
+     * <p>
+     * Some web map servers will refuse to render images at a scale less than
+     * the value provided here.
+     * <p>
+     * return  Min scale denominator for which it is appropriate to draw this layer
+     */
+    public double getScaleDenominatorMin() {
+        return scaleDenominatorMin;
+    }
+    /**
+     * Maximum scale for which this layer is considered good.
+     * <p>
+     * We assume this calculation is done in a similar manner to getScaleDenominatorMax();
+     * but a look at common web services such as JPL show this not to be the case.
+     * <p>
+     * @return The second scale hint value (understood to mean the max value)
+     * @deprecated Use getScaleDenomiatorMax() as there is less confusion over meaning
+     */
+    public double getScaleHintMax() {
 		return scaleHintMax;
 	}
 
+    /**
+     * Maximum scale for which this layer is considered good.
+     * <p>
+     * We assume this calculation is done in a similar manner to setScaleDenominatorMax();
+     * but a look at common web services such as JPL show this not to be the case.
+     * <p>
+     * @param The second scale hint value (understood to mean the max value)
+     * @deprecated Use setScaleDenomiatorMax() as there is less confusion over meaning
+     */
 	public void setScaleHintMax(double scaleHintMax) {
 		this.scaleHintMax = scaleHintMax;
 	}
-
+    /**
+     * Minimum scale for which this layer is considered good.
+     * <p>
+     * We assume this calculation is done in a similar manner to getScaleDenominatorMin();
+     * but a look at common web services such as JPL show this not to be the case.
+     * <p>
+     * @return The first scale hint value (understood to mean the min value)
+     * @deprecated Use getScaleDenomiatorMin() as there is less confusion over meaning
+     */
 	public double getScaleHintMin() {
 		return scaleHintMin;
 	}
 
+    /**
+     * Minimum scale for which this layer is considered good.
+     * <p>
+     * We assume this calculation is done in a similar manner to setScaleDenominatorMin();
+     * but a look at common web services such as JPL show this not to be the case.
+     * <p>
+     * param  The first scale hint value (understood to mean the min value)
+     * @deprecated Use setScaleDenomiatorMin() as there is less confusion over meaning
+     */
 	public void setScaleHintMin(double scaleHintMin) {
 		this.scaleHintMin = scaleHintMin;
 	}
