@@ -57,9 +57,10 @@ import org.geotools.gui.swing.datachooser.JServerDataPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.map2d.JDefaultEditableMap2D;
 import org.geotools.gui.swing.map.map2d.SelectableMap2D;
-import org.geotools.gui.swing.map.map2d.overLayer.ColorOverLayer;
-import org.geotools.gui.swing.map.map2d.overLayer.ImageOverLayer;
-import org.geotools.gui.swing.map.map2d.overLayer.NavigationOverLayer;
+import org.geotools.gui.swing.map.map2d.overLayer.ColorDecoration;
+import org.geotools.gui.swing.map.map2d.overLayer.ImageDecoration;
+import org.geotools.gui.swing.map.map2d.overLayer.MiniMapDecoration;
+import org.geotools.gui.swing.map.map2d.overLayer.NavigationDecoration;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
 import org.geotools.map.DefaultMapContext;
@@ -74,7 +75,7 @@ import org.geotools.styling.Style;
  *
  * @author johann sorel
  */
-public class SwingWidgetDemo extends javax.swing.JFrame {
+public class DemoAll extends javax.swing.JFrame {
 
     private final RandomStyleFactory RANDOM_STYLE_FACTORY = new RandomStyleFactory();
     private final JDefaultEditableMap2D map;
@@ -83,14 +84,15 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
     private final SelectionTreeTableColumn colSelection = new SelectionTreeTableColumn(null);
     
-    private final ImageOverLayer overBackImage= new ImageOverLayer();
-    private final ColorOverLayer overBackColor= new ColorOverLayer();
-    private final NavigationOverLayer overNavigation = new NavigationOverLayer();
+    private final ImageDecoration overBackImage= new ImageDecoration();
+    private final ColorDecoration overBackColor= new ColorDecoration();
+    private final NavigationDecoration overNavigation = new NavigationDecoration();
+    private final MiniMapDecoration overMiniMap = new MiniMapDecoration();
     
     private int nb = 1;
 
     /** Creates new form DemoSwingGeowidgets */
-    public SwingWidgetDemo() {
+    public DemoAll() {
                 
         initComponents();
         setLocationRelativeTo(null);
@@ -115,8 +117,8 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         overBackImage.setOpaque(true);
         overBackImage.setBackground(new Color(0.7f,0.7f,1f,0.8f));
         overBackImage.setStyle(org.jdesktop.swingx.JXImagePanel.Style.CENTERED);
-        map.setBackLayer(overBackColor);
-        map.addOverLayer(overNavigation);
+        map.setBackDecoration(overBackColor);
+        map.addDecoration(overNavigation);
         
         
         tree.addTreeContextListener(new TreeContextListener() {
@@ -160,21 +162,21 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
 
         try {
             context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
-            DataStore store = new ShapefileDataStore(SwingWidgetDemo.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
+            DataStore store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_polygon.shp"));
             FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
             Style style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_polygon.shp");
             context.addLayer(layer);
 
-            store = new ShapefileDataStore(SwingWidgetDemo.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
+            store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_ligne.shp"));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
             layer.setTitle("demo_line.shp");
             context.addLayer(layer);
 
-            store = new ShapefileDataStore(SwingWidgetDemo.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
+            store = new ShapefileDataStore(DemoAll.class.getResource("/org/geotools/gui/swing/demo/shape/test_point.shp"));
             fs = store.getFeatureSource(store.getTypeNames()[0]);
             style = RANDOM_STYLE_FACTORY.createRandomVectorStyle(fs);
             layer = new DefaultMapLayer(fs, style);
@@ -241,9 +243,14 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         pan_mappane = new javax.swing.JPanel();
         gui_map2dinfo = new org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar();
         jPanel4 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
         gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -268,6 +275,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItem6 = new javax.swing.JMenuItem();
         gui_Chknavigationlayer = new javax.swing.JCheckBoxMenuItem();
+        gui_Chkminimaplayer = new javax.swing.JCheckBoxMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
 
@@ -321,6 +329,8 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Swing Widgets Demo");
+        setIconImage(IconBundle.getResource().getIcon("about").getImage());
 
         jSplitPane1.setDividerLocation(300);
 
@@ -357,18 +367,61 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jpanel8);
 
+        jTabbedPane1.addTab("ContextTree", tree);
+
+        jLabel2.setText("Not yet, but it's the next step after the map2D");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(35, 35, 35)
+                .add(jLabel2)
+                .addContainerGap(34, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(82, 82, 82)
+                .add(jLabel2)
+                .addContainerGap(408, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("ToolBox", jPanel1);
+
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tree, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPanel4);
+
+        jButton1.setIcon(IconBundle.getResource().getIcon("16_new_context"));
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setIcon(IconBundle.getResource().getIcon("16_add_data"));
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
@@ -459,7 +512,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
 
         jMenu6.setText("Map2D");
 
-        jMenuItem5.setText("BackLayer------------------");
+        jMenuItem5.setText("BackDecoration-----");
         jMenuItem5.setEnabled(false);
         jMenu6.add(jMenuItem5);
 
@@ -474,7 +527,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
 
         bg_backlayer.add(jRadioButtonMenuItem1);
         jRadioButtonMenuItem1.setSelected(true);
-        jRadioButtonMenuItem1.setText("Color layer");
+        jRadioButtonMenuItem1.setText("Color");
         jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonMenuItem1ActionPerformed(evt);
@@ -483,7 +536,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         jMenu6.add(jRadioButtonMenuItem1);
 
         bg_backlayer.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setText("Image layer");
+        jRadioButtonMenuItem2.setText("Image");
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButtonMenuItem2ActionPerformed(evt);
@@ -492,18 +545,26 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         jMenu6.add(jRadioButtonMenuItem2);
         jMenu6.add(jSeparator1);
 
-        jMenuItem6.setText("OverLayer------------------");
+        jMenuItem6.setText("Decorations-----");
         jMenuItem6.setEnabled(false);
         jMenu6.add(jMenuItem6);
 
         gui_Chknavigationlayer.setSelected(true);
-        gui_Chknavigationlayer.setText("Navigation layer");
+        gui_Chknavigationlayer.setText("Navigation");
         gui_Chknavigationlayer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 gui_ChknavigationlayerActionPerformed(evt);
             }
         });
         jMenu6.add(gui_Chknavigationlayer);
+
+        gui_Chkminimaplayer.setText("Minimap");
+        gui_Chkminimaplayer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gui_ChkminimaplayerActionPerformed(evt);
+            }
+        });
+        jMenu6.add(gui_Chkminimaplayer);
 
         jMenu4.add(jMenu6);
 
@@ -528,18 +589,26 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jButton1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton2)
+                .add(16, 16, 16)
                 .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(350, Short.MAX_VALUE))
+                .addContainerGap(312, Short.MAX_VALUE))
             .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(gui_map2dcontrol, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(gui_map2dedit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jButton1)
+                        .add(jButton2)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE))
         );
@@ -631,24 +700,70 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_guiChkSelectionActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        map.setBackLayer(overBackImage);
+        map.setBackDecoration(overBackImage);
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
 
     private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
-        map.setBackLayer(overBackColor);
+        map.setBackDecoration(overBackColor);
     }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem3ActionPerformed
-       map.setBackLayer(null);
+       map.setBackDecoration(null);
     }//GEN-LAST:event_jRadioButtonMenuItem3ActionPerformed
 
     private void gui_ChknavigationlayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_ChknavigationlayerActionPerformed
         if(gui_Chknavigationlayer.isSelected()){
-            map.addOverLayer(overNavigation);
+            map.addDecoration(overNavigation);
         }else{
-            map.removeOverLayer(overNavigation);
+            map.removeDecoration(overNavigation);
         }
 }//GEN-LAST:event_gui_ChknavigationlayerActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        DefaultMapContext context;
+        context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
+        context.setTitle("Context " + nb);
+        tree.addContext(context);
+        nb++;
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        
+        if (tree.getActiveContext() != null) {
+            List<DataPanel> lst = new ArrayList<DataPanel>();
+
+            if (chk_file.isSelected()) {
+                lst.add(new JFileDataPanel());
+            }
+            if (chk_database.isSelected()) {
+                lst.add(new JDatabaseDataPanel());
+            }
+            if (chk_server.isSelected()) {
+                lst.add(new JServerDataPanel());
+            }
+
+            JDataChooser jdc = new JDataChooser(null,lst);
+            
+            JDataChooser.ACTION ret = jdc.showDialog();
+
+            if (ret == JDataChooser.ACTION.APPROVE) {
+                List<MapLayer> layers = jdc.getLayers();
+                for (MapLayer layer : layers) {
+                    tree.getActiveContext().addLayer(layer);
+                }
+            }
+
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void gui_ChkminimaplayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_ChkminimaplayerActionPerformed
+        if(gui_Chkminimaplayer.isSelected()){
+            map.addDecoration(overMiniMap);
+        }else{
+            map.removeDecoration(overMiniMap);
+        }
+}//GEN-LAST:event_gui_ChkminimaplayerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -668,7 +783,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
         }
 
 
-        new SwingWidgetDemo().setVisible(true);
+        new DemoAll().setVisible(true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bg_backlayer;
@@ -681,11 +796,15 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
     private javax.swing.JCheckBoxMenuItem guiChkSelection;
     private javax.swing.JCheckBoxMenuItem guiChkStyle;
     private javax.swing.JCheckBoxMenuItem guiChkVisible;
+    private javax.swing.JCheckBoxMenuItem gui_Chkminimaplayer;
     private javax.swing.JCheckBoxMenuItem gui_Chknavigationlayer;
     private org.geotools.gui.swing.map.map2d.control.JMap2DControlBar gui_map2dcontrol;
     private org.geotools.gui.swing.map.map2d.control.JMap2DEditBar gui_map2dedit;
     private org.geotools.gui.swing.map.map2d.control.JMap2DInfoBar gui_map2dinfo;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -700,6 +819,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
@@ -708,6 +828,7 @@ public class SwingWidgetDemo extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
