@@ -1430,7 +1430,7 @@ public class StyleBuilder {
     /**
      * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
-     * @param featureTypeName - name of the feature type
+     * @param typeName - The feature typeName you want to draw (use "Feature" as a wild card to match all)
      * @param symbolizer - the symbolizer to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
      * @param maxScaleDenominator - the maximum scale to draw the feature at
@@ -1438,12 +1438,12 @@ public class StyleBuilder {
      * @return the new feature type styler
      */
     public FeatureTypeStyle createFeatureTypeStyle(
-        String featureTypeName,
+        String typeName,
         Symbolizer symbolizer,
         double minScaleDenominator,
         double maxScaleDenominator) {
         return createFeatureTypeStyle(
-        		featureTypeName,
+        		typeName,
             new Symbolizer[] { symbolizer },
             minScaleDenominator,
             maxScaleDenominator);
@@ -1452,7 +1452,7 @@ public class StyleBuilder {
     /**
      * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
-     * @param featureTypeName - name of the feature type
+     * @param typeName - The feature typeName you want to draw (use "Feature" as a wild card to match all)
      * @param symbolizers - an array of symbolizers to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
      * @param maxScaleDenominator - the maximum scale to draw the feature at
@@ -1460,7 +1460,7 @@ public class StyleBuilder {
      * @return the new feature type styler
      */
     public FeatureTypeStyle createFeatureTypeStyle(
-        String featureTypeName,
+        String typeName,
         Symbolizer[] symbolizers,
         double minScaleDenominator,
         double maxScaleDenominator) {
@@ -1470,8 +1470,8 @@ public class StyleBuilder {
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         fts.setRules(new Rule[] { r });
 
-        if (featureTypeName != null) {
-            fts.setFeatureTypeName(featureTypeName);
+        if (typeName != null) {
+            fts.setFeatureTypeName(typeName);
         }
 
         return fts;
@@ -1480,18 +1480,18 @@ public class StyleBuilder {
     /**
      * create a SimpleFeature type styler
      *
-     * @param featureTypeName - name of the feature type
+     * @param typeName - The feature typeName you want to draw (use "Feature" as a wild card to match all)
      * @param r - the rule that driver this feature typ style
      *
      * @return the new feature type styler
      */
-    public FeatureTypeStyle createFeatureTypeStyle(String featureTypeName, Rule r) {
+    public FeatureTypeStyle createFeatureTypeStyle(String typeName, Rule r) {
         // setup the feature type style
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         fts.setRules(new Rule[] { r });
 
-        if (featureTypeName != null) {
-            fts.setFeatureTypeName(featureTypeName);
+        if (typeName != null) {
+            fts.setFeatureTypeName(typeName);
         }
 
         return fts;
@@ -1500,17 +1500,17 @@ public class StyleBuilder {
     /**
      * create a SimpleFeature type styler see the SLD Spec for more details of scaleDenominators
      *
-     * @param featureTypeName - name of the feature type
+     * @param typeName - The feature typeName you want to draw (use "Feature" as a wild card to match all)
      * @param rules - the rules that make up the FeatureTypeStyle
      *
      * @return the new feature type styler
      */
-    public FeatureTypeStyle createFeatureTypeStyle(String featureTypeName, Rule[] rules) {
+    public FeatureTypeStyle createFeatureTypeStyle(String typeName, Rule[] rules) {
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
         fts.setRules(rules);
 
-        if (featureTypeName != null) {
-            fts.setFeatureTypeName(featureTypeName);
+        if (typeName != null) {
+            fts.setFeatureTypeName(typeName);
         }
 
         return fts;
@@ -1546,19 +1546,19 @@ public class StyleBuilder {
     /**
      * create a new style
      *
-     * @param featureTypeStyleName - the name to use for the feature type style
+     * @param typeName - The feature typeName you want to draw (use "Feature" as a wild card to match all)
      * @param symbolizer - the symbolizer to use
      *
      * @return the new style
      */
-    public Style createStyle(String featureTypeStyleName, Symbolizer symbolizer) {
-        return createStyle(featureTypeStyleName, symbolizer, Double.NaN, Double.NaN);
+    public Style createStyle(String typeName, Symbolizer symbolizer) {
+        return createStyle(typeName, symbolizer, Double.NaN, Double.NaN);
     }
 
     /**
      * create a new style
      *
-     * @param featureTypeStyleName - the name to use for the feature type style
+     * @param typeName - The feature typeName you want to draw (use "Feature" as a wild card to match all)
      * @param symbolizer - the symbolizer to use
      * @param minScaleDenominator - the minimim scale to draw the feature at
      * @param maxScaleDenominator - the maximum scale to draw the feature at
@@ -1566,14 +1566,14 @@ public class StyleBuilder {
      * @return the new style
      */
     public Style createStyle(
-        String featureTypeStyleName,
+        String typeName,
         Symbolizer symbolizer,
         double minScaleDenominator,
         double maxScaleDenominator) {
         // create the feature type style
         FeatureTypeStyle fts =
             createFeatureTypeStyle(
-                featureTypeStyleName,
+                typeName,
                 symbolizer,
                 minScaleDenominator,
                 maxScaleDenominator);
