@@ -18,7 +18,6 @@ package org.geotools.gui.swing.map.map2d.control;
 import com.vividsolutions.jts.geom.Envelope;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -31,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
-import javax.swing.plaf.DimensionUIResource;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.MapConstants;
@@ -45,6 +43,9 @@ import org.geotools.gui.swing.map.map2d.event.Map2DMapAreaEvent;
 import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 
 /**
+ * JMap2DControlBar is a JPanel to handle Navigation state for a NavigableMap2D
+ * ZoomIn/Out, pan, selection, refresh ...
+ * 
  * @author johann sorel
  */
 public class JMap2DControlBar extends JPanel implements Map2DListener, NavigableMap2DListener {
@@ -61,17 +62,21 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
     private final JToggleButton gui_select = buildToggleButton(IconBundle.getResource().getIcon("16_select"));
     private final JToggleButton gui_other = new JToggleButton();
     private final JButton gui_refresh = buildButton(IconBundle.getResource().getIcon("16_data_reload"));
+    private final int largeur = 2;
 
     /**
-     * Creates a new instance of DefaultLightMapPaneToolBar
+     * Creates a new instance of JMap2DControlBar
      */
     public JMap2DControlBar() {
         this(null);
     }
 
-    public JMap2DControlBar(Map pane) {
+    /**
+     * Creates a new instance of JMap2DControlBar
+     * @param pane : related Map2D or null
+     */
+    public JMap2DControlBar(Map2D pane) {
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        //super( new GridLayout(1,8));
         getInsets().set(0, 0, 0, 0);
         setMap(pane);
         init();
@@ -196,8 +201,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
         add(gui_select);
 
     }
-    private final int largeur = 2;
-
+    
     private JButton buildButton(ImageIcon img) {
         JButton but = new JButton(img);
         but.setBorder(new EmptyBorder(largeur, largeur, largeur, largeur));
@@ -218,7 +222,11 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
         return but;
     }
 
-    public void setMap(Map pane) {
+    /**
+     * set the related Map2D
+     * @param map2d : related Map2D
+     */
+    public void setMap(Map2D map2d) {
 
         if (map != null) {
             map.removeMap2DListener(this);
@@ -229,13 +237,13 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
             lastMapArea = map.getMapArea();
         }
 
-        if (pane instanceof Map2D) {
-            map = (Map2D) pane;
+        if (map2d instanceof Map2D) {
+            map = (Map2D) map2d;
             map.addMap2DListener(this);
             gui_refresh.setEnabled(true);
 
-            if (pane instanceof NavigableMap2D) {
-                NavigableMap2D navigationMap = (NavigableMap2D) pane;
+            if (map2d instanceof NavigableMap2D) {
+                NavigableMap2D navigationMap = (NavigableMap2D) map2d;
                 navigationMap.addNavigableMap2DListener(this);
                 gui_zoomAll.setEnabled(true);
                 gui_zoomIn.setEnabled(true);
@@ -263,7 +271,7 @@ public class JMap2DControlBar extends JPanel implements Map2DListener, Navigable
                         break;
                 }
 
-                if (pane instanceof SelectableMap2D) {
+                if (map2d instanceof SelectableMap2D) {
                     gui_select.setEnabled(true);
                 } else {
                     gui_select.setEnabled(false);

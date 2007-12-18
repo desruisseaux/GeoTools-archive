@@ -5,31 +5,34 @@
  */
 package org.geotools.gui.swing.map.map2d.control;
 
-import java.awt.BorderLayout;
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
 import org.geotools.gui.swing.map.map2d.Map2D;
 
 /**
- *
+ * JMap2DInfoBar is a JPanel with a button to edit the GTRenderer and Rendering Strategy of the Map2D
  * @author johann Sorel
  */
 public class JMap2DInfoBar extends javax.swing.JPanel {
 
     private Map2D map;
 
-    /** Creates new form JMap2DInfoBar */
+    /** 
+     * Creates new form JMap2DInfoBar 
+     */
     public JMap2DInfoBar() {
         initComponents();
 
 
     }
 
-    public void setMap(Map map) {
+    /**
+     * set the related Map2D
+     * @param map : related Map2D
+     */
+    public void setMap(Map2D map) {
 
         if (map instanceof Map2D) {
             this.map = (Map2D) map;

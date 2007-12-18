@@ -20,16 +20,13 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
@@ -38,14 +35,13 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
 
-import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.icon.IconBundle;
 import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.EditableMap2D;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
@@ -61,6 +57,9 @@ import org.geotools.map.event.MapLayerListListener;
 import org.opengis.geometry.aggregate.MultiPoint;
 
 /**
+ * JMap2DEditBar is a JPanel to handle edition state for an EditableMap2D
+ * Layer selection, edition, line, polygon, point ...
+ * 
  * @author johann sorel
  */
 public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap2DListener, EditableMap2DListener {
@@ -110,13 +109,17 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
     
 
     /**
-     * Creates a new instance of DefaultLightMapPaneToolBar
+     * Creates a new instance of JMap2DEditBar
      */
     public JMap2DEditBar() {
         this(null);
     }
 
-    public JMap2DEditBar(Map pane) {
+    /**
+     * Creates a new instance of JMap2DEditBar
+     * @param pane : related Map2D or null
+     */
+    public JMap2DEditBar(Map2D pane) {
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         getInsets().set(0, 0, 0, 0);
         setMap(pane);
@@ -331,7 +334,11 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
         return but;
     }
 
-    public void setMap(Map pane) {
+    /**
+     * set the related Map2D
+     * @param map2d : related Map2D
+     */
+    public void setMap(Map2D map2d) {
 
         if (map != null) {
             map.removeMap2DListener(this);
@@ -339,8 +346,8 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
             map.removeEditableMap2DListener(this);
         }
 
-        if (pane instanceof EditableMap2D) {
-            map = (EditableMap2D) pane;
+        if (map2d instanceof EditableMap2D) {
+            map = (EditableMap2D) map2d;
             editionContext = map.getContext();
             editionLayer = map.getEditedMapLayer();
             map.addMap2DListener(this);
@@ -355,7 +362,6 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
             gui_layers.setEnabled(false);
             lock(false);
         }
-
 
         initComboBox();
     }

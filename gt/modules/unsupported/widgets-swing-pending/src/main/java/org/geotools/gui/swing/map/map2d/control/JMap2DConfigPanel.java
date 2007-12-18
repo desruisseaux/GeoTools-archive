@@ -16,7 +16,7 @@
 package org.geotools.gui.swing.map.map2d.control;
 
 import java.awt.RenderingHints;
-import org.geotools.gui.swing.map.map2d.JDefaultMap2D;
+import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.strategy.MergeBufferedImageStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.RenderingStrategy;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
@@ -24,14 +24,16 @@ import org.geotools.gui.swing.map.map2d.strategy.SingleVolatileImageStrategy;
 import org.geotools.renderer.GTRenderer;
 
 /**
- *
+ * JMap2DConfigPanel is a JPanel to edit the GTRenderer and Rendering Strategy of the Map2D
  * @author  johann Sorel
  */
 public class JMap2DConfigPanel extends javax.swing.JPanel {
 
-    private JDefaultMap2D map = null;
+    private Map2D map = null;
 
-    /** Creates new form JOptimizeMap2DPanel */
+    /** 
+     * Creates new form JOptimizeMap2DPanel 
+     */
     public JMap2DConfigPanel() {
         initComponents();
     }
@@ -58,18 +60,18 @@ public class JMap2DConfigPanel extends javax.swing.JPanel {
         }
     }
 
-    public JDefaultMap2D getMap() {
-        return map;
-    }
+    /**
+     * set the related Map2D
+     * @param map2d : related Map2D
+     */
+    public void setMap(Map2D map2d) {
+        this.map = map2d;
 
-    public void setMap(JDefaultMap2D map) {
-        this.map = map;
-
-        if (map != null && map.getRenderingStrategy().getRenderer() != null) {
-            GTRenderer renderer = map.getRenderingStrategy().getRenderer();
+        if (map2d != null && map2d.getRenderingStrategy().getRenderer() != null) {
+            GTRenderer renderer = map2d.getRenderingStrategy().getRenderer();
             RenderingHints rh = renderer.getJava2DHints();
 
-            RenderingStrategy cl = map.getRenderingStrategy();
+            RenderingStrategy cl = map2d.getRenderingStrategy();
             
             if(cl instanceof SingleBufferedImageStrategy){
                 jrb_rendering_single_buffer.setSelected(true);
