@@ -39,7 +39,6 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.geometry.GeometryBuilder;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 import org.geotools.gui.swing.map.map2d.listener.SelectableMap2DListener;
 import org.geotools.gui.swing.map.map2d.overLayer.MapDecoration;
@@ -69,14 +68,24 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
 /**
- *
+ * Default implementation of navigableMap2D
  * @author Johann Sorel
  */
 public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements SelectableMap2D {
 
+    /**
+     * Geometry factory for JTS geometry creation
+     */
     protected final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    /**
+     * Facilities factory to duplicate MapLayers
+     */
     protected final FacilitiesFactory FACILITIES_FACTORY = new FacilitiesFactory();
+    /**
+     * Style builder for sld style creation
+     */
     protected final StyleBuilder STYLE_BUILDER = new StyleBuilder();
+    
     private final MapContext selectionMapContext = new DefaultMapContext(DefaultGeographicCRS.WGS84);
     private final MouseInputListener mouseInputListener;
     private final MapLayerListListener mapLayerListlistener;
@@ -86,6 +95,9 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
     private final Map<MapLayer, MapLayer> copies = new HashMap<MapLayer, MapLayer>();
     private Style selectionStyle = null;
 
+    /**
+     * create a default JDefaultSelectableMap2D
+     */
     public JDefaultSelectableMap2D() {
         super();
         mouseInputListener = new MouseListen();
@@ -99,8 +111,69 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         buildSelectionStyle();
     }
 
-    private void buildSelectionStyle() {
+    /**
+     * transform a mouse coordinate in JTS Coordinate using the CRS of the mapcontext
+     * @param mx : x coordinate of the mouse on the map (in pixel)
+     * @param my : y coordinate of the mouse on the map (in pixel)
+     * @return JTS Coordinate
+     */
+    protected Coordinate toMapCoord(int mx, int my) {
+        Rectangle bounds = getBounds();
+        double width = mapArea.getWidth();
+        double height = mapArea.getHeight();
+        return toMapCoord(mx, my, width, height, bounds);
+    }
+    
+    /**
+     *  transform a mouse coordinate in JTS Geometry using the CRS of the mapcontext
+     * @param mx : x coordinate of the mouse on the map (in pixel)
+     * @param my : y coordinate of the mouse on the map (in pixel)
+     * @return JTS geometry (corresponding to a square of 6x6 pixel around mouse coordinate)
+     */
+    protected Geometry mousePositionToGeometry(double mx, double my) {
+        if (mapArea != null) {
+            Rectangle bounds = getBounds();
+            double width = mapArea.getWidth();
+            double height = mapArea.getHeight();
+            Coordinate[] coord = new Coordinate[5];
 
+            int taille = 3;
+
+            coord[0] = toMapCoord(mx - taille, my - taille, width, height, bounds);
+            coord[1] = toMapCoord(mx - taille, my + taille, width, height, bounds);
+            coord[2] = toMapCoord(mx + taille, my + taille, width, height, bounds);
+            coord[3] = toMapCoord(mx + taille, my - taille, width, height, bounds);
+            coord[4] = coord[0];
+
+            LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
+            return GEOMETRY_FACTORY.createPolygon(lr1, null);
+        }
+
+        return null;
+    }
+
+    /**
+     * create a filter corresponding to the layer features intersecting the geom
+     * @param geom : the intersect JTS geometry used by the filter
+     * @param layer : MapLayer for which the filter is made
+     * @return Filter
+     */
+    protected Filter getFeatureInGeometry(Geometry geom, MapLayer layer) {
+        Filter f = null;
+
+        try {
+            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
+            if (name.equals("")) {
+                name = "the_geom";
+            }
+            f = ff.intersects(ff.property(name), ff.literal(geom));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return f;
+    }
+    
+    private void buildSelectionStyle() {
 
         Fill fill = STYLE_BUILDER.createFill(Color.GREEN, 0.4f);
         Stroke stroke = STYLE_BUILDER.createStroke(Color.GREEN, 2);
@@ -159,55 +232,10 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         selectedPane.setBuffer(getRenderingStrategy().createBufferImage(selectionMapContext));
     }
 
-    protected Coordinate toMapCoord(int mx, int my) {
-        Rectangle bounds = getBounds();
-        double width = mapArea.getWidth();
-        double height = mapArea.getHeight();
-        return toMapCoord(mx, my, width, height, bounds);
-    }
-
     private Coordinate toMapCoord(double mx, double my, double width, double height, Rectangle bounds) {
         double mapX = ((mx * width) / (double) bounds.width) + mapArea.getMinX();
         double mapY = (((bounds.getHeight() - my) * height) / (double) bounds.height) + mapArea.getMinY();
         return new Coordinate(mapX, mapY);
-    }
-
-    protected Geometry mousePositionToGeometry(double mx, double my) {
-        if (mapArea != null) {
-            Rectangle bounds = getBounds();
-            double width = mapArea.getWidth();
-            double height = mapArea.getHeight();
-            Coordinate[] coord = new Coordinate[5];
-
-            int taille = 3;
-
-            coord[0] = toMapCoord(mx - taille, my - taille, width, height, bounds);
-            coord[1] = toMapCoord(mx - taille, my + taille, width, height, bounds);
-            coord[2] = toMapCoord(mx + taille, my + taille, width, height, bounds);
-            coord[3] = toMapCoord(mx + taille, my - taille, width, height, bounds);
-            coord[4] = coord[0];
-
-            LinearRing lr1 = GEOMETRY_FACTORY.createLinearRing(coord);
-            return GEOMETRY_FACTORY.createPolygon(lr1, null);
-        }
-
-        return null;
-    }
-
-    protected Filter getFeatureInGeometry(Geometry geom, MapLayer layer) {
-        Filter f = null;
-
-
-        try {
-            String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
-            if (name == "") {
-                name = "the_geom";
-            }
-            f = ff.intersects(ff.property(name), ff.literal(geom));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return f;
     }
 
     private void doMouseSelection(double mx, double my) {
@@ -330,7 +358,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         try {
             String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
 
-            if (name == "") {
+            if (name.equals("")) {
                 name = "the_geom";
             }
 
@@ -377,7 +405,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
             for (MapLayer layer : selectionMapContext.getLayers()) {
                 String name = layer.getFeatureSource().getSchema().getDefaultGeometry().getLocalName();
 
-                if (name == "") {
+                if (name.equals("")) {
                     name = "the_geom";
                 }
 
@@ -410,7 +438,7 @@ public class JDefaultSelectableMap2D extends JDefaultNavigableMap2D implements S
         return MAP2DLISTENERS.getListeners(SelectableMap2DListener.class);
     }
     
-    //---------------------PRIVATE CLASSES--------------------------------------
+    //---------------------PRIVATE CLASSES--------------------------------------        
     private class MouseListen implements MouseInputListener {
 
         int startX = 0;

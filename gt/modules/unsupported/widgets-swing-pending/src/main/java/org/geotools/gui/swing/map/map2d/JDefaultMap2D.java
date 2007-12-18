@@ -40,16 +40,32 @@ import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 
 /**
- *
+ * Default implementation of Map2D
  * @author Johann Sorel
  */
 public class JDefaultMap2D extends JPanel implements Map2D {
 
         
+    /**
+     * EventListenerList to manage all possible Listeners
+     */
     protected final EventListenerList MAP2DLISTENERS = new EventListenerList();
+    /**
+     * Map2D reference , same as "this" but needed to explicitly point to the 
+     * map2d object when coding a private class
+     */
     protected final Map2D THIS_MAP;
+    /**
+     * MapContext of the map2d widget, can be null
+     */
     protected MapContext context;
+    /**
+     * MapArea of the map2d widget, can be null
+     */
     protected Envelope mapArea;
+    /**
+     * Rendering Strategy of the map2d widget, should never be null
+     */
     protected RenderingStrategy renderingStrategy;
     
     private static final MapDecoration[] EMPTY_OVERLAYER_ARRAY = {};
@@ -65,9 +81,11 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     private Rectangle oldRect = null;
     private Envelope oldMapArea = null;
     private MapDecoration backDecoration;
-    
-    
+        
 
+    /**
+     * create a default JDefaultMap2D
+     */
     public JDefaultMap2D() {
         this.THIS_MAP = this;
 
@@ -87,7 +105,13 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         setOpaque(false);
     }
 
-    protected Envelope fixAspectRatio(Rectangle r, Envelope mapArea) {
+    /**
+     * Create a new Envelope preserving aspect ratio (height/width of rect) using the mapArea envelope
+     * @param rect : Rectangle on the widget (drawing zone in pixels)
+     * @param mapArea : Envelope we should see
+     * @return Envelope fit to the provided Rectangle
+     */
+    protected Envelope fixAspectRatio(Rectangle rect, Envelope mapArea) {
 
         if (mapArea == null && context != null) {
             try {
@@ -103,12 +127,12 @@ public class JDefaultMap2D extends JPanel implements Map2D {
 
         double mapWidth = mapArea.getWidth(); /* get the extent of the map */
         double mapHeight = mapArea.getHeight();
-        double scaleX = r.getWidth() / mapArea.getWidth(); /*
+        double scaleX = rect.getWidth() / mapArea.getWidth(); /*
          * calculate the new
          * scale
          */
 
-        double scaleY = r.getHeight() / mapArea.getHeight();
+        double scaleY = rect.getHeight() / mapArea.getHeight();
         double scale = 1.0; // stupid compiler!
 
         if (scaleX < scaleY) { /* pick the smaller scale */
@@ -118,8 +142,8 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         }
 
         /* calculate the difference in width and height of the new extent */
-        double deltaX = /* Math.abs */ ((r.getWidth() / scale) - mapWidth);
-        double deltaY = /* Math.abs */ ((r.getHeight() / scale) - mapHeight);
+        double deltaX = /* Math.abs */ ((rect.getWidth() / scale) - mapWidth);
+        double deltaY = /* Math.abs */ ((rect.getHeight() / scale) - mapHeight);
 
         /*
          * System.out.println("delta x " + deltaX); System.out.println("delta y " +
@@ -201,10 +225,18 @@ public class JDefaultMap2D extends JPanel implements Map2D {
     }
 
     //----------------------Over/Sub/information layers-------------------------
+    /**
+     * get the top InformationDecoration of the map2d widget
+     * @return InformationDecoration
+     */
     public InformationDecoration getInformationLayer() {
         return informationDecoration;
     }
 
+    /**
+     * set the decoration behind the map
+     * @param back : MapDecoration, use null to remove the decoration
+     */
     public void setBackDecoration(MapDecoration back) {
 
         if (backDecoration != null) {
@@ -220,52 +252,85 @@ public class JDefaultMap2D extends JPanel implements Map2D {
         mainDecorationPane.repaint();
     }
 
+    /**
+     * get the decoration behind the map
+     * @return MapDecoration : or null if no back decoration
+     */
     public MapDecoration getBackDecoration() {
         return backDecoration;
     }
 
-    public void addDecoration(MapDecoration layer){
+    /**
+     * add a Decoration between the map and the information top decoration
+     * @param deco : MapDecoration to add
+     */
+    public void addDecoration(MapDecoration deco){
                 
-        if(layer != null && !userDecorations.contains(layer)){
-            layer.setMap2D(THIS_MAP);
-            userDecorations.add(layer);                        
-            userDecorationPane.add(layer.geComponent(),new Integer( userDecorations.indexOf(layer) ));
+        if(deco != null && !userDecorations.contains(deco)){
+            deco.setMap2D(THIS_MAP);
+            userDecorations.add(deco);                        
+            userDecorationPane.add(deco.geComponent(),new Integer( userDecorations.indexOf(deco) ));
             userDecorationPane.revalidate();
             userDecorationPane.repaint();
         }
     }
     
-    public void addDecoration(int index,MapDecoration layer){
+    /**
+     * insert a MapDecoration at a specific index
+     * @param index : index where to isert the decoration
+     * @param deco : MapDecoration to add
+     */
+    public void addDecoration(int index,MapDecoration deco){
                 
-        if(layer != null && !userDecorations.contains(layer)){
-            layer.setMap2D(THIS_MAP);
-            userDecorations.add(index,layer);                        
-            userDecorationPane.add(layer.geComponent(),new Integer( userDecorations.indexOf(layer) ));
+        if(deco != null && !userDecorations.contains(deco)){
+            deco.setMap2D(THIS_MAP);
+            userDecorations.add(index,deco);                        
+            userDecorationPane.add(deco.geComponent(),new Integer( userDecorations.indexOf(deco) ));
             userDecorationPane.revalidate();
             userDecorationPane.repaint();
         }
     }
     
-    public int getDecorationIndex(MapDecoration layer){
-        return userDecorations.indexOf(layer);
+    /**
+     * get the index of a MapDecoration
+     * @param deco : MapDecoration to find
+     * @return index of the MapDecoration
+     * @throw ClassCastException or NullPointerException
+     */
+    public int getDecorationIndex(MapDecoration deco){
+        return userDecorations.indexOf(deco);
     }
     
-    public void removeDecoration(MapDecoration layer){
-        if(layer != null && userDecorations.contains(layer)){
-            layer.setMap2D(null);
-            userDecorations.remove(layer);
-            userDecorationPane.remove(layer.geComponent());            
+    /**
+     * remove a MapDecoration
+     * @param deco : MapDecoration to remove
+     */
+    public void removeDecoration(MapDecoration deco){
+        if(deco != null && userDecorations.contains(deco)){
+            deco.setMap2D(null);
+            userDecorations.remove(deco);
+            userDecorationPane.remove(deco.geComponent());            
             userDecorationPane.revalidate();
             userDecorationPane.repaint();
         }        
     }
     
+    /**
+     * get an array of all MapDecoration
+     * @return array of MapDecoration
+     */
     public MapDecoration[] getDecorations(){
         return userDecorations.toArray(EMPTY_OVERLAYER_ARRAY);
     }
     
-    protected void addMapDecoration(MapDecoration over) {
-        mapDecorationPane.add(over.geComponent(), new Integer(nextMapDecorationIndex));
+    /**
+     * add a MapDecoration between the map and the user MapDecoration
+     * those MapDecoration can not be removed because they are important
+     * for edition/selection/navigation.
+     * @param deco : MapDecoration to add
+     */
+    protected void addMapDecoration(MapDecoration deco) {
+        mapDecorationPane.add(deco.geComponent(), new Integer(nextMapDecorationIndex));
         nextMapDecorationIndex++;
     }
 

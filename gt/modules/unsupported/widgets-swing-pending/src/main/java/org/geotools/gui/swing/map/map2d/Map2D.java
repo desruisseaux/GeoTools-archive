@@ -94,7 +94,5 @@ public interface Map2D extends Map{
      * @return array of Map2DListener
      */
     public Map2DListener[] getMap2DListeners();
-    
-    
-    
+        
 }

@@ -28,15 +28,24 @@ import org.geotools.gui.swing.map.map2d.listener.NavigableMap2DListener;
 import org.geotools.gui.swing.map.map2d.overLayer.ZoomPanDecoration;
 
 /**
+ * Default implementation of NavigableMap2D
  * @author Johann Sorel
  */
 public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMap2D {
 
+    /**
+     * Action state of the map widget
+     */
+    protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
+    
     private final MouseInputListener mouseInputListener;
     private final ZoomPanDecoration zoompanPanel = new ZoomPanDecoration();
     private double zoomFactor = 2;
-    protected MapConstants.ACTION_STATE actionState = MapConstants.ACTION_STATE.PAN;
+    
 
+    /**
+     * create a default JDefaultNavigableMap2D
+     */
     public JDefaultNavigableMap2D() {
         super();
         mouseInputListener = new MouseListen();
@@ -55,7 +64,6 @@ public class JDefaultNavigableMap2D extends JDefaultMap2D implements NavigableMa
         }
 
     }
-
     
     //-----------------------NAVIGABLEMAP2D-------------------------------------
     public void setActionState(ACTION_STATE state) {

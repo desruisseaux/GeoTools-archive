@@ -84,12 +84,16 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
 /**
- *
+ * Default implementation of EditableMap2D
  * @author Johann Sorel
  */
 public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements EditableMap2D {
     
+    /**
+     * Edition state of the map widget
+     */
     protected MapConstants.EDIT_STATE editState = MapConstants.EDIT_STATE.NONE;
+    
     private static final Coordinate[] EMPTY_COORDINATE_ARRAY = new Coordinate[0];
     private final BufferComponent editedPane = new BufferComponent();
     private final MouseListen mouseInputListener;
@@ -98,6 +102,9 @@ public class JDefaultEditableMap2D extends JDefaultSelectableMap2D implements Ed
     private MapLayer editionLayer = null;
     private final Style editionStyle;
 
+    /**
+     * create a default JDefaultEditableMap2D
+     */
     public JDefaultEditableMap2D() {
         super();
 

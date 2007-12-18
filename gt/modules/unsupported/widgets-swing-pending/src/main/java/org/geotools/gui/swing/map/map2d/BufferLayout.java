@@ -1,6 +1,17 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package org.geotools.gui.swing.map.map2d;
@@ -11,42 +22,32 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 
 /**
- *
- * @author Administrateur
+ * Specific Layout used for JLayeredPane, all added componant take
+ * the complete size of the parent
+ * 
+ * @author johann sorel
  */
 public class BufferLayout implements LayoutManager{
 
-    Dimension dim = new Dimension(0, 0);
+    private Dimension dim = new Dimension(0, 0);
     
     public BufferLayout() {
     }
 
-    /* Required by LayoutManager. */
     public void addLayoutComponent(String name, Component comp) {
     }
 
-    /* Required by LayoutManager. */
     public void removeLayoutComponent(Component comp) {
     }
     
-    /* Required by LayoutManager. */
     public Dimension preferredLayoutSize(Container parent) {
         return dim;
     }
 
-    /* Required by LayoutManager. */
     public Dimension minimumLayoutSize(Container parent) {
         return dim;
     }
-
-    /* Required by LayoutManager. */
-    /*
-     * This is called when the panel is first displayed,
-     * and every time its size changes.
-     * Note: You CAN'T assume preferredLayoutSize or
-     * minimumLayoutSize will be called -- in the case
-     * of applets, at least, they probably won't be.
-     */
+    
     public void layoutContainer(Container parent) {
         int maxWidth = parent.getWidth();
         int maxHeight = parent.getHeight();
