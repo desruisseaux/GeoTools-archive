@@ -36,7 +36,7 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
 /**
- * 
+ * Optimize Strategy for edition. high memory needed
  * @author Johann Sorel
  */
 public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
@@ -54,10 +54,17 @@ public class MergeBufferedImageStrategy extends AbstractRenderingStrategy {
     private boolean complete = false;
     private int nbthread = 0;
 
+    /**
+     * create a default MergeBufferedImageStrategy
+     */
     public MergeBufferedImageStrategy() {
         this(new ShapefileRenderer());
     }
 
+    /**
+     * create a default MergeBufferedImageStrategy with a specific GTRenderer
+     * @param renderer
+     */
     public MergeBufferedImageStrategy(GTRenderer renderer) {
         this.renderer = renderer;
         opimizeRenderer();

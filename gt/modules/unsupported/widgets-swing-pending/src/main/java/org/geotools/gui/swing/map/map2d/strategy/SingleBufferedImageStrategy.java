@@ -34,7 +34,8 @@ import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
 /**
- *
+ * Not optimize Strategy, use a single bufferedImage. slow.
+ * Must repaint everything each time.
  * @author Johann Sorel
  */
 public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
@@ -48,10 +49,17 @@ public class SingleBufferedImageStrategy extends AbstractRenderingStrategy {
     private Rectangle oldRect = null;
     private int nbthread = 0;
 
+    /**
+     * create a default SingleBufferedImageStrategy
+     */
     public SingleBufferedImageStrategy() {
         this(new ShapefileRenderer());
     }
 
+    /**
+     * create a default SingleBufferedImageStrategy with a specific GTRenderer
+     * @param renderer
+     */
     public SingleBufferedImageStrategy(GTRenderer renderer) {
         this.renderer = renderer;
         opimizeRenderer();

@@ -38,7 +38,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- *
+ * A MapContext with only one layer
  * @author Johann Sorel
  */
 final class OneLayerContext implements MapContext {

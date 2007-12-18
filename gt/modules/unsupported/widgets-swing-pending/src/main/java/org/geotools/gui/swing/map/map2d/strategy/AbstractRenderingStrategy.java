@@ -26,29 +26,66 @@ import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 
 /**
- *
+ * Abstract implementation of RenderingStrategy , handle the Mapcontext,MapArea
+ * GTRenderer and listeners
  * @author Johann Sorel
  */
 public abstract class AbstractRenderingStrategy implements RenderingStrategy{
 
     
+    /**
+     * 
+     */
     protected final MapLayerListListener mapLayerListlistener = new MapLayerListListen();
+    /**
+     * EventListenerList lsi for different listeners
+     */
     protected final EventListenerList listeners = new EventListenerList();
+    /**
+     * MapContext
+     */
     protected MapContext context = null;
+    /**
+     * Envelope mapArea
+     */
     protected Envelope mapArea = null;
+    /**
+     * GTRenderer
+     */
     protected GTRenderer renderer = null;
     
+    /**
+     * this method is called when a layer is deleted from the mapContext
+     * @param event
+     */
     protected abstract void deletedLayer(MapLayerListEvent event);
 
+    /**
+     * this method is called when a layer change in the mapContext
+     * @param event
+     */
     protected abstract void changedLayer(MapLayerListEvent event);
 
+    /**
+     * this method is called when a layer is added in the mapContext
+     * @param event
+     */
     protected abstract void addedLayer(MapLayerListEvent event);
 
+    /**
+     * this method is called when a layer is moved in the mapContext
+     * @param event
+     */
     protected abstract void movedLayer(MapLayerListEvent event);
     
     
+    /**
+     * fire a rendering event, so that the top map decoration can
+     * show a waiting message
+     * @param isRendering true if is rendering, false if not
+     */
     protected void fireRenderingEvent(boolean isRendering){
-        
+                
         StrategyListener[] lst = getStrategyListeners();
 
         for (StrategyListener l : lst) {

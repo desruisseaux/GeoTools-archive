@@ -21,13 +21,21 @@ import org.geotools.gui.swing.map.map2d.event.Map2DEditLayerEvent;
 import org.geotools.gui.swing.map.map2d.event.Map2DEditStateEvent;
 
 /**
- *
+ * EditableMap2DListener used to listen to Map2D edition events
  * @author Johann Sorel
  */
 public interface EditableMap2DListener extends EventListener{
 
+    /**
+     * called when edition state change
+     * @param event : Map2DEditStateEvent
+     */
     public void mapEditStateChanged(Map2DEditStateEvent event);
     
+    /**
+     * called when the edited layer change
+     * @param event : Map2DEditLayerEvent
+     */
     public void mapEditLayerChanged(Map2DEditLayerEvent event);
     
 }

@@ -20,11 +20,15 @@ import java.util.EventListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DActionStateEvent;
 
 /**
- *
+ * NavigableMap2DListener used to listen to Map2D Navigation events 
  * @author Johann Sorel
  */
 public interface NavigableMap2DListener extends EventListener{
 
+    /**
+     * called when action state of the map changed
+     * @param event : Map2DActionStateEvent
+     */
     public void mapActionStateChanged(Map2DActionStateEvent event);
     
     

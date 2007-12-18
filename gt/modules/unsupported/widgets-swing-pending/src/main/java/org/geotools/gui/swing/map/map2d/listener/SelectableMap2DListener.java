@@ -20,11 +20,15 @@ import java.util.EventListener;
 import org.geotools.gui.swing.map.map2d.event.Map2DSelectionEvent;
 
 /**
- *
+ * SelectableMap2DListener used to listen to Map2D Selection events 
  * @author Johann Sorel
  */
 public interface SelectableMap2DListener extends EventListener{
 
+    /**
+     * called when the map2D selection changed
+     * @param event : Map2DSelectionEvent
+     */
     public void mapSelectionChanged(Map2DSelectionEvent event);
     
 }

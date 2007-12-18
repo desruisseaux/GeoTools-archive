@@ -21,13 +21,21 @@ import org.geotools.gui.swing.map.map2d.event.Map2DContextEvent;
 import java.util.EventListener;
 
 /**
- *
+ * Map2DListener used to listen to Map2D events 
  * @author Johann Sorel
  */
 public interface Map2DListener extends EventListener{
 
+    /**
+     * called when Map2d MapArea changed
+     * @param event : Map2DMapAreaEvent
+     */
     public void mapAreaChanged(Map2DMapAreaEvent event);
     
+    /**
+     * called when MapContext changed
+     * @param event : Map2DContextEvent
+     */
     public void mapContextChanged(Map2DContextEvent event);
     
 }

@@ -24,7 +24,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -34,12 +33,12 @@ import javax.swing.RepaintManager;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
-import org.geotools.map.event.MapLayerListListener;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.shape.ShapefileRenderer;
 
 /**
- *
+ * optimized strategy using a Volatile image stored on graphic card memory
+ * fast rendering. must redraw everything each time.
  * @author Johann Sorel
  */
 public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
@@ -52,10 +51,17 @@ public class SingleVolatileImageStrategy extends AbstractRenderingStrategy {
     private Rectangle oldRect = null;
     private int nbthread = 0;
 
+    /**
+     * create a default SingleVolatileImageStrategy
+     */
     public SingleVolatileImageStrategy() {
         this(new ShapefileRenderer());
     }
 
+    /**
+     * create a default SingleVolatileImageStrategy with a specific GTRenderer
+     * @param renderer
+     */
     public SingleVolatileImageStrategy(GTRenderer renderer) {
         this.renderer = renderer;
         opimizeRenderer();

@@ -19,11 +19,15 @@ package org.geotools.gui.swing.map.map2d.listener;
 import java.util.EventListener;
 
 /**
- *
+ * StrategyListener used to listen to RenderingStrategy events 
  * @author Johann Sorel
  */
 public interface StrategyListener extends EventListener{
 
+    /**
+     * set the actual state of the strategy
+     * @param rendering : true if the strategy strat working, false when it stops
+     */
     public void setRendering(boolean rendering);
     
 }
