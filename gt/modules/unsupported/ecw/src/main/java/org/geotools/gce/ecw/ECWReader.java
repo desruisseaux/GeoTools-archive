@@ -97,11 +97,11 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	private String parentPath;
 
 	/**
-	 * Creates a new instance of a ECWReader basing the decision on whether the
-	 * file is compressed or not. I assume nothing about file extension.
+	 * Creates a new instance of a {@code ECWReader}. I assume nothing about
+	 * file extension.
 	 * 
 	 * @param input
-	 *            Source object for which we want to build an ECWReader.
+	 *            Source object for which we want to build an {@code ECWReader}.
 	 * @throws DataSourceException
 	 * @throws FactoryException
 	 * @throws MismatchedDimensionException
@@ -112,11 +112,11 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Creates a new instance of a ECWReader basing the decision on whether the
-	 * file is compressed or not. I assume nothing about file extension.
+	 * Creates a new instance of a {@code ECWReader}. I assume nothing about
+	 * file extension.
 	 * 
 	 * @param input
-	 *            Source object for which we want to build an ECWReader.
+	 *            Source object for which we want to build an {@code ECWReader}.
 	 * @param hints
 	 *            Hints to be used by this reader throughout his life.
 	 * @throws DataSourceException
@@ -244,11 +244,11 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 		final String worldFilePath = new StringBuffer(this.parentPath).append(
 				File.separatorChar).append(this.coverageName).toString();
 
-		// TODO: Check if "ers" is the right extension of ecw world files.
-		File file2Parse = new File(worldFilePath + ".ers");
+		// TODO: Check if "eww" is the right extension of ecw world files.
+		File file2Parse = new File(worldFilePath + ".eww");
 		boolean worldFileExists = file2Parse.exists();
-		if (!worldFileExists){
-			file2Parse=new File(worldFilePath + ".wld");
+		if (!worldFileExists) {
+			file2Parse = new File(worldFilePath + ".wld");
 			worldFileExists = file2Parse.exists();
 		}
 		if (worldFileExists) {
@@ -273,8 +273,8 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Given a <code>IIOMetadata</code> metadata object, retrieves several
-	 * properties to properly set envelope, gridrange and crs.
+	 * Given a {@codeIIOMetadata} metadata object, retrieves several properties
+	 * to properly set envelope, gridrange and crs.
 	 * 
 	 * @param commonMetadata
 	 */
@@ -397,7 +397,7 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Close the {@link InStream} {@link ImageInputStream} if we open it up on
+	 * Close the {@code InStream} {@code ImageInputStream} if we open it up on
 	 * purpose toread header info for this {@link AbstractGridCoverage2DReader}.
 	 * If the stream cannot be closed, we just reset and mark it.
 	 * 
@@ -710,11 +710,11 @@ public final class ECWReader extends AbstractGridCoverage2DReader implements
 			intersectionEnvelope.intersect(originalEnvelope);
 			intersectionEnvelope.setCoordinateReferenceSystem(this.crs);
 
-			// ///
+			// //
 			//
 			// Crop the sourced region
 			//
-			// ///
+			// //
 			try {
 				final GeneralGridRange finalRange = new GeneralGridRange(CRS
 						.transform(this.raster2Model.inverse(),

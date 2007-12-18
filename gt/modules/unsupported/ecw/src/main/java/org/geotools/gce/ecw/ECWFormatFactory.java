@@ -30,8 +30,8 @@ import org.opengis.coverage.grid.Format;
  * Implementation of the {@link Format} service provider interface for ECW
  * files.
  * 
- * @author Daniele Romagnoli
- * @author Simone Giannecchini (simboss)
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  */
 public final class ECWFormatFactory implements GridFormatFactorySpi {
 	/** Logger. */

@@ -111,11 +111,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <!-- SKIPING TEST AS TEST DATA WAS NOT FOUND -->
-      <properties>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
-
-
 </project>

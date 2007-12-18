@@ -16,16 +16,11 @@
  */
 package org.geotools.gce.ecw;
 
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.test.TestData;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -44,7 +39,7 @@ public final class ECWTest extends AbstractECWTestCase {
 	 * "Spatial Reference Information" paragraph where to find useful
 	 * information about Projection, in order to build a valid .prj file.
 	 */
-	private final static String fileName = "land_shallow_topo_21600.ecw";
+	private final static String fileName = "sampledata.ecw";
 
 	/**
 	 * Creates a new instance of ECWTest
@@ -77,27 +72,28 @@ public final class ECWTest extends AbstractECWTestCase {
 		final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader
 				.getFormat()).READ_GRIDGEOMETRY2D.createValue();
 		final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
-		final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
-				oldEnvelope.getLowerCorner().getOrdinate(0)
-						+ oldEnvelope.getLength(0) / 2,
-				oldEnvelope.getLowerCorner().getOrdinate(1)
-						+ oldEnvelope.getLength(1) / 2 }, new double[] {
-				oldEnvelope.getUpperCorner().getOrdinate(0),
-				oldEnvelope.getUpperCorner().getOrdinate(1) });
-		cropEnvelope.setCoordinateReferenceSystem(reader.getCrs());
-		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
-				600, 300)), cropEnvelope));
+//		final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
+//				oldEnvelope.getLowerCorner().getOrdinate(0)
+//						+ oldEnvelope.getLength(0) / 2,
+//				oldEnvelope.getLowerCorner().getOrdinate(1)
+//						+ oldEnvelope.getLength(1) / 2 }, new double[] {
+//				oldEnvelope.getUpperCorner().getOrdinate(0),
+//				oldEnvelope.getUpperCorner().getOrdinate(1) });
+//		cropEnvelope.setCoordinateReferenceSystem(reader.getCrs());
+//		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
+//				1375, 942)), cropEnvelope));
+		gg.setValue(new GridGeometry2D(reader.getOriginalGridRange(), oldEnvelope));
 		final GridCoverage2D gc = (GridCoverage2D) reader
 				.read(new GeneralParameterValue[] { gg });
 
 		assertNotNull(gc);
-		System.out.println(oldEnvelope);
-		System.out.println(gc.getEnvelope());
-		System.out.println(cropEnvelope);
-		//NOTE: in some cases might be too restrictive
-		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
-				.getScale(((AffineTransform) ((GridGeometry2D) gc
-						.getGridGeometry()).getGridToCRS2D())) / 2, true));
+//		System.out.println(oldEnvelope);
+//		System.out.println(gc.getEnvelope());
+//		System.out.println(cropEnvelope);
+//		//NOTE: in some cases might be too restrictive
+//		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
+//				.getScale(((AffineTransform) ((GridGeometry2D) gc
+//						.getGridGeometry()).getGridToCRS2D())) / 2, true));
 
 		if (TestData.isInteractiveTest()) {
 			gc.show();
