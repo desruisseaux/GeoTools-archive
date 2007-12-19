@@ -498,10 +498,13 @@ public class AngleFormat extends Format {
      *
      * @return The string buffer passed in as {@code toAppendTo}, with formatted text appended.
      */
-    public synchronized StringBuffer format(final double angle,
-                                            StringBuffer toAppendTo,
+    public synchronized StringBuffer format(final double angle, StringBuffer toAppendTo,
                                             final FieldPosition pos)
     {
+        if (Double.isNaN(angle) || Double.isInfinite(angle)) {
+            return numberFormat.format(angle, toAppendTo,
+                    (pos != null) ? pos : new FieldPosition(DecimalFormat.INTEGER_FIELD));
+        }
         double degrees = angle;
         /*
          * Calcule à l'avance les minutes et les secondes. Si les minutes et secondes
@@ -514,7 +517,7 @@ public class AngleFormat extends Format {
         double secondes = Double.NaN;
         if (width1!=0 && !Double.isNaN(angle)) {
             int tmp = (int) degrees; // Arrondie vers 0 même si négatif.
-            minutes = Math.abs(degrees-tmp)*60;
+            minutes = Math.abs(degrees - tmp) * 60;
             degrees = tmp;
             if (minutes<0 || minutes>60) {
                 // Erreur d'arrondissement (parce que l'angle est trop élevé)
@@ -522,7 +525,7 @@ public class AngleFormat extends Format {
             }
             if (width2 != 0) {
                 tmp      = (int) minutes; // Arrondie vers 0 même si négatif.
-                secondes = (minutes-tmp)*60;
+                secondes = (minutes - tmp) * 60;
                 minutes  = tmp;
                 if (secondes<0 || secondes>60) {
                     // Erreur d'arrondissement (parce que l'angle est trop élevé)

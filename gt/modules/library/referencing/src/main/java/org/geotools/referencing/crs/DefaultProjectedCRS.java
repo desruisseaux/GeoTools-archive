@@ -68,6 +68,11 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
     private static final long serialVersionUID = -4502680112031773028L;
 
     /**
+     * Name of the {@value} projection parameter, which is handled specially during WKT formatting.
+     */
+    private static final String SEMI_MAJOR="semi_major", SEMI_MINOR="semi_minor";
+
+    /**
      * Constructs a new projected CRS with the same values than the specified one.
      * This copy constructor provides a way to wrap an arbitrary implementation into a
      * Geotools one or a user-defined one (as a subclass), usually in order to leverage
@@ -291,7 +296,7 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
         for (final GeneralParameterValue param : conversionFromBase.getParameterValues().values()) {
             final GeneralParameterDescriptor desc = param.getDescriptor();
             String name;
-            if (nameMatches(desc, name="semi_major") || nameMatches(desc, name="semi_minor")) {
+            if (nameMatches(desc, name=SEMI_MAJOR) || nameMatches(desc, name=SEMI_MINOR)) {
                 /*
                  * Do not format semi-major and semi-minor axis length in most cases, since those
                  * informations are provided in the ellipsoid. An exception occurs if the lengths
@@ -299,7 +304,7 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
                  */
                 if (param instanceof ParameterValue) {
                     final double value = ((ParameterValue) param).doubleValue(axisUnit);
-                    final double expected = (name == "semi_minor") ? // using '==' is okay here.
+                    final double expected = (name == SEMI_MINOR) ? // using '==' is okay here.
                             ellipsoid.getSemiMinorAxis() : ellipsoid.getSemiMajorAxis();
                     if (value == expected) {
                         continue;

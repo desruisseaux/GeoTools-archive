@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -72,6 +72,9 @@ public final class BoundingBoxes {
      * Initialize a geographic bounding box from the specified envelope. If the envelope contains
      * a CRS, then the bounding box will be projected to the {@linkplain DefaultGeographicCRS#WGS84
      * WGS 84} CRS. Otherwise, the envelope is assumed already in WGS 84 CRS.
+     *
+     * @param envelope The source envelope.
+     * @param box The target bounding box.
      */
     public static void copy(Envelope envelope, final GeographicBoundingBoxImpl box)
             throws TransformException
@@ -129,5 +132,5 @@ public final class BoundingBoxes {
                 .append(format.format(new Longitude(box.getWestBoundLongitude()))).append(" - ")
                 .append(format.format(new  Latitude(box.getSouthBoundLatitude()))).append(", ")
                 .append(format.format(new Longitude(box.getEastBoundLongitude()))).toString();
-    }    
+    }
 }

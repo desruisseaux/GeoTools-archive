@@ -115,8 +115,7 @@ public class ManyAuthoritiesFactory extends AuthorityFactoryAdapter implements C
         super(NORMAL_PRIORITY);
         inProgress = new ThreadLocal<Boolean>();
         if (factories!=null && !factories.isEmpty()) {
-            for (final Iterator it=factories.iterator(); it.hasNext();) {
-                final Object factory = it.next();
+            for (final AuthorityFactory factory : factories) {
                 if (factory instanceof Factory) {
                     hints.putAll(((Factory) factory).getImplementationHints());
                 }

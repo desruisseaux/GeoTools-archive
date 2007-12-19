@@ -18,7 +18,6 @@ package org.geotools.resources.image;
 
 import java.awt.Dimension;
 import java.awt.RenderingHints;
-import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.Iterator;
@@ -30,13 +29,10 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.BorderExtender;
-import javax.media.jai.BorderExtenderCopy;
-import javax.media.jai.BorderExtenderReflect;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
-import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 

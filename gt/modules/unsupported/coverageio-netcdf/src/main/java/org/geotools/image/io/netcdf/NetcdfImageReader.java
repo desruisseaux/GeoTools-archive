@@ -642,7 +642,7 @@ scan:       while (it.hasNext()) {
         if (variables != null) {
             for (final Variable variable : variables) {
                 if (variable!=null && name.equalsIgnoreCase(variable.getName())) {
-                    return candidate;
+                    return variable;
                 }
             }
         }

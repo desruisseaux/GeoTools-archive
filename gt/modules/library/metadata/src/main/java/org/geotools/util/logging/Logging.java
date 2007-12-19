@@ -592,7 +592,7 @@ public final class Logging {
                                                final String method, final Throwable error)
     {
         final String classname = (classe != null) ? classe.getName() : null;
-        return unexpectedException(logger, classname, method, error, Level.FINER);
+        return unexpectedException(logger, classname, method, error, Level.FINE);
     }
 
     /**
