@@ -31,7 +31,6 @@ import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
 import org.geotools.gui.swing.icon.IconBundle;
-import org.geotools.gui.swing.map.Map;
 import org.geotools.gui.swing.map.MapConstants;
 import org.geotools.gui.swing.map.map2d.Map2D;
 import org.geotools.gui.swing.map.map2d.NavigableMap2D;

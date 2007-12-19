@@ -33,7 +33,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.contexttree.column.TreeTableColumn;
 import org.geotools.gui.swing.contexttree.renderer.DefaultContextTreeHeaderRenderer;
-import org.geotools.gui.swing.contexttree.renderer.DefaultHeaderRenderer;
 import org.geotools.gui.swing.contexttree.renderer.HeaderInfo;
 import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.misc.FacilitiesFactory;
