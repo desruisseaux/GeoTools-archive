@@ -2667,12 +2667,12 @@ public class WMSComplexTypes {
 					styles.add(value[i].getValue());
 				}
 				if (sameName(elems[16], value[i])) {
-					Double max = (Double) value[i].getValue();
-					layer.setScaleDenominatorMax(max.doubleValue());
-				}
-				if (sameName(elems[17], value[i])) {
 					Double min = (Double) value[i].getValue();
 					layer.setScaleDenominatorMin(min.doubleValue());
+				}
+				if (sameName(elems[17], value[i])) {
+					Double max = (Double) value[i].getValue();
+					layer.setScaleDenominatorMax(max.doubleValue());
 				}
 				if (sameName(elems[18], value[i])) {
 					Layer childLayer = (Layer) value[i].getValue();
