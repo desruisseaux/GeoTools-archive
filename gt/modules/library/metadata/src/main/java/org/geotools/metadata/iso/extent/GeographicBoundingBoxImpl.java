@@ -24,6 +24,7 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import static java.lang.Double.doubleToLongBits;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
@@ -184,6 +185,23 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     }
 
     /**
+     * Sets the bounding box to the specified values.
+     *
+     * @since 2.5
+     */
+    public synchronized void setBounds(final double westBoundLongitude,
+                                       final double eastBoundLongitude,
+                                       final double southBoundLatitude,
+                                       final double northBoundLatitude)
+    {
+        checkWritePermission();
+        setWestBoundLongitude(westBoundLongitude);
+        setEastBoundLongitude(eastBoundLongitude);
+        setSouthBoundLatitude(southBoundLatitude);
+        setNorthBoundLatitude(northBoundLatitude);
+    }
+
+    /**
      * Returns the western-most coordinate of the limit of the
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
@@ -271,7 +289,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Adds a geographic bounding box to this box. If the {@linkplain #getInclusion inclusion}
      * status is the same for this box and the box to be added, then the resulting bounding box
      * is the union of the two boxes. If the {@linkplain #getInclusion inclusion} status are
-     * opposite (<cite>exclusion</cite>), then this method attempt to exclude the some area of
+     * opposite (<cite>exclusion</cite>), then this method attempt to exclude some area of
      * specified box from this box. The resulting bounding box is smaller if the exclusion can
      * be performed without ambiguity.
      *
@@ -308,6 +326,35 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     }
 
     /**
+     * Sets this bounding box to the intersection of this box with the specified one.
+     * The {@linkplain #getInclusion inclusion} status must be the same for both boxes.
+     *
+     * @since 2.5
+     */
+    public synchronized void intersect(final GeographicBoundingBox box) {
+        checkWritePermission();
+        final Boolean inc1 =     getInclusion(); ensureNonNull("inclusion", inc1);
+        final Boolean inc2 = box.getInclusion(); ensureNonNull("inclusion", inc2);
+        if (inc1.booleanValue() != inc2.booleanValue()) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "box"));
+        }
+        final double xmin = box.getWestBoundLongitude();
+        final double xmax = box.getEastBoundLongitude();
+        final double ymin = box.getSouthBoundLatitude();
+        final double ymax = box.getNorthBoundLatitude();
+        if (xmin > westBoundLongitude) westBoundLongitude = xmin;
+        if (xmax < eastBoundLongitude) eastBoundLongitude = xmax;
+        if (ymin > southBoundLatitude) southBoundLatitude = ymin;
+        if (ymax < northBoundLatitude) northBoundLatitude = ymax;
+        if (westBoundLongitude > eastBoundLongitude) {
+            westBoundLongitude = eastBoundLongitude = 0.5 * (westBoundLongitude + eastBoundLongitude);
+        }
+        if (southBoundLatitude > northBoundLatitude) {
+            southBoundLatitude = northBoundLatitude = 0.5 * (southBoundLatitude + northBoundLatitude);
+        }
+    }
+
+    /**
      * Compares this geographic bounding box with the specified object for equality.
      */
     @Override
@@ -319,14 +366,14 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         if (object!=null && object.getClass().equals(GeographicBoundingBoxImpl.class)) {
             final GeographicBoundingBoxImpl that = (GeographicBoundingBoxImpl) object;
             return Utilities.equals(this.getInclusion(), that.getInclusion()) &&
-                   Double.doubleToLongBits(this.southBoundLatitude) ==
-                   Double.doubleToLongBits(that.southBoundLatitude) &&
-                   Double.doubleToLongBits(this.northBoundLatitude) ==
-                   Double.doubleToLongBits(that.northBoundLatitude) &&
-                   Double.doubleToLongBits(this.eastBoundLongitude) ==
-                   Double.doubleToLongBits(that.eastBoundLongitude) &&
-                   Double.doubleToLongBits(this.westBoundLongitude) ==
-                   Double.doubleToLongBits(that.westBoundLongitude);
+                   doubleToLongBits(this.southBoundLatitude) ==
+                   doubleToLongBits(that.southBoundLatitude) &&
+                   doubleToLongBits(this.northBoundLatitude) ==
+                   doubleToLongBits(that.northBoundLatitude) &&
+                   doubleToLongBits(this.eastBoundLongitude) ==
+                   doubleToLongBits(that.eastBoundLongitude) &&
+                   doubleToLongBits(this.westBoundLongitude) ==
+                   doubleToLongBits(that.westBoundLongitude);
         }
         return super.equals(object);
     }
@@ -354,7 +401,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Returns a hash code value for the specified {@code double}.
      */
     private static int hashCode(final double value) {
-        final long code = Double.doubleToLongBits(value);
+        final long code = doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32);
     }
 
