@@ -121,11 +121,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
          * issue (todo).
          */
         super();
-        setInclusion         (box.getInclusion());
-        setWestBoundLongitude(box.getWestBoundLongitude());
-        setEastBoundLongitude(box.getEastBoundLongitude());
-        setSouthBoundLatitude(box.getSouthBoundLatitude());
-        setNorthBoundLatitude(box.getNorthBoundLatitude());
+        setBounds(box);
     }
 
     /**
@@ -178,27 +174,8 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                                      final double northBoundLatitude)
     {
         super(true);
-        setWestBoundLongitude(westBoundLongitude);
-        setEastBoundLongitude(eastBoundLongitude);
-        setSouthBoundLatitude(southBoundLatitude);
-        setNorthBoundLatitude(northBoundLatitude);
-    }
-
-    /**
-     * Sets the bounding box to the specified values.
-     *
-     * @since 2.5
-     */
-    public synchronized void setBounds(final double westBoundLongitude,
-                                       final double eastBoundLongitude,
-                                       final double southBoundLatitude,
-                                       final double northBoundLatitude)
-    {
-        checkWritePermission();
-        setWestBoundLongitude(westBoundLongitude);
-        setEastBoundLongitude(eastBoundLongitude);
-        setSouthBoundLatitude(southBoundLatitude);
-        setNorthBoundLatitude(northBoundLatitude);
+        setBounds(westBoundLongitude, eastBoundLongitude,
+                  southBoundLatitude, northBoundLatitude);
     }
 
     /**
@@ -283,6 +260,35 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     public synchronized void setNorthBoundLatitude(final double newValue) {
         checkWritePermission();
         northBoundLatitude = newValue;
+    }
+
+    /**
+     * Sets the bounding box to the specified values.
+     *
+     * @since 2.5
+     */
+    public synchronized void setBounds(final double westBoundLongitude,
+                                       final double eastBoundLongitude,
+                                       final double southBoundLatitude,
+                                       final double northBoundLatitude)
+    {
+        checkWritePermission();
+        this.westBoundLongitude = westBoundLongitude;
+        this.eastBoundLongitude = eastBoundLongitude;
+        this.southBoundLatitude = southBoundLatitude;
+        this.northBoundLatitude = northBoundLatitude;
+    }
+
+    /**
+     * Sets the bounding box to the same values than the specified box.
+     *
+     * @since 2.5
+     */
+    public void setBounds(final GeographicBoundingBox box) {
+        ensureNonNull("box", box);
+        setInclusion(box.getInclusion());
+        setBounds(box.getWestBoundLongitude(), box.getEastBoundLongitude(),
+                  box.getSouthBoundLatitude(), box.getNorthBoundLatitude());
     }
 
     /**

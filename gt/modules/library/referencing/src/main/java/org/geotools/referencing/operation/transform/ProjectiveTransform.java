@@ -499,6 +499,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                     throw new NoninvertibleTransformException(Errors.format(
                               ErrorKeys.NONINVERTIBLE_TRANSFORM), exception);
                 } catch (MismatchedSizeException exception) {
+                    // This exception is thrown if the matrix is not square.
                     throw new NoninvertibleTransformException(Errors.format(
                               ErrorKeys.NONINVERTIBLE_TRANSFORM), exception);
                 }
