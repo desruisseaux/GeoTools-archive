@@ -24,10 +24,10 @@ import javax.media.jai.JAI;
 import junit.framework.TestCase;
 
 /**
- * @author Giannecchini Simone
- * @author Romagnoli Daniele
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  * 
- * @source $URL:
+ * Base testing class initializing JAI properties to be used during tests.
  */
 public abstract class AbstractMrSIDTestCase extends TestCase {
 

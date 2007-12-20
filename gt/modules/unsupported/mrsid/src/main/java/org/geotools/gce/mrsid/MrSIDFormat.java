@@ -39,8 +39,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 /**
  * An implementation a {@link Format} for the MrSID format.
  * 
- * @author Daniele Romagnoli
- * @author Simone Giannecchini (simboss)
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  */
 public final class MrSIDFormat extends AbstractGridFormat implements Format {
 	private final static Logger LOGGER = org.geotools.util.logging.Logging
@@ -137,7 +137,6 @@ public final class MrSIDFormat extends AbstractGridFormat implements Format {
 			re.initCause(e);
 			throw re;
 		}
-
 	}
 
 	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {

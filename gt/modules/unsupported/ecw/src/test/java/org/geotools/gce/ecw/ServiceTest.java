@@ -18,8 +18,6 @@ package org.geotools.gce.ecw;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.opengis.referencing.FactoryException;
@@ -28,8 +26,8 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 /**
  * Class for testing availaibility of ECW format factory
  * 
- * @author Simone Giannecchini
- * @author Daniele Romagnoli
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  */
 public class ServiceTest extends AbstractECWTestCase {
 

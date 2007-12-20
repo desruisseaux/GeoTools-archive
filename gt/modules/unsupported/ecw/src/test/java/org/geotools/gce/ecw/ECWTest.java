@@ -25,6 +25,12 @@ import org.geotools.test.TestData;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 
+/**
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
+ * 
+ * Testing {@link ECWReader}
+ */
 public final class ECWTest extends AbstractECWTestCase {
 
 	/**
@@ -42,7 +48,7 @@ public final class ECWTest extends AbstractECWTestCase {
 	private final static String fileName = "sampledata.ecw";
 
 	/**
-	 * Creates a new instance of ECWTest
+	 * Creates a new instance of {@code ECWTest}
 	 * 
 	 * @param name
 	 */
@@ -61,8 +67,8 @@ public final class ECWTest extends AbstractECWTestCase {
 		// read in the grid coverage
 		if (fileName.equalsIgnoreCase("")) {
 			LOGGER
-					.info("===================================================================\n"
-							+ " Warning! No valid test File has been yet specified.\n"
+					.info("==================================================================\n"
+							+ " Warning! No valid test File has been specified.\n"
 							+ " Please provide a valid sample in the source code and repeat this test!\n"
 							+ "========================================================================");
 			return;
@@ -72,28 +78,31 @@ public final class ECWTest extends AbstractECWTestCase {
 		final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader
 				.getFormat()).READ_GRIDGEOMETRY2D.createValue();
 		final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
-//		final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
-//				oldEnvelope.getLowerCorner().getOrdinate(0)
-//						+ oldEnvelope.getLength(0) / 2,
-//				oldEnvelope.getLowerCorner().getOrdinate(1)
-//						+ oldEnvelope.getLength(1) / 2 }, new double[] {
-//				oldEnvelope.getUpperCorner().getOrdinate(0),
-//				oldEnvelope.getUpperCorner().getOrdinate(1) });
-//		cropEnvelope.setCoordinateReferenceSystem(reader.getCrs());
-//		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
-//				1375, 942)), cropEnvelope));
-		gg.setValue(new GridGeometry2D(reader.getOriginalGridRange(), oldEnvelope));
+		// final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[]
+		// {
+		// oldEnvelope.getLowerCorner().getOrdinate(0)
+		// + oldEnvelope.getLength(0) / 2,
+		// oldEnvelope.getLowerCorner().getOrdinate(1)
+		// + oldEnvelope.getLength(1) / 2 }, new double[] {
+		// oldEnvelope.getUpperCorner().getOrdinate(0),
+		// oldEnvelope.getUpperCorner().getOrdinate(1) });
+		// cropEnvelope.setCoordinateReferenceSystem(reader.getCrs());
+		// gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0,
+		// 0,
+		// 1375, 942)), cropEnvelope));
+		gg.setValue(new GridGeometry2D(reader.getOriginalGridRange(),
+				oldEnvelope));
 		final GridCoverage2D gc = (GridCoverage2D) reader
 				.read(new GeneralParameterValue[] { gg });
 
 		assertNotNull(gc);
-//		System.out.println(oldEnvelope);
-//		System.out.println(gc.getEnvelope());
-//		System.out.println(cropEnvelope);
-//		//NOTE: in some cases might be too restrictive
-//		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
-//				.getScale(((AffineTransform) ((GridGeometry2D) gc
-//						.getGridGeometry()).getGridToCRS2D())) / 2, true));
+		// System.out.println(oldEnvelope);
+		// System.out.println(gc.getEnvelope());
+		// System.out.println(cropEnvelope);
+		// //NOTE: in some cases might be too restrictive
+		// assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
+		// .getScale(((AffineTransform) ((GridGeometry2D) gc
+		// .getGridGeometry()).getGridToCRS2D())) / 2, true));
 
 		if (TestData.isInteractiveTest()) {
 			gc.show();

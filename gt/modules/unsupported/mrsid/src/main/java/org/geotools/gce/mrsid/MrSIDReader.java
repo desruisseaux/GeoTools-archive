@@ -77,14 +77,12 @@ import org.opengis.referencing.operation.TransformException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import com.vividsolutions.jts.io.InStream;
-
 /**
  * This class can read a MrSID data source and create a {@link GridCoverage2D}
  * from the data.
  * 
- * @author Daniele Romagnoli
- * @author Simone Giannecchini (simboss)
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  */
 public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
@@ -92,18 +90,18 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	private final static Logger LOGGER = org.geotools.util.logging.Logging
 			.getLogger("org.geotools.gce.mrsid");
 
-	/** Caches an ImageReaderSpi for a MrSIDImageReader. */
+	/** Caches an {@code ImageReaderSpi} for a {@code MrSIDImageReader}. */
 	private final static ImageReaderSpi readerSPI = new MrSIDImageReaderSpi();
 
 	/** Absolute path to the parent dir for this coverage. */
 	private String parentPath;
 
 	/**
-	 * Creates a new instance of a MrSIDReader. I assume nothing about file
-	 * extension.
+	 * Creates a new instance of a {@link MrSIDReader}. I assume nothing about
+	 * file extension.
 	 * 
 	 * @param input
-	 *            Source object for which we want to build an MrSIDReader.
+	 *            Source object for which we want to build a {@link MrSIDReader}.
 	 * @throws DataSourceException
 	 * @throws FactoryException
 	 * @throws MismatchedDimensionException
@@ -114,11 +112,11 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Creates a new instance of a MrSIDReader. I assume nothing about file
-	 * extension.
+	 * Creates a new instance of a {@link MrSIDReader}. I assume nothing about
+	 * file extension.
 	 * 
 	 * @param input
-	 *            Source object for which we want to build an MrSIDReader.
+	 *            Source object for which we want to build a {@link MrSIDReader}.
 	 * @param hints
 	 *            Hints to be used by this reader throughout his life.
 	 * @throws DataSourceException
@@ -162,7 +160,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 
 			// //
 			//
-			// Informations about multiple levels and such
+			// Information about multiple levels and such
 			//
 			// //
 			getResolutionInfo(reader);
@@ -185,18 +183,18 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Setting Envelope, GridRange and CRS from the given
-	 * <code>ImageReader</code>
+	 * Setting Envelope, GridRange and CRS from the given {@code ImageReader}
 	 * 
 	 * @param reader
-	 *            the <code>ImageReader</code> from which to retrieve metadata
-	 *            (if available) for setting properties
+	 *            the {@code ImageReader} from which to retrieve metadata (if
+	 *            available) for setting properties
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 * @throws TransformException
+	 * @throws MismatchedDimensionException
 	 */
 	private void setOriginalProperties(ImageReader reader) throws IOException,
-			IllegalStateException, TransformException {
+			IllegalStateException, TransformException, MismatchedDimensionException {
 
 		// //
 		//
@@ -241,18 +239,17 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Given a <code>IIOMetadata</code> metadata object, retrieves several
+	 * Given a {@code IIOMetadata} metadata object, retrieves several
 	 * properties to properly set envelope, gridrange and crs.
 	 * 
-	 * @param commonMetadata
+	 * @param metadata
 	 */
 	private void getPropertiesFromCommonMetadata(IIOMetadata metadata) {
 		// casting metadata
 		final GDALCommonIIOImageMetadata commonMetadata = (GDALCommonIIOImageMetadata) metadata;
-		final GDALDatasetWrapper dsWrapper = commonMetadata.getDsWrapper();
 
 		// setting CRS and Envelope directly from GDAL, if available
-		final String wkt = dsWrapper.getProjection();
+		final String wkt = commonMetadata.getProjection();
 		if (wkt != null && !(wkt.equalsIgnoreCase("")))
 			try {
 				crs = CRS.parseWKT(wkt);
@@ -264,13 +261,13 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 				crs = null;
 			}
 
-		final int hrWidth = dsWrapper.getWidth();
-		final int hrHeight = dsWrapper.getHeight();
+		final int hrWidth = commonMetadata.getWidth();
+		final int hrHeight = commonMetadata.getHeight();
 		originalGridRange = new GeneralGridRange(new Rectangle(0, 0, hrWidth,
 				hrHeight));
 
 		// getting Grid Properties
-		final double geoTransform[] = dsWrapper.getGeoTransformation();
+		final double geoTransform[] = commonMetadata.getGeoTransformation();
 		if (geoTransform != null && geoTransform.length == 6) {
 			final AffineTransform tempTransform = new AffineTransform(
 					geoTransform[1], geoTransform[4], geoTransform[2],
@@ -293,75 +290,6 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 			}
 		}
 
-		// final Node root = commonMetadata
-		// .getAsTree(GDALCommonIIOImageMetadata.nativeMetadataFormatName);
-		//
-		// Node child = root.getFirstChild();
-		// NamedNodeMap attributes = child.getAttributes();
-		//
-		// // setting CRS and Envelope directly from GDAL, if available
-		// final String wkt =
-		// attributes.getNamedItem("projection").getNodeValue();
-		// if (wkt != null && !(wkt.equalsIgnoreCase("")))
-		// try {
-		// crs = CRS.parseWKT(wkt);
-		//
-		// } catch (FactoryException fe) {
-		// // unable to get CRS from WKT
-		// if (LOGGER.isLoggable(Level.WARNING))
-		// LOGGER.log(Level.WARNING, fe.getLocalizedMessage(), fe);
-		// crs = null;
-		// }
-		//
-		// child = child.getNextSibling();
-		//
-		// // getting Grid Properties
-		// attributes = child.getAttributes();
-		// final int hrWidth = Integer.parseInt(attributes.getNamedItem("width")
-		// .getNodeValue());
-		// final int hrHeight =
-		// Integer.parseInt(attributes.getNamedItem("height")
-		// .getNodeValue());
-		// originalGridRange = new GeneralGridRange(new Rectangle(0, 0, hrWidth,
-		// hrHeight));
-		//
-		// child = child.getNextSibling();
-		// // getting Grid Properties
-		// attributes = child.getAttributes();
-		// final String m0 = attributes.getNamedItem("m0").getNodeValue();
-		// final String m1 = attributes.getNamedItem("m1").getNodeValue();
-		// final String m2 = attributes.getNamedItem("m2").getNodeValue();
-		// final String m3 = attributes.getNamedItem("m3").getNodeValue();
-		// final String m4 = attributes.getNamedItem("m4").getNodeValue();
-		// final String m5 = attributes.getNamedItem("m5").getNodeValue();
-		// if (m0 != null && m1 != null && m2 != null && m3 != null && m4 !=
-		// null
-		// && m5 != null && !(m0.trim().equalsIgnoreCase(""))
-		// && !(m1.trim().equalsIgnoreCase(""))
-		// && !(m2.trim().equalsIgnoreCase(""))
-		// && !(m3.trim().equalsIgnoreCase(""))
-		// && !(m4.trim().equalsIgnoreCase(""))
-		// && !(m5.trim().equalsIgnoreCase(""))) {
-		//
-		// final AffineTransform tempTransform = new AffineTransform(Double
-		// .parseDouble(m1), Double.parseDouble(m4), Double
-		// .parseDouble(m2), Double.parseDouble(m5), Double
-		// .parseDouble(m0), Double.parseDouble(m3));
-		// // tempTransform.translate(-0.5, -0.5);
-		// this.raster2Model = ProjectiveTransform.create(tempTransform);
-		// try {
-		//
-		// // Setting Envelope
-		// originalEnvelope = CRS.transform(raster2Model,
-		// new GeneralEnvelope(originalGridRange.toRectangle()));
-		// } catch (IllegalStateException e) {
-		// if (LOGGER.isLoggable(Level.WARNING))
-		// LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-		// } catch (TransformException e) {
-		// if (LOGGER.isLoggable(Level.WARNING))
-		// LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-		// }
-		// }
 	}
 
 	/**
@@ -375,11 +303,16 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	private void checkForWorldFile() throws IllegalStateException,
 			TransformException, IOException {
 
-		String worldFilePath = new StringBuffer(this.parentPath).append(
-				File.separatorChar).append(this.coverageName).append(".sdw")
-				.toString();
-		File file2Parse = new File(worldFilePath);
-		if (file2Parse.exists()) {
+		final String worldFilePath = new StringBuffer(this.parentPath).append(
+				File.separatorChar).append(this.coverageName).toString();
+
+		File file2Parse = new File(worldFilePath + ".sdw");
+		boolean worldFileExists = file2Parse.exists();
+		if (!worldFileExists) {
+			file2Parse = new File(worldFilePath + ".wld");
+			worldFileExists = file2Parse.exists();
+		}
+		if (worldFileExists) {
 			final WorldFileReader reader = new WorldFileReader(file2Parse);
 			raster2Model = reader.getTransform();
 
@@ -401,9 +334,10 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * Close the {@link InStream} {@link ImageInputStream} if we open it up on
-	 * purpose toread header info for this {@link AbstractGridCoverage2DReader}.
-	 * If the stream cannot be closed, we just reset and mark it.
+	 * Close the {@code InStream} {@code ImageInputStream} if if we open it up
+	 * on purpose toread header info for this
+	 * {@link AbstractGridCoverage2DReader}. If the stream cannot be closed, we
+	 * just reset and mark it.
 	 * 
 	 * @throws IOException
 	 */
@@ -421,7 +355,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * other objects and flags accordingly.
 	 * 
 	 * @param input
-	 *            provided to this {@link MrSIDReader}. *
+	 *            provided to this {@link MrSIDReader}.
 	 * @param hints
 	 *            Hints to be used by this reader throughout his life.
 	 * 
@@ -609,9 +543,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * This method creates the GridCoverage2D from the underlying file.
 	 * 
 	 * @param requestedDim
-	 * @param useJAIImageRead
 	 * @param readEnvelope
-	 * 
 	 * 
 	 * @return a GridCoverage
 	 * 
@@ -717,6 +649,13 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 								intersectionEnvelope));
 				// CROP
 				sourceRegion = finalRange.toRectangle();
+				if (!sourceRegion.intersects(this.originalGridRange
+						.toRectangle()))
+					sourceRegion = null;
+				else
+					sourceRegion = sourceRegion
+							.intersection(this.originalGridRange.toRectangle());
+
 			} catch (NoninvertibleTransformException e) {
 				if (LOGGER.isLoggable(Level.WARNING))
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
@@ -878,6 +817,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @throws FactoryException
 	 * @throws IOException
 	 * @throws FileNotFoundException
+	 * 
+	 * TODO: move this method to the parent class
 	 */
 	private void getCoordinateReferenceSystemFromPrj()
 			throws FileNotFoundException, IOException {
@@ -916,7 +857,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					} catch (IOException e) {
 						// warn about the error but proceed, it is not fatal
 						// we have at least the default crs to use
-						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+						LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
 					}
 			}
 		}

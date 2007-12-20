@@ -28,8 +28,8 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 /**
  * Class for testing availaibility of MrSID format factory
  * 
- * @author Simone Giannecchini
- * @author Daniele Romagnoli
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  */
 public class ServiceTest extends TestCase {
 

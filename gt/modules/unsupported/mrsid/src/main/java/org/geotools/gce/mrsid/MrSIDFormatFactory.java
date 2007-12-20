@@ -31,31 +31,34 @@ import org.opengis.coverage.grid.Format;
  * Implementation of the {@link Format} service provider interface for MrSID
  * files.
  * 
- * @author Daniele Romagnoli
- * @author Simone Giannecchini (simboss)
+ * @author Daniele Romagnoli, GeoSolutions
+ * @author Simone Giannecchini (simboss), GeoSolutions
  */
 public final class MrSIDFormatFactory implements GridFormatFactorySpi {
 	/** Logger. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.mrsid");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger("org.geotools.gce.mrsid");
 
 	/**
 	 * Tells me if the coverage plugin to access MrSID is availaible or not.
 	 * 
-	 * @return True if the plugin is availaible, False otherwise.
+	 * @return {@code true} if the plugin is availaible, {@code false}
+	 *         otherwise.
 	 */
 	public boolean isAvailable() {
 		boolean available = true;
 
-		// if these classes are here, then the runtine environment has
+		// if these classes are here, then the runtime environment has
 		// access to JAI and the JAI ImageI/O toolbox.
 		try {
 
 			Class.forName("javax.media.jai.JAI");
 			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-			
-			Class.forName("it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi");
+
+			Class
+					.forName("it.geosolutions.imageio.plugins.mrsid.MrSIDImageReaderSpi");
 			available = MrSIDImageReaderSpi.isAvailable();
-			MrSIDImageReaderSpi spi = new MrSIDImageReaderSpi();
+			final MrSIDImageReaderSpi spi = new MrSIDImageReaderSpi();
 			available = available && spi.isDriverAvailable();
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("MrSIDFormatFactory is availaible.");
@@ -68,9 +71,9 @@ public final class MrSIDFormatFactory implements GridFormatFactorySpi {
 	}
 
 	/**
-	 * Creating a {@link MrSIDFormat}.
+	 * Creating a {@link MrSIDFormat}
 	 * 
-	 * @return A {@link MrSIDFormat}.;
+	 * @return A {@link MrSIDFormat}
 	 */
 	public Format createFormat() {
 		return new MrSIDFormat();

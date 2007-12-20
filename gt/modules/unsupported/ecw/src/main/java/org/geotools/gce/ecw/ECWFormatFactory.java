@@ -35,26 +35,29 @@ import org.opengis.coverage.grid.Format;
  */
 public final class ECWFormatFactory implements GridFormatFactorySpi {
 	/** Logger. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.gce.ecw");
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger("org.geotools.gce.ecw");
 
 	/**
 	 * Tells me if the coverage plugin to access ECW is availaible or not.
 	 * 
-	 * @return True if the plugin is availaible, False otherwise.
+	 * @return {@code true} if the plugin is availaible, {@code false}
+	 *         otherwise.
 	 */
 	public boolean isAvailable() {
 		boolean available = true;
 
-		// if these classes are here, then the runtine environment has
+		// if these classes are here, then the runtime environment has
 		// access to JAI and the JAI ImageI/O toolbox.
 		try {
 
 			Class.forName("javax.media.jai.JAI");
 			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-			
-			Class.forName("it.geosolutions.imageio.plugins.ecw.ECWImageReaderSpi");
+
+			Class
+					.forName("it.geosolutions.imageio.plugins.ecw.ECWImageReaderSpi");
 			available = ECWImageReaderSpi.isAvailable();
-			ECWImageReaderSpi spi = new ECWImageReaderSpi();
+			final ECWImageReaderSpi spi = new ECWImageReaderSpi();
 			available = available && spi.isDriverAvailable();
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("ECWFormatFactory is availaible.");
@@ -68,9 +71,9 @@ public final class ECWFormatFactory implements GridFormatFactorySpi {
 	}
 
 	/**
-	 * Creating a {@link ECWFormat}.
+	 * Creating a {@link ECWFormat}
 	 * 
-	 * @return A {@link ECWFormat}.;
+	 * @return A {@link ECWFormat}
 	 */
 	public Format createFormat() {
 		return new ECWFormat();
@@ -79,8 +82,6 @@ public final class ECWFormatFactory implements GridFormatFactorySpi {
 	/**
 	 * Returns the implementation hints. The default implementation returns en
 	 * empty map.
-	 * 
-	 * @return DOCUMENT ME!
 	 */
 	public Map getImplementationHints() {
 		return Collections.EMPTY_MAP;
