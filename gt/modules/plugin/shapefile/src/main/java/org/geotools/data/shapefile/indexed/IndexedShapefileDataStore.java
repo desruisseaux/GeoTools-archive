@@ -451,7 +451,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	protected Reader getAttributesReader(boolean readDbf, boolean readGeometry,
 			Filter filter) throws IOException {
-		Envelope bbox = null;
+		Envelope bbox = new ReferencedEnvelope(); // will be bbox.isNull() to start
 
 		Collection<Data> goodRecs = null;
 		if (filter instanceof Id && fixURL!=null ) {
@@ -461,15 +461,17 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			goodRecs = queryFidIndex( (Set<String>) fids );
 		} else {
 			if (filter != null) {
- 			    //FilterConsumer fc = new FilterConsumer();
-                //Filters.accept(filter,fc);                
-			    ExtractBoundsFilterVisitor fc = new ExtractBoundsFilterVisitor( null );
-				filter.accept(fc, null );
-				
-				bbox = fc.getBounds();
+			    // Add additional bounds from the filter
+			    // will be null for Filter.EXCLUDES			    
+			    bbox = (Envelope) filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, bbox );
+			    if( bbox == null ) {
+			        bbox = new ReferencedEnvelope();
+			        // we hit Filter.EXCLUDES consider returning an empty reader?
+			        // (however should simplify the filter to detect ff.not( fitler.EXCLUDE )
+			    }
 			}
 
-			if ((bbox != null) && this.useIndex) {
+			if (!bbox.isNull() && this.useIndex) {
 				try {
 					goodRecs = this.queryTree(bbox);
 				} catch (TreeException e) {

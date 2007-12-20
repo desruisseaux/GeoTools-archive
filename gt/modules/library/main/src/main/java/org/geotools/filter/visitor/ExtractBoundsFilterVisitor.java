@@ -7,6 +7,7 @@ import org.geotools.filter.visitor.DefaultFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
@@ -21,7 +22,9 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.Contains;
@@ -35,65 +38,184 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.sun.corba.se.spi.transport.CorbaAcceptor;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Extract a a bounding box from the provided Filter.
- * 
+ * Extract a maximal envelope from the provided Filter.
+ * <p>
+ * The maximal envelope is generated from:
+ * <ul>
+ * <li>all the literal geometry instances involved if spatial operations - using
+ * geom.getEnvelopeInternal().
+ * <li>Filter.EXCLUDES will result in <code>null</code>
+ * <li>Filter.INCLUDES will result in a "world" envelope with range Double.NEGATIVE_INFINITY to
+ * Double.POSITIVE_INFINITY for each axis.
+ * </ul>
+ * Since geometry literals do not contains CRS information we can only produce a ReferencedEnvelope
+ * without CRS information. You can call this function with an existing ReferencedEnvelope 
+ * or with your data CRS to correct for this limitation.
+ * ReferencedEnvelope example:<pre><code>
+ * ReferencedEnvelope bbox = (ReferencedEnvelope)
+ *     filter.accepts(new ExtractBoundsFilterVisitor(), dataCRS );
+ * </code></pre>
+ * You can also call this function with an existing Envelope; if you are building up bounds based on
+ * several filters.
+ * <p>
  * This is a replacement for FilterConsumer.
+ * 
  * @author Jody Garnett
  */
-public class ExtractBoundsFilterVisitor extends DefaultFilterVisitor {
-    private static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.index.rtree");
+public class ExtractBoundsFilterVisitor extends NullFilterVisitor {
+    static public NullFilterVisitor BOUNDS_VISITOR = new ExtractBoundsFilterVisitor();
     
-    private ReferencedEnvelope bounds;
-    
-    public ExtractBoundsFilterVisitor( CoordinateReferenceSystem crs ){
-        bounds = new ReferencedEnvelope( crs );
+    private static Logger LOGGER = org.geotools.util.logging.Logging
+            .getLogger("org.geotools.index.rtree");
+
+    /**
+     * This FilterVisitor is stateless - use ExtractBoundsFilterVisitor.BOUNDS_VISITOR.
+     * <p>
+     * You may also subclass in order to reuse this functionality in your own
+     * FilterVisitor implementation.
+     */
+    protected ExtractBoundsFilterVisitor(){        
     }
     
-    public Envelope getBounds() {
-        return this.bounds;
-    }
-    
-    @Override
-    public Object visit( ExcludeFilter filter, Object data ) {
-        bounds.setToNull();        
-        return bounds;
-    }
-    
-    @Override
-    public Object visit( IncludeFilter filter, Object data ) {
-        // also consider making use of CRS extent?
-        bounds.expandToInclude(new Envelope(Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY));
-        return bounds;
-    }
-    
-    @Override
-    public Object visit( BBOX filter, Object data ) {
-        // consider doing reprojection here into data CRS?
-        Envelope other = new Envelope(filter.getMinX(),
-                filter.getMaxX(), filter.getMinY(),
-                filter.getMinY());        
-        bounds.expandToInclude(other);
-        return bounds;
-    }
-    
-    @Override
-    public Object visit( Literal expression, Object data ) {
-        Object value = expression.getValue();
-        if( value instanceof Geometry ){
-            Geometry geometry = (Geometry) value;
-            this.bounds.expandToInclude( geometry.getEnvelopeInternal() ); 
+    /**
+     * Produce an ReferencedEnvelope from the provided data parameter.
+     * 
+     * @param data
+     * @return ReferencedEnvelope
+     */
+    private ReferencedEnvelope bbox( Object data ) {
+        if( data == null ){
+            return null;
         }
-        else {
-            LOGGER.warning("LiteralExpression ignored!");
-        }        
-        return bounds;
+        else if (data instanceof ReferencedEnvelope) {
+            return (ReferencedEnvelope) data;
+        }
+        else if (data instanceof Envelope){
+            return new ReferencedEnvelope( (Envelope) data, null );
+        }
+        else if (data instanceof CoordinateReferenceSystem){
+            return new ReferencedEnvelope( (CoordinateReferenceSystem) data );
+        }
+        throw new ClassCastException("Could not cast data to ReferencedEnvelope");        
     }
 
+    public Object visit( ExcludeFilter filter, Object data ) {
+        return null;
+    }
+
+    public Object visit( IncludeFilter filter, Object data ) {
+        if( data == null ) return null;
+        ReferencedEnvelope bbox = bbox( data );
+        
+        // also consider making use of CRS extent?
+        Envelope world = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        bbox.expandToInclude( world );
+        return bbox;
+    }
+
+    public Object visit( BBOX filter, Object data ) {
+        if( data == null ) return null;
+        ReferencedEnvelope bbox = bbox( data );
+                
+        // consider doing reprojection here into data CRS?
+        Envelope bounds = new Envelope(filter.getMinX(), filter.getMaxX(), filter.getMinY(), filter
+                .getMaxY());
+        bbox.expandToInclude(bounds);
+        return bbox;
+    }
+    /**
+     * Please note we are only visiting literals involved in spatial operations.
+     * @param literal, hopefully a Geometry or Envelope
+     * @param data Incoming BoundingBox (or Envelope or CRS)
+     * 
+     * @return ReferencedEnvelope updated to reflect literal
+     */
+    public Object visit( Literal expression, Object data ) {        
+        if( data == null ) return null;
+        ReferencedEnvelope bbox = bbox( data );
+
+        Object value = expression.getValue();
+        if (value instanceof Geometry) {
+                        
+            Geometry geometry = (Geometry) value;
+            Envelope bounds = geometry.getEnvelopeInternal();
+            
+            bbox.expandToInclude(bounds);
+        } else {
+            LOGGER.finer("LiteralExpression ignored!");
+        }
+        return bbox;
+    }
+
+    public Object visit( Beyond filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        return data;
+    }
+
+    public Object visit( Contains filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        return data;
+    }
+
+    public Object visit( Crosses filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        return data;
+    }
+
+    public Object visit( Disjoint filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        return data;
+    }
+
+    public Object visit( DWithin filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        return data;
+    }
+
+    public Object visit( Equals filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        return data;
+    }
+
+    public Object visit( Intersects filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+
+        return data;
+    }
+
+    public Object visit( Overlaps filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+
+        return data;
+    }
+
+    public Object visit( Touches filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+
+        return data;
+    }
+
+    public Object visit( Within filter, Object data ) {
+        data = filter.getExpression1().accept(this, data);
+        data = filter.getExpression2().accept(this, data);
+        
+        return data;
+    }
+    
 }

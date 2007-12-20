@@ -42,31 +42,51 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 /**
- * Abstract implementation of FilterVisitor that simply walks the data structure.
+ * Abstract implementation of FilterVisitor simple returns the provided data.
  * <p>
- * This class implements the full FilterVisitor interface and will visit every Filter member of a
- * Filter object. This class performs no actions and is not intended to be used directly, instead
- * extend it and overide the methods for the Filter type you are interested in. Remember to call the
- * super method if you want to ensure that the entier filter tree is still visited. This class can
- * take an ExpressionVisitor as a construction parameter, if provided it will be called for each
- * expression in the Filter object.
+ * This class can be used as is as a placeholder that does nothing:<pre><code>
+ * Integer one = (Integer) filter.accepts( NullFilterVisitor.NULL_VISITOR, 1 );
+ * </code></pre>
  * 
+ * The class can also be used as an alternative to DefaultFilterVisitor if
+ * you want to only walk part of the data structure:
  * <pre><code>
- * FilterVisitor allFids = new DefaultFilterVisitor(){
+ * FilterVisitor allFids = new NullFilterVisitor(){
  *     public Object visit( Id filter, Object data ) {
+ *         if( data == null) return null;
  *         Set set = (Set) data;
  *         set.addAll(filter.getIDs());
  *         return set;
  *     }
  * };
  * Set set = (Set) myFilter.accept(allFids, new HashSet());
+ * Set set2 = (Set) myFilter.accept(allFids, null ); // set2 will be null
  * </code></pre>
+ * The base class provides implementations for:
+ * <ul>
+ * <li>walking And, Or, and Not data structures, returning null at any point will exit early
+ * <li>a default implementation for every other construct that will return the provided data
+ * </ul>
  * 
- * @author Jody
+ * @author Jody Garnett (Refractions Research)
  */
-public abstract class DefaultFilterVisitor implements FilterVisitor, ExpressionVisitor {
-
-    public DefaultFilterVisitor() {        
+public abstract class NullFilterVisitor implements FilterVisitor, ExpressionVisitor {
+    static public NullFilterVisitor NULL_VISITOR = new NullFilterVisitor(){
+        @Override
+        public Object visit( And filter, Object data ) {
+            return data;
+        }
+        @Override
+        public Object visit( Or filter, Object data ) {
+            return data;
+        }
+        @Override
+        public Object visit( Not filter, Object data ) {
+            return data;
+        }
+    };
+    
+    public NullFilterVisitor() {        
     }
 
     public Object visit( ExcludeFilter filter, Object data ) {
@@ -78,10 +98,11 @@ public abstract class DefaultFilterVisitor implements FilterVisitor, ExpressionV
     }
 
     public Object visit( And filter, Object data ) {
+        if( data == null ) return null;
         if (filter.getChildren() != null) {
-            for( Iterator i = filter.getChildren().iterator(); i.hasNext(); ) {
-                Filter child = (Filter) i.next();
-                child.accept(this, data);
+            for( Filter child : filter.getChildren() ) {
+                data = child.accept(this, data);
+                if( data == null ) return null;
             }
         }
         return data;
@@ -92,163 +113,103 @@ public abstract class DefaultFilterVisitor implements FilterVisitor, ExpressionV
     }
 
     public Object visit( Not filter, Object data ) {
-        if (filter.getFilter() != null) {
-            filter.getFilter().accept(this, data);
+        if( data == null ) return data;
+
+        Filter child = filter.getFilter();
+        if ( child != null) {
+            data = child.accept(this, data);
         }
         return data;
     }
 
     public Object visit( Or filter, Object data ) {
+        if( data == null ) return null;
         if (filter.getChildren() != null) {
-            for( Iterator i = filter.getChildren().iterator(); i.hasNext(); ) {
-                Filter child = (Filter) i.next();
-                child.accept(this, data);
+            for( Filter child : filter.getChildren() ) {
+                data = child.accept(this, data);
+                if( data == null ) return null;
             }
         }
         return data;
     }
 
     public Object visit( PropertyIsBetween filter, Object data ) {
-        filter.getLowerBoundary().accept(this, data);
-        filter.getExpression().accept(this, data);
-        filter.getUpperBoundary().accept(this, data);
         return data;
     }
 
     public Object visit( PropertyIsEqualTo filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
     public Object visit( PropertyIsNotEqualTo filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
     public Object visit( PropertyIsGreaterThan filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
     public Object visit( PropertyIsGreaterThanOrEqualTo filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
-    public Object visit( PropertyIsLessThan filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
+    public Object visit( PropertyIsLessThan filter, Object data ) {        
         return data;
     }
 
     public Object visit( PropertyIsLessThanOrEqualTo filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
-    public Object visit( PropertyIsLike filter, Object data ) {
-        filter.getExpression().accept(this, data);
-
+    public Object visit( PropertyIsLike filter, Object data ) {        
         return data;
     }
 
     public Object visit( PropertyIsNull filter, Object data ) {
-        filter.getExpression().accept(this, data);
         return data;
     }
 
     public Object visit( final BBOX filter, Object data ) {
-        // We will just use a simple wrapper until we add a getExpression method
-        PropertyName property = new PropertyName(){
-            public String getPropertyName() {
-                return filter.getPropertyName();
-            }
-            public Object accept( ExpressionVisitor visitor, Object data ) {
-                return visitor.visit(this, data);
-            }
-            public Object evaluate( Object object ) {
-                return null;
-            }
-            public Object evaluate( Object object, Class context ) {
-                return null;
-            }
-        };
-        property.accept(this, data);
         return data;
     }
 
     public Object visit( Beyond filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
         return data;
     }
 
     public Object visit( Contains filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
         return data;
     }
 
     public Object visit( Crosses filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
         return data;
     }
 
     public Object visit( Disjoint filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
         return data;
     }
 
     public Object visit( DWithin filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
         return data;
     }
 
     public Object visit( Equals filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
         return data;
     }
 
     public Object visit( Intersects filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
     public Object visit( Overlaps filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
     public Object visit( Touches filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-
         return data;
     }
 
     public Object visit( Within filter, Object data ) {
-        filter.getExpression1().accept(this, data);
-        filter.getExpression2().accept(this, data);
-        
         return data;
     }
 
@@ -261,22 +222,14 @@ public abstract class DefaultFilterVisitor implements FilterVisitor, ExpressionV
     }
 
     public Object visit( Add expression, Object data ) {
-        expression.getExpression1().accept( this, data);
-        expression.getExpression2().accept( this, data);
         return data;
     }
 
     public Object visit( Divide expression, Object data ) {
-        expression.getExpression1().accept( this, data);
-        expression.getExpression2().accept( this, data);        
         return data;
     }
 
     public Object visit( Function expression, Object data ) {
-        for( Iterator i=expression.getParameters().iterator();i.hasNext();){
-            Expression parameter = (Expression) i.next();
-            parameter.accept( this, data);
-        }
         return data;
     }
 
@@ -285,8 +238,6 @@ public abstract class DefaultFilterVisitor implements FilterVisitor, ExpressionV
     }
 
     public Object visit( Multiply expression, Object data ) {
-        expression.getExpression1().accept( this, data);
-        expression.getExpression2().accept( this, data);                
         return data;
     }
 
@@ -295,9 +246,6 @@ public abstract class DefaultFilterVisitor implements FilterVisitor, ExpressionV
     }
 
     public Object visit( Subtract expression, Object data ) {
-        expression.getExpression1().accept( this, data);
-        expression.getExpression2().accept( this, data);                
         return data;
     }
-
 }
