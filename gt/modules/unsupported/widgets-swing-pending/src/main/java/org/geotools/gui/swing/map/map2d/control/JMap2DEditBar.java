@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Polygon;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -54,7 +55,6 @@ import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
-import org.opengis.geometry.aggregate.MultiPoint;
 
 /**
  * JMap2DEditBar is a JPanel to handle edition state for an EditableMap2D
@@ -308,6 +308,14 @@ public class JMap2DEditBar extends JPanel implements Map2DListener, NavigableMap
                     gui_s_poly.setEnabled(true);
                 } else if (jtsClass.equals(MultiPolygon.class)) {
                     gui_geom.setEnabled(true);
+                    gui_m_poly.setEnabled(true);
+                } else{
+                    gui_geom.setEnabled(true);
+                    gui_s_point.setEnabled(true);
+                    gui_m_point.setEnabled(true);
+                    gui_s_line.setEnabled(true);
+                    gui_m_line.setEnabled(true);
+                    gui_s_poly.setEnabled(true);
                     gui_m_poly.setEnabled(true);
                 }
 

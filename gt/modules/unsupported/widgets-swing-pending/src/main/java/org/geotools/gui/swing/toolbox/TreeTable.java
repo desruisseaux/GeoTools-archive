@@ -20,6 +20,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JDialog;
 import javax.swing.tree.TreePath;
 import org.geotools.gui.swing.i18n.TextBundle;
+import org.geotools.gui.swing.toolbox.tools.shapecreation.ToolShapeCreation;
 import org.geotools.gui.swing.toolbox.tools.svg2mif.ToolSVG2MIF;
 import org.geotools.gui.swing.toolbox.tools.vdem2csv.ToolVdem2csv;
 import org.jdesktop.swingx.JXTreeTable;
@@ -43,6 +44,8 @@ final class TreeTable extends JXTreeTable implements MouseListener{
      */
     TreeTable(JToolTree frame) {
         super(new DefaultTreeTableModel(new ToolPackTreeNode("Root")));
+        
+        getSelectionModel().setSelectionMode(getSelectionModel().SINGLE_SELECTION);
                         
         setTreeCellRenderer(new DefaultTreeRenderer(new ToolTreeNodeProvider(frame)));
                 
@@ -54,6 +57,7 @@ final class TreeTable extends JXTreeTable implements MouseListener{
         
         addTool(new ToolSVG2MIF());
         addTool(new ToolVdem2csv());
+        addTool(new ToolShapeCreation());
                 
         expandAll();
         

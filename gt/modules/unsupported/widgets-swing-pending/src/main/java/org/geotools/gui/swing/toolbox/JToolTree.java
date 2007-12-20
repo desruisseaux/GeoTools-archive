@@ -39,7 +39,7 @@ public class JToolTree extends JComponent{
         
         setLayout(new BorderLayout());
         
-        add(BorderLayout.CENTER,pane);
+        add(BorderLayout.CENTER,pane);        
     }
     
     public void addTool(Tool tool){

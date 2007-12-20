@@ -29,7 +29,7 @@ import org.geotools.gui.swing.toolbox.tools.svg2mif.element.xml.Parser;
 
 /**
  *
- * @author  eclesia
+ * @author  johann sorel
  */
 public class svg2mifPanel extends javax.swing.JPanel {
     
