@@ -75,7 +75,7 @@ public class CurveImpl extends GeometryImpl implements Curve {
      * @inheritDoc
      * @see org.opengis.geometry.primitive.Curve#getSegments()
      */
-    public final List getSegments() {
+    public final List<CurveSegment> getSegments() {
         return curveSegments;
     }
 

@@ -25,6 +25,7 @@ import org.opengis.geometry.coordinate.Polygon;
 import org.opengis.geometry.coordinate.PolyhedralSurface;
 import org.opengis.geometry.coordinate.Position;
 import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.geometry.primitive.Primitive;
 import org.opengis.geometry.primitive.PrimitiveFactory;
@@ -129,8 +130,8 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
      * the List contains objects that are not instances of the CurveSegment
      * interface.
      */
-    public Curve createCurve(final List/* <CurveSegment> */segments) {
-        Curve result = new CurveImpl(crs);
+    public Curve createCurve(final List<CurveSegment> segments) {
+        CurveImpl result = new CurveImpl(crs);
         if (segments != null)
             result.getSegments().addAll(segments);
         return result;
