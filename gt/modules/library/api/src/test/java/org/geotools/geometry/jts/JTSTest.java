@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 public class JTSTest extends TestCase {
     static GeometryFactory factory = new GeometryFactory();
     static Random random = new Random(0); // use the same sequence each time
-    static int N=1000; // 93 squares 
+    static int N=10; // 93 squares 
     
-    int alternative[] = new int[]{ 93, 0, 0 };
+    int alternative[] = new int[]{ 8, 0, 0 };
     
     /** Array of geometries to use for testing */
     static Geometry geoms[];
@@ -52,7 +52,7 @@ public class JTSTest extends TestCase {
             run.run();
             long set = System.currentTimeMillis();
             long delta = (set - mark);
-            System.out.println("Run "+i+" is "+delta+" mills");            
+            //System.out.println("Run "+i+" is "+delta+" mills");            
             if( i<3 ){
                 continue;
             }
@@ -61,7 +61,7 @@ public class JTSTest extends TestCase {
         return duration / 7;
     }
     
-    public void XtestAlternativeOne(){
+    public void testAlternativeOne(){
         long duration = duration( new Runnable(){
             public void run() {
                 for( Geometry geometry : geoms ){
@@ -74,7 +74,7 @@ public class JTSTest extends TestCase {
                 }
             }            
         });
-        System.out.println( "Alternative 1 "+alternative[0]+" in "+duration+" mills");
+        //System.out.println( "Alternative 1 "+alternative[0]+" in "+duration+" mills");
     }
     public void testAlternativeOnePrepared(){
         long duration = duration( new Runnable(){
@@ -90,10 +90,10 @@ public class JTSTest extends TestCase {
                 }
             }            
         });
-        System.out.println( "PrepairedGeomery 1 "+alternative[0]+" in "+duration+" mills");
+        //System.out.println( "PrepairedGeomery 1 "+alternative[0]+" in "+duration+" mills");
     }
     
-    public void XtestAlternativeA(){
+    public void testAlternativeA(){
         long duration = duration( new Runnable(){
             public void run() {
                 for( Geometry geometry : circles ){
@@ -106,9 +106,9 @@ public class JTSTest extends TestCase {
                 }
             }            
         });
-        System.out.println( "Circles A "+alternative[0]+" in "+duration+" mills");
+        //System.out.println( "Circles A "+alternative[0]+" in "+duration+" mills");
     }
-    public void XtestAlternativeDPrepaired(){
+    public void testAlternativeDPrepaired(){
         long duration = duration( new Runnable(){
             public void run() {
                 for( Geometry geometry : circles ){
@@ -122,10 +122,10 @@ public class JTSTest extends TestCase {
                 }
             }            
         });
-        System.out.println( "Circles D "+alternative[0]+" in "+duration+" mills");
+        //System.out.println( "Circles D "+alternative[0]+" in "+duration+" mills");
     }
     
-    public void XtestAlternativeTwo(){
+    public void testAlternativeTwo(){
         long duration = duration( new Runnable(){
             public void run() {
                 for( Geometry geometry : geoms ){
@@ -139,11 +139,11 @@ public class JTSTest extends TestCase {
                 }
             }            
         });
-        System.out.println( "Alternative 2 "+alternative[1]+" in "+duration+" mills");
+        //System.out.println( "Alternative 2 "+alternative[1]+" in "+duration+" mills");
         assertEquals( "Alternative 2 correct", alternative[0], alternative[1]);
     }
     
-    public void XtestAlternativeThree(){
+    public void testAlternativeThree(){
         long duration = duration( new Runnable(){
             public void run() {
                 for( Geometry geometry : geoms ){
@@ -156,7 +156,7 @@ public class JTSTest extends TestCase {
                 }
             }            
         });
-        System.out.println( "Alternative 3 "+alternative[2]+" in "+duration+" mills");
+        //System.out.println( "Alternative 3 "+alternative[2]+" in "+duration+" mills");
         assertEquals( "Alternative 3 correct", alternative[0], alternative[2]);        
     }
 
@@ -167,8 +167,8 @@ public class JTSTest extends TestCase {
      * @return Polygon
      */
     private static Geometry createSquare() {
-        int x = random.nextInt(20);
-        int y = random.nextInt(20);
+        int x = random.nextInt(5);
+        int y = random.nextInt(5);
         Coordinate coords[] = new Coordinate[]{
                 new Coordinate((double)x,(double)y),
                 new Coordinate((double)x+2,(double)y),
@@ -187,8 +187,8 @@ public class JTSTest extends TestCase {
      * @return Polygon
      */
     private static Geometry createCircle() {
-        int x = random.nextInt(20);
-        int y = random.nextInt(20);
+        int x = random.nextInt(5);
+        int y = random.nextInt(5);
         int S = 32;
         Coordinate coords[] = new Coordinate[S];
         for( int i = 0; i < S; i++){
