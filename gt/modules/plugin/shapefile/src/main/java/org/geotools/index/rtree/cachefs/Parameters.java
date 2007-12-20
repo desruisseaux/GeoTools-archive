@@ -16,12 +16,13 @@
  */
 package org.geotools.index.rtree.cachefs;
 
-import org.geotools.index.DataDefinition;
-import org.geotools.index.TreeException;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
 import java.util.Stack;
+
+import org.geotools.index.DataDefinition;
+import org.geotools.index.TreeException;
 
 
 /**

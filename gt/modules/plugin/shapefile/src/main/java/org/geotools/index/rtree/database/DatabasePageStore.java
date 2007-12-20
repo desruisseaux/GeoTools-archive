@@ -16,6 +16,13 @@
 // TODO Store somewhere root pageId: add in rtrees_cat probably...
 package org.geotools.index.rtree.database;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.geotools.index.DataDefinition;
 import org.geotools.index.Lock;
 import org.geotools.index.LockTimeoutException;
@@ -23,11 +30,6 @@ import org.geotools.index.TreeException;
 import org.geotools.index.rtree.Entry;
 import org.geotools.index.rtree.Node;
 import org.geotools.index.rtree.PageStore;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.sql.DataSource;
 
 
 /**

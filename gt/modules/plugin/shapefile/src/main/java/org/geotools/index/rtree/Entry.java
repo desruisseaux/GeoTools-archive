@@ -16,8 +16,9 @@
  */
 package org.geotools.index.rtree;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.index.Data;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

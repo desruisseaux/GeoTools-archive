@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import com.vividsolutions.jts.geom.Envelope;
 

@@ -22,6 +22,8 @@ import org.geotools.filter.visitor.AbstractFilterVisitor;
 
 /**
  * Quick check to see of a FIDFilter is found.
+ * 
+ * @deprecated Please use IdFinderFilterVisitor
  */
 public class FIDFilterFinder extends AbstractFilterVisitor implements FilterVisitor {
 	

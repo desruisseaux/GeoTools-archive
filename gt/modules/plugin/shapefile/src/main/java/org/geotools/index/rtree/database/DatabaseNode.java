@@ -15,15 +15,17 @@
  */
 package org.geotools.index.rtree.database;
 
-import org.geotools.index.TreeException;
-import org.geotools.index.rtree.Entry;
-import org.geotools.index.rtree.Node;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
+
+import org.geotools.index.TreeException;
+import org.geotools.index.rtree.Entry;
+import org.geotools.index.rtree.Node;
 
 
 /**

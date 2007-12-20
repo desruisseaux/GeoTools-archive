@@ -15,13 +15,6 @@
  */
 package org.geotools.index.quadtree.fs;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-import org.geotools.data.shapefile.shp.IndexFile;
-import org.geotools.index.quadtree.IndexStore;
-import org.geotools.index.quadtree.Node;
-import org.geotools.index.quadtree.QuadTree;
-import org.geotools.index.quadtree.StoreException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,6 +24,14 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.shapefile.shp.IndexFile;
+import org.geotools.index.quadtree.IndexStore;
+import org.geotools.index.quadtree.Node;
+import org.geotools.index.quadtree.QuadTree;
+import org.geotools.index.quadtree.StoreException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

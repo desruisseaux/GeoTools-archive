@@ -16,8 +16,9 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import org.geotools.index.Data;
 import java.util.Comparator;
+
+import org.geotools.index.Data;
 
 
 /**

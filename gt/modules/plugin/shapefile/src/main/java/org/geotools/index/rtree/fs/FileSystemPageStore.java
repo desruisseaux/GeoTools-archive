@@ -16,13 +16,6 @@
  */
 package org.geotools.index.rtree.fs;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.index.DataDefinition;
-import org.geotools.index.DataDefinition.Field;
-import org.geotools.index.TreeException;
-import org.geotools.index.rtree.Entry;
-import org.geotools.index.rtree.Node;
-import org.geotools.index.rtree.PageStore;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -30,6 +23,15 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+
+import org.geotools.index.DataDefinition;
+import org.geotools.index.TreeException;
+import org.geotools.index.DataDefinition.Field;
+import org.geotools.index.rtree.Entry;
+import org.geotools.index.rtree.Node;
+import org.geotools.index.rtree.PageStore;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

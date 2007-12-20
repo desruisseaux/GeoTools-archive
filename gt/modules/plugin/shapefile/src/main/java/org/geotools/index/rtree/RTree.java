@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.filter.Filters;
+import org.geotools.filter.visitor.ExtractBoundsFilterVisitor;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.Lock;
@@ -77,8 +77,11 @@ public class RTree {
         throws TreeException, UnsupportedFilterException {
         this.checkOpen();
 
-        FilterConsumer fc = new FilterConsumer();
-        Filters.accept( filter, fc );
+        ExtractBoundsFilterVisitor fc = new ExtractBoundsFilterVisitor( null );
+        filter.accept(fc, null );
+        
+        //FilterConsumer fc = new FilterConsumer();
+        //Filters.accept( filter, fc );
 
         Envelope env = fc.getBounds();
 
@@ -181,9 +184,11 @@ public class RTree {
         List ret = null;
 
         try {
-            FilterConsumer fc = new FilterConsumer();
-            Filters.accept( filter,fc);
-
+            //FilterConsumer fc = new FilterConsumer();
+            //Filters.accept( filter,fc);
+            
+            ExtractBoundsFilterVisitor fc = new ExtractBoundsFilterVisitor( null );
+            filter.accept(fc, null );
             if (fc.getBounds() != null) {
                 ret = this.search(fc.getBounds(), lock);
             } else {

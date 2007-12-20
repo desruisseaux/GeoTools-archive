@@ -16,9 +16,10 @@
  */
 package org.geotools.index.rtree.fs;
 
-import org.geotools.index.DataDefinition;
 import java.nio.channels.FileChannel;
 import java.util.Stack;
+
+import org.geotools.index.DataDefinition;
 
 
 /**

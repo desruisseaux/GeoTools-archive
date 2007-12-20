@@ -16,11 +16,13 @@
  */
 package org.geotools.index.rtree;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.index.TreeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+
+import org.geotools.index.TreeException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

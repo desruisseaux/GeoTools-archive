@@ -16,7 +16,17 @@
  */
 package org.geotools.data.shapefile.indexed;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.nio.channels.FileChannel;
+import java.util.Hashtable;
+import java.util.logging.Logger;
+
 import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.ShapefileHeader;
@@ -33,16 +43,8 @@ import org.geotools.index.quadtree.fs.IndexHeader;
 import org.geotools.index.rtree.PageStore;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.cachefs.FileSystemPageStore;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.nio.channels.FileChannel;
-import java.util.Hashtable;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

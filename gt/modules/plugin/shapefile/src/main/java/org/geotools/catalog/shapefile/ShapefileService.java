@@ -15,6 +15,12 @@
  */
 package org.geotools.catalog.shapefile;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.geotools.catalog.AbstractService;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.ServiceInfo;
@@ -22,11 +28,6 @@ import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.util.ProgressListener;
-import java.io.IOException;
-import java.net.URI;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 
 /**

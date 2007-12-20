@@ -15,12 +15,13 @@
  */
 package org.geotools.index.quadtree.fs;
 
-import org.geotools.index.quadtree.StoreException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
+
+import org.geotools.index.quadtree.StoreException;
 
 
 /**

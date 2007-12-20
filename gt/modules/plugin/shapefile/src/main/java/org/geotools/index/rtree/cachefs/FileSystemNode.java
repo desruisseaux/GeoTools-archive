@@ -16,18 +16,20 @@
  */
 package org.geotools.index.rtree.cachefs;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.index.Data;
-import org.geotools.index.DataDefinition;
-import org.geotools.index.DataDefinition.Field;
-import org.geotools.index.TreeException;
-import org.geotools.index.rtree.Entry;
-import org.geotools.index.rtree.Node;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.util.EmptyStackException;
+
+import org.geotools.index.Data;
+import org.geotools.index.DataDefinition;
+import org.geotools.index.TreeException;
+import org.geotools.index.DataDefinition.Field;
+import org.geotools.index.rtree.Entry;
+import org.geotools.index.rtree.Node;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

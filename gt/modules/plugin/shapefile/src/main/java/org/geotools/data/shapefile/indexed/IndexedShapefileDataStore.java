@@ -71,6 +71,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
+import org.geotools.filter.visitor.ExtractBoundsFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
@@ -80,7 +81,6 @@ import org.geotools.index.UnsupportedFilterException;
 import org.geotools.index.quadtree.QuadTree;
 import org.geotools.index.quadtree.StoreException;
 import org.geotools.index.quadtree.fs.FileSystemIndexStore;
-import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.fs.FileSystemPageStore;
 import org.opengis.feature.simple.SimpleFeature;
@@ -461,8 +461,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			goodRecs = queryFidIndex( (Set<String>) fids );
 		} else {
 			if (filter != null) {
-				FilterConsumer fc = new FilterConsumer();
-				Filters.accept(filter,fc);
+ 			    //FilterConsumer fc = new FilterConsumer();
+                //Filters.accept(filter,fc);                
+			    ExtractBoundsFilterVisitor fc = new ExtractBoundsFilterVisitor( null );
+				filter.accept(fc, null );
+				
 				bbox = fc.getBounds();
 			}
 
