@@ -1,5 +1,11 @@
 package org.geotools.filter.capability;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.opengis.filter.capability.SpatialOperator;
 import org.opengis.filter.capability.SpatialOperators;
 
@@ -10,31 +16,78 @@ import org.opengis.filter.capability.SpatialOperators;
  *
  */
 public class SpatialOperatorsImpl implements SpatialOperators {
-
-    SpatialOperator[] operators;
     
-    public SpatialOperatorsImpl( SpatialOperator[] operators ) {
-        if ( operators == null ) {
-            operators = new SpatialOperator[]{};
+    /** It is not worth it to type narrow the component SpatialOperatorImpl */
+    Set<SpatialOperator> operators;
+    
+    public SpatialOperatorsImpl(){
+        this( new ArrayList<SpatialOperator>());
+    }
+    public SpatialOperatorsImpl( Collection<SpatialOperator> operators ){
+        this.operators = new HashSet<SpatialOperator>();
+        if ( operators != null ) {
+            for( SpatialOperator operator : operators ){
+                this.operators.add( new SpatialOperatorImpl( operator ));
+            }
         }
-        this.operators = operators;
+    }
+    public SpatialOperatorsImpl( SpatialOperator[] operators ) {
+        this.operators = new HashSet<SpatialOperator>();
+        if ( operators != null ) {
+            for( SpatialOperator operator : operators ){
+                this.operators.add( new SpatialOperatorImpl( operator ));
+            }
+        }
     }
     
-    public SpatialOperator[] getOperators() {
+    public SpatialOperatorsImpl( SpatialOperators copy ){
+        this.operators = new HashSet<SpatialOperator>();
+        if( copy.getOperators() != null ){
+            for( SpatialOperator operator : copy.getOperators() ){
+                this.operators.add( new SpatialOperatorImpl( operator ));
+            }
+        }
+    }
+    
+    public void setOperators( Collection<SpatialOperator> operators ) {
+        this.operators = new HashSet<SpatialOperator>();
+        if ( operators != null ) {
+            for( SpatialOperator operator : operators ){
+                this.operators.add( new SpatialOperatorImpl( operator ));
+            }
+        }
+    }
+    
+    public Collection<SpatialOperator> getOperators() {
         return operators;
     }
-    
     public SpatialOperator getOperator(String name) {
-        if ( name == null ) {
+        if ( name == null || operators == null ) {
             return null;
         }
         
-        for ( int i = 0; i < operators.length; i++ ) {
-            if ( name.equals( operators[i].getName() ) ) {
-                return operators[i];
+        for ( SpatialOperator spatialOperator : operators ) {
+            if ( name.equals( spatialOperator.getName() ) ) {
+                return spatialOperator;
             }
         }
         
         return null;
+    }
+
+    public void addAll( SpatialOperators copy ) {
+        if( copy == null ) return;        
+        if( copy.getOperators() != null ){
+            for( SpatialOperator operator : copy.getOperators() ){
+                this.operators.add( new SpatialOperatorImpl( operator ));
+            }
+        }
+    }
+    @Override
+    public String toString() {
+        if( operators == null ){
+            return "SpatialOperators: none";
+        }
+        return "SpatialOperators:"+operators;
     }
 }

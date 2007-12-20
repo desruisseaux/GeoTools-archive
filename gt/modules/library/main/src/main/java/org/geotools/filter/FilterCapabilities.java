@@ -53,10 +53,13 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 /**
- * Represents the Filter capabilities that are supported by a SQLEncoder.  Each
- * SQLEncoder class should have one static FilterCapabilities, representing
+ * Represents the Filter capabilities that are supported by a SQLEncoder
+ * <p>
+ * Each SQLEncoder class should have one static FilterCapabilities, representing
  * the filter encoding operations that it can successfully perform.
- *
+ * <p>
+ * This class is used as one big mask to detect filters that cannot be performed
+ * 
  * @author Chris Holmes, TOPP
  * @source $URL$
  * 

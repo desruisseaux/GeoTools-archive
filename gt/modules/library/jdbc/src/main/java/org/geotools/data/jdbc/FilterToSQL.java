@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+//import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.LikeFilterImpl;
 import org.geotools.util.Converters;

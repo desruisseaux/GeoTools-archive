@@ -15,13 +15,16 @@
  */
 package org.geotools.filter;
 
-import java.util.logging.Logger;
-
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.filter.And;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.PropertyIsEqualTo;
 
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.spatial.Beyond;
 /**
  * Unit test for FilterCapabilities.
  *
@@ -29,108 +32,33 @@ import junit.framework.TestSuite;
  * @source $URL$
  */
 public class CapabilitiesTest extends TestCase {
-    /** Standard logging instance */
-    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(
-            "org.geotools.defaultcore");
+    public void testCapablities(){
+        Capabilities capabilities = new Capabilities();
+        capabilities.addType( Beyond.class ); // add to SpatialCapabilities
+        capabilities.addType( PropertyIsEqualTo.class ); // add to ScalarCapabilities
+        capabilities.addName( "NullCheck" ); // will enable PropertyIsNull use
+        capabilities.addName( "Mul" ); // will enable hasSimpleArithmatic
+        capabilities.addName( "random" ); // a function returning a random number
+        capabilities.addName( "Length", 1 ); // single argument function
+        capabilities.addName( "toDegrees", "radians" ); // single argument function
+        capabilities.addName( "length", "expression" );
 
-    /** Feature on which to preform tests */
-    private Filter gFilter;
-    private Filter compFilter;
-    private Filter logFilter;
-    private FilterCapabilities capabilities;
-    private FilterFactory fact = FilterFactoryFinder.createFilterFactory();
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        Filter filter = ff.between( ff.literal(0), ff.property("x"), ff.literal( 2 ) );        
+        assertFalse("supports", capabilities.supports( filter ) );
+        
+        filter = ff.equals(ff.property("x"), ff.literal( 2 ) );        
+        assertTrue("supports", capabilities.supports( filter ) );
+        
+        assertTrue("fullySupports", capabilities.fullySupports( filter ) );
 
-    /** Test suite for this test case */
-    TestSuite suite = null;
+        Capabilities capabilities2 = new Capabilities();
 
-    /** Constructor with test name. */
-    String dataFolder = "";
-    boolean setup = false;
-
-    public CapabilitiesTest(String testName) {
-        super(testName);
-    }
-
-    /**
-     * Main for test runner.
-     *
-     * @param args DOCUMENT ME!
-     */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    /**
-     * Required suite builder.
-     *
-     * @return A test suite for this unit test.
-     */
-    public static Test suite() {
-        //_log.getLoggerRepository().setThreshold(Level.DEBUG);
-        TestSuite suite = new TestSuite(CapabilitiesTest.class);
-
-        return suite;
-    }
-
-    /**
-     * Sets up a schema and a test feature.
-     */
-    protected void setUp() {
-        LOGGER.finer("Setting up FilterCapabilitiesTest");
-
-        if (setup) {
-            return;
-        }
-
-        setup = true;
-        capabilities = new FilterCapabilities();
-
-        try {
-            gFilter = fact.createGeometryFilter(AbstractFilter.GEOMETRY_WITHIN);
-            compFilter = fact.createCompareFilter(FilterType.COMPARE_LESS_THAN);
-        } catch (IllegalFilterException ife) {
-            LOGGER.fine("Bad filter " + ife);
-        }
-
-        capabilities.addType(AbstractFilter.LOGIC_OR);
-        capabilities.addType(AbstractFilter.LOGIC_AND);
-        capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(FilterType.COMPARE_EQUALS);
-        capabilities.addType(FilterType.COMPARE_LESS_THAN);
-        capabilities.addType(AbstractFilter.BETWEEN);
-    }
-
-    public void testAdd() {
-        capabilities.addType(FilterType.COMPARE_GREATER_THAN);
-        capabilities.addType(FilterType.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.NULL);
-        assertTrue(capabilities.supports(AbstractFilter.NULL));
-    }
-
-    public void testShortSupports() {
-        assertTrue(capabilities.supports(AbstractFilter.LOGIC_AND));
-        assertTrue(!(capabilities.supports(AbstractFilter.LIKE)));
-    }
-
-    public void testFilterSupports() {
-        assertTrue(capabilities.supports(compFilter));
-        assertTrue(!(capabilities.supports(gFilter)));
-    }
-
-    public void testFullySupports() {
-        try {
-            logFilter = (org.geotools.filter.Filter) gFilter.and(compFilter);
-            assertTrue(capabilities.fullySupports(compFilter));
-            assertTrue(!(capabilities.fullySupports(gFilter)));
-            assertTrue(!(capabilities.fullySupports(logFilter)));
-            logFilter = (org.geotools.filter.Filter)  compFilter.and(fact.createBetweenFilter());
-            assertTrue(capabilities.fullySupports(logFilter));
-            logFilter = (org.geotools.filter.Filter) logFilter.or(fact.createBetweenFilter());
-            assertTrue(capabilities.fullySupports(logFilter));
-            logFilter = (org.geotools.filter.Filter) logFilter.and(gFilter);
-            assertTrue(!(capabilities.fullySupports(logFilter)));
-        } catch (IllegalFilterException e) {
-            LOGGER.fine("Bad filter " + e);
-        }
+        capabilities2.addAll( capabilities );
+        capabilities2.addType( And.class );
+        
+        assertTrue( capabilities2.getContents().getScalarCapabilities().hasLogicalOperators() );
+        assertFalse( capabilities.getContents().getScalarCapabilities().hasLogicalOperators() );
+        
     }
 }

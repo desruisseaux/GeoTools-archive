@@ -56,7 +56,7 @@ public class FunctionsTypeBindingTest extends OGCTestSupport {
         FilterMockData.functionNames(document, element);
 
         Functions functions = (Functions) parse(OGC.FunctionsType);
-        assertEquals(2, functions.getFunctionNames().length);
+        assertEquals(2, functions.getFunctionNames().size());
     }
 
     public void testEncode() throws Exception {
