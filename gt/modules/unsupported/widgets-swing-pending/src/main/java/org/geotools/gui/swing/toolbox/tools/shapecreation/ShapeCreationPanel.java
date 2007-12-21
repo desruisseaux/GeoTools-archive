@@ -65,14 +65,10 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
             // Create a Map object used by our DataStore Factory
             // NOTE: file.toURI().toURL() is used because file.toURL() is deprecated
             Map<String, URL> map = Collections.singletonMap("url", file.toURI().toURL());
-            System.out.println(file.toURI().toURL());
 
             // Create the ShapefileDataStore from our factory based on our Map object
             ShapefileDataStore myData = (ShapefileDataStore) factory.createNewDataStore(map);
-
-            // Tell the DataStore what type of Coordinate Reference System (CRS) to use
-            myData.forceSchemaCRS(crs);
-
+            
             // Tell this shapefile what type of data it will store
             StringBuffer buffer = new StringBuffer();
             buffer.append("geom:");
@@ -102,11 +98,15 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
                 }
             }
 
+            System.out.println(buffer);
+            
             SimpleFeatureType featureType = DataUtilities.createType(name, buffer.toString());
-
 
             // Create the Shapefile (empty at this point)
             myData.createSchema(featureType);
+            
+            // Tell the DataStore what type of Coordinate Reference System (CRS) to use
+            myData.forceSchemaCRS(crs);
 
             myData.dispose();
         } catch (IOException e) {
@@ -428,7 +428,7 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
 
         if (act == JFileChooser.APPROVE_OPTION) {
             File f = jfc.getSelectedFile();
-
+            
             if (f != null) {
                 if (f.getAbsolutePath().endsWith(".shp")) {
                     file = f;
@@ -436,7 +436,7 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
                 } else {
                     int lastdot = f.getAbsolutePath().lastIndexOf(".");
                     if(lastdot>0){
-                        f = new File(f.getAbsolutePath().substring(0,lastdot-1) +".shp");
+                        f = new File(f.getAbsolutePath().substring(0,lastdot) +".shp");
                     }else{
                         f = new File(f.getAbsolutePath() +".shp");
                     }
