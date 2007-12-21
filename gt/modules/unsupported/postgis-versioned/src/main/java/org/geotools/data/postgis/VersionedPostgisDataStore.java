@@ -1151,11 +1151,12 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             
             String viewName = getVFCViewName(typeName);
             st.execute("CREATE VIEW " + viewName + "\n " 
-                    + "AS SELECT " + typeName + ".*, "
+                    + "AS SELECT "
                     + "cr.revision as \"creationVersion\", cr.author as \"createdBy\", "
                     + "cr.date as \"creationDate\", cr.message as \"creationMessage\",  "
                     + "lu.revision as \"lastUpdateVersion\", lu.author as \"lastUpdatedBy\", "
-                    + "lu.date as \"lastUpdateDate\", lu.message as \"lastUpdateMessage\"\n" 
+                    + "lu.date as \"lastUpdateDate\", lu.message as \"lastUpdateMessage\"," 
+                    + typeName + ".*\n"
                     + "FROM " + typeName + " inner join " + " changesets lu on " + typeName 
                     + ".revision = lu.revision " +
                     " inner join changesets cr on " + typeName + ".created = cr.revision");

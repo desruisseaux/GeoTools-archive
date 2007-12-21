@@ -114,17 +114,14 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         SimpleFeatureType view = ds.wrapped.getSchema("road_vfc_view");
         AttributeDescriptor[] types = view.getAttributes().toArray(new AttributeDescriptor[view.getAttributes().size()]);
         assertEquals(ft.getAttributeCount() + 12, view.getAttributeCount());
-        assertEquals("revision", types[types.length - 11].getLocalName());
-        assertEquals("expired", types[types.length - 10].getLocalName());
-        assertEquals("created", types[types.length - 9].getLocalName());
-        assertEquals("creationVersion", types[types.length - 8].getLocalName());
-        assertEquals("createdBy", types[types.length - 7].getLocalName());
-        assertEquals("creationDate", types[types.length - 6].getLocalName());
-        assertEquals("creationMessage", types[types.length - 5].getLocalName());
-        assertEquals("lastUpdateVersion", types[types.length - 4].getLocalName());
-        assertEquals("lastUpdatedBy", types[types.length - 3].getLocalName());
-        assertEquals("lastUpdateDate", types[types.length - 2].getLocalName());
-        assertEquals("lastUpdateMessage", types[types.length - 1].getLocalName());
+        assertEquals("creationVersion", types[0].getLocalName());
+        assertEquals("createdBy", types[1].getLocalName());
+        assertEquals("creationDate", types[2].getLocalName());
+        assertEquals("creationMessage", types[3].getLocalName());
+        assertEquals("lastUpdateVersion", types[4].getLocalName());
+        assertEquals("lastUpdatedBy", types[5].getLocalName());
+        assertEquals("lastUpdateDate", types[6].getLocalName());
+        assertEquals("lastUpdateMessage", types[7].getLocalName());
         // check the versioned feature collation is not visible outside of the verioning datastore
         try {
             ds.getSchema("road_vfc_view");
@@ -1131,14 +1128,14 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(vfc.size(), fc.size());
         final int vfcAttributesCount = vfc.getSchema().getAttributeCount();
         assertEquals(fc.getSchema().getAttributeCount() + 8, vfcAttributesCount);
-        assertEquals("creationVersion", vfc.getSchema().getAttribute(vfcAttributesCount - 8).getLocalName());
-        assertEquals("createdBy", vfc.getSchema().getAttribute(vfcAttributesCount - 7).getLocalName());
-        assertEquals("creationDate", vfc.getSchema().getAttribute(vfcAttributesCount - 6).getLocalName());
-        assertEquals("creationMessage", vfc.getSchema().getAttribute(vfcAttributesCount - 5).getLocalName());
-        assertEquals("lastUpdateVersion", vfc.getSchema().getAttribute(vfcAttributesCount - 4).getLocalName());
-        assertEquals("lastUpdatedBy", vfc.getSchema().getAttribute(vfcAttributesCount - 3).getLocalName());
-        assertEquals("lastUpdateDate", vfc.getSchema().getAttribute(vfcAttributesCount - 2).getLocalName());
-        assertEquals("lastUpdateMessage", vfc.getSchema().getAttribute(vfcAttributesCount - 1).getLocalName());
+        assertEquals("creationVersion", vfc.getSchema().getAttribute(0).getLocalName());
+        assertEquals("createdBy", vfc.getSchema().getAttribute(1).getLocalName());
+        assertEquals("creationDate", vfc.getSchema().getAttribute(2).getLocalName());
+        assertEquals("creationMessage", vfc.getSchema().getAttribute(3).getLocalName());
+        assertEquals("lastUpdateVersion", vfc.getSchema().getAttribute(4).getLocalName());
+        assertEquals("lastUpdatedBy", vfc.getSchema().getAttribute(5).getLocalName());
+        assertEquals("lastUpdateDate", vfc.getSchema().getAttribute(6).getLocalName());
+        assertEquals("lastUpdateMessage", vfc.getSchema().getAttribute(7).getLocalName());
         final FeatureIterator vfr = vfc.features();
         final FeatureIterator fr = fc.features();
         final SimpleFeature vf = vfr.next();
@@ -1150,7 +1147,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(vfcAttributesCount, vfc.getSchema().getAttributeCount());
         assertEquals(f.getID(), vf.getID());
         for (int i = 0; i < f.getFeatureType().getAttributeCount(); i++) {
-            assertTrue(DataUtilities.attributesEqual(f.getAttribute(i), vf.getAttribute(i)));
+            assertTrue(DataUtilities.attributesEqual(f.getAttribute(i), vf.getAttribute(i + 8)));
         }
     }
     
