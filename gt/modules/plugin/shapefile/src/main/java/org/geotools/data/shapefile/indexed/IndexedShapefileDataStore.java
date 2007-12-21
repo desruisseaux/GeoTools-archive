@@ -69,6 +69,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.feature.visitor.IdCollectorFilterVisitor;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.Filters;
 import org.geotools.filter.visitor.ExtractBoundsFilterVisitor;
@@ -950,7 +951,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         ReferencedEnvelope ret = null;
 
         Set records=new HashSet();
-        if (query.getFilter() == Filter.INCLUDE || query==Query.ALL) {
+        Filter filter = query.getFilter();
+        if (filter == Filter.INCLUDE || query==Query.ALL) {
             return getBounds();
         } else if (this.useIndex) {
             if (treeType == TREE_GRX) {
@@ -958,12 +960,13 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             }
         }
         
-        FidFilterParserVisitor visitor=new FidFilterParserVisitor();
-        Filters.accept(query.getFilter(), visitor);
-        if( !visitor.fids.isEmpty() ) {
-            List<Data> recordsFound = queryFidIndex( visitor.fids );
-            if( recordsFound!=null )
+        Set<String> fids = (Set<String>) filter.accept( IdCollectorFilterVisitor.ID_COLLECTOR, new HashSet() );
+        
+        if( !fids.isEmpty() ) {
+            List<Data> recordsFound = queryFidIndex( fids );
+            if( recordsFound!=null ){
                 records.addAll(recordsFound);
+            }
         }
         
         if( records.isEmpty() )

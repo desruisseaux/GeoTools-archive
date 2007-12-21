@@ -39,11 +39,17 @@ public class FilterAttributeExtractor extends DefaultFilterVisitor {
     protected SimpleFeatureType featureType;
 
     /**
-     * @deprecated Should use {@link #FilterAttributeExtractor(FeatureType)}.
+     * Just extract the property names; don't check against a feature type.
      */
     public FilterAttributeExtractor() {
         this(null);
     }
+    /**
+     * Use the provided feature type as a sanity check when extracting
+     * property names.
+     * 
+     * @param featureType
+     */
     public FilterAttributeExtractor(SimpleFeatureType featureType) {
         this.featureType = featureType;
     }

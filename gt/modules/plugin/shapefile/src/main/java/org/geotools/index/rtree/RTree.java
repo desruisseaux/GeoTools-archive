@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.filter.visitor.ExtractBoundsFilterVisitor;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.Lock;
@@ -65,30 +66,26 @@ public class RTree {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the maxiumal boudns for the provided filter.
+     * <p>
+     * This method will try and produce a filter for the provided bounds,
+     * see ExtractBoundsFilterVisitor.BOUNDS_VISITOR for details of generation.
      *
      * @param filter
-     *
-     *
      * @throws TreeException
-     * @throws UnsupportedFilterException
+     * @throws UnsupportedFilterException For Filter.EXCLUDES
      */
     public Envelope getBounds(Filter filter)
         throws TreeException, UnsupportedFilterException {
         this.checkOpen();
 
-        ExtractBoundsFilterVisitor fc = new ExtractBoundsFilterVisitor( null );
-        filter.accept(fc, null );
+        Envelope env;
+        env = (Envelope) filter.accept( ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope() );
         
-        //FilterConsumer fc = new FilterConsumer();
-        //Filters.accept( filter, fc );
-
-        Envelope env = fc.getBounds();
-
-        if (env == null) {
-            throw new UnsupportedFilterException("Filter not supported");
+        if( env == null || env.isNull() ){
+            throw new UnsupportedFilterException("Filter does not contains any Geometry");
         }
-
+                
         Node root = this.store.getRoot();
 
         return env.contains(root.getBounds()) ? root.getBounds()
@@ -184,16 +181,12 @@ public class RTree {
         List ret = null;
 
         try {
-            //FilterConsumer fc = new FilterConsumer();
-            //Filters.accept( filter,fc);
+            Envelope env = (Envelope) filter.accept(ExtractBoundsFilterVisitor.BOUNDS_VISITOR, new ReferencedEnvelope());
             
-            ExtractBoundsFilterVisitor fc = new ExtractBoundsFilterVisitor( null );
-            filter.accept(fc, null );
-            if (fc.getBounds() != null) {
-                ret = this.search(fc.getBounds(), lock);
-            } else {
+            if (env == null || env.isNull()) {
                 throw new UnsupportedFilterException("Not a valid filter");
             }
+            ret = this.search( env, lock);            
         } finally {
             // Release the lock
             this.store.releaseLock(lock);

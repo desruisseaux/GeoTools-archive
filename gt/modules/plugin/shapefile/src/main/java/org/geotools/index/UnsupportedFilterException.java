@@ -17,12 +17,15 @@
 package org.geotools.index;
 
 /**
- * DOCUMENT ME!
+ * This exception is thrown when we are asked to use a filter that does not
+ * contain a geometry literal (or anything else we can guess a bounds for).
  *
  * @author Tommaso Nolli
  * @source $URL$
  */
 public class UnsupportedFilterException extends Exception {
+    private static final long serialVersionUID = 3292904738782996000L;
+
     /**
      *
      */
@@ -31,7 +34,7 @@ public class UnsupportedFilterException extends Exception {
     }
 
     /**
-     * DOCUMENT ME!
+     * Filter is not supported.
      *
      * @param message
      */
@@ -40,7 +43,7 @@ public class UnsupportedFilterException extends Exception {
     }
 
     /**
-     * DOCUMENT ME!
+     * Filter is not supported.
      *
      * @param message
      * @param cause
@@ -50,7 +53,7 @@ public class UnsupportedFilterException extends Exception {
     }
 
     /**
-     * DOCUMENT ME!
+     * Filter is not supported.
      *
      * @param cause
      */
