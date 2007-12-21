@@ -23,6 +23,9 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.net.URL;
+import java.net.URI;
+import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -48,18 +51,22 @@ public class TileCollection {
     private static final double EPS = 1E-6;
 
     /**
-     * The collection of tiles.
-     */
-    private final List<Tile> tiles;
-
-    /**
      * Tiles for which we should compute the bounding box only when we have them all.
      * Their bounding box (region) will need to be adjusted for the affine transform.
      */
-    private Map<AffineTransform,Tile> pending;
+    private final Map<AffineTransform,Tile> tiles;
+
+    /**
+     * Readers by suffix allocated up to date.
+     *
+     * @see #getImageReader(Object)
+     */
+    private Map<String,ImageReader> readersBySuffix;
 
     /**
      * The image reader for the next tiles to be added.
+     *
+     * @see #setImageReader
      */
     private ImageReader reader;
 
@@ -67,7 +74,10 @@ public class TileCollection {
      * Creates an initially empty tile collection.
      */
     public TileCollection() {
-        tiles = new ArrayList<Tile>();
+        // We really need an IdentityHashMap, not an ordinary HashMap, because we will
+        // put many AffineTransforms that are equal in the sense of Object.equals  but
+        // we still want to associate them to different Tile instances.
+        tiles = new IdentityHashMap<AffineTransform,Tile>();
     }
 
     /**
@@ -75,8 +85,8 @@ public class TileCollection {
      */
     public void clear() {
         tiles.clear();
-        if (pending != null) {
-            pending.clear();
+        if (readersBySuffix != null) {
+            readersBySuffix.clear();
         }
     }
 
@@ -84,7 +94,7 @@ public class TileCollection {
      * Returns {@code true} if there is no tile in this collection.
      */
     public boolean isEmpty() {
-        return tiles.isEmpty() && (pending == null || pending.isEmpty());
+        return tiles.isEmpty();
     }
 
     /**
@@ -102,24 +112,96 @@ public class TileCollection {
     }
 
     /**
-     * Returns an image reader for the given input. If a reader was explicitly specified,
-     * it will be used. Otherwise we will try to detect automatically a suitable reader.
+     * Returns an image reader for the given input. This method is invoked by {@code add} methods
+     * for creating new tiles. The default implementation performs the following steps:
      * <p>
-     * Note that this method <strong>does not</strong> attempt to convert the given string
-     * to image input stream, because {@link MosaicImageReader} is not well suited for them.
+     * <ul>
+     *   <li>If {@link #getImageReader()} returns a non-null value, then this value is returned
+     *       directly.</li>
+     *   <li>Otherwise if the input is a {@linkplain String string}, {@linkplain File file},
+     *       {@linkplain URL} or {@linkplain URI}, then this method tries to infer a reader
+     *        from the file suffix using {@link ImageIO#getImageReadersBySuffix}.</li>
+     *   <li>Otherwise this methode tries to infer a reader from the input using
+     *       {@link ImageIO#getImageReaders}.</li>
+     * </ul>
+     * <p>
+     * Note that this method <strong>does not</strong> attempt to convert the given object into
+     * an image input stream, because {@link MosaicImageReader} is not well suited for them.
      *
+     * @param  input The input.
+     * @return A suitable image reader.
      * @throws IllegalStateException if no suitable image reader has been found.
      */
-    private ImageReader getImageReader(final Object input) throws IllegalStateException {
-        final ImageReader reader = getImageReader();
+    protected ImageReader getImageReader(final Object input) throws IllegalStateException {
+        ImageReader reader = getImageReader();
         if (reader != null) {
             return reader;
         }
-        Iterator<ImageReader> it = ImageIO.getImageReaders(input);
-        if (it.hasNext()) {
-            return it.next();
+        final String name;
+        if (input instanceof File) {
+            name = ((File) input).getName();
+        } else if (input instanceof URL) {
+            name = ((URL) input).getPath();
+        } else if (input instanceof URI) {
+            name = ((URI) input).getPath();
+        } else if (input instanceof String) {
+            name = (String) input;
+        } else {
+            name = null;
+        }
+        if (name != null) {
+            final int split = name.lastIndexOf('.');
+            if (split >= 0) {
+                final String extension = name.substring(split + 1);
+                if (readersBySuffix != null) {
+                    reader = readersBySuffix.get(extension);
+                    if (reader != null) {
+                        return reader;
+                    }
+                }
+                final Iterator<ImageReader> it = ImageIO.getImageReadersBySuffix(extension);
+                while (it.hasNext()) {
+                    reader = it.next();
+                    if (filter(reader)) {
+                        if (readersBySuffix == null) {
+                            readersBySuffix = new HashMap<String,ImageReader>();
+                        }
+                        readersBySuffix.put(extension, reader);
+                        return reader;
+                    }
+                }
+            }
+        }
+        final Iterator<ImageReader> it = ImageIO.getImageReaders(input);
+        while (it.hasNext()) {
+            reader = it.next();
+            if (filter(reader)) {
+                return reader;
+            }
         }
         throw new IllegalStateException(Errors.format(ErrorKeys.NO_IMAGE_READER));
+    }
+
+    /**
+     * Returns {@code true} if {@link #getImageReader(Object)} should accepts the given reader.
+     * The default implementation returns {@code true} in all cases.
+     *
+     * @todo This method is not yet public because I'm not sure about its API.
+     */
+    private boolean filter(final ImageReader reader) {
+        return true;
+    }
+
+    /**
+     * Creates a default transform for the given pixel size. This method <strong>must</strong>
+     * returns a new instance on each invocation (no caching allowed).
+     */
+    private static AffineTransform asTransform(final Dimension pixelSize) {
+        if (pixelSize == null) {
+            return new AffineTransform();
+        } else {
+            return AffineTransform.getScaleInstance(pixelSize.width, pixelSize.height);
+        }
     }
 
     /**
@@ -131,9 +213,11 @@ public class TileCollection {
      * @param origin     The upper-left corner in the destination image.
      * @param pixelSize  Pixel size relative to the finest resolution in an image pyramid,
      *                   or {@code null} if none.
+     *
+     * @todo Not yet public because we need to review the semantic regarding affine transform.
      */
-    public void add(Object input, int imageIndex, Point origin, Dimension pixelSize) {
-        tiles.add(new Tile(getImageReader(input), input, imageIndex, origin, pixelSize));
+    private void add(Object input, int imageIndex, Point origin, Dimension pixelSize) {
+        add(input, imageIndex, origin, asTransform(pixelSize));
     }
 
     /**
@@ -145,9 +229,25 @@ public class TileCollection {
      *                   and {@linkplain Rectangle#height height} should match the image size.
      * @param pixelSize  Pixel size relative to the finest resolution in an image pyramid,
      *                   or {@code null} if none.
+     *
+     * @todo Not yet public because we need to review the semantic regarding affine transform.
      */
-    public void add(Object input, int imageIndex, Rectangle region, Dimension pixelSize) {
-        tiles.add(new Tile(getImageReader(input), input, imageIndex, region, pixelSize));
+    private void add(Object input, int imageIndex, Rectangle region, Dimension pixelSize) {
+        add(input, imageIndex, region, asTransform(pixelSize));
+    }
+
+    /**
+     * Adds a tile for the given input, origin and affine transform.
+     *
+     * @param input      The input to be given to the image reader.
+     * @param imageIndex The image index of the tile to be read. This is often 0.
+     * @param origin     The upper-left corner in the destination image.
+     * @param gridToCRS  A <cite>grid to coordinate reference system</cite> transform.
+     */
+    public void add(Object input, int imageIndex, Point origin, AffineTransform gridToCRS) {
+        Tile.ensureNonNull("gridToCRS", gridToCRS);
+        gridToCRS = new AffineTransform(gridToCRS);
+        tiles.put(gridToCRS, new Tile(getImageReader(input), input, imageIndex, origin, null));
     }
 
     /**
@@ -161,47 +261,23 @@ public class TileCollection {
      */
     public void add(Object input, int imageIndex, Rectangle region, AffineTransform gridToCRS) {
         Tile.ensureNonNull("gridToCRS", gridToCRS);
-        if (pending == null) {
-            pending = new IdentityHashMap<AffineTransform,Tile>();
-        }
         gridToCRS = new AffineTransform(gridToCRS);
-        pending.put(gridToCRS, new Tile(getImageReader(input), input, imageIndex, region, null));
+        tiles.put(gridToCRS, new Tile(getImageReader(input), input, imageIndex, region, null));
     }
 
     /**
-     * Returns the tiles.
+     * Returns the tiles. Keys are <cite>grid to coordinate reference system</cite> transforms
+     * and values are the tiles. This method usually returns a singleton map, but more entries
+     * may be present if this method was not able to build a single pyramid using all provided
+     * tiles.
+     * <p>
+     * <strong>Invoking this method flush the collection</strong>. On return, this instance
+     * is in the same state as if {@link #clear} has been invoked. This is because current
+     * implementation modify its workspace directly for efficienty.
      */
-    public Tile[] getTiles() {
-        flush();
-        return tiles.toArray(new Tile[tiles.size()]);
-    }
-
-    /**
-     * If there is any tiles waiting in the {@linkplain #pending} list, computes
-     * their bounds now and flush them to the final {@linkplain #tiles} list.
-     *
-     * @todo Current implementation consider only the mosaic/pyramid with the greatest
-     *       amount of images, and discards the other ones. We should keep them all,
-     *       maybe by allowing this class to handle more than one mosaic/pyramid.
-     */
-    private void flush() {
-        if (pending == null || pending.isEmpty()) {
-            return;
-        }
-        /*
-         * Searchs for the map with the greatest amount of images. If we had to
-         * ignore some images, a warning will be logged at the end of this method.
-         */
-        int count = 0;
-        Map<AffineTransform,Dimension> levels = null;
-        for (final Map<AffineTransform,Dimension> candidate : computePyramidLevels(pending.keySet())) {
-            final int n = candidate.size();
-            if (n > count) {
-                count = n;
-                levels = candidate;
-            }
-        }
-        if (levels != null) {
+    public Map<AffineTransform,Tile[]> tiles() {
+        final Map<AffineTransform,Tile[]> results = new HashMap<AffineTransform,Tile[]>(4);
+        for (final Map<AffineTransform,Dimension> levels : computePyramidLevels(tiles.keySet())) {
             /*
              * Picks an affine transform to be used as the reference one. We need the finest one.
              * If more than one have the finest resolution, the exact choice does not matter much.
@@ -219,48 +295,74 @@ public class TileCollection {
                     reference = tr;
                 }
             }
-            if (!Double.isInfinite(scale)) {
+            if (Double.isInfinite(scale)) {
+                continue;
+            }
+            /*
+             * Transforms the image bounding box from its own space to the reference space. If
+             * 'computePyramidLevels' did its job correctly, the transform should contains only
+             * a scale and translation - no shear (we don't put assertions because of rounding
+             * errors). In such particular case, transforming a Rectangle2D is accurate. We
+             * round (we do not clip as in the default Rectangle implementation) because we
+             * really expect integer results.
+             */
+            reference = new AffineTransform(reference); // Protects from upcomming changes.
+            final AffineTransform toGrid;
+            try {
+                toGrid = reference.createInverse();
+            } catch (NoninvertibleTransformException e) {
+                throw new IllegalStateException(e);
+            }
+            int index = 0;
+            Rectangle boundsForAll = null;
+            final Rectangle2D.Double envelope = new Rectangle2D.Double();
+            final Tile[] tilesArray = new Tile[levels.size()];
+            for (final Map.Entry<AffineTransform,Dimension> entry : levels.entrySet()) {
+                final AffineTransform tr = entry.getKey();
+                Tile tile = tiles.remove(tr); // Should never be null.
+                tr.preConcatenate(toGrid);
+                final ImageReader  reader = tile.getReader();
+                final Object       input  = tile.getInput();
+                final int      imageIndex = tile.getImageIndex();
+                final Dimension pixelSize = entry.getValue();
                 /*
-                 * Transforms the image bounding box from its own space to the reference space. If
-                 * 'computePyramidLevels' did its job correctly, the transform should contains only
-                 * a scale and translation - no shear (we don't put assertions because of rounding
-                 * errors). In such particular case, transforming a Rectangle2D is accurate. We
-                 * round (we do not clip as in the default Rectangle implementation) because we
-                 * really expect integer results.
+                 * Computes the transformed bounds if it is cheap, or only the origin point
+                 * otherwise. We expand 'boundsForAll' accordingly.
                  */
-                try {
-                    reference = reference.createInverse(); // Really need a copy, not in-place.
-                } catch (NoninvertibleTransformException e) {
-                    throw new IllegalStateException(e);
-                }
-                final Rectangle2D.Double envelope = new Rectangle2D.Double();
-                for (final Map.Entry<AffineTransform,Dimension> entry : levels.entrySet()) {
-                    final AffineTransform tr = entry.getKey();
-                    Tile tile = pending.remove(tr); // Should never be null.
-                    final Rectangle bounds;
+                final Rectangle bounds;
+                if (tile.isGetRegionCheap()) {
                     try {
                         bounds = tile.getRegion();
                     } catch (IOException e) {
                         throw new IllegalStateException(e);
                     }
-                    tr.preConcatenate(reference);
                     XAffineTransform.transform(tr, bounds, envelope);
                     bounds.x      = (int) Math.round(envelope.x);
                     bounds.y      = (int) Math.round(envelope.y);
                     bounds.width  = (int) Math.round(envelope.width);
                     bounds.height = (int) Math.round(envelope.height);
-                    tile = new Tile(tile.getReader(), tile.getInput(), tile.getImageIndex(),
-                                    bounds, entry.getValue());
-                    tiles.add(tile);
+                    tile = new Tile(reader, input, imageIndex, bounds, pixelSize);
+                    if (boundsForAll == null) {
+                        boundsForAll = bounds;
+                    } else {
+                        boundsForAll.add(bounds);
+                    }
+                } else {
+                    final Point origin = tile.getOrigin();
+                    tr.transform(origin, origin);
+                    tile = new Tile(reader, input, imageIndex, origin, pixelSize);
+                    if (boundsForAll == null) {
+                        boundsForAll = new Rectangle(origin.x, origin.y, 0, 0);
+                    } else {
+                        boundsForAll.add(origin);
+                    }
                 }
+                tilesArray[index++] = tile;
             }
+            results.put(reference, tilesArray);
         }
-        count = pending.size();
-        pending.clear();
-        if (count != 0) {
-            // TODO: localize
-            Logging.getLogger("org.geotools.image.io.mosaic").warning("Ignored " + count + " images.");
-        }
+        clear();
+        return results;
     }
 
     /**
