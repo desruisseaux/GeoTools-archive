@@ -64,7 +64,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         f = PostgisTests.newFixture(getFixtureFile());
 
         String url = "jdbc:postgresql" + "://" + f.host + ":" + f.port + "/" + f.database;
-        pool = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", f.user, f.password, "select now()");
+        pool = DataSourceUtil.buildDefaultDataSource(url, "org.postgresql.Driver", f.user, f.password, 20, 1, "select now()", false, -1);
 
         // make sure versioned metadata is not in the way
         SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);

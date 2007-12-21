@@ -56,6 +56,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.fidmapper.PostGISAutoIncrementFIDMapper;
+import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapperFactory;
 import org.geotools.factory.CommonFactoryFinder;
@@ -390,9 +391,10 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         if (versioned == null) {
             // first check the type exists for good, this will throw an exception if the
             // schema does not
-            wrapped.getSchema(typeName);
             if(isVersionedFeatureCollection(typeName))
                 throw new DataSourceException("Could not find type " + typeName);
+            if(!Arrays.asList(wrapped.getTypeNames()).contains(typeName))
+                throw new DataSourceException("Unknown feature type " + typeName);
             
             Connection conn = null;
             Statement st = null;
@@ -425,7 +427,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         return versioned.booleanValue();
     }
 
-    private boolean isVersionedFeatureCollection(String typeName) throws IOException {
+    public boolean isVersionedFeatureCollection(String typeName) throws IOException {
         if(!typeName.endsWith("_vfc_view"))
             return false;
         
@@ -1058,12 +1060,18 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // the value is not Long.MAX_VALUE
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName)
                     + " ADD COLUMN EXPIRED BIGINT NOT NULL DEFAULT " + Long.MAX_VALUE);
+            execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName)
+                    + " ADD COLUMN CREATED BIGINT REFERENCES " + TBL_CHANGESETS);
 
             // update all rows in the table with the new revision number
             // and turn revision into a not null column
-            execute(st, "UPDATE " + sqlb.encodeTableName(typeName) + " SET REVISION = " + revision);
+            execute(st, "UPDATE " + sqlb.encodeTableName(typeName) 
+                    + " SET REVISION = " + revision
+                    + " , CREATED = " + revision);
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName)
                     + " ALTER REVISION SET NOT NULL");
+            execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName)
+                    + " ALTER CREATED SET NOT NULL");
 
             // now recreate the primary key with revision as first column
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName) + " ADD CONSTRAINT "
@@ -1144,10 +1152,13 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             String viewName = getVFCViewName(typeName);
             st.execute("CREATE VIEW " + viewName + "\n " 
                     + "AS SELECT " + typeName + ".*, "
-                    + "changesets.revision as version, changesets.author, " +
-                    		"changesets.date, changesets.message\n" 
-                    + "FROM " + typeName + " inner join " + " changesets on " + typeName 
-                    + ".revision = changesets.revision");
+                    + "cr.revision as \"creationVersion\", cr.author as \"createdBy\", "
+                    + "cr.date as \"creationDate\", cr.message as \"creationMessage\",  "
+                    + "lu.revision as \"lastUpdateVersion\", lu.author as \"lastUpdatedBy\", "
+                    + "lu.date as \"lastUpdateDate\", lu.message as \"lastUpdateMessage\"\n" 
+                    + "FROM " + typeName + " inner join " + " changesets lu on " + typeName 
+                    + ".revision = lu.revision " +
+                    " inner join changesets cr on " + typeName + ".created = cr.revision");
             
             // make sure there is no other row for this view (one might have remained
             // due to errors, and we would end up with a primary key violation)
@@ -1268,6 +1279,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
             // drop versioning columns
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName) + " DROP COLUMN REVISION");
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName) + " DROP COLUMN EXPIRED");
+            execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName) + " DROP COLUMN CREATED");
 
             // now recreate theold primary key with revision as first column
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName) + " ADD CONSTRAINT "
@@ -1450,6 +1462,8 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
      */
     protected Filter transformFidFilter(String featureTypeName, Filter filter) throws IOException,
             FactoryRegistryException {
+        if(isVersionedFeatureCollection(featureTypeName))
+            featureTypeName = getVFCTableName(featureTypeName);
         SimpleFeatureType featureType = wrapped.getSchema(featureTypeName);
         VersionedFIDMapper mapper = (VersionedFIDMapper) wrapped.getFIDMapper(featureTypeName);
         FidTransformeVisitor transformer = new FidTransformeVisitor(FilterFactoryFinder
@@ -1493,6 +1507,7 @@ public class VersionedPostgisDataStore implements VersioningDataStore {
         if (isVersionedFeatureCollection(query.getTypeName()) || isVersioned(query.getTypeName(), null)) {
             extraColumns.add("revision");
             extraColumns.add("expired");
+            extraColumns.add("created");
         }
         FIDMapper mapper = getFIDMapper(query.getTypeName());
         for (int i = 0; i < mapper.getColumnCount(); i++) {

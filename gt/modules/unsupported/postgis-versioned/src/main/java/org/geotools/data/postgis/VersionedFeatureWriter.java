@@ -285,14 +285,23 @@ class VersionedFeatureWriter implements FeatureWriter {
                 //set revision and expired,
                 newFeature.setAttribute("expired", NON_EXPIRED);
                 newFeature.setAttribute("revision", new Long(state.getRevision()));
+                
+                // mark the feature creation
+                if (oldFeature != null) {
+                    newFeature.setAttribute("created", oldFeature.getAttribute("created"));
+                } else {
+                    newFeature.setAttribute("created", new Long(state.getRevision()));
+                }
     
                 // set FID to the old one
                 // TODO: check this, I'm not sure this is the proper handling
                 String id = null;
                 if (oldFeature != null) {
                     id = mapper.createVersionedFid(liveFeature.getID(), state.getRevision()); 
+                    newFeature.setAttribute("created", oldFeature.getAttribute("created"));
                 } else if (!mapper.hasAutoIncrementColumns()) {
                     id = mapper.createID(state.getConnection(), newFeature, null);
+                    newFeature.setAttribute("created", new Long(state.getRevision()));
                 }
                 // transfer generated id values to the primary key attributes
                 if (id != null) {

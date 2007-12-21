@@ -113,13 +113,18 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // check the versioned feature collection view is there
         SimpleFeatureType view = ds.wrapped.getSchema("road_vfc_view");
         AttributeDescriptor[] types = view.getAttributes().toArray(new AttributeDescriptor[view.getAttributes().size()]);
-        assertEquals(ft.getAttributeCount() + 7, view.getAttributeCount());
-        assertEquals("revision", types[types.length - 6].getLocalName());
-        assertEquals("expired", types[types.length - 5].getLocalName());
-        assertEquals("version", types[types.length - 4].getLocalName());
-        assertEquals("author", types[types.length - 3].getLocalName());
-        assertEquals("date", types[types.length - 2].getLocalName());
-        assertEquals("message", types[types.length - 1].getLocalName());
+        assertEquals(ft.getAttributeCount() + 12, view.getAttributeCount());
+        assertEquals("revision", types[types.length - 11].getLocalName());
+        assertEquals("expired", types[types.length - 10].getLocalName());
+        assertEquals("created", types[types.length - 9].getLocalName());
+        assertEquals("creationVersion", types[types.length - 8].getLocalName());
+        assertEquals("createdBy", types[types.length - 7].getLocalName());
+        assertEquals("creationDate", types[types.length - 6].getLocalName());
+        assertEquals("creationMessage", types[types.length - 5].getLocalName());
+        assertEquals("lastUpdateVersion", types[types.length - 4].getLocalName());
+        assertEquals("lastUpdatedBy", types[types.length - 3].getLocalName());
+        assertEquals("lastUpdateDate", types[types.length - 2].getLocalName());
+        assertEquals("lastUpdateMessage", types[types.length - 1].getLocalName());
         // check the versioned feature collation is not visible outside of the verioning datastore
         try {
             ds.getSchema("road_vfc_view");
@@ -212,10 +217,10 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // extract the good ones
         SqlTestUtils.execute(pool, "INSERT INTO CHANGESETS VALUES(2, 'gimbo', default, '', null)");
         SqlTestUtils.execute(pool, "INSERT INTO CHANGESETS VALUES(3, 'gimbo', default, '', null)");
-        SqlTestUtils.execute(pool, "INSERT INTO ROAD SELECT FID, ID, GEOM, 'r1 rev 2', 2, 3 "
+        SqlTestUtils.execute(pool, "INSERT INTO ROAD SELECT FID, ID, GEOM, 'r1 rev 2', 2, 3, 2 "
                 + "FROM ROAD WHERE ID = 1 AND EXPIRED = " + Long.MAX_VALUE);
-        SqlTestUtils.execute(pool, "INSERT INTO ROAD SELECT FID, ID, GEOM, 'r1 rev 3', 3, "
-                + Long.MAX_VALUE + " " + "FROM ROAD WHERE ID = 1 AND EXPIRED = " + Long.MAX_VALUE);
+        SqlTestUtils.execute(pool, "INSERT INTO ROAD SELECT FID, ID, GEOM, 'r1 rev 3', 3,  "
+                + Long.MAX_VALUE + ", 2 " + "FROM ROAD WHERE ID = 1 AND EXPIRED = " + Long.MAX_VALUE);
         SqlTestUtils.execute(pool,
                 "UPDATE ROAD SET EXPIRED = 2 WHERE ID = 1 AND REVISION = 1 AND EXPIRED = "
                         + Long.MAX_VALUE);
@@ -1125,11 +1130,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         FeatureCollection fc = fs.getFeatures();
         assertEquals(vfc.size(), fc.size());
         final int vfcAttributesCount = vfc.getSchema().getAttributeCount();
-        assertEquals(fc.getSchema().getAttributeCount() + 4, vfcAttributesCount);
-        assertEquals("version", vfc.getSchema().getAttribute(vfcAttributesCount - 4).getLocalName());
-        assertEquals("author", vfc.getSchema().getAttribute(vfcAttributesCount - 3).getLocalName());
-        assertEquals("date", vfc.getSchema().getAttribute(vfcAttributesCount - 2).getLocalName());
-        assertEquals("message", vfc.getSchema().getAttribute(vfcAttributesCount - 1).getLocalName());
+        assertEquals(fc.getSchema().getAttributeCount() + 8, vfcAttributesCount);
+        assertEquals("creationVersion", vfc.getSchema().getAttribute(vfcAttributesCount - 8).getLocalName());
+        assertEquals("createdBy", vfc.getSchema().getAttribute(vfcAttributesCount - 7).getLocalName());
+        assertEquals("creationDate", vfc.getSchema().getAttribute(vfcAttributesCount - 6).getLocalName());
+        assertEquals("creationMessage", vfc.getSchema().getAttribute(vfcAttributesCount - 5).getLocalName());
+        assertEquals("lastUpdateVersion", vfc.getSchema().getAttribute(vfcAttributesCount - 4).getLocalName());
+        assertEquals("lastUpdatedBy", vfc.getSchema().getAttribute(vfcAttributesCount - 3).getLocalName());
+        assertEquals("lastUpdateDate", vfc.getSchema().getAttribute(vfcAttributesCount - 2).getLocalName());
+        assertEquals("lastUpdateMessage", vfc.getSchema().getAttribute(vfcAttributesCount - 1).getLocalName());
         final FeatureIterator vfr = vfc.features();
         final FeatureIterator fr = fc.features();
         final SimpleFeature vf = vfr.next();
@@ -1139,7 +1148,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(fc.getSchema().getTypeName(), vfc.getSchema().getTypeName());
         assertEquals(f.getFeatureType().getTypeName(), vf.getFeatureType().getTypeName());
         assertEquals(vfcAttributesCount, vfc.getSchema().getAttributeCount());
-        assertEquals(vf.getID(), f.getID());
+        assertEquals(f.getID(), vf.getID());
         for (int i = 0; i < f.getFeatureType().getAttributeCount(); i++) {
             assertTrue(DataUtilities.attributesEqual(f.getAttribute(i), vf.getAttribute(i)));
         }

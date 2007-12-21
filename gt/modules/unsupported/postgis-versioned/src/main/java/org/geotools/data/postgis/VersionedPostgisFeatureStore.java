@@ -204,7 +204,6 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // we have to hit the view
         DefaultQuery vq = new DefaultQuery(query);
         vq.setTypeName(VersionedPostgisDataStore.getVFCViewName(typeName));
-        
         vq = store.buildVersionedQuery(vq);
         FeatureCollection fc = store.wrapped.getFeatureSource(VersionedPostgisDataStore.getVFCViewName(typeName)).getFeatures(vq);
         final SimpleFeatureType fcSchema = fc.getSchema();
