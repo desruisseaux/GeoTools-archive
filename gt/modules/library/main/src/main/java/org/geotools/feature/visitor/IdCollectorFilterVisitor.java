@@ -22,8 +22,8 @@ public class IdCollectorFilterVisitor extends DefaultFilterVisitor {
     @SuppressWarnings("unchecked")
     @Override
     public Object visit( Id filter, Object data ) {
-        Set<String> set = (Set<String>) data;
-        set.addAll( (Collection< ? extends String>) filter.getIDs() );        
+        Set set = (Set) data;
+        set.addAll( filter.getIDs() );        
         return set;
     }
 }
