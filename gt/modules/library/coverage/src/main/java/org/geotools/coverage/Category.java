@@ -19,22 +19,17 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.Color;
 import java.util.Arrays;
 import java.io.Serializable;
-
-// JAI dependencies
 import javax.media.jai.operator.PiecewiseDescriptor;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
@@ -59,7 +54,7 @@ import org.geotools.util.NumberRange;
  * through the following linear relation:
  *
  * <var>altitude</var>&nbsp;=&nbsp;<var>sample&nbsp;value</var>&times;100.
- * 
+ *
  * Some image mixes both qualitative and quantitative categories. For example,
  * images of Sea Surface Temperature  (SST)  may have a quantitative category
  * for temperature with values ranging from 2 to 35°C,  and three qualitative
@@ -116,13 +111,18 @@ public class Category implements Serializable {
     }
 
     /**
+     * A transparent color for missing data.
+     */
+    private static final Color TRANSPARENT = new Color(0,0,0,0);
+
+    /**
      * A default category for "no data" values. This default qualitative category use
      * sample value 0, which is mapped to geophysics value {@link Float#NaN} for those who work
      * with floating point images. The rendering color default to a fully transparent color and
      * the name is "no data" localized to the requested locale.
      */
     public static final Category NODATA = new Category(
-            Vocabulary.formatInternational(VocabularyKeys.NODATA), new Color(0,0,0,0), 0);
+            Vocabulary.formatInternational(VocabularyKeys.NODATA), TRANSPARENT, 0);
 
     /**
      * A default category for the boolean "{@link Boolean#FALSE false}" value. This default
@@ -223,7 +223,7 @@ public class Category implements Serializable {
                     final Color        color,
                     final boolean      sample)
     {
-        this(name, new Color[]{color}, sample ? BYTE_0 : BYTE_1, LinearTransform1D.IDENTITY);
+        this(name, toArray(color), sample ? BYTE_0 : BYTE_1, LinearTransform1D.IDENTITY);
     }
 
     /**
@@ -261,6 +261,7 @@ public class Category implements Serializable {
     /**
      * Constructs a qualitative category for sample value {@code sample}.
      */
+    @SuppressWarnings("unchecked")
     private Category(final CharSequence name,
                      final int[]        ARGB,
                      final Number       sample)
@@ -283,7 +284,7 @@ public class Category implements Serializable {
                     final Color       color,
                     final NumberRange sampleValueRange) throws IllegalArgumentException
     {
-        this(name, new Color[] {color}, sampleValueRange, (MathTransform1D) null);
+        this(name, toArray(color), sampleValueRange, (MathTransform1D) null);
     }
 
     /**
@@ -471,8 +472,7 @@ public class Category implements Serializable {
          * Checks the arguments. Use '!' in comparaison in order to reject NaN values,
          * except for the legal case catched by the "if" block just above.
          */
-        if (!(minimum<=maximum) || Double.isInfinite(minimum) || Double.isInfinite(maximum))
-        {
+        if (!(minimum<=maximum) || Double.isInfinite(minimum) || Double.isInfinite(maximum)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
                                                range.getMinValue(), range.getMaxValue()));
         }
@@ -504,7 +504,7 @@ public class Category implements Serializable {
     }
 
     /**
-     * Construct a geophysics category. <strong>This constructor should never
+     * Constructs a geophysics category. <strong>This constructor should never
      * be invoked outside {@link GeophysicsCategory} constructor.</strong>
      *
      * @param  inverse The originating {@link Category}.
@@ -559,7 +559,7 @@ public class Category implements Serializable {
     }
 
     /**
-     * Create a linear transform mapping values from {@code sampleValueRange}
+     * Creates a linear transform mapping values from {@code sampleValueRange}
      * to {@code geophysicsValueRange}.
      */
     private static MathTransform1D createLinearTransform(final NumberRange sampleValueRange,
@@ -636,6 +636,13 @@ public class Category implements Serializable {
     }
 
     /**
+     * Returns the given color in an array of length 1, or {@code null} if {@code color} is null.
+     */
+    private static Color[] toArray(final Color color) {
+        return (color != null) ? new Color[] {color} : null;
+    }
+
+    /**
      * Convert an array of colors to an array of ARGB values.
      * If {@code colors} is null, then a default array
      * will be returned.
@@ -648,7 +655,12 @@ public class Category implements Serializable {
         if (colors!=null && colors.length!=0) {
             ARGB = new int[colors.length];
             for (int i=0; i<ARGB.length; i++) {
-                ARGB[i] = colors[i].getRGB();
+                final Color color = colors[i];
+                if (color != null) {
+                    ARGB[i] = color.getRGB();
+                } else {
+                    // Left ARGB[i] to its default value (0), which is the transparent color.
+                }
             }
         } else {
             ARGB = DEFAULT;
@@ -661,10 +673,12 @@ public class Category implements Serializable {
      * is null, a default ARGB code will be returned.
      */
     private static int[] toARGB(Color color, final int sample) {
-        if (color==null) {
+        if (color == null) {
             color = CYCLE[Math.abs(sample) % CYCLE.length];
         }
-        return toARGB(new Color[] {color});
+        return new int[] {
+            color.getRGB()
+        };
     }
 
     /**
@@ -731,7 +745,7 @@ public class Category implements Serializable {
      * An array of length 0 or a {@code null} array means that some default colors should be
      * used (usually a gradient from opaque black to opaque white).
      *
-     * @param colors A set of colors for the new category. 
+     * @param colors A set of colors for the new category.
      * @return A category with the new color palette, or {@code this}
      *         if the new colors are identical to the current ones.
      *
@@ -817,6 +831,7 @@ public class Category implements Serializable {
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
@@ -825,6 +840,7 @@ public class Category implements Serializable {
      * Compares the specified object with
      * this category for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object==this) {
             // Slight optimization

@@ -19,18 +19,15 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.renderable.RenderedImageFactory;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// JAI dependencies
 import javax.media.jai.CRIFImpl;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -42,7 +39,6 @@ import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// Geotools dependencies
 import org.geotools.coverage.grid.AbstractGridCoverage;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -56,7 +52,7 @@ import org.geotools.image.TransfertRectIter;
  * transformation to geophyics values, or the converse. Images are created using the
  * {@code SampleTranscoder.CRIF} inner class, where "CRIF" stands for
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
- * operation name is "org.geotools.SampleTranscode".
+ * operation name is {@code "org.geotools.SampleTranscode"}.
  *
  * @source $URL$
  * @version $Id$
@@ -77,7 +73,7 @@ final class SampleTranscoder extends PointOpImage {
      * The array length must matches the number of bands in source image.
      */
     private final CategoryList[] categories;
-    
+
     /**
      * Constructs a new {@code SampleTranscoder}.
      *
@@ -97,7 +93,7 @@ final class SampleTranscoder extends PointOpImage {
         }
         permitInPlaceOperation();
     }
-    
+
     /**
      * Computes one of the destination image tile.
      *
@@ -116,24 +112,32 @@ final class SampleTranscoder extends PointOpImage {
      * @param dest     The destination tile.
      * @param destRect the rectangle within the destination to be written.
      */
+    @Override
     protected void computeRect(final PlanarImage[] sources,
                                final WritableRaster   dest,
                                final Rectangle    destRect)
     {
         final PlanarImage source = sources[0];
-        WritableRectIter iterator = RectIterFactory.createWritable(dest, destRect);
+        final Rectangle bounds = destRect.intersection(source.getBounds());
+        if (!destRect.equals(bounds)) {
+            // TODO: Check if this case occurs sometime, and fill pixel values if it does.
+            //       If it happen to occurs, we will need to fix other GeoTools operations
+            //       as well.
+            org.geotools.util.logging.Logging.getLogger("org.geotools.coverage").warning(
+                    "Bounds mismatch: " + destRect + " and " + bounds);
+        }
+        WritableRectIter iterator = RectIterFactory.createWritable(dest, bounds);
         if (true) {
             // TODO: Detect if source and destination rasters are the same. If they are
             //       the same, we should skip this block. Iteration will then be faster.
-            iterator = TransfertRectIter.create(RectIterFactory.create(source, destRect), iterator);
+            iterator = TransfertRectIter.create(RectIterFactory.create(source, bounds), iterator);
         }
-        int band=0;
+        int band = 0;
         if (!iterator.finishedBands()) do {
-            categories[band].transform(iterator);
-            band++;
+            categories[band++].transform(iterator);
         }
         while (!iterator.nextBandDone());
-        assert(band == categories.length) : band;
+        assert band == categories.length : band;
     }
 
 
@@ -212,7 +216,8 @@ final class SampleTranscoder extends PointOpImage {
     }
 
     /**
-     * The {@link RenderedImageFactory} for the "SampleTranscode" operation.
+     * The {@link java.awt.image.renderable.RenderedImageFactory}
+     * for the {@code "SampleTranscode"} operation.
      */
     private static final class CRIF extends CRIFImpl {
         /**

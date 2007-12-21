@@ -67,7 +67,9 @@ import org.geotools.util.NumberRange;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-class CategoryList extends AbstractList implements MathTransform1D, Comparator<Category>, Serializable {
+class CategoryList extends AbstractList<Category>
+        implements MathTransform1D, Comparator<Category>, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -735,7 +737,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator<C
     /**
      * Returns the element at the specified position in this list.
      */
-    public final Object get(final int i) {
+    public final Category get(final int i) {
         return categories[i];
     }
 
@@ -743,7 +745,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator<C
      * Returns all categories in this {@code CategoryList}.
      */
     @Override
-    public final Object[] toArray() {
+    public final Category[] toArray() {
         return categories.clone();
     }
 

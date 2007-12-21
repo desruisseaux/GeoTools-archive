@@ -17,6 +17,7 @@
 package org.geotools.image.io.mosaic;
 
 import java.awt.Point;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -96,6 +97,12 @@ public class Tile implements Comparable<Tile> {
     private final int imageIndex;
 
     /**
+     * The pixel size relative to the finest pyramid level. If this tile is the
+     * finest level, then the value shall be 1. Should never be 0 or negative.
+     */
+    private final int dx, dy;
+
+    /**
      * The upper-left corner in the destination image.
      */
     private final int x, y;
@@ -121,8 +128,14 @@ public class Tile implements Comparable<Tile> {
      *          The image index of the tile to be read. This is often 0.
      * @param origin
      *          The upper-left corner in the destination image.
+     * @param pixelSize
+     *          Pixel size relative to the finest resolution in an image pyramid,
+     *          or {@code null} if none. If non-null, width and height should be
+     *          strictly positive.
      */
-    public Tile(final ImageReader reader, final Object input, final int imageIndex, final Point origin) {
+    public Tile(final ImageReader reader, final Object input, final int imageIndex,
+                final Point origin, final Dimension pixelSize)
+    {
         ensureNonNull("reader", reader);
         ensureNonNull("input",  input);
         ensureNonNull("origin", origin);
@@ -132,6 +145,13 @@ public class Tile implements Comparable<Tile> {
         this.imageIndex = imageIndex;
         this.x          = origin.x;
         this.y          = origin.y;
+        if (pixelSize != null) {
+            dx = pixelSize.width;
+            dy = pixelSize.height;
+            ensureValidPixelSize();
+        } else {
+            dx = dy = 1;
+        }
     }
 
     /**
@@ -151,8 +171,14 @@ public class Tile implements Comparable<Tile> {
      * @param region
      *          The region in the destination image. The {@linkplain Rectangle#width width} and
      *          {@linkplain Rectangle#height height} should match the image size.
+     * @param pixelSize
+     *          Pixel size relative to the finest resolution in an image pyramid,
+     *          or {@code null} if none. If non-null, width and height should be
+     *          strictly positive.
      */
-    public Tile(final ImageReader reader, final Object input, final int imageIndex, final Rectangle region) {
+    public Tile(final ImageReader reader, final Object input, final int imageIndex,
+                final Rectangle region, final Dimension pixelSize)
+    {
         ensureNonNull("reader", reader);
         ensureNonNull("input",  input);
         ensureNonNull("region", region);
@@ -167,12 +193,29 @@ public class Tile implements Comparable<Tile> {
         this.y          = region.y;
         this.width      = region.width;
         this.height     = region.height;
+        if (pixelSize != null) {
+            dx = pixelSize.width;
+            dy = pixelSize.height;
+            ensureValidPixelSize();
+        } else {
+            dx = dy = 1;
+        }
+    }
+
+    /**
+     * Ensures that the pixel size is strictly positive.
+     */
+    private void ensureValidPixelSize() {
+        int n;
+        if ((n=dx) < 1 || (n=dy) < 1) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_GREATER_THAN_ZERO_$1, n));
+        }
     }
 
     /**
      * Ensures that the given argument is non-null.
      */
-    private static void ensureNonNull(final String argument, final Object value) {
+    static void ensureNonNull(final String argument, final Object value) {
         if (value == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, argument));
         }
@@ -312,6 +355,14 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
+     * Returns the pixel size relative to the finest level in an image pyramid.
+     * This method never returns {@code null}.
+     */
+    public Dimension getPixelSize() {
+        return new Dimension(dx, dy);
+    }
+
+    /**
      * Returns the upper-left corner in the destination image.
      */
     public Point getOrigin() {
@@ -333,9 +384,8 @@ public class Tile implements Comparable<Tile> {
     public Rectangle getRegion() throws IOException {
         if (width == 0 && height == 0) {
             final ImageReader reader = getPreparedReader(true, true);
-            int value;
-            value = reader.getWidth (imageIndex); if (value > width ) width  = value;
-            value = reader.getHeight(imageIndex); if (value > height) height = value;
+            width  = reader.getWidth (imageIndex);
+            height = reader.getHeight(imageIndex);
         }
         return new Rectangle(x, y, width, height);
     }
@@ -372,20 +422,26 @@ public class Tile implements Comparable<Tile> {
      * {@linkplain #getReader image reader} and {@linkplain #getInput input}.
      */
     public final int compareTo(final Tile other) {
-        int c = getImageIndex() - other.getImageIndex();
+        int c = imageIndex - other.imageIndex;
         if (c == 0) {
-            final Point p1 = getOrigin();
-            final Point p2 = other.getOrigin();
-            c = p1.y - p2.y;
+            c = y - other.y;
             if (c == 0) {
-                c = p1.x - p2.x;
+                c = x - other.x;
+                if (c == 0) {
+                    c = dy - other.dy;
+                    if (c == 0) {
+                        c = dx - other.dx;
+                    }
+                }
             }
         }
         return c;
     }
 
     /**
-     * Compares this tile with the specified one for equality.
+     * Compares this tile with the specified one for equality. The default implementation compares
+     * every properties except the {@link #getRegion region} width and height, because they may be
+     * expensive to compute.
      */
     @Override
     public boolean equals(final Object object) {
@@ -394,17 +450,14 @@ public class Tile implements Comparable<Tile> {
         }
         if (object != null && object.getClass().equals(getClass())) {
             final Tile that = (Tile) object;
-            if (this.getImageIndex() == that.getImageIndex() &&
-                    Utilities.deepEquals(this.getInput(),  that.getInput())  &&
-                    Utilities.equals    (this.getReader(), that.getReader()) &&
-                    Utilities.equals    (this.getOrigin(), that.getOrigin()))
+            if (x == that.x && y == that.y && dx == that.dx && dy == that.dy &&
+                imageIndex == that.imageIndex &&
+                Utilities.deepEquals(input,  that.input) &&
+                Utilities.equals    (reader, that.reader))
             {
-                if (this.isGetRegionCheap() && that.isGetRegionCheap()) try {
-                    return Utilities.equals(this.getRegion(), that.getRegion());
-                } catch (IOException e) {
-                    // Should not occurs, since we checked that 'getRegion()' should be cheap.
-                    Logging.recoverableException(Tile.class, "equals", e);
-                }
+                // We don't compare width and height - see javadoc. We could compare them only
+                // if already defined, but it could lead to inconsistent behavior (tiles equal
+                // at some time, then not equal anymore later).
                 return true;
             }
         }
@@ -412,16 +465,19 @@ public class Tile implements Comparable<Tile> {
     }
 
     /**
-     * Returns a hash code value for this tile.
+     * Returns a hash code value for this tile. The default implementation uses the
+     * {@linkplain #getReader reader}, {@linkplain #getInput input} and {@linkplain
+     * #getImageIndex image index}, which should be suffisient for uniquely distinguish
+     * every tiles.
      */
     @Override
     public int hashCode() {
-        // reader, input and imageIndex should be suffisient for distinguish the tiles.
-        return getReader().hashCode() + Utilities.deepHashCode(getInput()) + 37*getImageIndex();
+        return reader.hashCode() + Utilities.deepHashCode(input) + 37*imageIndex;
     }
 
     /**
-     * Returns a string representation of this tile.
+     * Returns a string representation of this tile. The returned string is mostly for
+     * debugging purpose and could change in any future version.
      */
     @Override
     public String toString() {

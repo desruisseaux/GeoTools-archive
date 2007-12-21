@@ -19,7 +19,6 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies and extensions
 import java.awt.Color;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;  // For javadoc
@@ -32,11 +31,9 @@ import java.util.List;
 import java.util.Locale;
 import javax.units.Unit;
 
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -47,7 +44,6 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
-// Geotools dependencies
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
@@ -209,7 +205,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * of zero. For example: [0]="Background", [1]="Water", [2]="Forest",
      * [3]="Urban". The created sample dimension will have no unit and a default
      * set of colors.
-     * 
+     *
      * @param description
      *            The sample dimension title or description, or {@code null} for the default
      *            (the name of what looks like the "main" category). This is the value to be
@@ -237,7 +233,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * of zero. For example: [0]="Background", [1]="Water", [2]="Forest",
      * [3]="Urban". The created sample dimension will have no unit and a default
      * set of colors.
-     * 
+     *
      * @param categoriesNames
      *            Sequence of category names for the values contained in a
      *            sample dimension, as {@link String} or
@@ -269,7 +265,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * a cell value of zero. For example: [0]="Background", [1]="Water",
      * [2]="Forest", [3]="Urban". The created sample dimension will have no unit
      * and a default set of colors.
-     * 
+     *
      * @param description
      *            The sample dimension title or description, or {@code null} for the default
      *            (the name of what looks like the "main" category). This is the value to be
@@ -301,7 +297,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * a cell value of zero. For example: [0]="Background", [1]="Water",
      * [2]="Forest", [3]="Urban". The created sample dimension will have no unit
      * and a default set of colors.
-     * 
+     *
      * @param names
      *            Sequence of category names for the values contained in a
      *            sample dimension, as {@link String} or
@@ -341,7 +337,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * {@link Category} objects. However, this constructor still less general
      * and provides less fine-grain control than the constructor expecting an
      * array of {@link Category} objects.
-     * 
+     *
      * @param description
      *            The sample dimension title or description, or {@code null} for the default
      *            (the name of what looks like the "main" category). This is the value to be
@@ -394,7 +390,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *            The unit information for this sample dimension, or
      *            {@code null} if none. This is the value to be returned by
      *            {@link #getUnits}.
-     * 
+     *
      * @throws IllegalArgumentException
      *             if the range {@code [minimum..maximum]} is not valid.
      */
@@ -411,7 +407,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
                                final Unit                 unit)
     {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
-        //       ("Relax constraint on placement of this()/super() call in constructors").        
+        //       ("Relax constraint on placement of this()/super() call in constructors").
         this(description, list(description, type, color, palette, categories, nodata,
                                minimum, maximum, scale, offset, unit));
     }
@@ -449,7 +445,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         }
         final int  nameCount    = (categories != null) ? categories.length : 0;
         final int  nodataCount  = (nodata     != null) ?     nodata.length : 0;
-        final List categoryList = new ArrayList(nameCount + nodataCount + 2);
+        final List<Category> categoryList = new ArrayList<Category>(nameCount + nodataCount + 2);
         /*
          * STEP 1 - Add a qualitative category for each 'nodata' value.
          *   NAME: Fetched from 'categories' if available, otherwise default to the value.
@@ -529,7 +525,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         if (scale != 1 || offset != 0 || nodataCount != 0 || categoryList.size() <= 1) {
             needQuantitative = true;
             for (int i = categoryList.size(); --i >= 0;) {
-                Category category = (Category) categoryList.get(i);
+                Category category = categoryList.get(i);
                 if (!category.isQuantitative()) {
                     final NumberRange range = category.getRange();
                     final Comparable  min   = range.getMinValue();
@@ -562,7 +558,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
             boolean minIncluded = true;
             boolean maxIncluded = true;
             for (int i = categoryList.size(); --i >= 0;) {
-                final NumberRange range = ((Category) categoryList.get(i)).getRange();
+                final NumberRange range = categoryList.get(i).getRange();
                 final double min = range.getMinimum();
                 final double max = range.getMaximum();
                 if (max-minimum < maximum-min) {
@@ -600,7 +596,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
          * STEP 5 - Now, the list of categories should be complete. Construct a
          *          sample dimension appropriate for the type of palette used.
          */
-        final Category[] cl = (Category[]) categoryList.toArray(new Category[categoryList.size()]);
+        final Category[] cl = categoryList.toArray(new Category[categoryList.size()]);
         if (ColorInterpretation.PALETTE_INDEX.equals(color) ||
             ColorInterpretation.GRAY_INDEX.equals(color))
         {
@@ -615,7 +611,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * than one quantitative categories, providing that their sample value
      * ranges do not overlap. Quantitative categories can map sample values to
      * geophysics values using arbitrary relation (not necessarly linear).
-     * 
+     *
      * @param description
      *            The sample dimension title or description, or {@code null} for the default
      *            (the name of what looks like the "main" category). This is the value to be
@@ -649,7 +645,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * than one quantitative categories, providing that their sample value
      * ranges do not overlap. Quantitative categories can map sample values to
      * geophysics values using arbitrary relation (not necessarly linear).
-     * 
+     *
      * @param categories
      *            The list of categories.
      * @param units
@@ -684,7 +680,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 
     /**
      * Constructs a sample dimension with the specified list of categories.
-     * 
+     *
      * @param description
      *            The sample dimension title or description, or {@code null} for the default
      *            (the name of what looks like the "main" category). This is the value to be
@@ -719,7 +715,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         boolean qualitative = false;
         if (list != null) {
             for (int i = list.size(); --i >= 0;) {
-                final MathTransform1D candidate = ((Category) list.get(i)).getSampleToGeophysics();
+                final MathTransform1D candidate = list.get(i).getSampleToGeophysics();
                 if (candidate == null) {
                     qualitative = true;
                     continue;
@@ -768,7 +764,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Wrap the specified OpenGIS's sample dimension into a Geotools's
      * implementation of {@code GridSampleDimension}.
-     * 
+     *
      * @param sd
      *            The sample dimension to wrap into a Geotools implementation.
      */
@@ -853,7 +849,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         }
         InternationalString[] names = null;
         for (int i=categories.size(); --i>=0;) {
-            final Category category = (Category) categories.get(i);
+            final Category category = categories.get(i);
             final int lower = (int) category.minimum;
             final int upper = (int) category.maximum;
             if (lower!=category.minimum || lower<0 ||
@@ -879,7 +875,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @see #getCategoryNames
      * @see #getCategory
      */
-    public List getCategories() {
+    public List<Category> getCategories() {
         return categories;
     }
 
@@ -956,7 +952,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
         double[] padValues = null;
         final int size = categories.size();
         for (int i=0; i<size; i++) {
-            final Category category = (Category) categories.get(i);
+            final Category category = categories.get(i);
             if (!category.isQuantitative()) {
                 final double min = category.minimum;
                 final double max = category.maximum;
@@ -1010,7 +1006,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      */
     public double getMinimumValue() {
         if (categories!=null && !categories.isEmpty()) {
-            final double value = ((Category) categories.get(0)).minimum;
+            final double value = categories.get(0).minimum;
             if (!Double.isNaN(value)) {
                 return value;
             }
@@ -1029,7 +1025,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     public double getMaximumValue() {
         if (categories!=null) {
             for (int i=categories.size(); --i>=0;) {
-                final double value = ((Category) categories.get(i)).maximum;
+                final double value = categories.get(i).maximum;
                 if (!Double.isNaN(value)) {
                     return value;
                 }
@@ -1403,7 +1399,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 
     /**
      * Returns a color model for this sample dimension. The default implementation create the
-     * color model using each category's colors as returned by {@link Category#getColors}. 
+     * color model using each category's colors as returned by {@link Category#getColors}.
      *
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
@@ -1443,7 +1439,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     public GridSampleDimension rescale(final double scale, final double offset) {
         final MathTransform1D sampleToGeophysics = Category.createLinearTransform(scale, offset);
         final Category[] categories = (Category[]) getCategories().toArray();
-        final Category[] reference  = (Category[]) categories.clone();
+        final Category[] reference  = categories.clone();
         final int length = categories.length;
         for (int i = 0; i < length; i++) {
             if (categories[i].isQuantitative()) {
@@ -1470,7 +1466,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      */
     public String[] getMetaDataNames() {
         return EMPTY_METADATA;
-    }    
+    }
 
     /**
      * Retrieve the metadata value for a given metadata name.
@@ -1493,6 +1489,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * This value need not remain consistent between
      * different implementations of the same class.
      */
+    @Override
     public int hashCode() {
         return (categories!=null) ? categories.hashCode() : (int) serialVersionUID;
     }
@@ -1500,6 +1497,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Compares the specified object with this sample dimension for equality.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             // Slight optimization
@@ -1521,6 +1519,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * sample value range, then the list of categories. A "*"
      * mark is put in front of what seems the "main" category.
      */
+    @Override
     public String toString() {
         if (categories != null) {
             return categories.toString(this);

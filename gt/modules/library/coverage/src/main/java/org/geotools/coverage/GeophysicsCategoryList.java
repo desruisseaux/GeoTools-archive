@@ -19,14 +19,11 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies and extensions
 import java.text.FieldPosition;
 import java.text.NumberFormat;
-import java.util.AbstractList;
 import java.util.Locale;
 import javax.units.Unit;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 
@@ -56,33 +53,33 @@ final class GeophysicsCategoryList extends CategoryList {
      * significant digits to allow when formatting a geophysics value.
      */
     private static final int MAX_DIGITS = 6;
-    
+
     /**
      * Unités des mesures géophysiques représentées par les catégories.
      * Ce champ peut être nul s'il ne s'applique pas ou si les unités
      * ne sont pas connues.
      */
     private final Unit unit;
-    
+
     /**
      * Nombre de chiffres significatifs après la virgule.
      * Cette information est utilisée pour les écritures
      * des valeurs géophysiques des catégories.
      */
     private final int ndigits;
-    
+
     /**
      * Locale used for creating {@link #format} last time.
      * May be {@code null} if default locale was requested.
      */
     private transient Locale locale;
-    
+
     /**
      * Format à utiliser pour écrire les
      * valeurs géophysiques des thèmes.
      */
     private transient NumberFormat format;
-    
+
     /**
      * Objet temporaire pour {@link NumberFormat}.
      */
@@ -108,7 +105,7 @@ final class GeophysicsCategoryList extends CategoryList {
         this.ndigits = getFractionDigitCount(categories);
         assert isScaled(true);
     }
-    
+
     /**
      * Computes the smallest number of fraction digits necessary to resolve all
      * quantitative values. This method assume that geophysics values in the range
@@ -122,8 +119,8 @@ final class GeophysicsCategoryList extends CategoryList {
         for (int i=0; i<length; i++) {
             final Category geophysics = categories[i].geophysics(true);
             final Category samples    = categories[i].geophysics(false);
-            final double ln = XMath.log10((geophysics.maximum - geophysics.minimum)/
-                                          (   samples.maximum -    samples.minimum));
+            final double ln = Math.log10((geophysics.maximum - geophysics.minimum)/
+                                         (   samples.maximum -    samples.minimum));
             if (!Double.isNaN(ln)) {
                 final int n = -(int)(Math.floor(ln + EPS));
                 if (n>ndigits) {
@@ -140,21 +137,23 @@ final class GeophysicsCategoryList extends CategoryList {
      * in which <code>{@link Category#geophysics(boolean) Category.geophysics}(toGeophysics)</code>
      * has been invoked for each category.
      */
+    @Override
     public CategoryList geophysics(final boolean toGeophysics) {
         final CategoryList scaled = toGeophysics ? this : inverse;
         assert scaled.isScaled(toGeophysics);
         return scaled;
     }
-    
+
     /**
      * Returns the unit information for quantitative categories in this list.
      * May returns {@code null}  if there is no quantitative categories
      * in this list, or if there is no unit information.
      */
+    @Override
     public Unit getUnits() {
         return unit;
     }
-    
+
     /**
      * Formatte la valeur spécifiée selon les conventions locales. Le nombre sera
      * écrit avec un nombre de chiffres après la virgule approprié pour la catégorie.
@@ -169,6 +168,7 @@ final class GeophysicsCategoryList extends CategoryList {
      * @param  buffer Le buffer dans lequel écrire la valeur.
      * @return Le buffer {@code buffer} dans lequel auront été écrit la valeur et les unités.
      */
+    @Override
     synchronized StringBuffer format(final double value, final boolean writeUnits,
                                      final Locale locale, StringBuffer buffer)
     {
@@ -191,12 +191,13 @@ final class GeophysicsCategoryList extends CategoryList {
         }
         return buffer;
     }
-    
+
     /**
      * Compares the specified object with this category list for equality.
      * If the two objects are instances of {@link CategoryList}, then the
      * test is a little bit stricter than the default {@link AbstractList#equals}.
      */
+    @Override
     public boolean equals(final Object object) {
         if (object instanceof GeophysicsCategoryList) {
             final GeophysicsCategoryList that = (GeophysicsCategoryList) object;
