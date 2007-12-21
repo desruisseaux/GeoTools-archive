@@ -12,6 +12,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.LineSegment;
 import org.opengis.geometry.coordinate.PointArray;
 import org.opengis.geometry.primitive.Curve;
+import org.opengis.geometry.primitive.CurveSegment;
 import org.opengis.geometry.primitive.OrientableCurve;
 import org.opengis.geometry.primitive.Ring;
 import org.opengis.geometry.primitive.Surface;
@@ -50,7 +51,7 @@ public class SurfaceImplTest extends TestCase {
          // A curve will be created
          // - The curve will be set as parent curves for the Curve segments
          // - Start and end params for the CurveSegments will be set
-         List<LineSegment> segmentList = new ArrayList<LineSegment>();
+         List<CurveSegment> segmentList = new ArrayList<CurveSegment>();
          for( int i=0; i<points.length();i++){
              int start = i;
              int end = (i+1)%points.size();
