@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.visitor.IdCollectorFilterVisitor;
+import org.geotools.feature.visitor.IdFinderFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -111,5 +113,26 @@ public class FilterVisitorTest extends TestCase {
         assertNotNull( bbox );
         assertEquals( 10, (int) bbox.getLength(0) );
         assertEquals( 10, (int) bbox.getLength(1) );
+    }
+    public void testIdFinderFilterVisitor(){
+        Filter filter = ff.isNull(ff.property("name"));
+        boolean found = (Boolean) filter.accept( new IdFinderFilterVisitor(), null );
+        assertFalse( found );
+        
+        filter = ff.id( Collections.singleton( ff.featureId("eclesia")));
+        found = (Boolean) filter.accept( new IdFinderFilterVisitor(), null );
+        assertTrue( found );        
+    }
+    
+    public void testIdCollector(){
+        Filter filter = ff.isNull(ff.property("name"));
+        Set fids = (Set) filter.accept( IdCollectorFilterVisitor.ID_COLLECTOR, new HashSet() );
+        assertTrue( fids.isEmpty() );
+        assertFalse( fids.contains("eclesia"));
+        
+        filter = ff.id( Collections.singleton( ff.featureId("eclesia")));
+        fids = (Set) filter.accept( IdCollectorFilterVisitor.ID_COLLECTOR, new HashSet() );
+        assertFalse( fids.isEmpty() );
+        assertTrue( fids.contains("eclesia"));        
     }
 }
