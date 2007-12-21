@@ -17,18 +17,22 @@ package org.geotools.gui.swing.toolbox.tools.shapecreation;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.CRS;
+import org.geotools.gui.swing.crschooser.JCRSChooser;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  *
@@ -38,6 +42,8 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
 
     private ShapeAttModel model = new ShapeAttModel();
     private String geotype = "Point";
+    private CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+    private File file = new File("default.shp");
 
     /** 
      * Creates new form shapeCreationPanel 
@@ -46,15 +52,15 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
         initComponents();
         gui_tab.getSelectionModel().setSelectionMode(gui_tab.getSelectionModel().SINGLE_SELECTION);
         gui_tab.getColumn(1).setCellEditor(new TypeEditor());
+
+        gui_jtf_crs.setText(crs.getName().toString());
+        gui_jtf_name.setText(file.getAbsolutePath());
     }
 
     private void createShape(String name) {
         try {
             // Create the DataStoreFactory
             FileDataStoreFactorySpi factory = new IndexedShapefileDataStoreFactory();
-
-            // Create the file you want to write to
-            File file = new File(name + ".shp");
 
             // Create a Map object used by our DataStore Factory
             // NOTE: file.toURI().toURL() is used because file.toURL() is deprecated
@@ -65,7 +71,7 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
             ShapefileDataStore myData = (ShapefileDataStore) factory.createNewDataStore(map);
 
             // Tell the DataStore what type of Coordinate Reference System (CRS) to use
-            myData.forceSchemaCRS(CRS.decode("EPSG:4326"));
+            myData.forceSchemaCRS(crs);
 
             // Tell this shapefile what type of data it will store
             StringBuffer buffer = new StringBuffer();
@@ -76,8 +82,8 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
 
             for (Data data : datas) {
                 buffer.append("," + data.name);
-                
-                switch (data.type) {                    
+
+                switch (data.type) {
                     case INTEGER:
                         buffer.append(":" + Integer.class.getName());
                         break;
@@ -95,20 +101,18 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
                         break;
                 }
             }
-                                            
+
             SimpleFeatureType featureType = DataUtilities.createType(name, buffer.toString());
-            
+
 
             // Create the Shapefile (empty at this point)
             myData.createSchema(featureType);
 
             myData.dispose();
-        } catch (FactoryException fe) {
-            fe.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Incorrect File : " + e.getMessage());
         } catch (SchemaException se) {
-            se.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Incorrect Schema : " + se.getMessage());
         }
 
     }
@@ -148,6 +152,7 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
 
         jXTitledSeparator1.setTitle(bundle.getString("shapefile_creation")); // NOI18N
 
+        gui_jtf_name.setEditable(false);
         gui_jtf_name.setText(bundle.getString("default")); // NOI18N
 
         gui_but_create.setText(bundle.getString("create")); // NOI18N
@@ -158,6 +163,11 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
         });
 
         gui_but_file.setText(bundle.getString("...")); // NOI18N
+        gui_but_file.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gui_but_fileActionPerformed(evt);
+            }
+        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("attributs"))); // NOI18N
 
@@ -263,18 +273,12 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(gui_jrb_point)
-                            .add(gui_jrb_multipoint)))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(gui_jrb_multiline))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(gui_jrb_multipolygon)))
+                    .add(gui_jrb_point)
+                    .add(gui_jrb_multipoint)
+                    .add(gui_jrb_multiline)
+                    .add(gui_jrb_multipolygon))
                 .addContainerGap(40, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -291,7 +295,11 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
         );
 
         gui_but_crs.setText(bundle.getString("list")); // NOI18N
-        gui_but_crs.setEnabled(false);
+        gui_but_crs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gui_but_crsActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText(bundle.getString("crs")); // NOI18N
 
@@ -400,6 +408,47 @@ public class ShapeCreationPanel extends javax.swing.JPanel {
     private void gui_jrb_multipolygonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_jrb_multipolygonActionPerformed
         geotype = "MultiPolygon";
     }//GEN-LAST:event_gui_jrb_multipolygonActionPerformed
+
+    private void gui_but_crsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_but_crsActionPerformed
+        JCRSChooser jcrs = new JCRSChooser(null, true);
+        jcrs.setCRS(crs);
+        JCRSChooser.ACTION act = jcrs.showDialog();
+
+        if (act == JCRSChooser.ACTION.APPROVE) {
+            crs = jcrs.getCRS();
+        }
+
+        gui_jtf_crs.setText(crs.getName().toString());
+                
+    }//GEN-LAST:event_gui_but_crsActionPerformed
+
+    private void gui_but_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gui_but_fileActionPerformed
+        JFileChooser jfc = new JFileChooser(file);
+        int act = jfc.showSaveDialog(null);
+
+        if (act == JFileChooser.APPROVE_OPTION) {
+            File f = jfc.getSelectedFile();
+
+            if (f != null) {
+                if (f.getAbsolutePath().endsWith(".shp")) {
+                    file = f;
+                    gui_jtf_name.setText(file.getAbsolutePath());
+                } else {
+                    int lastdot = f.getAbsolutePath().lastIndexOf(".");
+                    if(lastdot>0){
+                        f = new File(f.getAbsolutePath().substring(0,lastdot-1) +".shp");
+                    }else{
+                        f = new File(f.getAbsolutePath() +".shp");
+                    }
+                    
+                    file = f;
+                    gui_jtf_name.setText(file.getAbsolutePath());
+                }
+            }
+
+        }
+        
+    }//GEN-LAST:event_gui_but_fileActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup grp_geom;

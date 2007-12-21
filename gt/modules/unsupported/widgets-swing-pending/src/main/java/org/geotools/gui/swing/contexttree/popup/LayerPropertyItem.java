@@ -28,6 +28,7 @@ import org.geotools.gui.swing.i18n.TextBundle;
 import org.geotools.gui.swing.propertyedit.JPropertyDialog;
 import org.geotools.gui.swing.propertyedit.LayerFeaturePropertyPanel;
 import org.geotools.gui.swing.propertyedit.LayerFilterPropertyPanel;
+import org.geotools.gui.swing.propertyedit.LayerGeneralPanel;
 import org.geotools.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotools.gui.swing.propertyedit.PropertyPanel;
 import org.geotools.map.MapLayer;
@@ -59,6 +60,7 @@ public class LayerPropertyItem extends JMenuItem implements TreePopupItem {
     }
 
     private void init() {
+        lst.add(new LayerGeneralPanel());
         lst.add(new LayerFilterPropertyPanel());
         lst.add(new LayerStylePropertyPanel());
 
