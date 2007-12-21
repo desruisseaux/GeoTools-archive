@@ -41,6 +41,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
@@ -48,16 +49,14 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.BasicFeatureTypes;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -81,6 +80,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
     final static String STREAM    = "shapes/stream.shp";
     final static String DANISH    = "shapes/danish_point.shp";
     final static String CHINESE   = "shapes/chinese_poly.shp";
+    final static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
     
     public ShapefileDataStoreTest(String testName) throws IOException {
         super(testName);
@@ -640,22 +640,20 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         assertEquals("the_geom", reader.getFeatureType().getAttribute(0).getLocalName());
         
         // here too, the filter is using the geometry only
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         GeometryFactory gc = new GeometryFactory();
         LinearRing ring = gc.createLinearRing(new Coordinate[] {new Coordinate(0,0), new Coordinate(10,0), new Coordinate(10,10), new Coordinate(0,10), new Coordinate(0,0)});
         Polygon polygon = gc.createPolygon(ring, null);
-        GeometryFilter gf = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
-        gf.addLeftGeometry(ff.createAttributeExpression("the_geom"));
-        gf.addRightGeometry(ff.createLiteralExpression(polygon));
+        
+        ReferencedEnvelope bounds = new ReferencedEnvelope(polygon.getEnvelopeInternal(),null);
+        Filter gf = ff.bbox(ff.property("the_geom"), bounds );
+        
         query = new DefaultQuery(s.getSchema().getTypeName(), gf, new String[] {"the_geom"});
         reader = s.getFeatureReader( s.getSchema().getTypeName(), query);
         assertEquals(1, reader.getFeatureType().getAttributeCount());
         assertEquals("the_geom", reader.getFeatureType().getAttribute(0).getLocalName());
         
         // here not, we need state_name in the feature type, so open the dbf file please
-        CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
-        cf.addLeftValue(ff.createAttributeExpression("STATE_NAME"));
-        cf.addRightValue(ff.createLiteralExpression("Illinois"));
+        Filter cf = ff.equals( ff.property("STATE_NAME"), ff.literal("Illinois"));
         query = new DefaultQuery(s.getSchema().getTypeName(), cf, new String[] {"the_geom"});
         reader = s.getFeatureReader(s.getSchema().getTypeName(), query);
         assertEquals(s.getSchema(), reader.getFeatureType());

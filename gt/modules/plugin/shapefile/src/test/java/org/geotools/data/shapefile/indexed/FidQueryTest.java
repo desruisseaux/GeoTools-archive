@@ -31,29 +31,22 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.filter.BBoxExpression;
-
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 public class FidQueryTest extends FIDTestCase {
 	private IndexedShapefileDataStore ds;
 
-	
+	private static final FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(null);
 	Map<String,SimpleFeature> fids = new HashMap<String,SimpleFeature>();
 
 	FeatureStore featureStore;
@@ -113,11 +106,13 @@ public class FidQueryTest extends FIDTestCase {
 		Set<String> newFids = featureStore.addFeatures(collection);
 		assertEquals(1, newFids.size());
 //		this.assertFidsMatch();
-		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
+		
                 
 		DefaultQuery query = new DefaultQuery( schema.getTypeName() );
 		String fid = (String) newFids.iterator().next();
-		query.setFilter(fac.createFidFilter(fid));
+		FeatureId id = fac.featureId( fid );
+        Filter filter = fac.id( Collections.singleton(id));
+        query.setFilter( filter );
 		FeatureIterator features = featureStore.getFeatures(query)
 				.features();
 		try {
@@ -231,8 +226,6 @@ public class FidQueryTest extends FIDTestCase {
 	
 	private void assertFidsMatch() throws IOException {
 		//long start = System.currentTimeMillis();
-		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
-        
 		DefaultQuery query = new DefaultQuery( featureStore.getSchema().getTypeName());
 
 		int i=0;
@@ -241,7 +234,9 @@ public class FidQueryTest extends FIDTestCase {
 			i++;
 			Map.Entry entry = (Map.Entry) iter.next();
 			String fid = (String) entry.getKey();
-			query.setFilter(fac.createFidFilter(fid));
+			FeatureId id = fac.featureId( fid );
+			Filter filter = fac.id( Collections.singleton(id));
+			query.setFilter( filter );
 			FeatureIterator features = featureStore.getFeatures(query)
 					.features();
 			try {

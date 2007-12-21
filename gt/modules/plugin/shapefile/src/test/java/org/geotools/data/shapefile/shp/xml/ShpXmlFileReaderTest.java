@@ -20,9 +20,6 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;

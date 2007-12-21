@@ -19,7 +19,6 @@ import org.geotools.data.shapefile.indexed.FidIndexer;
 import org.geotools.data.shapefile.indexed.IndexedFidReader;
 import org.geotools.data.shapefile.indexed.IndexedFidWriter;
 import org.geotools.data.shapefile.shp.IndexFile;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.channels.FileChannel;

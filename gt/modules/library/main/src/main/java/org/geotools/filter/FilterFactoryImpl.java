@@ -252,7 +252,8 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public BBOX bbox( Expression geometry, BoundingBox bounds ) {
-        return bbox( geometry, bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(), bounds.getCoordinateReferenceSystem().getName().toString() );
+        return bbox( geometry, bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(),
+                bounds.getCoordinateReferenceSystem() == null ? null : bounds.getCoordinateReferenceSystem().getName().toString() );
     }
     
     public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {

@@ -40,22 +40,20 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -239,16 +237,12 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             IOException {
         FeatureCollection features;
         FeatureIterator indexIter;
-        FilterFactory fac = FilterFactoryFinder.createFilterFactory();
-        org.geotools.filter.BBoxExpression bbox = fac
-                .createBBoxExpression(newBounds);
-        org.geotools.filter.AttributeExpression attrExpression = fac
-                .createAttributeExpression(indexedDS.getSchema()
-                        .getDefaultGeometry().getLocalName());
-        GeometryFilter filter = fac
-                .createGeometryFilter(FilterType.GEOMETRY_BBOX);
-        filter.addLeftGeometry(attrExpression);
-        filter.addRightGeometry(bbox);
+        FilterFactory2 fac = CommonFactoryFinder.getFilterFactory2(null);
+        String geometryName = indexedDS.getSchema().getDefaultGeometry().getLocalName();
+        
+        Filter filter = fac
+                .bbox( fac.property( geometryName ), newBounds );
+        
         features = indexedDS.getFeatureSource().getFeatures(filter);
         FeatureCollection features2 = baselineDS.getFeatureSource()
                 .getFeatures(filter);

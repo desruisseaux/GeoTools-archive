@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,18 +28,17 @@ import junit.framework.AssertionFailedError;
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -236,7 +236,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
         params.put( IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
         IndexedShapefileDataStore ds = (IndexedShapefileDataStore) fac.createDataStore(params);
         
-        FilterFactory ff=FilterFactoryFinder.createFilterFactory();
+        org.geotools.filter.FilterFactory ff=FilterFactoryFinder.createFilterFactory();
 
         FeatureCollection features = ds.getFeatureSource().getFeatures(ff.createFidFilter("streams.84"));
         FeatureIterator iter = features.features();
@@ -247,7 +247,10 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
             iter.close();
         }
         
-        FidFilter filter = ff.createFidFilter("streams.84");
+        //FidFilter filter = ff.createFidFilter();
+        FeatureId id = ff.featureId( "streams.84" );
+        Id filter = ff.id( Collections.singleton( id ));
+        
         Query query=new DefaultQuery(ds.getCurrentTypeName(), filter);
         
         Envelope result = ds.getFeatureSource().getBounds(query);
