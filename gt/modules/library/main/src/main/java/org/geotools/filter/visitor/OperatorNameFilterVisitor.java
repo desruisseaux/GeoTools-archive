@@ -33,11 +33,11 @@ import org.opengis.filter.spatial.Within;
  * used to identify the provided filter.
  * <p>
  * These names will match those used by FilterCapabilities Operations
- * and may be used to verify that the povided filter is supported.
+ * and may be used to verify that the provided filter is supported.
  * <p>
  * @author Jody Garnett
  */
-public class NameThatFilterVisitor implements FilterVisitor {
+public class OperatorNameFilterVisitor implements FilterVisitor {
     public Object visit( ExcludeFilter filter, Object extraData ) {
         return "Exclude";
     }

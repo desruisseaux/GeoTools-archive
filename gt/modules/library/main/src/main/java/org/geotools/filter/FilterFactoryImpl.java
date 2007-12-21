@@ -54,6 +54,7 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
@@ -253,7 +254,7 @@ public class FilterFactoryImpl implements FilterFactory {
 
     public BBOX bbox( Expression geometry, BoundingBox bounds ) {
         return bbox( geometry, bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY(),
-                bounds.getCoordinateReferenceSystem() == null ? null : bounds.getCoordinateReferenceSystem().getName().toString() );
+                CRS.toSRS( bounds.getCoordinateReferenceSystem() ) );
     }
     
     public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {

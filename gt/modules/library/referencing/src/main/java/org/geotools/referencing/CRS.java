@@ -1446,4 +1446,24 @@ public final class CRS {
     public static void main(final String[] args) {
         Command.execute(args);
     }
+
+    /**
+     * OGC Web Services have the concept of a Spatial Reference System identifier used to communicate
+     * CRS information between systems.
+     * <p>
+     * Spatial Reference System (ie SRS) values:
+     * <ul>
+     * <li>EPSG:4326 - this is the usual format understood to mean forceXY order
+     * <li>AUTO:43200 - 
+     * <li>ogc:uri ..... - understood to match the EPSG database axis order
+     * <li>well known text
+     * </ul>
+     * 
+     * @param crs
+     * @return SRS represented as a string for communication between systems
+     */
+    public static String toSRS( CoordinateReferenceSystem crs ) {
+        if( crs == null ) return null;
+        return crs.getName().toString();        
+    }    
 }

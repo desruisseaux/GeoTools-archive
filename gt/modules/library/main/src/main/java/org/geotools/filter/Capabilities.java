@@ -27,7 +27,7 @@ import org.geotools.filter.capability.SpatialOperatorImpl;
 import org.geotools.filter.capability.SpatialOperatorsImpl;
 import org.geotools.filter.visitor.IsFullySupportedFilterVisitor;
 import org.geotools.filter.visitor.IsSupportedFilterVisitor;
-import org.geotools.filter.visitor.NameThatFilterVisitor;
+import org.geotools.filter.visitor.OperatorNameFilterVisitor;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.And;
@@ -154,7 +154,7 @@ public class Capabilities {
         exprNames.put(Function.class,"Function");
     }
 
-    private static final NameThatFilterVisitor operationNameVisitor = new NameThatFilterVisitor();
+    private static final OperatorNameFilterVisitor operationNameVisitor = new OperatorNameFilterVisitor();
     
     /** Support for logical types AND, OR and NOT */
     public static Capabilities LOGICAL; 
