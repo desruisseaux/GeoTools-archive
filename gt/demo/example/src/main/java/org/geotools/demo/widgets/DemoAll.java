@@ -15,6 +15,7 @@
  */
 package org.geotools.demo.widgets;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.io.IOException;
@@ -63,6 +64,7 @@ import org.geotools.gui.swing.map.map2d.overLayer.MiniMapDecoration;
 import org.geotools.gui.swing.map.map2d.overLayer.NavigationDecoration;
 import org.geotools.gui.swing.map.map2d.strategy.SingleBufferedImageStrategy;
 import org.geotools.gui.swing.misc.Render.RandomStyleFactory;
+import org.geotools.gui.swing.toolbox.JToolTree;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -83,6 +85,8 @@ public class DemoAll extends javax.swing.JFrame {
     private final VisibleTreeTableColumn colVisible = new VisibleTreeTableColumn();
     private final StyleTreeTableColumn colStyle = new StyleTreeTableColumn();
     private final SelectionTreeTableColumn colSelection = new SelectionTreeTableColumn(null);
+    
+    private final JToolTree tooltree = new JToolTree();
     
     private final ImageDecoration overBackImage= new ImageDecoration();
     private final ColorDecoration overBackColor= new ColorDecoration();
@@ -105,8 +109,7 @@ public class DemoAll extends javax.swing.JFrame {
                         
         pan_mappane.setLayout(new GridLayout(1, 1));
         pan_mappane.add(map);
-        
-        
+                
         tree.addContext(context);
 
         gui_map2dcontrol.setMap(map);
@@ -119,8 +122,7 @@ public class DemoAll extends javax.swing.JFrame {
         overBackImage.setStyle(org.jdesktop.swingx.JXImagePanel.Style.CENTERED);
         map.setBackDecoration(overBackColor);
         map.addDecoration(overNavigation);
-        
-        
+                
         tree.addTreeContextListener(new TreeContextListener() {
 
             public void contextAdded(TreeContextEvent event) {
@@ -139,7 +141,9 @@ public class DemoAll extends javax.swing.JFrame {
             }
         });
         
+        pantoolbox.add(BorderLayout.CENTER,tooltree);
         
+                
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -245,8 +249,7 @@ public class DemoAll extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         tree = new org.geotools.gui.swing.contexttree.JContextTree();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        pantoolbox = new javax.swing.JPanel();
         gui_map2dedit = new org.geotools.gui.swing.map.map2d.control.JMap2DEditBar();
         gui_map2dcontrol = new org.geotools.gui.swing.map.map2d.control.JMap2DControlBar();
         jButton1 = new javax.swing.JButton();
@@ -369,26 +372,8 @@ public class DemoAll extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("ContextTree", tree);
 
-        jLabel2.setText("Not yet, but it's the next step after the map2D");
-
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(35, 35, 35)
-                .add(jLabel2)
-                .addContainerGap(34, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(82, 82, 82)
-                .add(jLabel2)
-                .addContainerGap(408, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("ToolBox", jPanel1);
+        pantoolbox.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("ToolBox", pantoolbox);
 
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -804,7 +789,6 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -819,7 +803,6 @@ public class DemoAll extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
@@ -832,6 +815,7 @@ public class DemoAll extends javax.swing.JFrame {
     private org.jdesktop.swingx.JXImagePanel jXImagePanel1;
     private javax.swing.JPanel jpanel8;
     private javax.swing.JPanel pan_mappane;
+    private javax.swing.JPanel pantoolbox;
     private org.geotools.gui.swing.contexttree.JContextTree tree;
     // End of variables declaration//GEN-END:variables
 }
