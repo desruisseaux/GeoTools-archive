@@ -107,14 +107,7 @@ public class IndexedResourceBundle extends ResourceBundle {
      * the fully qualified classname of this {@code IndexedResourceBundle} subclass.
      */
     protected IndexedResourceBundle() {
-        String classname = getClass().getName();
-        if (classname.endsWith("_en")) {
-            /*
-             * In Geotools implementation, the English language resources are the default ones.
-             */
-            classname = classname.substring(0, classname.length()-3);
-        }
-        filename = classname.substring(classname.lastIndexOf('.') + 1) + ".utf";
+        filename = getClass().getSimpleName() + ".utf";
     }
 
     /**
@@ -213,13 +206,19 @@ public class IndexedResourceBundle extends ResourceBundle {
                  */
                 record= new LogRecord(Level.FINER, "Loaded resources for {0} from bundle \"{1}\".");
                 record.setSourceClassName (getClass().getName());
-                record.setSourceMethodName((key!=null) ? "getObject" : "getKeys");
+                record.setSourceMethodName((key != null) ? "getObject" : "getKeys");
                 /*
-                 * Load resources from the UTF file.
+                 * Loads resources from the UTF file.
                  */
-                final InputStream in = getClass().getResourceAsStream(filename);
-                if (in == null) {
-                    throw new FileNotFoundException(filename);
+                InputStream in;
+                String name = filename;
+                while ((in = getClass().getResourceAsStream(name)) == null) {
+                    final int ext  = name.lastIndexOf('.');
+                    final int lang = name.lastIndexOf('_', ext-1);
+                    if (lang <= 0) {
+                        throw new FileNotFoundException(filename);
+                    }
+                    name = name.substring(0, lang) + name.substring(ext);
                 }
                 final DataInputStream input = new DataInputStream(new BufferedInputStream(in));
                 this.values = values = new String[input.readInt()];
