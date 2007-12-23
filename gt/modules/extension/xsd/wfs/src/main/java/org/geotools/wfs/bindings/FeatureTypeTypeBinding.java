@@ -132,16 +132,4 @@ public class FeatureTypeTypeBinding extends AbstractComplexEMFBinding {
     public Class getType() {
         return FeatureTypeType.class;
     }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object parse(ElementInstance instance, Node node, Object value)
-        throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, node, value);
-    }
 }

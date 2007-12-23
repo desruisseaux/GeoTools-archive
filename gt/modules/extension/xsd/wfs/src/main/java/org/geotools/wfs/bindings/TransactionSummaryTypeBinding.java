@@ -15,41 +15,46 @@
  */
 package org.geotools.wfs.bindings;
 
+import net.opengis.wfs.TransactionSummaryType;
 import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.*;
 
-
 /**
- * Binding object for the type http://www.opengis.net/wfs:TransactionSummaryType.
- *
+ * Binding object for the type
+ * http://www.opengis.net/wfs:TransactionSummaryType.
+ * 
  * <p>
- *        <pre>
+ * 
+ * <pre>
  *         <code>
- *  &lt;xsd:complexType name="TransactionSummaryType"&gt;
+ *  &lt;xsd:complexType name=&quot;TransactionSummaryType&quot;&gt;
  *      &lt;xsd:annotation&gt;
- *          &lt;xsd:documentation xml:lang="en"&gt;
+ *          &lt;xsd:documentation xml:lang=&quot;en&quot;&gt;
  *              Reports the total number of features affected by some kind
  *              of write action (i.e, insert, update, delete).
  *           &lt;/xsd:documentation&gt;
  *      &lt;/xsd:annotation&gt;
  *      &lt;xsd:sequence&gt;
- *          &lt;xsd:element minOccurs="0" name="totalInserted" type="xsd:nonNegativeInteger"/&gt;
- *          &lt;xsd:element minOccurs="0" name="totalUpdated" type="xsd:nonNegativeInteger"/&gt;
- *          &lt;xsd:element minOccurs="0" name="totalDeleted" type="xsd:nonNegativeInteger"/&gt;
+ *          &lt;xsd:element minOccurs=&quot;0&quot; name=&quot;totalInserted&quot; type=&quot;xsd:nonNegativeInteger&quot;/&gt;
+ *          &lt;xsd:element minOccurs=&quot;0&quot; name=&quot;totalUpdated&quot; type=&quot;xsd:nonNegativeInteger&quot;/&gt;
+ *          &lt;xsd:element minOccurs=&quot;0&quot; name=&quot;totalDeleted&quot; type=&quot;xsd:nonNegativeInteger&quot;/&gt;
  *      &lt;/xsd:sequence&gt;
  *  &lt;/xsd:complexType&gt;
- *
- *          </code>
+ * </code>
  *         </pre>
+ * 
  * </p>
- *
+ * 
  * @generated
  */
 public class TransactionSummaryTypeBinding extends AbstractComplexEMFBinding {
+    private WfsFactory factory;
+
     public TransactionSummaryTypeBinding(WfsFactory factory) {
         super(factory);
+        this.factory = factory;
     }
 
     /**
@@ -60,24 +65,17 @@ public class TransactionSummaryTypeBinding extends AbstractComplexEMFBinding {
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return TransactionSummaryType.class;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
-        throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, node, value);
+    throws Exception {
+        //TransactionSummaryType ts = factory.createTransactionSummaryType();
+     return super.parse(instance, node, value);   
     }
 }
