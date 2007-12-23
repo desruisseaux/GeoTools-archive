@@ -20,29 +20,33 @@ import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
 import org.geotools.xml.*;
-
+import org.geotools.xml.impl.AttributeImpl;
 
 /**
  * Binding object for the type http://www.opengis.net/wfs:AllSomeType.
- *
+ * 
  * <p>
- *        <pre>
+ * 
+ * <pre>
  *         <code>
- *  &lt;xsd:simpleType name="AllSomeType"&gt;
- *      &lt;xsd:restriction base="xsd:string"&gt;
- *          &lt;xsd:enumeration value="ALL"/&gt;
- *          &lt;xsd:enumeration value="SOME"/&gt;
+ *  &lt;xsd:simpleType name=&quot;AllSomeType&quot;&gt;
+ *      &lt;xsd:restriction base=&quot;xsd:string&quot;&gt;
+ *          &lt;xsd:enumeration value=&quot;ALL&quot;/&gt;
+ *          &lt;xsd:enumeration value=&quot;SOME&quot;/&gt;
  *      &lt;/xsd:restriction&gt;
  *  &lt;/xsd:simpleType&gt;
- *
- *          </code>
+ * </code>
  *         </pre>
+ * 
  * </p>
- *
+ * 
  * @generated
  */
 public class AllSomeTypeBinding extends AbstractSimpleBinding {
+    private final WfsFactory factory;
+
     public AllSomeTypeBinding(WfsFactory factory) {
+        this.factory = factory;
     }
 
     /**
@@ -53,9 +57,8 @@ public class AllSomeTypeBinding extends AbstractSimpleBinding {
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
      * @generated modifiable
      */
     public Class getType() {
@@ -63,14 +66,14 @@ public class AllSomeTypeBinding extends AbstractSimpleBinding {
     }
 
     /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     * 
      * @generated modifiable
      */
-    public Object parse(InstanceComponent instance, Object value)
-        throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, value);
+    public Object parse(InstanceComponent instance, Object value) throws Exception {
+        AttributeImpl att = (AttributeImpl) instance;
+        String text = att.getText();
+        AllSomeType allSomeType = AllSomeType.get(text);
+        return allSomeType;
     }
 }

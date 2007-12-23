@@ -15,6 +15,7 @@
  */
 package org.geotools.wfs.bindings;
 
+import net.opengis.wfs.LockFeatureType;
 import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
@@ -115,7 +116,7 @@ public class LockFeatureTypeBinding extends AbstractComplexEMFBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return LockFeatureType.class;
     }
 
     /**

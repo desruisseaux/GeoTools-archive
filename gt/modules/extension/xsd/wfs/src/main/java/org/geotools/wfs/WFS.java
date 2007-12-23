@@ -167,6 +167,9 @@ public final class WFS extends XSD {
     public static final QName TransactionResultsType = new QName("http://www.opengis.net/wfs",
             "TransactionResultsType");
 
+    public static final QName TransactionResults = new QName("http://www.opengis.net/wfs",
+    "TransactionResults");
+
     /** @generated */
     public static final QName TransactionSummaryType = new QName("http://www.opengis.net/wfs",
             "TransactionSummaryType");

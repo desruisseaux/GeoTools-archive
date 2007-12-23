@@ -17,6 +17,8 @@ package org.geotools.wfs;
 
 import net.opengis.wfs.WfsFactory;
 import org.eclipse.emf.ecore.EObject;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.go.CommonFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,6 +32,8 @@ import java.nio.charset.Charset;
 import java.util.NoSuchElementException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.test.XMLTestSupport;
@@ -37,10 +41,11 @@ import org.geotools.xml.test.XMLTestSupport;
 
 public abstract class WFSTestSupport extends XMLTestSupport {
     protected WfsFactory factory = WfsFactory.eINSTANCE;
+    protected FilterFactory2 filterFac;
     private Class bindingTargetClass;
     private int executionMode;
     private QName qname;
-    private final Binding binding;
+    protected final Binding binding;
 
     protected WFSTestSupport(final QName qname, final Class<?extends EObject> bindingClass,
         final int executionMode) {
@@ -49,6 +54,7 @@ public abstract class WFSTestSupport extends XMLTestSupport {
         this.bindingTargetClass = bindingClass;
         this.executionMode = executionMode;
         binding = binding(qname);
+        filterFac = CommonFactoryFinder.getFilterFactory2(null);
     }
 
     protected Configuration createConfiguration() {
