@@ -197,6 +197,7 @@ public abstract class AbstractComplexEMFBinding extends AbstractComplexBinding {
                     //just throw the oringinal exception
                     throw e;
                 }
+                EMFUtils.set(eObject, property, value);
             }
         } else {
             //search by type
