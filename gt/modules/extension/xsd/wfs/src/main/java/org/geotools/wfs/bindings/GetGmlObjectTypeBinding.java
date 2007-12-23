@@ -15,6 +15,7 @@
  */
 package org.geotools.wfs.bindings;
 
+import net.opengis.wfs.GetGmlObjectType;
 import net.opengis.wfs.WfsFactory;
 import javax.xml.namespace.QName;
 import org.geotools.wfs.WFS;
@@ -102,18 +103,6 @@ public class GetGmlObjectTypeBinding extends AbstractComplexEMFBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object parse(ElementInstance instance, Node node, Object value)
-        throws Exception {
-        //TODO: implement and remove call to super
-        return super.parse(instance, node, value);
+        return GetGmlObjectType.class;
     }
 }
