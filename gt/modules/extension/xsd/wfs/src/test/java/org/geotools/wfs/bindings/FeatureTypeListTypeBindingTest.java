@@ -16,17 +16,20 @@
 package org.geotools.wfs.bindings;
 
 import net.opengis.wfs.FeatureTypeListType;
+
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
 
-
 /**
- *
+ * Unit test suite for {@link FeatureTypeListTypeBinding}
+ * 
  * @author Gabriel Roldan
- * @version $Id$
+ * @version $Id: FeatureTypeListTypeBindingTest.java 27749 2007-11-05 09:51:33Z
+ *          groldan $
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/wfs/src/test/java/org/geotools/wfs/bindings/FeatureTypeListTypeBindingTest.java $
  */
 public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
     public FeatureTypeListTypeBindingTest() {
@@ -34,14 +37,14 @@ public class FeatureTypeListTypeBindingTest extends WFSTestSupport {
     }
 
     public void testEncode() throws Exception {
-        //throw new UnsupportedOperationException("Not yet implemented");
-        //temporarilly force pass to not break the build
+        // throw new UnsupportedOperationException("Not yet implemented");
+        // temporarilly force pass to not break the build
         assertTrue(true);
     }
 
     public void testParse() throws Exception {
         String xml = "<FeatureTypeList>" + "<Operations/>" + "<FeatureType/>" + "<FeatureType/>"
-            + "</FeatureTypeList>";
+                + "</FeatureTypeList>";
 
         buildDocument(xml);
 

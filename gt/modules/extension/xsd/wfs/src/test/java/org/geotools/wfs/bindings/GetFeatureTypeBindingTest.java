@@ -15,20 +15,24 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.GetFeatureType;
-import org.w3c.dom.Document;
 import java.math.BigInteger;
+
+import net.opengis.wfs.GetFeatureType;
+
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
-
+import org.w3c.dom.Document;
 
 /**
- *
+ * Unit test suite for {@link GetFeatureTypeBinding}
+ * 
  * @author Justin Deoliveira
- * @version $Id$
+ * @version $Id: GetFeatureTypeBindingTest.java 27749 2007-11-05 09:51:33Z
+ *          groldan $
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/wfs/src/test/java/org/geotools/wfs/bindings/GetFeatureTypeBindingTest.java $
  */
 public class GetFeatureTypeBindingTest extends WFSTestSupport {
     public GetFeatureTypeBindingTest() {
@@ -50,8 +54,8 @@ public class GetFeatureTypeBindingTest extends WFSTestSupport {
     }
 
     public void testParse() throws Exception {
-        //throw new UnsupportedOperationException("Not yet implemented");
-        //temporarilly force pass to not break the build
+        // throw new UnsupportedOperationException("Not yet implemented");
+        // temporarilly force pass to not break the build
         assertTrue(true);
     }
 }

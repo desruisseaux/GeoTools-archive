@@ -15,6 +15,7 @@
  */
 package org.geotools.wfs;
 
+import junit.extensions.TestSetup;
 import junit.framework.TestCase;
 import net.opengis.ows.KeywordsType;
 import net.opengis.ows.OperationType;
@@ -56,7 +57,6 @@ import org.geotools.xml.Parser;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.StreamingParser;
 
-
 public class WFSParsingTest extends TestCase {
     WFSConfiguration configuration;
 
@@ -69,7 +69,7 @@ public class WFSParsingTest extends TestCase {
     public void testParseGetCapabilities() throws Exception {
         Parser parser = new Parser(configuration);
         WFSCapabilitiesType caps = (WFSCapabilitiesType) parser.parse(getClass()
-                                                                          .getResourceAsStream("geoserver-GetCapabilities.xml"));
+                .getResourceAsStream("geoserver-GetCapabilities.xml"));
 
         assertNotNull(caps);
 
@@ -112,16 +112,16 @@ public class WFSParsingTest extends TestCase {
         assertNotNull(ftl);
 
         assertEquals(3, ftl.getFeatureType().size());
-        assertEquals("AggregateGeoFeature",
-            ((FeatureTypeType) ftl.getFeatureType().get(0)).getName().getLocalPart());
+        assertEquals("AggregateGeoFeature", ((FeatureTypeType) ftl.getFeatureType().get(0))
+                .getName().getLocalPart());
         assertEquals("sf", ((FeatureTypeType) ftl.getFeatureType().get(0)).getName().getPrefix());
-        assertEquals("http://cite.opengeospatial.org/gmlsf",
-            ((FeatureTypeType) ftl.getFeatureType().get(0)).getName().getNamespaceURI());
+        assertEquals("http://cite.opengeospatial.org/gmlsf", ((FeatureTypeType) ftl
+                .getFeatureType().get(0)).getName().getNamespaceURI());
 
-        assertEquals("Entit\u00E9G\u00E9n\u00E9rique",
-            ((FeatureTypeType) ftl.getFeatureType().get(1)).getName().getLocalPart());
-        assertEquals("PrimitiveGeoFeature",
-            ((FeatureTypeType) ftl.getFeatureType().get(2)).getName().getLocalPart());
+        assertEquals("Entit\u00E9G\u00E9n\u00E9rique", ((FeatureTypeType) ftl.getFeatureType().get(
+                1)).getName().getLocalPart());
+        assertEquals("PrimitiveGeoFeature", ((FeatureTypeType) ftl.getFeatureType().get(2))
+                .getName().getLocalPart());
     }
 
     void assertFilterCapabilities(WFSCapabilitiesType caps) {
@@ -132,7 +132,7 @@ public class WFSParsingTest extends TestCase {
         assertEquals(4, fc.getSpatialCapabilities().getGeometryOperands().length);
 
         SpatialOperators spatial = (SpatialOperators) fc.getSpatialCapabilities()
-                                                        .getSpatialOperators();
+                .getSpatialOperators();
         assertEquals(10, spatial.getOperators().length);
         assertNotNull(spatial.getOperator("BBOX"));
         assertNotNull(spatial.getOperator("Intersects"));
@@ -145,7 +145,8 @@ public class WFSParsingTest extends TestCase {
         assertNotNull(schema);
         assertEquals(1, schema.getTypeDefinitions().size());
 
-        XSDComplexTypeDefinition type = (XSDComplexTypeDefinition) schema.getTypeDefinitions().get(0);
+        XSDComplexTypeDefinition type = (XSDComplexTypeDefinition) schema.getTypeDefinitions().get(
+                0);
         assertEquals("PrimitiveGeoFeatureType", type.getName());
         assertEquals("http://cite.opengeospatial.org/gmlsf", type.getTargetNamespace());
     }
@@ -165,15 +166,14 @@ public class WFSParsingTest extends TestCase {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(in);
 
-        //http://cite.opengeospatial.org/gmlsf http://localhost:8080/geoserver/wfs?service=WFS&amp;version=1.1.0&amp;request=DescribeFeatureType&amp;typeName=sf:PrimitiveGeoFeature
-        String schemaLocation = doc.getDocumentElement()
-                                   .getAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
-                "schemaLocation");
+        // http://cite.opengeospatial.org/gmlsf
+        // http://localhost:8080/geoserver/wfs?service=WFS&amp;version=1.1.0&amp;request=DescribeFeatureType&amp;typeName=sf:PrimitiveGeoFeature
+        String schemaLocation = doc.getDocumentElement().getAttributeNS(
+                "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation");
         schemaLocation = schemaLocation.replaceAll("http://cite.opengeospatial.org/gmlsf .*",
                 "http://cite.opengeospatial.org/gmlsf " + tmp.getAbsolutePath());
-        doc.getDocumentElement()
-           .setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation",
-            schemaLocation);
+        doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                "schemaLocation", schemaLocation);
 
         tmp = File.createTempFile("geoserver-GetFeature", "xml");
         tmp.deleteOnExit();

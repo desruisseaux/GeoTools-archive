@@ -34,6 +34,14 @@ import org.opengis.filter.Id;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Unit test suite for {@link LockFeatureTypeBinding}
+ * 
+ * @author Gabriel Roldan (TOPP)
+ * @version $Id$
+ * @since 2.5.x
+ * @source $URL$
+ */
 public class LockFeatureTypeBindingTest extends WFSTestSupport {
 
     public LockFeatureTypeBindingTest() {
@@ -57,7 +65,7 @@ public class LockFeatureTypeBindingTest extends WFSTestSupport {
             lock2.setFilter(filterFac.id(Collections.singleton(filterFac.featureId("fid2"))));
             lockFeature.getLock().add(lock2);
         }
-        
+
         final Document dom = encode(lockFeature, WFS.LockFeature);
         final Element root = dom.getDocumentElement();
 

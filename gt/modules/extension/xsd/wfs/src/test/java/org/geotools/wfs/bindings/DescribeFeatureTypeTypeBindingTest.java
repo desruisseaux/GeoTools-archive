@@ -15,24 +15,28 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.DescribeFeatureTypeType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
+
+import net.opengis.wfs.DescribeFeatureTypeType;
+
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
- *
+ * Unit test suite for {@link DescribeFeatureTypeTypeBinding}
+ * 
  * @author Justin Deoliveira
  * @author Gabriel Roldan
- * @version $Id$
+ * @version $Id: DescribeFeatureTypeTypeBindingTest.java 27759 2007-11-05
+ *          19:46:45Z groldan $
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
 public class DescribeFeatureTypeTypeBindingTest extends WFSTestSupport {
     public DescribeFeatureTypeTypeBindingTest() {
@@ -41,12 +45,13 @@ public class DescribeFeatureTypeTypeBindingTest extends WFSTestSupport {
 
     public void testEncode() throws Exception {
         final DescribeFeatureTypeType dft = factory.createDescribeFeatureTypeType();
-        //set BaseRequestType propertyes (DescribeFeatureType extends BaseRequestType)
+        // set BaseRequestType propertyes (DescribeFeatureType extends
+        // BaseRequestType)
         dft.setService("WFS");
         dft.setVersion("1.1.0");
         dft.setHandle("bar");
 
-        //set DescribeFeatureType properties
+        // set DescribeFeatureType properties
         dft.setOutputFormat("foo");
 
         final QName name1 = new QName("http://www.geotools.org/test", "Type1");

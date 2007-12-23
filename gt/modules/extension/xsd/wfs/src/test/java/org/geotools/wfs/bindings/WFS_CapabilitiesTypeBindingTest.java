@@ -16,17 +16,20 @@
 package org.geotools.wfs.bindings;
 
 import net.opengis.wfs.WFSCapabilitiesType;
+
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
 
-
 /**
- *
+ * Unit test suite for {@link WFS_CapabilitiesTypeBinding}
+ * 
  * @author Justin Deoliveira
- * @version $Id$
+ * @version $Id: WFS_CapabilitiesTypeBindingTest.java 27749 2007-11-05 09:51:33Z
+ *          groldan $
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/extension/xsd/wfs/src/test/java/org/geotools/wfs/bindings/WFS_CapabilitiesTypeBindingTest.java $
  */
 public class WFS_CapabilitiesTypeBindingTest extends WFSTestSupport {
     public WFS_CapabilitiesTypeBindingTest() {
@@ -35,7 +38,7 @@ public class WFS_CapabilitiesTypeBindingTest extends WFSTestSupport {
 
     public void testParse() throws Exception {
         String xml = "<WFS_Capabilities version=\"1.1.0\">" + "<FeatureTypeList/>"
-            + "</WFS_Capabilities>";
+                + "</WFS_Capabilities>";
         buildDocument(xml);
 
         WFSCapabilitiesType caps = (WFSCapabilitiesType) parse();
@@ -45,8 +48,8 @@ public class WFS_CapabilitiesTypeBindingTest extends WFSTestSupport {
     }
 
     public void testEncode() throws Exception {
-        //throw new UnsupportedOperationException("Not yet implemented");
-        //temporarilly force pass to not break the build
+        // throw new UnsupportedOperationException("Not yet implemented");
+        // temporarilly force pass to not break the build
         assertTrue(true);
     }
 }

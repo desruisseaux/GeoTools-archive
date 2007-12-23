@@ -15,30 +15,33 @@
  */
 package org.geotools.wfs.bindings;
 
-import net.opengis.wfs.BaseRequestType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.net.URL;
+
+import net.opengis.wfs.BaseRequestType;
+
 import org.geotools.test.TestData;
 import org.geotools.wfs.WFS;
 import org.geotools.wfs.WFSTestSupport;
 import org.geotools.xml.Binding;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
- *
- * @author Gabriel Roldan
+ * Unit test suite for {@link BaseRequestTypeBinding}
+ * 
+ * @author Gabriel Roldan (TOPP)
  * @version $Id$
  * @since 2.5.x
- * @URL $URL$
+ * @source $URL$
  */
+
 public class BaseRequestTypeBindingTest extends WFSTestSupport {
     public BaseRequestTypeBindingTest() {
         super(WFS.BaseRequestType, BaseRequestType.class, Binding.OVERRIDE);
     }
 
     public void testEncode() throws Exception {
-        //BaseRequestType is abstract, use a concrete subclass instead
+        // BaseRequestType is abstract, use a concrete subclass instead
         BaseRequestType brq = factory.createDescribeFeatureTypeType();
         brq.setHandle("foo");
         brq.setService("NotAService");
