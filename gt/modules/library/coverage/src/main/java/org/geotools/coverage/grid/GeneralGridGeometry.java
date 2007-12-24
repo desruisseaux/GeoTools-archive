@@ -69,6 +69,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
+ *
+ * @see GridGeometry2D
+ * @see ImageGeometry
  */
 public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**

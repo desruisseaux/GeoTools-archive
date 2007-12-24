@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,12 +17,11 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.prefs.Preferences;
 
-// OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -31,7 +30,6 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.Matrix2;
@@ -45,38 +43,40 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Transforms two-dimensional coordinate points using an {@link AffineTransform}.
+ * Transforms two-dimensional coordinate points using an affine transform. This class both
+ * extends {@link AffineTransform} and implements {@link MathTransform2D}, so it can be
+ * used as a bridge between Java2D and the referencing module.
  *
- * @since 2.0
+ * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class AffineTransform2D extends XAffineTransform
-                           implements MathTransform2D, LinearTransform, Formattable {
+public class AffineTransform2D extends XAffineTransform
+        implements MathTransform2D, LinearTransform, Formattable, Cloneable
+{
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5299837898367149069L;
-    
+
     /**
-     * The inverse transform. This field
-     * will be computed only when needed.
+     * The inverse transform. This field will be computed only when needed.
      */
     private transient AffineTransform2D inverse;
-    
+
     /**
-     * Constructs an affine transform.
+     * Constructs a new affine transform with the same coefficient than the specified transform.
      */
-    protected AffineTransform2D(final AffineTransform transform) {
+    public AffineTransform2D(final AffineTransform transform) {
         super(transform);
     }
-    
+
     /**
      * Throws an {@link UnsupportedOperationException} when a mutable method
      * is invoked, since {@code AffineTransform2D} must be immutable.
      */
-    protected void checkPermission() {
+    protected final void checkPermission() {
         throw new UnsupportedOperationException(
                   Errors.format(ErrorKeys.UNMODIFIABLE_AFFINE_TRANSFORM));
     }
@@ -91,21 +91,21 @@ final class AffineTransform2D extends XAffineTransform
     public ParameterValueGroup getParameterValues() {
         return ProjectiveTransform.getParameterValues(getMatrix());
     }
-    
+
     /**
-     * Gets the dimension of input points.
+     * Gets the dimension of input points, which is fixed to 2.
      */
-    public int getSourceDimensions() {
+    public final int getSourceDimensions() {
         return 2;
     }
-    
+
     /**
-     * Gets the dimension of output points.
+     * Gets the dimension of output points, which is fixed to 2.
      */
-    public int getTargetDimensions() {
+    public final int getTargetDimensions() {
         return 2;
     }
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
@@ -125,14 +125,14 @@ final class AffineTransform2D extends XAffineTransform
         ptDst.setOrdinate(1, array[1]);
         return ptDst;
     }
-    
+
     /**
      * Returns this transform as an affine transform matrix.
      */
     public Matrix getMatrix() {
         return new Matrix3(this);
     }
-    
+
     /**
      * Gets the derivative of this transform at a point. For an affine transform,
      * the derivative is the same everywhere.
@@ -141,18 +141,19 @@ final class AffineTransform2D extends XAffineTransform
         return new Matrix2(getScaleX(), getShearX(),
                            getShearY(), getScaleY());
     }
-    
+
     /**
-     * Gets the derivative of this transform at a point.
-     * For an affine transform, the derivative is the
-     * same everywhere.
+     * Gets the derivative of this transform at a point. For an affine transform,
+     * the derivative is the same everywhere.
      */
     public Matrix derivative(final DirectPosition point) {
         return derivative((Point2D) null);
     }
-    
+
     /**
      * Creates the inverse transform of this object.
+     *
+     * @throws NoninvertibleTransformException if this transform can't be inverted.
      */
     public MathTransform inverse() throws NoninvertibleTransformException {
         if (inverse == null) {
@@ -168,6 +169,17 @@ final class AffineTransform2D extends XAffineTransform
             }
         }
         return inverse;
+    }
+
+    /**
+     * Returns a new affine transform which is a modifiable copy of this transform. We override
+     * this method because it is {@linkplain AffineTransform#clone defined in the super-class}.
+     * However this implementation do not returns a new {@code AffineTransform2D} instance because
+     * the later is unmodifiable, which make exact cloning useless.
+     */
+    @Override
+    public AffineTransform clone() {
+        return new AffineTransform(this);
     }
 
     /**
@@ -191,8 +203,8 @@ final class AffineTransform2D extends XAffineTransform
     public String toWKT() {
         int indentation = 2;
         try {
-            indentation = Preferences.userNodeForPackage(Formattable.class)
-                                     .getInt("Indentation", indentation);
+            indentation = Preferences.userNodeForPackage(org.geotools.referencing.wkt.Formattable.class)
+                    .getInt("Indentation", indentation);
         } catch (SecurityException ignore) {
             // Ignore. Will fallback on the default indentation.
         }
@@ -204,6 +216,7 @@ final class AffineTransform2D extends XAffineTransform
     /**
      * Returns the WKT representation of this transform.
      */
+    @Override
     public String toString() {
         return toWKT();
     }

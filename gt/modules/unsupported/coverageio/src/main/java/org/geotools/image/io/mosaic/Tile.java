@@ -103,9 +103,11 @@ public class Tile implements Comparable<Tile> {
     private final int dx, dy;
 
     /**
-     * The upper-left corner in the destination image.
+     * The upper-left corner in the destination image. Should be considered as final, since
+     * this class is supposed to be mostly immutable. However the value can be changed by
+     * {@link #translate} before an instance is made public.
      */
-    private final int x, y;
+    private int x, y;
 
     /**
      * The size of the image to be read, or 0 if not yet computed.
@@ -396,6 +398,15 @@ public class Tile implements Comparable<Tile> {
      */
     final boolean isGetRegionCheap() {
         return width != 0 || height != 0;
+    }
+
+    /**
+     * Translates this tile. For internal usage by {@link TileBuilder} only. This method
+     * shound not be invoked anymore after a {@code Tile} instance has been made public.
+     */
+    final void translate(final int dx, final int dy) {
+        x += dx;
+        y += dy;
     }
 
     /**

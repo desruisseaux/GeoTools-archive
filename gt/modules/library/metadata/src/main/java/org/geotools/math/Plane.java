@@ -215,19 +215,16 @@ public class Plane implements Cloneable, Serializable {
             buffer.append(0);
         } else {
             if (c != 0) {
-                buffer.append(c);
-                buffer.append(" + ");
+                buffer.append(c).append(" + ");
             }
             if (cx != 0) {
-                buffer.append(cx);
-                buffer.append("*x");
+                buffer.append(cx).append("*x");
                 if (cy != 0) {
-                        buffer.append(" + ");
+                    buffer.append(" + ");
                 }
             }
             if (cy != 0) {
-                buffer.append(cy);
-                buffer.append("*y");
+                buffer.append(cy).append("*y");
             }
         }
         return buffer.toString();

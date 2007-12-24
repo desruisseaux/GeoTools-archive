@@ -137,7 +137,7 @@ public class GeneralEnvelope extends AbstractEnvelope implements Cloneable, Seri
      *         less than or equal to the corresponding ordinate value in the maximum point.
      */
     public GeneralEnvelope(final GeneralDirectPosition minDP, final GeneralDirectPosition maxDP)
-            throws IllegalArgumentException
+            throws MismatchedReferenceSystemException, IllegalArgumentException
     {
 //  Uncomment next lines if Sun fixes RFE #4093999
 //      ensureNonNull("minDP", minDP);

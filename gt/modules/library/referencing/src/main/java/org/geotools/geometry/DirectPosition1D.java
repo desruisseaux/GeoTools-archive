@@ -16,10 +16,7 @@
  */
 package org.geotools.geometry;
 
-// J2SE dependencies
 import java.io.Serializable;
-
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
@@ -28,7 +25,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 
 /**
  * Holds the coordinates for a one-dimensional position within some coordinate reference system.
- * 
+ *
  * @since 2.0
  * @source $URL$
  * @version $Id$
@@ -52,28 +49,28 @@ public class DirectPosition1D extends AbstractDirectPosition implements Serializ
      * The ordinate value.
      */
     public double ordinate;
-    
+
     /**
      * Constructs a position initialized to (0) with a {@code null}
      * coordinate reference system.
      */
     public DirectPosition1D() {
     }
-    
+
     /**
      * Constructs a position with the specified coordinate reference system.
      */
     public DirectPosition1D(final CoordinateReferenceSystem crs) {
         setCoordinateReferenceSystem(crs);
     }
-    
+
     /**
      * Constructs a 1D position from the specified ordinate.
      */
     public DirectPosition1D(final double ordinate) {
         this.ordinate = ordinate;
     }
-    
+
     /**
      * Constructs a position initialized to the same values than the specified point.
      */
@@ -171,10 +168,11 @@ public class DirectPosition1D extends AbstractDirectPosition implements Serializ
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
         ordinate = position.getOrdinate(0);
     }
-    
+
     /**
      * Returns a hash value for this coordinate.
      */
+    @Override
     public int hashCode() {
         final long value = Double.doubleToLongBits(ordinate);
         int code = 31 + ((int)value ^ (int)(value >>> 32));

@@ -43,6 +43,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see GridRange2D
  */
 public class GeneralGridRange implements GridRange, Serializable {
     /**
@@ -373,14 +375,21 @@ public class GeneralGridRange implements GridRange, Serializable {
      */
     @Override
     public String toString() {
-        final int dimension = index.length / 2;
-        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
+        return toString(this);
+    }
+
+    /**
+     * Returns a string représentation of the specified grid range.
+     */
+    static String toString(final GridRange range) {
+        final int dimension = range.getDimension();
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(range));
         buffer.append('[');
         for (int i=0; i<dimension; i++) {
-            if (i!=0) {
+            if (i != 0) {
                 buffer.append(", ");
             }
-            buffer.append(index[i]).append("..").append(index[i+dimension]);
+            buffer.append(range.getLower(i)).append("..").append(range.getUpper(i));
         }
         return buffer.append(']').toString();
     }

@@ -465,22 +465,21 @@ public class Line implements Cloneable, Serializable {
      *
      * @return A string representation of this line.
      */
+    @Override
     public String toString() {
         if (!Double.isInfinite(slope)) {
             StringBuilder buffer = new StringBuilder("y= ");
             if (slope != 0) {
-                buffer.append(slope);
-                buffer.append("*x");
+                buffer.append(slope).append("*x");
                 if (y0 != 0) {
                     buffer.append(" + ");
                 } else {
                     return buffer.toString();
                 }
             }
-            buffer.append(y0);
-            return buffer.toString();
+            return buffer.append(y0).toString();
         } else {
-            return "x= "+x0;
+            return "x= " + x0;
         }
     }
 

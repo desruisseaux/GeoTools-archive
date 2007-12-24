@@ -360,10 +360,8 @@ public class ColorRamp extends JComponent {
                     min = tr.transform(lower);
                     max = tr.transform(upper);
                 } catch (TransformException cause) {
-                    IllegalArgumentException e = new IllegalArgumentException(Errors.format(
-                                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "band", band));
-                    e.initCause(cause);
-                    throw e;
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.ILLEGAL_ARGUMENT_$2, "band", band), cause);
                 }
                 if (min > max) {
                     // This case occurs typically when displaying a color ramp for

@@ -16,17 +16,12 @@
  */
 package org.geotools.resources.image;
 
-// J2SE dependencies
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
-import java.math.BigInteger;
 import java.util.Arrays;
-
-// Geotools dependencies
-import org.geotools.resources.XMath;
 
 
 /**
@@ -59,7 +54,7 @@ public final class ColorUtilities {
     /**
      * Creates an sRGB color with the specified red, green, blue, and alpha
      * values in the range (0 - 255).
-     * 
+     *
      * @param  r the red component
      * @param  g the green component
      * @param  b the blue component
@@ -275,8 +270,8 @@ public final class ColorUtilities {
             final double dL = (double)lab1[0] - lab2[0];
             final double da = (double)lab1[1] - lab2[1];
             final double db = (double)lab1[2] - lab2[2];
-            final double C1 = XMath.hypot(lab1[1], lab1[2]);
-            final double C2 = XMath.hypot(lab2[1], lab2[2]);
+            final double C1 = Math.hypot(lab1[1], lab1[2]);
+            final double C2 = Math.hypot(lab2[1], lab2[2]);
             final double dC = C1 - C2;
             final double dH = Math.sqrt(da*da + db*db - dC*dC);
             final double sL = dL / 2;

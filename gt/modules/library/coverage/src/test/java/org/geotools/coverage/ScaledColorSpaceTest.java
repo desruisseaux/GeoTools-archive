@@ -16,7 +16,6 @@
  */
 package org.geotools.coverage;
 
-// J2SE and JAI dependencies
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -26,14 +25,11 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Random;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
 import org.geotools.coverage.grid.Viewer;
-import org.geotools.resources.XMath;
 
 
 /**
@@ -95,8 +91,8 @@ public class ScaledColorSpaceTest extends TestCase {
         final BufferedImage image = new BufferedImage(model, data, false, null);
         for (int x=data.getWidth(); --x>=0;) {
             for (int y=data.getHeight(); --y>=0;) {
-                double v = XMath.hypot((double)x/data.getWidth() - 0.5,
-                                       (double)y/data.getWidth() - 0.5);
+                double v = Math.hypot((double)x/data.getWidth() - 0.5,
+                                      (double)y/data.getWidth() - 0.5);
                 v = v*(maximum-minimum) + minimum;
                 data.setSample(x,y,0,v);
             }

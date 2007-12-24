@@ -65,6 +65,9 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see ImageGeometry
+ * @see GeneralGridGeometry
  */
 public class GridGeometry2D extends GeneralGridGeometry {
     /**
@@ -620,13 +623,13 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @see RenderedImage#getWidth
      * @see RenderedImage#getHeight
      */
-    public Rectangle getGridRange2D() throws InvalidGridGeometryException {
+    public GridRange2D getGridRange2D() throws InvalidGridGeometryException {
         if (gridRange != null) {
             assert isDefined(GRID_RANGE);
-            return new Rectangle(gridRange.getLower (gridDimensionX),
-                                 gridRange.getLower (gridDimensionY),
-                                 gridRange.getLength(gridDimensionX),
-                                 gridRange.getLength(gridDimensionY));
+            return new GridRange2D(gridRange.getLower (gridDimensionX),
+                                   gridRange.getLower (gridDimensionY),
+                                   gridRange.getLength(gridDimensionX),
+                                   gridRange.getLength(gridDimensionY));
         }
         assert !isDefined(GRID_RANGE);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_IMAGE_SIZE));

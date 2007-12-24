@@ -302,10 +302,7 @@ public class FormatChooser extends JPanel {
              * (rather then the internal format field), Change the exception type for consistency
              * with the usual specification.
              */
-            final IllegalArgumentException e;
-            e = new IllegalArgumentException(exception.getLocalizedMessage());
-            e.initCause(exception);
-            throw e;
+            throw new IllegalArgumentException(exception.getLocalizedMessage(), exception);
         }
         firePropertyChange("format", old, format);
     }

@@ -16,22 +16,23 @@
  */
 package org.geotools.resources;
 
-// Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 
 
 /**
- * Interface for object that can be formatted as 
+ * Interface for object that can be formatted as
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
- * Known Text</cite> (WKT), but can't extends {@link org.geotools.referencing.wkt.Formattable}.
- * This interface is especially used for <ocde>AffineTransform2D</code> implementation. This
- * interface is not public because the {@code formatWKT(Formatter)} method usually has a
- * protected access.
+ * Known Text</cite> (WKT), but can't extends {@link org.geotools.referencing.wkt.Formattable}. This
+ * interface is especially used for {@code AffineTransform2D} implementation. This interface is not
+ * public because the {@code formatWKT(Formatter)} method usually has a protected access.
  *
  * @since 2.0
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Consider renaming {@link org.geotools.referencing.wkt.Formattable} as
+ *       {@code AbstractFormattable} and move this interface in the wkt package.
  */
 public interface Formattable {
     /**

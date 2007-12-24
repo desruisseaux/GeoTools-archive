@@ -30,6 +30,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 
+import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -56,6 +57,12 @@ public class TileBuilder {
     private static final double EPS = 1E-6;
 
     /**
+     * The origin of the final bounding box (the one including every tiles).
+     * Tiles will be translated as needed in order to fit this origin.
+     */
+    private final int xOrigin, yOrigin;
+
+    /**
      * Tiles for which we should compute the bounding box only when we have them all.
      * Their bounding box (region) will need to be adjusted for the affine transform.
      */
@@ -76,9 +83,24 @@ public class TileBuilder {
     private ImageReader reader;
 
     /**
-     * Creates an initially empty tile collection.
+     * Creates an initially empty tile collection with the origin set to (0,0).
      */
     public TileBuilder() {
+        this(null);
+    }
+
+    /**
+     * Creates an initially empty tile collection with the given origin.
+     *
+     * @param origin The origin, or {@code null} for (0,0).
+     */
+    public TileBuilder(final Point origin) {
+        if (origin != null) {
+            xOrigin = origin.x;
+            yOrigin = origin.y;
+        } else {
+            xOrigin = yOrigin = 0;
+        }
         // We really need an IdentityHashMap, not an ordinary HashMap, because we will
         // put many AffineTransforms that are equal in the sense of Object.equals  but
         // we still want to associate them to different Tile instances.
@@ -210,6 +232,15 @@ public class TileBuilder {
     }
 
     /**
+     * Returns the origin of the tile collections to be created. The origin is usually (0,0)
+     * which match the {@linkplain java.awt.image.BufferedImage buffered image} origin, but
+     * it doesn't have to.
+     */
+    public Point getOrigin() {
+        return new Point(xOrigin, yOrigin);
+    }
+
+    /**
      * Adds a tile for the given input and origin point. The tile width and
      * height will be computed when first needed.
      *
@@ -271,17 +302,17 @@ public class TileBuilder {
     }
 
     /**
-     * Returns the tiles. Keys are <cite>grid to coordinate reference system</cite> transforms
-     * and values are the tiles. This method usually returns a singleton map, but more entries
-     * may be present if this method was not able to build a single pyramid using all provided
-     * tiles.
+     * Returns the tiles. Keys are grid geometry (containing image bounds and <cite>grid to
+     * coordinate reference system</cite> transforms) and values are the tiles. This method
+     * usually returns a singleton map, but more entries may be present if this method was
+     * not able to build a single pyramid using all provided tiles.
      * <p>
      * <strong>Invoking this method flush the collection</strong>. On return, this instance
      * is in the same state as if {@link #clear} has been invoked. This is because current
      * implementation modify its workspace directly for efficienty.
      */
-    public Map<AffineTransform,Tile[]> tiles() {
-        final Map<AffineTransform,Tile[]> results = new HashMap<AffineTransform,Tile[]>(4);
+    public Map<ImageGeometry,Tile[]> tiles() {
+        final Map<ImageGeometry,Tile[]> results = new HashMap<ImageGeometry,Tile[]>(4);
         for (final Map<AffineTransform,Dimension> levels : computePyramidLevels(tiles.keySet())) {
             /*
              * Picks an affine transform to be used as the reference one. We need the finest one.
@@ -319,7 +350,7 @@ public class TileBuilder {
                 throw new IllegalStateException(e);
             }
             int index = 0;
-            Rectangle boundsForAll = null;
+            Rectangle groupBounds = null;
             final Rectangle2D.Double envelope = new Rectangle2D.Double();
             final Tile[] tilesArray = new Tile[levels.size()];
             for (final Map.Entry<AffineTransform,Dimension> entry : levels.entrySet()) {
@@ -347,24 +378,39 @@ public class TileBuilder {
                     bounds.width  = (int) Math.round(envelope.width);
                     bounds.height = (int) Math.round(envelope.height);
                     tile = new Tile(reader, input, imageIndex, bounds, pixelSize);
-                    if (boundsForAll == null) {
-                        boundsForAll = bounds;
+                    if (groupBounds == null) {
+                        groupBounds = bounds;
                     } else {
-                        boundsForAll.add(bounds);
+                        groupBounds.add(bounds);
                     }
                 } else {
                     final Point origin = tile.getOrigin();
                     tr.transform(origin, origin);
                     tile = new Tile(reader, input, imageIndex, origin, pixelSize);
-                    if (boundsForAll == null) {
-                        boundsForAll = new Rectangle(origin.x, origin.y, 0, 0);
+                    if (groupBounds == null) {
+                        groupBounds = new Rectangle(origin.x, origin.y, 0, 0);
                     } else {
-                        boundsForAll.add(origin);
+                        groupBounds.add(origin);
                     }
                 }
                 tilesArray[index++] = tile;
             }
-            results.put(reference, tilesArray);
+            /*
+             * Translates the tiles in such a way that the upper-left corner has the coordinates
+             * specified by (xOrigin, yOrigin). Adjusts the final affine transform concequently.
+             */
+            if (groupBounds != null) {
+                final int dx = xOrigin - groupBounds.x;
+                final int dy = yOrigin - groupBounds.y;
+                if (dx != 0 || dy != 0) {
+                    reference.translate(-dx, -dy);
+                    groupBounds.translate(dx, dy);
+                    for (final Tile tile : tilesArray) {
+                        tile.translate(dx, dy);
+                    }
+                }
+                results.put(new ImageGeometry(groupBounds, reference), tilesArray);
+            }
         }
         clear();
         return results;

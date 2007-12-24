@@ -25,7 +25,6 @@ import java.util.Locale;
 import javax.units.Unit;
 
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XMath;
 
 
 /**

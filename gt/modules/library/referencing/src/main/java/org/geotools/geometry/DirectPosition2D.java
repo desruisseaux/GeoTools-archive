@@ -22,11 +22,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 import org.opengis.referencing.cs.AxisDirection; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
+
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -53,7 +55,7 @@ import org.opengis.geometry.MismatchedDimensionException;
  * @see GeneralPosition
  * @see java.awt.geom.Point2D
  */
-public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable {
+public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable, Cloneable {
     /**
      * Serial number for interoperability with different versions.
      */

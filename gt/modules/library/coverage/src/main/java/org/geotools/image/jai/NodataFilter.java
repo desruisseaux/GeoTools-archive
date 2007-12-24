@@ -16,21 +16,16 @@
  */
 package org.geotools.image.jai;
 
-// J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
 
-// JAI dependencies
 import javax.media.jai.AreaOpImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.iterator.RandomIter;
 import javax.media.jai.iterator.RandomIterFactory;
-
-// Geotools dependencies
-import org.geotools.resources.XMath;
 
 
 /**
@@ -40,7 +35,7 @@ import org.geotools.resources.XMath;
  * {@code NaN} values. If the number of valid values is greater than
  * {@code validityThreshold}, then the center {@code NaN} is replaced
  * by the computed average. Otherwise, the {@code NaN} value is left unchanged.
- * 
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -152,7 +147,7 @@ public class NodataFilter extends AreaOpImage {
                             final double scan = iter.getSampleDouble(sx, sy, band);
                             if (!Double.isNaN(scan)) {
                                 final double distance = distances[index];
-                                assert (Math.abs(distance-XMath.hypot(sx-x, sy-y)) < 1E-6) &&
+                                assert (Math.abs(distance-Math.hypot(sx-x, sy-y)) < 1E-6) &&
                                        (distance > 0) : distance;
                                 sumValue    += distance*scan;
                                 sumDistance += distance;

@@ -26,12 +26,13 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import javax.media.jai.util.Range;
 
+import org.opengis.util.Cloneable;
+
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.opengis.util.Cloneable;
 
 
 /**

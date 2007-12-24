@@ -518,10 +518,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             try {
                 referenced.setObjectiveCRS(objectiveCRS);
             } catch (TransformException exception) {
-                final IllegalArgumentException e;
-                e = new IllegalArgumentException(exception.getLocalizedMessage());
-                e.initCause(exception); // TODO: put straight into 'new' with J2SE 1.5.
-                throw e;
+                throw new IllegalArgumentException(exception.getLocalizedMessage(), exception);
             }
             if (hasEnvelopeListeners) {
                 oldEnvelope = new GeneralEnvelope(envelope);

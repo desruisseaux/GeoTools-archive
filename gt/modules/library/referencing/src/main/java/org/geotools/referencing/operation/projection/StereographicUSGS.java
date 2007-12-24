@@ -24,16 +24,12 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 
-// Geotools dependencies
-import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -54,7 +50,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
-class StereographicUSGS extends Stereographic {    
+class StereographicUSGS extends Stereographic {
     /**
      * Maximum number of iterations for iterative computations.
      */
@@ -83,7 +79,7 @@ class StereographicUSGS extends Stereographic {
      * @param  parameters The group of parameter values.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    protected StereographicUSGS(final ParameterValueGroup parameters) 
+    protected StereographicUSGS(final ParameterValueGroup parameters)
             throws ParameterNotFoundException
     {
         this(parameters, Provider.PARAMETERS);
@@ -97,7 +93,7 @@ class StereographicUSGS extends Stereographic {
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     StereographicUSGS(final ParameterValueGroup parameters,
-                      final ParameterDescriptorGroup descriptor) 
+                      final ParameterDescriptorGroup descriptor)
             throws ParameterNotFoundException
     {
         super(parameters, descriptor);
@@ -124,8 +120,8 @@ class StereographicUSGS extends Stereographic {
      * (units in radians) and stores the result in {@code ptDst} (linear distance
      * on a unit sphere).
      */
-    protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D transformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         final double chi    = 2.0 * Math.atan(ssfn(y, Math.sin(y))) - (Math.PI/2);
         final double sinChi = Math.sin(chi);
@@ -146,8 +142,8 @@ class StereographicUSGS extends Stereographic {
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
-    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
-            throws ProjectionException 
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
     {
         final double  rho    = Math.sqrt(x*x + y*y);
         final double  ce     = 2.0 * Math.atan2(rho*cosChi1, k0);
@@ -213,7 +209,7 @@ class StereographicUSGS extends Stereographic {
 
 
     /**
-     * Provides the transform equations for the spherical case of the 
+     * Provides the transform equations for the spherical case of the
      * Stereographic projection.
      *
      * @version $Id$
@@ -236,8 +232,8 @@ class StereographicUSGS extends Stereographic {
          * @param  descriptor The expected parameter descriptor.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        Spherical(final ParameterValueGroup parameters, final ParameterDescriptorGroup descriptor) 
-                throws ParameterNotFoundException 
+        Spherical(final ParameterValueGroup parameters, final ParameterDescriptorGroup descriptor)
+                throws ParameterNotFoundException
         {
             super(parameters, descriptor);
             ensureSpherical();
@@ -249,7 +245,7 @@ class StereographicUSGS extends Stereographic {
          * on a unit sphere).
          */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
-                throws ProjectionException 
+                throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
@@ -279,7 +275,7 @@ class StereographicUSGS extends Stereographic {
          * and stores the result in {@code ptDst}.
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
-                throws ProjectionException 
+                throws ProjectionException
         {
             // Compute using ellipsoidal formulas, for comparaison later.
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
