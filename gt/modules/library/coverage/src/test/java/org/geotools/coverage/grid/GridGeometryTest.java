@@ -83,9 +83,9 @@ public class GridGeometryTest extends TestCase {
         upper[2] = 3;
         gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity, null);
         assertTrue(identity.isIdentity());
-        assertTrue(gg.getGridToCoordinateSystem().isIdentity());
+        assertTrue(gg.getGridToCRS().isIdentity());
         assertTrue(gg.getGridToCRS2D().isIdentity());
-        assertEquals(3, gg.getGridToCoordinateSystem().getSourceDimensions());
+        assertEquals(3, gg.getGridToCRS().getSourceDimensions());
         assertEquals(2, gg.getGridToCRS2D().getSourceDimensions());
         assertTrue(gg.getGridToCRS2D() instanceof AffineTransform);
     }

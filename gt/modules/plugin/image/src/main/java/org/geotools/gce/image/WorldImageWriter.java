@@ -270,7 +270,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 				.getCoordinateReferenceSystem());
 		final CoordinateSystem cs = crs.getCoordinateSystem();
 		final AffineTransform gridToWorld = (AffineTransform) gc
-				.getGridGeometry().getGridToCoordinateSystem();
+				.getGridGeometry().getGridToCRS();
 		final boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
 
 		// /////////////////////////////////////////////////////////////////////

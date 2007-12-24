@@ -486,7 +486,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     public MathTransform getGridToCRS(final PixelInCell halfPixel)
             throws InvalidGridGeometryException
     {
-        final MathTransform gridToCRS = getGridToCoordinateSystem();
+        final MathTransform gridToCRS = getGridToCRS();
         if (PixelInCell.CELL_CENTER.equals(halfPixel)) {
             return gridToCRS;
         }
