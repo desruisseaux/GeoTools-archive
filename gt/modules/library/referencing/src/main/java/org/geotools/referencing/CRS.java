@@ -695,6 +695,36 @@ public final class CRS {
     }
 
     /**
+     * Returns the <cite>Spatial Reference System</cite> identifier, or {@code null} if none. OGC
+     * Web Services have the concept of a Spatial Reference System identifier used to communicate
+     * CRS information between systems.
+     * <p>
+     * Spatial Reference System (ie SRS) values:
+     * <ul>
+     *   <li>{@code EPSG:4326} - this is the usual format understood to mean <cite>forceXY</cite>
+     *       order. Note that the axis order is <em>not necessarly</em> (<var>longitude</var>,
+     *       <var>latitude</var>), but this is the common behavior we observe in practice.</li>
+     *   <li>{@code AUTO:43200} - </li>
+     *   <li>{@code ogc:uri:.....} - understood to match the EPSG database axis order.</li>
+     *   <li>Well Known Text (WKT)</li>
+     * </ul>
+     *
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return SRS represented as a string for communication between systems, or {@code null}.
+     *
+     * @since 2.5
+     */
+    public static String toSRS(final CoordinateReferenceSystem crs) {
+        if (crs != null) {
+            final ReferenceIdentifier name = crs.getName();
+            if (name != null) {
+                return name.toString();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Looks up an identifier for the specified object. This method searchs in registered factories
      * for an object {@linkplain #equalsIgnoreMetadata equals, ignoring metadata}, to the specified
      * object. If such object is found, then its identifier is returned. Otherwise this method
@@ -1446,24 +1476,4 @@ public final class CRS {
     public static void main(final String[] args) {
         Command.execute(args);
     }
-
-    /**
-     * OGC Web Services have the concept of a Spatial Reference System identifier used to communicate
-     * CRS information between systems.
-     * <p>
-     * Spatial Reference System (ie SRS) values:
-     * <ul>
-     * <li>EPSG:4326 - this is the usual format understood to mean forceXY order
-     * <li>AUTO:43200 - 
-     * <li>ogc:uri ..... - understood to match the EPSG database axis order
-     * <li>well known text
-     * </ul>
-     * 
-     * @param crs
-     * @return SRS represented as a string for communication between systems
-     */
-    public static String toSRS( CoordinateReferenceSystem crs ) {
-        if( crs == null ) return null;
-        return crs.getName().toString();        
-    }    
 }
