@@ -33,18 +33,23 @@ import javax.imageio.ImageReader;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.util.logging.Logging;
 
 
 /**
- * Convenience methods for building a collection of {@link Tile tiles}.
+ * Creates a collection of {@link Tile tiles} from their <cite>grid to CRS</cite> affine transform.
+ * When the {@linkplain Rectangle rectangle} that describe the destination region is known for every
+ * tiles, {@linkplain Tile#Tile(ImageReader,Object,int,Rectangle,Dimension) tile constructor} can be
+ * invoked directly. But in some cases the destination region is not known directly. Instead we have
+ * a set of {@linkplain java.awt.image.BufferedImage buffered images} with a (0,0) origin for each
+ * of them, and different <cite>grid to CRS</cite> affine transforms. This {@code TileBuilder} class
+ * infer the destination regions automatically from the set of affine transforms.
  *
  * @since 2.5
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TileCollection {
+public class TileBuilder {
     /**
      * Small number for floating point comparaisons.
      */
@@ -73,7 +78,7 @@ public class TileCollection {
     /**
      * Creates an initially empty tile collection.
      */
-    public TileCollection() {
+    public TileBuilder() {
         // We really need an IdentityHashMap, not an ordinary HashMap, because we will
         // put many AffineTransforms that are equal in the sense of Object.equals  but
         // we still want to associate them to different Tile instances.
