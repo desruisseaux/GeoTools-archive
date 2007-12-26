@@ -69,12 +69,6 @@ public class FilterBuilderTest extends TestCase {
         super(testName);
     }
 
-    public static junit.framework.Test suite() {
-        junit.framework.TestSuite suite = new junit.framework.TestSuite(FilterBuilderTest.class);
-
-        return suite;
-    }
-
     /**
      * Verify the parser uses the provided FilterFactory implementation
      * @throws ParseException

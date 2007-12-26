@@ -341,11 +341,17 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
         case JJTFLOATINGNODE:
             return filterFactory.literal(Double.parseDouble(getToken(0).image));
 
+        case JJTLITERALINFUNCTION_NODE: {
+            String tokenImg = getToken(0).image;
+            return filterFactory.literal(tokenImg);
+        }
         case JJTSTRINGNODE:
-        case JJTCHARACTERPATTERNNODE:
-        	String strLiteral = removeQuotes(n.getToken().image);
-        	return filterFactory.literal(strLiteral);
+        case JJTCHARACTERPATTERNNODE:{
             
+                String tokenImg = getToken(0).image;
+        	String strLiteral = removeQuotes(tokenImg);
+        	return filterFactory.literal(strLiteral);
+        }
             // ----------------------------------------
             // Identifier
             // ----------------------------------------
@@ -548,7 +554,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
     }
 
     private PropertyName buildCompoundAttribute() throws CQLException {
-        ArrayList arrayIdentifiers = new ArrayList();
+        ArrayList<String> arrayIdentifiers = new ArrayList<String>();
 
         // precondition: stack has one or more simple attributes
         while (resultStack.size() > 0) {
@@ -583,7 +589,7 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
         // precondition: the stack have one or more parts (string type)
         // retrieve all part of identifier from result stack
         try {
-            ArrayList arrayParts = new ArrayList();
+            ArrayList<String> arrayParts = new ArrayList<String>();
 
             while (resultStack.size() > 0) {
                 Result r = resultStack.peek();
@@ -1179,39 +1185,6 @@ final class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         default:
             throw new CQLException("unexpeted filter type.");
-        }
-    }
-
-    /**
-     * makes Binary Comparasion filter
-     * 
-     * @param filterType
-     * @param right
-     * @param left
-     * @return buildBinaryComparasionOperator
-     */
-    private BinaryComparisonOperator buildBinaryComparasion(
-            final int filterType,
-            final org.opengis.filter.expression.Expression right,
-            final org.opengis.filter.expression.Expression left) {
-        switch (filterType) {
-        case LTE:
-            return filterFactory.lessOrEqual(left, right);
-
-        case LT:
-            return filterFactory.less(left, right);
-
-        case GTE:
-            return filterFactory.greaterOrEqual(left, right);
-
-        case GT:
-            return filterFactory.greater(left, right);
-
-        case EQ:
-            return filterFactory.equals(left, right);
-
-        default:
-            return null;
         }
     }
 

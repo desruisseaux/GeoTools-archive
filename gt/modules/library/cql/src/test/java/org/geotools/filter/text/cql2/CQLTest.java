@@ -61,12 +61,6 @@ public class CQLTest extends TestCase {
         super(testName);
     }
 
-    public static junit.framework.Test suite() {
-        junit.framework.TestSuite suite = new junit.framework.TestSuite(CQLTest.class);
-
-        return suite;
-    }
-
     /**
      * Test Comparison Predicate
      * <p>
@@ -1150,11 +1144,14 @@ public class CQLTest extends TestCase {
      */
     public void testFunctionExpressionWithFunctionArgs()
         throws Exception {
-        // Test 1
-        String cqlExpression = "strConcat(A, abs(B))";
-        Expression expression = CQL.toExpression(cqlExpression);
+        String cqlExpression;
+        Expression expression;
 
-        // Test 2
+        // Test 1
+        cqlExpression = "strConcat(A, abs(B))";
+        expression = CQL.toExpression(cqlExpression);
+
+        // Test 2 
         cqlExpression = "strConcat(A, strConcat(B, strConcat(C, \".\")))";
         expression = CQL.toExpression(cqlExpression);
         assertNotNull(expression);
@@ -1186,6 +1183,8 @@ public class CQLTest extends TestCase {
         arg2 = (Expression) function.getParameters().get(1);
         assertTrue(arg2 instanceof Literal);
         assertEquals(".", ((Literal) arg2).getValue());
+        
+        
     }
 
     /**
