@@ -129,11 +129,11 @@ public class WFSParsingTest extends TestCase {
         assertTrue(fc.getIdCapabilities().hasEID());
         assertTrue(fc.getIdCapabilities().hasFID());
 
-        assertEquals(4, fc.getSpatialCapabilities().getGeometryOperands().length);
+        assertEquals(4, fc.getSpatialCapabilities().getGeometryOperands().size());
 
         SpatialOperators spatial = (SpatialOperators) fc.getSpatialCapabilities()
                 .getSpatialOperators();
-        assertEquals(10, spatial.getOperators().length);
+        assertEquals(10, spatial.getOperators().size());
         assertNotNull(spatial.getOperator("BBOX"));
         assertNotNull(spatial.getOperator("Intersects"));
     }
