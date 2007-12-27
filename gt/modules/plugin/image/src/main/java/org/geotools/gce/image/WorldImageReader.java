@@ -281,7 +281,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// get the dimension of the hr image and build the model as well as
 		// computing the resolution
 		// //
-		numOverviews = wmsRequest ? 0 : reader.getNumImages(true) - 1;
+		numOverviews = wmsRequest ? 0 : reader.getNumImages(true);
 		int hrWidth = reader.getWidth(0);
 		int hrHeight = reader.getHeight(0);
 		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);

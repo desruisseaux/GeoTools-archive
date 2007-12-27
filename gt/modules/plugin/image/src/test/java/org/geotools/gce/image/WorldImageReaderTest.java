@@ -23,10 +23,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageReadParam;
+import javax.media.jai.RenderedOp;
+
 import junit.textui.TestRunner;
 
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.parameter.Parameter;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.parameter.GeneralParameterValue;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -107,6 +122,79 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 //			return;
 //		this.read(url);
 	}
+	
+	public void testOverviewsNearest() throws IOException {
+        final File file = TestData.file(this, "etopo.tif");
+        wiReader = new WorldImageReader(file);
+        // more than native resolution (250 pixel representation for 125 pixels image)
+        assertEquals(0, getChosenOverview(250));
+        // native resolution (125 pixel representation for 125 pixels image)
+        assertEquals(0, getChosenOverview(125));
+        // half of native, the overview is in position 3 (out of order, remember?)
+        assertEquals(3, getChosenOverview(73));
+        // quarter of native, the overview is in position 2
+        assertEquals(2, getChosenOverview(31));
+        // 1/8 of native, the overview is in position 4
+        assertEquals(4, getChosenOverview(16));
+        // 1/16 of native, the overview is in position 1
+        assertEquals(1, getChosenOverview(9));
+        // 1/32 of native, no overview, still 1
+        assertEquals(1, getChosenOverview(4));
+        
+        // 13 is nearer to 16 and to 9
+        assertEquals(4, getChosenOverview(13));
+        // 11 is nearer to 9 than to 16
+        assertEquals(4, getChosenOverview(13));
+    }
+	
+	public void testOverviewsQuality() throws IOException {
+        final File file = TestData.file(this, "etopo.tif");
+        Hints hints = new Hints();
+        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_QUALITY);
+        wiReader = new WorldImageReader(file, hints);
+        // between 16 and 9, any value should report the match of 16
+        assertEquals(4, getChosenOverview(16));
+        assertEquals(4, getChosenOverview(15));
+        assertEquals(4, getChosenOverview(14));
+        assertEquals(4, getChosenOverview(13));
+        assertEquals(4, getChosenOverview(12));
+        assertEquals(4, getChosenOverview(11));
+        assertEquals(4, getChosenOverview(10));
+    }
+	
+	public void testOverviewsSpeed() throws IOException {
+        final File file = TestData.file(this, "etopo.tif");
+        Hints hints = new Hints();
+        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_SPEED);
+        wiReader = new WorldImageReader(file, hints);
+        // between 16 and 9, any value should report the match of 16
+        assertEquals(1, getChosenOverview(15));
+        assertEquals(1, getChosenOverview(14));
+        assertEquals(1, getChosenOverview(13));
+        assertEquals(1, getChosenOverview(12));
+        assertEquals(1, getChosenOverview(11));
+        assertEquals(1, getChosenOverview(10));
+    }
+
+    private int getChosenOverview(final int size) throws IOException {
+        // get the coverage and then the rendered image
+        final Parameter readGG = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D);
+        
+        readGG.setValue(new GridGeometry2D(new GeneralGridRange(new java.awt.Rectangle(size,
+                (int) (164.0 / 125.0 * size))), new ReferencedEnvelope(118.8, 134.56, 47.819, 63.142,
+                DefaultGeographicCRS.WGS84)));
+        final GridCoverage2D coverage = (GridCoverage2D) wiReader
+                .read(new GeneralParameterValue[] { readGG });
+        assertNotNull(coverage);
+        assertNotNull((coverage).getRenderedImage());
+
+        RenderedOp op = (RenderedOp) coverage.getRenderedImage();
+        while (!op.getOperationName().equals("ImageRead"))
+            op = (RenderedOp) op.getSources().get(0);
+
+        Integer choice = (Integer) op.getParameterBlock().getObjectParameter(1);
+        return choice.intValue();
+    }
 
 	/**
 	 * Read, test and show a coverage from the supplied source.

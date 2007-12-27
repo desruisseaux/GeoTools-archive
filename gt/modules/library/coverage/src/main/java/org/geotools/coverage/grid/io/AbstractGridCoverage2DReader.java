@@ -25,6 +25,10 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,7 +83,7 @@ import org.opengis.referencing.operation.TransformException;
  */
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
-
+    
 	/** The {@link Logger} for this {@link AbstractGridCoverage2DReader}. */
 	private final static Logger LOGGER = Logging
 			.getLogger("org.geotools.data.coverage.grid");
@@ -101,7 +105,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * Until multi-image files are supported, this is going to be 0 or 1.
 	 */
 	protected volatile int numOverviews = 0;
-
+	
 	/** 2DGridToWorld math transform. */
 	protected MathTransform raster2Model = null;
 
@@ -240,61 +244,114 @@ public abstract class AbstractGridCoverage2DReader implements
 		//
 		// //
 		if (!decimate) {
-			// /////////////////////////////////////////////////////////////////////
-			// OVERVIEWS
-			// /////////////////////////////////////////////////////////////////////
-			// Should we leave now? In case the resolution of the first level is
-			// already lower than the requested one we should use the first
-			// level and leave.
-			if (highestRes[0] - requestedRes[0] > EPS
-					&& highestRes[1] - requestedRes[1] > EPS)
-				return imageChoice;
-
-			// Should we leave now? In case the resolution of the first level is
-			// already lower than the requested one we should use the first
-			// level and leave.
-			int axis = 0;
-			if (requestedRes[0] - requestedRes[1] > EPS)
-				axis = 1;
-
-			// //
-			//
-			// looking for the overview with the highest lower resolution
-			// compared
-			// to the requested one.
-			// This ensure more speed but less quality. In the future we should
-			// provide a hint to control this behaviour.
-			//
-			// //
-			double actRes;
-			int i = 0;
-			for (; i < numOverviews; i++) {
-				actRes = (axis == 0) ? overViewResolutions[i][0]
-						: overViewResolutions[i][1];
-				// is actual resolution lower than the requested resolution?
-				if (actRes - requestedRes[axis] > EPS) {
-
-					i--;
-					break;
-
-				}
-
-			}
-			// checking that we did not exceeded the maximum number of pages.
-			if (i == numOverviews) {
-				// int subsamplingFactor=
-				imageChoice = new Integer(numOverviews);
-			} else
-				// keeping the first image at highest resolution into account in
-				// order to get the overview wit
-				imageChoice = new Integer(i + 1);
+			return getOverviewImage(null, requestedRes);
+		} else {
+    		// /////////////////////////////////////////////////////////////////////
+    		// DECIMATION ON READING
+    		// /////////////////////////////////////////////////////////////////////
+    		decimationOnReadingControl(imageChoice, readP, requestedRes);
+    		return imageChoice;
 		}
-		// /////////////////////////////////////////////////////////////////////
-		// DECIMATION ON READING
-		// /////////////////////////////////////////////////////////////////////
-		decimationOnReadingControl(imageChoice, readP, requestedRes);
-		return imageChoice;
 	}
+
+	private Integer getOverviewImage(String policy, double[] requestedRes) {
+	    // setup policy
+        if(policy == null) {
+            policy = (String) hints.get(Hints.OVERVIEW_POLICY);
+            if(policy == null)
+                policy = Hints.VALUE_OVERVIEW_POLICY_NEAREST;
+        }
+        
+        // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)
+        // keeping a reference to the original image choice
+        List resolutions = new ArrayList();
+        for (int i = 0; i < overViewResolutions.length; i++) {
+            resolutions.add(new Resolution(overViewResolutions[i][0], overViewResolutions[i][1], i));
+        }
+        Collections.sort(resolutions);
+
+        // Now search for the best matching resolution. 
+        // Check also for the "perfect match"... unlikely in practice unless someone
+        // tunes the clients to request exactly the resolution embedded in
+        // the overviews, something a perf sensitive person might do in fact)
+        
+        // the requested resolutions
+        final double reqx = requestedRes[0];
+        final double reqy = requestedRes[1];
+        
+        // are we looking for a resolution even higher than the native one?
+        Resolution max = (Resolution) resolutions.get(0);
+        if(reqx < max.x && reqy < max.y ||
+               (Math.abs(reqx - max.x) < EPS && Math.abs(reqy - max.y) < EPS))
+            return max.imageChoice;
+        // are we looking for a resolution even lower than the smallest overview?
+        Resolution min = (Resolution) resolutions.get(resolutions.size() - 1);
+        if(reqx > min.x && reqy > min.y ||
+                (Math.abs(reqx - min.x) < EPS && Math.abs(reqy - min.y) < EPS))
+            return min.imageChoice;
+        // Ok, so we know the overview is between min and max, skip the first
+        // and search for an overview with a resolution lower than the one requested,
+        // that one and the one from the previous step will bound the searched resolution
+        Resolution prev = max;
+        for (int i = 1; i < resolutions.size(); i++) {
+            Resolution curr = (Resolution) resolutions.get(i);
+            // perfect match check
+            if((Math.abs(reqx - curr.x) < EPS && Math.abs(reqy - curr.y) < EPS)) {
+                return curr.imageChoice;
+            }
+            
+            // middle check. The first part of the condition should be sufficient, but
+            // there are cases where the x resolution is satisfied by the lowest resolution, 
+            // the y by the one before the lowest (so the aspect ratio of the request is 
+            // different than the one of the overviews), and we would end up going out of the loop
+            // since not even the lowest can "top" the request for one axis 
+            if(curr.x > reqx && curr.y > reqy || i == resolutions.size() - 1) {
+                if(policy == Hints.VALUE_OVERVIEW_POLICY_QUALITY)
+                    return prev.imageChoice;
+                else if(policy == Hints.VALUE_OVERVIEW_POLICY_SPEED)
+                    return curr.imageChoice;
+                else if(reqx - prev.x < curr.x - reqx)
+                    return prev.imageChoice;
+                else
+                    return curr.imageChoice;
+            }
+            prev = curr;
+        }
+        throw new RuntimeException("There is an error in the resolution lookup code");
+    }
+	
+	/**
+	 * Simple support class for sorting orerview resolutions
+	 */
+	private static class Resolution implements Comparable {
+	    double x;
+	    double y;
+	    int imageChoice;
+	    
+        public Resolution(double x, double y, int imageChoice) {
+            super();
+            this.x = x;
+            this.y = y;
+            this.imageChoice = imageChoice;
+        }
+	    
+	    public int compareTo(Object o) {
+	        Resolution other = (Resolution) o;
+	        if(x > other.x)
+	            return 1;
+	        else if(x < other.x)
+	            return -1;
+	        else if(y > other.y)
+                return 1;
+            else
+                return -1;
+	    }
+	    
+	    public String toString() {
+	        return "Resolution[Choice=" + imageChoice + ",x=" + x + ",y=" + y + "]";
+	    }
+	}
+	
 
 	/**
 	 * This method is responsible for evaluating possible subsampling factors
