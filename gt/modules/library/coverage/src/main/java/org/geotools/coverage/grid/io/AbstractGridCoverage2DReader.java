@@ -25,7 +25,6 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,16 +37,15 @@ import javax.units.Unit;
 import javax.units.UnitFormat;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
+import org.geotools.factory.GeoTools;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
@@ -58,7 +56,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -84,18 +81,11 @@ public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
 	/** The {@link Logger} for this {@link AbstractGridCoverage2DReader}. */
-	private final static Logger LOGGER = Logging.getLogger("org.geotools.data.coverage.grid");
-
-	/** Caches a default GridCoverageFactory for usage in plugins. */
-	protected final static GridCoverageFactory coverageFactory = CoverageFactoryFinder
-			.getGridCoverageFactory(null);
+	private final static Logger LOGGER = Logging
+			.getLogger("org.geotools.data.coverage.grid");
 
 	protected static final double EPS = 1E-6;
 
-	   /** Buffered factory for coordinate operations. */
-    protected final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
-            new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
-    
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
 	 * data
@@ -128,7 +118,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected Object source = null;
 
 	/** Hints used by the {@link AbstractGridCoverage2DReader} subclasses. */
-	protected Hints hints = new Hints(new HashMap(5,1.0f));
+	protected Hints hints = GeoTools.getDefaultHints();
 
 	/**
 	 * Highest resolution availaible for this reader.
@@ -158,6 +148,11 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	/** Resolutions avialaible through an overviews based mechanism. */
 	protected double[][] overViewResolutions = null;
+
+	/**
+	 * {@link GridCoverageFactory} instance.
+	 */
+	protected GridCoverageFactory coverageFactory;
 
 	// -------------------------------------------------------------------------
 	//
@@ -200,11 +195,13 @@ public abstract class AbstractGridCoverage2DReader implements
 		//
 		// //
 		Integer imageChoice = new Integer(0);
-        
-		// we are able to handle overviews properly only if the transformation is
-        // an affine transform with pure scale and translation, no rotational components
-        if(raster2Model != null && !isScaleTranslate(raster2Model))
-            return imageChoice;
+
+		// we are able to handle overviews properly only if the transformation
+		// is
+		// an affine transform with pure scale and translation, no rotational
+		// components
+		if (raster2Model != null && !isScaleTranslate(raster2Model))
+			return imageChoice;
 
 		// //
 		//
@@ -378,7 +375,8 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
 	 * the {@link #originalEnvelope} that was provided for this coverage.
 	 * 
-	 * @param image contains the data for the coverage to create.
+	 * @param image
+	 *            contains the data for the coverage to create.
 	 * @return a {@link GridCoverage}
 	 * @throws IOException
 	 */
@@ -387,23 +385,25 @@ public abstract class AbstractGridCoverage2DReader implements
 		return createImageCoverage(image, null);
 
 	}
-	
+
 	/**
 	 * Creates a {@link GridCoverage} for the provided {@link PlanarImage} using
 	 * the {@link #raster2Model} that was provided for this coverage.
 	 * 
 	 * <p>
-	 * This method is vital when working with coverages that have a raster to model transformation
-	 * that is not a simple scale and translate.
+	 * This method is vital when working with coverages that have a raster to
+	 * model transformation that is not a simple scale and translate.
 	 * 
-	 * @param image contains the data for the coverage to create.
-	 * @param raster2Model is the {@link MathTransform} that maps from the 
-	 * 		  raster space to the model space.
+	 * @param image
+	 *            contains the data for the coverage to create.
+	 * @param raster2Model
+	 *            is the {@link MathTransform} that maps from the raster space
+	 *            to the model space.
 	 * @return a {@link GridCoverage}
 	 * @throws IOException
 	 */
-	protected final GridCoverage createImageCoverage(PlanarImage image, MathTransform raster2Model)
-			throws IOException {
+	protected final GridCoverage createImageCoverage(PlanarImage image,
+			MathTransform raster2Model) throws IOException {
 
 		// deciding the number range
 		NumberRange geophysicRange = null;
@@ -513,16 +513,17 @@ public abstract class AbstractGridCoverage2DReader implements
 			bands[i] = new GridSampleDimension(names[i],
 					new Category[] { values }, null).geophysics(true);
 		}
-		
+
 		// creating coverage
 		if (raster2Model != null) {
-		        return coverageFactory.create(coverageName, image, crs,
-		                        raster2Model, bands, null, null);
+			return coverageFactory.create(coverageName, image, crs,
+					raster2Model, bands, null, null);
 		}
 		return coverageFactory.create(coverageName, image, new GeneralEnvelope(
 				originalEnvelope), bands, null, null);
 
 	}
+
 	/**
 	 * Creates a {@link GridCoverage} for a coverage that is not a simple image
 	 * but that contains complex dadta from measurements.
@@ -599,10 +600,8 @@ public abstract class AbstractGridCoverage2DReader implements
 				final CoordinateReferenceSystem crs2D = CRSUtilities
 						.getCRS2D(envelope.getCoordinateReferenceSystem());
 
-				if (crs != null
-						&& !CRS.equalsIgnoreMetadata(crs, crs2D)) {
-					final MathTransform tr = CRS.findMathTransform(
-							crs2D, crs);
+				if (crs != null && !CRS.equalsIgnoreMetadata(crs, crs2D)) {
+					final MathTransform tr = CRS.findMathTransform(crs2D, crs);
 					if (!tr.isIdentity())
 						envelope = CRS.transform(tr, envelope);
 				}
@@ -727,16 +726,18 @@ public abstract class AbstractGridCoverage2DReader implements
 	public int getGridCoverageCount() {
 		throw new UnsupportedOperationException("Unsupported opertion.");
 	}
-    
-    /**
-     * Checks the transformation is a pure scale/translate instance (using a tolerance)
-     * @param transform
-     * @return
-     */
-    protected final boolean isScaleTranslate(MathTransform transform) {
-        if(!(transform instanceof AffineTransform))
-            return false;
-        AffineTransform at = (AffineTransform) transform;
-        return at.getShearX() < EPS && at.getShearY() < EPS;
-    }
+
+	/**
+	 * Checks the transformation is a pure scale/translate instance (using a
+	 * tolerance)
+	 * 
+	 * @param transform
+	 * @return
+	 */
+	protected final static boolean isScaleTranslate(MathTransform transform) {
+		if (!(transform instanceof AffineTransform))
+			return false;
+		AffineTransform at = (AffineTransform) transform;
+		return at.getShearX() < EPS && at.getShearY() < EPS;
+	}
 }
