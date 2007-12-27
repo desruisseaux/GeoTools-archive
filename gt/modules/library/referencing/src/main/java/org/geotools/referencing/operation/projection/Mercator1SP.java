@@ -3,7 +3,7 @@
  *    http://geotools.org
  *
  *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -24,7 +23,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 
-// Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -35,7 +33,7 @@ import org.geotools.resources.i18n.Vocabulary;
  * Mercator Cylindrical 1SP Projection.
  *
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"Mercator 1SP" on RemoteSensing.org</A>
- * 
+ *
  * @since 2.2
  * @source $URL$
  * @version $Id$
@@ -131,7 +129,7 @@ public class Mercator1SP extends Mercator {
             });
 
         /**
-         * Constructs a new provider. 
+         * Constructs a new provider.
          */
         public Provider() {
             super(PARAMETERS);
@@ -140,7 +138,8 @@ public class Mercator1SP extends Mercator {
         /**
          * Returns the operation type for this map projection.
          */
-        public Class getOperationType() {
+        @Override
+        public Class<CylindricalProjection> getOperationType() {
             return CylindricalProjection.class;
         }
 
