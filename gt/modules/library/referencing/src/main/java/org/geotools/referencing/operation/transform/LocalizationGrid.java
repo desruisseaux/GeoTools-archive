@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2002, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -26,17 +25,14 @@ import java.awt.geom.Point2D;
 import java.awt.image.WritableRaster;  // For javadoc
 import java.util.Arrays;
 
-// JAI dependencies
 import javax.media.jai.Warp;           // For javadoc
 import javax.media.jai.WarpGrid;       // For javadoc
 import javax.media.jai.WarpPolynomial; // For javadoc
 import javax.media.jai.RasterFactory;  // For javadoc
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.GridGeometry;  // For javadoc
 import org.opengis.referencing.operation.MathTransform2D;
 
-// Geotools dependencies
 import org.geotools.referencing.crs.DefaultDerivedCRS;            // For javadoc
 import org.geotools.referencing.crs.DefaultGeographicCRS;         // For javadoc
 import org.geotools.referencing.cs.DefaultCartesianCS;            // For javadoc
@@ -476,10 +472,10 @@ public class LocalizationGrid {
             if (singularityOffset != -1) {
                 final int currentOffset = offset+step*(val2-1);
                 final int num = (currentOffset-singularityOffset)/step + 1;
-                replaceSingularity(grid,singularityOffset,num,step);                
-            }            
-        }        
-    }         
+                replaceSingularity(grid,singularityOffset,num,step);
+            }
+        }
+    }
 
     /**
      * Replace consecutive singularity by linear values in sub-array.
@@ -490,7 +486,7 @@ public class LocalizationGrid {
      *              *--*--*--*--*--*
      *              |07|08|08|08|11|
      *              *--*--*--*--*--*
-     * 
+     *
      * Params are : offset = 0, num = 5, step = 1
      *
      *                  after
@@ -685,7 +681,7 @@ public class LocalizationGrid {
         if (transforms != null) {
             if (transforms[0] != null) {
                 // Clones is required only for the grid-backed transform.
-                grid = (double[]) grid.clone();
+                grid = grid.clone();
             }
             // Signal that all transforms need to be recomputed.
             transforms = null;

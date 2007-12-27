@@ -533,6 +533,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * This trick is used for avoiding the creation of thousands of temporary objects
      * when transforming an array of points using {@link Warp#mapDestPoint}.
      */
+    @SuppressWarnings("serial")
     private static final class PointFloat extends Point2D.Float {
         @Override
         public PointFloat clone() {
@@ -545,6 +546,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * This trick is used for avoiding the creation of thousands of temporary objects
      * when transforming an array of points using {@link Warp#mapDestPoint}.
      */
+    @SuppressWarnings("serial")
     private static final class PointDouble extends Point2D.Double {
         public PointDouble() {
             super();

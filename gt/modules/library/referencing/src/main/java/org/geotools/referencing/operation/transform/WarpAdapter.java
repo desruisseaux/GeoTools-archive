@@ -40,6 +40,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 final class WarpAdapter extends Warp {
     /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -8679060848877065181L;
+
+    /**
      * The coverage name. Used for formatting error message.
      */
     private final CharSequence name;

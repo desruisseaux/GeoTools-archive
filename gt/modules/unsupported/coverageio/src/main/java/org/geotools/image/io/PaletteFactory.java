@@ -83,7 +83,7 @@ public class PaletteFactory {
      * The fallback factory, or {@code null} if there is none. The fallback factory
      * will be queried if a palette was not found in current factory.
      * <p>
-     * This field should be considered as final. It is modified by {@link #addDefault} only.
+     * This field should be considered as final. It is modified by {@link #scanForPlugins} only.
      */
     private PaletteFactory fallback;
 
@@ -138,7 +138,7 @@ public class PaletteFactory {
      * holds a reference to a color model - this is necessary in order to prevent multiple creation
      * of the same {@link IndexColorModel}. The references are cleaned by {@link PaletteDisposer}.
      */
-    final Set<Palette>protectedPalettes = new HashSet<Palette>();
+    final Set<Palette> protectedPalettes = new HashSet<Palette>();
 
     /**
      * Gets the default palette factory. This method creates a default instance looking for

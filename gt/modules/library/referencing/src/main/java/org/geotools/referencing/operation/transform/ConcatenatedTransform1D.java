@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *   
+ *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2001, Institut de Recherche pour le Développement
  *
@@ -17,7 +17,6 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// OpenGIS dependencies
 import org.geotools.geometry.DirectPosition1D;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -38,7 +37,7 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 8150427971141078395L;
-    
+
     /**
      * Constructs a concatenated transform.
      */
@@ -47,14 +46,15 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
     {
         super(transform1, transform2);
     }
-    
+
     /**
-     * Check if transforms are compatibles with this implementation.
+     * Checks if transforms are compatibles with this implementation.
      */
+    @Override
     boolean isValid() {
         return super.isValid() && getSourceDimensions()==1 && getTargetDimensions()==1;
     }
-    
+
     /**
      * Transforms the specified value.
      */
@@ -65,7 +65,7 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
         transform2.transform(buffer, 0, values, 0, 1);
         return values[0];
     }
-    
+
     /**
      * Gets the derivative of this function at a value.
      */
