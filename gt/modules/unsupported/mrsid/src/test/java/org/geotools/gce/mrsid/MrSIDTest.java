@@ -16,13 +16,19 @@
  */
 package org.geotools.gce.mrsid;
 
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.test.TestData;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
 
 /**
  * @author Daniele Romagnoli, GeoSolutions
@@ -47,7 +53,7 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
 	 * the sample data as a coherently GeoReferenced coverage, by means of, as
 	 * an instance, uDIG.
 	 */
-	private final static String fileName = "";
+	private final static String fileName = "n13250i.sid";
 
 	/**
 	 * Creates a new instance of {@link MrSIDTest}
@@ -78,21 +84,47 @@ public final class MrSIDTest extends AbstractMrSIDTestCase {
 			return;
 		}
 
+		// get a reader
 		final AbstractGridCoverage2DReader reader = new MrSIDReader(TestData
 				.file(this, fileName));
 
-		final ParameterValueGroup params = reader.getFormat()
-				.getReadParameters();
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(reader.getOriginalGridRange(),
-								reader.getOriginalEnvelope()));
-		final GeneralParameterValue[] gpv = { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
+		// read once
+		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
+		assertNotNull(gc);
+		if (TestData.isInteractiveTest())
+			gc.show();
+		else
+			gc.getRenderedImage().getData();
 
-		final GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
+		// read again with subsampling and crop
+		final double cropFactor = 2.0;
+		final int oldW = gc.getRenderedImage().getWidth();
+		final int oldH = gc.getRenderedImage().getHeight();
+		final Rectangle range = reader.getOriginalGridRange().toRectangle();
+		final GeneralEnvelope oldEnvelope = reader.getOriginalEnvelope();
+		final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
+				oldEnvelope.getLowerCorner().getOrdinate(0)
+						+ oldEnvelope.getLength(0) / cropFactor,
+				oldEnvelope.getLowerCorner().getOrdinate(1)
+						+ oldEnvelope.getLength(1) / cropFactor },
+				new double[] { oldEnvelope.getUpperCorner().getOrdinate(0),
+						oldEnvelope.getUpperCorner().getOrdinate(1) });
+		cropEnvelope.setCoordinateReferenceSystem(reader.getCrs());
+
+		final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader
+				.getFormat()).READ_GRIDGEOMETRY2D.createValue();
+		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
+				(int) (range.width / cropFactor),
+				(int) (range.height / cropFactor))), cropEnvelope));
+		gc = (GridCoverage2D) reader.read(new GeneralParameterValue[] { gg });
+		assertNotNull(gc);
+		// NOTE: in some cases might be too restrictive
+		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
+				.getScale(((AffineTransform) ((GridGeometry2D) gc
+						.getGridGeometry()).getGridToCRS2D())) / 2, true));
+		// this should be fine since we give 1 pixel tolerance
+		assertEquals(oldW / cropFactor, gc.getRenderedImage().getWidth(), 1);
+		assertEquals(oldH / cropFactor, gc.getRenderedImage().getHeight(), 1);
 
 		if (TestData.isInteractiveTest()) {
 			gc.show();
