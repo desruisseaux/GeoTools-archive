@@ -28,7 +28,6 @@ import java.util.*;
 
 import org.geotools.io.DefaultFileFilter;
 import org.geotools.io.LineFormat;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.IndexedResourceBundle;
