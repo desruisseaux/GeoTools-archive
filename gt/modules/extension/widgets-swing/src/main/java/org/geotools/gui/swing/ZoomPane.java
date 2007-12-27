@@ -529,12 +529,12 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final class Listeners extends MouseAdapter implements MouseWheelListener,
-                                                                  ComponentListener, Serializable
+    private final class Listeners extends MouseAdapter
+            implements MouseWheelListener, ComponentListener, Serializable
     {
-        @Override public void mouseWheelMoved (final MouseWheelEvent event) {ZoomPane.this.mouseWheelMoved (event);}
-        @Override public void mousePressed    (final MouseEvent      event) {ZoomPane.this.mayShowPopupMenu(event);}
-        @Override public void mouseReleased   (final MouseEvent      event) {ZoomPane.this.mayShowPopupMenu(event);}
+        public void mouseWheelMoved (final MouseWheelEvent event) {ZoomPane.this.mouseWheelMoved (event);}
+        public void mousePressed    (final MouseEvent      event) {ZoomPane.this.mayShowPopupMenu(event);}
+        public void mouseReleased   (final MouseEvent      event) {ZoomPane.this.mayShowPopupMenu(event);}
         public void componentResized(final ComponentEvent  event) {ZoomPane.this.processSizeEvent(event);}
         public void componentMoved  (final ComponentEvent  event) {}
         public void componentShown  (final ComponentEvent  event) {}
