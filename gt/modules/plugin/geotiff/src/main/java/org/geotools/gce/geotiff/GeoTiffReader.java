@@ -53,7 +53,9 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -133,13 +135,17 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// assume that we have first longitude the latitude.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		this.hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
-				Boolean.TRUE);
+		if (hints == null)
+			this.hints= new Hints();	
 		if (uHints != null) {
 			// prevent the use from reordering axes
 			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
 			this.hints.add(uHints);
+			this.hints.add(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+				Boolean.TRUE));
+			
 		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
 		coverageName = "geotiff_coverage";
 
 		// /////////////////////////////////////////////////////////////////////

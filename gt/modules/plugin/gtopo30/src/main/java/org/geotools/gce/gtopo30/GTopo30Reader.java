@@ -54,6 +54,7 @@ import javax.units.Unit;
 import javax.units.UnitFormat;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -172,6 +173,21 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 */
 	public GTopo30Reader(final Object source, final Hints hints)
 			throws IOException {
+		
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
+			// prevent the use from reordering axes
+			this.hints.add(hints);
+		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		
+		
 		if (source == null) {
 			throw new DataSourceException(
 					"GTopo30Reader:No source set to read this coverage.");
@@ -192,8 +208,6 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		} else {
 			throw new IllegalArgumentException("Illegal input argument!");
 		}
-		if (hints != null)
-			this.hints.add(hints);
 		this.source = source;
 		coverageName = "gtopo30_coverage";
 		// ///////////////////////////////////////////////////////////

@@ -42,6 +42,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -133,9 +134,21 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					"WorldImageReader", ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
-		this.source = input;
-		if (hints != null)
+		this.source=input;
+		
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
+			// prevent the use from reordering axes
 			this.hints.add(hints);
+		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+			
 		coverageName = "image_coverage";
 		try {
 			boolean closeMe = true;

@@ -47,6 +47,7 @@ import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -240,6 +241,23 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 	private void checkSource(Object input, final Hints hints)
 			throws UnsupportedEncodingException, DataSourceException,
 			IOException, FileNotFoundException {
+		
+		
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
+			// prevent the use from reordering axes
+			this.hints.add(hints);
+		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		
+		
+		
 		if (input == null) {
 			final DataSourceException ex = new DataSourceException(
 					"No source set to read this coverage.");
@@ -248,8 +266,6 @@ public final class ArcGridReader extends AbstractGridCoverage2DReader implements
 			throw ex;
 		}
 		this.source = input;
-		if (hints != null)
-			this.hints.add(hints);
 		closeMe = true;
 		// //
 		//

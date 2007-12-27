@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageReadParam;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -151,32 +152,32 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * 
 	 */
 	public ImagePyramidReader(Object source, Hints uHints) throws IOException {
-		// /////////////////////////////////////////////////////////////////////
-		// 
-		// Forcing longitude first since the geotiff specification seems to
-		// assume that we have first longitude the latitude.
+		// //
 		//
-		// /////////////////////////////////////////////////////////////////////
-		this.hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
-				Boolean.TRUE);
-		if (uHints != null) {
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
 			// prevent the use from reordering axes
-			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
-			this.hints.add(uHints);
+			this.hints.add(hints);
 		}
-		if (source == null) {
-
-			final IOException ex = new IOException(
-					"ImagePyramidReader:No source set to read this coverage.");
-			throw new DataSourceException(ex);
-		}
-		this.source = source;
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+		
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Check source
 		//
 		// /////////////////////////////////////////////////////////////////////
+		if (source == null) {
+
+			final IOException ex = new IOException(
+					"ImagePyramidReader:No source set to read this coverage.");
+			throw new DataSourceException(ex);
+		}
+		this.source = source;		
 		if (source instanceof File)
 			this.sourceFile = ((File) source);
 		else if (source instanceof URL) {

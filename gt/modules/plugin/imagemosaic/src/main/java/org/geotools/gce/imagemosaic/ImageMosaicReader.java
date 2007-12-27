@@ -63,6 +63,7 @@ import javax.media.jai.TileCache;
 import javax.media.jai.operator.MosaicDescriptor;
 import javax.media.jai.operator.PatternDescriptor;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -151,15 +152,17 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * order to NOT remove them from {@link JAI} {@link TileCache};
 	 * 
 	 * <p>
-	 * Note: we don't keep around any hard references TODO we miight want two
-	 * things:
+	 * Note: we don't keep around any hard references
+	 * 
+	 * <p>
+	 * TODO we might want two things:
 	 * <ol>
 	 * <li>The possibility to actually flush these cache</li>
 	 * <li>The possibility to specify a {@link JAI} {@link TileCache} to use
 	 * for all the various operations</li>
 	 * </ol>
 	 */
-	private final SoftValueHashMap<String, Map<Integer,Map<Long, RenderedImage>>> tileCache = new SoftValueHashMap<String,  Map<Integer,Map<Long, RenderedImage>>>(
+	private final SoftValueHashMap<String, Map<Integer, Map<Long, RenderedImage>>> tileCache = new SoftValueHashMap<String, Map<Integer, Map<Long, RenderedImage>>>(
 			0);
 
 	/**
@@ -192,6 +195,12 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private boolean expandMe;
 
 	/**
+	 * I <code>true</code> it tells us if the mosaic points to absolute paths
+	 * or to relative ones. (in case of <code>false</code>).
+	 */
+	private boolean absolutePath;
+
+	/**
 	 * Max number of tiles that this plugin will load.
 	 * 
 	 * If this number is exceeded, i.e. we request an area which is too large
@@ -210,16 +219,25 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * 
 	 */
 	public ImageMosaicReader(Object source, Hints uHints) throws IOException {
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (this.hints == null)
+			this.hints= new Hints();	
+		if (hints != null) {
+			// prevent the use from reordering axes
+			this.hints.add(hints);
+		}
+		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
+
+
 		// /////////////////////////////////////////////////////////////////////
-		// 
-		// Forcing longitude first since the geotiff specification seems to
-		// assume that we have first longitude the latitude.
+		//
+		// Check source
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (uHints != null) {
-			// prevent the use from reordering axes
-			this.hints.add(uHints);
-		}
 		if (source == null) {
 
 			final IOException ex = new IOException(
@@ -228,13 +246,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
-		this.source = source;
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Check source
-		//
-		// /////////////////////////////////////////////////////////////////////
+		this.source = source;		
 		if (source instanceof File)
 			this.sourceURL = ((File) source).toURL();
 		else if (source instanceof URL)
@@ -414,6 +426,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 						/ highestRes[0]), (int) Math.round(originalEnvelope
 						.getLength(1)
 						/ highestRes[1])));
+
+		// absolute or relative path
+		absolutePath = Boolean
+				.parseBoolean(properties.getProperty("", "False"));
 	}
 
 	/**
@@ -825,6 +841,21 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			ColorModel model = null;
 			RenderedImage loadedImage = null;
 			String location = null;
+			// //
+			//
+			// 0==relative, 1==absolute, -1==uninitialized
+			//
+			// //
+			//
+			// In case we set the absolute path we used it here, if not we do
+			// not make any assumption and we check what we can do so that we
+			// are back compatible.
+			//
+			// //
+			int relativePath = -1;
+			if (absolutePath)
+				relativePath = 1;
+
 			do {
 
 				// /////////////////////////////////////////////////////////////////////
@@ -844,8 +875,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// /////////////////////////////////////////////////////////////////////
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("About to read image number " + i);
-				final File imageFile = new File(
-						new StringBuffer(parentLocation).append(
+				File imageFile = new File(relativePath == 1 ? location
+						: new StringBuffer(parentLocation).append(
 								File.separatorChar).append(location).toString());
 
 				// //
@@ -855,14 +886,32 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// //
 				if (!imageFile.exists() || !imageFile.canRead()
 						|| !imageFile.isFile()) {
-					if (LOGGER.isLoggable(Level.INFO))
-						LOGGER.info("Unable to read image for file "
-								+ imageFile.getAbsolutePath());
-					i++;
-					continue;
+
+					// check if we need to switch to absolute path
+					if (relativePath == -1) {
+						// create an absolute path
+						imageFile = new File(location);
+						if (!imageFile.exists() || !imageFile.canRead()
+								|| !imageFile.isFile()) {
+							// file does not exist this way either, let's bypass
+							// it WITHOUT setting relativePath
+							if (LOGGER.isLoggable(Level.INFO))
+								LOGGER.info("Unable to read image for file "
+										+ imageFile.getAbsolutePath());
+							i++;
+							continue;
+						} else
+							relativePath = 1;
+					} else {
+						if (LOGGER.isLoggable(Level.INFO))
+							LOGGER.info("Unable to read image for file "
+									+ imageFile.getAbsolutePath());
+						i++;
+						continue;
+					}
 				}
 				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine("Cache hit");
+					LOGGER.fine("File found");
 				// //
 				//
 				// Check in the cache
@@ -880,13 +929,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					final String filePath = imageFile.getAbsolutePath();
 					final long key = readP.getSourceXSubsampling()
 							+ (readP.getSourceYSubsampling() << 32);
-					Map<Integer,Map<Long, RenderedImage>> overviewsMap = null;
+					Map<Integer, Map<Long, RenderedImage>> overviewsMap = null;
 					Map<Long, RenderedImage> subsamplingsMap = null;
 					if (tileCache.containsKey(filePath)) {
 						overviewsMap = tileCache.get(filePath);
 
 					} else {
-						overviewsMap = new HashMap<Integer,Map<Long, RenderedImage>>(this.numOverviews);
+						overviewsMap = new HashMap<Integer, Map<Long, RenderedImage>>(
+								this.numOverviews);
 						tileCache.put(filePath, overviewsMap);
 					}
 
@@ -917,7 +967,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 							loadedImage = JAI.create("ImageRead", pbjImageRead);
 							// add to cache
 							subsamplingsMap.put(key, loadedImage);
-							
 
 						}
 
