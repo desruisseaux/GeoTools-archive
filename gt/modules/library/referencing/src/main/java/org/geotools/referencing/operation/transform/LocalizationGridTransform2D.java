@@ -539,7 +539,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
              * know if this point is valid. Otherwise, an exception is thrown.
              */
             if (MASK_NON_CONVERGENCE) {
-                Logging.getLogger("org.geotools.gc").fine("No convergence");
+                Logging.getLogger(LocalizationGridTransform2D.class).fine("No convergence");
                 if (bestX>=0 && bestX<width && bestY>=0 && bestY<height) {
                     target.x = bestX;
                     target.y = bestY;

@@ -341,7 +341,7 @@ public final class Parameters {
             final LogRecord record = new LogRecord(Level.FINE, "Axis length mismatch.");
             record.setSourceClassName(Parameters.class.getName());
             record.setSourceMethodName("ensureSet");
-            Logging.getLogger("org.geotools.parameter").log(record);
+            Logging.getLogger(Parameters.class).log(record);
         }
         return true;
     }

@@ -158,11 +158,11 @@ public final class Registry {
     }
 
     /**
-     * Log the specified record.
+     * Logs the specified record.
      */
     private static void log(final String method, final LogRecord record) {
         record.setSourceClassName(Registry.class.getName());
         record.setSourceMethodName(method);
-        org.geotools.util.logging.Logging.getLogger("org.geotools.image").log(record);
+        org.geotools.util.logging.Logging.getLogger(Registry.class).log(record);
     }
 }

@@ -30,7 +30,6 @@ import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import org.opengis.util.InternationalString;
 import org.geotools.util.logging.Logging;
@@ -51,11 +50,6 @@ import org.geotools.util.logging.Logging;
  * @author Martin Desruisseaux
  */
 public class IndexedResourceBundle extends ResourceBundle {
-    /**
-     * The logger for reporting resources loading.
-     */
-    private static final Logger LOGGER = Logging.getLogger("org.geotools.resources");
-
     /**
      * Maximum string length for text inserted into another text. This parameter is used by
      * {@link #summarize}. Resource strings are never cut to this length. However, text replacing
@@ -237,13 +231,13 @@ public class IndexedResourceBundle extends ResourceBundle {
                 }
                 record.setParameters(new String[]{language, getPackageName()});
             }
-            LOGGER.log(record);
+            Logging.getLogger(IndexedResourceBundle.class).log(record);
             return values;
         } catch (IOException exception) {
             record.setLevel  (Level.WARNING);
             record.setMessage(exception.getLocalizedMessage());
             record.setThrown (exception);
-            LOGGER.log(record);
+            Logging.getLogger(IndexedResourceBundle.class).log(record);
             final MissingResourceException error = new MissingResourceException(
                     exception.getLocalizedMessage(), getClass().getName(), key);
             error.initCause(exception);
@@ -705,7 +699,7 @@ public class IndexedResourceBundle extends ResourceBundle {
      * Invoked when an unexpected exception occured in the {@link #format} method.
      */
     private static void unexpectedException(final RuntimeException exception) {
-        Logging.unexpectedException(LOGGER, IndexedResourceBundle.class, "format", exception);
+        Logging.unexpectedException(IndexedResourceBundle.class, "format", exception);
     }
 
     /**

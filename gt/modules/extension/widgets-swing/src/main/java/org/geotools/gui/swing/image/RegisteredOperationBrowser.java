@@ -224,7 +224,7 @@ public class RegisteredOperationBrowser extends JPanel {
                  * deal; just left some label blank. Log the exception with a low level, since
                  * this warning is not really important.
                  */
-                Logging.getLogger("org.geotools.gui.swing").log(Level.FINER,
+                Logging.getLogger(RegisteredOperationBrowser.class).log(Level.FINER,
                                  exception.getLocalizedMessage(), exception);
             }
         }

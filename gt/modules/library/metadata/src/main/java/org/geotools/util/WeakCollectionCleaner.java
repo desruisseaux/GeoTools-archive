@@ -36,11 +36,6 @@ import org.geotools.util.logging.Logging;
  */
 final class WeakCollectionCleaner extends Thread {
     /**
-     * The name of the logger to use.
-     */
-    private static final String LOGGER = "org.geotools.util";
-
-    /**
      * The default thread.
      */
     public static final WeakCollectionCleaner DEFAULT = new WeakCollectionCleaner();
@@ -94,15 +89,13 @@ final class WeakCollectionCleaner extends Thread {
             } catch (InterruptedException exception) {
                 // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {
-                Logging.unexpectedException(LOGGER,
-                        WeakCollectionCleaner.class, "remove", exception);
+                Logging.unexpectedException(WeakCollectionCleaner.class, "remove", exception);
             } catch (AssertionError exception) {
-                Logging.unexpectedException(LOGGER,
-                        WeakCollectionCleaner.class, "remove", exception);
+                Logging.unexpectedException(WeakCollectionCleaner.class, "remove", exception);
                 // Do not kill the thread on assertion failure, in order to
                 // keep the same behaviour as if assertions were turned off.
             }
         }
-        Logging.getLogger(LOGGER).severe("Daemon stopped."); // Should never happen.
+        Logging.getLogger(WeakCollectionCleaner.class).severe("Daemon stopped."); // Should never happen.
     }
 }

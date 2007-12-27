@@ -16,14 +16,12 @@
  */
 package org.geotools.resources.geometry;
 
-// J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.io.Serializable;
 
-// Geotools dependencies
 import org.geotools.resources.Classes;
 
 
@@ -73,7 +71,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      */
     public XRectangle2D() {
     }
-    
+
     /**
      * Construct a rectangle with the specified location and dimension.
      * This constructor uses the same signature than {@link Rectangle2D} for consistency.
@@ -84,7 +82,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
         this.xmax = x+width;
         this.ymax = y+height;
     }
-    
+
     /**
      * Construct a rectangle with the same coordinates than the supplied rectangle.
      *
@@ -113,7 +111,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
         rect.ymax = ymax;
         return rect;
     }
-    
+
     /**
      * Determines whether the {@code RectangularShape} is empty.
      * When the {@code RectangularShape} is empty, it encloses no
@@ -145,7 +143,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     public double getY() {
         return ymin;
     }
-    
+
     /**
      * Returns the width of the framing rectangle in
      * {@code double} precision.
@@ -167,6 +165,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the smallest X coordinate of the rectangle.
      */
+    @Override
     public double getMinX() {
         return xmin;
     }
@@ -174,6 +173,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the smallest Y coordinate of the rectangle.
      */
+    @Override
     public double getMinY() {
         return ymin;
     }
@@ -181,6 +181,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the largest X coordinate of the rectangle.
      */
+    @Override
     public double getMaxX() {
         return xmax;
     }
@@ -188,6 +189,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the largest Y coordinate of the rectangle.
      */
+    @Override
     public double getMaxY() {
         return ymax;
     }
@@ -195,15 +197,17 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Returns the X coordinate of the center of the rectangle.
      */
+    @Override
     public double getCenterX() {
-        return (xmin+xmax)*0.5;
+        return (xmin + xmax) * 0.5;
     }
 
     /**
      * Returns the Y coordinate of the center of the rectangle.
      */
+    @Override
     public double getCenterY() {
-        return (ymin+ymax)*0.5;
+        return (ymin + ymax) * 0.5;
     }
 
     /**
@@ -217,11 +221,12 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * @param width the value to use to set the width of this {@code Rectangle2D}
      * @param height the value to use to set the height of this {@code Rectangle2D}
      */
+    @Override
     public void setRect(final double x, final double y, final double width, final double height) {
         this.xmin = x;
         this.ymin = y;
-        this.xmax = x+width;
-        this.ymax = y+height;
+        this.xmax = x + width;
+        this.ymax = y + height;
     }
 
     /**
@@ -230,6 +235,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @param r the specified {@code Rectangle2D}
      */
+    @Override
     public void setRect(final Rectangle2D r) {
         this.xmin = r.getMinX();
         this.ymin = r.getMinY();
@@ -252,6 +258,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * intersects the interior of a specified set of rectangular
      * coordinates; {@code false} otherwise.
      */
+    @Override
     public boolean intersects(final double x,     final double y,
                               final double width, final double height)
     {
@@ -273,6 +280,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @see #intersectInclusive(Rectangle2D, Rectangle2D)
      */
+    @Override
     public boolean intersects(final Rectangle2D rect) {
         if (!(xmin<xmax && ymin<ymax)) {
             return false;
@@ -397,6 +405,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *         entirely contains specified set of rectangular
      *         coordinates; {@code false} otherwise.
      */
+    @Override
     public boolean contains(final double x,     final double y,
                             final double width, final double height)
     {
@@ -416,6 +425,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * @param  rect the specified rectangle.
      * @return {@code true} if this shape entirely contains the specified rectangle.
      */
+    @Override
     public boolean contains(final Rectangle2D rect) {
         if (!(xmin<xmax && ymin<ymax)) {
             return false;
@@ -437,6 +447,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *         inside the boundary of this {@code Rectangle2D};
      *         {@code false} otherwise.
      */
+    @Override
     public boolean contains(final double x, final double y) {
         return (x>=xmin && y>=ymin && x<xmax && y<ymax);
     }
@@ -516,7 +527,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
         r.ymax = Math.min(ymax, rect.getMaxY());
         return r;
     }
-    
+
     /**
      * Returns a new {@code Rectangle2D} object representing the
      * union of this {@code Rectangle2D} with the specified
@@ -551,11 +562,12 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * the left or bottom edge of the enlarged rectangle,
      * {@code contains} returns {@code false} for that point.
      */
+    @Override
     public void add(final double x, final double y) {
-        if (x<xmin) xmin=x;
-        if (x>xmax) xmax=x;
-        if (y<ymin) ymin=y;
-        if (y>ymax) ymax=y;
+        if (x < xmin) xmin = x;
+        if (x > xmax) xmax = x;
+        if (y < ymin) ymin = y;
+        if (y > ymax) ymax = y;
     }
 
     /**
@@ -565,12 +577,13 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @param rect the {@code Rectangle2D} to add to this {@code Rectangle2D}.
      */
+    @Override
     public void add(final Rectangle2D rect) {
         double t;
-        if ((t=rect.getMinX()) < xmin) xmin=t;
-        if ((t=rect.getMaxX()) > xmax) xmax=t;
-        if ((t=rect.getMinY()) < ymin) ymin=t;
-        if ((t=rect.getMaxY()) > ymax) ymax=t;
+        if ((t=rect.getMinX()) < xmin) xmin = t;
+        if ((t=rect.getMaxX()) > xmax) xmax = t;
+        if ((t=rect.getMinY()) < ymin) ymin = t;
+        if ((t=rect.getMaxY()) > ymax) ymax = t;
     }
 
     /**

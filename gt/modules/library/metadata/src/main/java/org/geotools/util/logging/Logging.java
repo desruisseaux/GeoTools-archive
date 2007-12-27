@@ -126,6 +126,22 @@ public final class Logging {
     }
 
     /**
+     * Returns a logger for the specified class. This convenience method invokes
+     * {@link #getLogger(String)} with the package name as the logger name.
+     *
+     * @param  classe The class for which to obtain a logger.
+     * @return A logger for the specified class.
+     *
+     * @since 2.5
+     */
+    public static Logger getLogger(final Class<?> classe) {
+        String name = classe.getName();
+        final int separator = name.lastIndexOf('.');
+        name = (separator >= 1) ? name.substring(0, separator-1) : "";
+        return getLogger(name);
+    }
+
+    /**
      * Returns a logger for the specified name. If a {@linkplain LoggerFactory logger factory} has
      * been set, then this method first {@linkplain LoggerFactory#getLogger ask to the factory}.
      * It gives GeoTools a chance to redirect logging events to
@@ -229,7 +245,7 @@ public final class Logging {
 
     /**
      * Sets a new logger factory for this {@code Logging} instance and every children. The
-     * specified factory will be used by <code>{@linkplain #getLogger getLogger}(name)</code>
+     * specified factory will be used by <code>{@linkplain #getLogger(String) getLogger}(name)</code>
      * when {@code name} is this {@code Logging} name or one of its children.
      */
     public void setLoggerFactory(final LoggerFactory factory) {

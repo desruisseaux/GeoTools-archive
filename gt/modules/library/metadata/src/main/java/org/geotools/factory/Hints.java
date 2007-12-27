@@ -642,43 +642,43 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final Key USE_JAI_IMAGEREAD = new Key(Boolean.class);
-    
-    
+
     /**
-     * Overview policy, will choose the overview with the lower resolution among the ones 
+     * Overview policy, will choose the overview with the lower resolution among the ones
      * with higher resolution than one used for rendering.
-     * 
+     *
      * @since 2.5
      */
     public static final String VALUE_OVERVIEW_POLICY_QUALITY = "Quality";
-    
+
     /**
-     * Overview policy, will choose the overview with with the resolution closest to the one used 
+     * Overview policy, will choose the overview with with the resolution closest to the one used
      * for rendering
-     * 
+     *
      * @since 2.5
      */
     public static final String VALUE_OVERVIEW_POLICY_NEAREST = "Nearest";
-    
+
     /**
-     * Overview policy, will choose the overview with the higher resolution among the ones 
+     * Overview policy, will choose the overview with the higher resolution among the ones
      * with lower resolution than one used for rendering.
-     * 
+     *
      * @since 2.5
      */
     public static final String VALUE_OVERVIEW_POLICY_SPEED = "Speed";
-    
+
     /**
-     * Overview choosing policy
-     * 
+     * Overview choosing policy.
+     *
      * @see Hints#VALUE_OVERVIEW_POLICY_QUALITY
      * @see Hints#VALUE_OVERVIEW_POLICY_NEAREST
      * @see Hints#VALUE_OVERVIEW_POLICY_SPEED
+     *
      * @since 2.5
      */
     public static final OptionKey OVERVIEW_POLICY = new OptionKey(VALUE_OVERVIEW_POLICY_QUALITY,
             VALUE_OVERVIEW_POLICY_NEAREST, VALUE_OVERVIEW_POLICY_SPEED);
-    
+
 
     /**
      * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
@@ -1448,7 +1448,7 @@ public final class Hints extends RenderingHints {
                 try {
                     Integer.parseInt(value.toString());
                 } catch (NumberFormatException e) {
-                    Logging.getLogger("org.geotools.factory").finer(e.toString());
+                    Logging.getLogger(IntegerKey.class).finer(e.toString());
                 }
             }
             return false;

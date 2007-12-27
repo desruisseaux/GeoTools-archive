@@ -16,10 +16,8 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
 import java.util.Locale;
 
-// OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -28,7 +26,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.Envelope;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;

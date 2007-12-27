@@ -123,7 +123,7 @@ final class SampleTranscoder extends PointOpImage {
             // TODO: Check if this case occurs sometime, and fill pixel values if it does.
             //       If it happen to occurs, we will need to fix other GeoTools operations
             //       as well.
-            org.geotools.util.logging.Logging.getLogger("org.geotools.coverage").warning(
+            org.geotools.util.logging.Logging.getLogger(SampleTranscoder.class).warning(
                     "Bounds mismatch: " + destRect + " and " + bounds);
         }
         WritableRectIter iterator = RectIterFactory.createWritable(dest, bounds);

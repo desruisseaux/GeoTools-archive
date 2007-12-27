@@ -33,7 +33,6 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -264,8 +263,7 @@ public final class CRSUtilities {
             }
             crs = c.get(0);
         }
-        // Remove first cast when covariance will be allowed (J2SE 1.5).
-        return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
+        return ((GeographicCRS) crs).getDatum().getEllipsoid();
     }
 
     /**

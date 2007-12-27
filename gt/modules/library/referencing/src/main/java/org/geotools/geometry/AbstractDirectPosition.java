@@ -55,6 +55,26 @@ public abstract class AbstractDirectPosition implements DirectPosition {
     }
 
     /**
+     * Sets this direct position to the given position. If the given position is
+     * {@code null}, then all ordinate values are set to {@linkplain Double#NaN NaN}.
+     *
+     * @since 2.5
+     */
+    public void setPosition(final DirectPosition position) {
+        final int dimension = getDimension();
+        if (position != null) {
+            ensureDimensionMatch("position", position.getDimension(), dimension);
+            for (int i=0; i<dimension; i++) {
+                setOrdinate(i, position.getOrdinate(i));
+            }
+        } else {
+            for (int i=0; i<dimension; i++) {
+                setOrdinate(i, Double.NaN);
+            }
+        }
+    }
+
+    /**
      * Returns a sequence of numbers that hold the coordinate of this position in its
      * reference system.
      *

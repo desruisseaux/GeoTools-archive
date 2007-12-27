@@ -140,7 +140,7 @@ public class CoverageStack extends AbstractCoverage {
          * in order to log a "Loading data..." message.
          */
         String getName() throws IOException;
-        
+
         /**
          * Returns the minimum and maximum <var>z</var> value for the coverage.
          * This information is mandatory. This method should not load a large
@@ -249,7 +249,7 @@ public class CoverageStack extends AbstractCoverage {
             }
             return coverage.toString();
         }
-        
+
         /**
          * Returns the minimum and maximum <var>z</var> values for the coverage. If the range was
          * not explicitly specified to the constructor, then the default implementation infers it
@@ -307,13 +307,13 @@ public class CoverageStack extends AbstractCoverage {
             return coverage;
         }
     }
-    
+
     /**
      * Coverage elements in this stack. Elements may be shared by more than one
      * instances of {@code CoverageStack}.
      */
     private final Element[] elements;
-    
+
     /**
      * The sample dimensions for this coverage, or {@code null} if unknown.
      */
@@ -324,7 +324,7 @@ public class CoverageStack extends AbstractCoverage {
      * Note: this attribute may be non-null even if {@link #sampleDimensions} is null.
      */
     private final int numSampleDimensions;
-    
+
     /**
      * The envelope for this coverage. This is the union of all elements envelopes.
      *
@@ -352,48 +352,48 @@ public class CoverageStack extends AbstractCoverage {
      * or {@code null} if unknown.
      */
     private final CoordinateReferenceSystem zCRS;
-    
+
     /**
      * {@code true} if interpolations are allowed.
      */
     private boolean interpolationEnabled = true;
-    
+
     /**
      * Maximal interval between the upper z-value of a coverage and the lower z-value of the next
      * one. If a greater difference is found, we will consider that there is a hole in the data
      * and {@code evaluate(...)} methods will returns NaN for <var>z</var> values in this hole.
      */
     private final double lagTolerance = 0;
-    
+
     /**
      * List of objects to inform when image loading are trigged.
      */
     private final IIOListeners listeners = new IIOListeners();
-    
+
     /**
      * Internal listener for logging image loading.
      */
     private transient Listeners readListener;
-    
+
     /**
      * Coverage with a minimum z-value lower than or equals to the requested <var>z</var> value.
      * If possible, this class will tries to select a coverage with a middle value (not just the
      * minimum value) lower than the requested <var>z</var> value.
      */
     private transient Coverage lower;
-    
+
     /**
      * Coverage with a maximum z-value higher than or equals to the requested <var>z</var> value.
      * If possible, this class will tries to select a coverage with a middle value (not just the
      * maximum value) higher than the requested <var>z</var> value.
      */
     private transient Coverage upper;
-    
+
     /**
      * <var>Z</var> values in the middle of {@link #lower} and {@link #upper} envelope.
      */
     private transient double lowerZ=Double.POSITIVE_INFINITY, upperZ=Double.NEGATIVE_INFINITY;
-    
+
     /**
      * Range for {@link #lower} and {@link #upper}.
      */
@@ -422,7 +422,7 @@ public class CoverageStack extends AbstractCoverage {
      * thel again everytime an {@code evaluate(...)} method is invoked.
      */
     private transient double[] doubleBuffer;
-    
+
     /**
      * Initialize fields after deserialization.
      */
@@ -453,7 +453,7 @@ public class CoverageStack extends AbstractCoverage {
      *     coverages.add(factory.create(..., crs, envelope, ...);
      * }
      * </pre></blockquote>
-     * 
+     *
      * This convenience constructor wraps all coverage intos a {@link Adapter Adapter} object.
      * Users with a significant amount of data are encouraged to uses the constructor expecting
      * {@link Element Element} objects instead, in order to provides their own implementation
@@ -610,7 +610,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         zCRS = CRSUtilities.getSubCRS(crs, zDimension, zDimension+1);
     }
-    
+
     /**
      * Constructs a new coverage using the same elements than the specified coverage stack.
      */
@@ -624,7 +624,7 @@ public class CoverageStack extends AbstractCoverage {
         zCRS                 = source.zCRS;
         interpolationEnabled = source.interpolationEnabled;
     }
-    
+
     /**
      * Rethrows the exception in {@link #COMPARATOR} as a {@link RuntimeException}.
      * It gives an opportunity for implementations of {@link Element} to uses some
@@ -640,7 +640,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         throw exception;
     }
-    
+
     /**
      * A comparator for {@link Element} sorting and binary search. This comparator uses the
      * middle <var>z</var> value as criterion. It must accepts {@link Double} objects as well
@@ -658,7 +658,7 @@ public class CoverageStack extends AbstractCoverage {
             }
         }
     };
-    
+
     /**
      * Returns the <var>z</var> value of the specified object. The specified
      * object may be a {@link Double} or an {@link Element} instance.
@@ -675,7 +675,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return getZ((Element) object);
     }
-    
+
     /**
      * Returns the middle <var>z</var> value. If the element has no <var>z</var> value
      * (for example if the <var>z</var> value is the time and the coverage is constant
@@ -684,7 +684,7 @@ public class CoverageStack extends AbstractCoverage {
     private static double getZ(final Element entry) throws IOException {
         return getZ(entry.getZRange());
     }
-    
+
     /**
      * Returns the <var>z</var> value in the middle of the specified range.
      * If the range is null, then this method returns {@link Double#NaN}.
@@ -712,14 +712,14 @@ public class CoverageStack extends AbstractCoverage {
     private static boolean contains(final NumberRange range, final double z) {
         return z>=range.getMinimum() && z<=range.getMaximum();
     }
-    
+
     /**
      * Returns the bounding box for the coverage domain in coordinate system coordinates.
      */
     public Envelope getEnvelope() {
         return (Envelope) envelope.clone();
     }
-    
+
     /**
      * Returns the number of sample dimension in this coverage.
      */
@@ -731,7 +731,7 @@ public class CoverageStack extends AbstractCoverage {
             throw new IllegalStateException("Sample dimensions are undetermined.");
         }
     }
-    
+
     /**
      * Retrieve sample dimension information for the coverage.
      * For a grid coverage, a sample dimension is a band. The sample dimension information
@@ -747,7 +747,7 @@ public class CoverageStack extends AbstractCoverage {
             throw new IllegalStateException("Sample dimensions are undetermined.");
         }
     }
-    
+
     /**
      * Snaps the specified coordinate point to the coordinate of the nearest voxel available in
      * this coverage. First, this method locate the {@linkplain Element coverage element} at or
@@ -827,7 +827,7 @@ public class CoverageStack extends AbstractCoverage {
             }
         }
     }
-    
+
     /**
      * Returns a message for exception.
      *
@@ -836,7 +836,7 @@ public class CoverageStack extends AbstractCoverage {
     private static String cannotEvaluate(final DirectPosition point) {
         return Errors.format(ErrorKeys.CANT_EVALUATE_$1, point);
     }
-    
+
     /**
      * Loads a single coverage for the specified element. All {@code evaluate(...)} methods
      * ultimately loads their coverages through this method. It provides a single place where
@@ -866,7 +866,7 @@ public class CoverageStack extends AbstractCoverage {
         assert coverage.getNumSampleDimensions() == numSampleDimensions : coverage;
         return coverage;
     }
-    
+
     /**
      * Loads a single image at the given index.
      *
@@ -881,7 +881,7 @@ public class CoverageStack extends AbstractCoverage {
         lowerZ     = upperZ     = getZ(zRange);
         lowerRange = upperRange = zRange;
     }
-    
+
     /**
      * Loads images for the given elements.
      *
@@ -894,7 +894,7 @@ public class CoverageStack extends AbstractCoverage {
         final NumberRange upperRange = upperElement.getZRange();
         final Coverage lower = load(lowerElement);
         final Coverage upper = load(upperElement);
-        
+
         this.lower      = lower; // Set only when BOTH images are OK.
         this.upper      = upper;
         this.lowerZ     = getZ(lowerRange);
@@ -902,7 +902,7 @@ public class CoverageStack extends AbstractCoverage {
         this.lowerRange = lowerRange;
         this.upperRange = upperRange;
     }
-    
+
     /**
      * Loads coverages required for a linear interpolation at the specified <var>z</var> value.
      * The loaded coverages will be stored in {@link #lower} and {@link #upper} fields. It is
@@ -1015,7 +1015,7 @@ public class CoverageStack extends AbstractCoverage {
         throw new OrdinateOutsideCoverageException(Errors.format(
                   ErrorKeys.ZVALUE_OUTSIDE_COVERAGE_$2, getName(), Zp), zDimension, getEnvelope());
     }
-    
+
     /**
      * Returns a point with the same number of dimensions than the specified coverage.
      * The number of dimensions must be {@link #zDimensions} or {@code zDimensions+1}.
@@ -1036,7 +1036,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return coord;
     }
-    
+
     /**
      * Returns a sequence of values for a given point in the coverage. The default implementation
      * delegates to the {@link #evaluate(DirectPosition, double[])} method.
@@ -1051,7 +1051,7 @@ public class CoverageStack extends AbstractCoverage {
     {
         return evaluate(coord, (double[]) null);
     }
-    
+
     /**
      * Returns a sequence of boolean values for a given point in the coverage.
      *
@@ -1081,7 +1081,7 @@ public class CoverageStack extends AbstractCoverage {
         final Coverage coverage = (z >= 0.5*(lowerZ+upperZ)) ? upper : lower;
         return coverage.evaluate(reduce(coord, coverage), dest);
     }
-    
+
     /**
      * Returns a sequence of byte values for a given point in the coverage.
      *
@@ -1116,7 +1116,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of integer values for a given point in the coverage.
      *
@@ -1151,7 +1151,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of float values for a given point in the coverage.
      *
@@ -1201,7 +1201,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns a sequence of double values for a given point in the coverage.
      *
@@ -1251,7 +1251,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return dest;
     }
-    
+
     /**
      * Returns the coverages to be used for the specified <var>z</var> value. Special cases:
      * <p>
@@ -1281,7 +1281,7 @@ public class CoverageStack extends AbstractCoverage {
         }
         return Arrays.asList(new Coverage[] {lower, upper});
     }
-    
+
     /**
      * Returns {@code true} if interpolation are enabled in the <var>z</var> value dimension.
      * Interpolations are enabled by default.
@@ -1289,7 +1289,7 @@ public class CoverageStack extends AbstractCoverage {
     public boolean isInterpolationEnabled() {
         return interpolationEnabled;
     }
-    
+
     /**
      * Enable or disable interpolations in the <var>z</var> value dimension.
      */
@@ -1300,35 +1300,35 @@ public class CoverageStack extends AbstractCoverage {
         upperZ               = Double.NEGATIVE_INFINITY;
         interpolationEnabled = flag;
     }
-    
+
     /**
      * Adds an {@link IIOReadWarningListener} to the list of registered warning listeners.
      */
     public void addIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.addIIOReadWarningListener(listener);
     }
-    
+
     /**
      * Removes an {@link IIOReadWarningListener} from the list of registered warning listeners.
      */
     public void removeIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.removeIIOReadWarningListener(listener);
     }
-    
+
     /**
      * Adds an {@link IIOReadProgressListener} to the list of registered progress listeners.
      */
     public void addIIOReadProgressListener(final IIOReadProgressListener listener) {
         listeners.addIIOReadProgressListener(listener);
     }
-    
+
     /**
      * Removes an {@link IIOReadProgressListener} from the list of registered progress listeners.
      */
     public void removeIIOReadProgressListener(final IIOReadProgressListener listener) {
         listeners.removeIIOReadProgressListener(listener);
     }
-    
+
     /**
      * Invoked automatically when an image is about to be loaded. The default implementation
      * logs the message in the {@code "org.geotools.coverage"} logger. Subclasses can override
@@ -1337,7 +1337,7 @@ public class CoverageStack extends AbstractCoverage {
      * @param record The log record. The message contains information about the images to load.
      */
     protected void logLoading(final LogRecord record) {
-        Logging.getLogger("org.geotools.coverage").log(record);
+        Logging.getLogger(CoverageStack.class).log(record);
     }
 
     /**
@@ -1369,7 +1369,7 @@ public class CoverageStack extends AbstractCoverage {
          * The record to log.
          */
         public LogRecord record;
-        
+
         /**
          * Reports that an image read operation is beginning.
          */

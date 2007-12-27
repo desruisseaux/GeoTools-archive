@@ -114,20 +114,12 @@ public class GridCoverageTest extends TestCase {
             return;
         }
         out.close();
-        /*
-         * Deserialization requires J2SE 1.5 or above.
-         */
-        if (System.getProperty("java.version").compareTo("1.5") >= 0) {
-            final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
-            GridCoverage2D read;
-            read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(false));
-//          read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(true ));
-//          assertNotSame(read, read.geophysics(true));
-            in.close();
-        } else {
-            Logging.getLogger("org.geotools.coverage.grid")
-                  .fine("Deserialization test skipped for pre-1.5 Java version.");
-        }
+        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+        GridCoverage2D read;
+        read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(false));
+//      read = (GridCoverage2D) in.readObject(); assertSame(read, read.geophysics(true ));
+//      assertNotSame(read, read.geophysics(true));
+        in.close();
     }
 
     /**
