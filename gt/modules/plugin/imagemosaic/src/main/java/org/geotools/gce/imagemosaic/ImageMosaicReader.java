@@ -60,6 +60,7 @@ import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.TileCache;
+import javax.media.jai.operator.ConstantDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
 import javax.media.jai.operator.PatternDescriptor;
 
@@ -669,8 +670,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			LOGGER.fine("loading tile for envelope "
 					+ intersectionJTSEnvelope.toString());
 		final List<SimpleFeature> features = getFeaturesFromIndex(intersectionJTSEnvelope);
-		if (features == null) {
-			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+		if (features == null || features.size() == 0) {
+			return background(requestedOriginalEnvelope, pixelDimension, outputTransparentColor);
 		}
 		// do we have any feature to load
 		final Iterator<SimpleFeature> it = features.iterator();
@@ -727,6 +728,19 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 						dim.height), ImageUtilities.NOCACHE_HINT),
 				requestedEnvelope);
 
+	}
+	
+	private GridCoverage background(GeneralEnvelope requestedEnvelope, Rectangle dim, Color 
+	        outputTransparentColor) {
+	    if(outputTransparentColor == null)
+	        outputTransparentColor = Color.BLACK; 
+	    Byte[] values = new Byte[] {new Byte((byte) outputTransparentColor.getRed()),
+	            new Byte((byte) outputTransparentColor.getGreen()),
+	            new Byte((byte) outputTransparentColor.getBlue()),
+	            new Byte((byte) outputTransparentColor.getAlpha())};
+	    RenderedImage constant = ConstantDescriptor.create(new Float(dim.width), new Float(dim.height), 
+	            values, ImageUtilities.NOCACHE_HINT);
+	    return coverageFactory.create(coverageName, constant, requestedEnvelope);
 	}
 
 	/**
