@@ -83,6 +83,8 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -201,7 +203,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private int maxAllowedTiles = ((Integer) ImageMosaicFormat.MAX_ALLOWED_TILES
 			.getDefaultValue()).intValue();
 
-	private String locationAttributeName="location";
+	private String locationAttributeName;
 	/**
 	 * COnstructor.
 	 * 
@@ -297,7 +299,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		typeName = typeNames[0];
 		featureSource = tileIndexStore.getFeatureSource(typeName);
-		if(featureSource.getSchema().getAttribute(this.locationAttributeName)==null)
+		final SimpleFeatureType schema = featureSource.getSchema();
+		if(this.locationAttributeName==null)
+		{
+			//get the first string
+			for(AttributeDescriptor attribute: schema.getAttributes()){
+				if(attribute.getType().getBinding().equals(String.class))
+					this.locationAttributeName=attribute.getName().toString();
+			}
+		}
+		if(schema.getAttribute(this.locationAttributeName)==null)
 			throw new DataSourceException("The provided name for the location attribute is invalid.");
 
 		// //
@@ -687,7 +698,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					.warning(new StringBuffer("We can load at most ")
 							.append(maxNumTiles)
 							.append(" tiles while there were requested ")
-							.append(features)
+							.append(size)
 							.append(
 									"\nI am going to print out a fake coverage, sorry about it!")
 							.toString());
