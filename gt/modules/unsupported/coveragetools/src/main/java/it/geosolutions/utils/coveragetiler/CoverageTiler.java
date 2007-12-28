@@ -17,23 +17,25 @@
  */
 package it.geosolutions.utils.coveragetiler;
 
+import it.geosolutions.utils.CoverageToolsConstants;
+import it.geosolutions.utils.progress.BaseArgumentsManager;
 import it.geosolutions.utils.progress.ExceptionEvent;
 import it.geosolutions.utils.progress.ProcessingEvent;
 import it.geosolutions.utils.progress.ProcessingEventListener;
-import it.geosolutions.utils.progress.ProgressManager;
 
 import java.awt.Rectangle;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.cli2.builder.DefaultOptionBuilder;
-import org.apache.commons.cli2.option.DefaultOption;
-import org.apache.commons.cli2.option.GroupImpl;
-import org.apache.commons.cli2.util.HelpFormatter;
+import javax.imageio.ImageWriteParam;
+
+import org.apache.commons.cli2.Option;
+import org.apache.commons.cli2.validation.InvalidArgumentException;
+import org.apache.commons.cli2.validation.Validator;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -51,14 +53,17 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * <p>
- * This utility splits rasters into smaller pieces. Having a raster tiled into
- * pieces, and using them on a mosaic, for instance, means big performance
- * improvements.
+ * This utility splits rasters into smaller pieces. One can control both the
+ * dimension of the tile that will be generated as well as the dimension of the
+ * internal tiles for the, improvements. This would allows us not only to break
+ * a big coverage into smaller tiles, but also to do the opposite. One may want
+ * to compose a mosaic and retile it into bigger tiles, well this can be easily
+ * done with this utility.
  * </p>
  * 
  * <p>
  * Example of usage:<br/>
- * <code>CoverageTiler -t "35,35" -s "/usr/home/tmp/myImage.tiff"</code>
+ * <code>CoverageTiler -t "8192,8192" -it "512,512" -s "/usr/home/tmp/myImage.tiff"</code>
  * </p>
  * 
  * <p>
@@ -66,131 +71,151 @@ import org.opengis.parameter.ParameterValueGroup;
  * which will be automatically created.
  * </p>
  * 
- * <pre>
- *                                                                                                      
- *         HINT: set the tile dimensions in order to obtain smaller pieces which size is between 500Kb and 2Mb
- *               The size of the pieces depends on the raster resolution and the Envelope.                    
- *               Use the CoverageScaler to change your raster resolution.                                     
- *               If you don't know these parameters, however, try first with small values like 20,20 or 40,40 
- *               and calibrate then the tile dimension in order to obtain the desired size.                   
- * </pre>
  * 
  * @author Simone Giannecchini, GeoSolutions
  * @author Alessio Fabiani, GeoSolutions
  * @version 0.3
  * 
  */
-public class CoverageTiler extends ProgressManager implements
+public class CoverageTiler extends BaseArgumentsManager implements
 		ProcessingEventListener, Runnable {
 	/** Default Logger * */
 	private final static Logger LOGGER = Logger.getLogger(CoverageTiler.class
 			.toString());
 
 	/** Program Version */
-	private final static String versionNumber = "0.3";
+	private final static String VERSION = "0.3";
 
-	private final DefaultOptionBuilder optionBuilder = new DefaultOptionBuilder();
+	private static final String NAME = "CoverageTiler";
 
-	private DefaultOption helpOpt;
+	private Option inputLocationOpt;
 
-	private DefaultOption versionOpt;
+	private Option outputLocationOpt;
 
-	private DefaultOption inputLocationOpt;
+	private Option tileDimOpt;
 
-	private DefaultOption outputLocationOpt;
+	private Option compressionTypeOpt;
+
+	private Option compressionRatioOpt;
+
+	private Option internalTileDimOpt;
 
 	private File inputLocation;
 
 	private File outputLocation;
 
-	private DefaultOption tileDimOpt;
-
 	private int tileWidth;
 
 	private int tileHeight;
 
-	private DefaultOption internalTileDimOpt;
+	private int internalTileWidth = CoverageToolsConstants.DEFAULT_INTERNAL_TILE_WIDTH;
 
-	private int internalTileWidth;
+	private int internalTileHeight = CoverageToolsConstants.DEFAULT_INTERNAL_TILE_HEIGHT;
 
-	private int internalTileHeight;
+	private String compressionScheme = CoverageToolsConstants.DEFAULT_COMPRESSION_SCHEME;
+
+	private double compressionRatio = CoverageToolsConstants.DEFAULT_COMPRESSION_RATIO;
 
 	/**
 	 * Default constructor
 	 */
 	public CoverageTiler() {
+		super(NAME, VERSION);
+
 		// /////////////////////////////////////////////////////////////////////
 		// Options for the command line
 		// /////////////////////////////////////////////////////////////////////
-		helpOpt = optionBuilder.withShortName("h").withShortName("?")
-				.withLongName("helpOpt").withDescription("print this message.")
-				.create();
-		versionOpt = optionBuilder.withShortName("v")
-				.withLongName("versionOpt").withDescription(
-						"print the versionOpt.").create();
 		inputLocationOpt = optionBuilder.withShortName("s").withLongName(
 				"src_coverage").withArgument(
-				arguments.withName("source").withMinimum(1).withMaximum(1)
-						.create()).withDescription(
+				argumentBuilder.withName("source").withMinimum(1)
+						.withMaximum(1).create()).withDescription(
 				"path where the source code is located").withRequired(true)
 				.create();
 		outputLocationOpt = optionBuilder
 				.withShortName("d")
 				.withLongName("dest_directory")
 				.withArgument(
-						arguments.withName("destination").withMinimum(0)
+						argumentBuilder.withName("destination").withMinimum(0)
 								.withMaximum(1).create())
 				.withDescription(
 						"output directory, if none is provided, the \"tiled\" directory will be used")
 				.withRequired(false).create();
 		tileDimOpt = optionBuilder.withShortName("t").withLongName(
 				"tile_dimension").withArgument(
-				arguments.withName("t").withMinimum(1).withMaximum(1).create())
-				.withDescription("Width and height of each tile we generate")
-				.withRequired(true).create();
+				argumentBuilder.withName("t").withMinimum(1).withMaximum(1)
+						.create()).withDescription(
+				"Width and height of each tile we generate").withRequired(true)
+				.create();
 
 		internalTileDimOpt = optionBuilder.withShortName("it").withLongName(
 				"internal_tile_dimension").withArgument(
-				arguments.withName("it").withMinimum(0).withMaximum(1).create()).withDescription(
+				argumentBuilder.withName("it").withMinimum(0).withMaximum(1)
+						.create()).withDescription(
 				"Internal width and height of each tile we generate")
 				.withRequired(false).create();
 
-		priorityOpt = optionBuilder.withShortName("p").withLongName(
-				"thread_priority").withArgument(
-				arguments.withName("priority").withMinimum(0).withMaximum(1)
-						.create()).withDescription(
-				"priority for the underlying thread").withRequired(false)
+		compressionTypeOpt = optionBuilder
+				.withShortName("z")
+				.withLongName("compressionType")
+				.withDescription("compression type.")
+				.withArgument(
+						argumentBuilder.withName("compressionType")
+								.withMinimum(0).withMaximum(1).withValidator(
+										new Validator() {
+
+											public void validate(List args)
+													throws InvalidArgumentException {
+												final int size = args.size();
+												if (size > 1)
+													throw new InvalidArgumentException(
+															"Only one scaling algorithm at a time can be chosen");
+
+											}
+										}).create()).withRequired(false)
 				.create();
 
-		cmdOpts.add(helpOpt);
-		cmdOpts.add(tileDimOpt);
-		cmdOpts.add(versionOpt);
-		cmdOpts.add(inputLocationOpt);
-		cmdOpts.add(outputLocationOpt);
-		cmdOpts.add(priorityOpt);
-		cmdOpts.add(internalTileDimOpt);
-		
+		compressionRatioOpt = optionBuilder
+				.withShortName("r")
+				.withLongName("compressionRatio")
+				.withDescription("compression ratio.")
+				.withArgument(
+						argumentBuilder.withName("compressionRatio")
+								.withMinimum(0).withMaximum(1).withValidator(
+										new Validator() {
 
-		optionsGroup = new GroupImpl(cmdOpts, "Options", "All the options", 1,
-				10);
+											public void validate(List args)
+													throws InvalidArgumentException {
+												final int size = args.size();
+												if (size > 1)
+													throw new InvalidArgumentException(
+															"Only one scaling algorithm at a time can be chosen");
+												final String val = (String) args
+														.get(0);
+
+												final double value = Double
+														.parseDouble(val);
+												if (value <= 0 || value > 1)
+													throw new InvalidArgumentException(
+															"Invalid compressio ratio");
+
+											}
+										}).create()).withRequired(false)
+				.create();
+
+		addOption(tileDimOpt);
+		addOption(inputLocationOpt);
+		addOption(outputLocationOpt);
+		addOption(internalTileDimOpt);
+		addOption(compressionTypeOpt);
+		addOption(compressionRatioOpt);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Help Formatter
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final HelpFormatter cmdHlp = new HelpFormatter("| ", "  ", " |", 75);
-		cmdHlp.setShellCommand("CoverageTiler");
-		cmdHlp.setHeader("Help");
-		cmdHlp.setFooter(new StringBuffer(
-				"CoverageTiler - GeoSolutions S.a.s (C) 2006 - v ").append(
-				CoverageTiler.versionNumber).toString());
-		cmdHlp
-				.setDivider("|-------------------------------------------------------------------------|");
+		finishInitialization();
 
-		cmdParser.setGroup(optionsGroup);
-		cmdParser.setHelpOption(helpOpt);
-		cmdParser.setHelpFormatter(cmdHlp);
 	}
 
 	/**
@@ -200,11 +225,12 @@ public class CoverageTiler extends ProgressManager implements
 	 */
 	public static void main(String[] args) throws MalformedURLException,
 			InterruptedException {
+
 		final CoverageTiler coverageTiler = new CoverageTiler();
 		coverageTiler.addProcessingEventListener(coverageTiler);
 		if (coverageTiler.parseArgs(args)) {
-			final Thread t = new Thread(coverageTiler, "CoverageTiler");
-			t.setPriority(coverageTiler.priority);
+			final Thread t = new Thread(coverageTiler, NAME);
+			t.setPriority(coverageTiler.getPriority());
 			t.start();
 			try {
 				t.join();
@@ -256,8 +282,8 @@ public class CoverageTiler extends ProgressManager implements
 		// 
 		// 
 		// /////////////////////////////////////////////////////////////////////
-		StringBuffer message = new StringBuffer(
-				"Acquiring a mosaic reader to mosaic ").append(inputLocation);
+		StringBuffer message = new StringBuffer("Acquiring a reader to  ")
+				.append(inputLocation);
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(message.toString());
 		fireEvent(message.toString(), 0);
@@ -330,8 +356,7 @@ public class CoverageTiler extends ProgressManager implements
 
 		// //
 		//
-		// read a coverage with the actual
-		// envelope
+		// read a coverage
 		//
 		// //
 		GridCoverage2D gc;
@@ -397,13 +422,19 @@ public class CoverageTiler extends ProgressManager implements
 				// Write this coverage out as a geotiff
 				//
 				// //
-				final AbstractGridFormat outFormat= new GeoTiffFormat();
+				final AbstractGridFormat outFormat = new GeoTiffFormat();
 				try {
 
 					final GeoTiffWriteParams wp = new GeoTiffWriteParams();
 					wp.setTilingMode(GeoToolsWriteParams.MODE_EXPLICIT);
 					wp.setTiling(internalTileWidth, internalTileHeight);
 					wp.setSourceRegion(sourceRegion);
+					if (this.compressionScheme != null
+							&& !Double.isNaN(compressionRatio)) {
+						wp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+						wp.setCompressionType(compressionScheme);
+						wp.setCompressionQuality((float) this.compressionRatio);
+					}
 					final ParameterValueGroup params = outFormat
 							.getWriteParameters();
 					params.parameter(
@@ -427,70 +458,68 @@ public class CoverageTiler extends ProgressManager implements
 		fireEvent(message.toString(), 100);
 	}
 
-	private boolean parseArgs(String[] args) {
-		cmdLine = cmdParser.parseAndHelp(args);
-		if (cmdLine != null && cmdLine.hasOption(versionOpt)) {
-			System.out.print(new StringBuffer(
-					"MosaicIndexBuilder - GeoSolutions S.a.s (C) 2006 - v")
-					.append(CoverageTiler.versionNumber).toString());
-			System.exit(1);
+	public boolean parseArgs(String[] args) {
+		if (!super.parseArgs(args))
+			return false;
 
-		} else if (cmdLine != null) {
-			// ////////////////////////////////////////////////////////////////
-			//
-			// parsing command line parameters and setting up
-			// Mosaic Index Builder options
-			//
-			// ////////////////////////////////////////////////////////////////
-			inputLocation = new File((String) cmdLine
-					.getValue(inputLocationOpt));
+		// ////////////////////////////////////////////////////////////////
+		//
+		// Parsing command line parameters and setting up
+		// Mosaic Index Builder options
+		//
+		// ////////////////////////////////////////////////////////////////
+		inputLocation = new File((String) getOptionValue(inputLocationOpt));
 
-			// output files' directory
-			if (cmdLine.hasOption(outputLocationOpt))
-				outputLocation = new File((String) cmdLine
-						.getValue(outputLocationOpt));
-			else
-				outputLocation = new File(inputLocation.getParentFile(),
-						"tiled");
-			// //
-			//
-			// tile dim
-			//
-			// //
-			final String tileDim = (String) cmdLine.getValue(tileDimOpt);
-			String[] pairs = tileDim.split(",");
-			tileWidth = Integer.parseInt(pairs[0]);
-			tileHeight = Integer.parseInt(pairs[1]);
+		// output files' directory
+		if (hasOption(outputLocationOpt))
+			outputLocation = new File(
+					(String) getOptionValue(outputLocationOpt));
+		else
+			outputLocation = new File(inputLocation.getParentFile(), "tiled");
+		// //
+		//
+		// tile dim
+		//
+		// //
+		final String tileDim = (String) getOptionValue(tileDimOpt);
+		String[] pairs = tileDim.split(",");
+		tileWidth = Integer.parseInt(pairs[0]);
+		tileHeight = Integer.parseInt(pairs[1]);
 
-			// //
-			//
-			// Internal Tile dim
-			//
-			// //
-			final String internalTileDim = (String) cmdLine
-					.getValue(internalTileDimOpt);
-			if (internalTileDim != null && internalTileDim.length() > 0) {
-				pairs = internalTileDim.split(",");
-				internalTileWidth = Integer.parseInt(pairs[0]);
-				internalTileHeight = Integer.parseInt(pairs[1]);
-			} else {
-				internalTileWidth=tileWidth;
-				internalTileHeight=tileHeight;
+		// //
+		//
+		// Internal Tile dim
+		//
+		// //
+		final String internalTileDim = (String) getOptionValue(internalTileDimOpt);
+		if (internalTileDim != null && internalTileDim.length() > 0) {
+			pairs = internalTileDim.split(",");
+			internalTileWidth = Integer.parseInt(pairs[0]);
+			internalTileHeight = Integer.parseInt(pairs[1]);
+		}
+
+		// //
+		//
+		// Compression params
+		//
+		// //
+		// index name
+		if (hasOption(compressionTypeOpt)) {
+			compressionScheme = (String) getOptionValue(compressionTypeOpt);
+			if (compressionScheme == "")
+				compressionScheme = null;
+		}
+		if (hasOption(compressionRatioOpt)) {
+			try {
+				compressionRatio = Double
+						.parseDouble((String) getOptionValue(compressionRatioOpt));
+			} catch (Exception e) {
+				compressionRatio = Double.NaN;
 			}
 
-			// //
-			//
-			// Thread priority
-			//
-			// //
-			// index name
-			if (cmdLine.hasOption(priorityOpt))
-				priority = Integer.parseInt((String) cmdLine
-						.getValue(priorityOpt));
-			return true;
-
 		}
-		return false;
+
+		return true;
 
 	}
 
@@ -525,4 +554,37 @@ public class CoverageTiler extends ProgressManager implements
 	public void setOutputLocation(File outputLocation) {
 		this.outputLocation = outputLocation;
 	}
+
+	public final double getCompressionRatio() {
+		return compressionRatio;
+	}
+
+	public final void setCompressionRatio(double compressionRatio) {
+		this.compressionRatio = compressionRatio;
+	}
+
+	public final String getCompressionScheme() {
+		return compressionScheme;
+	}
+
+	public final void setCompressionScheme(String compressionScheme) {
+		this.compressionScheme = compressionScheme;
+	}
+
+	public int getInternalTileHeight() {
+		return internalTileHeight;
+	}
+
+	public void setInternalTileHeight(int internalTileHeight) {
+		this.internalTileHeight = internalTileHeight;
+	}
+
+	public int getInternalTileWidth() {
+		return internalTileWidth;
+	}
+
+	public void setInternalTileWidth(int internalTileWidth) {
+		this.internalTileWidth = internalTileWidth;
+	}
+
 }
