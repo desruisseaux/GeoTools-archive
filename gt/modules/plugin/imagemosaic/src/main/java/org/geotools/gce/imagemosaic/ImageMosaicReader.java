@@ -1636,6 +1636,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		}
 		xTrans = (bound.getMinX() - ulc.getX()) / res[0];
 		yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
+		// build an image layout that will make the tiles match exactly the transformed image
+		ImageLayout layout = new ImageLayout();
+        layout.setTileGridXOffset((int) Math.round(xTrans));
+        layout.setTileGridYOffset((int) Math.round(yTrans));
 		//
 		// Optimising scale and translate.
 		//
@@ -1666,22 +1670,22 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					ImageUtilities.NN_INTERPOLATION_HINT
 							.get(JAI.KEY_INTERPOLATION));
 			// avoid doing the color expansion now since it might not be needed
-			return JAI.create("Translate", pbjAffine,
-					ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
+			final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
+            .clone();
+            hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
+			return JAI.create("Translate", pbjAffine, hints);
 
 		}
 		// translation and scaling
-		pbjAffine.addSource(image).add(
-				new AffineTransform(scaleX, 0, 0, scaleY, xTrans, yTrans))
-				.add(
-						ImageUtilities.NN_INTERPOLATION_HINT
+		final AffineTransform tx = new AffineTransform(scaleX, 0, 0, scaleY, xTrans, yTrans);
+        pbjAffine.addSource(image).add(tx).add(ImageUtilities.NN_INTERPOLATION_HINT
 								.get(JAI.KEY_INTERPOLATION));
 		// avoid doing the color expansion now since it might not be needed
 		final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
 				.clone();
-		// adding the capability to do a border extension which is great when
-		// doing
+		// adding the capability to do a border extension which is great when doing
 		hints.add(ImageUtilities.EXTEND_BORDER_BY_COPYING);
+		hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
 		return JAI.create("Affine", pbjAffine, hints);
 
 	}
