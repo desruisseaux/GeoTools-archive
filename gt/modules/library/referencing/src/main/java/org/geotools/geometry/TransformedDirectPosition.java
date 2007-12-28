@@ -16,7 +16,6 @@
  */
 package org.geotools.geometry;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -26,7 +25,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.CRS;
@@ -73,7 +71,7 @@ import org.geotools.resources.i18n.Errors;
  *     private static final CoordinateReferenceSystem   PUBLIC_CRS = ...
  *     private static final CoordinateReferenceSystem INTERNAL_CRS = ...
  *
- *     private final TransformedDirectPosition myPosition = 
+ *     private final TransformedDirectPosition myPosition =
  *             new TransformedDirectPosition(PUBLIC_CRS, INTERNAL_CRS, null);
  *
  *     public void setPosition(DirectPosition position) throws TransformException {
@@ -86,7 +84,7 @@ import org.geotools.resources.i18n.Errors;
  *     }
  * }
  * </pre></blockquote>
- * 
+ *
  * @since 2.2
  * @author Martin Desruisseaux
  * @source $URL$
@@ -184,6 +182,7 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
      * @throws MismatchedDimensionException if the specified CRS doesn't have the expected
      *         number of dimensions.
      */
+    @Override
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs)
             throws MismatchedDimensionException
     {
@@ -225,7 +224,7 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
      *       {@linkplain #TransformedDirectPosition(CoordinateReferenceSystem,
      *       CoordinateReferenceSystem, Hints) construction time} <strong>if and only if</strong>
      *       the CRS associated with {@code position} is null.</p></li>
-     * 
+     *
      *   <li><p>The {@linkplain CoordinateOperation#getTargetCRS target CRS} is the {@linkplain
      *       #getCoordinateReferenceSystem CRS associated with this position}. This is always the
      *       {@code targetCRS} argument given at {@linkplain

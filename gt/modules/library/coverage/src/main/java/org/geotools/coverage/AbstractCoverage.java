@@ -59,8 +59,6 @@ import javax.media.jai.TiledImage;
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
-import javax.media.jai.util.CaselessStringKey;           // For Javadoc
-import javax.media.jai.widget.ScrollingImagePanel;
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.CommonPointRule;
@@ -69,9 +67,6 @@ import org.opengis.coverage.GeometryValuePair;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.AttributeValues;
 import org.opengis.coverage.DomainObject;
-import org.opengis.coverage.grid.GridCoverage;                // For javadoc
-import org.opengis.coverage.grid.GridGeometry;                // For javadoc
-import org.opengis.coverage.processing.GridCoverageProcessor; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -173,9 +168,8 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @param source The source for this coverage, or {@code null} if none. Source may be (but is
      *               not limited to) a {@link PlanarImage} or an other {@code AbstractCoverage}
      *               object.
-     * @param properties The set of properties for this coverage, or {@code null} if there is
-     *               none. "Properties" in <cite>Java Advanced Imaging</cite> is what OpenGIS
-     *               calls "Metadata". Keys are {@link String} objects ({@link CaselessStringKey}
+     * @param properties The set of properties for this coverage, or {@code null} if there is none.
+     *               Keys are {@link String} objects ({@link javax.media.jai.util.CaselessStringKey}
      *               are accepted as well), while values may be any {@link Object}.
      */
     protected AbstractCoverage(final CharSequence             name,
@@ -192,8 +186,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * Constructs a new coverage with the same parameters than the specified coverage.
      * <p>
      * <strong>Note:</strong> This constructor keeps a strong reference to the source
-     * coverage (through {@link PropertySourceImpl}). In many cases, it is not a problem
-     * since {@link GridCoverage} will retains a strong reference to its source anyway.
+     * coverage (through {@link PropertySourceImpl}).
      *
      * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
      * @param coverage The source coverage.
@@ -232,11 +225,12 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * referenced. This is the CRS used when accessing a coverage or grid coverage with
      * the {@code evaluate(...)} methods. This coordinate reference system is usually
      * different than coordinate system of the grid. It is the target coordinate reference
-     * system of the {@link GridGeometry#getGridToCRS gridToCRS} math transform.
+     * system of the {@link org.opengis.coverage.grid.GridGeometry#getGridToCRS gridToCRS}
+     * math transform.
      * <p>
      * Grid coverage can be accessed (re-projected) with new coordinate reference system
-     * with the {@link GridCoverageProcessor} component. In this case, a new instance of
-     * a grid coverage is created.
+     * with the {@link org.opengis.coverage.processing.GridCoverageProcessor} component.
+     * In this case, a new instance of a grid coverage is created.
      *
      * @return The coordinate reference system used when accessing a coverage or
      *         grid coverage with the {@code evaluate(...)} methods.
@@ -735,6 +729,11 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      */
     protected class Renderable extends PropertySourceImpl implements RenderableImage, ImageFunction {
         /**
+         * For compatibility during cross-version serialization.
+         */
+        private static final long serialVersionUID = -6661389795161502552L;
+
+        /**
          * The two dimensional view of the coverage's envelope.
          */
         private final Rectangle2D bounds;
@@ -1150,12 +1149,12 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         /**
          * Displays the specified image in a window with the specified title.
          */
-        @SuppressWarnings("deprecated")
+        @SuppressWarnings("deprecation")
         public Viewer(final String title, final RenderedImage image) {
             final int width  = Math.max(Math.min(image.getWidth(),  800), 24);
             final int height = Math.max(Math.min(image.getHeight(), 600), 24);
             frame = new Frame(title);
-            frame.add(new ScrollingImagePanel(image, width, height));
+            frame.add(new javax.media.jai.widget.ScrollingImagePanel(image, width, height));
             frame.addWindowListener(this);
             EventQueue.invokeLater(this);
         }

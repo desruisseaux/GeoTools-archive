@@ -68,7 +68,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class DimensionFilter {
     /**
-     * The input dimensions to keep.
+     * The input dimensions to keep, in strictly increasing order.
      * This sequence can contains any integers in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getSourceDimensions getSourceDimensions()}</code>
      * exclusive.
@@ -76,7 +76,7 @@ public class DimensionFilter {
     private int[] sourceDimensions;
 
     /**
-     * The output dimensions to keep.
+     * The output dimensions to keep, in strictly increasing order.
      * This sequence can contains any integers in the range 0 inclusive to
      * <code>transform.{@linkplain MathTransform#getTargetDimensions getTargetDimensions()}</code>
      * exclusive.

@@ -29,9 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.media.jai.PlanarImage;  // For javadoc
 import javax.media.jai.PropertySource;
-import javax.media.jai.util.CaselessStringKey;  // For javadoc
 
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
@@ -84,17 +82,16 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      *        system used when accessing a coverage or grid coverage with the
      *        {@code evaluate(...)} methods.
      * @param source The source for this coverage, or {@code null} if none.
-     *        Source may be (but is not limited to) a {@link PlanarImage} or an
-     *        other {@code AbstractGridCoverage} object.
+     *        Source may be (but is not limited to) a {@link javax.media.jai.PlanarImage}
+     *        or an other {@code AbstractGridCoverage} object.
      * @param properties The set of properties for this coverage, or {@code null} if there is none.
-     *        "Properties" in <cite>Java Advanced Imaging</cite> is what OpenGIS calls "Metadata".
-     *        Keys are {@link String} objects ({@link CaselessStringKey} are accepted as well),
-     *        while values may be any {@link Object}.
+     *        Keys are {@link String} objects ({@link javax.media.jai.util.CaselessStringKey} are
+     *        accepted as well), while values may be any {@link Object}.
      */
     protected AbstractGridCoverage(final CharSequence             name,
                                    final CoordinateReferenceSystem crs,
                                    final PropertySource         source,
-                                   final Map                properties)
+                                   final Map<?,?>           properties)
     {
         super(name, crs, source, properties);
         sources = null;
@@ -117,7 +114,7 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
                                    final CoordinateReferenceSystem crs,
                                    final GridCoverage[]        sources,
                                    final PropertySource         source,
-                                   final Map                properties)
+                                   final Map<?,?>           properties)
     {
         super(name, crs, source, properties);
         if (sources != null) {
