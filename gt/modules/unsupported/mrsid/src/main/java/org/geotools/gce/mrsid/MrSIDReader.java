@@ -59,7 +59,6 @@ import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -70,6 +69,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
@@ -526,6 +526,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	public GridCoverage read(GeneralParameterValue[] params)
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
+		String overviewPolicy=null;
 		Rectangle requestedDim = null;
 		// USE JAI ImageRead 1-1== no, 0== unset 1==yes
 		int iUseJAI = 0;
@@ -533,7 +534,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				final Parameter param = (Parameter) params[i];
+				final ParameterValue param = (ParameterValue) params[i];
 				final String name = param.getDescriptor().getName().getCode();
 				if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D
 						.getName().toString())) {
@@ -543,16 +544,23 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
 					requestedDim = gg.getGridRange2D().getBounds();
-				} else if (name
+					continue;
+				} 
+				if (name
 						.equalsIgnoreCase(AbstractGridFormat.USE_JAI_IMAGEREAD
 								.getName().toString())) {
 					iUseJAI = param.booleanValue() ? 1 : -1;
-					;
+					continue;
 				}
-
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+						.getName().toString())) {
+					overviewPolicy=param.stringValue();
+					continue;
+				}		
 			}
 		}
-		return createCoverage(readEnvelope, requestedDim, iUseJAI);
+		return createCoverage(readEnvelope, requestedDim, iUseJAI,
+				overviewPolicy);
 	}
 
 	/**
@@ -560,6 +568,7 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @param requestedDim
 	 * @param iUseJAI
+	 * @param overviewPolicy 
 	 * @param readEnvelope
 	 * 
 	 * @return a GridCoverage
@@ -567,7 +576,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 	 * @throws java.io.IOException
 	 */
 	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle requestedDim, int iUseJAI) throws IOException {
+			Rectangle requestedDim, int iUseJAI, String overviewPolicy)
+			throws IOException {
 
 		if (!closeMe) {
 			inStream.reset();
@@ -589,7 +599,8 @@ public final class MrSIDReader extends AbstractGridCoverage2DReader implements
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, requestedDim);
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);

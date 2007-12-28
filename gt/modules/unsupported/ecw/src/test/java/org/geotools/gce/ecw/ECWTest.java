@@ -24,6 +24,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.test.TestData;
@@ -72,8 +73,11 @@ public final class ECWTest extends AbstractECWTestCase {
 		// get a reader
 		final AbstractGridCoverage2DReader reader = new ECWReader(TestData
 				.file(this, fileName));
-
+		///////////////////////////////////////////////////////////////////////
+		//
 		// read once
+		//
+		///////////////////////////////////////////////////////////////////////
 		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
 		assertNotNull(gc);
 		if (TestData.isInteractiveTest())
@@ -82,8 +86,11 @@ public final class ECWTest extends AbstractECWTestCase {
 			gc.getRenderedImage().getData();
 		
 		
-		
-		//read again with subsampling and crop
+		///////////////////////////////////////////////////////////////////////
+		//
+		// read again with subsampling and crop
+		//
+		///////////////////////////////////////////////////////////////////////
 		final double cropFactor=2.0;
 		final int oldW=gc.getRenderedImage().getWidth();
 		final int oldH=gc.getRenderedImage().getHeight();
@@ -102,9 +109,33 @@ public final class ECWTest extends AbstractECWTestCase {
 		final ParameterValue gg = (ParameterValue) ((AbstractGridFormat) reader
 				.getFormat()).READ_GRIDGEOMETRY2D.createValue();	
 		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
-				(int)(range.width/cropFactor),(int)( range.height/cropFactor))), cropEnvelope));
+				(int) (range.width /2.0/ cropFactor ), (int) (range.height/2.0
+						/ cropFactor ))), cropEnvelope));
 		gc = (GridCoverage2D) reader
 				.read(new GeneralParameterValue[] { gg });
+		assertNotNull(gc);
+		 // NOTE: in some cases might be too restrictive
+		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
+				.getScale(((AffineTransform) ((GridGeometry2D) gc
+						.getGridGeometry()).getGridToCRS2D())) / 2, true));
+		//this should be fine since we give 1 pixel tolerance
+		assertEquals(oldW/2.0/(cropFactor),gc.getRenderedImage().getWidth(),1);
+		assertEquals(oldH/2.0/(cropFactor),gc.getRenderedImage().getHeight(),1);
+		if (TestData.isInteractiveTest()) {
+			gc.show();
+		} else
+			gc.getRenderedImage().getData();
+		
+		///////////////////////////////////////////////////////////////////////
+		//
+		// read ignoring overviews with subsampling and crop
+		//
+		///////////////////////////////////////////////////////////////////////
+		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) reader
+				.getFormat()).OVERVIEW_POLICY.createValue();	
+		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_IGNORE);
+		gc = (GridCoverage2D) reader
+				.read(new GeneralParameterValue[] { gg,policy });
 		assertNotNull(gc);
 		 // NOTE: in some cases might be too restrictive
 		assertTrue(cropEnvelope.equals(gc.getEnvelope(), XAffineTransform
@@ -114,6 +145,7 @@ public final class ECWTest extends AbstractECWTestCase {
 		assertEquals(oldW/cropFactor,gc.getRenderedImage().getWidth(),1);
 		assertEquals(oldH/cropFactor,gc.getRenderedImage().getHeight(),1);
 
+		
 		if (TestData.isInteractiveTest()) {
 			gc.show();
 		} else
