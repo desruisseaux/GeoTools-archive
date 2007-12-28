@@ -1,20 +1,14 @@
 package it.geosolutions.utils.progress;
 
-import it.geosolutions.utils.imagemosaic.MosaicIndexBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
-
-import org.apache.commons.cli2.CommandLine;
-import org.apache.commons.cli2.Group;
-import org.apache.commons.cli2.Option;
-import org.apache.commons.cli2.builder.ArgumentBuilder;
-import org.apache.commons.cli2.builder.DefaultOptionBuilder;
-import org.apache.commons.cli2.commandline.Parser;
-import org.apache.commons.cli2.option.DefaultOption;
-
+/**
+ * 
+ * @author Simone Giannecchini, GeoSolutions.
+ *
+ */
 public abstract class ProgressManager {
 
 	/**
@@ -25,16 +19,36 @@ public abstract class ProgressManager {
 	protected final static class ProgressEventDispatchThreadEventLauncher
 			implements Runnable {
 
+		/**
+		 * The event we want to fire away.
+		 */
 		private ProcessingEvent event;
 
+		/**
+		 * The list of listeners.
+		 */
 		private Object[] listeners;
 
+		/**
+		 * Default constructor.
+		 * 
+		 */
 		ProgressEventDispatchThreadEventLauncher() {
 		}
 
+		/**
+		 * Used to send an event to an array of listeners.
+		 * 
+		 * @param evt
+		 *            is the {@link ProcessingEvent} to send.
+		 * @param listeners
+		 *            is the array of {@link ProcessingEventListener}s to
+		 *            notify.
+		 */
 		synchronized void setEvent(final ProcessingEvent evt,
 				final Object[] listeners) {
-
+			if (listeners == null || evt == null)
+				throw new NullPointerException("Input argumentBuilder cannot be null");
 			this.listeners = listeners;
 			this.event = evt;
 
@@ -47,35 +61,25 @@ public abstract class ProgressManager {
 		 */
 		public void run() {
 			final int numListeners = listeners.length;
-            if (event instanceof ExceptionEvent)
-                for (int i = 0; i < numListeners; i++)
-                    ((ProcessingEventListener) listeners[i])
-                            .exceptionOccurred((ExceptionEvent) this.event);
-            else
-                for (int i = 0; i < numListeners; i++)
-                    ((ProcessingEventListener) listeners[i]).getNotification(this.event);
+			if (event instanceof ExceptionEvent)
+				for (int i = 0; i < numListeners; i++)
+					((ProcessingEventListener) listeners[i])
+							.exceptionOccurred((ExceptionEvent) this.event);
+			else
+				for (int i = 0; i < numListeners; i++)
+					((ProcessingEventListener) listeners[i])
+							.getNotification(this.event);
 		}
 
 	}
 
 	/**
-	 * Options for the command line.
+	 * Set this to false for command line UIs where the delayed event sending
+	 * may prevent some messages to be seen before the tool exits, to true for
+	 * real GUI where you don't want the processing to be blocked too long, or
+	 * when you have slow listeners in general.
 	 */
-	protected final List<Option> cmdOpts = new ArrayList<Option>(5);
-
-	protected final Parser cmdParser = new Parser();
-
-	protected final ArgumentBuilder arguments = new ArgumentBuilder();
-    
-    /**
-     * Set this to false for command line UIs where the delayed event sending may prevent some
-     * messages to be seen before the tool exits, to true for real GUI where you don't want
-     * the processing to be blocked too long, or when you have slow listeners in general.
-     */
-    protected final boolean sendDelayedMessages = false;
-
-	/** Event launcher. */
-	private ProgressEventDispatchThreadEventLauncher eventLauncher = new ProgressEventDispatchThreadEventLauncher();
+	private boolean sendDelayedMessages = false;
 
 	/**
 	 * Proper way to stop a thread is not by calling Thread.stop() but by using
@@ -88,38 +92,25 @@ public abstract class ProgressManager {
 	 * List containing all the objects that want to be notified during
 	 * processing.
 	 */
-	private List notificationListeners = new ArrayList();
+	private List<ProcessingEventListener> notificationListeners = new ArrayList<ProcessingEventListener>();
 
-	/**
-	 * Default priority for the underlying {@link Thread}.
-	 */
-	private static int DEFAULT_PRIORITY = Thread.NORM_PRIORITY;
-
-	protected final DefaultOptionBuilder optionBuilder = new DefaultOptionBuilder();
-
-	protected Group optionsGroup;
-
-	protected CommandLine cmdLine;
-
-	protected Option helpOpt;
-
-	protected DefaultOption priorityOpt;
-
-	/**
-	 * Default priority for the underlying {@link Thread}.
-	 */
-	protected int priority = DEFAULT_PRIORITY;
-
-	protected	DefaultOption versionOpt;
-
-	public ProgressManager() {
-		super();
+	public ProgressManager(boolean sendDelayedMessages) {
+		this.sendDelayedMessages = sendDelayedMessages;
 	}
 
 	/**
-	 * Adding a listener for the notifications.
+	 * Default constructor.
+	 * 
+	 */
+	public ProgressManager() {
+
+	}
+
+	/**
+	 * Adding a listener to the {@link ProcessingEventListener}s' list.
 	 * 
 	 * @param listener
+	 *            to add to the list of listeners.
 	 */
 	public final synchronized void addProcessingEventListener(
 			final ProcessingEventListener listener) {
@@ -127,9 +118,11 @@ public abstract class ProgressManager {
 	}
 
 	/**
-	 * Removing a listener.
+	 * Removing a {@link ProcessingEventListener} from the listeners' list.
 	 * 
 	 * @param listener
+	 *            {@link ProcessingEventListener} to remove from the list of
+	 *            listeners.
 	 */
 	public final synchronized void removeProcessingEventListener(
 			final ProcessingEventListener listener) {
@@ -154,7 +147,7 @@ public abstract class ProgressManager {
 	 * @param percentage
 	 *            The percentage for the process.
 	 */
-	protected synchronized void fireEvent(final String string,
+	public synchronized void fireEvent(final String string,
 			final double percentage) {
 		final String newLine = System.getProperty("line.separator");
 		final StringBuffer message = new StringBuffer("Thread Name ");
@@ -163,55 +156,56 @@ public abstract class ProgressManager {
 				string);
 		final ProcessingEvent evt = new ProcessingEvent(this, string,
 				percentage);
-        ProgressEventDispatchThreadEventLauncher eventLauncher = new ProgressEventDispatchThreadEventLauncher();
+		ProgressEventDispatchThreadEventLauncher eventLauncher = new ProgressEventDispatchThreadEventLauncher();
 		eventLauncher.setEvent(evt, this.notificationListeners.toArray());
-        sendEvent(eventLauncher);
+		sendEvent(eventLauncher);
 	}
 
-    protected void sendEvent(ProgressEventDispatchThreadEventLauncher eventLauncher) {
-        if(sendDelayedMessages)
-            SwingUtilities.invokeLater(eventLauncher);
-        else
-            eventLauncher.run();
-    }
-    
-    /**
-     * Firing an exception event to listeners in order to inform them that processing
-     * broke and we can no longer proceed
-     * 
-     * @param string
-     *            The message to show.
-     * @param percentage
-     *            The percentage for the process.
-     * @param ex
-     *            the actual exception occurred
-     */
-    protected synchronized void fireException(final String string,
-            final double percentage, Exception ex) {
-        final String newLine = System.getProperty("line.separator");
-        final StringBuffer message = new StringBuffer("Thread Name ");
-        message.append(Thread.currentThread().getName()).append(newLine);
-        message.append(this.getClass().toString()).append(newLine).append(
-                string);
-        final ExceptionEvent evt = new ExceptionEvent(this, string,
-                percentage, ex);
-        ProgressEventDispatchThreadEventLauncher eventLauncher = new ProgressEventDispatchThreadEventLauncher();
-        eventLauncher.setEvent(evt, this.notificationListeners.toArray());
-        sendEvent(eventLauncher);
-    }
-    
-    /**
-     * Firing an exception event to listeners in order to inform them that processing
-     * broke and we can no longer proceed. This is a convenience method, it will call
-     * {@link #fireException(String, double, Exception)} with the exception message and -1 as 
-     * percentage.
-     * 
-     * @param ex
-     *            the actual exception occurred
-     */
-    protected synchronized void fireException(Exception ex) {
-        fireException(ExceptionEvent.getMessageFromException(ex), -1, ex);
-    }
+	private void sendEvent(
+			ProgressEventDispatchThreadEventLauncher eventLauncher) {
+		if (sendDelayedMessages)
+			SwingUtilities.invokeLater(eventLauncher);
+		else
+			eventLauncher.run();
+	}
+
+	/**
+	 * Firing an exception event to listeners in order to inform them that
+	 * processing broke and we can no longer proceed
+	 * 
+	 * @param string
+	 *            The message to show.
+	 * @param percentage
+	 *            The percentage for the process.
+	 * @param ex
+	 *            the actual exception occurred
+	 */
+	public synchronized void fireException(final String string,
+			final double percentage, Exception ex) {
+		final String newLine = System.getProperty("line.separator");
+		final StringBuffer message = new StringBuffer("Thread Name ");
+		message.append(Thread.currentThread().getName()).append(newLine);
+		message.append(this.getClass().toString()).append(newLine).append(
+				string);
+		final ExceptionEvent evt = new ExceptionEvent(this, string, percentage,
+				ex);
+		ProgressEventDispatchThreadEventLauncher eventLauncher = new ProgressEventDispatchThreadEventLauncher();
+		eventLauncher.setEvent(evt, this.notificationListeners.toArray());
+		sendEvent(eventLauncher);
+	}
+
+	/**
+	 * Firing an exception event to listeners in order to inform them that
+	 * processing broke and we can no longer proceed. This is a convenience
+	 * method, it will call {@link #fireException(String, double, Exception)}
+	 * with the exception message and -1 as percentage.
+	 * 
+	 * @param ex
+	 *            the actual exception occurred
+	 */
+	public synchronized void fireException(Exception ex) {
+		fireException(ExceptionEvent.getMessageFromException(ex), -1, ex);
+	}
 
 	/**
 	 * Should this thread be stopped?
@@ -231,13 +225,17 @@ public abstract class ProgressManager {
 	}
 
 	/**
-	 * Cleans up the {@link MosaicIndexBuilder}.
+	 * Perform proper clean up.
 	 * 
 	 */
-	public void dispose() {
+	public synchronized void dispose() {
 		removeAllProcessingEventListeners();
 	}
-	
-	public abstract void run();
+
+	/**
+	 * This method is responsible for doing the actual processing.
+	 * 
+	 */
+	public abstract void run() throws Throwable;
 
 }

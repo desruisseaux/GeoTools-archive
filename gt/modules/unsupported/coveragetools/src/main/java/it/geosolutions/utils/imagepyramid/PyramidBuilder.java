@@ -17,14 +17,14 @@
  */
 package it.geosolutions.utils.imagepyramid;
 
+import it.geosolutions.utils.CoverageToolsConstants;
 import it.geosolutions.utils.coveragetiler.CoverageTiler;
 import it.geosolutions.utils.imagemosaic.MosaicIndexBuilder;
+import it.geosolutions.utils.progress.BaseArgumentsManager;
 import it.geosolutions.utils.progress.ExceptionEvent;
 import it.geosolutions.utils.progress.ProcessingEvent;
 import it.geosolutions.utils.progress.ProcessingEventListener;
-import it.geosolutions.utils.progress.ProgressManager;
 
-import java.awt.RenderingHints;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,22 +32,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.RecyclingTileFactory;
-import javax.media.jai.TileCache;
 
+import org.apache.commons.cli2.Option;
 import org.apache.commons.cli2.option.DefaultOption;
-import org.apache.commons.cli2.option.GroupImpl;
-import org.apache.commons.cli2.util.HelpFormatter;
 import org.apache.commons.cli2.validation.InvalidArgumentException;
 import org.apache.commons.cli2.validation.Validator;
 import org.apache.commons.io.FileUtils;
@@ -55,7 +49,6 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.geometry.GeneralEnvelope;
-import org.opengis.coverage.grid.GridRange;
 
 /**
  * Given an original image, builds an image pyramid out of it by combining the
@@ -63,51 +56,21 @@ import org.opengis.coverage.grid.GridRange;
  * 
  * <pre>
  * Example of use:
- *   PyramidBuilder -s "/usr/home/data/home.tif" -f 2 -n 4 -t "25,25" -w
+ *   PyramidBuilder -s &quot;/usr/home/data/home.tif&quot; -f 2 -n 4 -t &quot;25,25&quot; -w
  * </pre>
  * 
  * @author Andrea Aime
+ * @author Simone Giannecchini, GeoSolutions.
  * @since 2.3.x
  * 
  */
-public class PyramidBuilder extends ProgressManager implements Runnable,
+public class PyramidBuilder extends BaseArgumentsManager implements Runnable,
 		ProcessingEventListener {
 
-	/**
-	 * Default tile cache size.
-	 */
-	public final static long DEFAULT_TILE_CHACHE_SIZE = 32 * 1024 * 1024;
-
-	/**
-	 * Default imageio caching behaviour.
-	 */
-	public final boolean DEFAULT_IMAGEIO_CACHING_BEHAVIOUR = false;
-
-	/**
-	 * Default thread priority.
-	 */
-	public final int DEFAULT_THREAD_PRIORITY = Thread.NORM_PRIORITY;
-
-	/**
-	 * Default interpolation.
-	 */
-	public final static Interpolation DEFAULT_INTERPOLATION = Interpolation
-			.getInstance(Interpolation.INTERP_NEAREST);
-
-	/** Default filter for subsampling averaged. */
-	public final static float[] DEFAULT_KERNEL_GAUSSIAN = new float[] { 0.5F,
-			1.0F / 3.0F, 0.0F, -1.0F / 12.0F };
-
-	/**
-	 * Default border extender.
-	 */
-	public final static BorderExtender DEFAULT_BORDER_EXTENDER = BorderExtender
-			.createInstance(BorderExtender.BORDER_COPY);
-
-	/** Static immutable ap for scaling algorithms. */
-	private static List scalingAlgorithms;
+	/** Static immutable set for scaling algorithms. */
+	private static final Set<String> scalingAlgorithms;
 	static {
-		scalingAlgorithms = new ArrayList(4);
+		scalingAlgorithms = new HashSet<String>();
 		scalingAlgorithms.add("nn");
 		scalingAlgorithms.add("bil");
 		scalingAlgorithms.add("bic");
@@ -116,7 +79,9 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	}
 
 	/** Program Version */
-	private final static String versionNumber = "0.2";
+	private final static String VERSION = "0.3";
+
+	private final static String NAME = "PyramidBuilder";
 
 	/** Commons-cli option for the input location. */
 	private DefaultOption locationOpt;
@@ -128,25 +93,22 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	private File outputLocation;
 
 	/** Commons-cli option for the tile dimension. */
-	private DefaultOption tileDimOpt;
+	private Option tileDimOpt;
 
 	/** Commons-cli option for the scale algorithm. */
-	private DefaultOption scaleAlgorithmOpt;
-
-	/** Commons-cli option for the tile cache size to use. */
-	private DefaultOption tileCacheSizeOpt;
+	private Option scaleAlgorithmOpt;
 
 	/** Commons-cli option for the tile numbe of subsample step to use. */
-	private DefaultOption numStepsOpt;
+	private Option numStepsOpt;
 
 	/** Commons-cli option for the scale factor to use. */
-	private DefaultOption scaleFactorOpt;
+	private Option scaleFactorOpt;
 
 	/**
 	 * Commons-cli options for overwriting the output layer dirs if already
 	 * available
 	 */
-	private DefaultOption overwriteOpt;
+	private Option overwriteOpt;
 
 	/** Tile width. */
 	private int tileW = -1;
@@ -158,20 +120,11 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	private String scaleAlgorithm;
 
 	/** Logger for this class. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(PyramidBuilder.class
-			.toString());
-
-	/** ImageIO caching behvaiour controller. */
-	private boolean useImageIOCache = DEFAULT_IMAGEIO_CACHING_BEHAVIOUR;
-
-	/** Default border extender. */
-	private BorderExtender borderExtender = DEFAULT_BORDER_EXTENDER;
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger(PyramidBuilder.class.toString());
 
 	/** Downsampling step. */
 	private int scaleFactor;
-
-	/** Default tile cache size. */
-	private long tileCacheSize = DEFAULT_TILE_CHACHE_SIZE;
 
 	/**
 	 * The source path.
@@ -186,17 +139,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	/**
 	 * Commons-cli option for the pyramid name
 	 */
-	private DefaultOption nameOpt;
-
-	/**
-	 * 
-	 * Interpolation method used througout all the program.
-	 * 
-	 * @TODO make the interpolation method customizable from the user
-	 *       perpsective.
-	 * 
-	 */
-	private Interpolation interp = DEFAULT_INTERPOLATION;
+	private Option nameOpt;
 
 	private int numSteps;
 
@@ -209,7 +152,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	private double totalSteps = 0;
 
 	/**
-	 * Relaunches slave tools progress with the appropriate percentage
+	 * Re-launches slave tools progress with the appropriate percentage
 	 * corrections
 	 */
 	private ProcessingEventListener slaveToolsListener = new ProcessingEventListener() {
@@ -231,6 +174,21 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 
 	private double[][] resolutions;
 
+
+	private Option compressionRatioOpt;
+
+
+	private Option compressionTypeOpt;
+
+	private Option internalTileDimOpt;
+
+	private int internalTileWidth=CoverageToolsConstants.DEFAULT_INTERNAL_TILE_WIDTH;
+
+	private int internalTileHeight=CoverageToolsConstants.DEFAULT_INTERNAL_TILE_HEIGHT;
+
+	private String compressionScheme = CoverageToolsConstants.DEFAULT_COMPRESSION_SCHEME;
+
+	private double compressionRatio = CoverageToolsConstants.DEFAULT_COMPRESSION_RATIO;
 	/**
 	 * Simple constructor for a pyramid generator. Use the input string in order
 	 * to read an image.
@@ -238,22 +196,23 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	 * 
 	 */
 	public PyramidBuilder() {
+		super(NAME, VERSION);
 		// /////////////////////////////////////////////////////////////////////
 		// Options for the command line
 		// /////////////////////////////////////////////////////////////////////
-		helpOpt = optionBuilder.withShortName("h").withShortName("?")
-				.withLongName("helpOpt").withDescription("print this message.")
-				.withRequired(false).create();
 
-		versionOpt = optionBuilder.withShortName("v")
-				.withLongName("versionOpt").withDescription(
-						"print the versionOpt.").withRequired(false).create();
+		internalTileDimOpt = optionBuilder.withShortName("it").withLongName(
+				"internal_tile_dimension").withArgument(
+				argumentBuilder.withName("it").withMinimum(0).withMaximum(1)
+						.create()).withDescription(
+				"Internal width and height of each tile we generate")
+				.withRequired(false).create();
 
 		locationOpt = optionBuilder
 				.withShortName("s")
 				.withLongName("source")
 				.withArgument(
-						arguments.withName("source").withMinimum(1)
+						argumentBuilder.withName("source").withMinimum(1)
 								.withMaximum(1).withValidator(new Validator() {
 
 									public void validate(List args)
@@ -278,24 +237,24 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 
 		nameOpt = optionBuilder.withShortName("name").withLongName(
 				"pyramid_name").withArgument(
-				arguments.withName("name").withMinimum(0).withMaximum(1)
+				argumentBuilder.withName("name").withMinimum(0).withMaximum(1)
 						.create()).withDescription(
 				"name for the pyramid property file").withRequired(false)
 				.create();
 
 		tileDimOpt = optionBuilder.withShortName("t").withLongName(
 				"tiled_dimension").withArgument(
-				arguments.withName("t").withMinimum(0).withMaximum(1).create())
-				.withDescription(
-						"tile dimensions as a couple width,height in pixels")
-				.withRequired(false).create();
+				argumentBuilder.withName("t").withMinimum(0).withMaximum(1)
+						.create()).withDescription(
+				"tile dimensions as a couple width,height in pixels")
+				.withRequired(true).create();
 
 		scaleFactorOpt = optionBuilder
 				.withShortName("f")
 				.withLongName("scale_factor")
 				.withArgument(
-						arguments.withName("f").withMinimum(1).withMaximum(1)
-								.withValidator(new Validator() {
+						argumentBuilder.withName("f").withMinimum(1)
+								.withMaximum(1).withValidator(new Validator() {
 
 									public void validate(List args)
 											throws InvalidArgumentException {
@@ -324,8 +283,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 
 		numStepsOpt = optionBuilder.withShortName("n")
 				.withLongName("num_steps").withArgument(
-						arguments.withName("n").withMinimum(1).withMaximum(1)
-								.withValidator(new Validator() {
+						argumentBuilder.withName("n").withMinimum(1)
+								.withMaximum(1).withValidator(new Validator() {
 
 									public void validate(List args)
 											throws InvalidArgumentException {
@@ -351,8 +310,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 				.withShortName("a")
 				.withLongName("scaling_algorithm")
 				.withArgument(
-						arguments.withName("a").withMinimum(0).withMaximum(1)
-								.withValidator(new Validator() {
+						argumentBuilder.withName("a").withMinimum(0)
+								.withMaximum(1).withValidator(new Validator() {
 
 									public void validate(List args)
 											throws InvalidArgumentException {
@@ -376,127 +335,86 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 						"name of the scaling algorithm, eeither one of average (a), filtered (f), bilinear (bil), nearest neigbhor (nn)")
 				.withRequired(false).create();
 
-		priorityOpt = optionBuilder.withShortName("p").withLongName(
-				"thread_priority").withArgument(
-				arguments.withName("thread_priority").withMinimum(0)
-						.withMaximum(1).create()).withDescription(
-				"priority for the underlying thread").withRequired(false)
-				.create();
-
-		tileCacheSizeOpt = optionBuilder.withShortName("c").withLongName(
-				"cache_size").withArgument(
-				arguments.withName("c").withMinimum(0).withMaximum(1).create())
-				.withDescription("tile cache sized").withRequired(false)
-				.create();
-
 		overwriteOpt = optionBuilder.withShortName("w").withLongName(
 				"overwrite").withDescription(
 				"completely wipe out existing layer dirs before proceeding.")
 				.withRequired(false).create();
 
-		cmdOpts.add(locationOpt);
-		cmdOpts.add(tileDimOpt);
-		cmdOpts.add(scaleFactorOpt);
-		cmdOpts.add(scaleAlgorithmOpt);
-		cmdOpts.add(numStepsOpt);
-		cmdOpts.add(priorityOpt);
-		cmdOpts.add(tileCacheSizeOpt);
-		cmdOpts.add(versionOpt);
-		cmdOpts.add(helpOpt);
-		cmdOpts.add(overwriteOpt);
+		compressionTypeOpt = optionBuilder
+				.withShortName("z")
+				.withLongName("compressionType")
+				.withDescription("compression type.")
+				.withArgument(
+						argumentBuilder.withName("compressionType")
+								.withMinimum(0).withMaximum(1).withValidator(
+										new Validator() {
 
-		optionsGroup = new GroupImpl(cmdOpts, "Options", "All the options", 0,
-				9);
+											public void validate(List args)
+													throws InvalidArgumentException {
+												final int size = args.size();
+												if (size > 1)
+													throw new InvalidArgumentException(
+															"Only one scaling algorithm at a time can be chosen");
 
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Help Formatter
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final HelpFormatter cmdHlp = new HelpFormatter("| ", "  ", " |", 75);
-		cmdHlp.setShellCommand("PyramidBuilder");
-		cmdHlp.setHeader("Help");
-		cmdHlp.setFooter(new StringBuffer(
-				"PyramidBuilder - GeoSolutions S.a.s (C) 2006 - v ").append(
-				PyramidBuilder.versionNumber).toString());
-		cmdHlp
-				.setDivider("|-------------------------------------------------------------------------|");
+											}
+										}).create()).withRequired(false)
+				.create();
 
-		cmdParser.setGroup(optionsGroup);
-		cmdParser.setHelpOption(helpOpt);
-		cmdParser.setHelpFormatter(cmdHlp);
-	}
+		compressionRatioOpt = optionBuilder
+				.withShortName("r")
+				.withLongName("compressionRatio")
+				.withDescription("compression ratio.")
+				.withArgument(
+						argumentBuilder.withName("compressionRatio")
+								.withMinimum(0).withMaximum(1).withValidator(
+										new Validator() {
 
-	/**
-	 * 
-	 * This method is a utlity method for setting various JAi wide hints we will
-	 * use here and afterwards.
-	 * 
-	 * 
-	 */
-	private void settingJAIHints() {
+											public void validate(List args)
+													throws InvalidArgumentException {
+												final int size = args.size();
+												if (size > 1)
+													throw new InvalidArgumentException(
+															"Only one scaling algorithm at a time can be chosen");
+												final String val = (String) args
+														.get(0);
 
-		// //
-		// Imageio caching behaviour in case it is ever needed.
-		// //
-		ImageIO.setUseCache(useImageIOCache);
+												final double value = Double
+														.parseDouble(val);
+												if (value <= 0 || value > 1)
+													throw new InvalidArgumentException(
+															"Invalid compressio ratio");
 
-		// //
-		//
-		// JAI cache fine tuning
-		//
-		// //
-		final JAI jaiDef = JAI.getDefaultInstance();
-		// setting the tile cache
-		final TileCache cache = jaiDef.getTileCache();
-		cache.setMemoryCapacity(tileCacheSize);
-		// setting JAI wide hints
-		jaiDef.setRenderingHint(JAI.KEY_INTERPOLATION, this.interp);
-		jaiDef.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		jaiDef.setRenderingHint(RenderingHints.KEY_RENDERING,
-				RenderingHints.VALUE_RENDER_SPEED);
-		jaiDef.setRenderingHint(JAI.KEY_CACHED_TILE_RECYCLING_ENABLED,
-				Boolean.TRUE);
-		// //
-		//
-		// tile factory and recycler
-		//
-		// //
-		RecyclingTileFactory recyclingFactory = new RecyclingTileFactory();
-		jaiDef.setRenderingHint(JAI.KEY_TILE_FACTORY, recyclingFactory);
-		jaiDef.setRenderingHint(JAI.KEY_TILE_RECYCLER, recyclingFactory);
+											}
+										}).create()).withRequired(false)
+				.create();
 
-		// //
-		//
-		// border extender
-		//
-		// //
-		jaiDef.setRenderingHint(JAI.KEY_BORDER_EXTENDER, borderExtender);
-
+		addOption(compressionTypeOpt);
+		addOption(compressionRatioOpt);
+		addOption(locationOpt);
+		addOption(tileDimOpt);
+		addOption(scaleFactorOpt);
+		addOption(scaleAlgorithmOpt);
+		addOption(numStepsOpt);
+		addOption(overwriteOpt);
+		addOption(internalTileDimOpt);
+		finishInitialization();
 	}
 
 	public void run() {
-		// //
-		//
-		// setting JAI wide hints
-		//
-		// //
-		settingJAIHints();
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Gather reader to compute tile x and y from tile size
 		//
 		// /////////////////////////////////////////////////////////////////////
-		AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
+		final AbstractGridFormat format = (AbstractGridFormat) GridFormatFinder
 				.findFormat(inputLocation);
 		if (format == null) {
 			String message = "Could not find a format for this coverage";
 			fireException(message, 0, new IOException(message));
 			return;
 		}
-		AbstractGridCoverage2DReader inReader = (AbstractGridCoverage2DReader) format
+		final AbstractGridCoverage2DReader inReader = (AbstractGridCoverage2DReader) format
 				.getReader(inputLocation);
 		if (inReader == null) {
 			String message = "Unable to instantiate a reader for this coverage";
@@ -505,18 +423,13 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		}
 
 		envelope = inReader.getOriginalEnvelope();
-		final GridRange range = inReader.getOriginalGridRange();
-//		final int numTileX = (int) Math.ceil(range.getLength(0) / tileW);
-//		final int numtileY = (int) Math.ceil(range.getLength(1) / tileH);
 		inReader.dispose();
-
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Create output directory
 		//
 		// /////////////////////////////////////////////////////////////////////
-
 		if (!outputLocation.exists())
 			if (!outputLocation.mkdir()) {
 				String message = "Could not create output directory: "
@@ -531,7 +444,6 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		// event percentages can be corrected to represent the global progress
 		//
 		// //////////////////////////////////////////////////////////////////////
-
 		totalSteps = (numSteps + 1) * 2;
 		currStep = 1;
 
@@ -540,14 +452,13 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		// Set up initial level using the coverage tiler
 		//
 		// /////////////////////////////////////////////////////////////////////
-
 		File outputDir = new File(outputLocation, "0");
 		if (!checkLayerDir(outputDir))
 			return;
 
 		// create first tiled set
-		resolutions = new double[2][numSteps+1];
-//		tileInput(numTileX, numtileY, outputDir);
+		resolutions = new double[2][numSteps + 1];
+		// tileInput(numTileX, numtileY, outputDir);
 		tileInput(outputDir);
 		if (exceptionOccurred)
 			return;
@@ -570,9 +481,9 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		int prevLevel = 0;
 		for (int step = 0; step < numSteps; step++) {
 			// check output dir
-			File prevLevelDirectory = new File(outputLocation, String
+			final File prevLevelDirectory = new File(outputLocation, String
 					.valueOf(prevLevel));
-			File currLevelDirectory = new File(outputLocation, String
+			final File currLevelDirectory = new File(outputLocation, String
 					.valueOf(currLevel));
 			if (!checkLayerDir(currLevelDirectory))
 				return;
@@ -585,8 +496,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 
 			// mosaic it
 			resolution = mosaicLevel(currLevel);
-			resolutions[0][step+1] = resolution[0];
-			resolutions[1][step+1] = resolution[1];
+			resolutions[0][step + 1] = resolution[0];
+			resolutions[1][step + 1] = resolution[1];
 			if (exceptionOccurred)
 				return;
 			currStep++;
@@ -625,7 +536,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		return true;
 	}
 
-//	private void tileInput(final int numTileX, final int numTileY,
+	// private void tileInput(final int numTileX, final int numTileY,
 	private void tileInput(File outputDir) {
 		CoverageTiler tiler = new CoverageTiler();
 		tiler.addProcessingEventListener(slaveToolsListener);
@@ -633,6 +544,10 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		tiler.setOutputLocation(outputDir);
 		tiler.setTileWidth(tileW);
 		tiler.setTileHeight(tileH);
+		tiler.setInternalTileHeight(internalTileHeight);
+		tiler.setInternalTileWidth(internalTileWidth);
+		tiler.setCompressionRatio(this.compressionRatio);
+		tiler.setCompressionScheme(this.compressionScheme);
 		tiler.run();
 		tiler.removeAllProcessingEventListeners();
 	}
@@ -640,13 +555,15 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 	private void buildNewLayer(File prevLevelDirectory, File currLevelDirectory) {
 		PyramidLayerBuilder layerBuilder = new PyramidLayerBuilder();
 		layerBuilder.addProcessingEventListener(slaveToolsListener);
-		layerBuilder
-				.setInputLocation(new File(prevLevelDirectory, name+".shp"));
+		layerBuilder.setInputLocation(new File(prevLevelDirectory, name
+				+ ".shp"));
 		layerBuilder.setOutputLocation(currLevelDirectory);
 		layerBuilder.setScaleAlgorithm(scaleAlgorithm);
 		layerBuilder.setScaleFactor(scaleFactor);
-		layerBuilder.setTileH(tileH);
-		layerBuilder.setTileW(tileW);
+		layerBuilder.setTileHeight(tileH);
+		layerBuilder.setTileWidth(tileW);
+		layerBuilder.setCompressionRatio(this.compressionRatio);
+		layerBuilder.setCompressionScheme(this.compressionScheme);
 		layerBuilder.run();
 		layerBuilder.removeAllProcessingEventListeners();
 	}
@@ -675,10 +592,10 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 				Double.toString(envelope.getMinimum(1))).append(" ").append(
 				Double.toString(envelope.getMaximum(0))).append(",").append(
 				Double.toString(envelope.getMaximum(1))).toString());
-		properties.setProperty("LevelsNum", Integer.toString(numSteps+1));
+		properties.setProperty("LevelsNum", Integer.toString(numSteps + 1));
 		final StringBuffer levels = new StringBuffer();
 		final StringBuffer levelDirs = new StringBuffer();
-		for (int i = 0; i < numSteps+1; i++) {
+		for (int i = 0; i < numSteps + 1; i++) {
 			levels.append(Double.toString(resolutions[0][i])).append(",")
 					.append(Double.toString(resolutions[1][i]));
 			levelDirs.append(i == 0 ? "0" : Integer.toString((int) Math.pow(
@@ -698,7 +615,7 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 			// //
 			// Creating PRJ file
 			// //
-			File prjFile = new File(outputLocation, name + ".prj");
+			final File prjFile = new File(outputLocation, name + ".prj");
 			BufferedWriter out = new BufferedWriter(new FileWriter(prjFile));
 			out.write(envelope.getCoordinateReferenceSystem().toWKT());
 			out.close();
@@ -720,97 +637,133 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 				.getException());
 	}
 
-	private boolean parseArgs(String[] args) {
-		cmdLine = cmdParser.parseAndHelp(args);
-		if (cmdLine != null && cmdLine.hasOption(versionOpt)) {
-			LOGGER.fine(new StringBuffer(
-					"OverviewsEmbedder - GeoSolutions S.a.s (C) 2006 - v")
-					.append(PyramidBuilder.versionNumber).toString());
-			System.exit(1);
+	public boolean parseArgs(String[] args) {
+		if (!super.parseArgs(args))
+			return false;
+		// ////////////////////////////////////////////////////////////////
+		//
+		// parsing command line parameters and setting up
+		// Pyramid Builder options
+		//
+		// ////////////////////////////////////////////////////////////////
+		inputLocation = new File((String) getOptionValue(locationOpt));
 
-		} else if (cmdLine != null) {
-			// ////////////////////////////////////////////////////////////////
-			//
-			// parsing command line parameters and setting up
-			// Pyramid Builder options
-			//
-			// ////////////////////////////////////////////////////////////////
-			inputLocation = new File((String) cmdLine.getValue(locationOpt));
+		// output files' directory
+		if (hasOption(outputLocationOpt))
+			outputLocation = new File(
+					(String) getOptionValue(outputLocationOpt));
+		else
+			outputLocation = new File(inputLocation.getParentFile(), "pyramid");
 
-			// output files' directory
-			if (cmdLine.hasOption(outputLocationOpt))
-				outputLocation = new File((String) cmdLine
-						.getValue(outputLocationOpt));
-			else
-				outputLocation = new File(inputLocation.getParentFile(),
-						"pyramid");
+		// output file name
+		if (hasOption(nameOpt))
+			name = (String) getOptionValue(nameOpt);
+		else
+			name = "pyramid";
 
-			// output file name
-			if (cmdLine.hasOption(nameOpt))
-				name = (String) cmdLine.getValue(nameOpt);
-			else
-				name = "pyramid";
+		// shall we overwrite the output dirs?
+		overwriteOutputDirs = hasOption(overwriteOpt);
 
-			// shall we overwrite the output dirs?
-			overwriteOutputDirs = cmdLine.hasOption(overwriteOpt);
+		// tile dim
+		final String tileDim = (String) getOptionValue(tileDimOpt);
+		String[] pairs = tileDim.split(",");
+		tileW = Integer.parseInt(pairs[0]);
+		tileH = Integer.parseInt(pairs[1]);
 
-			// tile dim
-			if (cmdLine.hasOption(tileDimOpt)) {
-				final String tileDim = (String) cmdLine.getValue(tileDimOpt);
-				final String[] pairs = tileDim.split(",");
-				tileW = Integer.parseInt(pairs[0]);
-				tileH = Integer.parseInt(pairs[1]);
+		// //
+		//
+		// scale factor
+		//
+		// //
+		final String scaleF = (String) getOptionValue(scaleFactorOpt);
+		scaleFactor = Integer.parseInt(scaleF);
+
+		// //
+		//
+		// scaling algorithm (default to nearest neighbour)
+		//
+		// //
+		scaleAlgorithm = (String) getOptionValue(scaleAlgorithmOpt);
+		if (scaleAlgorithm == null)
+			scaleAlgorithm = "nn";
+
+		// //
+		//
+		// number of steps
+		//
+		// //
+		numSteps = Integer.parseInt((String) getOptionValue(numStepsOpt));
+
+		// //
+		//
+		// Compression params
+		//
+		// //
+		// index name
+		if (hasOption(compressionTypeOpt)) {
+			compressionScheme = (String) getOptionValue(compressionTypeOpt);
+			if (compressionScheme == "")
+				compressionScheme = null;
+		}
+		if (hasOption(compressionRatioOpt)) {
+			try {
+				compressionRatio = Double
+						.parseDouble((String) getOptionValue(compressionRatioOpt));
+			} catch (Exception e) {
+				compressionRatio = Double.NaN;
 			}
-			// //
-			//
-			// scale factor
-			//
-			// //
-			final String scaleF = (String) cmdLine.getValue(scaleFactorOpt);
-			scaleFactor = Integer.parseInt(scaleF);
-
-			// //
-			//
-			// scaling algorithm (default to nearest neighbour)
-			//
-			// //
-			scaleAlgorithm = (String) cmdLine.getValue(scaleAlgorithmOpt);
-			if (scaleAlgorithm == null)
-				scaleAlgorithm = "nn";
-
-			// //
-			//
-			// number of steps
-			//
-			// //
-			numSteps = Integer.parseInt((String) cmdLine.getValue(numStepsOpt));
-
-			// //
-			//
-			// Thread priority
-			//
-			// //
-			// index name
-			if (cmdLine.hasOption(priorityOpt))
-				priority = Integer.parseInt((String) cmdLine
-						.getValue(priorityOpt));
-
-			// //
-			//
-			// Tile cache size
-			//
-			// //
-			// index name
-			if (cmdLine.hasOption(tileCacheSizeOpt)) {
-				tileCacheSize = Integer.parseInt((String) cmdLine
-						.getValue(tileCacheSizeOpt));
-
-			}
-			return true;
 
 		}
-		return false;
 
+		// //
+		//
+		// Internal Tile dim
+		//
+		// //
+		final String internalTileDim = (String) getOptionValue(internalTileDimOpt);
+		if (internalTileDim != null && internalTileDim.length() > 0) {
+			pairs = internalTileDim.split(",");
+			internalTileWidth = Integer.parseInt(pairs[0]);
+			internalTileHeight = Integer.parseInt(pairs[1]);
+		} else {
+			internalTileWidth = tileW;
+			internalTileHeight = tileH;
+		}
+
+		return true;
+
+	}
+
+	public double getCompressionRatio() {
+		return compressionRatio;
+	}
+
+	public String getCompressionScheme() {
+		return compressionScheme;
+	}
+
+	public void setCompressionRatio(double compressionRatio) {
+		this.compressionRatio = compressionRatio;
+	}
+
+	public void setCompressionScheme(String compressionScheme) {
+		this.compressionScheme = compressionScheme;
+	}
+
+	public int getInternalTileHeight() {
+		return internalTileHeight;
+	}
+
+	public int getInternalTileWidth() {
+		return internalTileWidth;
+	}
+
+	public void setInternalTileHeight(int internalTileHeight) {
+		this.internalTileHeight = internalTileHeight;
+	}
+
+	public void setInternalTileWidth(int internalTileWidth) {
+		this.internalTileWidth = internalTileWidth;
 	}
 
 	/**
@@ -830,12 +783,12 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 		final PyramidBuilder builder = new PyramidBuilder();
 		// adding the embedder itself as a listener
 		builder.addProcessingEventListener(builder);
-		// parsing input arguments
+		// parsing input argumentBuilder
 		if (builder.parseArgs(args)) {
 			// creating a thread to execute the request process, with the
 			// provided priority
 			final Thread t = new Thread(builder, "PyramidBuilder");
-			t.setPriority(builder.priority);
+			t.setPriority(builder.getPriority());
 			t.start();
 			try {
 				t.join();
@@ -844,7 +797,8 @@ public class PyramidBuilder extends ProgressManager implements Runnable,
 			}
 
 		} else if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("Unable to parse command line arguments, exiting...");
+			LOGGER
+					.fine("Unable to parse command line argumentBuilder, exiting...");
 
 	}
 }
