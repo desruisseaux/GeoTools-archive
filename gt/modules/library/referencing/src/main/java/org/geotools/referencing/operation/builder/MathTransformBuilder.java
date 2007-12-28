@@ -15,7 +15,6 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE and extensions
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,6 @@ import java.io.StringWriter;
 import java.text.NumberFormat;
 import javax.vecmath.MismatchedSizeException;
 
-// OpenGIS dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.CartesianCS;  // For javadoc only
@@ -44,7 +42,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.geometry.MismatchedReferenceSystemException;
 
-// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.io.TableWriter;
 import org.geotools.math.Statistics;
@@ -110,12 +107,12 @@ public abstract class MathTransformBuilder {
     /**
      * The list of mapped positions.
      */
-    private final List/*<MappedPosition>*/ positions = new ArrayList();
+    private final List<MappedPosition> positions = new ArrayList<MappedPosition>();
 
     /**
      * An unmodifiable view of mapped positions to be returned by {@link #getMappedPositions}.
      */
-    private final List/*<MappedPosition>*/ unmodifiablePositions =
+    private final List<MappedPosition> unmodifiablePositions =
             Collections.unmodifiableList(positions);
 
     /**
@@ -204,7 +201,7 @@ public abstract class MathTransformBuilder {
      *         {@linkplain #getDimension expected number of dimensions}.
      * @throws MismatchedReferenceSystemException if CRS is not the same for all points.
      */
-    public void setMappedPositions(final List/*<MappedPosition>*/ positions)
+    public void setMappedPositions(final List<MappedPosition> positions)
             throws MismatchedSizeException, MismatchedDimensionException,
                    MismatchedReferenceSystemException
     {
@@ -263,7 +260,7 @@ public abstract class MathTransformBuilder {
                 mp = new MappedPosition(dimension);
                 positions.add(mp);
             } else {
-                mp = (MappedPosition) positions.get(i);
+                mp = positions.get(i);
             }
             final DirectPosition point = points[i];
             if (target) {
@@ -347,7 +344,7 @@ public abstract class MathTransformBuilder {
         }
         final NumberFormat source = getNumberFormat(locale, false);
         final NumberFormat target = getNumberFormat(locale, true);
-        final TableWriter  table  = new TableWriter(out, " \u2502 ");
+        final TableWriter  table  = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
         table.setAlignment(TableWriter.ALIGN_CENTER);
         table.writeHorizontalSeparator();
         try {
@@ -449,7 +446,7 @@ public abstract class MathTransformBuilder {
      * @throws FactoryException if the CRS can't be created.
      */
     private EngineeringCRS createEngineeringCRS(final boolean target) throws FactoryException {
-        final Map properties = new HashMap(4);
+        final Map<String,Object> properties = new HashMap<String,Object>(4);
         properties.put(CoordinateReferenceSystem.NAME_KEY, Vocabulary.format(VocabularyKeys.UNKNOW));
         final GeographicExtent validArea = getValidArea(target);
         if (validArea != null) {
@@ -576,7 +573,7 @@ public abstract class MathTransformBuilder {
      * {@code CoordinateSystem.class}, which means that every kind of coordinate system
      * is legal. Some subclasses will restrict to {@linkplain CartesianCS cartesian CS}.
      */
-    public Class/*<? extends CoordinateSystem>*/ getCoordinateSystemType() {
+    public Class<? extends CoordinateSystem> getCoordinateSystemType() {
         return CoordinateSystem.class;
     }
 
@@ -697,7 +694,7 @@ public abstract class MathTransformBuilder {
      */
     public Transformation getTransformation() throws FactoryException {
         if (transformation == null) {
-            final Map properties = new HashMap();
+            final Map<String,Object> properties = new HashMap<String,Object>();
             properties.put(Transformation.NAME_KEY, getName());
             /*
              * Set the valid area as the intersection of source CRS and target CRS valid area.
@@ -758,6 +755,7 @@ public abstract class MathTransformBuilder {
      * Returns a string representation of this builder. The default implementation
      * returns a table containing all source and target points.
      */
+    @Override
     public String toString() {
         final StringWriter out = new StringWriter();
         try {

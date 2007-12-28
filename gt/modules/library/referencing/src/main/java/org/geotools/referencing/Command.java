@@ -174,7 +174,7 @@ final class Command {
      */
     private static void factories(final PrintWriter out) {
         final Set<Citation> done  = new HashSet<Citation>();
-        final TableWriter   table = new TableWriter(out, " \u2502 ");
+        final TableWriter   table = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
         final TableWriter   notes = new TableWriter(out, " ");
         int noteCount = 0;
         notes.setMultiLinesCells(true);

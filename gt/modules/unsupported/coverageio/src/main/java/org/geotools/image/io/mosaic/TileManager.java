@@ -236,7 +236,7 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     public Rectangle getRegion(final int imageIndex) throws IOException {
         Rectangle region = regions[imageIndex];
         if (region == null) {
-            for (final Tile tile : getTiles(imageIndex, null)) {
+            for (final Tile tile : getTiles(imageIndex)) {
                 final Rectangle expand = tile.getRegion();
                 if (region == null) {
                     region = expand;
@@ -257,6 +257,18 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
     }
 
     /**
+     * Returns every tiles at the given image index.
+     *
+     * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
+     * @return The tiles that intercept the given region.
+     * @throws IOException if it was necessary to fetch an image dimension from its
+     *         {@linkplain Tile#getReader reader} and this operation failed.
+     */
+    public final Collection<Tile> getTiles(final int imageIndex) throws IOException {
+        return getTiles(imageIndex, null, 1, 1);
+    }
+
+    /**
      * Returns every tiles that intersect the given region.
      *
      * @param  imageIndex The image index, from 0 inclusive to {@link #getNumImages} exclusive.
@@ -265,7 +277,8 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
      * @throws IOException if it was necessary to fetch an image dimension from its
      *         {@linkplain Tile#getReader reader} and this operation failed.
      */
-    public Collection<Tile> getTiles(final int imageIndex, final Rectangle region)
+    public Collection<Tile> getTiles(final int imageIndex, final Rectangle region,
+                                     final int xSubsampling, final int ySubsampling)
             throws IOException
     {
         Collection<Tile> interest = tilesOfInterest[imageIndex];
@@ -280,7 +293,9 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
             for (final Tile tile : tiles) {
                 if (tile.getImageIndex() == imageIndex) {
                     if (region == null || tile.intersects(region)) {
-                        interest.add(tile);
+                        if (tile.canSubsample(xSubsampling, ySubsampling)) {
+                            interest.add(tile);
+                        }
                     }
                 }
             }
@@ -322,7 +337,7 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
         if (size == null) {
             int width  = 0;
             int height = 0;
-            for (final Tile tile : getTiles(imageIndex, null)) {
+            for (final Tile tile : getTiles(imageIndex)) {
                 final Rectangle region = tile.getRegion();
                 if (region.width  > width)  width  = region.width;
                 if (region.height > height) height = region.height;
@@ -367,5 +382,13 @@ fill:   for (final List<Tile> sameInputs : tilesByInput.values()) {
                 reader.dispose();
             }
         }
+    }
+
+    /**
+     * Returns a string representation of this tile manager.
+     */
+    @Override
+    public String toString() {
+        return Tile.toString(allTiles);
     }
 }

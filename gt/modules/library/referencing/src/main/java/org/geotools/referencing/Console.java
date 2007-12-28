@@ -3,7 +3,7 @@
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
  *    (C) 2004, Institut de Recherche pour le Développement
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -16,7 +16,6 @@
  */
 package org.geotools.referencing;
 
-// J2SE dependencies
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -28,7 +27,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -38,7 +36,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.io.TableWriter;
 import org.geotools.measure.Measure;
@@ -143,7 +140,7 @@ public class Console extends AbstractConsole {
      * The source and target CRS, or {@code null} if not yet determined.
      */
     private CoordinateReferenceSystem sourceCRS, targetCRS;
-    
+
     /**
      * Source and target coordinate points, or {@code null} if not yet determined.
      */
@@ -176,7 +173,7 @@ public class Console extends AbstractConsole {
         super(new Preprocessor(new Parser()));
         numberSeparator = getNumberSeparator(numberFormat);
     }
-    
+
     /**
      * Creates a new console instance using the specified input stream.
      *
@@ -417,9 +414,9 @@ public class Console extends AbstractConsole {
     private void printCRS() throws FactoryException, IOException {
         final Locale locale = null;
         final Vocabulary resources = Vocabulary.getResources(locale);
-        final TableWriter table = new TableWriter(out, " \u2502 ");
+        final TableWriter table = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
         table.setMultiLinesCells(true);
-        char separator = '\u2500';
+        char separator = TableWriter.SINGLE_HORIZONTAL_LINE;
         if (sourceCRS!=null || targetCRS!=null) {
             table.writeHorizontalSeparator();
             table.write(resources.getString(VocabularyKeys.SOURCE_CRS));
@@ -435,7 +432,7 @@ public class Console extends AbstractConsole {
                 table.write(parser.format(targetCRS));
             }
             table.nextLine();
-            separator = '\u2550';
+            separator = TableWriter.DOUBLE_HORIZONTAL_LINE;
         }
         /*
          * Format the math transform and its inverse, if any.
@@ -695,6 +692,7 @@ public class Console extends AbstractConsole {
      *
      * @param exception The exception to report.
      */
+    @Override
     protected void reportError(final Exception exception) {
         super.reportError(exception);
         lastError = exception;

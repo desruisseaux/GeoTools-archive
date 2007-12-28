@@ -17,6 +17,7 @@
 package org.geotools.image.io.mosaic;
 
 import java.awt.Point;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -28,6 +29,9 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -36,6 +40,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 
 import org.geotools.image.io.metadata.MetadataMerge;
+import org.geotools.io.TableWriter;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -58,6 +63,11 @@ public class MosaicImageReader extends ImageReader {
     private static final Class<?>[] INTEGER_ARGUMENTS = {
         int.class
     };
+
+    /**
+     * The logging level for tiling information during reads.
+     */
+    private Level level = Level.FINE;
 
     /**
      * The tile manager.
@@ -291,7 +301,7 @@ public class MosaicImageReader extends ImageReader {
         if (useDefaultImplementation("isRandomAccessEasy", INTEGER_ARGUMENTS)) {
             return super.isRandomAccessEasy(imageIndex);
         }
-        for (final Tile tile : tiles.getTiles(imageIndex, null)) {
+        for (final Tile tile : tiles.getTiles(imageIndex)) {
             final Object input = tile.getInput();
             if (!(input instanceof File)) {
                 return false;
@@ -314,7 +324,7 @@ public class MosaicImageReader extends ImageReader {
     public float getAspectRatio(final int imageIndex) throws IOException {
         if (!useDefaultImplementation("getAspectRatio", INTEGER_ARGUMENTS)) {
             float ratio = Float.NaN;
-            for (final Tile tile : tiles.getTiles(imageIndex, null)) {
+            for (final Tile tile : tiles.getTiles(imageIndex)) {
                 final float candidate = tile.getPreparedReader(true, true).getAspectRatio(imageIndex);
                 if (candidate == ratio || Float.isNaN(candidate)) {
                     // Same ratio or unspecified ratio.
@@ -349,7 +359,7 @@ public class MosaicImageReader extends ImageReader {
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
         if (tiles != null) {
             final ImageTypeSpecifier type =
-                    getRawImageType(imageIndex, tiles.getTiles(imageIndex, null));
+                    getRawImageType(imageIndex, tiles.getTiles(imageIndex));
             if (type != null) {
                 return type;
             }
@@ -448,7 +458,7 @@ public class MosaicImageReader extends ImageReader {
      * @throws IOException If an error occurs reading the information from the input source.
      */
     public Iterator<ImageTypeSpecifier> getImageTypes(final int imageIndex) throws IOException {
-        final Collection<Tile> tiles = getTileManager().getTiles(imageIndex, null);
+        final Collection<Tile> tiles = getTileManager().getTiles(imageIndex);
         return getImageTypes(imageIndex, tiles, null).iterator();
     }
 
@@ -520,7 +530,7 @@ public class MosaicImageReader extends ImageReader {
      */
     public IIOMetadata getImageMetadata(final int imageIndex) throws IOException {
         IIOMetadata metadata = null;
-        for (final Tile tile : getTileManager().getTiles(imageIndex, null)) {
+        for (final Tile tile : getTileManager().getTiles(imageIndex)) {
             final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
             final IIOMetadata candidate = reader.getImageMetadata(imageIndex);
             metadata = MetadataMerge.merge(candidate, metadata);
@@ -540,7 +550,7 @@ public class MosaicImageReader extends ImageReader {
             final String formatName, final Set<String> nodeNames) throws IOException
     {
         IIOMetadata metadata = null;
-        for (final Tile tile : getTileManager().getTiles(imageIndex, null)) {
+        for (final Tile tile : getTileManager().getTiles(imageIndex)) {
             final ImageReader reader = tile.getPreparedReader(true, ignoreMetadata);
             final IIOMetadata candidate = reader.getImageMetadata(imageIndex, formatName, nodeNames);
             metadata = MetadataMerge.merge(candidate, metadata);
@@ -558,10 +568,21 @@ public class MosaicImageReader extends ImageReader {
      */
     public BufferedImage read(final int imageIndex, ImageReadParam param) throws IOException {
         clearAbortRequest();
-        final int          srcWidth  = getWidth (imageIndex);
-        final int          srcHeight = getHeight(imageIndex);
+        final int xSubsampling, ySubsampling;
+        if (param != null) {
+            xSubsampling = param.getSourceXSubsampling();
+            ySubsampling = param.getSourceYSubsampling();
+            // Note: we don't extract subsampling offsets because they will be taken in account
+            //       in the 'sourceRegion' to be calculated by ImageReader.computeRegions(...).
+        } else {
+            xSubsampling = 1;
+            ySubsampling = 1;
+        }
+        final int srcWidth  = getWidth (imageIndex);
+        final int srcHeight = getHeight(imageIndex);
         final Rectangle sourceRegion = getSourceRegion(param, srcWidth, srcHeight);
-        final Collection<Tile> tiles = getTileManager().getTiles(imageIndex, sourceRegion);
+        final Collection<Tile> tiles = getTileManager().getTiles(
+                imageIndex, sourceRegion, xSubsampling, ySubsampling);
         if (tiles.size() == 1) {
             /*
              * If there is exactly one tile, delegates to the image reader
@@ -580,11 +601,13 @@ public class MosaicImageReader extends ImageReader {
             return reader.read(imageIndex, param);
         }
         /*
-         * We need to read at least two tiles (or zero).
-         * Creates the destination image here.
+         * We need to read at least two tiles (or zero). Creates the destination image here.
+         * Note that this is the only image ever to be created during a mosaic read, unless
+         * some underlying ImageReader do not honor our ImageReadParam.setDestination(image)
+         * setting.
          */
         BufferedImage image = (param != null) ? param.getDestination() : null;
-        final Rectangle   destRegion = new Rectangle(); // Will be computed later.
+        final Rectangle destRegion = new Rectangle(); // Will be computed later.
         computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
         if (image == null) {
             /*
@@ -608,42 +631,137 @@ public class MosaicImageReader extends ImageReader {
             computeRegions(param, srcWidth, srcHeight, image, sourceRegion, destRegion);
         }
         /*
-         * Now read every tiles...
+         * Now read every tiles... If logging are enabled, we will format the tiles that we read in
+         * a table and logs the table as one log record once the reading is completed or failed.
          */
-        final int  destinationXOffset = destRegion.x - sourceRegion.x;
-        final int  destinationYOffset = destRegion.y - sourceRegion.y;
-        final Point destinationOffset = new Point();
+        final Logger logger = Logging.getLogger(MosaicImageReader.class);
+        final TableWriter table;
+        if (logger.isLoggable(level)) {
+            table = new TableWriter(null, TableWriter.SINGLE_VERTICAL_LINE);
+            table.writeHorizontalSeparator();
+            table.write("Reader\tTile\tSize\tSource\tDestination\tSubsampling");
+            table.writeHorizontalSeparator();
+        } else {
+            table = null;
+        }
         if (param == null) {
             param = getDefaultReadParam();
         }
+        final Point destinationOffset = new Point();
+        Exception failure = null;
         for (final Tile tile : tiles) {
             if (abortRequested()) {
                 break;
             }
             final Rectangle tileRegion = tile.getRegion();
-            final Rectangle sourceTileRegion = tileRegion.intersection(sourceRegion);
-            if (sourceTileRegion.isEmpty()) {
+            final Rectangle regionToRead = tileRegion.intersection(sourceRegion);
+            /*
+             * Computes the location of the region to read relative to the source region requested
+             * by the user, and make sure that this location is a multiple of subsampling (if any).
+             * The region to read may become smaller as a result of this calculation, i.e. the
+             * value of its (x,y) location may increase, never reduce.
+             */
+            int xOffset = (regionToRead.x - sourceRegion.x) % xSubsampling;
+            int yOffset = (regionToRead.y - sourceRegion.y) % ySubsampling;
+            if (xOffset != 0) {
+                xOffset -= xSubsampling;
+                regionToRead.x     -= xOffset;
+                regionToRead.width += xOffset;
+            }
+            if (yOffset != 0) {
+                yOffset -= ySubsampling;
+                regionToRead.y      -= yOffset;
+                regionToRead.height += yOffset;
+            }
+            if (regionToRead.isEmpty()) {
                 continue;
             }
-            destinationOffset.move(sourceTileRegion.x, sourceTileRegion.y);
-            destinationOffset.translate(destinationXOffset, destinationYOffset);
-            sourceTileRegion .translate(-tileRegion.x, -tileRegion.y);
+            /*
+             * Now that the offset is a multiple of subsampling, computes the destination offset.
+             * Then translate the region to read from "this image reader" space to "tile" space.
+             */
+            xOffset = (regionToRead.x - sourceRegion.x) / xSubsampling;
+            yOffset = (regionToRead.y - sourceRegion.y) / ySubsampling;
+            destinationOffset.x = destRegion.x + xOffset;
+            destinationOffset.y = destRegion.y + yOffset;
+            assert sourceRegion.contains(regionToRead) : regionToRead;
+            assert tileRegion  .contains(regionToRead) : regionToRead;
+            regionToRead.translate(-tileRegion.x, -tileRegion.y);
+            /*
+             * Sets the parameters to be given to the tile reader. We don't use any subsampling
+             * offset because it has already been calculated in the region to read. Note that
+             * the pixel size should be a dividor of subsampling; this condition must have been
+             * checked by the tile manager when it selected the tiles to be returned.
+             */
+            final Dimension pixelSize = tile.getPixelSize();
+            assert xSubsampling % pixelSize.width  == 0 : pixelSize;
+            assert ySubsampling % pixelSize.height == 0 : pixelSize;
             param.setController(null);
             param.setDestinationType(null);
             param.setDestination(image); // Must be after setDestinationType.
             param.setDestinationOffset(destinationOffset);
-            param.setSourceRegion(sourceTileRegion);
+            param.setSourceRegion(regionToRead);
+            param.setSourceSubsampling(xSubsampling / pixelSize.width,
+                                       ySubsampling / pixelSize.height, 0, 0);
             if (param.canSetSourceRenderSize()) {
                 param.setSourceRenderSize(null); // TODO.
             }
             final ImageReader reader = tile.getPreparedReader(true, true);
-            final BufferedImage output = reader.read(imageIndex, param);
+            /*
+             * Adds a row in the table to be logged (if logable) and process to the reading.
+             */
+            if (table != null) {
+                table.write(Tile.toString(reader));
+                table.nextColumn();
+                table.write(tile.getInputString());
+                format(table, regionToRead.width,  regionToRead.height);
+                format(table, regionToRead.x,      regionToRead.y);
+                format(table, destinationOffset.x, destinationOffset.y);
+                format(table, param.getSourceXSubsampling(), param.getSourceYSubsampling());
+                table.nextLine();
+            }
+            final BufferedImage output;
+            try {
+                output = reader.read(imageIndex, param);
+            } catch (IOException exception) {
+                failure = exception;
+                break;
+            } catch (RuntimeException exception) {
+                failure = exception;
+                break;
+            }
             if (output != image) {
                 /*
                  * The read operation ignored our destination image. Copy the pixels (slower)
                  * (todo: not yet implemented).
                  */
-                throw new IIOException("Not yet implemented.");
+                failure = new IIOException("Not yet implemented.");
+                break;
+            }
+        }
+        /*
+         * Finished the read operation, either on success of failure. Sends the log before
+         * to throw the exception, so developpers can inspect the log in order to see what
+         * has been read so far.
+         */
+        if (table != null) {
+            table.writeHorizontalSeparator();
+            final StringBuilder message = new StringBuilder("Loading ").append(tiles.size())
+                    .append(" tiles").append(System.getProperty("line.separator", "\n"))
+                    .append(table);
+            if (failure != null) {
+                message.append("Failed before completion with ").append(failure);
+            }
+            final LogRecord record = new LogRecord(level, message.toString());
+            record.setSourceClassName(MosaicImageReader.class.getName());
+            record.setSourceMethodName("read");
+            logger.log(record);
+        }
+        if (failure != null) {
+            if (failure instanceof IOException) {
+                throw (IOException) failure;
+            } else {
+                throw (RuntimeException) failure;
             }
         }
         return image;
@@ -668,6 +786,36 @@ public class MosaicImageReader extends ImageReader {
         final ImageReadParam param = getDefaultReadParam();
         param.setSourceRegion(sourceRegion);
         return read(imageIndex, param);
+    }
+
+    /**
+     * Returns the logging level for tile information during reads.
+     */
+    public Level getLogLevel() {
+        return level;
+    }
+
+    /**
+     * Sets the logging level for tile information during reads. The default
+     * value is {@link Level#FINE}. A {@code null} value restore the default.
+     */
+    public void setLogLevel(Level level) {
+        if (level == null) {
+            level = Level.FINE;
+        }
+        this.level = level;
+    }
+
+    /**
+     * Formats a (x,y) value pair. A call to {@link TableWriter#nextColumn} is performed first.
+     */
+    private static void format(final TableWriter table, final int x, final int y) {
+        table.nextColumn();
+        table.write('(');
+        table.write(String.valueOf(x));
+        table.write(',');
+        table.write(String.valueOf(y));
+        table.write(')');
     }
 
     /**
@@ -725,7 +873,7 @@ public class MosaicImageReader extends ImageReader {
         /**
          * The default instance.
          */
-        static final Spi DEFAULT = new Spi();
+        public static final Spi DEFAULT = new Spi();
 
         /**
          * Creates a default provider.

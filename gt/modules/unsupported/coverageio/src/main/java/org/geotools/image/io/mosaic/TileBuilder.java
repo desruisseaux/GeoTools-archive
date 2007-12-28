@@ -666,4 +666,14 @@ public class TileBuilder {
     private static boolean redo(final Dimension size) {
         return true;
     }
+
+    /**
+     * Returns a string representation of the tiles contained in this object.
+     */
+    @Override
+    public String toString() {
+        final List<Tile> tiles = new ArrayList<Tile>(this.tiles.values());
+        Collections.sort(tiles);
+        return Tile.toString(tiles);
+    }
 }
