@@ -200,6 +200,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 */
 	private int maxAllowedTiles = ((Integer) ImageMosaicFormat.MAX_ALLOWED_TILES
 			.getDefaultValue()).intValue();
+
+	private String locationAttributeName="location";
 	/**
 	 * COnstructor.
 	 * 
@@ -219,12 +221,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			this.hints= new Hints();	
 		if (hints != null) {
 			// prevent the use from reordering axes
-			this.hints.add(hints);
+			this.hints.add(uHints);
 		}
 		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
 		//set the maximum number of tile to load
 		if(this.hints.containsKey(Hints.MAX_ALLOWED_TILES))
 			this.maxAllowedTiles=((Integer)this.hints.get(Hints.MAX_ALLOWED_TILES)).intValue();
+		if(this.hints.containsKey(Hints.MOSAIC_LOCATION_ATTRIBUTE))
+			this.locationAttributeName=((String)this.hints.get(Hints.MOSAIC_LOCATION_ATTRIBUTE));
 		
 
 		// /////////////////////////////////////////////////////////////////////
@@ -293,6 +297,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		typeName = typeNames[0];
 		featureSource = tileIndexStore.getFeatureSource(typeName);
+		if(featureSource.getSchema().getAttribute(this.locationAttributeName)==null)
+			throw new DataSourceException("The provided name for the location attribute is invalid.");
 
 		// //
 		//
@@ -867,7 +873,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				//
 				// /////////////////////////////////////////////////////////////////////
 				final SimpleFeature feature = (SimpleFeature) it.next();
-				location = (String) feature.getAttribute("location");
+				location = (String) feature.getAttribute(this.locationAttributeName);
 				final ReferencedEnvelope bound = ReferencedEnvelope
 						.reference(feature.getBounds());
 

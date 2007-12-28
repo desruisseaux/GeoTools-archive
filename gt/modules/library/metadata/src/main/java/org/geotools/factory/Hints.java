@@ -644,6 +644,14 @@ public final class Hints extends RenderingHints {
 	 */
     public static final Key MAX_ALLOWED_TILES = new Key(Integer.class);
     
+	/**
+	 * Key to control the namee of the attribute that contains the location for
+	 * the tiles in the mosaic index.
+	 * 
+	 * @since 2.5
+	 */
+    public static final Key MOSAIC_LOCATION_ATTRIBUTE = new Key(String.class);
+    
     /**
      * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to read
      * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model,
