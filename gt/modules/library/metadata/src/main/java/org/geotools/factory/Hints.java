@@ -634,7 +634,16 @@ public final class Hints extends RenderingHints {
      * @deprecated use the correct {@link #OVERVIEW_POLICY} instead.
      */
     public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
-
+    
+	/**
+	 * Key to control the max allowed number of tiles that we will load.
+	 * 
+	 * If this number is exceeded, i.e. we request an area which is too large
+	 * instead of getting stuck with opening thousands of files we throw an error.
+	 * @since 2.5
+	 */
+    public static final Key MAX_ALLOWED_TILES = new Key(Integer.class);
+    
     /**
      * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to read
      * the image using the JAI ImageRead operation (leveraging on Deferred Execution Model,

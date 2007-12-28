@@ -25,7 +25,6 @@ import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
@@ -41,11 +40,9 @@ import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -62,7 +59,6 @@ import javax.media.jai.ROI;
 import javax.media.jai.TileCache;
 import javax.media.jai.operator.ConstantDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
-import javax.media.jai.operator.PatternDescriptor;
 
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -186,13 +182,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	/** {@link FeatureSource} for the shape index. */
 	private final FeatureSource featureSource;
 
-	/**
-	 * This {@link BufferedImage} is cached in memory since it is used whenever
-	 * I need to build up a fake mosaic. TODO should be parametric and probably
-	 * somehow static
-	 */
-	private final BufferedImage unavailableImage;
-
 	private boolean expandMe;
 
 	/**
@@ -201,15 +190,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 */
 	private boolean absolutePath;
 
+
 	/**
 	 * Max number of tiles that this plugin will load.
 	 * 
 	 * If this number is exceeded, i.e. we request an area which is too large
-	 * instead of getting stuck ith opening thousands of files I give you back a
-	 * fake coverage. TODO should be parametric
+	 * instead of getting stuck with opening thousands of files I give you back a
+	 * fake coverage. 
 	 */
-	public static final int MAX_TILES = 1000000;
-
+	private int maxAllowedTiles = ((Integer) ImageMosaicFormat.MAX_ALLOWED_TILES
+			.getDefaultValue()).intValue();
 	/**
 	 * COnstructor.
 	 * 
@@ -232,7 +222,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			this.hints.add(hints);
 		}
 		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
-
+		//set the maximum number of tile to load
+		if(this.hints.containsKey(Hints.MAX_ALLOWED_TILES))
+			this.maxAllowedTiles=((Integer)this.hints.get(Hints.MAX_ALLOWED_TILES)).intValue();
+		
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -348,9 +341,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// property file
 		loadProperties();
 
-		// load the unavailaible pattern
-		unavailableImage = ImageIO
-				.read(this.getClass().getResource("unav.png"));
 	}
 
 	/**
@@ -483,6 +473,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
 		boolean blend = false;
+		int maxNumTiles=this.maxAllowedTiles;
 		String overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
@@ -529,7 +520,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 						.getName().toString())) {
 					overviewPolicy=param.stringValue();
 					continue;
-				}					
+				}	
+				if (name.equals(ImageMosaicFormat.MAX_ALLOWED_TILES
+						.getName().toString())) {
+					maxNumTiles=param.intValue();
+					continue;
+				}	
+				
 			}
 		}
 		// /////////////////////////////////////////////////////////////////////
@@ -539,7 +536,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		return loadTiles(requestedEnvelope, inputTransparentColor,
 				outputTransparentColor, inputImageThreshold, dim, blend,
-				overviewPolicy);
+				overviewPolicy,maxNumTiles);
 	}
 
 	/**
@@ -565,6 +562,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 *            instead of the classic
 	 *            {@link MosaicDescriptor#MOSAIC_TYPE_OVERLAY}.
 	 * @param overviewPolicy 
+	 * @param maxNumTiles 
 	 * @return a {@link GridCoverage2D} matching as close as possible the
 	 *         requested {@link GeneralEnvelope} and <code>pixelDimension</code>,
 	 *         or null in case nothing existed in the requested area.
@@ -573,7 +571,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private GridCoverage loadTiles(GeneralEnvelope requestedOriginalEnvelope,
 			Color transparentColor, Color outputTransparentColor,
 			double inputImageThresholdValue, Rectangle pixelDimension,
-			boolean fading, String overviewPolicy) throws IOException {
+			boolean fading, String overviewPolicy, int maxNumTiles) throws IOException {
 
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER
@@ -676,18 +674,18 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// do we have any feature to load
 		final Iterator<SimpleFeature> it = features.iterator();
 		if (!it.hasNext())
-			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+			throw new DataSourceException("No data was found to match the actual request");
 		final int size = features.size();
-		if (size > MAX_TILES) {
+		if (size > maxNumTiles) {
 			LOGGER
 					.warning(new StringBuffer("We can load at most ")
-							.append(MAX_TILES)
+							.append(maxNumTiles)
 							.append(" tiles while there were requested ")
 							.append(features)
 							.append(
 									"\nI am going to print out a fake coverage, sorry about it!")
 							.toString());
-			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+			throw new DataSourceException("The maximum allowed number of tiles to be loaded was exceeded.");
 		}
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("We have " + size + " tiles to load");
@@ -703,33 +701,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	}
 
-	/**
-	 * Builds up a fake mosaic that consists of a transparent image with a red
-	 * cross.
-	 * 
-	 * <p>
-	 * The purpose of the fake mosaic
-	 * 
-	 * @param requestedEnvelope
-	 *            is the envelope requested by the user.
-	 * @param dim
-	 *            indicates the requested dimension for this
-	 *            {@link GridCoverage2D} in terms of pixels.
-	 * @param features
-	 *            is the number of features touching the requsted envelope.
-	 * @return a {@link GridCoverage2D}. TODO this could be static or somehow
-	 *         cached since {@link GridCoverage}s are read only
-	 */
-	private GridCoverage fakeMosaic(GeneralEnvelope requestedEnvelope,
-			Rectangle dim) {
-
-		return coverageFactory.create(coverageName, PatternDescriptor.create(
-				unavailableImage, new Integer(dim.width), new Integer(
-						dim.height), ImageUtilities.NOCACHE_HINT),
-				requestedEnvelope);
-
-	}
-	
 	private GridCoverage background(GeneralEnvelope requestedEnvelope, Rectangle dim, Color 
 	        outputTransparentColor) {
 	    if(outputTransparentColor == null)
