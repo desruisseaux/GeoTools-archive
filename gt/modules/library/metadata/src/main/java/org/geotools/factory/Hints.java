@@ -631,6 +631,7 @@ public final class Hints extends RenderingHints {
      * object during a read. This hints also implied that no decimation on reading is performed.
      *
      * @since 2.3
+     * @deprecated use the correct {@link #OVERVIEW_POLICY} instead.
      */
     public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
 
@@ -650,11 +651,18 @@ public final class Hints extends RenderingHints {
      * @since 2.5
      */
     public static final String VALUE_OVERVIEW_POLICY_QUALITY = "Quality";
-
+    
     /**
-     * Overview policy, will choose the overview with with the resolution closest to the one used
+     * Overview policy, will ignore the overviews.
+     * 
+     * @since 2.5
+     */
+    public static final String VALUE_OVERVIEW_POLICY_IGNORE = "Ignore";
+    
+    /**
+     * Overview policy, will choose the overview with with the resolution closest to the one used 
      * for rendering
-     *
+     * 
      * @since 2.5
      */
     public static final String VALUE_OVERVIEW_POLICY_NEAREST = "Nearest";
@@ -677,8 +685,8 @@ public final class Hints extends RenderingHints {
      * @since 2.5
      */
     public static final OptionKey OVERVIEW_POLICY = new OptionKey(VALUE_OVERVIEW_POLICY_QUALITY,
-            VALUE_OVERVIEW_POLICY_NEAREST, VALUE_OVERVIEW_POLICY_SPEED);
-
+            VALUE_OVERVIEW_POLICY_NEAREST, VALUE_OVERVIEW_POLICY_SPEED,VALUE_OVERVIEW_POLICY_IGNORE);
+    
 
     /**
      * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage

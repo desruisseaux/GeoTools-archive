@@ -163,6 +163,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	// old support methods
 	//
 	// -------------------------------------------------------------------------
+	
 	/**
 	 * This method is responsible for preparing the read param for doing an
 	 * {@link ImageReader#read(int, ImageReadParam)}.
@@ -176,6 +177,12 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * resolution. It also returns and {@link Integer} representing the index of
 	 * the raster to be read when dealing with multipage raster.
 	 * 
+	 * @param overviewPolicy
+	 *            it can be one of {@link Hints#VALUE_OVERVIEW_POLICY_IGNORE},
+	 *            {@link Hints#VALUE_OVERVIEW_POLICY_NEAREST},
+	 *            {@link Hints#VALUE_OVERVIEW_POLICY_QUALITY} or
+	 *            {@link Hints#VALUE_OVERVIEW_POLICY_SPEED}. It specifies the
+	 *            policy to compute the overviews level upon request.
 	 * @param readP
 	 *            an instance of {@link ImageReadParam} for setting the
 	 *            subsampling factors.
@@ -187,36 +194,56 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @throws IOException
 	 * @throws TransformException
 	 */
-	protected Integer setReadParams(ImageReadParam readP,
+	protected Integer setReadParams(String overviewPolicy,ImageReadParam readP,
 			GeneralEnvelope requestedEnvelope, Rectangle requestedDim)
 			throws IOException, TransformException {
-
-		readP.setSourceSubsampling(1, 1, 0, 0);// default values for
-		// subsampling
+		
+		// //
+		//
+		// Init overview policy
+		//
+		// //
+		// when policy is explictly provided it overrides the policy provided
+		// using hints.
+		if(overviewPolicy==null||overviewPolicy.length()==0)
+		{
+			// check if a policy was provided using hints (check even the
+			// deprecated one)
+			if (this.hints != null)
+				if (this.hints.containsKey(Hints.OVERVIEW_POLICY))
+					overviewPolicy = (String) this.hints
+							.get(Hints.OVERVIEW_POLICY);
+				else if (this.hints.containsKey(Hints.IGNORE_COVERAGE_OVERVIEW))
+					overviewPolicy = ((Boolean) this.hints
+							.get(Hints.IGNORE_COVERAGE_OVERVIEW))
+							.booleanValue() ? Hints.VALUE_OVERVIEW_POLICY_IGNORE
+							: hints.VALUE_OVERVIEW_POLICY_QUALITY;
+			
+			//use default if not provided
+			if(overviewPolicy==null||overviewPolicy.length()==0)
+				overviewPolicy=Hints.VALUE_OVERVIEW_POLICY_QUALITY;
+		}
+		
+		
+		
+		// default values for subsampling
+		readP.setSourceSubsampling(1, 1, 0, 0);
 		// //
 		//
 		// Default image index 0
 		//
 		// //
 		Integer imageChoice = new Integer(0);
+		if (overviewPolicy.equalsIgnoreCase(Hints.VALUE_OVERVIEW_POLICY_IGNORE))
+			return imageChoice;
 
 		// we are able to handle overviews properly only if the transformation
-		// is
-		// an affine transform with pure scale and translation, no rotational
+		// is  an affine transform with pure scale and translation, no rotational
 		// components
 		if (raster2Model != null && !isScaleTranslate(raster2Model))
 			return imageChoice;
 
-		// //
-		//
-		// Check Hint to ignore overviews
-		//
-		// //
-		Object o = hints.get(Hints.IGNORE_COVERAGE_OVERVIEW);
-		if (o != null && ((Boolean) o).booleanValue()) {
-			return imageChoice;
 
-		}
 
 		// //
 		//
@@ -244,7 +271,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		//
 		// //
 		if (!decimate) {
-			return getOverviewImage(null, requestedRes);
+			return getOverviewImage(overviewPolicy, requestedRes);
 		} else {
     		// /////////////////////////////////////////////////////////////////////
     		// DECIMATION ON READING
@@ -253,18 +280,64 @@ public abstract class AbstractGridCoverage2DReader implements
     		return imageChoice;
 		}
 	}
+	
+	/**
+	 * This method is responsible for preparing the read param for doing an
+	 * {@link ImageReader#read(int, ImageReadParam)}.
+	 * 
+	 * 
+	 * <p>
+	 * This method is responsible for preparing the read param for doing an
+	 * {@link ImageReader#read(int, ImageReadParam)}. It sets the passed
+	 * {@link ImageReadParam} in terms of decimation on reading using the
+	 * provided requestedEnvelope and requestedDim to evaluate the needed
+	 * resolution. It also returns and {@link Integer} representing the index of
+	 * the raster to be read when dealing with multipage raster.
+	 * 
+	 * @param readP
+	 *            an instance of {@link ImageReadParam} for setting the
+	 *            subsampling factors.
+	 * @param requestedEnvelope
+	 *            the {@link GeneralEnvelope} we are requesting.
+	 * @param requestedDim
+	 *            the requested dimensions.
+	 * @return the index of the raster to read in the underlying data source.
+	 * @throws IOException
+	 * @throws TransformException
+	 * @deprecated use
+	 *             {@link #setReadParams(String, ImageReadParam, GeneralEnvelope, Rectangle)}
+	 *             instead and set the policy for overviews.
+	 */
+	protected Integer setReadParams(ImageReadParam readP,
+			GeneralEnvelope requestedEnvelope, Rectangle requestedDim)
+			throws IOException, TransformException {
+
+		// //
+		//
+		// Check Hint to ignore overviews
+		//
+		// //
+		Object o = hints.get(Hints.IGNORE_COVERAGE_OVERVIEW);
+		if (o != null && ((Boolean) o).booleanValue()) {
+			return setReadParams(Hints.VALUE_OVERVIEW_POLICY_IGNORE, readP, requestedEnvelope, requestedDim);
+
+		}
+		return setReadParams(Hints.VALUE_OVERVIEW_POLICY_QUALITY, readP, requestedEnvelope, requestedDim);
+		
+	}
 
 	private Integer getOverviewImage(String policy, double[] requestedRes) {
 	    // setup policy
         if(policy == null) {
             policy = (String) hints.get(Hints.OVERVIEW_POLICY);
             if(policy == null)
+            	//defaul policy
                 policy = Hints.VALUE_OVERVIEW_POLICY_NEAREST;
         }
         
         // sort resolutions from smallest pixels (higher res) to biggest pixels (higher res)
         // keeping a reference to the original image choice
-        List resolutions = new ArrayList();
+        final List<Resolution> resolutions = new ArrayList<Resolution>();
         for (int i = 0; i < overViewResolutions.length; i++) {
             resolutions.add(new Resolution(overViewResolutions[i][0], overViewResolutions[i][1], i));
         }
@@ -273,7 +346,7 @@ public abstract class AbstractGridCoverage2DReader implements
         // Now search for the best matching resolution. 
         // Check also for the "perfect match"... unlikely in practice unless someone
         // tunes the clients to request exactly the resolution embedded in
-        // the overviews, something a perf sensitive person might do in fact)
+        // the overviews, something a perf sensitive person might do in fact
         
         // the requested resolutions
         final double reqx = requestedRes[0];
@@ -321,9 +394,11 @@ public abstract class AbstractGridCoverage2DReader implements
     }
 	
 	/**
-	 * Simple support class for sorting orerview resolutions
+	 * Simple support class for sorting overview resolutions
+	 * @author Andrea Aime
+	 * @since 2.5
 	 */
-	private static class Resolution implements Comparable {
+	private static class Resolution implements Comparable<Resolution> {
 	    double x;
 	    double y;
 	    int imageChoice;
@@ -335,8 +410,7 @@ public abstract class AbstractGridCoverage2DReader implements
             this.imageChoice = imageChoice;
         }
 	    
-	    public int compareTo(Object o) {
-	        Resolution other = (Resolution) o;
+	    public int compareTo(Resolution other) {
 	        if(x > other.x)
 	            return 1;
 	        else if(x < other.x)
@@ -357,9 +431,9 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * This method is responsible for evaluating possible subsampling factors
 	 * once the best resolution level has been found, in case we have support
 	 * for overviews, or starting from the original coverage in case there are
-	 * no overviews availaible.
+	 * no overviews available.
 	 * 
-	 * Anyhow this methof should not be called directly but subclasses should
+	 * Anyhow this method should not be called directly but subclasses should
 	 * make use of the setReadParams method instead in order to transparently
 	 * look for overviews.
 	 * 

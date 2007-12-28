@@ -69,7 +69,7 @@ public abstract class AbstractGridFormat implements Format {
 	 * "version" value type=String Naturally, any methods that are overridden
 	 * need not have an entry in the Map
 	 */
-	protected Map mInfo;
+	protected Map<String,String> mInfo;
 
 	/**
 	 * {@link ParameterValueGroup} that controls the reading process for a
@@ -131,8 +131,23 @@ public abstract class AbstractGridFormat implements Format {
      * Tile Caching,...), or the direct {@code ImageReader}'s read methods.
 	 */
 	public static final DefaultParameterDescriptor USE_JAI_IMAGEREAD = new DefaultParameterDescriptor(
-			"UseJaiImageRead", Boolean.class, null, null);
+			Hints.USE_JAI_IMAGEREAD.toString(), Boolean.class, new Boolean[] {
+					Boolean.TRUE, Boolean.FALSE }, Boolean.TRUE);
 	
+	/**
+	 * This {@link GeneralParameterValue} can be provided to the
+	 * {@link GridCoverageReader}s through the
+	 * {@link GridCoverageReader#read(GeneralParameterValue[])} method in order
+	 * to specify the policy a reader should adopt when chhosing the right
+	 * overview during a read operation.
+	 */
+	public static final DefaultParameterDescriptor OVERVIEW_POLICY = new DefaultParameterDescriptor(
+			Hints.OVERVIEW_POLICY.toString(), String.class, new String[] {
+					Hints.VALUE_OVERVIEW_POLICY_IGNORE,
+					Hints.VALUE_OVERVIEW_POLICY_NEAREST,
+					Hints.VALUE_OVERVIEW_POLICY_QUALITY,
+					Hints.VALUE_OVERVIEW_POLICY_SPEED },
+			Hints.VALUE_OVERVIEW_POLICY_QUALITY);
 	
 	/**
 	 * @see org.opengis.coverage.grid.Format#getName()

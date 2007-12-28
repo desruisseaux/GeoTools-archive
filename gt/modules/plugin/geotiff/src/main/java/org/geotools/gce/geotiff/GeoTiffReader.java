@@ -55,7 +55,6 @@ import javax.media.jai.JAI;
 
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
@@ -64,7 +63,6 @@ import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.coverage.grid.Format;
@@ -73,6 +71,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -343,6 +342,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
+		String overviewPolicy=null;
 		if (params != null) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -351,8 +351,9 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
 				for (int i = 0; i < params.length; i++) {
-					final Parameter param = (Parameter) params[i];
-					if (param.getDescriptor().getName().getCode().equals(
+					final ParameterValue param = (ParameterValue) params[i];
+					final String name = param.getDescriptor().getName().getCode();
+					if (name.equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {
 						final GridGeometry2D gg = (GridGeometry2D) param
@@ -360,7 +361,13 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 						requestedEnvelope = new GeneralEnvelope((Envelope) gg
 								.getEnvelope2D());
 						dim = gg.getGridRange2D().getBounds();
+						continue;
 					}
+					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+							.getName().toString())) {
+						overviewPolicy=param.stringValue();
+						continue;
+					}					
 				}
 			}
 		}
@@ -372,7 +379,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		Integer imageChoice = new Integer(0);
 		final ImageReadParam readP = new ImageReadParam();
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, dim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, dim);
 		} catch (TransformException e) {
 			new DataSourceException(e);
 		}

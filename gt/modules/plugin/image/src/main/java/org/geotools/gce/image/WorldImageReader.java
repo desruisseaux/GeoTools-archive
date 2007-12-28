@@ -40,7 +40,6 @@ import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -52,21 +51,19 @@ import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.matrix.AffineTransform2D;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.Envelope;
-import org.opengis.geometry.MismatchedDimensionException;
 
 /**
  * Reads a GridCoverage from a given source. WorldImage sources only support one
@@ -367,11 +364,12 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// do we have paramters to use for reading from the specified source
+		// do we have parameters to use for reading from the specified source
 		//
 		// /////////////////////////////////////////////////////////////////////
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
+		String overviewPolicy=null;
 		if (params != null) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -380,8 +378,9 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
 				for (int i = 0; i < params.length; i++) {
-					final Parameter param = (Parameter) params[i];
-					if (param.getDescriptor().getName().getCode().equals(
+					final ParameterValue param = (ParameterValue) params[i];
+					final String name = param.getDescriptor().getName().getCode();
+					if (name.equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {
 						final GridGeometry2D gg = (GridGeometry2D) param
@@ -389,11 +388,16 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 						requestedEnvelope = new GeneralEnvelope((Envelope) gg
 								.getEnvelope2D());
 						dim = gg.getGridRange2D().getBounds();
+						continue;
 					}
+					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+							.getName().toString())) {
+						overviewPolicy=param.stringValue();
+						continue;
+					}					
 				}
 			}
 		}
-
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// set params
@@ -403,7 +407,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		final ImageReadParam readP = new ImageReadParam();
 		if (!wmsRequest) {
 			try {
-				imageChoice = setReadParams(readP, requestedEnvelope, dim);
+				imageChoice = setReadParams(overviewPolicy,readP, requestedEnvelope, dim);
 			} catch (TransformException e) {
 				new DataSourceException(e);
 			}

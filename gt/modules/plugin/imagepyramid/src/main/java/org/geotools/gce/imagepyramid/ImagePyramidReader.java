@@ -49,11 +49,11 @@ import org.geotools.gce.imagemosaic.ImageMosaicReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.util.SoftValueHashMap;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
@@ -121,7 +121,8 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
 	/** Logger. */
-	private final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(ImagePyramidReader.class.toString());
+	private final static Logger LOGGER = org.geotools.util.logging.Logging
+			.getLogger(ImagePyramidReader.class.toString());
 
 	/**
 	 * The input properties file to read the pyramid information from.
@@ -158,13 +159,12 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		//
 		// //
 		if (this.hints == null)
-			this.hints= new Hints();	
+			this.hints = new Hints();
 		if (hints != null) {
 			// prevent the use from reordering axes
 			this.hints.add(hints);
 		}
-		this.coverageFactory= FactoryFinder.getGridCoverageFactory(this.hints);
-		
+		this.coverageFactory = FactoryFinder.getGridCoverageFactory(this.hints);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -177,7 +177,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					"ImagePyramidReader:No source set to read this coverage.");
 			throw new DataSourceException(ex);
 		}
-		this.source = source;		
+		this.source = source;
 		if (source instanceof File)
 			this.sourceFile = ((File) source);
 		else if (source instanceof URL) {
@@ -262,14 +262,14 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * geographic extent and overviews.
 	 * 
 	 * @param sourceFile
-	 * @throws IOException 
+	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
 	private void parseMainFile(final File sourceFile) throws IOException {
 		BufferedInputStream propertyStream = null;
 		try {
-			propertyStream = new BufferedInputStream(
-			new FileInputStream(sourceFile));
+			propertyStream = new BufferedInputStream(new FileInputStream(
+					sourceFile));
 			final Properties properties = new Properties();
 			properties.load(propertyStream);
 
@@ -320,10 +320,10 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					(int) Math.round(originalEnvelope.getLength(1)
 							/ highestRes[1])));
 		} catch (IOException e) {
-			//close input stream
-			if(propertyStream!=null)
+			// close input stream
+			if (propertyStream != null)
 				propertyStream.close();
-			//re-throw exception
+			// re-throw exception
 			throw e;
 		}
 
@@ -359,28 +359,34 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 */
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
 
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Checking params
-		//
-		// /////////////////////////////////////////////////////////////////////
-
-		ParameterValue param = null;
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
-
+		String overviewPolicy=null;
 		if (params != null) {
-			final int length = params.length;
-			for (int i = 0; i < length; i++) {
-				param = (ParameterValue) params[i];
-
-				if (param.getDescriptor().getName().getCode().equals(
-						ImagePyramidFormat.READ_GRIDGEOMETRY2D.getName()
-								.toString())) {
-					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
-					requestedEnvelope = (GeneralEnvelope) gg.getEnvelope();
-					dim = gg.getGridRange2D().getBounds();
-
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// Checking params
+			//
+			// /////////////////////////////////////////////////////////////////////
+			if (params != null) {
+				for (int i = 0; i < params.length; i++) {
+					final ParameterValue param = (ParameterValue) params[i];
+					final String name = param.getDescriptor().getName()
+							.getCode();
+					if (name.equals(AbstractGridFormat.READ_GRIDGEOMETRY2D
+							.getName().toString())) {
+						final GridGeometry2D gg = (GridGeometry2D) param
+								.getValue();
+						requestedEnvelope = new GeneralEnvelope((Envelope)gg
+								.getEnvelope2D());
+						dim = gg.getGridRange2D().getBounds();
+						continue;
+					}
+					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+							.getName().toString())) {
+						overviewPolicy = param.stringValue();
+						continue;
+					}
 				}
 			}
 		}
@@ -389,7 +395,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		// Loading tiles
 		//
 		// /////////////////////////////////////////////////////////////////////
-		return loadTiles(requestedEnvelope, dim, params);
+		return loadTiles(requestedEnvelope, dim, params, overviewPolicy);
 	}
 
 	/**
@@ -402,11 +408,13 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @param singleImageROI
 	 * @param dim
 	 * @param params
+	 * @param overviewPolicy 
 	 * @return A {@link GridCoverage}, well actually a {@link GridCoverage2D}.
 	 * @throws IOException
 	 */
 	private GridCoverage loadTiles(GeneralEnvelope requestedEnvelope,
-			Rectangle dim, GeneralParameterValue[] params) throws IOException {
+			Rectangle dim, GeneralParameterValue[] params, String overviewPolicy)
+			throws IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -424,8 +432,8 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 				try {
 					// transforming the envelope back to the data set crs
 					final MathTransform transform = CRS.findMathTransform(
-							requestedEnvelope
-									.getCoordinateReferenceSystem(), crs);
+							requestedEnvelope.getCoordinateReferenceSystem(),
+							crs);
 					if (!transform.isIdentity()) {
 						requestedEnvelope = CRS.transform(transform,
 								requestedEnvelope);
@@ -435,9 +443,8 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 						if (LOGGER.isLoggable(Level.FINE))
 							LOGGER.fine(new StringBuffer(
 									"Reprojected envelope ").append(
-											requestedEnvelope.toString())
-									.append(" crs ").append(crs.toWKT())
-									.toString());
+									requestedEnvelope.toString()).append(
+									" crs ").append(crs.toWKT()).toString());
 					}
 				} catch (TransformException e) {
 					throw new DataSourceException(
@@ -460,7 +467,8 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		requestedEnvelope.setCoordinateReferenceSystem(this.crs);
 		// ok we got something to return
 		try {
-			return loadRequestedTiles(requestedEnvelope, dim, params);
+			return loadRequestedTiles(requestedEnvelope, dim, params,
+					overviewPolicy);
 		} catch (TransformException e) {
 			throw new DataSourceException(e);
 		}
@@ -477,6 +485,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @param singleImageROI
 	 * @param singleImageROIThreshold
 	 * @param dim
+	 * @param overviewPolicy 
 	 * @param ggParam
 	 * @return A {@link GridCoverage}, well actually a {@link GridCoverage2D}.
 	 * @throws TransformException
@@ -487,7 +496,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @throws FactoryRegistryException
 	 */
 	private GridCoverage loadRequestedTiles(GeneralEnvelope requestedEnvelope,
-			Rectangle dim, GeneralParameterValue[] params)
+			Rectangle dim, GeneralParameterValue[] params, String overviewPolicy)
 			throws TransformException, IOException {
 
 		// if we get here we have something to load
@@ -499,7 +508,8 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		if (dim != null)
-			imageChoice = setReadParams(readP, requestedEnvelope, dim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, dim);
 		else
 			imageChoice = new Integer(0);
 		// /////////////////////////////////////////////////////////////////////

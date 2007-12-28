@@ -64,7 +64,6 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.ReferencingFactoryContainer;
@@ -72,14 +71,15 @@ import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.Envelope;
 
 import com.sun.media.imageio.stream.RawImageInputStream;
 import com.sun.media.imageioimpl.plugins.raw.RawImageReader;
@@ -316,11 +316,12 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 			throws java.lang.IllegalArgumentException, java.io.IOException {
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// do we have paramters to use for reading from the specified source
+		// do we have parameters to use for reading from the specified source
 		//
 		// /////////////////////////////////////////////////////////////////////
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
+		String overviewPolicy=null;
 		if (params != null) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -328,12 +329,10 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 			//
 			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
-				Parameter param;
-				final int length = params.length;
-				for (int i = 0; i < length; i++) {
-					param = (Parameter) params[i];
-
-					if (param.getDescriptor().getName().getCode().equals(
+				for (int i = 0; i < params.length; i++) {
+					final ParameterValue param = (ParameterValue) params[i];
+					final String name = param.getDescriptor().getName().getCode();
+					if (name.equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {
 						final GridGeometry2D gg = (GridGeometry2D) param
@@ -341,7 +340,13 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 						requestedEnvelope = new GeneralEnvelope((Envelope) gg
 								.getEnvelope2D());
 						dim = gg.getGridRange2D().getBounds();
+						continue;
 					}
+					if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+							.getName().toString())) {
+						overviewPolicy=param.stringValue();
+						continue;
+					}					
 				}
 			}
 		}
@@ -351,7 +356,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		// Building the required coverage
 		//
 		// /////////////////////////////////////////////////////////////////////
-		return getGridCoverage(requestedEnvelope, dim);
+		return getGridCoverage(requestedEnvelope, dim,overviewPolicy);
 	}
 
 	/**
@@ -405,6 +410,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @param dim
 	 * @param requestedEnvelope
+	 * @param overviewPolicy 
 	 * 
 	 * @return the GridCoverage object
 	 * 
@@ -412,7 +418,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 *             if an error occurs
 	 */
 	private GridCoverage2D getGridCoverage(GeneralEnvelope requestedEnvelope,
-			Rectangle dim) throws IOException {
+			Rectangle dim, String overviewPolicy) throws IOException {
 		int hrWidth = originalGridRange.getLength(0);
 		int hrHeight = originalGridRange.getLength(1);
 
@@ -426,7 +432,8 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, dim);
+			imageChoice = setReadParams(overviewPolicy, readP,
+					requestedEnvelope, dim);
 		} catch (TransformException e) {
 			throw new DataSourceException(e);
 		}

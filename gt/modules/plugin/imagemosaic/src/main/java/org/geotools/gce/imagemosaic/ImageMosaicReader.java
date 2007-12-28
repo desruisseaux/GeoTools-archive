@@ -479,42 +479,56 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				.getDefaultValue();
 		double inputImageThreshold = ((Double) ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
 				.getDefaultValue()).doubleValue();
-		ParameterValue param = null;
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
 		boolean blend = false;
+		String overviewPolicy=null;
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
-				param = (ParameterValue) params[i];
-
-				if (param.getDescriptor().getName().getCode().equals(
+				final ParameterValue param = (ParameterValue) params[i];
+				final String name = param.getDescriptor().getName().getCode();
+				if (name.equals(
 						ImageMosaicFormat.READ_GRIDGEOMETRY2D.getName()
 								.toString())) {
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
 					requestedEnvelope = (GeneralEnvelope) gg.getEnvelope();
 					dim = gg.getGridRange2D().getBounds();
-				} else if (param.getDescriptor().getName().getCode().equals(
+					continue;
+				} 
+				if (name.equals(
 						ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName()
 								.toString())) {
 					inputTransparentColor = (Color) param.getValue();
+					continue;
 
-				} else if (param.getDescriptor().getName().getCode().equals(
+				} 
+				if (name.equals(
 						ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE.getName()
 								.toString())) {
 					inputImageThreshold = ((Double) param.getValue())
 							.doubleValue();
+					continue;
 
-				} else if (param.getDescriptor().getName().getCode().equals(
+				} 
+				if (name.equals(
 						ImageMosaicFormat.FADING.getName().toString())) {
 					blend = ((Boolean) param.getValue()).booleanValue();
+					continue;
 
-				} else if (param.getDescriptor().getName().getCode().equals(
+				} 
+				if (name.equals(
 						ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName()
 								.toString())) {
 					outputTransparentColor = (Color) param.getValue();
+					continue;
 
 				}
+				if (name.equals(AbstractGridFormat.OVERVIEW_POLICY
+						.getName().toString())) {
+					overviewPolicy=param.stringValue();
+					continue;
+				}					
 			}
 		}
 		// /////////////////////////////////////////////////////////////////////
@@ -523,7 +537,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		return loadTiles(requestedEnvelope, inputTransparentColor,
-				outputTransparentColor, inputImageThreshold, dim, blend);
+				outputTransparentColor, inputImageThreshold, dim, blend,
+				overviewPolicy);
 	}
 
 	/**
@@ -548,6 +563,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 *            tells to ask for {@link MosaicDescriptor#MOSAIC_TYPE_BLEND}
 	 *            instead of the classic
 	 *            {@link MosaicDescriptor#MOSAIC_TYPE_OVERLAY}.
+	 * @param overviewPolicy 
 	 * @return a {@link GridCoverage2D} matching as close as possible the
 	 *         requested {@link GeneralEnvelope} and <code>pixelDimension</code>,
 	 *         or null in case nothing existed in the requested area.
@@ -556,7 +572,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private GridCoverage loadTiles(GeneralEnvelope requestedOriginalEnvelope,
 			Color transparentColor, Color outputTransparentColor,
 			double inputImageThresholdValue, Rectangle pixelDimension,
-			boolean fading) throws IOException {
+			boolean fading, String overviewPolicy) throws IOException {
 
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER
@@ -678,7 +694,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			return loadRequestedTiles(requestedOriginalEnvelope,
 					intersectionEnvelope, transparentColor,
 					outputTransparentColor, intersectionJTSEnvelope, features,
-					it, inputImageThresholdValue, pixelDimension, size, fading);
+					it, inputImageThresholdValue, pixelDimension, size, fading,
+					overviewPolicy);
 		} catch (TransformException e) {
 			throw new DataSourceException(e);
 		}
@@ -728,6 +745,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param dim
 	 * @param numImages
 	 * @param blend
+	 * @param overviewPolicy 
 	 * @return
 	 * @throws DataSourceException
 	 * @throws TransformException
@@ -738,7 +756,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Color outputTransparentColor, final Envelope requestedJTSEnvelope,
 			final List<SimpleFeature> features,
 			final Iterator<SimpleFeature> it, double inputImageThresholdValue,
-			Rectangle dim, int numImages, boolean blend)
+			Rectangle dim, int numImages, boolean blend, String overviewPolicy)
 			throws DataSourceException, TransformException {
 
 		try {
@@ -761,8 +779,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			final ImageReadParam readP = new ImageReadParam();
 			final Integer imageChoice;
 			if (dim != null)
-				imageChoice = setReadParams(readP, requestedOriginalEnvelope,
-						dim);
+				imageChoice = setReadParams(overviewPolicy, readP,
+						requestedOriginalEnvelope, dim);
 			else
 				imageChoice = new Integer(0);
 			if (LOGGER.isLoggable(Level.FINE))

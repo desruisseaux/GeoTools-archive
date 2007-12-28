@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageReadParam;
 import javax.media.jai.RenderedOp;
 
+import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -40,6 +41,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.test.TestData;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -53,8 +55,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class WorldImageReaderTest extends WorldImageBaseTestCase {
-
-	private WorldImageReader wiReader;
 
 	private Logger logger = org.geotools.util.logging.Logging.getLogger(WorldImageReaderTest.class
 			.toString());
@@ -125,76 +125,179 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 	
 	public void testOverviewsNearest() throws IOException {
         final File file = TestData.file(this, "etopo.tif");
-        wiReader = new WorldImageReader(file);
+        
+        ///////////////////////////////////////////////////////////////////////
+        //
+        // HINTS
+        //
+        ///////////////////////////////////////////////////////////////////////
+        Hints hints = new Hints();
+        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+        WorldImageReader wiReader = new WorldImageReader(file, hints);
+
         // more than native resolution (250 pixel representation for 125 pixels image)
-        assertEquals(0, getChosenOverview(250));
+        assertEquals(0, getChosenOverview(250,wiReader));
         // native resolution (125 pixel representation for 125 pixels image)
-        assertEquals(0, getChosenOverview(125));
+        assertEquals(0, getChosenOverview(125,wiReader));
         // half of native, the overview is in position 3 (out of order, remember?)
-        assertEquals(3, getChosenOverview(73));
+        assertEquals(3, getChosenOverview(73,wiReader));
         // quarter of native, the overview is in position 2
-        assertEquals(2, getChosenOverview(31));
+        assertEquals(2, getChosenOverview(31,wiReader));
         // 1/8 of native, the overview is in position 4
-        assertEquals(4, getChosenOverview(16));
+        assertEquals(4, getChosenOverview(16,wiReader));
         // 1/16 of native, the overview is in position 1
-        assertEquals(1, getChosenOverview(9));
+        assertEquals(1, getChosenOverview(9,wiReader));
         // 1/32 of native, no overview, still 1
-        assertEquals(1, getChosenOverview(4));
+        assertEquals(1, getChosenOverview(4,wiReader));
         
         // 13 is nearer to 16 and to 9
-        assertEquals(4, getChosenOverview(13));
+        assertEquals(4, getChosenOverview(13,wiReader));
         // 11 is nearer to 9 than to 16
-        assertEquals(4, getChosenOverview(13));
+        assertEquals(4, getChosenOverview(13,wiReader));
+        wiReader.dispose();
+        
+        
+        ///////////////////////////////////////////////////////////////////////
+        //
+        // PARAMETER
+        //
+        ///////////////////////////////////////////////////////////////////////
+        wiReader = new WorldImageReader(file);
+		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
+				.getFormat()).OVERVIEW_POLICY.createValue();	
+		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+
+        // more than native resolution (250 pixel representation for 125 pixels image)
+        assertEquals(0, getChosenOverview(250,wiReader,policy));
+        // native resolution (125 pixel representation for 125 pixels image)
+        assertEquals(0, getChosenOverview(125,wiReader,policy));
+        // half of native, the overview is in position 3 (out of order, remember?)
+        assertEquals(3, getChosenOverview(73,wiReader,policy));
+        // quarter of native, the overview is in position 2
+        assertEquals(2, getChosenOverview(31,wiReader,policy));
+        // 1/8 of native, the overview is in position 4
+        assertEquals(4, getChosenOverview(16,wiReader,policy));
+        // 1/16 of native, the overview is in position 1
+        assertEquals(1, getChosenOverview(9,wiReader,policy));
+        // 1/32 of native, no overview, still 1
+        assertEquals(1, getChosenOverview(4,wiReader,policy));
+        
+        // 13 is nearer to 16 and to 9
+        assertEquals(4, getChosenOverview(13,wiReader));
+        // 11 is nearer to 9 than to 16
+        assertEquals(4, getChosenOverview(13,wiReader));
+        wiReader.dispose();
     }
 	
 	public void testOverviewsQuality() throws IOException {
         final File file = TestData.file(this, "etopo.tif");
-        Hints hints = new Hints();
-        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_QUALITY);
-        wiReader = new WorldImageReader(file, hints);
+        
+        ///////////////////////////////////////////////////////////////////////
+        //
+        // HINTS
+        //
+        ///////////////////////////////////////////////////////////////////////
+        WorldImageReader wiReader = new WorldImageReader(file);
+        
         // between 16 and 9, any value should report the match of 16
-        assertEquals(4, getChosenOverview(16));
-        assertEquals(4, getChosenOverview(15));
-        assertEquals(4, getChosenOverview(14));
-        assertEquals(4, getChosenOverview(13));
-        assertEquals(4, getChosenOverview(12));
-        assertEquals(4, getChosenOverview(11));
-        assertEquals(4, getChosenOverview(10));
+        assertEquals(4, getChosenOverview(16,wiReader));
+        assertEquals(4, getChosenOverview(15,wiReader));
+        assertEquals(4, getChosenOverview(14,wiReader));
+        assertEquals(4, getChosenOverview(13,wiReader));
+        assertEquals(4, getChosenOverview(12,wiReader));
+        assertEquals(4, getChosenOverview(11,wiReader));
+        assertEquals(4, getChosenOverview(10,wiReader));
+        
+        ///////////////////////////////////////////////////////////////////////
+        //
+        // PARAMETER
+        //
+        ///////////////////////////////////////////////////////////////////////
+        //parameter ovverrides hints
+        Hints hints = new Hints();
+        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+        wiReader = new WorldImageReader(file, hints);
+		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
+				.getFormat()).OVERVIEW_POLICY.createValue();	
+		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_QUALITY);
+		
+        // between 16 and 9, any value should report the match of 16
+        assertEquals(4, getChosenOverview(16,wiReader,policy));
+        assertEquals(4, getChosenOverview(15,wiReader,policy));
+        assertEquals(4, getChosenOverview(14,wiReader,policy));
+        assertEquals(4, getChosenOverview(13,wiReader,policy));
+        assertEquals(4, getChosenOverview(12,wiReader,policy));
+        assertEquals(4, getChosenOverview(11,wiReader,policy));
+        assertEquals(4, getChosenOverview(10,wiReader,policy));
     }
 	
 	public void testOverviewsSpeed() throws IOException {
         final File file = TestData.file(this, "etopo.tif");
+        
+        ///////////////////////////////////////////////////////////////////////
+        //
+        // HINTS
+        //
+        ///////////////////////////////////////////////////////////////////////
         Hints hints = new Hints();
         hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_SPEED);
-        wiReader = new WorldImageReader(file, hints);
+        WorldImageReader wiReader = new WorldImageReader(file, hints);
         // between 16 and 9, any value should report the match of 16
-        assertEquals(1, getChosenOverview(15));
-        assertEquals(1, getChosenOverview(14));
-        assertEquals(1, getChosenOverview(13));
-        assertEquals(1, getChosenOverview(12));
-        assertEquals(1, getChosenOverview(11));
-        assertEquals(1, getChosenOverview(10));
-    }
-
-    private int getChosenOverview(final int size) throws IOException {
-        // get the coverage and then the rendered image
-        final Parameter readGG = new Parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D);
+        assertEquals(1, getChosenOverview(15,wiReader));
+        assertEquals(1, getChosenOverview(14,wiReader));
+        assertEquals(1, getChosenOverview(13,wiReader));
+        assertEquals(1, getChosenOverview(12,wiReader));
+        assertEquals(1, getChosenOverview(11,wiReader));
+        assertEquals(1, getChosenOverview(10,wiReader));
         
-        readGG.setValue(new GridGeometry2D(new GeneralGridRange(new java.awt.Rectangle(size,
-                (int) (164.0 / 125.0 * size))), new ReferencedEnvelope(118.8, 134.56, 47.819, 63.142,
-                DefaultGeographicCRS.WGS84)));
-        final GridCoverage2D coverage = (GridCoverage2D) wiReader
-                .read(new GeneralParameterValue[] { readGG });
-        assertNotNull(coverage);
-        assertNotNull((coverage).getRenderedImage());
-
-        RenderedOp op = (RenderedOp) coverage.getRenderedImage();
-        while (!op.getOperationName().equals("ImageRead"))
-            op = (RenderedOp) op.getSources().get(0);
-
-        Integer choice = (Integer) op.getParameterBlock().getObjectParameter(1);
-        return choice.intValue();
+        
+        ///////////////////////////////////////////////////////////////////////
+        //
+        // PARAMETER
+        //
+        ///////////////////////////////////////////////////////////////////////
+        //parameter ovverrides hints
+        hints.put(Hints.OVERVIEW_POLICY, Hints.VALUE_OVERVIEW_POLICY_NEAREST);
+        wiReader = new WorldImageReader(file, hints);
+		final ParameterValue policy = (ParameterValue) ((AbstractGridFormat) wiReader
+				.getFormat()).OVERVIEW_POLICY.createValue();	
+		policy.setValue(Hints.VALUE_OVERVIEW_POLICY_SPEED);
+        // between 16 and 9, any value should report the match of 16
+        assertEquals(1, getChosenOverview(15,wiReader,policy));
+        assertEquals(1, getChosenOverview(14,wiReader,policy));
+        assertEquals(1, getChosenOverview(13,wiReader,policy));
+        assertEquals(1, getChosenOverview(12,wiReader,policy));
+        assertEquals(1, getChosenOverview(11,wiReader,policy));
+        assertEquals(1, getChosenOverview(10,wiReader,policy));
     }
+
+    private int getChosenOverview(final int size, WorldImageReader wiReader)
+			throws IOException {
+		return getChosenOverview(size, wiReader, null);
+	}
+    private int getChosenOverview(final int size, WorldImageReader wiReader,
+			ParameterValue policy) throws IOException {
+		// get the coverage and then the rendered image
+		final Parameter readGG = new Parameter(
+				AbstractGridFormat.READ_GRIDGEOMETRY2D);
+
+		readGG.setValue(new GridGeometry2D(new GeneralGridRange(
+				new java.awt.Rectangle(size, (int) (164.0 / 125.0 * size))),
+				new ReferencedEnvelope(118.8, 134.56, 47.819, 63.142,
+						DefaultGeographicCRS.WGS84)));
+		final GridCoverage2D coverage = (GridCoverage2D) wiReader
+				.read(policy != null ? new GeneralParameterValue[] { readGG,
+						policy } : new GeneralParameterValue[] { readGG });
+		assertNotNull(coverage);
+		assertNotNull((coverage).getRenderedImage());
+
+		RenderedOp op = (RenderedOp) coverage.getRenderedImage();
+		while (!op.getOperationName().equals("ImageRead"))
+			op = (RenderedOp) op.getSources().get(0);
+
+		Integer choice = (Integer) op.getParameterBlock().getObjectParameter(1);
+		return choice.intValue();
+	}
 
 	/**
 	 * Read, test and show a coverage from the supplied source.
@@ -218,11 +321,10 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		logger.info(((File)source).getAbsolutePath());
 		
 		// get a reader
-		wiReader = new WorldImageReader(source);
+		final WorldImageReader wiReader = new WorldImageReader(source);
 
-
-		 // get the coverage
-		 final GridCoverage2D coverage = (GridCoverage2D) wiReader.read(null);
+		// get the coverage
+		final GridCoverage2D coverage = (GridCoverage2D) wiReader.read(null);
 
 		// test the coverage
 		assertNotNull(coverage);
@@ -242,6 +344,14 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 	}
 
 	public static void main(String[] args) {
-		TestRunner.run(WorldImageReaderTest.class);
+		TestRunner.run(WorldImageReaderTest.suite());
+	}
+	public final static TestSuite suite(){
+		final TestSuite suite= new TestSuite();
+		suite.addTest(new WorldImageReaderTest("testOverviewsNearest"));
+		suite.addTest(new WorldImageReaderTest("testOverviewsQuality"));
+		suite.addTest(new WorldImageReaderTest("testOverviewsSpeed"));
+		suite.addTest(new WorldImageReaderTest("testRead"));
+		return suite;
 	}
 }
