@@ -14,7 +14,7 @@
   <groupId>org.geotools.maven</groupId>
   <artifactId>gt2-xmlcodegen</artifactId>
   <packaging>maven-plugin</packaging>
-  <name></name>
+  <name>XML Code Generator</name>
   <url>http://maven.geotools.fr/reports/build/maven/xmlcodegen/</url>
   
   <scm>
