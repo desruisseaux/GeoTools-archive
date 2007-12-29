@@ -29,6 +29,7 @@ import java.lang.reflect.Modifier;
 import javax.naming.Name;
 import javax.sql.DataSource;
 
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.util.InternationalString;
 import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
@@ -777,6 +778,14 @@ public final class Hints extends RenderingHints {
      */
     public static final Hints.Key ASSOCIATION_TRAVERSAL_DEPTH = new Key( Integer.class );
 
+    /**
+     * The name of a property to traverse in a datastore query.
+     * <p>
+     * This maps directly to a xlinkPropertyName in a wfs query.
+     * </p>
+     */
+    public static final Hints.Key ASSOCIATION_PROPERTY = new Key( PropertyName.class ); 
+        
     /**
      * Constructs an initially empty set of hints.
      *
